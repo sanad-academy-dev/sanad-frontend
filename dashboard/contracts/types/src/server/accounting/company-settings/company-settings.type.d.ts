@@ -1,0 +1,65 @@
+import { z } from "zod";
+import type { Prisma } from "@/generated/prisma/client";
+export declare const companyAccountingSettingsSelect: {
+    readonly id: true;
+    readonly clinicId: true;
+    readonly defaultCurrencyCode: true;
+    readonly defaultReceivableAccountId: true;
+    readonly defaultPayableAccountId: true;
+    readonly defaultIncomeAccountId: true;
+    readonly defaultExpenseAccountId: true;
+    readonly defaultCashAccountId: true;
+    readonly defaultBankAccountId: true;
+    readonly roundOffAccountId: true;
+    readonly roundOffForOpeningAccountId: true;
+    readonly writeOffAccountId: true;
+    readonly exchangeGainLossAccountId: true;
+    readonly unrealizedExchangeGainLossAccountId: true;
+    readonly unrealizedProfitLossAccountId: true;
+    readonly defaultDiscountAccountId: true;
+    readonly defaultDeferredRevenueAccountId: true;
+    readonly defaultDeferredExpenseAccountId: true;
+    readonly defaultAdvanceReceivedAccountId: true;
+    readonly defaultAdvancePaidAccountId: true;
+    readonly roundOffCostCenterId: true;
+    readonly defaultCostCenterId: true;
+    readonly defaultFinanceBookId: true;
+    readonly defaultPaymentTermsTemplateId: true;
+    readonly creditLimit: true;
+    readonly bypassCreditLimitCheck: true;
+    readonly createdAt: true;
+    readonly updatedAt: true;
+};
+export type CompanyAccountingSettingsResponse = Prisma.ClinicAccountingSettingsGetPayload<{
+    select: typeof companyAccountingSettingsSelect;
+}>;
+/** Fields a user may edit (everything except identity/audit columns). Derived from
+ * Prisma's create input so decimal money accepts a precision-safe string (contract C2). */
+export type UpdateCompanyAccountingSettingsInput = Partial<Pick<Prisma.ClinicAccountingSettingsUncheckedCreateInput, "defaultCurrencyCode" | "defaultReceivableAccountId" | "defaultPayableAccountId" | "defaultIncomeAccountId" | "defaultExpenseAccountId" | "defaultCashAccountId" | "defaultBankAccountId" | "roundOffAccountId" | "roundOffForOpeningAccountId" | "writeOffAccountId" | "exchangeGainLossAccountId" | "unrealizedExchangeGainLossAccountId" | "unrealizedProfitLossAccountId" | "defaultDiscountAccountId" | "defaultDeferredRevenueAccountId" | "defaultDeferredExpenseAccountId" | "defaultAdvanceReceivedAccountId" | "defaultAdvancePaidAccountId" | "roundOffCostCenterId" | "defaultCostCenterId" | "defaultFinanceBookId" | "defaultPaymentTermsTemplateId" | "creditLimit" | "bypassCreditLimitCheck">>;
+export declare const updateCompanyAccountingSettingsSchema: z.ZodObject<{
+    defaultCurrencyCode: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    defaultReceivableAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    defaultPayableAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    defaultIncomeAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    defaultExpenseAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    defaultCashAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    defaultBankAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    roundOffAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    roundOffForOpeningAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    writeOffAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    exchangeGainLossAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    unrealizedExchangeGainLossAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    unrealizedProfitLossAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    defaultDiscountAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    defaultDeferredRevenueAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    defaultDeferredExpenseAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    defaultAdvanceReceivedAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    defaultAdvancePaidAccountId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    roundOffCostCenterId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    defaultCostCenterId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    defaultFinanceBookId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    defaultPaymentTermsTemplateId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    creditLimit: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    bypassCreditLimitCheck: z.ZodOptional<z.ZodBoolean>;
+}, z.core.$strip>;
+export type UpdateCompanyAccountingSettingsFormInput = z.infer<typeof updateCompanyAccountingSettingsSchema>;

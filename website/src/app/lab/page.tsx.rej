@@ -1,0 +1,10 @@
+diff a/website/src/app/lab/page.tsx b/website/src/app/lab/page.tsx	(rejected hunks)
+@@ -403,7 +403,7 @@ export function ParticleText({
+     <div
+       ref={wrapRef}
+       className={cn(
+-        "relative h-[240px] w-[min(520px,100%)] overflow-hidden rounded-2xl bg-surface font-sans shadow-raised",
++        "relative h-[240px] w-[min(520px,100%)] overflow-hidden  bg-surface font-sans shadow-raised",
+         className,
+       )}
+     >

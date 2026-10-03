@@ -1,0 +1,76 @@
+name: Migration Check
+
+# Validates Prisma migrations by applying them to a fresh Postgres in CI.
+# Layered with the runtime guard in the Dockerfile (CMD aborts container if
+# migrate deploy fails, so prod keeps serving the previous image).
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "prisma/schema.prisma"
+      - "prisma/migrations/**"
+      - "prisma.config.ts"
+      - ".github/workflows/migrate-check.yml"
+  # Note: push-to-main migrate-check is now part of deploy.yml (gates the deploy).
+  # This workflow only runs on PRs, so broken migrations show red before merge.
+
+concurrency:
+  group: migrate-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  migrate:
+    name: Validate migrations against empty Postgres
+    # Runner is a repo VARIABLE, not a literal (2026-08-21). The default is still the
+    # hosted ubuntu runner, so nothing changes for anyone with working Actions billing.
+    # Setting the repo variable CI_RUNNER=self-hosted moves every job onto a local runner
+    # — which is what un-blocked this repo when the billing gate refused to START any job
+    # for two days (50 consecutive runs, zero steps executed in each). Deleting the
+    # variable moves everything straight back. Neither direction needs a file edit.
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Replaces the old `services: postgres` block, which only runs on a hosted Linux
+      # runner — that restriction is precisely what tied this workflow to billed minutes.
+      # It exports DATABASE_URL for every step below and publishes on 127.0.0.1:55432,
+      # NOT 5432, which on a self-hosted runner is the developer's own dev database.
+      - name: Start throwaway Postgres
+        uses: ./.github/actions/ephemeral-postgres
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Cache Bun install cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      - name: Install dependencies (triggers prisma generate via postinstall)
+        run: bun install --frozen-lockfile
+
+      - name: Validate Prisma schema
+        run: bun --bun run prisma validate
+
+      # (The readiness wait that used to sit here moved into the action, which probes with
+      # `docker exec` — the host's pg_isready is guaranteed on ubuntu-latest but not on a
+      # macOS runner.)
+      - name: Apply migrations to empty database
+        run: bun --bun run prisma migrate deploy
+
+      - name: Verify schema matches migrations (no drift)
+        run: bun --bun run prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
+
+      # A hosted runner is thrown away after the job; a self-hosted one is not. Without
+      # this the container outlives the run and holds the port for the next one.
+      - name: Stop throwaway Postgres
+        if: always()
+        run: docker rm -f elite-vet-ci-postgres >/dev/null 2>&1 || true

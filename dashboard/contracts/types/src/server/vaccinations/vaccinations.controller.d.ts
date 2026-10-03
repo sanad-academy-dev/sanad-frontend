@@ -1,0 +1,1698 @@
+import Elysia from "elysia";
+export declare const vaccinationsController: Elysia<"/vaccinations", {
+    decorator: {};
+    store: {};
+    derive: {};
+    resolve: {};
+}, {
+    typebox: {};
+    error: {};
+} & {
+    typebox: {
+        readonly "vaccinations.vaccine.create": import("@sinclair/typebox").TObject<{
+            name: import("@sinclair/typebox").TString;
+            nameEn: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            kind: import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"MODIFIED_LIVE">, import("@sinclair/typebox").TLiteral<"KILLED">, import("@sinclair/typebox").TLiteral<"RECOMBINANT">, import("@sinclair/typebox").TLiteral<"TOXOID">, import("@sinclair/typebox").TLiteral<"SUBUNIT">, import("@sinclair/typebox").TLiteral<"OTHER">]>;
+            manufacturerName: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            catalogProductId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            inventoryItemId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            antigenCodes: import("@sinclair/typebox").TArray<import("@sinclair/typebox").TString>;
+            species: import("@sinclair/typebox").TArray<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"DOG">, import("@sinclair/typebox").TLiteral<"CAT">, import("@sinclair/typebox").TLiteral<"HORSE">, import("@sinclair/typebox").TLiteral<"CATTLE">, import("@sinclair/typebox").TLiteral<"SHEEP">, import("@sinclair/typebox").TLiteral<"GOAT">, import("@sinclair/typebox").TLiteral<"CAMEL">, import("@sinclair/typebox").TLiteral<"POULTRY">, import("@sinclair/typebox").TLiteral<"RABBIT">, import("@sinclair/typebox").TLiteral<"SWINE">, import("@sinclair/typebox").TLiteral<"FISH">, import("@sinclair/typebox").TLiteral<"BEE">]>>;
+            primarySeriesDoses: import("@sinclair/typebox").TInteger;
+            primarySeriesIntervalDays: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TInteger]>>;
+            boosterIntervalDays: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TInteger]>>;
+            immunityOnsetDays: import("@sinclair/typebox").TInteger;
+            defaultRoute: import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"SUBCUTANEOUS">, import("@sinclair/typebox").TLiteral<"INTRAMUSCULAR">, import("@sinclair/typebox").TLiteral<"INTRANASAL">, import("@sinclair/typebox").TLiteral<"ORAL">, import("@sinclair/typebox").TLiteral<"INTRADERMAL">, import("@sinclair/typebox").TLiteral<"TOPICAL">, import("@sinclair/typebox").TLiteral<"OTHER">]>;
+            defaultSite: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"LEFT_SHOULDER">, import("@sinclair/typebox").TLiteral<"RIGHT_SHOULDER">, import("@sinclair/typebox").TLiteral<"LEFT_HIND_LIMB">, import("@sinclair/typebox").TLiteral<"RIGHT_HIND_LIMB">, import("@sinclair/typebox").TLiteral<"INTERSCAPULAR">, import("@sinclair/typebox").TLiteral<"LEFT_FLANK">, import("@sinclair/typebox").TLiteral<"RIGHT_FLANK">, import("@sinclair/typebox").TLiteral<"NASAL">, import("@sinclair/typebox").TLiteral<"ORAL">, import("@sinclair/typebox").TLiteral<"OTHER">]>]>>;
+            defaultDoseVolumeMl: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TNumber]>>;
+            notes: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            active: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TBoolean>;
+        }>;
+        readonly "vaccinations.vaccine.update": import("@sinclair/typebox").TObject<{
+            name: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TString>;
+            nameEn: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            kind: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"MODIFIED_LIVE">, import("@sinclair/typebox").TLiteral<"KILLED">, import("@sinclair/typebox").TLiteral<"RECOMBINANT">, import("@sinclair/typebox").TLiteral<"TOXOID">, import("@sinclair/typebox").TLiteral<"SUBUNIT">, import("@sinclair/typebox").TLiteral<"OTHER">]>>;
+            manufacturerName: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            catalogProductId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            inventoryItemId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            antigenCodes: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TArray<import("@sinclair/typebox").TString>>;
+            species: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TArray<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"DOG">, import("@sinclair/typebox").TLiteral<"CAT">, import("@sinclair/typebox").TLiteral<"HORSE">, import("@sinclair/typebox").TLiteral<"CATTLE">, import("@sinclair/typebox").TLiteral<"SHEEP">, import("@sinclair/typebox").TLiteral<"GOAT">, import("@sinclair/typebox").TLiteral<"CAMEL">, import("@sinclair/typebox").TLiteral<"POULTRY">, import("@sinclair/typebox").TLiteral<"RABBIT">, import("@sinclair/typebox").TLiteral<"SWINE">, import("@sinclair/typebox").TLiteral<"FISH">, import("@sinclair/typebox").TLiteral<"BEE">]>>>;
+            primarySeriesDoses: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TInteger>;
+            primarySeriesIntervalDays: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TInteger]>>;
+            boosterIntervalDays: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TInteger]>>;
+            immunityOnsetDays: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TInteger>;
+            defaultRoute: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"SUBCUTANEOUS">, import("@sinclair/typebox").TLiteral<"INTRAMUSCULAR">, import("@sinclair/typebox").TLiteral<"INTRANASAL">, import("@sinclair/typebox").TLiteral<"ORAL">, import("@sinclair/typebox").TLiteral<"INTRADERMAL">, import("@sinclair/typebox").TLiteral<"TOPICAL">, import("@sinclair/typebox").TLiteral<"OTHER">]>>;
+            defaultSite: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"LEFT_SHOULDER">, import("@sinclair/typebox").TLiteral<"RIGHT_SHOULDER">, import("@sinclair/typebox").TLiteral<"LEFT_HIND_LIMB">, import("@sinclair/typebox").TLiteral<"RIGHT_HIND_LIMB">, import("@sinclair/typebox").TLiteral<"INTERSCAPULAR">, import("@sinclair/typebox").TLiteral<"LEFT_FLANK">, import("@sinclair/typebox").TLiteral<"RIGHT_FLANK">, import("@sinclair/typebox").TLiteral<"NASAL">, import("@sinclair/typebox").TLiteral<"ORAL">, import("@sinclair/typebox").TLiteral<"OTHER">]>]>>;
+            defaultDoseVolumeMl: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TNumber]>>;
+            notes: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            active: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TBoolean>;
+        }>;
+        readonly "vaccinations.protocol.create": import("@sinclair/typebox").TObject<{
+            name: import("@sinclair/typebox").TString;
+            nameEn: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            species: import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"DOG">, import("@sinclair/typebox").TLiteral<"CAT">, import("@sinclair/typebox").TLiteral<"HORSE">, import("@sinclair/typebox").TLiteral<"CATTLE">, import("@sinclair/typebox").TLiteral<"SHEEP">, import("@sinclair/typebox").TLiteral<"GOAT">, import("@sinclair/typebox").TLiteral<"CAMEL">, import("@sinclair/typebox").TLiteral<"POULTRY">, import("@sinclair/typebox").TLiteral<"RABBIT">, import("@sinclair/typebox").TLiteral<"SWINE">, import("@sinclair/typebox").TLiteral<"FISH">, import("@sinclair/typebox").TLiteral<"BEE">]>;
+            animalTypeId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            animalStrainId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            isCore: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TBoolean>;
+            active: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TBoolean>;
+            notes: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            doses: import("@sinclair/typebox").TArray<import("@sinclair/typebox").TObject<{
+                antigenCode: import("@sinclair/typebox").TString;
+                label: import("@sinclair/typebox").TString;
+                kind: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"PRIMARY">, import("@sinclair/typebox").TLiteral<"BOOSTER">, import("@sinclair/typebox").TLiteral<"ANNUAL">, import("@sinclair/typebox").TLiteral<"CATCH_UP">]>>;
+                ageWeeksMin: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TInteger]>>;
+                ageWeeksMax: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TInteger]>>;
+                intervalDaysFromPrev: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TInteger]>>;
+                boosterIntervalDays: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TInteger]>>;
+                notes: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            }>>;
+        }>;
+        readonly "vaccinations.protocol.update": import("@sinclair/typebox").TObject<{
+            name: import("@sinclair/typebox").TString;
+            nameEn: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            species: import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"DOG">, import("@sinclair/typebox").TLiteral<"CAT">, import("@sinclair/typebox").TLiteral<"HORSE">, import("@sinclair/typebox").TLiteral<"CATTLE">, import("@sinclair/typebox").TLiteral<"SHEEP">, import("@sinclair/typebox").TLiteral<"GOAT">, import("@sinclair/typebox").TLiteral<"CAMEL">, import("@sinclair/typebox").TLiteral<"POULTRY">, import("@sinclair/typebox").TLiteral<"RABBIT">, import("@sinclair/typebox").TLiteral<"SWINE">, import("@sinclair/typebox").TLiteral<"FISH">, import("@sinclair/typebox").TLiteral<"BEE">]>;
+            animalTypeId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            animalStrainId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            isCore: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TBoolean>;
+            active: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TBoolean>;
+            notes: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            doses: import("@sinclair/typebox").TArray<import("@sinclair/typebox").TObject<{
+                antigenCode: import("@sinclair/typebox").TString;
+                label: import("@sinclair/typebox").TString;
+                kind: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"PRIMARY">, import("@sinclair/typebox").TLiteral<"BOOSTER">, import("@sinclair/typebox").TLiteral<"ANNUAL">, import("@sinclair/typebox").TLiteral<"CATCH_UP">]>>;
+                ageWeeksMin: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TInteger]>>;
+                ageWeeksMax: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TInteger]>>;
+                intervalDaysFromPrev: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TInteger]>>;
+                boosterIntervalDays: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TInteger]>>;
+                notes: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            }>>;
+        }>;
+        readonly "vaccinations.administer": import("@sinclair/typebox").TObject<{
+            patientId: import("@sinclair/typebox").TString;
+            vaccineId: import("@sinclair/typebox").TString;
+            appointmentId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            branchId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            administeredById: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            administeredAt: import("@sinclair/typebox").TString;
+            doseNumber: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TInteger>;
+            doseKind: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"PRIMARY">, import("@sinclair/typebox").TLiteral<"BOOSTER">, import("@sinclair/typebox").TLiteral<"ANNUAL">, import("@sinclair/typebox").TLiteral<"CATCH_UP">]>>;
+            route: import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"SUBCUTANEOUS">, import("@sinclair/typebox").TLiteral<"INTRAMUSCULAR">, import("@sinclair/typebox").TLiteral<"INTRANASAL">, import("@sinclair/typebox").TLiteral<"ORAL">, import("@sinclair/typebox").TLiteral<"INTRADERMAL">, import("@sinclair/typebox").TLiteral<"TOPICAL">, import("@sinclair/typebox").TLiteral<"OTHER">]>;
+            site: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"LEFT_SHOULDER">, import("@sinclair/typebox").TLiteral<"RIGHT_SHOULDER">, import("@sinclair/typebox").TLiteral<"LEFT_HIND_LIMB">, import("@sinclair/typebox").TLiteral<"RIGHT_HIND_LIMB">, import("@sinclair/typebox").TLiteral<"INTERSCAPULAR">, import("@sinclair/typebox").TLiteral<"LEFT_FLANK">, import("@sinclair/typebox").TLiteral<"RIGHT_FLANK">, import("@sinclair/typebox").TLiteral<"NASAL">, import("@sinclair/typebox").TLiteral<"ORAL">, import("@sinclair/typebox").TLiteral<"OTHER">]>]>>;
+            doseVolumeMl: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TNumber]>>;
+            batchId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            allowExpiredBatch: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TBoolean>;
+            expiredBatchReason: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            adverseReaction: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"NONE">, import("@sinclair/typebox").TLiteral<"MILD">, import("@sinclair/typebox").TLiteral<"MODERATE">, import("@sinclair/typebox").TLiteral<"SEVERE">, import("@sinclair/typebox").TLiteral<"ANAPHYLACTIC">]>>;
+            adverseReactionNotes: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            protocolDoseId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            carePlanEnrollmentVisitId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+            notes: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
+        }>;
+        readonly "vaccinations.void": import("@sinclair/typebox").TObject<{
+            voidReason: import("@sinclair/typebox").TString;
+            restoreStock: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TBoolean>;
+        }>;
+        readonly "vaccinations.list.query": import("@sinclair/typebox").TObject<{
+            q: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TString>;
+            species: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"DOG">, import("@sinclair/typebox").TLiteral<"CAT">, import("@sinclair/typebox").TLiteral<"HORSE">, import("@sinclair/typebox").TLiteral<"CATTLE">, import("@sinclair/typebox").TLiteral<"SHEEP">, import("@sinclair/typebox").TLiteral<"GOAT">, import("@sinclair/typebox").TLiteral<"CAMEL">, import("@sinclair/typebox").TLiteral<"POULTRY">, import("@sinclair/typebox").TLiteral<"RABBIT">, import("@sinclair/typebox").TLiteral<"SWINE">, import("@sinclair/typebox").TLiteral<"FISH">, import("@sinclair/typebox").TLiteral<"BEE">]>>;
+            activeOnly: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TBoolean>;
+        }>;
+        readonly "vaccinations.records.query": import("@sinclair/typebox").TObject<{
+            patientId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TString>;
+            vaccineId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TString>;
+            branchId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TString>;
+            from: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TString>;
+            to: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TString>;
+            includeVoided: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TBoolean>;
+            skip: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TNumber>;
+            take: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TNumber>;
+        }>;
+        readonly "vaccinations.due.query": import("@sinclair/typebox").TObject<{
+            branchId: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TString>;
+            species: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"DOG">, import("@sinclair/typebox").TLiteral<"CAT">, import("@sinclair/typebox").TLiteral<"HORSE">, import("@sinclair/typebox").TLiteral<"CATTLE">, import("@sinclair/typebox").TLiteral<"SHEEP">, import("@sinclair/typebox").TLiteral<"GOAT">, import("@sinclair/typebox").TLiteral<"CAMEL">, import("@sinclair/typebox").TLiteral<"POULTRY">, import("@sinclair/typebox").TLiteral<"RABBIT">, import("@sinclair/typebox").TLiteral<"SWINE">, import("@sinclair/typebox").TLiteral<"FISH">, import("@sinclair/typebox").TLiteral<"BEE">]>>;
+            horizonDays: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TNumber>;
+        }>;
+    };
+    error: {};
+}, {
+    schema: {};
+    standaloneSchema: {};
+    macro: Partial<{
+        readonly requireClinic: boolean;
+    }>;
+    macroFn: {
+        readonly requireClinic: {
+            readonly resolve: ({ request }: {
+                body: unknown;
+                query: Record<string, string>;
+                params: {};
+                headers: Record<string, string | undefined>;
+                cookie: Record<string, import("elysia").Cookie<unknown>>;
+                server: import("elysia/universal/server").Server | null;
+                redirect: import("elysia").redirect;
+                set: {
+                    headers: import("elysia").HTTPHeaders;
+                    status?: number | keyof import("elysia").StatusMap;
+                    redirect?: string;
+                    cookie?: Record<string, import("elysia/cookies").ElysiaCookie>;
+                };
+                path: string;
+                route: string;
+                request: Request;
+                store: {};
+                status: <const Code extends number | keyof import("elysia").StatusMap, const T = Code extends 200 | 100 | 101 | 102 | 103 | 201 | 202 | 203 | 204 | 205 | 206 | 207 | 208 | 300 | 301 | 302 | 303 | 304 | 307 | 308 | 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 420 | 421 | 422 | 423 | 424 | 425 | 426 | 428 | 429 | 431 | 451 | 500 | 501 | 502 | 503 | 504 | 505 | 506 | 507 | 508 | 510 | 511 ? {
+                    readonly 100: "Continue";
+                    readonly 101: "Switching Protocols";
+                    readonly 102: "Processing";
+                    readonly 103: "Early Hints";
+                    readonly 200: "OK";
+                    readonly 201: "Created";
+                    readonly 202: "Accepted";
+                    readonly 203: "Non-Authoritative Information";
+                    readonly 204: "No Content";
+                    readonly 205: "Reset Content";
+                    readonly 206: "Partial Content";
+                    readonly 207: "Multi-Status";
+                    readonly 208: "Already Reported";
+                    readonly 300: "Multiple Choices";
+                    readonly 301: "Moved Permanently";
+                    readonly 302: "Found";
+                    readonly 303: "See Other";
+                    readonly 304: "Not Modified";
+                    readonly 307: "Temporary Redirect";
+                    readonly 308: "Permanent Redirect";
+                    readonly 400: "Bad Request";
+                    readonly 401: "Unauthorized";
+                    readonly 402: "Payment Required";
+                    readonly 403: "Forbidden";
+                    readonly 404: "Not Found";
+                    readonly 405: "Method Not Allowed";
+                    readonly 406: "Not Acceptable";
+                    readonly 407: "Proxy Authentication Required";
+                    readonly 408: "Request Timeout";
+                    readonly 409: "Conflict";
+                    readonly 410: "Gone";
+                    readonly 411: "Length Required";
+                    readonly 412: "Precondition Failed";
+                    readonly 413: "Payload Too Large";
+                    readonly 414: "URI Too Long";
+                    readonly 415: "Unsupported Media Type";
+                    readonly 416: "Range Not Satisfiable";
+                    readonly 417: "Expectation Failed";
+                    readonly 418: "I'm a teapot";
+                    readonly 420: "Enhance Your Calm";
+                    readonly 421: "Misdirected Request";
+                    readonly 422: "Unprocessable Content";
+                    readonly 423: "Locked";
+                    readonly 424: "Failed Dependency";
+                    readonly 425: "Too Early";
+                    readonly 426: "Upgrade Required";
+                    readonly 428: "Precondition Required";
+                    readonly 429: "Too Many Requests";
+                    readonly 431: "Request Header Fields Too Large";
+                    readonly 451: "Unavailable For Legal Reasons";
+                    readonly 500: "Internal Server Error";
+                    readonly 501: "Not Implemented";
+                    readonly 502: "Bad Gateway";
+                    readonly 503: "Service Unavailable";
+                    readonly 504: "Gateway Timeout";
+                    readonly 505: "HTTP Version Not Supported";
+                    readonly 506: "Variant Also Negotiates";
+                    readonly 507: "Insufficient Storage";
+                    readonly 508: "Loop Detected";
+                    readonly 510: "Not Extended";
+                    readonly 511: "Network Authentication Required";
+                }[Code] : Code>(code: Code, response?: T) => import("elysia").ElysiaCustomStatusResponse<Code, T, Code extends "Continue" | "Switching Protocols" | "Processing" | "Early Hints" | "OK" | "Created" | "Accepted" | "Non-Authoritative Information" | "No Content" | "Reset Content" | "Partial Content" | "Multi-Status" | "Already Reported" | "Multiple Choices" | "Moved Permanently" | "Found" | "See Other" | "Not Modified" | "Temporary Redirect" | "Permanent Redirect" | "Bad Request" | "Unauthorized" | "Payment Required" | "Forbidden" | "Not Found" | "Method Not Allowed" | "Not Acceptable" | "Proxy Authentication Required" | "Request Timeout" | "Conflict" | "Gone" | "Length Required" | "Precondition Failed" | "Payload Too Large" | "URI Too Long" | "Unsupported Media Type" | "Range Not Satisfiable" | "Expectation Failed" | "I'm a teapot" | "Enhance Your Calm" | "Misdirected Request" | "Unprocessable Content" | "Locked" | "Failed Dependency" | "Too Early" | "Upgrade Required" | "Precondition Required" | "Too Many Requests" | "Request Header Fields Too Large" | "Unavailable For Legal Reasons" | "Internal Server Error" | "Not Implemented" | "Bad Gateway" | "Service Unavailable" | "Gateway Timeout" | "HTTP Version Not Supported" | "Variant Also Negotiates" | "Insufficient Storage" | "Loop Detected" | "Not Extended" | "Network Authentication Required" ? {
+                    readonly Continue: 100;
+                    readonly "Switching Protocols": 101;
+                    readonly Processing: 102;
+                    readonly "Early Hints": 103;
+                    readonly OK: 200;
+                    readonly Created: 201;
+                    readonly Accepted: 202;
+                    readonly "Non-Authoritative Information": 203;
+                    readonly "No Content": 204;
+                    readonly "Reset Content": 205;
+                    readonly "Partial Content": 206;
+                    readonly "Multi-Status": 207;
+                    readonly "Already Reported": 208;
+                    readonly "Multiple Choices": 300;
+                    readonly "Moved Permanently": 301;
+                    readonly Found: 302;
+                    readonly "See Other": 303;
+                    readonly "Not Modified": 304;
+                    readonly "Temporary Redirect": 307;
+                    readonly "Permanent Redirect": 308;
+                    readonly "Bad Request": 400;
+                    readonly Unauthorized: 401;
+                    readonly "Payment Required": 402;
+                    readonly Forbidden: 403;
+                    readonly "Not Found": 404;
+                    readonly "Method Not Allowed": 405;
+                    readonly "Not Acceptable": 406;
+                    readonly "Proxy Authentication Required": 407;
+                    readonly "Request Timeout": 408;
+                    readonly Conflict: 409;
+                    readonly Gone: 410;
+                    readonly "Length Required": 411;
+                    readonly "Precondition Failed": 412;
+                    readonly "Payload Too Large": 413;
+                    readonly "URI Too Long": 414;
+                    readonly "Unsupported Media Type": 415;
+                    readonly "Range Not Satisfiable": 416;
+                    readonly "Expectation Failed": 417;
+                    readonly "I'm a teapot": 418;
+                    readonly "Enhance Your Calm": 420;
+                    readonly "Misdirected Request": 421;
+                    readonly "Unprocessable Content": 422;
+                    readonly Locked: 423;
+                    readonly "Failed Dependency": 424;
+                    readonly "Too Early": 425;
+                    readonly "Upgrade Required": 426;
+                    readonly "Precondition Required": 428;
+                    readonly "Too Many Requests": 429;
+                    readonly "Request Header Fields Too Large": 431;
+                    readonly "Unavailable For Legal Reasons": 451;
+                    readonly "Internal Server Error": 500;
+                    readonly "Not Implemented": 501;
+                    readonly "Bad Gateway": 502;
+                    readonly "Service Unavailable": 503;
+                    readonly "Gateway Timeout": 504;
+                    readonly "HTTP Version Not Supported": 505;
+                    readonly "Variant Also Negotiates": 506;
+                    readonly "Insufficient Storage": 507;
+                    readonly "Loop Detected": 508;
+                    readonly "Not Extended": 510;
+                    readonly "Network Authentication Required": 511;
+                }[Code] : Code>;
+            }) => Promise<import("elysia").ElysiaCustomStatusResponse<401, {
+                readonly message: "غير مصرح";
+            }, 401> | {
+                clinicId: string;
+                userId: string;
+            }>;
+        };
+    };
+    parser: {};
+    response: {};
+}, {
+    vaccinations: {};
+} & {
+    vaccinations: {
+        stats: {
+            get: {
+                body: {};
+                params: {};
+                query: {};
+                headers: {};
+                response: {
+                    200: {
+                        overdue: number;
+                        dueSoon: number;
+                        givenThisMonth: number;
+                        activeVaccines: number;
+                        adverseReactionsThisMonth: number;
+                    };
+                    401: {
+                        readonly message: "غير مصرح";
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        antigens: {
+            get: {
+                body: {};
+                params: {};
+                query: {};
+                headers: {};
+                response: {
+                    200: {
+                        code: string;
+                        nameAr: string;
+                        order: number;
+                        nameEn: string;
+                        immunityOnsetDays: number;
+                        noteAr: string | null;
+                    }[];
+                    401: {
+                        readonly message: "غير مصرح";
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        due: {
+            get: {
+                body: {};
+                params: {};
+                query: {
+                    branchId?: string | undefined;
+                    species?: "DOG" | "CAT" | "HORSE" | "CATTLE" | "SHEEP" | "GOAT" | "CAMEL" | "POULTRY" | "RABBIT" | "SWINE" | "FISH" | "BEE" | undefined;
+                    horizonDays?: number | undefined;
+                };
+                headers: {};
+                response: {
+                    200: import("./vaccinations.type").VaccinationDueRow[];
+                    401: {
+                        readonly message: "غير مصرح";
+                    };
+                    422: {
+                        type: "validation";
+                        on: string;
+                        summary?: string;
+                        message?: string;
+                        found?: unknown;
+                        property?: string;
+                        expected?: string;
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        unschedulable: {
+            get: {
+                body: {};
+                params: {};
+                query: {};
+                headers: {};
+                response: {
+                    200: import("./vaccinations.type").UnschedulablePatientRow[];
+                    401: {
+                        readonly message: "غير مصرح";
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        vaccines: {
+            get: {
+                body: {};
+                params: {};
+                query: {
+                    species?: "DOG" | "CAT" | "HORSE" | "CATTLE" | "SHEEP" | "GOAT" | "CAMEL" | "POULTRY" | "RABBIT" | "SWINE" | "FISH" | "BEE" | undefined;
+                    q?: string | undefined;
+                    activeOnly?: boolean | undefined;
+                };
+                headers: {};
+                response: {
+                    200: {
+                        inventoryItem: {
+                            name: string;
+                            id: string;
+                            code: string;
+                            stock: number;
+                            tracksBatches: boolean;
+                        } | null;
+                        name: string;
+                        id: string;
+                        createdAt: Date;
+                        updatedAt: Date;
+                        code: string;
+                        notes: string | null;
+                        active: boolean;
+                        editsCount: number;
+                        species: {
+                            species: import("../drug-catalog/drug-catalog.type").CatalogSpecies;
+                        }[];
+                        kind: import("./vaccinations.type").VaccineKind;
+                        catalogProduct: {
+                            id: string;
+                            registerNumber: string;
+                            tradeName: string;
+                            authorizationStatus: string | null;
+                            manufacturerName: string | null;
+                            manufacturerCountry: string | null;
+                        } | null;
+                        nameEn: string | null;
+                        boosterIntervalDays: number | null;
+                        manufacturerName: string | null;
+                        primarySeriesDoses: number;
+                        primarySeriesIntervalDays: number | null;
+                        immunityOnsetDays: number;
+                        defaultRoute: import("./vaccinations.type").VaccineRoute;
+                        defaultSite: import("./vaccinations.type").InjectionSite | null;
+                        defaultDoseVolumeMl: import("@prisma/client-runtime-utils").Decimal | null;
+                        antigens: {
+                            antigen: {
+                                nameAr: string;
+                                nameEn: string;
+                            };
+                            antigenCode: string;
+                        }[];
+                    }[];
+                    401: {
+                        readonly message: "غير مصرح";
+                    };
+                    422: {
+                        type: "validation";
+                        on: string;
+                        summary?: string;
+                        message?: string;
+                        found?: unknown;
+                        property?: string;
+                        expected?: string;
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        vaccines: {
+            post: {
+                body: {
+                    notes?: string | null | undefined;
+                    active?: boolean | undefined;
+                    inventoryItemId?: string | null | undefined;
+                    catalogProductId?: string | null | undefined;
+                    nameEn?: string | null | undefined;
+                    boosterIntervalDays?: number | null | undefined;
+                    manufacturerName?: string | null | undefined;
+                    primarySeriesIntervalDays?: number | null | undefined;
+                    defaultSite?: "OTHER" | "ORAL" | "LEFT_SHOULDER" | "RIGHT_SHOULDER" | "LEFT_HIND_LIMB" | "RIGHT_HIND_LIMB" | "INTERSCAPULAR" | "LEFT_FLANK" | "RIGHT_FLANK" | "NASAL" | null | undefined;
+                    defaultDoseVolumeMl?: number | null | undefined;
+                    name: string;
+                    species: ("DOG" | "CAT" | "HORSE" | "CATTLE" | "SHEEP" | "GOAT" | "CAMEL" | "POULTRY" | "RABBIT" | "SWINE" | "FISH" | "BEE")[];
+                    kind: "OTHER" | "MODIFIED_LIVE" | "KILLED" | "RECOMBINANT" | "TOXOID" | "SUBUNIT";
+                    primarySeriesDoses: number;
+                    immunityOnsetDays: number;
+                    defaultRoute: "OTHER" | "TOPICAL" | "SUBCUTANEOUS" | "INTRAMUSCULAR" | "INTRANASAL" | "ORAL" | "INTRADERMAL";
+                    antigenCodes: string[];
+                };
+                params: {};
+                query: {};
+                headers: {};
+                response: {
+                    200: {
+                        inventoryItem: {
+                            name: string;
+                            id: string;
+                            code: string;
+                            stock: number;
+                            tracksBatches: boolean;
+                        } | null;
+                        name: string;
+                        id: string;
+                        createdAt: Date;
+                        updatedAt: Date;
+                        code: string;
+                        notes: string | null;
+                        active: boolean;
+                        editsCount: number;
+                        species: {
+                            species: import("../drug-catalog/drug-catalog.type").CatalogSpecies;
+                        }[];
+                        kind: import("./vaccinations.type").VaccineKind;
+                        catalogProduct: {
+                            id: string;
+                            registerNumber: string;
+                            tradeName: string;
+                            authorizationStatus: string | null;
+                            manufacturerName: string | null;
+                            manufacturerCountry: string | null;
+                        } | null;
+                        nameEn: string | null;
+                        boosterIntervalDays: number | null;
+                        manufacturerName: string | null;
+                        primarySeriesDoses: number;
+                        primarySeriesIntervalDays: number | null;
+                        immunityOnsetDays: number;
+                        defaultRoute: import("./vaccinations.type").VaccineRoute;
+                        defaultSite: import("./vaccinations.type").InjectionSite | null;
+                        defaultDoseVolumeMl: import("@prisma/client-runtime-utils").Decimal | null;
+                        antigens: {
+                            antigen: {
+                                nameAr: string;
+                                nameEn: string;
+                            };
+                            antigenCode: string;
+                        }[];
+                    };
+                    401: {
+                        readonly message: "غير مصرح";
+                    };
+                    422: {
+                        type: "validation";
+                        on: string;
+                        summary?: string;
+                        message?: string;
+                        found?: unknown;
+                        property?: string;
+                        expected?: string;
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        vaccines: {
+            ":id": {
+                get: {
+                    body: {};
+                    params: {
+                        id: string;
+                    };
+                    query: {};
+                    headers: {};
+                    response: {
+                        200: {
+                            inventoryItem: {
+                                name: string;
+                                id: string;
+                                code: string;
+                                stock: number;
+                                tracksBatches: boolean;
+                            } | null;
+                            name: string;
+                            id: string;
+                            createdAt: Date;
+                            updatedAt: Date;
+                            code: string;
+                            notes: string | null;
+                            active: boolean;
+                            editsCount: number;
+                            species: {
+                                species: import("../drug-catalog/drug-catalog.type").CatalogSpecies;
+                            }[];
+                            kind: import("./vaccinations.type").VaccineKind;
+                            catalogProduct: {
+                                id: string;
+                                registerNumber: string;
+                                tradeName: string;
+                                authorizationStatus: string | null;
+                                manufacturerName: string | null;
+                                manufacturerCountry: string | null;
+                            } | null;
+                            nameEn: string | null;
+                            boosterIntervalDays: number | null;
+                            manufacturerName: string | null;
+                            primarySeriesDoses: number;
+                            primarySeriesIntervalDays: number | null;
+                            immunityOnsetDays: number;
+                            defaultRoute: import("./vaccinations.type").VaccineRoute;
+                            defaultSite: import("./vaccinations.type").InjectionSite | null;
+                            defaultDoseVolumeMl: import("@prisma/client-runtime-utils").Decimal | null;
+                            antigens: {
+                                antigen: {
+                                    nameAr: string;
+                                    nameEn: string;
+                                };
+                                antigenCode: string;
+                            }[];
+                        };
+                        401: {
+                            readonly message: "غير مصرح";
+                        };
+                        404: {
+                            readonly message: "اللقاح غير موجود";
+                        };
+                        422: {
+                            type: "validation";
+                            on: string;
+                            summary?: string;
+                            message?: string;
+                            found?: unknown;
+                            property?: string;
+                            expected?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        vaccines: {
+            ":id": {
+                patch: {
+                    body: {
+                        name?: string | undefined;
+                        notes?: string | null | undefined;
+                        active?: boolean | undefined;
+                        species?: ("DOG" | "CAT" | "HORSE" | "CATTLE" | "SHEEP" | "GOAT" | "CAMEL" | "POULTRY" | "RABBIT" | "SWINE" | "FISH" | "BEE")[] | undefined;
+                        kind?: "OTHER" | "MODIFIED_LIVE" | "KILLED" | "RECOMBINANT" | "TOXOID" | "SUBUNIT" | undefined;
+                        inventoryItemId?: string | null | undefined;
+                        catalogProductId?: string | null | undefined;
+                        nameEn?: string | null | undefined;
+                        boosterIntervalDays?: number | null | undefined;
+                        manufacturerName?: string | null | undefined;
+                        primarySeriesDoses?: number | undefined;
+                        primarySeriesIntervalDays?: number | null | undefined;
+                        immunityOnsetDays?: number | undefined;
+                        defaultRoute?: "OTHER" | "TOPICAL" | "SUBCUTANEOUS" | "INTRAMUSCULAR" | "INTRANASAL" | "ORAL" | "INTRADERMAL" | undefined;
+                        defaultSite?: "OTHER" | "ORAL" | "LEFT_SHOULDER" | "RIGHT_SHOULDER" | "LEFT_HIND_LIMB" | "RIGHT_HIND_LIMB" | "INTERSCAPULAR" | "LEFT_FLANK" | "RIGHT_FLANK" | "NASAL" | null | undefined;
+                        defaultDoseVolumeMl?: number | null | undefined;
+                        antigenCodes?: string[] | undefined;
+                    };
+                    params: {
+                        id: string;
+                    };
+                    query: {};
+                    headers: {};
+                    response: {
+                        200: {
+                            inventoryItem: {
+                                name: string;
+                                id: string;
+                                code: string;
+                                stock: number;
+                                tracksBatches: boolean;
+                            } | null;
+                            name: string;
+                            id: string;
+                            createdAt: Date;
+                            updatedAt: Date;
+                            code: string;
+                            notes: string | null;
+                            active: boolean;
+                            editsCount: number;
+                            species: {
+                                species: import("../drug-catalog/drug-catalog.type").CatalogSpecies;
+                            }[];
+                            kind: import("./vaccinations.type").VaccineKind;
+                            catalogProduct: {
+                                id: string;
+                                registerNumber: string;
+                                tradeName: string;
+                                authorizationStatus: string | null;
+                                manufacturerName: string | null;
+                                manufacturerCountry: string | null;
+                            } | null;
+                            nameEn: string | null;
+                            boosterIntervalDays: number | null;
+                            manufacturerName: string | null;
+                            primarySeriesDoses: number;
+                            primarySeriesIntervalDays: number | null;
+                            immunityOnsetDays: number;
+                            defaultRoute: import("./vaccinations.type").VaccineRoute;
+                            defaultSite: import("./vaccinations.type").InjectionSite | null;
+                            defaultDoseVolumeMl: import("@prisma/client-runtime-utils").Decimal | null;
+                            antigens: {
+                                antigen: {
+                                    nameAr: string;
+                                    nameEn: string;
+                                };
+                                antigenCode: string;
+                            }[];
+                        };
+                        401: {
+                            readonly message: "غير مصرح";
+                        };
+                        422: {
+                            type: "validation";
+                            on: string;
+                            summary?: string;
+                            message?: string;
+                            found?: unknown;
+                            property?: string;
+                            expected?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        vaccines: {
+            ":id": {
+                delete: {
+                    body: {};
+                    params: {
+                        id: string;
+                    };
+                    query: {};
+                    headers: {};
+                    response: {
+                        200: {
+                            id: string;
+                        };
+                        401: {
+                            readonly message: "غير مصرح";
+                        };
+                        422: {
+                            type: "validation";
+                            on: string;
+                            summary?: string;
+                            message?: string;
+                            found?: unknown;
+                            property?: string;
+                            expected?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        vaccines: {
+            ":id": {
+                batches: {
+                    get: {
+                        body: {};
+                        params: {
+                            id: string;
+                        };
+                        query: {};
+                        headers: {};
+                        response: {
+                            200: {
+                                isExpired: boolean;
+                                warehouse: {
+                                    name: string;
+                                    id: string;
+                                    branchId: string | null;
+                                };
+                                id: string;
+                                qty: number;
+                                expiryDate: Date | null;
+                                batchNo: string;
+                            }[];
+                            401: {
+                                readonly message: "غير مصرح";
+                            };
+                            422: {
+                                type: "validation";
+                                on: string;
+                                summary?: string;
+                                message?: string;
+                                found?: unknown;
+                                property?: string;
+                                expected?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        protocols: {
+            get: {
+                body: {};
+                params: {};
+                query: {};
+                headers: {};
+                response: {
+                    200: {
+                        animalType: {
+                            id: string;
+                            arName: string;
+                            enName: string;
+                        } | null;
+                        animalStrain: {
+                            id: string;
+                            arName: string;
+                            enName: string;
+                        } | null;
+                        name: string;
+                        id: string;
+                        clinicId: string | null;
+                        createdAt: Date;
+                        updatedAt: Date;
+                        code: string;
+                        isDefault: boolean;
+                        notes: string | null;
+                        active: boolean;
+                        species: import("../drug-catalog/drug-catalog.type").CatalogSpecies;
+                        animalTypeId: string | null;
+                        animalStrainId: string | null;
+                        nameEn: string | null;
+                        doses: {
+                            antigen: {
+                                nameAr: string;
+                                nameEn: string;
+                            };
+                            id: string;
+                            order: number;
+                            notes: string | null;
+                            kind: import("./vaccinations.type").VaccinationDoseKind;
+                            label: string;
+                            antigenCode: string;
+                            ageWeeksMin: number | null;
+                            ageWeeksMax: number | null;
+                            intervalDaysFromPrev: number | null;
+                            boosterIntervalDays: number | null;
+                        }[];
+                        isCore: boolean;
+                    }[];
+                    401: {
+                        readonly message: "غير مصرح";
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        protocols: {
+            post: {
+                body: {
+                    notes?: string | null | undefined;
+                    active?: boolean | undefined;
+                    animalTypeId?: string | null | undefined;
+                    animalStrainId?: string | null | undefined;
+                    nameEn?: string | null | undefined;
+                    isCore?: boolean | undefined;
+                    name: string;
+                    species: "DOG" | "CAT" | "HORSE" | "CATTLE" | "SHEEP" | "GOAT" | "CAMEL" | "POULTRY" | "RABBIT" | "SWINE" | "FISH" | "BEE";
+                    doses: {
+                        notes?: string | null | undefined;
+                        kind?: "PRIMARY" | "BOOSTER" | "ANNUAL" | "CATCH_UP" | undefined;
+                        ageWeeksMin?: number | null | undefined;
+                        ageWeeksMax?: number | null | undefined;
+                        intervalDaysFromPrev?: number | null | undefined;
+                        boosterIntervalDays?: number | null | undefined;
+                        label: string;
+                        antigenCode: string;
+                    }[];
+                };
+                params: {};
+                query: {};
+                headers: {};
+                response: {
+                    200: {
+                        animalType: {
+                            id: string;
+                            arName: string;
+                            enName: string;
+                        } | null;
+                        animalStrain: {
+                            id: string;
+                            arName: string;
+                            enName: string;
+                        } | null;
+                        name: string;
+                        id: string;
+                        clinicId: string | null;
+                        createdAt: Date;
+                        updatedAt: Date;
+                        code: string;
+                        isDefault: boolean;
+                        notes: string | null;
+                        active: boolean;
+                        species: import("../drug-catalog/drug-catalog.type").CatalogSpecies;
+                        animalTypeId: string | null;
+                        animalStrainId: string | null;
+                        nameEn: string | null;
+                        doses: {
+                            antigen: {
+                                nameAr: string;
+                                nameEn: string;
+                            };
+                            id: string;
+                            order: number;
+                            notes: string | null;
+                            kind: import("./vaccinations.type").VaccinationDoseKind;
+                            label: string;
+                            antigenCode: string;
+                            ageWeeksMin: number | null;
+                            ageWeeksMax: number | null;
+                            intervalDaysFromPrev: number | null;
+                            boosterIntervalDays: number | null;
+                        }[];
+                        isCore: boolean;
+                    };
+                    401: {
+                        readonly message: "غير مصرح";
+                    };
+                    422: {
+                        type: "validation";
+                        on: string;
+                        summary?: string;
+                        message?: string;
+                        found?: unknown;
+                        property?: string;
+                        expected?: string;
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        protocols: {
+            ":id": {
+                get: {
+                    body: {};
+                    params: {
+                        id: string;
+                    };
+                    query: {};
+                    headers: {};
+                    response: {
+                        200: {
+                            animalType: {
+                                id: string;
+                                arName: string;
+                                enName: string;
+                            } | null;
+                            animalStrain: {
+                                id: string;
+                                arName: string;
+                                enName: string;
+                            } | null;
+                            name: string;
+                            id: string;
+                            clinicId: string | null;
+                            createdAt: Date;
+                            updatedAt: Date;
+                            code: string;
+                            isDefault: boolean;
+                            notes: string | null;
+                            active: boolean;
+                            species: import("../drug-catalog/drug-catalog.type").CatalogSpecies;
+                            animalTypeId: string | null;
+                            animalStrainId: string | null;
+                            nameEn: string | null;
+                            doses: {
+                                antigen: {
+                                    nameAr: string;
+                                    nameEn: string;
+                                };
+                                id: string;
+                                order: number;
+                                notes: string | null;
+                                kind: import("./vaccinations.type").VaccinationDoseKind;
+                                label: string;
+                                antigenCode: string;
+                                ageWeeksMin: number | null;
+                                ageWeeksMax: number | null;
+                                intervalDaysFromPrev: number | null;
+                                boosterIntervalDays: number | null;
+                            }[];
+                            isCore: boolean;
+                        };
+                        401: {
+                            readonly message: "غير مصرح";
+                        };
+                        404: {
+                            readonly message: "البروتوكول غير موجود";
+                        };
+                        422: {
+                            type: "validation";
+                            on: string;
+                            summary?: string;
+                            message?: string;
+                            found?: unknown;
+                            property?: string;
+                            expected?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        protocols: {
+            ":id": {
+                patch: {
+                    body: {
+                        notes?: string | null | undefined;
+                        active?: boolean | undefined;
+                        animalTypeId?: string | null | undefined;
+                        animalStrainId?: string | null | undefined;
+                        nameEn?: string | null | undefined;
+                        isCore?: boolean | undefined;
+                        name: string;
+                        species: "DOG" | "CAT" | "HORSE" | "CATTLE" | "SHEEP" | "GOAT" | "CAMEL" | "POULTRY" | "RABBIT" | "SWINE" | "FISH" | "BEE";
+                        doses: {
+                            notes?: string | null | undefined;
+                            kind?: "PRIMARY" | "BOOSTER" | "ANNUAL" | "CATCH_UP" | undefined;
+                            ageWeeksMin?: number | null | undefined;
+                            ageWeeksMax?: number | null | undefined;
+                            intervalDaysFromPrev?: number | null | undefined;
+                            boosterIntervalDays?: number | null | undefined;
+                            label: string;
+                            antigenCode: string;
+                        }[];
+                    };
+                    params: {
+                        id: string;
+                    };
+                    query: {};
+                    headers: {};
+                    response: {
+                        200: {
+                            animalType: {
+                                id: string;
+                                arName: string;
+                                enName: string;
+                            } | null;
+                            animalStrain: {
+                                id: string;
+                                arName: string;
+                                enName: string;
+                            } | null;
+                            name: string;
+                            id: string;
+                            clinicId: string | null;
+                            createdAt: Date;
+                            updatedAt: Date;
+                            code: string;
+                            isDefault: boolean;
+                            notes: string | null;
+                            active: boolean;
+                            species: import("../drug-catalog/drug-catalog.type").CatalogSpecies;
+                            animalTypeId: string | null;
+                            animalStrainId: string | null;
+                            nameEn: string | null;
+                            doses: {
+                                antigen: {
+                                    nameAr: string;
+                                    nameEn: string;
+                                };
+                                id: string;
+                                order: number;
+                                notes: string | null;
+                                kind: import("./vaccinations.type").VaccinationDoseKind;
+                                label: string;
+                                antigenCode: string;
+                                ageWeeksMin: number | null;
+                                ageWeeksMax: number | null;
+                                intervalDaysFromPrev: number | null;
+                                boosterIntervalDays: number | null;
+                            }[];
+                            isCore: boolean;
+                        };
+                        401: {
+                            readonly message: "غير مصرح";
+                        };
+                        422: {
+                            type: "validation";
+                            on: string;
+                            summary?: string;
+                            message?: string;
+                            found?: unknown;
+                            property?: string;
+                            expected?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        protocols: {
+            ":id": {
+                clone: {
+                    post: {
+                        body: {};
+                        params: {
+                            id: string;
+                        };
+                        query: {};
+                        headers: {};
+                        response: {
+                            200: {
+                                animalType: {
+                                    id: string;
+                                    arName: string;
+                                    enName: string;
+                                } | null;
+                                animalStrain: {
+                                    id: string;
+                                    arName: string;
+                                    enName: string;
+                                } | null;
+                                name: string;
+                                id: string;
+                                clinicId: string | null;
+                                createdAt: Date;
+                                updatedAt: Date;
+                                code: string;
+                                isDefault: boolean;
+                                notes: string | null;
+                                active: boolean;
+                                species: import("../drug-catalog/drug-catalog.type").CatalogSpecies;
+                                animalTypeId: string | null;
+                                animalStrainId: string | null;
+                                nameEn: string | null;
+                                doses: {
+                                    antigen: {
+                                        nameAr: string;
+                                        nameEn: string;
+                                    };
+                                    id: string;
+                                    order: number;
+                                    notes: string | null;
+                                    kind: import("./vaccinations.type").VaccinationDoseKind;
+                                    label: string;
+                                    antigenCode: string;
+                                    ageWeeksMin: number | null;
+                                    ageWeeksMax: number | null;
+                                    intervalDaysFromPrev: number | null;
+                                    boosterIntervalDays: number | null;
+                                }[];
+                                isCore: boolean;
+                            };
+                            401: {
+                                readonly message: "غير مصرح";
+                            };
+                            422: {
+                                type: "validation";
+                                on: string;
+                                summary?: string;
+                                message?: string;
+                                found?: unknown;
+                                property?: string;
+                                expected?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        protocols: {
+            ":id": {
+                delete: {
+                    body: {};
+                    params: {
+                        id: string;
+                    };
+                    query: {};
+                    headers: {};
+                    response: {
+                        200: {
+                            id: string;
+                        };
+                        401: {
+                            readonly message: "غير مصرح";
+                        };
+                        422: {
+                            type: "validation";
+                            on: string;
+                            summary?: string;
+                            message?: string;
+                            found?: unknown;
+                            property?: string;
+                            expected?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        records: {
+            get: {
+                body: {};
+                params: {};
+                query: {
+                    to?: string | undefined;
+                    from?: string | undefined;
+                    take?: number | undefined;
+                    skip?: number | undefined;
+                    branchId?: string | undefined;
+                    patientId?: string | undefined;
+                    vaccineId?: string | undefined;
+                    includeVoided?: boolean | undefined;
+                };
+                headers: {};
+                response: {
+                    200: {
+                        items: {
+                            branch: {
+                                name: string;
+                                id: string;
+                            } | null;
+                            patient: {
+                                animalType: {
+                                    id: string;
+                                    arName: string;
+                                    species: import("../drug-catalog/drug-catalog.type").CatalogSpecies | null;
+                                };
+                                owner: {
+                                    name: string;
+                                    id: string;
+                                    phone: string;
+                                } | null;
+                                name: string;
+                                id: string;
+                                code: string;
+                                birthDate: Date | null;
+                            };
+                            appointment: {
+                                id: string;
+                                startsAt: Date;
+                            } | null;
+                            vaccine: {
+                                name: string;
+                                id: string;
+                                kind: import("./vaccinations.type").VaccineKind;
+                                antigens: {
+                                    antigenCode: string;
+                                }[];
+                            };
+                            id: string;
+                            createdAt: Date;
+                            code: string;
+                            notes: string | null;
+                            route: import("./vaccinations.type").VaccineRoute;
+                            patientId: string;
+                            nextDueAt: Date | null;
+                            batchId: string | null;
+                            site: import("./vaccinations.type").InjectionSite | null;
+                            batchNo: string | null;
+                            protectiveFromAt: Date | null;
+                            protectiveUntilAt: Date | null;
+                            immunityOnsetDaysSnapshot: number | null;
+                            administeredAt: Date;
+                            vaccineNameSnapshot: string;
+                            doseNumber: number;
+                            doseKind: import("./vaccinations.type").VaccinationDoseKind;
+                            doseVolumeMl: import("@prisma/client-runtime-utils").Decimal | null;
+                            batchExpiryDate: Date | null;
+                            manufacturerSnapshot: string | null;
+                            adverseReaction: import("./vaccinations.type").AdverseReactionSeverity;
+                            adverseReactionNotes: string | null;
+                            boosterIntervalDaysSnapshot: number | null;
+                            isVoided: boolean;
+                            voidedAt: Date | null;
+                            voidReason: string | null;
+                            administeredBy: {
+                                name: string;
+                                prefix: import("../staff/staff.type").StaffPrefix | null;
+                                id: string;
+                                licenseNumber: string | null;
+                            } | null;
+                            protocolDose: {
+                                id: string;
+                                label: string;
+                                antigenCode: string;
+                            } | null;
+                        }[];
+                        total: number;
+                    };
+                    401: {
+                        readonly message: "غير مصرح";
+                    };
+                    422: {
+                        type: "validation";
+                        on: string;
+                        summary?: string;
+                        message?: string;
+                        found?: unknown;
+                        property?: string;
+                        expected?: string;
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        records: {
+            post: {
+                body: {
+                    branchId?: string | null | undefined;
+                    notes?: string | null | undefined;
+                    appointmentId?: string | null | undefined;
+                    batchId?: string | null | undefined;
+                    site?: "OTHER" | "ORAL" | "LEFT_SHOULDER" | "RIGHT_SHOULDER" | "LEFT_HIND_LIMB" | "RIGHT_HIND_LIMB" | "INTERSCAPULAR" | "LEFT_FLANK" | "RIGHT_FLANK" | "NASAL" | null | undefined;
+                    administeredById?: string | null | undefined;
+                    doseNumber?: number | undefined;
+                    doseKind?: "PRIMARY" | "BOOSTER" | "ANNUAL" | "CATCH_UP" | undefined;
+                    doseVolumeMl?: number | null | undefined;
+                    adverseReaction?: "NONE" | "MILD" | "MODERATE" | "SEVERE" | "ANAPHYLACTIC" | undefined;
+                    adverseReactionNotes?: string | null | undefined;
+                    protocolDoseId?: string | null | undefined;
+                    carePlanEnrollmentVisitId?: string | null | undefined;
+                    allowExpiredBatch?: boolean | undefined;
+                    expiredBatchReason?: string | null | undefined;
+                    route: "OTHER" | "TOPICAL" | "SUBCUTANEOUS" | "INTRAMUSCULAR" | "INTRANASAL" | "ORAL" | "INTRADERMAL";
+                    patientId: string;
+                    administeredAt: string;
+                    vaccineId: string;
+                };
+                params: {};
+                query: {};
+                headers: {};
+                response: {
+                    200: {
+                        branch: {
+                            name: string;
+                            id: string;
+                        } | null;
+                        patient: {
+                            animalType: {
+                                id: string;
+                                arName: string;
+                                species: import("../drug-catalog/drug-catalog.type").CatalogSpecies | null;
+                            };
+                            owner: {
+                                name: string;
+                                id: string;
+                                phone: string;
+                            } | null;
+                            name: string;
+                            id: string;
+                            code: string;
+                            birthDate: Date | null;
+                        };
+                        appointment: {
+                            id: string;
+                            startsAt: Date;
+                        } | null;
+                        vaccine: {
+                            name: string;
+                            id: string;
+                            kind: import("./vaccinations.type").VaccineKind;
+                            antigens: {
+                                antigenCode: string;
+                            }[];
+                        };
+                        id: string;
+                        createdAt: Date;
+                        code: string;
+                        notes: string | null;
+                        route: import("./vaccinations.type").VaccineRoute;
+                        patientId: string;
+                        nextDueAt: Date | null;
+                        batchId: string | null;
+                        site: import("./vaccinations.type").InjectionSite | null;
+                        batchNo: string | null;
+                        protectiveFromAt: Date | null;
+                        protectiveUntilAt: Date | null;
+                        immunityOnsetDaysSnapshot: number | null;
+                        administeredAt: Date;
+                        vaccineNameSnapshot: string;
+                        doseNumber: number;
+                        doseKind: import("./vaccinations.type").VaccinationDoseKind;
+                        doseVolumeMl: import("@prisma/client-runtime-utils").Decimal | null;
+                        batchExpiryDate: Date | null;
+                        manufacturerSnapshot: string | null;
+                        adverseReaction: import("./vaccinations.type").AdverseReactionSeverity;
+                        adverseReactionNotes: string | null;
+                        boosterIntervalDaysSnapshot: number | null;
+                        isVoided: boolean;
+                        voidedAt: Date | null;
+                        voidReason: string | null;
+                        administeredBy: {
+                            name: string;
+                            prefix: import("../staff/staff.type").StaffPrefix | null;
+                            id: string;
+                            licenseNumber: string | null;
+                        } | null;
+                        protocolDose: {
+                            id: string;
+                            label: string;
+                            antigenCode: string;
+                        } | null;
+                    };
+                    401: {
+                        readonly message: "غير مصرح";
+                    };
+                    422: {
+                        type: "validation";
+                        on: string;
+                        summary?: string;
+                        message?: string;
+                        found?: unknown;
+                        property?: string;
+                        expected?: string;
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        records: {
+            ":id": {
+                get: {
+                    body: {};
+                    params: {
+                        id: string;
+                    };
+                    query: {};
+                    headers: {};
+                    response: {
+                        200: {
+                            branch: {
+                                name: string;
+                                id: string;
+                            } | null;
+                            patient: {
+                                animalType: {
+                                    id: string;
+                                    arName: string;
+                                    species: import("../drug-catalog/drug-catalog.type").CatalogSpecies | null;
+                                };
+                                owner: {
+                                    name: string;
+                                    id: string;
+                                    phone: string;
+                                } | null;
+                                name: string;
+                                id: string;
+                                code: string;
+                                birthDate: Date | null;
+                            };
+                            appointment: {
+                                id: string;
+                                startsAt: Date;
+                            } | null;
+                            vaccine: {
+                                name: string;
+                                id: string;
+                                kind: import("./vaccinations.type").VaccineKind;
+                                antigens: {
+                                    antigenCode: string;
+                                }[];
+                            };
+                            id: string;
+                            createdAt: Date;
+                            code: string;
+                            notes: string | null;
+                            route: import("./vaccinations.type").VaccineRoute;
+                            patientId: string;
+                            nextDueAt: Date | null;
+                            batchId: string | null;
+                            site: import("./vaccinations.type").InjectionSite | null;
+                            batchNo: string | null;
+                            protectiveFromAt: Date | null;
+                            protectiveUntilAt: Date | null;
+                            immunityOnsetDaysSnapshot: number | null;
+                            administeredAt: Date;
+                            vaccineNameSnapshot: string;
+                            doseNumber: number;
+                            doseKind: import("./vaccinations.type").VaccinationDoseKind;
+                            doseVolumeMl: import("@prisma/client-runtime-utils").Decimal | null;
+                            batchExpiryDate: Date | null;
+                            manufacturerSnapshot: string | null;
+                            adverseReaction: import("./vaccinations.type").AdverseReactionSeverity;
+                            adverseReactionNotes: string | null;
+                            boosterIntervalDaysSnapshot: number | null;
+                            isVoided: boolean;
+                            voidedAt: Date | null;
+                            voidReason: string | null;
+                            administeredBy: {
+                                name: string;
+                                prefix: import("../staff/staff.type").StaffPrefix | null;
+                                id: string;
+                                licenseNumber: string | null;
+                            } | null;
+                            protocolDose: {
+                                id: string;
+                                label: string;
+                                antigenCode: string;
+                            } | null;
+                        };
+                        401: {
+                            readonly message: "غير مصرح";
+                        };
+                        404: {
+                            readonly message: "السجل غير موجود";
+                        };
+                        422: {
+                            type: "validation";
+                            on: string;
+                            summary?: string;
+                            message?: string;
+                            found?: unknown;
+                            property?: string;
+                            expected?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        records: {
+            ":id": {
+                void: {
+                    post: {
+                        body: {
+                            restoreStock?: boolean | undefined;
+                            voidReason: string;
+                        };
+                        params: {
+                            id: string;
+                        };
+                        query: {};
+                        headers: {};
+                        response: {
+                            200: {
+                                branch: {
+                                    name: string;
+                                    id: string;
+                                } | null;
+                                patient: {
+                                    animalType: {
+                                        id: string;
+                                        arName: string;
+                                        species: import("../drug-catalog/drug-catalog.type").CatalogSpecies | null;
+                                    };
+                                    owner: {
+                                        name: string;
+                                        id: string;
+                                        phone: string;
+                                    } | null;
+                                    name: string;
+                                    id: string;
+                                    code: string;
+                                    birthDate: Date | null;
+                                };
+                                appointment: {
+                                    id: string;
+                                    startsAt: Date;
+                                } | null;
+                                vaccine: {
+                                    name: string;
+                                    id: string;
+                                    kind: import("./vaccinations.type").VaccineKind;
+                                    antigens: {
+                                        antigenCode: string;
+                                    }[];
+                                };
+                                id: string;
+                                createdAt: Date;
+                                code: string;
+                                notes: string | null;
+                                route: import("./vaccinations.type").VaccineRoute;
+                                patientId: string;
+                                nextDueAt: Date | null;
+                                batchId: string | null;
+                                site: import("./vaccinations.type").InjectionSite | null;
+                                batchNo: string | null;
+                                protectiveFromAt: Date | null;
+                                protectiveUntilAt: Date | null;
+                                immunityOnsetDaysSnapshot: number | null;
+                                administeredAt: Date;
+                                vaccineNameSnapshot: string;
+                                doseNumber: number;
+                                doseKind: import("./vaccinations.type").VaccinationDoseKind;
+                                doseVolumeMl: import("@prisma/client-runtime-utils").Decimal | null;
+                                batchExpiryDate: Date | null;
+                                manufacturerSnapshot: string | null;
+                                adverseReaction: import("./vaccinations.type").AdverseReactionSeverity;
+                                adverseReactionNotes: string | null;
+                                boosterIntervalDaysSnapshot: number | null;
+                                isVoided: boolean;
+                                voidedAt: Date | null;
+                                voidReason: string | null;
+                                administeredBy: {
+                                    name: string;
+                                    prefix: import("../staff/staff.type").StaffPrefix | null;
+                                    id: string;
+                                    licenseNumber: string | null;
+                                } | null;
+                                protocolDose: {
+                                    id: string;
+                                    label: string;
+                                    antigenCode: string;
+                                } | null;
+                            };
+                            401: {
+                                readonly message: "غير مصرح";
+                            };
+                            422: {
+                                type: "validation";
+                                on: string;
+                                summary?: string;
+                                message?: string;
+                                found?: unknown;
+                                property?: string;
+                                expected?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+} & {
+    vaccinations: {
+        patients: {
+            ":patientId": {
+                status: {
+                    get: {
+                        body: {};
+                        params: {
+                            patientId: string;
+                        };
+                        query: {};
+                        headers: {};
+                        response: {
+                            200: import("./vaccinations.type").PatientVaccinationStatus;
+                            401: {
+                                readonly message: "غير مصرح";
+                            };
+                            404: {
+                                readonly message: "الطفل غير موجود";
+                            };
+                            422: {
+                                type: "validation";
+                                on: string;
+                                summary?: string;
+                                message?: string;
+                                found?: unknown;
+                                property?: string;
+                                expected?: string;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+}, {
+    derive: {};
+    resolve: {};
+    schema: {};
+    standaloneSchema: {};
+    response: {};
+}, {
+    derive: {};
+    resolve: {};
+    schema: {};
+    standaloneSchema: {};
+    response: {};
+} & {
+    derive: {};
+    resolve: {};
+    schema: {};
+    standaloneSchema: {};
+    response: {};
+}>;

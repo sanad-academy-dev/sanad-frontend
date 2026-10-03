@@ -1,0 +1,68 @@
+<svg viewBox="0 0 356 252" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="لا توجد وظائف">
+	<!-- ===== البطاقة الخلفية الباهتة ===== -->
+	<g transform="rotate(-8 118 148)">
+		<rect x="44" y="52" width="150" height="192" rx="14" fill="#FCFCFD" stroke="#ECECEE" stroke-width="3" />
+		<!-- صورة مصغّرة أعلى البطاقة -->
+		<rect x="62" y="74" width="70" height="46" rx="4" fill="#EDEDF0" />
+		<!-- أسطر باهتة -->
+		<rect x="140" y="82" width="34" height="6" rx="3" fill="#EDEDF0" />
+		<rect x="140" y="96" width="26" height="6" rx="3" fill="#EDEDF0" />
+		<!-- نقطة + أسطر -->
+		<circle cx="72" cy="150" r="10" fill="#EDEDF0" />
+		<rect x="62" y="176" width="112" height="6" rx="3" fill="#EDEDF0" />
+		<rect x="62" y="190" width="90" height="6" rx="3" fill="#EDEDF0" />
+	</g>
+
+	<!-- ===== البطاقة الأمامية ===== -->
+	<g>
+		<rect x="150" y="40" width="156" height="200" rx="16" fill="#FFFFFF" stroke="#E6E6E9" stroke-width="3" />
+
+		<!-- إطار الأفاتار -->
+		<rect x="168" y="60" width="60" height="60" rx="3" fill="#F1F1F3" />
+
+		<!-- الكتفان (خلف الرأس، مقصوصان بالإطار) -->
+		<clipPath id="avatarClip">
+			<rect x="168" y="60" width="60" height="60" rx="3" />
+		</clipPath>
+		<g clip-path="url(#avatarClip)">
+			<path d="M180 122 C182 108 192 102 198 102 L200 102 C206 102 216 108 218 122 Z" fill="#2E2C4A" />
+		</g>
+
+		<!-- الرأس -->
+		<circle cx="198" cy="90" r="23" fill="#5E54E8" />
+
+		<!-- الوجه: عينان مغمضتان -->
+		<path d="M188 88 q3 3 6 0" stroke="#2E2C4A" stroke-width="1.6" stroke-linecap="round" fill="none" />
+		<path d="M202 88 q3 3 6 0" stroke="#2E2C4A" stroke-width="1.6" stroke-linecap="round" fill="none" />
+		<!-- شارب -->
+		<path d="M192 97 q6 5 12 0" stroke="#2E2C4A" stroke-width="1.6" stroke-linecap="round" fill="none" />
+
+		<!-- خصلة/سلك ملفوف -->
+		<path d="M177 96 c-6 2 -8 8 -4 11 c3 2 7 0 6 -4 c-1 -3 -5 -2 -5 1" stroke="#2E2C4A" stroke-width="1.6" stroke-linecap="round" fill="none" />
+
+		<!-- سماعات الرأس -->
+		<path d="M176 90 a22 22 0 0 1 44 0" stroke="#2E2C4A" stroke-width="4" fill="none" stroke-linecap="round" />
+		<rect x="171" y="86" width="10" height="16" rx="5" fill="#2E2C4A" />
+		<rect x="215" y="86" width="10" height="16" rx="5" fill="#2E2C4A" />
+
+		<!-- سطرا التمييز البنفسجيان -->
+		<rect x="244" y="80" width="46" height="7" rx="3.5" fill="#5E54E8" />
+		<rect x="244" y="93" width="54" height="7" rx="3.5" fill="#5E54E8" />
+
+		<!-- صفوف القائمة -->
+		<g fill="#E4E4E7">
+			<!-- صف 1 -->
+			<circle cx="184" cy="146" r="11" />
+			<rect x="204" y="138" width="86" height="6" rx="3" />
+			<rect x="204" y="149" width="70" height="6" rx="3" />
+			<!-- صف 2 -->
+			<circle cx="184" cy="176" r="11" />
+			<rect x="204" y="168" width="86" height="6" rx="3" />
+			<rect x="204" y="179" width="70" height="6" rx="3" />
+			<!-- صف 3 -->
+			<circle cx="184" cy="206" r="11" />
+			<rect x="204" y="198" width="86" height="6" rx="3" />
+			<rect x="204" y="209" width="70" height="6" rx="3" />
+		</g>
+	</g>
+</svg>

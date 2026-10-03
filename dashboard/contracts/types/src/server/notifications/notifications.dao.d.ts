@@ -1,0 +1,45 @@
+import { type UpdateNotificationsInput } from "@/server/notifications/notifications.type";
+export declare const notificationsDao: {
+    get(clinicId: string): Promise<{
+        id: string;
+        clinicId: string;
+        emailEnabled: boolean;
+        customerFollowUp: boolean;
+        systemUpdates: boolean;
+        emailBookings: boolean;
+        emailAppointmentUpdates: boolean;
+        emailAppointmentCancellations: boolean;
+        emailReminderApprovalEnabled: boolean;
+        emailReminderApprovalHours: number;
+        emailReminderFollowUpEnabled: boolean;
+        emailReminderFollowUpHours: number;
+        emailReminderPaymentEnabled: boolean;
+        emailReminderPaymentHours: number;
+        emailReminderCommentsEnabled: boolean;
+        emailInvoices: boolean;
+        emailFormRequest: boolean;
+        emailFormFollowUp: boolean;
+        emailTreatmentFollowUp: boolean;
+    } | null>;
+    upsert(clinicId: string, data: UpdateNotificationsInput): Promise<{
+        id: string;
+        clinicId: string;
+        emailEnabled: boolean;
+        customerFollowUp: boolean;
+        systemUpdates: boolean;
+        emailBookings: boolean;
+        emailAppointmentUpdates: boolean;
+        emailAppointmentCancellations: boolean;
+        emailReminderApprovalEnabled: boolean;
+        emailReminderApprovalHours: number;
+        emailReminderFollowUpEnabled: boolean;
+        emailReminderFollowUpHours: number;
+        emailReminderPaymentEnabled: boolean;
+        emailReminderPaymentHours: number;
+        emailReminderCommentsEnabled: boolean;
+        emailInvoices: boolean;
+        emailFormRequest: boolean;
+        emailFormFollowUp: boolean;
+        emailTreatmentFollowUp: boolean;
+    }>;
+};

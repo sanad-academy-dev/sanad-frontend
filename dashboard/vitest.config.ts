@@ -1,0 +1,11 @@
+import tsconfigPaths from "vite-tsconfig-paths";
+import { defineConfig } from "vitest/config";
+
+export default defineConfig({
+	plugins: [tsconfigPaths()],
+	test: {
+		environment: "jsdom",
+		include: ["src/**/*.test.{ts,tsx}"],
+		env: { VITE_API_URL: "http://localhost:5180" },
+	},
+});

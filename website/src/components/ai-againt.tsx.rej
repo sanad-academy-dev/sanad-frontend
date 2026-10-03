@@ -1,0 +1,55 @@
+diff a/website/src/components/ai-againt.tsx b/website/src/components/ai-againt.tsx	(rejected hunks)
+@@ -81,15 +81,15 @@ export default function AiAgent() {
+                   </h2>
+                 </div>
+                 <div className="flex items-center gap-1 text-muted-foreground">
+-                  <button className="flex size-8 items-center justify-center rounded-md hover:bg-muted hover:text-foreground transition-colors">
++                  <button className="flex size-8 items-center justify-center  hover:bg-muted hover:text-foreground transition-colors">
+                     <Copy className="size-4" />
+                   </button>
+-                  <button className="flex size-8 items-center justify-center rounded-md hover:bg-muted hover:text-foreground transition-colors">
++                  <button className="flex size-8 items-center justify-center  hover:bg-muted hover:text-foreground transition-colors">
+                     <Trash2 className="size-4" />
+                   </button>
+                   <button
+                     onClick={() => setIsOpen(false)}
+-                    className="flex size-8 items-center justify-center rounded-md hover:bg-muted hover:text-foreground transition-colors"
++                    className="flex size-8 items-center justify-center  hover:bg-muted hover:text-foreground transition-colors"
+                   >
+                     <ChevronsLeft className="size-5" />
+                   </button>
+@@ -100,14 +100,14 @@ export default function AiAgent() {
+               <div className="flex-1 overflow-y-auto p-4 flex flex-col justify-end">
+                 {/* Example of empty state / disconnected */}
+                 <div className="flex flex-col items-center justify-center gap-4 py-12 text-center">
+-                  <div className="flex items-center gap-2 rounded-md bg-destructive/10 px-3 py-1.5 text-sm font-medium text-destructive">
++                  <div className="flex items-center gap-2  bg-destructive/10 px-3 py-1.5 text-sm font-medium text-destructive">
+                     <RefreshCw className="size-4" />
+                     <span>فشلت محاولة الاتصال بالخادم.</span>
+                   </div>
+                   <p className="text-sm text-muted-foreground">
+                     هذه المحادثة غير متوفرة حالياً. أعد التحميل للمحاولة.
+                   </p>
+-                  <button className="flex items-center gap-2 rounded-lg border border-border bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors">
++                  <button className="flex items-center gap-2  border border-border bg-background px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors">
+                     <RefreshCw className="size-4" />
+                     إعادة تحميل
+                   </button>
+@@ -140,7 +140,7 @@ export default function AiAgent() {
+ 
+               {/* Input Area */}
+               <div className="p-4 pt-0">
+-                <div className="relative rounded-2xl border border-border bg-background shadow-sm focus-within:ring-1 focus-within:ring-primary transition-all">
++                <div className="relative  border border-border bg-background shadow-sm focus-within:ring-1 focus-within:ring-primary transition-all">
+                   <textarea
+                     value={query}
+                     onChange={(e) => setQuery(e.target.value)}
+@@ -158,7 +158,7 @@ export default function AiAgent() {
+                     <button
+                       disabled={!query.trim()}
+                       className={cn(
+-                        "flex size-8 items-center justify-center rounded-lg transition-colors",
++                        "flex size-8 items-center justify-center  transition-colors",
+                         query.trim()
+                           ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                           : "bg-muted text-muted-foreground cursor-not-allowed"

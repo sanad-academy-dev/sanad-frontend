@@ -1,0 +1,1 @@
+export const TOTAL_REQUIRED_ANIMAL_FIELDS = 9;

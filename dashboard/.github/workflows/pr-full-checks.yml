@@ -1,0 +1,254 @@
+name: PR Full Checks
+
+# FULL gate — the phase-exit run: migrations on a throwaway Postgres, the production build
+# (the client-bundle guard, CLAUDE.md rule 7), and the ENTIRE vitest suite — DB suites,
+# volume acceptance, walkthrough e2e.
+#
+# A COLD typecheck runs here again as of [P13.6] (`typecheck-cold`, its own runner). It
+# had been removed on 2026-08-18 because a cold whole-program `tsc` no longer fit a
+# standard 16GB runner — SIGKILLed three times, and at the one ceiling that stopped the
+# kill it ran 33 minutes against 5m26s locally. [P13.6] removed the cause rather than
+# the check: `generated/` is 885 `.ts` files (63 MB) that `skipLibCheck` cannot skip
+# because they are sources, not declarations; compiling them once to `.d.ts` takes that
+# mass out of every subsequent program. Measured after the split, one process per
+# program: generated 5.56 GB / 193 s, server 8.11 GB / 314 s, client 8.66 GB / 485 s —
+# peak is the MAX (8.66 GB), not the sum (22.3 GB). The fast job's incremental typecheck
+# still runs on every push; this one proves the graph from scratch at a phase exit.
+#
+# Costs ~25 minutes, so it does NOT run on every push (owner 2026-08-17 — free Actions
+# minutes ran out mid-phase and intermediate commits were most of the burn). It runs when:
+#   · the PR carries the `full-ci` label — add it on the head you want gated; or
+#   · it is dispatched manually from the Actions tab (workflow_dispatch).
+#
+# THIS is the run rule 11 means. A task's CI cell may go ✅ only from a CONCLUDED
+# `success` run of THIS workflow whose head contains that task's commit. A green fast job
+# is not a substitute, and neither is a cancelled or superseded run here.
+
+on:
+  pull_request:
+    branches: [main]
+    # `labeled` so adding `full-ci` starts the run; the others keep a labelled PR gated on
+    # each new head, which is what a phase exit needs.
+    types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
+
+concurrency:
+  group: pr-full-checks-${{ github.ref }}
+  # A superseded run is worthless under rule 11 anyway (its head no longer contains the
+  # commit under test), so cancelling it saves minutes rather than losing evidence.
+  cancel-in-progress: true
+
+jobs:
+  full:
+    name: Build & full test suite
+    # Label-gated. workflow_dispatch has no PR context, so it always runs.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.pull_request.labels.*.name, 'full-ci')
+    # Runner is a repo VARIABLE, not a literal (2026-08-21) — see migrate-check.yml for
+    # the full note. Default stays hosted; CI_RUNNER=self-hosted moves it local.
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+
+    # NOTE: every value below is a throwaway CI dummy — NOT a real secret. The app's
+    # env.ts requires these server vars to be present (no skip flag), but the DB-backed
+    # tests only use DATABASE_URL; auth/email/S3/Google values are never contacted.
+    # DATABASE_URL is deliberately NOT here — the ephemeral-postgres step exports it, so
+    # there is exactly one place that decides which database this suite may write to.
+    env:
+      NODE_ENV: production
+      BETTER_AUTH_URL: http://localhost:3000
+      BETTER_AUTH_SECRET: ci-dummy-not-a-real-secret
+      BETTER_AUTH_API_KEY: ci-dummy-not-a-real-key
+      GOOGLE_CLIENT_ID: ci-dummy
+      GOOGLE_CLIENT_SECRET: ci-dummy
+      EMAIL_USER: ci@example.com
+      EMAIL_PASSWORD: ci-dummy
+      S3_BUCKET: ci-dummy
+      S3_REGION: us-east-1
+      S3_ACCESS_KEY: ci-dummy
+      S3_SECRET_KEY: ci-dummy
+      VITE_API_URL: ${{ vars.VITE_API_URL || 'http://localhost:3000' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Replaces the old `services: postgres` block, which only runs on a hosted Linux
+      # runner — that restriction is precisely what tied this workflow to billed minutes.
+      # It exports DATABASE_URL for every step below and publishes on 127.0.0.1:55432,
+      # NOT 5432, which on a self-hosted runner is the developer's own dev database. That
+      # matters most here: this is the suite that creates clinics, accounts and ledger
+      # entries, so pointing it at a real database would not fail — it would corrupt.
+      - name: Start throwaway Postgres
+        uses: ./.github/actions/ephemeral-postgres
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Cache Bun install cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      # `bun install` already runs `prisma generate` via postinstall; the separate step
+      # that used to follow was duplicated work.
+      - name: Install dependencies (runs prisma generate via postinstall)
+        run: bun install --frozen-lockfile
+
+      # (The readiness wait that used to sit here moved into the action, which probes with
+      # `docker exec` — the host's pg_isready is guaranteed on ubuntu-latest but not on a
+      # macOS runner.)
+      - name: Apply migrations
+        run: bun --bun run prisma migrate deploy
+
+      # The client-bundle guard the fast job deliberately does not carry (rule 7).
+      #
+      # It also proves an invariant the CI split depends on: BOTH typecheck jobs (the fast
+      # job's incremental one and this workflow's `typecheck-cold`) check against
+      # `bun run gen:routetree` output rather than the bundle's, so those two must stay
+      # identical. That was verified once by hand;
+      # generating before the build and diffing after makes it a permanent check, and any
+      # future drift in the tanstackStart plugin fails here instead of silently weakening
+      # what the typecheck sees.
+      - name: Generate route tree (pre-build, for the equivalence check)
+        run: |
+          bun run gen:routetree
+          cp src/routeTree.gen.ts /tmp/routeTree.generated.ts
+
+      - name: Build app
+        run: bun run build
+
+      - name: Route tree from the generator must match the build's
+        run: |
+          if ! diff -q /tmp/routeTree.generated.ts src/routeTree.gen.ts >/dev/null; then
+            echo "::error::gen:routetree output diverged from the build's routeTree.gen.ts —" \
+                 "the fast job and typecheck-cold are typechecking against a stale shape."
+            diff /tmp/routeTree.generated.ts src/routeTree.gen.ts | head -40
+            exit 1
+          fi
+          echo "route tree: generator output identical to the build's"
+
+      - name: Run FULL test suite (incl. DB suites + walkthrough e2e)
+        run: bun run test
+
+      # A hosted runner is thrown away after the job; a self-hosted one is not. Without
+      # this the container outlives the run and holds the port for the next one.
+      - name: Stop throwaway Postgres
+        if: always()
+        run: docker rm -f elite-vet-ci-postgres >/dev/null 2>&1 || true
+
+  # [P13.6] The cold gate: the whole graph built from scratch, no `.tsbuildinfo` and no
+  # emitted `.d.ts` restored from any cache. The fast job's incremental typecheck is
+  # honest (a deliberate type error injected against a warm cache fails correctly, with
+  # the right file and code) but it can only ever prove the DELTA. This proves the whole
+  # program, which is what a phase-exit gate has to mean.
+  #
+  # Its OWN runner, deliberately: not to avoid a slow job, but because the 2026-08-18
+  # removal taught that a `tsc` this large sharing a box with Postgres and a vite build
+  # trades memory for GC until a 5-minute check takes 33. It needs the whole machine.
+  typecheck-cold:
+    name: Typecheck (cold, whole graph)
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.pull_request.labels.*.name, 'full-ci')
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    # Measured 955s (~16 min) on its first real CI run, against 944s locally — this job
+    # got a fast runner; the fast tier's identical cold typecheck took 1,636s on the same
+    # head, so treat 16-27 min as the range rather than 16 as the number. The ceiling
+    # exists so a thrashing run FAILS instead of quietly burning an hour of billed
+    # minutes — the exact cost that got the old job deleted.
+    #
+    # 45 → 90 (owner-authorized 2026-09-03, at the CRM-P4 gate). The 45 was set when the
+    # job took ~20 minutes. It now legitimately takes 45+: measured 20m58s → 31m44s →
+    # 43m32s across three CRM heads, then CANCELLED at the cap after 44m13s on
+    # `ab9e1bd` — a head whose forced-fresh pre-push typecheck had already passed
+    # locally. That is the failure mode this raise fixes: a cancelled run is not evidence
+    # in EITHER direction (CLAUDE.md rule 11), so a cap the job routinely reaches
+    # manufactures ambiguity instead of preventing waste. 90 still fails a genuinely
+    # thrashing run — it just stops guillotining healthy ones. The real fix is the
+    # self-hosted runner: this episode is the fourth data point in [P13.9].
+    timeout-minutes: 90
+
+    # No DATABASE_URL and no Postgres: `tsc` reads files, it does not connect. The other
+    # env vars are the same throwaway dummies the sibling job documents — env.ts is
+    # imported by the type graph, so the vars must exist, and none is ever contacted.
+    env:
+      # [2026-09-04] Heap ceiling for `bun run typecheck` (scripts/typecheck.mjs).
+      #
+      # CI needs more than the dev box. The shared hardcoded ceiling was lowered
+      # 12288 -> 9216 on 2026-09-03 for a 32 GB Windows machine (CLAUDE.md rule 13:
+      # a 12 GB tsc on top of VS Code and Docker exhausts its COMMIT limit), and that
+      # silently lowered it here too — where this job runs ALONE with 8 GB of extra
+      # swap provisioned below. Both CI tiers then OOMed.
+      #
+      # Measured cold on 2026-09-04, one process per program:
+      #   generated 7,582 MB · server 8,886 MB · client 9,819 MB
+      # The client program alone exceeds 9216 — and does so WITHOUT the reminders
+      # module too (9,571 MB with it removed), i.e. the graph had already outgrown the
+      # ceiling before that work: inpatients and emergency landed after the 8.66 GB
+      # figure in rule 14's table was measured.
+      #
+      # 11264 sits above the measured peak with ~1.4 GB of headroom, and below the
+      # 12288 that was SIGKILLed in 2026-08 — that was the pre-[P13.6] MONOLITH on a
+      # SHARED runner, not one program per process on a dedicated one.
+      TYPECHECK_HEAP_MB: 11264
+      NODE_ENV: production
+      BETTER_AUTH_URL: http://localhost:3000
+      BETTER_AUTH_SECRET: ci-dummy-not-a-real-secret
+      BETTER_AUTH_API_KEY: ci-dummy-not-a-real-key
+      GOOGLE_CLIENT_ID: ci-dummy
+      GOOGLE_CLIENT_SECRET: ci-dummy
+      EMAIL_USER: ci@example.com
+      EMAIL_PASSWORD: ci-dummy
+      S3_BUCKET: ci-dummy
+      S3_REGION: us-east-1
+      S3_ACCESS_KEY: ci-dummy
+      S3_SECRET_KEY: ci-dummy
+      VITE_API_URL: ${{ vars.VITE_API_URL || 'http://localhost:3000' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Cache Bun install cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      - name: Install dependencies (runs prisma generate via postinstall)
+        run: bun install --frozen-lockfile
+
+      # src/routeTree.gen.ts is gitignored and emitted by the vite build; the client
+      # program does not typecheck without it. The sibling job proves this generator's
+      # output is byte-identical to the build's.
+      - name: Generate route tree
+        run: bun run gen:routetree
+
+      # Same safety net as the fast job, and for the same reason — it should not engage
+      # (peak 8.66 GB against a 10240 MB ceiling), but a cold build is exactly where a
+      # spike would land. See the fast job for why this ADDS swap on /mnt instead of
+      # resizing the runner's active /swapfile.
+      - name: Provision additional swap (safety net)
+        run: |
+          sudo fallocate -l 8G /mnt/swapfile
+          sudo chmod 600 /mnt/swapfile
+          sudo mkswap /mnt/swapfile
+          sudo swapon /mnt/swapfile
+
+      # `typecheck:cold` = rm -rf tsbuild && typecheck. No cache is restored into this
+      # job at all, so the rm is belt-and-braces against a stray local artifact.
+      - name: Typecheck from scratch
+        run: bun run typecheck:cold

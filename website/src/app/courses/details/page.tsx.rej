@@ -1,0 +1,48 @@
+diff a/website/src/app/courses/details/page.tsx b/website/src/app/courses/details/page.tsx	(rejected hunks)
+@@ -101,8 +101,8 @@ export default function CourseDetailsPage() {
+           {/* الشريط الجانبي — يسار */}
+           <aside className="flex flex-col gap-6">
+             {/* بطاقة التسجيل */}
+-            <div className="flex flex-col gap-4 rounded-2xl border border-border bg-card p-4">
+-              <div className="relative h-[200px] w-full overflow-hidden rounded-xl bg-[#d9d9d9]">
++            <div className="flex flex-col gap-4  border border-border bg-card p-4">
++              <div className="relative h-[200px] w-full overflow-hidden  bg-[#d9d9d9]">
+                 <Image
+                   src="/courses/path-1.jpg"
+                   alt="معاينة الدورة"
+@@ -113,7 +113,7 @@ export default function CourseDetailsPage() {
+               </div>
+               <a
+                 href="#"
+-                className="rounded-xl bg-primary py-3 text-center text-base font-medium primarytransition-colors hover:bg-primary"
++                className=" bg-primary py-3 text-center text-base font-medium primarytransition-colors hover:bg-primary"
+               >
+                 سجّل ابنك الآن
+               </a>
+@@ -135,7 +135,7 @@ export default function CourseDetailsPage() {
+             </div>
+ 
+             {/* بطاقة المدرّب */}
+-            <div className="flex flex-col gap-5 rounded-2xl border border-border bg-card p-5">
++            <div className="flex flex-col gap-5  border border-border bg-card p-5">
+               <div className="flex items-center gap-3">
+                 <div className="flex flex-1 flex-col items-end gap-1 text-right">
+                   <span className="text-lg font-semibold text-foreground">
+@@ -155,7 +155,7 @@ export default function CourseDetailsPage() {
+                 </div>
+               </div>
+ 
+-              <div className="flex items-stretch justify-between rounded-xl bg-background py-3">
++              <div className="flex items-stretch justify-between  bg-background py-3">
+                 {INSTRUCTOR_STATS.map((stat, i) => (
+                   <div
+                     key={stat.label}
+@@ -181,7 +181,7 @@ export default function CourseDetailsPage() {
+ 
+               <a
+                 href="#"
+-                className="flex items-center justify-center gap-2 rounded-xl bg-background py-3 text-base font-medium text-foreground transition-colors hover:bg-secondary"
++                className="flex items-center justify-center gap-2  bg-background py-3 text-base font-medium text-foreground transition-colors hover:bg-secondary"
+               >
+                 مزيد من التفاصيل
+                 <ArrowLeft className="size-5" />

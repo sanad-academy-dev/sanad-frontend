@@ -1,0 +1,41 @@
+import { type CreateCostCenterInput, type UpdateCostCenterInput } from "@/server/accounting/cost-center/cost-center.type";
+export declare function createCostCenter(input: CreateCostCenterInput): Promise<{
+    id: string;
+    clinicId: string;
+    disabled: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    isGroup: boolean;
+    lft: number;
+    rgt: number;
+    costCenterName: string;
+    costCenterNumber: string | null;
+    parentCostCenterId: string | null;
+}>;
+export declare function updateCostCenter(clinicId: string, id: string, data: UpdateCostCenterInput): Promise<{
+    id: string;
+    clinicId: string;
+    disabled: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    isGroup: boolean;
+    lft: number;
+    rgt: number;
+    costCenterName: string;
+    costCenterNumber: string | null;
+    parentCostCenterId: string | null;
+}>;
+export declare function moveCostCenter(clinicId: string, id: string, newParentId: string | null): Promise<{
+    id: string;
+    clinicId: string;
+    disabled: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    isGroup: boolean;
+    lft: number;
+    rgt: number;
+    costCenterName: string;
+    costCenterNumber: string | null;
+    parentCostCenterId: string | null;
+}>;
+export declare function deleteCostCenter(clinicId: string, id: string): Promise<void>;
