@@ -151,13 +151,13 @@ const FEATURES: Feature[] = [
     icon: <Icon><circle cx="12" cy="12" r="10" /><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" /></Icon>,
   },
   {
-    title: "تطبيق عملي",
-    text: "كل مفهوم نحوله لتجربة عملية",
+    title: "يتعلم بالممارسة",
+    text: "كل مفهوم يتحول إلى تجربة ومهمة ومشروع يستطيع الطفل فهمه وبناؤه",
     icon: <Icon><rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" /></Icon>,
   },
   {
-    title: "نبني مشاريع",
-    text: "في كل مستوي يبني الطفل مشروع حقيقي",
+    title: "كل مستوى ينتهي بإنجاز حقيقي",
+    text: "لا ينتقل الطفل لمجرد انتهاء الوقت؛ ينتقل عندما يثبت ما تعلمه.",
     icon: <Icon><path d="M12 2v20" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" /></Icon>,
   },
   {
@@ -179,8 +179,9 @@ const FEATURES: Feature[] = [
 
 export default function WhySanad() {
   return (
-    <Container className="bg-background relative overflow-hidden border-t border-border py-16">
-      <div className="w-full">
+    <section className="w-full bg-background">
+      <Container className="relative overflow-hidden py-16">
+        <div className="w-full border-t border-border pt-16">
         <div className="flex flex-col items-center justify-center text-center space-y-4 mb-16">
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
@@ -211,6 +212,7 @@ export default function WhySanad() {
           <SpotlightGrid features={FEATURES} />
         </motion.div>
       </div>
-    </Container>
+      </Container>
+    </section>
   );
 }

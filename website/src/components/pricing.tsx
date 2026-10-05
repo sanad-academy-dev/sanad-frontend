@@ -631,7 +631,8 @@ const PLANS: Plan[] = [
 export default function Pricing() {
   return (
     <section className="relative w-full overflow-hidden bg-card">
-      <Container className="relative z-10 flex flex-col items-center gap-12 py-20 md:py-28 border-t border-border">
+      <Container className="relative z-10 py-20 md:py-28">
+        <div className="w-full border-t border-border pt-20 md:pt-28 flex flex-col items-center gap-12">
         <div className="flex flex-col items-center gap-4 text-center max-w-3xl">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground tracking-tight">
             باقات الاشتراك
@@ -643,6 +644,7 @@ export default function Pricing() {
 
         <div className="flex w-full justify-center">
           <PricingCalculator plans={PLANS} defaultPlanIndex={0} familyDiscount={0.1} />
+        </div>
         </div>
       </Container>
     </section>

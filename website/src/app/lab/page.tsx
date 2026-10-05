@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
-import Navbar from "@/components/navbar";
 
 // Sampling pitch in CSS px. Sized for about 1,500 particles in "LAB" at this
 // canvas size: dense enough to read as letters, light enough for any phone.
@@ -421,8 +420,7 @@ export function ParticleText({
 
 export default function ParticleTextDemo() {
     return (
-       <main className="bg-card">
-      <Navbar variant="solid" />
+       <main className="bg-card flex-1">
     <div className="flex justify-center items-center h-screen">
         <ParticleText text="LAB" />
     </div>

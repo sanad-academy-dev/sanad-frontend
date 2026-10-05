@@ -1,6 +1,5 @@
 import Image from "next/image";
 
-import Navbar from "@/components/navbar";
 import Hero from "@/components/hero";
 import StatsCard from "@/components/stats-card";
 import BrandMarquee from "@/components/brand-marquee";
@@ -10,14 +9,12 @@ import LearningPaths from "@/components/learning-paths";
 import Pricing from "@/components/pricing";
 import Faq from "@/components/faq";
 import CtaBanner from "@/components/cta-banner";
-import Footer from "@/components/footer";
 import { getCourses, getCategories } from "@/lib/courses";
 import Levels from "@/components/levels";
 import JourneyChild from "@/components/journey-child";
 import TestimonialsSection from "@/components/testimonials";
-import AiAgent from "@/components/ai-againt";
 import WhySanad from "@/components/why-sanad";
-
+import Support from "@/components/support";
 export default async function Home() {
   // المحتوى يُجلب ديناميكياً من داشبورد سند
   const [{ courses }, { categories }] = await Promise.all([
@@ -38,9 +35,6 @@ export default async function Home() {
           className="object-cover"
         />
         <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.6),rgba(28,0,75,0.12))]" />
-
-        {/* الـ Navbar فوق الـ hero */}
-        <Navbar />
 
         {/* محتوى الـ hero */}
         <Hero />
@@ -89,6 +83,10 @@ export default async function Home() {
       {/* أسئلة أولياء الأمور */}
       <Faq />
 
+      {/* قسم الدعم والمساعدة */}
+      <div id="support">
+        <Support />
+      </div>
       {/* استكشاف فئات الدورات */}
       <div id="bootcamps">
         <CourseCategories  />
@@ -97,13 +95,6 @@ export default async function Home() {
       {/* بانر الدعوة للإجراء */}
       <CtaBanner />
 
-      {/* الفوتر */}
-      <div id="footer">
-        <Footer />
-      </div>
-
-      {/* المساعد الذكي */}
-      <AiAgent />
     </main>
   );
 }

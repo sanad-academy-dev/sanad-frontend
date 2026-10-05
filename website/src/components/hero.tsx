@@ -86,11 +86,13 @@ export default function Hero() {
           <JoinButton className="px-10 py-4 text-lg h-auto font-semibold">
              قيم ابنك مجانًا
           </JoinButton>
-          <Button asChild variant="secondary" className="px-8 py-4 text-lg h-auto font-semibold">
-            <a href="#">
-              اكتشف مساراتنا
-              <ArrowLeft className="size-6 ml-2" />
-            </a>
+          <Button 
+            variant="secondary" 
+            className="px-8 py-4 text-lg h-auto font-semibold cursor-pointer"
+            onClick={() => window.dispatchEvent(new CustomEvent("open-ai-agent"))}
+          >
+            اكتشف مساراتنا
+            <ArrowLeft className="size-6 ml-2" />
           </Button>
         </div>
 

@@ -10,8 +10,6 @@ import {
   Video,
 } from "lucide-react";
 
-import Navbar from "@/components/navbar";
-import Footer from "@/components/footer";
 import Container from "@/components/container";
 import CourseDetailsHero from "@/components/course-details-hero";
 import CourseContent from "@/components/course-content";
@@ -72,7 +70,7 @@ const RELATED: PathCardData[] = [
 export default function CourseDetailsPage() {
   return (
     <main className="bg-card">
-      <Navbar variant="solid" />
+
 
       {/* فتات الخبز */}
       <Container className="py-4">
@@ -210,7 +208,6 @@ export default function CourseDetailsPage() {
         </div>
       </Container>
 
-      <Footer />
     </main>
   );
 }
