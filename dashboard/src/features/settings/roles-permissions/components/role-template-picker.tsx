@@ -6,7 +6,7 @@ import {
 	ROLE_TEMPLATES,
 	type RoleTemplate,
 	resolveTemplateGrants,
-} from "@/lib/rbac/rbac-role-templates";
+} from "@sanad/contracts/runtime/lib/rbac/rbac-role-templates";
 import { cn } from "@/lib/utils";
 
 /**

@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { createRegisterSchema, type RegisterFormValues } from "@/features/auth/auth.type";
+import { invalidateSessionCache } from "@/functions/get-session";
 import { useI18n } from "@/hooks/use-i18n";
 import { signIn, signUp } from "@/lib/auth/client";
 
@@ -60,11 +61,16 @@ function RouteComponent() {
 			return;
 		}
 
+		invalidateSessionCache();
 		navigate({ to: "/dashboard" });
 	};
 
 	const handleGoogleSignUp = () => {
-		signIn.social({ provider: "google" });
+		signIn.social({
+			provider: "google",
+			callbackURL: `${window.location.origin}/dashboard`,
+			errorCallbackURL: `${window.location.origin}/register`,
+		});
 	};
 
 	return (
