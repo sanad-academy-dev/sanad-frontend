@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChevronsLeft,
-  Copy,
+  Copy ,
   Cpu,
   CreditCard,
   Monitor,
