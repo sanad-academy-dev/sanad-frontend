@@ -458,12 +458,11 @@ function LoginPopup({ onClose }: { onClose: () => void }) {
   );
 }
 
-export default function Navbar() {
+export default function Navbar({ variant = "overlay" }: { variant?: Variant }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loginPopupOpen, setLoginPopupOpen] = useState(false);
   const [openMobileDropdown, setOpenMobileDropdown] = useState<string | null>(null);
   const pathname = usePathname();
-  const variant: Variant = "overlay";
   const t = THEME[variant];
 
   const isActive = (href: string) =>
