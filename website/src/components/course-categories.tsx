@@ -1,4 +1,5 @@
 import Container from "@/components/container";
+import { SectionHeader } from "@/components/ui/header";
 
 const CAMPS = [
   { id: "01", title: "Coding Camp", desc: "من الفكرة إلى أول برنامج" },
@@ -10,27 +11,16 @@ const CAMPS = [
 export default function CourseCategories() {
   return (
     <section className="w-full bg-card">
-      <Container className="py-16">
-        <div className="w-full border-t border-border pt-16 flex flex-col gap-8">
+      <Container withBorder>
         {/* Header */}
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-          <div className="flex flex-col gap-3 text-right">
-            <span className="w-fit rounded-full bg-primary/10 px-4 py-2 text-sm font-bold text-primary">
-              تجربة قصيرة بهدف واضح
-            </span>
-            <div className="flex items-center gap-3">
-              <h2 className="text-3xl font-bold text-foreground sm:text-4xl">
-                معسكرات سَنَد
-              </h2>
-              <span className="inline-flex shrink-0 items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                قريباً
-              </span>
-            </div>
-            <p className="max-w-2xl text-base text-muted-foreground sm:text-lg">
-              برنامج مكثّف يركّز على مهارة محددة وينتهي بمشروع، مناسب للإجازات
-              واستكشاف مجال جديد.
-            </p>
-          </div>
+          <SectionHeader
+            title="معسكرات سَنَد"
+            description="برنامج مكثّف يركّز على مهارة محددة وينتهي بمشروع، مناسب للإجازات واستكشاف مجال جديد."
+            label="تجربة قصيرة بهدف واضح"
+            badge="قريباً"
+            className="text-right "
+          />
           <a
             href="https://cb58e96a-80e5-44e0-ba3c-3eb7cca9cc3d-figmacachedpreview.figma.site/#assessment"
             target="_blank"
@@ -64,7 +54,6 @@ export default function CourseCategories() {
               </div>
             </a>
           ))}
-        </div>
         </div>
       </Container>
     </section>

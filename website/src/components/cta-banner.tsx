@@ -48,8 +48,7 @@ function GeometricDecor({ className }: { className?: string }) {
 export default function CtaBanner() {
   return (
     <section className="w-full bg-card">
-      <Container className="py-16">
-        <div className="w-full border-t border-border pt-16">
+      <Container withBorder>
         <div className="relative flex flex-col items-center gap-8 overflow-hidden rounded-3xl border border-border bg-[linear-gradient(to_bottom,#1a1a1a,#0a0a0a)] px-6 py-14 text-center sm:px-12">
           {/* نمط النقاط في الخلفية */}
           <div 
@@ -75,7 +74,6 @@ export default function CtaBanner() {
               تواصل مع المبيعات (قريباً) <ArrowLeft className="mt-1" />
             </JoinButton>
           </div>
-        </div>
         </div>
       </Container>
     </section>

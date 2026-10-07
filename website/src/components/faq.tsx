@@ -6,6 +6,7 @@ import { Headset } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 import Container from "@/components/container";
+import { SectionHeader } from "@/components/ui/header";
 
 export type SpineItem = { id: string; label: string };
 
@@ -389,17 +390,13 @@ export default function Faq() {
 
   return (
     <section className="relative w-full overflow-hidden bg-card ">
-      <Container className="relative z-10 py-20 md:py-28">
-        <div className="w-full border-t border-border pt-20 md:pt-28 flex flex-col gap-12">
+      <Container className="relative z-10" withBorder>
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex flex-col gap-3 text-center md:text-right">
-            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight">
-              أسئلة أولياء الأمور
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              إجابات واضحة على الأسئلة الأكثر شيوعاً
-            </p>
-          </div>
+          <SectionHeader
+            title="أسئلة أولياء الأمور"
+            description="إجابات واضحة على الأسئلة الأكثر شيوعاً"
+            className="text-center md:text-right"
+          />
           <a
             href="https://wa.me/+201022805731"
             target="_blank"
@@ -446,7 +443,6 @@ export default function Faq() {
             </article>
           </div>
           
-        </div>
         </div>
       </Container>
     </section>

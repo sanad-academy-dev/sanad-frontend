@@ -1,21 +1,18 @@
 import Container from "@/components/container";
 import { Marquee } from "@/components/ui/marquee";
 import Image from "next/image";
+import { SectionHeader } from "@/components/ui/header";
 
 // قسم "Desktop - 3": عنوان + شريط متحرّك للشركات والدورات
 export default function BrandMarquee() {
   return (
     <section className="w-full bg-card">
-      <Container className="py-16">
-        <div className="w-full border-t border-border pt-16 flex flex-col items-center gap-8 text-center">
-        <div className="flex flex-col gap-2 mb-5">
-          <h2 className="text-3xl font-bold text-foreground">
-            اعتمادات وشراكات سند
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            تجربة تعليمية مصممة للجيل القادم
-          </p>
-        </div>
+      <Container>
+        <div className="w-full flex flex-col items-center gap-8 text-center">
+        <SectionHeader
+          title="اعتمادات وشراكات سند"
+          description="تجربة تعليمية مصممة للجيل القادم"
+        />
 
         <div className="flex text-muted-foreground w-full max-w-full flex-col gap-2 font-medium" dir="rtl">
           <Marquee

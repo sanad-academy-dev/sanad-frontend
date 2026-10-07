@@ -3,6 +3,7 @@ import { ArrowLeft, Bookmark, Calendar, Star } from "lucide-react";
 import { JoinButton } from "@/components/join-button";
 
 import Container from "@/components/container";
+import { SectionHeader } from "@/components/ui/header";
 
 // قسم "الدورات الأكثر طلباً" — Desktop - 4 من التصميم
 type Course = {
@@ -151,18 +152,14 @@ export default function FeaturedCourses({
 }) {
   return (
     <section className="w-full bg-card">
-      <Container className="py-16">
-        <div className="w-full border-t border-border pt-16 flex flex-col gap-8">
+      <Container withBorder>
         {/* العنوان */}
         <div className="flex items-center justify-between gap-6">
-          <div className="flex flex-col gap-3 text-right">
-            <h2 className="text-2xl font-bold text-foreground">
-              الدورات الأكثر طلباً
-            </h2>
-            <p className="text-base text-muted-foreground">
-              اختيارات أولياء الأمور المفضلة
-            </p>
-          </div>
+          <SectionHeader
+            title="الدورات الأكثر طلباً"
+            description="اختيارات أولياء الأمور المفضلة"
+            className="text-right"
+          />
           <a
             href="#"
             className="flex shrink-0 items-center gap-2 text-xl font-medium text-primary transition-opacity hover:opacity-80"
@@ -177,7 +174,6 @@ export default function FeaturedCourses({
           {courses.map((course, i) => (
             <CourseCard key={i} course={course} />
           ))}
-        </div>
         </div>
       </Container>
     </section>

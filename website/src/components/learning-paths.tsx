@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
 import { JoinButton } from "@/components/join-button";
+import { SectionHeader } from "@/components/ui/header";
 
 // --- PageDots Logic ---
 const DOT = 6;
@@ -500,21 +501,14 @@ export default function LearningPaths() {
         if (!insideRegion(e.relatedTarget)) setFocused(false);
       }}
     >
-      <Container className="flex flex-col gap-8 py-16">
-        <div className="w-full border-t border-border pt-16 flex flex-col gap-8">
+      <Container withBorder>
         {/* الرأس */}
         <div className="flex flex-col items-center justify-center gap-6 text-center">
-          <div className="flex flex-col items-center gap-3">
-            {/* <span className="rounded-full bg-primary/10 px-4 py-2 text-sm font-bold text-primary">
-              مسارات وليست كورسات منفصلة
-            </span> */}
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground">
-              المسار الذي يناسب طفلك الآن
-            </h2>
-            <p className="max-w-[600px] text-base text-muted-foreground">
-              العمر يوجّه الاختيار، والتقييم يحدد المستوى ونقطة البداية الفعلية.
-            </p>
-          </div>
+          <SectionHeader
+            title="المسار الذي يناسب طفلك الآن"
+            description="العمر يوجّه الاختيار، والتقييم يحدد المستوى ونقطة البداية الفعلية."
+            className="items-center"
+          />
 
             {/* شريط الفلترة */}
           {/* <div className="flex flex-col md:flex-row items-center justify-between gap-6">
@@ -598,7 +592,6 @@ export default function LearningPaths() {
             />
           </div>
         )}
-        </div>
       </Container>
     </section>
   );

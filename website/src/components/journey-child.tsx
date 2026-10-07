@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, useScroll, useSpring, useMotionValueEvent } from 'framer-motion';
 import { Check, Star, Code, PenTool, Lightbulb, User, Flag } from 'lucide-react';
 import Container from './container';
+import { SectionHeader } from "@/components/ui/header";
 
 const stations = [
   {
@@ -136,16 +137,12 @@ export default function JourneyChild() {
 
   return (
     <section className="relative w-full overflow-hidden bg-background " id="journey">
-      <Container className="relative z-10 py-20 md:py-28" dir="rtl">
-        <div className="w-full border-t border-border pt-20 md:pt-28 flex flex-col">
-        <div className="text-center mb-32 max-w-3xl mx-auto flex flex-col items-center gap-4">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground tracking-tight">
-           رحلة واضحة من التقييم إلى الإنجاز
-          </h2>
-          <p className="text-muted-foreground text-lg md:text-xl leading-relaxed">
-       لا تبدأ الرحلة بحجز كورس؛ تبدأ بفهم ابنك، ثم تتحول كل خطوة إلى مهارة ومشروع وتقدّم ملموس.
-          </p>
-        </div>
+      <Container className="relative z-10" dir="rtl" withBorder>
+        <SectionHeader
+          title="رحلة واضحة من التقييم إلى الإنجاز"
+          description="لا تبدأ الرحلة بحجز كورس؛ تبدأ بفهم ابنك، ثم تتحول كل خطوة إلى مهارة ومشروع وتقدّم ملموس."
+          className="text-center items-center mx-auto"
+        />
 
         <div className="relative" ref={containerRef}>
           {/* SVG Canvas for the curved line */}
@@ -286,7 +283,6 @@ export default function JourneyChild() {
             </div>
           </div>
 
-        </div>
         </div>
       </Container>
     </section>

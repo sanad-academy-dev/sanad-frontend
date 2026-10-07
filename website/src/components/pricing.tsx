@@ -12,6 +12,7 @@ import {
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
 import Container from "@/components/container";
+import { SectionHeader } from "@/components/ui/header";
 
 export type Plan = {
   name: string;
@@ -631,20 +632,15 @@ const PLANS: Plan[] = [
 export default function Pricing() {
   return (
     <section className="relative w-full overflow-hidden bg-card">
-      <Container className="relative z-10 py-20 md:py-28">
-        <div className="w-full border-t border-border pt-20 md:pt-28 flex flex-col items-center gap-12">
-        <div className="flex flex-col items-center gap-4 text-center max-w-3xl">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground tracking-tight">
-            باقات الاشتراك
-          </h2>
-          <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">
-            خطط مرنة تتناسب مع مسار ابنك — حدد المرحلة التعليمية لتبدأ الرحلة.
-          </p>
-        </div>
+      <Container className="relative z-10" withBorder>
+        <SectionHeader
+          title="باقات الاشتراك"
+          description="خطط مرنة تتناسب مع مسار ابنك — حدد المرحلة التعليمية لتبدأ الرحلة."
+           className="items-center text-center"
+        />
 
         <div className="flex w-full justify-center">
           <PricingCalculator plans={PLANS} defaultPlanIndex={0} familyDiscount={0.1} />
-        </div>
         </div>
       </Container>
     </section>

@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import Container from "./container";
+import { SectionHeader } from "@/components/ui/header";
 
 // Paints only the 1px padding ring, so the gradient shows as a lit edge.
 const RING_MASK =
@@ -180,27 +181,18 @@ const FEATURES: Feature[] = [
 export default function WhySanad() {
   return (
     <section className="w-full bg-background">
-      <Container className="relative overflow-hidden py-16">
-        <div className="w-full border-t border-border pt-16">
-        <div className="flex flex-col items-center justify-center text-center space-y-4 mb-16">
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-foreground leading-tight"
-          >
-            لماذا أكاديمية سند؟
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="text-lg md:text-xl font-medium text-muted-foreground leading-relaxed max-w-2xl"
-          >
-            نعلّم، نطبّق، ونبني مهارات تستمر مع ابنك.
-          </motion.p>
-        </div>
+      <Container className="relative overflow-hidden" withBorder>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="flex flex-col items-center justify-center text-center"
+        >
+          <SectionHeader
+            title="لماذا أكاديمية سند؟"
+            description="نعلّم، نطبّق، ونبني مهارات تستمر مع ابنك."
+          />
+        </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -211,7 +203,6 @@ export default function WhySanad() {
         >
           <SpotlightGrid features={FEATURES} />
         </motion.div>
-      </div>
       </Container>
     </section>
   );

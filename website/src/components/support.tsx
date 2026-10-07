@@ -6,6 +6,7 @@ import { CheckCircle2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import Container from "./container";
+import { SectionHeader } from "@/components/ui/header";
 import { MultiStepForm } from "./multi-step-form";
 import { Button } from "@/components/ui/button";
 
@@ -66,16 +67,12 @@ export default function Support() {
 
   return (
     <section className="relative w-full overflow-hidden bg-background ">
-      <Container className="py-20 md:py-28" >
-        <div className="w-full border-t border-border pt-20 md:pt-28">
-        <div className="flex flex-col items-center justify-center text-center space-y-6 mb-16">
-          <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-foreground tracking-tight">
-            كيف يمكننا مساعدتك؟
-          </h2>
-          <p className="text-lg md:text-xl font-medium text-muted-foreground leading-relaxed max-w-3xl mx-auto">
-            سواء كنت تبحث عن المسار المناسب لطفلك، أو تريد حجز التقييم، أو لديك استفسار عن برامج سند، نحن هنا لمساعدتك.
-          </p>
-        </div>
+      <Container withBorder>
+        <SectionHeader
+          title="كيف يمكننا مساعدتك؟"
+          description="سواء كنت تبحث عن المسار المناسب لطفلك، أو تريد حجز التقييم، أو لديك استفسار عن برامج سند، نحن هنا لمساعدتك."
+          className="text-center items-center"
+        />
 
         <div className="w-full rounded-3xl border border-border bg-card overflow-hidden shadow-sm" dir="rtl">
           {/* Top Banner */}
@@ -131,7 +128,6 @@ export default function Support() {
               </div>
             ))}
           </div>
-        </div>
         </div>
       </Container>
 

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Container from './container';
+import { SectionHeader } from "@/components/ui/header";
 import { Compass, Brain, Code2, Layers, Sparkles, TrendingUp, Check, Target, ChevronLeft } from 'lucide-react';
 
 const stages = [
@@ -120,19 +121,13 @@ export default function Levels() {
 
   return (
     <section className="w-full bg-background relative overflow-hidden">
-      <Container className="py-24 relative z-10">
-        <div className="relative z-10 w-full border-t border-border pt-24">
-        
+      <Container className="relative z-10" withBorder>
         {/* Header */}
-        <div className="text-center mb-24 flex flex-col items-center">
-          
-          <h2 className="text-4xl md:text-5xl font-black text-foreground mb-6 leading-tight">
-            27 مستوى... مهارة تُبنى<br />خطوة بخطوة
-          </h2>
-          <p className="text-muted-foreground text-lg">
-            كل مستوى يضيف مهارة جديدة، وكل مرحلة تقرّب طفلك من بناء مشاريع أكثر تقدماً.
-          </p>
-        </div>
+        <SectionHeader
+          title={<>27 مستوى... مهارة تُبنى<br />خطوة بخطوة</>}
+          description="كل مستوى يضيف مهارة جديدة، وكل مرحلة تقرّب طفلك من بناء مشاريع أكثر تقدماً."
+          className="text-center items-center"
+        />
 
         {/* Timeline */}
         <div className="relative flex justify-start md:justify-between items-start w-full mb-16 overflow-x-auto pb-6 gap-6 md:gap-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -270,7 +265,6 @@ export default function Levels() {
           </div>
         </div>
 
-      </div>
       </Container>
     </section>
   );
