@@ -98,7 +98,7 @@ export default function Hero() {
         </div>
 
         {/* Location Info */}
-        <div className="mt-2 flex flex-col sm:flex-row items-center justify-center gap-3 text-sm font-bold text-muted-foreground">
+        <div className="mt-2 flex flex-row items-center justify-center gap-3 text-sm font-bold text-muted-foreground">
           <div className="flex items-center gap-2 rounded-full border border-border/40 bg-background/40 px-5 py-2.5 backdrop-blur-md transition-colors hover:bg-background/60">
             <MapPin className="size-5 text-primary" />
             <span>حضوري</span>
