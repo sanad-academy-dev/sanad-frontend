@@ -14,12 +14,15 @@ import { JoinButton } from "@/components/join-button";
 type NavLink = {
   label: string;
   href: string;
+  badge?: string;
   children?: { label: string; href: string; badge?: string }[];
 };
 
 const NAV_LINKS: NavLink[] = [
   { label: "الرئيسية", href: "/" },
   { label: "المسارات", href: "/#paths" },
+  { label: "المتجر", href: "/store", badge: "قريباً" },
+
   {
     label: "حول الأكاديمية",
     href: "#",
@@ -43,6 +46,7 @@ const NAV_LINKS: NavLink[] = [
   },
   { label: "الأسعار", href: "/#pricing" },
   { label: "تواصل معنا", href: "/#footer" },
+  { label: "التوثيق", href: "/verify" },
 ];
 
 type Variant = "overlay" | "solid";
@@ -246,7 +250,7 @@ function DesktopNav({
                   }}
                   href={link.href}
                   className={cn(
-                    "block whitespace-nowrap px-3 py-2 text-sm transition-colors",
+                    "flex items-center gap-1.5 whitespace-nowrap px-3 py-2 text-sm transition-colors",
                     t.text,
                     isActive(link.href)
                       ? cn("rounded bg-primary/10 font-medium", t.activeText)
@@ -261,7 +265,12 @@ function DesktopNav({
                     }
                   }}
                 >
-                  {link.label}
+                  <span>{link.label}</span>
+                  {link.badge && (
+                    <span className="inline-flex shrink-0 items-center rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                      {link.badge}
+                    </span>
+                  )}
                 </Link>
               </li>
             );
@@ -581,13 +590,18 @@ export default function Navbar({ variant = "overlay" }: { variant?: Variant }) {
                       href={link.href}
                       onClick={() => setMobileOpen(false)}
                       className={cn(
-                        "block rounded px-4 py-3 text-base transition-colors",
+                        "flex items-center gap-2 rounded px-4 py-3 text-base transition-colors",
                         isActive(link.href)
                           ? "bg-primary/10 font-medium text-primary"
                           : "text-foreground hover:bg-secondary",
                       )}
                     >
-                      {link.label}
+                      <span>{link.label}</span>
+                      {link.badge && (
+                        <span className="inline-flex shrink-0 items-center rounded-full border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                          {link.badge}
+                        </span>
+                      )}
                     </Link>
                   </li>
                 ),

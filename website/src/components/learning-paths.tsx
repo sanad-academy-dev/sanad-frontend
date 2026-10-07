@@ -500,7 +500,8 @@ export default function LearningPaths() {
         if (!insideRegion(e.relatedTarget)) setFocused(false);
       }}
     >
-      <Container className="flex flex-col gap-8 border-t border-border py-16">
+      <Container className="flex flex-col gap-8 py-16">
+        <div className="w-full border-t border-border pt-16 flex flex-col gap-8">
         {/* الرأس */}
         <div className="flex flex-col items-center justify-center gap-6 text-center">
           <div className="flex flex-col items-center gap-3">
@@ -597,6 +598,7 @@ export default function LearningPaths() {
             />
           </div>
         )}
+        </div>
       </Container>
     </section>
   );

@@ -158,7 +158,7 @@ function Stepper({ active }: { active: number }) {
   );
 }
 
-function TrialModal({ onClose }: { onClose: () => void }) {
+export function TrialModal({ onClose }: { onClose: () => void }) {
   const [step, setStep] = useState(0);
 
   return (

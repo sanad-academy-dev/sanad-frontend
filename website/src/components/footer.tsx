@@ -51,7 +51,8 @@ const SOCIALS: { name: string; path: string }[] = [
 export default function Footer() {
   return (
     <footer dir="rtl" className="w-full bg-background">
-      <Container className="flex flex-col gap-6 py-16 border-t border-border">
+      <Container className="py-16">
+        <div className="w-full border-t border-border pt-16 flex flex-col gap-6">
         <div className="flex flex-col gap-12 lg:flex-row lg:justify-between lg:gap-12">
           {/* العلامة + الوصف + السوشال */}
           <div className="flex flex-col items-start gap-6 text-start lg:max-w-[576px]">
@@ -130,6 +131,7 @@ export default function Footer() {
           <p className="text-base text-muted-foreground">
             © 2026 أكاديمية سند. جميع الحقوق محفوظة.
           </p>
+        </div>
         </div>
       </Container>
     </footer>

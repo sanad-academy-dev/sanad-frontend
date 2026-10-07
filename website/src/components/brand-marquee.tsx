@@ -1,12 +1,13 @@
 import Container from "@/components/container";
 import { Marquee } from "@/components/ui/marquee";
-import { Landmark, Microscope, RadioTower } from "lucide-react";
+import Image from "next/image";
 
 // قسم "Desktop - 3": عنوان + شريط متحرّك للشركات والدورات
 export default function BrandMarquee() {
   return (
-    <section className="w-full bg-card py-16 my-5">
-      <Container className="flex flex-col items-center gap-8 text-center">
+    <section className="w-full bg-card">
+      <Container className="py-16">
+        <div className="w-full border-t border-border pt-16 flex flex-col items-center gap-8 text-center">
         <div className="flex flex-col gap-2 mb-5">
           <h2 className="text-3xl font-bold text-foreground">
             اعتمادات وشراكات سند
@@ -23,20 +24,21 @@ export default function BrandMarquee() {
             fade={false}
             className="text-lg text-muted-foreground font-bold"
             items={[
-              { name: "وزارة الاستثمار", icon: <Landmark className="text-[#cda434] size-5" /> },
-              { name: "STEM", icon: <Microscope className="text-[#e3000f] size-5" /> },
-              { name: "وزارة الاتصالات", icon: <RadioTower className="text-[#00529b] size-5" /> },
-              { name: "وزارة الاستثمار", icon: <Landmark className="text-[#cda434] size-5" /> },
-              { name: "STEM", icon: <Microscope className="text-[#e3000f] size-5" /> },
-              { name: "وزارة الاتصالات", icon: <RadioTower className="text-[#00529b] size-5" /> },
-              { name: "وزارة الاستثمار", icon: <Landmark className="text-[#cda434] size-5" /> },
-              { name: "STEM", icon: <Microscope className="text-[#e3000f] size-5" /> },
-              { name: "وزارة الاتصالات", icon: <RadioTower className="text-[#00529b] size-5" /> },
-              { name: "وزارة الاستثمار", icon: <Landmark className="text-[#cda434] size-5" /> },
-              { name: "STEM", icon: <Microscope className="text-[#e3000f] size-5" /> },
-              { name: "وزارة الاتصالات", icon: <RadioTower className="text-[#00529b] size-5" /> },
+              { name: "", icon: <Image src="/assets/marquee-1.jpeg" alt="شريك 1" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-2.jpeg" alt="شريك 2" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-3.jpeg" alt="شريك 3" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-1.jpeg" alt="شريك 1" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-2.jpeg" alt="شريك 2" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-3.jpeg" alt="شريك 3" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-1.jpeg" alt="شريك 1" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-2.jpeg" alt="شريك 2" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-3.jpeg" alt="شريك 3" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-1.jpeg" alt="شريك 1" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-2.jpeg" alt="شريك 2" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-3.jpeg" alt="شريك 3" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
             ]}
           />
+        </div>
         </div>
       </Container>
     </section>

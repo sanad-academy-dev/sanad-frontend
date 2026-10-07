@@ -577,12 +577,14 @@ const TESTIMONIALS: Testimonial[] = [
 
 export default function TestimonialsSection() {
     return (
-        <Container className="border-t border-border py-16" >
-            <div className="flex flex-col items-center gap-3 text-center"> 
+        <section className="w-full bg-background">
+        <Container className="py-16" >
+            <div className="w-full border-t border-border pt-16 flex flex-col items-center gap-3 text-center"> 
                 <h1 className="text-4xl md:text-5xl font-bold text-foreground">  آراء ألوياء الأمور </h1>
                 <p className="text-base text-muted-foreground" >اكتشف كيف ساعد سند الطلاب في تحقيق أهدافهم الأكاديمية من خلال آراء أولياء الأمور</p>
             </div>
              <TestimonialHighlight testimonials={TESTIMONIALS} />
         </Container>
+        </section>
     )  ;
 }

@@ -151,7 +151,8 @@ export default function FeaturedCourses({
 }) {
   return (
     <section className="w-full bg-card">
-      <Container className="flex flex-col gap-8 border-t border-border py-16">
+      <Container className="py-16">
+        <div className="w-full border-t border-border pt-16 flex flex-col gap-8">
         {/* العنوان */}
         <div className="flex items-center justify-between gap-6">
           <div className="flex flex-col gap-3 text-right">
@@ -176,6 +177,7 @@ export default function FeaturedCourses({
           {courses.map((course, i) => (
             <CourseCard key={i} course={course} />
           ))}
+        </div>
         </div>
       </Container>
     </section>

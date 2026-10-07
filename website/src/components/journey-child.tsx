@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, useScroll, useSpring, useMotionValueEvent } from 'framer-motion';
-import { Check, Star, Code, PenTool, Lightbulb, User } from 'lucide-react';
+import { Check, Star, Code, PenTool, Lightbulb, User, Flag } from 'lucide-react';
 import Container from './container';
 
 const stations = [
@@ -56,6 +56,7 @@ export default function JourneyChild() {
   const pathRef = useRef<SVGPathElement>(null);
   const [pathD, setPathD] = useState("");
   const [arrowPos, setArrowPos] = useState({ x: 0, y: 0 });
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const { scrollYProgress } = useScroll({
@@ -84,7 +85,9 @@ export default function JourneyChild() {
       const y = rect.top + rect.height / 2 - containerRect.top;
       
       if (i === 0) {
-        d += `M ${x} ${Math.max(0, y - 100)} L ${x} ${y} `;
+        const startY = Math.max(0, y - 100);
+        d += `M ${x} ${startY} L ${x} ${y} `;
+        setStartPos({ x, y: startY });
       } else {
         const prevNode = nodesRef.current[i - 1]!;
         const prevRect = prevNode.getBoundingClientRect();
@@ -132,8 +135,9 @@ export default function JourneyChild() {
   });
 
   return (
-    <section className="relative w-full overflow-hidden bg-background border-t border-border" id="journey">
-      <Container className="relative z-10 flex flex-col py-20 md:py-32" dir="rtl">
+    <section className="relative w-full overflow-hidden bg-background " id="journey">
+      <Container className="relative z-10 py-20 md:py-28" dir="rtl">
+        <div className="w-full border-t border-border pt-20 md:pt-28 flex flex-col">
         <div className="text-center mb-32 max-w-3xl mx-auto flex flex-col items-center gap-4">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-foreground tracking-tight">
            رحلة واضحة من التقييم إلى الإنجاز
@@ -207,17 +211,31 @@ export default function JourneyChild() {
             </div>
           )}
 
-          <div className="flex flex-col gap-12 md:gap-8 relative z-20">
+          {/* Start Flag */}
+          {pathD && (
+            <div 
+              className="absolute z-20 pointer-events-none flex items-center justify-center"
+              style={{ 
+                left: startPos.x, 
+                top: startPos.y,
+                transform: 'translate(-50%, -100%)',
+              }}
+            >
+              <Flag className="w-8 h-8 fill-none text-white" />
+            </div>
+          )}
+
+          <div className="flex flex-col gap-6 md:gap-0 relative z-20">
             {stations.map((station, index) => {
               const isEven = index % 2 === 0;
               const isActive = activeIndex >= index;
               
               return (
-                <div key={station.num} className="grid grid-cols-[4rem_1fr] md:flex w-full min-h-[200px] items-center relative">
+                <div key={station.num} className="grid grid-cols-[4rem_1fr] md:flex w-full min-h-[140px] items-center relative">
                   
                   {/* Right/Left Card (Desktop) */}
                   <div className={`hidden md:flex w-full ${isEven ? 'justify-start' : 'justify-end'}`}>
-                    <StationCard station={station} isActive={isActive} isEven={isEven} className="w-[480px] shrink-0" />
+                    <StationCard station={station} isActive={isActive} isEven={isEven} className="shrink-0" />
                   </div>
 
                   {/* Shared Node */}
@@ -229,7 +247,7 @@ export default function JourneyChild() {
                     top-1/2 -translate-y-1/2
                     right-[2rem] translate-x-1/2
                     md:translate-x-0
-                    ${isEven ? 'md:right-[490px]' : 'md:right-auto md:left-[490px]'}`}
+                    ${isEven ? 'md:right-[390px]' : 'md:right-auto md:left-[390px]'}`}
                   >
                     <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center font-bold font-sans transition-colors duration-500 ${isActive ? 'bg-primary text-primary-foreground scale-110' : 'bg-muted text-foreground'}`}>
                       {station.num}
@@ -268,6 +286,7 @@ export default function JourneyChild() {
             </div>
           </div>
 
+        </div>
         </div>
       </Container>
     </section>

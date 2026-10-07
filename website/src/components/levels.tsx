@@ -119,8 +119,9 @@ export default function Levels() {
   const [activeStage, setActiveStage] = useState(stages[0]);
 
   return (
-    <Container className="border-t border-border py-24 bg-background relative overflow-hidden">
-      <div className="relative z-10">
+    <section className="w-full bg-background relative overflow-hidden">
+      <Container className="py-24 relative z-10">
+        <div className="relative z-10 w-full border-t border-border pt-24">
         
         {/* Header */}
         <div className="text-center mb-24 flex flex-col items-center">
@@ -270,7 +271,8 @@ export default function Levels() {
         </div>
 
       </div>
-    </Container>
+      </Container>
+    </section>
   );
 }
 

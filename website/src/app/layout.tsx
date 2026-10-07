@@ -3,6 +3,9 @@ import localFont from "next/font/local";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
+import AiAgent from "@/components/ai-againt";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -29,8 +32,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ar" dir="rtl" className={cn("dark scroll-smooth", thmanyah.variable)}>
-      <body className={cn(thmanyah.variable, "bg-background text-foreground antialiased")}>
-        {children}
+      <body className={cn(thmanyah.variable, "bg-background text-foreground antialiased min-h-screen flex flex-col")}>
+        <Navbar />
+        <div className="flex-1">
+          {children}
+        </div>
+        <Footer />
+        <AiAgent />
       </body>
     </html>
   );

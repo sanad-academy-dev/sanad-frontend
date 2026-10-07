@@ -10,7 +10,8 @@ const CAMPS = [
 export default function CourseCategories() {
   return (
     <section className="w-full bg-card">
-      <Container className="flex flex-col gap-8 border-t border-border py-16">
+      <Container className="py-16">
+        <div className="w-full border-t border-border pt-16 flex flex-col gap-8">
         {/* Header */}
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div className="flex flex-col gap-3 text-right">
@@ -63,6 +64,7 @@ export default function CourseCategories() {
               </div>
             </a>
           ))}
+        </div>
         </div>
       </Container>
     </section>
