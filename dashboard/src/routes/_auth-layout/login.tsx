@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { createLoginSchema, type LoginFormValues } from "@/features/auth/auth.type";
+import { invalidateSessionCache } from "@/functions/get-session";
 import { useI18n } from "@/hooks/use-i18n";
 import { signIn } from "@/lib/auth/client";
 
@@ -46,11 +47,16 @@ function RouteComponent() {
 			return;
 		}
 
+		invalidateSessionCache();
 		navigate({ to: "/dashboard" });
 	};
 
 	const handleGoogleSignIn = () => {
-		signIn.social({ provider: "google" });
+		signIn.social({
+			provider: "google",
+			callbackURL: `${window.location.origin}/dashboard`,
+			errorCallbackURL: `${window.location.origin}/login`,
+		});
 	};
 
 	return (
