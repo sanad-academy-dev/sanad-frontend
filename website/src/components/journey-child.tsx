@@ -2,7 +2,7 @@
 
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { motion, useScroll, useSpring, useMotionValueEvent } from 'framer-motion';
-import { Check, Star, Code, PenTool, Lightbulb, User, Flag } from 'lucide-react';
+import { Check, Star, Code, PenTool, Lightbulb, User, Flag, Sparkles } from 'lucide-react';
 import Container from './container';
 import { SectionHeader } from "@/components/ui/header";
 
@@ -215,10 +215,10 @@ export default function JourneyChild() {
               style={{ 
                 left: startPos.x, 
                 top: startPos.y,
-                transform: 'translate(-50%, -100%)',
+                transform: 'translate(-18%, -95%)',
               }}
             >
-              <Flag className="w-8 h-8 fill-none text-white" />
+              <Flag className="w-8 h-8 fill-none text-white" strokeWidth={2} />
             </div>
           )}
 
@@ -261,21 +261,38 @@ export default function JourneyChild() {
           </div>
           
           {/* شارة الإنجاز النهائية */}
-          <div className="flex flex-col items-center justify-center mt-32 mb-16 relative z-20">
+          <div className="flex flex-col items-center justify-center mt-20 mb-8 relative z-20">
             <div 
-              ref={el => { if(el) nodesRef.current[stations.length] = el; }}
-              className={`transition-all duration-700 border rounded-3xl p-8 max-w-lg w-full text-center bg-background ${activeIndex >= stations.length ? 'border-primary shadow-2xl shadow-primary/20 scale-105' : 'border-border'}`}
+              className={`transition-all duration-700 flex flex-col items-center gap-4 md:gap-6 ${activeIndex >= stations.length ? 'scale-105' : 'opacity-80 scale-100'}`}
             >
-              <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-6 transition-colors duration-500 ${activeIndex >= stations.length ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}>
-                <Star className={`w-8 h-8 ${activeIndex >= stations.length ? 'fill-primary-foreground' : 'fill-none'}`} />
+              {/* Pill Container */}
+              <div 
+                ref={el => { if(el) nodesRef.current[stations.length] = el; }}
+                className={`relative px-5 py-3 md:px-6 md:py-4 text-center transition-all duration-500 flex items-center justify-center w-full max-w-[280px] md:max-w-[320px] ${activeIndex >= stations.length ? 'bg-primary text-primary-foreground shadow-xl' : 'bg-muted text-muted-foreground border border-border'}`} style={{ borderRadius: 'var(--radius)' }}>
+                
+                {/* Sparkle icon */}
+                <div className={`transition-opacity duration-500 flex-shrink-0 ${activeIndex >= stations.length ? 'opacity-100' : 'opacity-0'}`}>
+                   <Sparkles className="w-5 h-5 md:w-6 md:h-6 text-primary-foreground" fill="currentColor" strokeWidth={1} />
+                </div>
+
+                <div className="flex flex-col items-center flex-1">
+                  <h4 className="text-xs md:text-sm font-bold opacity-80 mb-0.5">
+                    أهداف المستوى اكتملت
+                  </h4>
+                  <p className="text-lg md:text-xl font-black leading-tight">
+                    جاهز للمستوى التالي
+                  </p>
+                </div>
               </div>
-              <h4 className={`text-2xl font-bold mb-2 transition-colors duration-500 ${activeIndex >= stations.length ? 'text-primary' : 'text-foreground'}`}>أهداف المستوى اكتملت</h4>
-              <p className={`font-bold text-lg mb-8 transition-colors duration-500 ${activeIndex >= stations.length ? 'text-foreground' : 'text-muted-foreground'}`}>جاهز للمستوى التالي</p>
               
-              <div className="flex flex-wrap justify-center gap-3">
-                {['مهارة', 'مشروع', 'شارة الإنجاز', 'تقدّم'].map((badge) => (
-                  <div key={badge} className={`flex items-center gap-2 border px-4 py-2 rounded-full text-sm font-medium transition-colors duration-500 ${activeIndex >= stations.length ? 'bg-primary/20 border-primary/30 text-primary' : 'bg-background border-border text-muted-foreground'}`}>
-                    <Check className="w-4 h-4" />
+              {/* Badges */}
+              <div className="flex flex-wrap justify-center gap-2 md:gap-3">
+                {['مهارة', 'مشروع', 'شارة إنجاز', 'تقدّم'].map((badge) => (
+                  <div 
+                    key={badge} 
+                    className={`flex items-center gap-1.5 border px-3 py-1.5 md:px-4 md:py-2 rounded-[var(--radius)] text-xs md:text-sm font-medium transition-colors duration-500 ${activeIndex >= stations.length ? 'bg-background/50 border-border text-foreground shadow-sm hover:bg-background/80' : 'bg-background border-border/50 text-muted-foreground'}`} style={{ borderRadius: 'var(--radius)' }}
+                  >
+                    <Check className={`w-3.5 h-3.5 md:w-4 md:h-4 transition-colors duration-500 ${activeIndex >= stations.length ? 'text-primary' : 'text-muted-foreground'}`} strokeWidth={2.5} />
                     {badge}
                   </div>
                 ))}
@@ -291,9 +308,9 @@ export default function JourneyChild() {
 
 function StationCard({ station, isActive, isEven, className }: { station: any, isActive: boolean, isEven: boolean, className?: string }) {
   return (
-    <div className={`p-6 w-full max-w-[360px] transition-all duration-500 relative overflow-hidden border rounded-3xl text-right ${isActive ? 'bg-primary/5 border-primary/30 shadow-lg shadow-primary/5' : 'bg-muted/30 border-border hover:border-primary/50'} ${className ?? ''}`}>
+    <div className={`p-6 w-full max-w-[360px] transition-all duration-500 relative overflow-hidden border text-right ${isActive ? 'bg-primary/5 border-primary/30 shadow-lg shadow-primary/5' : 'bg-muted/30 border-border hover:border-primary/50'} ${className ?? ''}`} style={{ borderRadius: 'var(--radius)' }}>
       <div className="flex items-start gap-4">
-        <div className={`p-3 rounded-2xl shrink-0 transition-colors duration-500 ${isActive ? 'bg-primary text-primary-foreground' : 'bg-background border border-border text-primary'}`}>
+        <div className={`p-3 shrink-0 transition-colors duration-500 ${isActive ? 'bg-primary text-primary-foreground' : 'bg-background border border-border text-primary'}`} style={{ borderRadius: 'var(--radius)' }}>
           {station.icon}
         </div>
         <div className="flex flex-col flex-1 gap-2 pt-1">

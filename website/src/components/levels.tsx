@@ -124,7 +124,7 @@ export default function Levels() {
       <Container className="relative z-10" withBorder>
         {/* Header */}
         <SectionHeader
-          title={<>27 مستوى... مهارة تُبنى<br />خطوة بخطوة</>}
+          title="27 مستوى... مهارة تُبنى >خطوة بخطوة"
           description="كل مستوى يضيف مهارة جديدة، وكل مرحلة تقرّب طفلك من بناء مشاريع أكثر تقدماً."
           className="text-center items-center"
         />
@@ -174,10 +174,15 @@ export default function Levels() {
             {/* Right Content */}
             <div className="flex-1 flex flex-col justify-between py-2 md:py-4 px-2 md:px-4 order-2 md:order-1">
               <div>
-                <div className="flex justify-between items-center mb-2">
-                  <div className="text-primary font-bold text-sm md:text-base">المرحلة {activeStage.stageNumber}</div>
+                <div className="flex items-start gap-4 mb-6">
+                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-[calc(var(--radius)+4px)] border border-border flex items-center justify-center bg-background text-foreground shrink-0 shadow-sm mt-1">
+                    <activeStage.icon className="w-6 h-6 md:w-7 md:h-7" />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <div className="text-muted-foreground font-bold text-sm md:text-base">المرحلة {activeStage.stageNumber}</div>
+                    <h3 className="text-4xl md:text-4xl lg:text-5xl font-black text-foreground">{activeStage.title}</h3>
+                  </div>
                 </div>
-                <h3 className="text-4xl md:text-5xl font-black text-foreground mb-4">{activeStage.title}</h3>
                 
                 <div className="flex flex-wrap gap-2 mb-6">
                   <span className="bg-background px-4 py-2 rounded-full text-sm font-bold text-foreground shadow-sm border border-border">
@@ -188,12 +193,12 @@ export default function Levels() {
                   </span>
                 </div>
 
-                <div className="relative mb-8">
+                {/* <div className="relative mb-8">
                   <div className="absolute right-0 top-0 bottom-0 w-1.5 bg-primary rounded-r-full"></div>
                   <div className="bg-background pr-6 pl-4 py-3 rounded-r-none shadow-sm border border-l border-y border-border border-r-0 text-lg md:text-xl font-black text-foreground leading-snug">
                     "{activeStage.quote}"
                   </div>
-                </div>
+                </div> */}
 
                 <div className="mb-6">
                   <h4 className="text-sm font-bold text-muted-foreground mb-3">المهارات الأساسية</h4>
@@ -208,15 +213,15 @@ export default function Levels() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 bg-background p-4 shadow-sm border border-border mt-auto">
-                <div className="bg-primary/10 p-3 rounded-full text-primary shrink-0">
+              {/* <div className="flex items-center gap-4 bg-background p-4 shadow-sm border border-border mt-auto">
+                 <div className="bg-primary/10 p-3 rounded-full text-primary shrink-0">
                   <Target className="w-5 h-5" />
-                </div>
-                <div>
+                </div> 
+                 <div>
                   <div className="text-xs font-bold text-muted-foreground mb-1">نتيجة المرحلة</div>
                   <div className="font-black text-foreground text-sm md:text-base">{activeStage.outcome}</div>
-                </div>
-              </div>
+                </div> 
+              </div> */}
             </div>
 
             {/* Left Content - Dark Card */}
@@ -226,17 +231,17 @@ export default function Levels() {
               </div> */}
               
               <div className="relative z-10 flex flex-col h-full">
-                <div className="flex justify-between items-center mb-6">
-                  <div className="text-primary text-xs font-black tracking-widest uppercase bg-primary/10 px-3 py-1.5 rounded-full">مستوى {activeStage.example.level}</div>
-                  <div className="w-10 h-10 rounded-full border border-primary/30 flex items-center justify-center bg-primary/10 text-primary">
-                    <activeStage.icon className="w-5 h-5" />
+                {/* <div className="flex items-center justify-start mb-6">
+                  <div className="text-primary text-xs font-black tracking-widest uppercase bg-primary/10 px-3 py-1.5 rounded-full">
+                    مستوى {activeStage.example.level}
                   </div>
-                </div>
+                </div> 
+                    */}
 
-                <div className="mb-6">
+                {/* <div className="mb-6">
                   <div className="text-muted-foreground text-sm font-bold mb-2">مثال من داخل المرحلة</div>
                   <h4 className="text-2xl font-black text-foreground">{activeStage.example.title}</h4>
-                </div>
+                </div> */}
 
                 <div className="space-y-6 flex-1">
                   <div>

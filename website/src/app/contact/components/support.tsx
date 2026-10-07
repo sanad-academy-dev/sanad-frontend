@@ -4,13 +4,21 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { CheckCircle2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { cn } from "@/lib/utils";
-import Container from "./container";
 import { SectionHeader } from "@/components/ui/header";
-import { MultiStepForm } from "./multi-step-form";
+import { MultiStepForm } from "../../../components/multi-step-form";
 import { Button } from "@/components/ui/button";
+import { PopupContact } from "./popup-contact";
 
-const CARDS = [
+type SupportCard = {
+  title: string;
+  subtitle: string;
+  text: string;
+  action: string;
+  onClickType?: string;
+  href?: string;
+};
+
+const CARDS: SupportCard[] = [
   {
     title: "التسجيل والبرامج",
     subtitle: "ابدأ رحلة التعلم مع سند",
@@ -30,19 +38,20 @@ const CARDS = [
     subtitle: "هل ترغب في العمل معنا؟",
     text: "إذا كنت مدربًا، أو تمثل مدرسة أو مؤسسة تعليمية، أو لديك فكرة للتعاون مع سند، يسعدنا التواصل معك.",
     action: "تواصل معنا",
-    href: "https://wa.me/+201022805731",
+    onClickType: "contact-popup",
   },
   {
     title: "الدعم والمساعدة",
     subtitle: "هل تحتاج إلى مساعدة؟",
     text: "نساعدك في أي استفسار يتعلق بالتسجيل، المواعيد، الدفع، البرامج، أو رحلة التعلم.",
     action: "تواصل مع الدعم",
-    href: "https://wa.me/+201022805731",
+    onClickType: "contact-popup",
   },
 ];
 
-export default function Support() {
+export default function Support({ withBorder = true }: { withBorder?: boolean } = {}) {
   const [multiStepOpen, setMultiStepOpen] = useState(false);
+  const [contactPopupOpen, setContactPopupOpen] = useState(false);
 
   useEffect(() => {
     if (multiStepOpen) {
@@ -60,6 +69,8 @@ export default function Support() {
       window.dispatchEvent(new Event("open-ai-agent"));
     } else if (type === "trial-modal") {
       setMultiStepOpen(true);
+    } else if (type === "contact-popup") {
+      setContactPopupOpen(true);
     } else if (href) {
       window.open(href, "_blank", "noopener,noreferrer");
     }
@@ -67,7 +78,7 @@ export default function Support() {
 
   return (
     <section className="relative w-full overflow-hidden bg-background ">
-      <Container withBorder>
+      <div className="w-full">
         <SectionHeader
           title="كيف يمكننا مساعدتك؟"
           description="سواء كنت تبحث عن المسار المناسب لطفلك، أو تريد حجز التقييم، أو لديك استفسار عن برامج سند، نحن هنا لمساعدتك."
@@ -85,14 +96,11 @@ export default function Support() {
                 نحن هنا للإجابة عن استفساراتك ومساعدتك في اختيار الخطوة المناسبة في رحلة التعلم.
               </p>
               <div className="flex items-center gap-4 mt-4">
-                <a
-                  href="https://wa.me/+201022805731"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center rounded-xl bg-foreground px-8 py-3.5 text-base font-bold text-background transition-colors hover:bg-foreground/90 shadow-sm"
+                <Button
+                  onClick={() => setContactPopupOpen(true)}
                 >
                   تحدث معنا
-                </a>
+                </Button>
               </div>
             </div>
             <div className="flex items-center gap-2.5 text-sm font-semibold text-[#25D366] bg-[#25D366]/10 px-5 py-2.5 rounded-full whitespace-nowrap self-start md:self-auto">
@@ -102,9 +110,9 @@ export default function Support() {
           </div>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x lg:divide-x-reverse divide-border">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[1px] bg-border">
             {CARDS.map((card, i) => (
-              <div key={i} className="flex flex-col items-start p-8 md:p-10 gap-8 group hover:bg-muted/40 transition-colors">
+              <div key={i} className="flex flex-col items-start p-8 md:p-10 gap-8 group hover:bg-muted/40 transition-colors bg-card">
                 <div className="flex-1 space-y-4">
                   <h4 className="text-xl md:text-2xl font-bold text-foreground">
                     {card.title}
@@ -121,7 +129,7 @@ export default function Support() {
                 <Button
                   variant="secondary"
                   onClick={() => handleAction(card.onClickType, card.href)}
-                  className="rounded-lg px-5 py-5 text-[15px] font-semibold transition-all hover:bg-foreground hover:text-background"
+                  className="transition-all hover:bg-foreground hover:text-background"
                 >
                   {card.action}
                 </Button>
@@ -129,7 +137,7 @@ export default function Support() {
             ))}
           </div>
         </div>
-      </Container>
+      </div>
 
       {multiStepOpen && typeof document !== "undefined" && createPortal(
         <AnimatePresence>
@@ -148,6 +156,11 @@ export default function Support() {
             </div>
           </motion.div>
         </AnimatePresence>,
+        document.body
+      )}
+
+      {typeof document !== "undefined" && createPortal(
+        <PopupContact isOpen={contactPopupOpen} onClose={() => setContactPopupOpen(false)} />,
         document.body
       )}
     </section>

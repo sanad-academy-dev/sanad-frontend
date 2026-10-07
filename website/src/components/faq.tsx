@@ -258,7 +258,7 @@ export function ScrollSpine({
                 }}
                 onBlur={() => setPreview((p) => (p === i ? null : p))}
                 className={cn(
-                  "group/band absolute touch-manipulation rounded text-start outline-hidden transition-[scale] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-foreground active:scale-[0.96] motion-reduce:transition-none",
+                  "group/band absolute touch-manipulation rounded-[var(--radius)] text-start outline-hidden transition-[scale] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-foreground active:scale-[0.96] motion-reduce:transition-none",
                   inline ? "inset-y-0 -start-2 end-0 ps-5" : "inset-0",
                 )}
               >
@@ -401,14 +401,14 @@ export default function Faq() {
             href="https://wa.me/+201022805731"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex shrink-0 items-center justify-center gap-2 bg-[#25D366]/10 px-6 py-3.5 text-lg md:text-xl font-bold text-[#25D366] transition-colors hover:bg-[#25D366]/20 shadow-sm hover:shadow-md"
+            className="flex shrink-0 items-center justify-center gap-2 rounded-[var(--radius)] bg-[#25D366]/10 px-6 py-3.5 text-lg md:text-xl font-bold text-[#25D366] transition-colors hover:bg-[#25D366]/20 shadow-sm hover:shadow-md"
           >
             تواصل معنا
             <FaWhatsapp className="size-6" />
           </a>
         </div>
 
-        <div className="@container mt-4 flex h-[630px] w-full max-w-full overflow-hidden border-2 border-border bg-muted/30 shadow-sm">
+        <div className="@container mt-4 flex h-[630px] w-full max-w-full overflow-hidden rounded-[calc(var(--radius)*2)] border-2 border-border bg-muted/30 shadow-sm">
           <div className="flex w-12 shrink-0 flex-col items-center border-s border-border pt-8 @min-[520px]:w-[340px] @min-[520px]:items-stretch @min-[520px]:pe-6 @min-[520px]:ps-8">
             <p className="mb-6 hidden text-base font-semibold tracking-wide text-muted-foreground uppercase @min-[520px]:block text-right">
               في هذا القسم

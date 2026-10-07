@@ -21,8 +21,7 @@ type NavLink = {
 const NAV_LINKS: NavLink[] = [
   { label: "الرئيسية", href: "/" },
   { label: "المسارات", href: "/#paths" },
-  { label: "المتجر", href: "/store", badge: "قريباً" },
-
+  
   {
     label: "حول الأكاديمية",
     href: "#",
@@ -45,7 +44,8 @@ const NAV_LINKS: NavLink[] = [
     ],
   },
   { label: "الأسعار", href: "/#pricing" },
-  { label: "تواصل معنا", href: "/#footer" },
+  { label: "المتجر", href: "/store", badge: "قريباً" },
+  { label: "تواصل معنا", href: "/contact" },
   { label: "التوثيق", href: "/verify" },
 ];
 
@@ -481,17 +481,18 @@ export default function Navbar({ variant = "overlay" }: { variant?: Variant }) {
           href="/"
           className="text-[32px] font-bold leading-[38px] tracking-[-0.2px] text-primary shrink-0"
         >
-           <Image src="/logos/Logo White.png" alt="Logo" width={80} height={80} />
+           <Image src="/logos/Logo White.png" alt="Logo" width={58} height={58} />
         </Link>
 
         {/* روابط القائمة — وسط (ديسكتوب) */}
         <DesktopNav links={NAV_LINKS} t={t} isActive={isActive} />
 
         {/* أزرار الإجراءات — يسار (ديسكتوب) */}
-        <div className="hidden items-center gap-3 lg:flex shrink-0">
+        <div className="hidden items-center gap-2 lg:flex shrink-0">
           <Button 
             variant="outline" 
-            className="cursor-pointer rounded h-auto py-3 px-3 text-xs font-medium border-primary/20 bg-primary/10 text-primary hover:bg-primary/20"
+            size="sm"
+            className="cursor-pointer font-medium border-primary/20 bg-primary/10 text-primary hover:bg-primary/20"
             onClick={() => window.dispatchEvent(new CustomEvent("open-ai-agent"))}
           >
             <Sparkles className="size-4 ml-1" />
@@ -501,12 +502,13 @@ export default function Navbar({ variant = "overlay" }: { variant?: Variant }) {
           <span className={cn("h-[24px] w-px", t.divider)} aria-hidden />
           <Button
             variant="ghost"
+            size="sm"
             onClick={() => setLoginPopupOpen(true)}
-            className={cn("cursor-pointer h-auto py-3 px-3 text-sm font-medium", t.text)}
+            className={cn("cursor-pointer font-medium", t.text)}
           >
             تسجيل الدخول
           </Button>
-          <JoinButton />
+          <JoinButton size="sm" />
         </div>
 
         {/* تحكم الموبايل — يسار */}
@@ -611,7 +613,8 @@ export default function Navbar({ variant = "overlay" }: { variant?: Variant }) {
             <div className="mt-4 flex flex-col gap-3 border-t border-border pt-4">
               <Button 
                 variant="outline" 
-                className="rounded h-auto py-3 text-base font-medium w-full border-primary/20 bg-primary/10 text-primary hover:bg-primary/20"
+                size="default"
+                className="w-full font-medium border-primary/20 bg-primary/10 text-primary hover:bg-primary/20"
                 onClick={() => {
                   window.dispatchEvent(new CustomEvent("open-ai-agent"));
                   setMobileOpen(false);
@@ -622,15 +625,16 @@ export default function Navbar({ variant = "overlay" }: { variant?: Variant }) {
               </Button>
               <Button
                 variant="ghost"
+                size="default"
                 onClick={() => {
                   setLoginPopupOpen(true);
                   setMobileOpen(false);
                 }}
-                className="h-auto py-3 text-base font-medium w-full"
+                className="w-full font-medium"
               >
                 تسجيل الدخول
               </Button>
-              <JoinButton className="w-full" />
+              <JoinButton className="w-full" size="default" />
             </div>
           </motion.div>
         )}

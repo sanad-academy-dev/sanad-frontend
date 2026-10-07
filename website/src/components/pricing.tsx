@@ -22,6 +22,7 @@ export type Plan = {
 };
 
 type Billing = "single" | "family";
+type Duration = "1_month" | "3_months" | "1_year";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
 const BLUR_IN = {
@@ -51,11 +52,16 @@ export function PricingCalculator({
   const reduceMotion = useReducedMotion() ?? false;
   const [planIndex, setPlanIndex] = useState(defaultPlanIndex);
   const [billing, setBilling] = useState<Billing>("single");
+  const [duration, setDuration] = useState<Duration>("1_month");
   const plan = plans[planIndex];
 
   const monthly = plan.price;
   const familyCut = billing === "family" ? monthly * familyDiscount : 0;
-  const total = monthly - familyCut;
+  const baseTotal = monthly - familyCut;
+  
+  const durationMultiplier = duration === "1_month" ? 1 : duration === "3_months" ? 3 : 12;
+  const total = baseTotal * durationMultiplier;
+  
   const isFamily = billing === "family";
 
   return (
@@ -67,20 +73,20 @@ export function PricingCalculator({
       dir="rtl"
     >
       {/* القسم الأيمن: التفاعل والحسابات */}
-      <div className="flex-1 flex flex-col gap-10 justify-center">
+      <div className="flex-1 flex flex-col gap-10 pt-6 ">
         <div className="flex items-start justify-between gap-3">
           <div className="flex flex-col gap-2">
             <p className="text-[16px] font-medium text-muted-foreground">المرحلة التعليمية</p>
-            <p className="flex items-end gap-3 text-[40px] leading-none font-bold tracking-tight tabular-nums text-foreground">
+            {/* <p className="flex items-end gap-3 text-[40px] leading-none font-bold tracking-tight tabular-nums text-foreground">
               {plan.name}
               <span className="mb-2 text-[18px] leading-none font-medium text-muted-foreground">
                 ({plan.levels})
               </span>
-            </p>
+            </p> */}
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 pt-8 mb-4" dir="ltr">
+        <div className="flex flex-col gap-2  mb-4" >
           <LevelSlider
             value={planIndex}
             min={0}
@@ -120,9 +126,9 @@ export function PricingCalculator({
 
       {/* القسم الأيسر: الخلاصة والمزايا */}
       <div className="w-full xl:w-[420px] flex flex-col gap-6 rounded-2xl bg-secondary/30 p-6 md:p-8 border border-border/50">
-        <div className="flex justify-between items-center">
-          <span className="text-[16px] font-semibold text-foreground">الباقة المختارة</span>
-          <PlanBadge plan={plan} rank={planIndex} reduceMotion={reduceMotion} />
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-[16px] font-semibold text-foreground">مدة الاشتراك</span>
+          <DurationSwitch value={duration} onChange={setDuration} />
         </div>
         
         <div className="flex flex-col gap-2 mt-2">
@@ -417,7 +423,7 @@ function LevelSlider({
   }, [value, reduceMotion, fill]);
 
   const scaleX = fill;
-  const left = useTransform(fill, (f) => `calc(${f * 100}% - ${f * 20}px)`);
+  const right = useTransform(fill, (f) => `calc(${f * 100}% - ${f * 20}px)`);
 
   return (
     <div className="flex flex-col gap-3">
@@ -425,7 +431,7 @@ function LevelSlider({
       <div className="relative h-12">
         <div className="absolute inset-x-0 top-1/2 h-2 -translate-y-1/2 overflow-hidden rounded-full bg-secondary shadow-inner">
           <motion.div
-            className="h-full origin-left bg-primary"
+            className="h-full origin-right bg-primary"
             style={{ scaleX }}
           />
         </div>
@@ -434,18 +440,18 @@ function LevelSlider({
             key={plan.name}
             aria-hidden
             className={cn(
-              "absolute top-1/2 h-4 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full transition-colors duration-200 ease-out",
+              "absolute top-1/2 h-4 w-1 translate-x-1/2 -translate-y-1/2 rounded-full transition-colors duration-200 ease-out",
               value >= i ? "bg-background" : "bg-muted-foreground/40",
             )}
             style={{
-              left: `calc(${at(i) * 100}% + ${10 - at(i) * 20}px)`,
+              right: `calc(${at(i) * 100}% + ${10 - at(i) * 20}px)`,
             }}
           />
         ))}
         <motion.span
           aria-hidden
-          className="pointer-events-none absolute top-1/2 size-7 -translate-y-1/2 rounded-full bg-background shadow-lg border-2 border-primary"
-          style={{ left }}
+          className="pointer-events-none absolute top-1/2 size-7 -translate-y-1/2 translate-x-1/2 rounded-full bg-background shadow-lg border-2 border-primary"
+          style={{ right }}
         />
         <input
           id={id}
@@ -472,11 +478,11 @@ function LevelSlider({
           <div
             key={plan.name}
             className={cn(
-              "absolute -translate-x-1/2 flex flex-col items-center whitespace-nowrap transition-all duration-200 ease-out",
+              "absolute translate-x-1/2 flex flex-col items-center whitespace-nowrap transition-all duration-200 ease-out",
               value >= i ? "text-foreground font-bold" : "text-muted-foreground/70",
             )}
             style={{
-              left: `calc(${at(i) * 100}% + ${10 - at(i) * 20}px)`,
+              right: `calc(${at(i) * 100}% + ${10 - at(i) * 20}px)`,
             }}
           >
             <span>{plan.name}</span>
@@ -553,6 +559,78 @@ function BillingSwitch({
                 −{Math.round(discount * 100)}%
               </span>
             )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function DurationSwitch({
+  value,
+  onChange,
+}: {
+  value: Duration;
+  onChange: (d: Duration) => void;
+}) {
+  const options: { id: Duration; label: string }[] = [
+    { id: "1_month", label: "شهر" },
+    { id: "3_months", label: "3 أشهر" },
+    { id: "1_year", label: "سنة" },
+  ];
+  return (
+    <div
+      role="radiogroup"
+      aria-label="مدة الاشتراك"
+      className="relative grid h-11 grid-cols-3 rounded-full bg-secondary p-1 shadow-inner"
+      onKeyDown={(e) => {
+        if (
+          ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)
+        ) {
+          e.preventDefault();
+          const currentIndex = options.findIndex(o => o.id === value);
+          let nextIndex = currentIndex;
+          if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+            nextIndex = (currentIndex + 1) % options.length;
+          } else {
+            nextIndex = (currentIndex - 1 + options.length) % options.length;
+          }
+          const next = options[nextIndex].id;
+          onChange(next);
+          (
+            e.currentTarget.querySelector(
+              `[data-id="${next}"]`,
+            ) as HTMLElement | null
+          )?.focus();
+        }
+      }}
+    >
+      <span
+        aria-hidden
+        className={cn(
+          "absolute inset-y-1 right-1 w-[calc(33.333%-2px)] rounded-full bg-background shadow-sm transition-transform duration-250 ease-[cubic-bezier(0.77,0,0.175,1)] motion-reduce:transition-none",
+          value === "3_months" && "-translate-x-full",
+          value === "1_year" && "-translate-x-[200%]",
+        )}
+      />
+      {options.map((option) => {
+        const active = option.id === value;
+        return (
+          <button
+            suppressHydrationWarning
+            key={option.id}
+            type="button"
+            role="radio"
+            data-id={option.id}
+            aria-checked={active}
+            tabIndex={active ? 0 : -1}
+            onClick={() => onChange(option.id)}
+            className={cn(
+              "relative flex touch-manipulation items-center justify-center gap-1.5 px-4 rounded-full text-[14px] font-semibold outline-none transition-[color,scale] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-primary active:scale-[0.96]",
+              active ? "text-foreground" : "text-muted-foreground",
+            )}
+          >
+            {option.label}
           </button>
         );
       })}

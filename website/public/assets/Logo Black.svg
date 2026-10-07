@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1201 1201">
+  <defs>
+    <style>
+      .cls-1 {
+        font-family: thmanyahsans-Regular, 'thmanyah sans';
+        font-size: 223.64px;
+      }
+
+      .cls-2 {
+        font-family: ClashDisplay-Bold, 'Clash Display';
+        font-size: 141.57px;
+        font-weight: 700;
+      }
+    </style>
+  </defs>
+  <text class="cls-2" transform="translate(352.42 815.71)"><tspan x="0" y="0">SANAD</tspan></text>
+  <g>
+    <polygon points="713.75 529.01 893.2 439.28 893.2 259.83 713.75 349.55 713.75 529.01"/>
+    <polygon points="534.29 529.01 713.75 439.28 713.75 259.83 534.29 349.55 534.29 529.01"/>
+    <polygon points="354.84 529.01 534.29 439.28 534.29 259.83 354.84 349.55 354.84 529.01"/>
+  </g>
+  <text class="cls-1" transform="translate(353.74 682.02)"><tspan x="0" y="0">سنـــــد</tspan></text>
+</svg>

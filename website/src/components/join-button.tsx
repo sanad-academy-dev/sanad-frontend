@@ -11,11 +11,13 @@ import { MultiStepForm } from "@/components/multi-step-form";
 export function JoinButton({ 
   className, 
   children,
-  variant 
+  variant,
+  size
 }: { 
   className?: string;
   children?: React.ReactNode;
   variant?: any;
+  size?: any;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -35,12 +37,13 @@ export function JoinButton({
     <>
       <Button 
         variant={variant}
+        size={size || "default"}
         onClick={() => setOpen(true)}
-        className={cn("rounded h-auto px-4 py-2 text-sm font-medium cursor-pointer", className)}
+        className={cn("cursor-pointer", className)}
       >
         {children || (
           <>
-            <ArrowLeft className="size-4 ml-1" />
+            <ArrowLeft className="size-5 ml-2" />
             <span className="whitespace-nowrap"> قيم ابنك </span>
           </>
         )}

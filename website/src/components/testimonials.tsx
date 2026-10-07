@@ -268,7 +268,7 @@ export function TestimonialHighlight({
             </div>
             <Button
               variant="ghost"
-              size="icon"
+              size="icon-sm"
               onClick={() => setPaused((p) => !p)}
               aria-label={paused ? "استئناف العرض" : "إيقاف العرض"}
               aria-pressed={paused}

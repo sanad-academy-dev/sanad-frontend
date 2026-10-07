@@ -82,17 +82,18 @@ export default function Hero() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-3">
-          <JoinButton className="px-10 py-4 text-lg h-auto font-semibold">
+       <div className="flex w-full sm:w-auto max-w-[400px] sm:max-w-none items-center justify-center gap-2 sm:gap-3 px-2 sm:px-0">
+          <JoinButton className="flex-1 sm:flex-none text-sm sm:text-lg px-2 sm:px-8" variant="default" size="lg">
              قيم ابنك مجانًا
           </JoinButton>
           <Button 
             variant="secondary" 
-            className="px-8 py-4 text-lg h-auto font-semibold cursor-pointer"
+            size="lg"
+            className="flex-1 sm:flex-none text-sm sm:text-lg px-2 sm:px-8 cursor-pointer"
             onClick={() => window.dispatchEvent(new CustomEvent("open-ai-agent"))}
           >
             اكتشف مساراتنا
-            <ArrowLeft className="size-6 ml-2" />
+            <ArrowLeft className="size-5 ml-1 sm:ml-2" />
           </Button>
         </div>
 

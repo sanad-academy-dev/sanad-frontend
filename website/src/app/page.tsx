@@ -14,7 +14,7 @@ import Levels from "@/components/levels";
 import JourneyChild from "@/components/journey-child";
 import TestimonialsSection from "@/components/testimonials";
 import WhySanad from "@/components/why-sanad";
-import Support from "@/components/support";
+import Support from "@/app/contact/components/support";
 export default async function Home() {
   // المحتوى يُجلب ديناميكياً من داشبورد سند
   const [{ courses }, { categories }] = await Promise.all([
@@ -53,15 +53,17 @@ export default async function Home() {
       {/* الدورات الأكثر طلباً */}
       {/* <FeaturedCourses courses={courses} /> */}
 
+          {/* لماذا سند */}
+      <div id="about">
+        <WhySanad />
+      </div>
+
       {/* مسارات التعلم */}
       <div id="paths">
         <LearningPaths />
       </div>
 
-      {/* لماذا سند */}
-      <div id="about">
-        <WhySanad />
-      </div>
+  
 
       {/* رحلة الطالب */}
       <JourneyChild />
@@ -83,10 +85,6 @@ export default async function Home() {
       {/* أسئلة أولياء الأمور */}
       <Faq />
 
-      {/* قسم الدعم والمساعدة */}
-      <div id="support">
-        <Support />
-      </div>
       {/* استكشاف فئات الدورات */}
       <div id="bootcamps">
         <CourseCategories  />
