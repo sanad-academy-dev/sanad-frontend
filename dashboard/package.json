@@ -8,7 +8,7 @@
   },
   "scripts": {
     "predev": "node scripts/predev.mjs",
-    "dev": "vite dev --port 3001 --host 0.0.0.0",
+    "dev": "vite dev --port 3001",
     "build": "NODE_OPTIONS=--max-old-space-size=8192 vite build",
     "preview": "vite preview --port 3001",
     "test": "vitest run",
@@ -25,7 +25,7 @@
     "env:sync:prod": "bun scripts/vercel-env.ts sync --env production",
     "env:sync:dry": "bun scripts/vercel-env.ts sync --dry-run",
     "prepare": "husky",
-    "dev:lan": "vite dev --port 3001 --host 0.0.0.0",
+    "dev:lan": "vite dev --port 3001 --host",
     "typecheck:cold": "rm -rf tsbuild && bun run typecheck",
     "typecheck:legacy": "bun scripts/run-exclusive.mjs typecheck-legacy bun run typecheck:raw"
   },
