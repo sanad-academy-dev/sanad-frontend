@@ -4,6 +4,7 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import viteTsConfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
+import { fileURLToPath } from "node:url";
 
 const logger = createLogger();
 const loggerWarn = logger.warn;
@@ -21,11 +22,21 @@ logger.warn = (message, options) => {
 
 export default defineConfig(({ mode }) => ({
   customLogger: logger,
+  resolve: {
+    alias: [
+      {
+        find: "@/generated",
+        replacement: fileURLToPath(new URL("./contracts/generated", import.meta.url)),
+      },
+      {
+        find: "@/server",
+        replacement: fileURLToPath(new URL("./contracts/types/src/server", import.meta.url)),
+      },
+    ],
+  },
   server: {
-    // الهاتف يصل بعنوان الشبكة (192.168.x.x) لا بـ localhost. وفيت يرفض المضيفات غير
-    // المعروفة، فيسقط الطلب إلى معالج SSR ويعود HTML مكان وحدة JS — فيفشل تحميل وحدات
-    // العميل بخطأ MIME ويعلق الشعار الدوّار إلى الأبد، بلا خطأ ظاهر في الطرفية.
-    // الأثر يقتصر على تصفّح اللوحة من الهاتف؛ طلبات API تذهب مباشرةً إلى الـBackend.
+    // الهاتف يصل بعنوان الشبكة (192.168.x.x) عند تشغيل bun run dev:lan. وفيت يرفض المضيفات غير
+    // المعروفة، فيسقط الطلب إلى معالج SSR ويعود HTML مكان وحدة JS.
     allowedHosts: true,
     watch: {
       /**
@@ -59,7 +70,24 @@ export default defineConfig(({ mode }) => ({
   optimizeDeps: {
     include: [
       "@tabler/icons-react",
+      "fast-deep-equal",
+      "seedrandom",
+      "spark-md5",
+      "xmlbuilder2",
+      "lodash.get",
+      "lodash.clonedeep",
+      "lodash.debounce",
+      "pako",
+      "utif",
       "dicom-parser",
+      "react-phone-number-input",
+      "react-phone-number-input/flags",
+      "react-phone-number-input/locale/ar.json",
+      "react-hook-form",
+      "@hookform/resolvers/zod",
+      "better-auth/react",
+      "better-auth/client/plugins",
+      "@better-auth/i18n/client",
       // مفكّكات الضغط تُشحن بصيغة UMD، والمحمّل يستوردها ديناميكيًا. بلا تحويلها
       // مسبقًا يقرأها المتصفح كوحدة ESM بلا تصدير default فينهار فكّ ضغط الصور.
       "@cornerstonejs/codec-charls/decodewasmjs",
