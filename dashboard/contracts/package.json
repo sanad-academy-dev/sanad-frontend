@@ -5,6 +5,7 @@
 	"type": "module",
 	"description": "Browser-safe contracts shared by Sanad frontend applications",
 	"exports": {
+		"./runtime/*": "./runtime/*.ts",
 		"./*": "./src/*"
 	}
 }
