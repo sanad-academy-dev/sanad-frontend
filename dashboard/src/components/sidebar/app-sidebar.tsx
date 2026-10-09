@@ -193,6 +193,12 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				title: t("sidebar.sections.care"),
 				items: [
 					{
+						title: "التسجيل الرقمي",
+						url: "/digital-registration",
+						icon: <IconFileDescription className="size-[14px]" />,
+						isActive: isActive("/digital-registration"),
+					},
+					/* {
 						title: t("sidebar.items.labTests"),
 						url: "/services/lab-tests",
 						icon: <LuTestTubeDiagonal className="size-[14px]" />,
@@ -259,7 +265,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 						url: "/care/mobile-clinic",
 						icon: <LuTruck className="size-[14px]" />,
 						isActive: isActive("/care/mobile-clinic"),
-					},
+					}, */
 				],
 			},
 			{
@@ -342,9 +348,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			},
 			// [CRM-P1] §11.1 — dropped entirely (not rendered empty) when the user holds no
 			// CRM permission; `crmItems` is already filtered per row.
-			...(canSeeCrm && crmItems.length > 0
+			/* ...(canSeeCrm && crmItems.length > 0
 				? [{ title: t("sidebar.sections.crm"), items: crmItems }]
-				: []),
+				: []), */
 		],
 		[
 			canSeeCrm,
