@@ -1,0 +1,36 @@
+# Scoped pre-commit (lint-staged style): format + lint ONLY the staged files, then
+# typecheck. The full `vite build` was moved out of pre-commit — it runs in CI and in
+# the pre-push hook (`.husky/pre-push` — lefthook.yml is dead config, see its header).
+# Keeps commits fast and stops the whole-repo formatter from touching files unrelated to
+# the change.
+
+# Portable bun lookup (was hardcoded to a single machine's path before).
+command -v bun >/dev/null 2>&1 || export PATH="$HOME/.bun/bin:$PATH"
+
+# Format + lint only the staged source files, then re-stage the fixes.
+staged=$(git diff --cached --name-only --diff-filter=ACMR -- '*.ts' '*.tsx' '*.js' '*.jsx' '*.json' '*.css')
+if [ -n "$staged" ]; then
+	echo "$staged" | xargs bunx biome check --write --no-errors-on-unmatched
+	echo "$staged" | xargs git add
+fi
+
+# Typecheck can't be scoped to files, so only pay it when the commit can actually change
+# the type graph. A docs/screenshot-only commit paid the full run for nothing (owner note
+# 2026-08-16), which is the same waste CLAUDE.md rule 13 is about: remove the contention,
+# don't absorb it. Since [P13.6] this is three composed projects rather than one 12 GB
+# program — incremental against tsbuild/, so an ordinary commit re-checks only what it
+# touched. Do NOT delete tsbuild/ to "start clean": that throws away the generated
+# project's .d.ts and makes the next commit pay the cold path.
+# Anything TypeScript can see is included: .ts/.tsx, the Prisma schema (regenerates
+# the client's types), and the tsconfigs themselves.
+typecheckable=$(git diff --cached --name-only --diff-filter=ACMR -- '*.ts' '*.tsx' '*.mts' '*.cts' '*.prisma' 'tsconfig*.json')
+
+if [ -z "$typecheckable" ]; then
+	echo "↷ no .ts/.tsx/.prisma/tsconfig files staged — skipping typecheck."
+elif [ -f src/routeTree.gen.ts ]; then
+	# needs the generated TanStack route tree; skip gracefully on a fresh clone that has
+	# never run dev/build — CI always typechecks after the build generates it.
+	bun run typecheck
+else
+	echo "⚠ src/routeTree.gen.ts missing — run 'bun run dev' or 'bun run build' once. Skipping typecheck; CI will typecheck."
+fi

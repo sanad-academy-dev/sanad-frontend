@@ -1,0 +1,96 @@
+name: Ephemeral CI Postgres
+description: >-
+  Starts a throwaway Postgres 16 in Docker and exports DATABASE_URL for the rest of the job.
+  Replaces the `services:` block, which only works on GitHub-HOSTED Linux runners — that
+  restriction is what tied every DB workflow to billed minutes.
+
+# WHY THIS EXISTS (2026-08-21)
+# ---------------------------
+# Actions was blocked at the billing gate for two days: every job reported `failure` in
+# 4-5 seconds with ZERO steps executed — they were never started, so nothing was ever
+# verified. A self-hosted runner is not billed and not subject to that gate, but a
+# `services:` block cannot run on one (service containers are a hosted-Linux feature).
+# So Postgres is started here, by hand, in a way that works identically on a hosted
+# ubuntu runner and on a self-hosted macOS/Linux runner with Docker.
+#
+# ⚠️ THE PORT IS NOT 5432, AND THAT IS THE POINT.
+# A self-hosted runner runs on a real workstation where 5432 is very likely the
+# developer's OWN Postgres. On this repo's machine it is exactly that: the local
+# `elite_vet` dev database, same database name and same user name the CI URL uses.
+# Publishing on 5432 would have pointed `prisma migrate deploy` and the whole DB test
+# suite — which creates clinics, accounts and ledger entries — at real development data.
+# The container therefore publishes on 55432 and binds to 127.0.0.1 only.
+
+inputs:
+  port:
+    description: Host port to publish Postgres on. Never 5432 — see the note above.
+    required: false
+    default: "55432"
+  database:
+    description: Database name to create.
+    required: false
+    default: elite_vet
+  user:
+    description: Database user to create.
+    required: false
+    default: ci_user
+  password:
+    description: Throwaway CI password. Not a secret — the container is local and ephemeral.
+    required: false
+    default: ci_test_password
+
+runs:
+  using: composite
+  steps:
+    - name: Start throwaway Postgres
+      shell: bash
+      env:
+        PG_PORT: ${{ inputs.port }}
+        PG_DB: ${{ inputs.database }}
+        PG_USER: ${{ inputs.user }}
+        PG_PASSWORD: ${{ inputs.password }}
+      run: |
+        set -euo pipefail
+
+        # A hosted runner is a fresh VM; a self-hosted one is NOT. A container left behind
+        # by a cancelled run would still hold the port, so anything this action started
+        # before is cleared first. The label keeps that blast radius to our own containers.
+        for c in $(docker ps -aq --filter "label=elite-vet-ci-postgres=true"); do
+          docker rm -f "$c" >/dev/null 2>&1 || true
+        done
+
+        # Refuse to run against the default port even if someone overrides the input:
+        # this guard is the last thing standing between a CI run and a real dev database.
+        if [ "$PG_PORT" = "5432" ]; then
+          echo "::error::Refusing to publish CI Postgres on 5432 — that is the developer's own database port."
+          exit 1
+        fi
+
+        docker run -d \
+          --name elite-vet-ci-postgres \
+          --label elite-vet-ci-postgres=true \
+          -e POSTGRES_USER="$PG_USER" \
+          -e POSTGRES_PASSWORD="$PG_PASSWORD" \
+          -e POSTGRES_DB="$PG_DB" \
+          -p "127.0.0.1:${PG_PORT}:5432" \
+          --health-cmd "pg_isready -U $PG_USER -d $PG_DB" \
+          --health-interval 5s \
+          --health-timeout 5s \
+          --health-retries 10 \
+          postgres:16 >/dev/null
+
+        # Readiness is probed with `docker exec`, not the host's `pg_isready`: the host
+        # binary is guaranteed to exist on ubuntu-latest but not on a macOS runner, and
+        # probing from inside the container also proves it is OUR container answering.
+        for i in $(seq 1 60); do
+          if docker exec elite-vet-ci-postgres pg_isready -U "$PG_USER" -d "$PG_DB" >/dev/null 2>&1; then
+            echo "Postgres ready after ${i}s on 127.0.0.1:${PG_PORT}"
+            echo "DATABASE_URL=postgres://${PG_USER}:${PG_PASSWORD}@127.0.0.1:${PG_PORT}/${PG_DB}?schema=public" >> "$GITHUB_ENV"
+            exit 0
+          fi
+          sleep 1
+        done
+
+        echo "::error::Postgres did not become ready in 60s"
+        docker logs elite-vet-ci-postgres 2>&1 | tail -50
+        exit 1

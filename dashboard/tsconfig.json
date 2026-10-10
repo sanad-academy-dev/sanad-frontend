@@ -1,0 +1,6 @@
+{
+	"$comment": "Dashboard solution file. Paths remain here because Vite and Vitest resolve them from this config.",
+	"extends": "./tsconfig.base.json",
+	"files": [],
+	"references": [{ "path": "./tsconfig.client.json" }]
+}

@@ -1,0 +1,71 @@
+#!/usr/bin/env sh
+# Pre-push guards (fast → slow). Two escapes burned CI cycles at the P2 exit and are
+# now caught here before the push:
+#  1. schema changed without a migration (original guard)
+#  2. pure feature tests (e.g. finance-nav config locks) — seconds, always run
+#  3. FORCED-FRESH whole-graph typecheck — the authoritative type verdict (see below)
+#  4. FULL client bundle build — only when the push touches browser-reachable code;
+#     a truncated local build once let a Prisma-runtime import reach the client bundle.
+
+command -v bun >/dev/null 2>&1 || export PATH="$HOME/.bun/bin:$PATH"
+
+LOCAL=$(git rev-parse @)
+REMOTE=$(git rev-parse @{u} 2>/dev/null || echo "")
+
+# No upstream yet (first push) — skip range checks, still run the fast tests
+if [ -n "$REMOTE" ]; then
+  RANGE="${REMOTE}..${LOCAL}"
+
+  SCHEMA_CHANGED=$(git diff --name-only "$RANGE" | grep -c "prisma/schema.prisma" || true)
+  MIGRATION_ADDED=$(git diff --name-only "$RANGE" | grep -c "prisma/migrations/" || true)
+
+  if [ "$SCHEMA_CHANGED" -gt 0 ] && [ "$MIGRATION_ADDED" -eq 0 ]; then
+    echo ""
+    echo "ERROR: prisma/schema.prisma changed but no migration file was added."
+    echo "Run: bunx prisma migrate dev --name <descriptive-name>"
+    echo "Then commit the generated migration before pushing."
+    echo ""
+    exit 1
+  fi
+fi
+
+# 2. pure test suites (no DATABASE_URL needed) — catches frozen nav/config tests.
+# Was `bun test src/features` (12 files). `test:fast` is the same idea with the scope
+# DERIVED rather than guessed: every test that does not reach a database, 52 files / 605
+# tests, still ~8 seconds. Same suite the fast CI job runs, so a local pass and a CI pass
+# mean the same thing.
+bun run test:fast || exit 1
+
+# 3. AUTHORITATIVE TYPE VERDICT — forced fresh, never inherited (CLAUDE.md rules 13/14).
+#
+# The gate runs at TWO SPEEDS on purpose:
+#   commit  → `bun run typecheck`      incremental, MAY inherit tsbuild/ — fast, fallible
+#   push/CI → `bun run typecheck:cold` forced fresh — authoritative
+#
+# Why this exists: a stale .tsbuildinfo let the pre-commit gate report green while real
+# errors sat unchecked, because tsc considered the affected projects up to date. A commit-
+# time false green is tolerable — this hook and CI catch it within minutes — but a PUSH
+# must never depend on inherited state.
+#
+# Why `rm -rf tsbuild` and not `--force`: `--force` exists only in BUILD mode (`tsc -b`),
+# and only the `generated` project is built that way. The server and client projects are
+# checked with `tsc -p`, where the sole way to defeat an inherited .tsbuildinfo is to
+# delete it. Removing the directory is therefore the only mechanism that covers all three
+# — and it leaves a correct, freshly-built tsbuild/ behind, so the next commit is fast.
+#
+# It runs BEFORE the build: a type error is far likelier than a bundling error, and this
+# way the slower build is not paid to discover one.
+echo "pre-push: forced-fresh typecheck (authoritative — ignores any cached tsbuild/)..."
+bun run typecheck:cold || exit 1
+
+# 4. client-bundle smoke: full build when the pushed range touches the browser surface
+if [ -n "$REMOTE" ]; then
+  UI_TOUCHED=$(git diff --name-only "$RANGE" | grep -cE "^src/(features|routes|components|locales|hooks|lib)/|^src/server/.*\.type\.ts$" || true)
+  if [ "$UI_TOUCHED" -gt 0 ]; then
+    echo "pre-push: UI surface changed — running the FULL build (client bundle guard)..."
+    # Serialized against any other heavy job on this machine (see scripts/run-exclusive.mjs):
+    # a build landing on top of a pre-commit typecheck is what pushes Windows past its
+    # commit limit and kills VS Code.
+    bun scripts/run-exclusive.mjs build bun run build || exit 1
+  fi
+fi

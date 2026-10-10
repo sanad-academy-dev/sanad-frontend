@@ -1,0 +1,511 @@
+diff a/website/src/components/multi-step-form.tsx b/website/src/components/multi-step-form.tsx	(rejected hunks)
+@@ -47,9 +47,11 @@ const fade: Variants = {
+ export function MultiStepForm({
+   className,
+   onCreate,
++  onClose,
+ }: {
+   className?: string;
+   onCreate?: () => void;
++  onClose?: () => void;
+ }) {
+   const reduceMotion = useReducedMotion();
+   const uid = useId();
+@@ -184,7 +186,7 @@ export function MultiStepForm({
+   );
+ 
+   return (
+-    <div className={cn(" grid w-full max-w-[calc(100vw-2rem)] md:max-w-[800px] font-sans mx-auto", className)} dir="rtl">
++    <div className={cn(" grid w-full max-w-[800px] font-sans mx-auto", className)} dir="rtl">
+       {/* Ghost layer to pre-calculate height */}
+       <div
+         aria-hidden
+@@ -202,16 +204,26 @@ export function MultiStepForm({
+ 
+       <form
+         noValidate
+-        className="col-start-1 bg-background row-start-1 flex flex-col self-start w-full max-w-[calc(100vw-2rem)] md:max-w-full overflow-hidden max-h-[85vh] rounded-[32px] bg-background text-foreground shadow-2xl border"
++        className="col-start-1 bg-background row-start-1 flex flex-col self-start w-full overflow-hidden max-h-[85vh]  text-foreground shadow-2xl border relative"
+         onSubmit={(e) => e.preventDefault()}
+       >
++        {onClose && (
++          <button
++            type="button"
++            onClick={onClose}
++            className="cursor-pointer absolute top-4 left-4 z-50 flex size-8 items-center justify-center rounded-full bg-secondary/80 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
++            aria-label="إغلاق"
++          >
++            <X className="size-5" />
++          </button>
++        )}
+         {/* Overall Progress Stepper */}
+         {panel >= 0 && (
+           <div className="w-full flex justify-center px-4 pt-6 sm:pt-8 pb-2 shrink-0 z-10 ">
+             <ProgressStepper
+               steps={["قيم ابنك", "اختر الموعد", "البيانات الشخصية", "التأكيد"]}
+               current={panel <= 14 ? 0 : panel === 15 ? 1 : panel === 16 ? 2 : 3}
+-              className="w-full max-w-full"
++              className="w-full max-w-full mt-10"
+             />
+           </div>
+         )}
+@@ -341,23 +353,23 @@ function PanelContent({
+         </p>
+ 
+         <div className="flex flex-col border-t border-border/60">
+-          <div className="bg-muted px-6 rounded-[16px]  flex justify-between items-center py-4 my-2">
++          <div className="bg-muted px-6   flex justify-between items-center py-4 my-2">
+             <span className="text-muted-foreground font-bold text-[15px]">نحدد</span>
+             <span className="text-foreground font-extrabold text-[15px]">المسار والمستوى المناسبين</span>
+           </div>
+-          <div className="bg-muted px-6 rounded-[16px]  flex justify-between items-center py-4 my-2">
++          <div className="bg-muted px-6   flex justify-between items-center py-4 my-2">
+             <span className="text-muted-foreground font-bold text-[15px]">نوضح</span>
+             <span className="text-foreground font-extrabold text-[15px]">المدة وعدد الحصص</span>
+           </div>
+-          <div className="bg-muted px-6 rounded-[16px]  flex justify-between items-center py-4 my-2">
++          <div className="bg-muted px-6   flex justify-between items-center py-4 my-2">
+             <span className="text-muted-foreground font-bold text-[15px]">الفئة العمرية</span>
+             <span className="text-foreground font-extrabold text-[15px]">من 6 إلى 18 سنة</span>
+           </div>
+-          <div className="bg-muted px-6 rounded-[16px]  flex justify-between items-center py-4 my-2">
++          <div className="bg-muted px-6   flex justify-between items-center py-4 my-2">
+             <span className="text-muted-foreground font-bold text-[15px]">النتيجة المتوقعة</span>
+             <span className="text-foreground font-extrabold text-[15px]">مهارات عملية + مشروع</span>
+           </div>
+-          <div className="bg-muted px-6 rounded-[16px]  flex justify-between items-center py-4 my-2">
++          <div className="bg-muted px-6   flex justify-between items-center py-4 my-2">
+             <span className="text-muted-foreground font-bold text-[15px]">السعر</span>
+             <span className="text-foreground font-extrabold text-[15px]">يُوضح حسب المسار</span>
+           </div>
+@@ -366,7 +378,7 @@ function PanelContent({
+         <div className="mt-10 flex flex-col items-center gap-3 w-full">
+           <Button
+             onClick={() => go(0, 1)}
+-            className="cursor-po h-[54px] w-full rounded-2xl text-lg font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-md shadow-primary/20 flex items-center justify-center gap-2"
++            className="cursor-po h-[54px] w-full  text-lg font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-md shadow-primary/20 flex items-center justify-center gap-2"
+           >
+             <span>ابدأ التقييم</span>
+             <ArrowLeft className="w-5 h-5" />
+@@ -397,7 +409,7 @@ function PanelContent({
+               type="button"
+               onClick={() => setAge(a)}
+               className={cn(
+-                "h-14 rounded-2xl text-[20px] font-bold transition-all border-2",
++                "h-14  text-[20px] font-bold transition-all border-2",
+                 age === a
+                   ? "border-primary bg-primary/10 text-primary"
+                   : "border-transparent bg-secondary text-secondary-foreground shadow-sm hover:border-border"
+@@ -411,7 +423,7 @@ function PanelContent({
+         <Button
+           onClick={() => go(1, 1)}
+           disabled={!age}
+-          className="h-[54px] w-full rounded-2xl text-lg font-bold transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
++          className="h-[54px] w-full  text-lg font-bold transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
+         >
+           التالي
+         </Button>
+@@ -422,7 +434,7 @@ function PanelContent({
+   if (panel === 1) {
+     return (
+       <div className="flex flex-col gap-7 text-center items-center pt-2">
+-        <div className="flex size-[72px] items-center justify-center rounded-[22px] bg-secondary shadow-sm">
++        <div className="flex size-[72px] items-center justify-center  bg-secondary shadow-sm">
+           <Compass className="size-9 text-muted-foreground" strokeWidth={1.5} />
+         </div>
+         
+@@ -436,15 +448,15 @@ function PanelContent({
+         </p>
+ 
+         <div className="grid grid-cols-3 gap-3 w-full mt-1">
+-          <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2.5 rounded-2xl bg-secondary/50 py-3 sm:py-4 px-1 sm:px-2 shadow-sm border border-border">
++          <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2.5  bg-secondary/50 py-3 sm:py-4 px-1 sm:px-2 shadow-sm border border-border">
+             <Users className="size-5 sm:size-6 text-muted-foreground" />
+             <span className="text-[10px] sm:text-[11px] font-extrabold text-foreground text-center">3 أسئلة لك</span>
+           </div>
+-          <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2.5 rounded-2xl bg-secondary/50 py-3 sm:py-4 px-1 sm:px-2 shadow-sm border border-border">
++          <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2.5  bg-secondary/50 py-3 sm:py-4 px-1 sm:px-2 shadow-sm border border-border">
+             <Gamepad2 className="size-5 sm:size-6 text-muted-foreground" />
+             <span className="text-[10px] sm:text-[11px] font-extrabold text-foreground text-center">10 تحديات لابنك</span>
+           </div>
+-          <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2.5 rounded-2xl bg-secondary/50 py-3 sm:py-4 px-1 sm:px-2 shadow-sm border border-border">
++          <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2.5  bg-secondary/50 py-3 sm:py-4 px-1 sm:px-2 shadow-sm border border-border">
+             <Calendar className="size-5 sm:size-6 text-muted-foreground" />
+             <span className="text-[10px] sm:text-[11px] font-extrabold text-foreground text-center">حجز التقييم العملي</span>
+           </div>
+@@ -453,7 +465,7 @@ function PanelContent({
+         <div className="flex flex-col gap-3 w-full mt-3">
+           <Button
+             onClick={() => go(2, 1)}
+-            className="h-[54px] w-full rounded-2xl text-lg font-bold transition-all shadow-lg shadow-primary/25"
++            className="h-[54px] w-full  text-lg font-bold transition-all shadow-lg shadow-primary/25"
+           >
+             لنبداً
+           </Button>
+@@ -500,7 +512,7 @@ function PanelContent({
+                 type="button"
+                 onClick={() => setQ1(opt.id)}
+                 className={cn(
+-                  "flex items-center justify-between rounded-2xl border-2 p-4 transition-all bg-secondary/20",
++                  "flex items-center justify-between  border-2 p-4 transition-all bg-secondary/20",
+                   checked
+                     ? "border-primary shadow-md shadow-primary/10"
+                     : "border-border shadow-sm hover:border-primary/50"
+@@ -508,7 +520,7 @@ function PanelContent({
+               >
+                 <span className="text-[17px] font-bold text-foreground">{opt.label}</span>
+                 <span className={cn(
+-                  "flex size-[34px] items-center justify-center rounded-xl text-[15px] font-extrabold transition-colors",
++                  "flex size-[34px] items-center justify-center  text-[15px] font-extrabold transition-colors",
+                   checked ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
+                 )}>
+                   {opt.id}
+@@ -559,7 +571,7 @@ function PanelContent({
+                 type="button"
+                 onClick={() => setQ2(opt.id)}
+                 className={cn(
+-                  "flex items-center justify-between rounded-2xl border-2 p-4 transition-all bg-secondary/20",
++                  "flex items-center justify-between  border-2 p-4 transition-all bg-secondary/20",
+                   checked
+                     ? "border-primary shadow-md shadow-primary/10"
+                     : "border-border shadow-sm hover:border-primary/50"
+@@ -567,7 +579,7 @@ function PanelContent({
+               >
+                 <span className="text-[17px] font-bold text-foreground">{opt.label}</span>
+                 <span className={cn(
+-                  "flex size-[34px] items-center justify-center rounded-xl text-[15px] font-extrabold transition-colors",
++                  "flex size-[34px] items-center justify-center  text-[15px] font-extrabold transition-colors",
+                   checked ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
+                 )}>
+                   {opt.id}
+@@ -619,7 +631,7 @@ function PanelContent({
+                 type="button"
+                 onClick={() => setQ3(opt.id)}
+                 className={cn(
+-                  "flex items-center justify-between rounded-2xl border-2 p-4 transition-all bg-secondary/20",
++                  "flex items-center justify-between  border-2 p-4 transition-all bg-secondary/20",
+                   checked
+                     ? "border-primary shadow-md shadow-primary/10"
+                     : "border-border shadow-sm hover:border-primary/50"
+@@ -627,7 +639,7 @@ function PanelContent({
+               >
+                 <span className="text-[17px] font-bold text-foreground">{opt.label}</span>
+                 <span className={cn(
+-                  "flex size-[34px] items-center justify-center rounded-xl text-[15px] font-extrabold transition-colors",
++                  "flex size-[34px] items-center justify-center  text-[15px] font-extrabold transition-colors",
+                   checked ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
+                 )}>
+                   {opt.id}
+@@ -668,7 +680,7 @@ function PanelContent({
+         <div className="flex flex-col gap-3 w-full mt-4">
+           <Button
+             onClick={() => go(6, 1)}
+-            className="h-[54px] w-full rounded-2xl text-lg font-bold transition-all shadow-lg shadow-primary/25"
++            className="h-[54px] w-full  text-lg font-bold transition-all shadow-lg shadow-primary/25"
+           >
+             أنا جاهز — لنبدأ!
+           </Button>
+@@ -698,13 +710,13 @@ function PanelContent({
+           أكمل المتتالية
+         </h2>
+ 
+-        <div className="flex items-center justify-center gap-2 mt-4 bg-secondary/30 p-4 rounded-2xl">
++        <div className="flex items-center justify-center gap-2 mt-4 bg-secondary/30 p-4 ">
+           {[2, 6, 12, 20].map((num) => (
+-            <div key={num} className="flex size-12 md:size-14 items-center justify-center rounded-xl bg-muted/30 text-xl font-bold text-foreground shadow-sm">
++            <div key={num} className="flex size-12 md:size-14 items-center justify-center  bg-muted/30 text-xl font-bold text-foreground shadow-sm">
+               {num}
+             </div>
+           ))}
+-          <div className="flex size-12 md:size-14 items-center justify-center rounded-xl bg-primary/10 text-xl font-bold text-primary shadow-sm border border-primary/20 bg-[repeating-linear-gradient(45deg,transparent,transparent_4px,rgba(0,0,0,0.03)_4px,rgba(0,0,0,0.03)_8px)]">
++          <div className="flex size-12 md:size-14 items-center justify-center  bg-primary/10 text-xl font-bold text-primary shadow-sm border border-primary/20 bg-[repeating-linear-gradient(45deg,transparent,transparent_4px,rgba(0,0,0,0.03)_4px,rgba(0,0,0,0.03)_8px)]">
+             ؟
+           </div>
+         </div>
+@@ -718,7 +730,7 @@ function PanelContent({
+                 type="button"
+                 onClick={() => setC1(opt.id)}
+                 className={cn(
+-                  "flex h-[60px] items-center justify-center rounded-2xl border-2 transition-all bg-background",
++                  "flex h-[60px] items-center justify-center  border-2 transition-all bg-background",
+                   checked
+                     ? "border-primary shadow-md shadow-primary/10 text-primary"
+                     : "border-border shadow-sm hover:border-primary/50 text-foreground"
+@@ -763,7 +775,7 @@ function PanelContent({
+                 type="button"
+                 onClick={() => setC2(opt.id)}
+                 className={cn(
+-                  "flex h-[60px] items-center justify-center rounded-2xl border-2 transition-all bg-background",
++                  "flex h-[60px] items-center justify-center  border-2 transition-all bg-background",
+                   checked
+                     ? "border-primary shadow-md shadow-primary/10 text-primary"
+                     : "border-border shadow-sm hover:border-primary/50 text-foreground"
+@@ -799,13 +811,13 @@ function PanelContent({
+           كل رقم ضعف الذي قبله — ما التالي؟
+         </h2>
+ 
+-        <div className="flex items-center justify-center gap-2 mt-4 bg-secondary/30 p-4 rounded-2xl" dir="ltr">
++        <div className="flex items-center justify-center gap-2 mt-4 bg-secondary/30 p-4 " dir="ltr">
+           {[1, 2, 4, 8].map((num) => (
+-            <div key={num} className="flex size-12 md:size-14 items-center justify-center rounded-xl bg-muted/30 text-xl font-bold text-foreground shadow-sm">
++            <div key={num} className="flex size-12 md:size-14 items-center justify-center  bg-muted/30 text-xl font-bold text-foreground shadow-sm">
+               {num}
+             </div>
+           ))}
+-          <div className="flex size-12 md:size-14 items-center justify-center rounded-xl bg-primary/10 text-xl font-bold text-primary shadow-sm border border-primary/20 bg-[repeating-linear-gradient(45deg,transparent,transparent_4px,rgba(0,0,0,0.03)_4px,rgba(0,0,0,0.03)_8px)]">
++          <div className="flex size-12 md:size-14 items-center justify-center  bg-primary/10 text-xl font-bold text-primary shadow-sm border border-primary/20 bg-[repeating-linear-gradient(45deg,transparent,transparent_4px,rgba(0,0,0,0.03)_4px,rgba(0,0,0,0.03)_8px)]">
+             ؟
+           </div>
+         </div>
+@@ -819,7 +831,7 @@ function PanelContent({
+                 type="button"
+                 onClick={() => setC3(opt.id)}
+                 className={cn(
+-                  "flex h-[60px] items-center justify-center rounded-2xl border-2 transition-all bg-background",
++                  "flex h-[60px] items-center justify-center  border-2 transition-all bg-background",
+                   checked
+                     ? "border-primary shadow-md shadow-primary/10 text-primary"
+                     : "border-border shadow-sm hover:border-primary/50 text-foreground"
+@@ -864,7 +876,7 @@ function PanelContent({
+                 type="button"
+                 onClick={() => setC4(opt.id)}
+                 className={cn(
+-                  "flex h-[60px] items-center justify-center rounded-2xl border-2 transition-all bg-background",
++                  "flex h-[60px] items-center justify-center  border-2 transition-all bg-background",
+                   checked
+                     ? "border-primary shadow-md shadow-primary/10 text-primary"
+                     : "border-border shadow-sm hover:border-primary/50 text-foreground"
+@@ -920,7 +932,7 @@ function PanelContent({
+                 type="button"
+                 onClick={() => toggleOption(opt.id)}
+                 className={cn(
+-                  "relative flex h-[80px] items-center justify-center rounded-2xl border-2 transition-all bg-background",
++                  "relative flex h-[80px] items-center justify-center  border-2 transition-all bg-background",
+                   isSelected
+                     ? "border-primary shadow-md shadow-primary/10 text-primary"
+                     : "border-border shadow-sm hover:border-primary/50 text-foreground"
+@@ -974,7 +986,7 @@ function PanelContent({
+                 type="button"
+                 onClick={() => setC6(opt.id)}
+                 className={cn(
+-                  "flex h-[70px] items-center justify-center rounded-2xl border-2 transition-all bg-background",
++                  "flex h-[70px] items-center justify-center  border-2 transition-all bg-background",
+                   checked
+                     ? "border-primary shadow-md shadow-primary/10 text-primary"
+                     : "border-border shadow-sm hover:border-primary/50 text-foreground"
+@@ -1019,7 +1031,7 @@ function PanelContent({
+                 type="button"
+                 onClick={() => setC7(opt.id)}
+                 className={cn(
+-                  "flex h-[60px] items-center justify-center rounded-2xl border-2 transition-all bg-background",
++                  "flex h-[60px] items-center justify-center  border-2 transition-all bg-background",
+                   checked
+                     ? "border-primary shadow-md shadow-primary/10 text-primary"
+                     : "border-border shadow-sm hover:border-primary/50 text-foreground"
+@@ -1064,7 +1076,7 @@ function PanelContent({
+                 type="button"
+                 onClick={() => setC10(opt.id)}
+                 className={cn(
+-                  "flex h-[60px] items-center justify-center rounded-2xl border-2 transition-all bg-background",
++                  "flex h-[60px] items-center justify-center  border-2 transition-all bg-background",
+                   checked
+                     ? "border-primary shadow-md shadow-primary/10 text-primary"
+                     : "border-border shadow-sm hover:border-primary/50 text-foreground"
+@@ -1100,11 +1112,11 @@ function PanelContent({
+         </p>
+ 
+         <div className="flex items-center gap-2 sm:gap-4 w-full mt-2 justify-center">
+-          <div className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-background py-3 sm:py-4 px-4 sm:px-6 shadow-sm border-2 border-secondary flex-1">
++          <div className="flex flex-col items-center justify-center gap-1  bg-background py-3 sm:py-4 px-4 sm:px-6 shadow-sm border-2 border-secondary flex-1">
+             <span className="text-2xl sm:text-3xl font-extrabold text-primary">EN2</span>
+             <span className="text-[11px] sm:text-[12px] font-bold text-muted-foreground mt-1 text-center">المستوى المقترح</span>
+           </div>
+-          <div className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-background py-3 sm:py-4 px-4 sm:px-6 shadow-sm border-2 border-secondary flex-1">
++          <div className="flex flex-col items-center justify-center gap-1  bg-background py-3 sm:py-4 px-4 sm:px-6 shadow-sm border-2 border-secondary flex-1">
+             <div className="flex items-baseline gap-0.5">
+               <span className="text-2xl sm:text-3xl font-extrabold text-primary">7</span>
+               <span className="text-base sm:text-lg font-bold text-muted-foreground">/10</span>
+@@ -1116,7 +1128,7 @@ function PanelContent({
+         <div className="flex flex-col gap-3 w-full mt-2">
+           <Button
+             onClick={() => go(15, 1)}
+-            className="h-[54px] w-full rounded-2xl text-lg font-bold transition-all shadow-lg shadow-primary/25"
++            className="h-[54px] w-full  text-lg font-bold transition-all shadow-lg shadow-primary/25"
+           >
+             احجز جلسة التقييم الحضورية
+           </Button>
+@@ -1147,7 +1159,7 @@ function PanelContent({
+     return (
+       <div className="flex flex-col gap-6 pt-2 pb-4">
+         <div className="flex items-center justify-between" dir="ltr">
+-          <button type="button" onClick={() => onCreate?.()} className="rounded-xl border-2 border-border p-1.5 hover:bg-secondary transition-colors">
++          <button type="button" onClick={() => onCreate?.()} className=" border-2 border-border p-1.5 hover:bg-secondary transition-colors">
+             <X className="size-5 text-foreground" />
+           </button>
+           <h2 className="text-[22px] font-extrabold text-foreground" dir="rtl">
+@@ -1160,11 +1172,11 @@ function PanelContent({
+         {/* Calendar */}
+         <div className="flex flex-col gap-4 mt-2 px-4">
+           <div className="flex items-center justify-between">
+-            <button type="button" className="p-1 hover:bg-secondary rounded-lg">
++            <button type="button" className="p-1 hover:bg-secondary ">
+               <ChevronRight className="size-5 text-foreground" />
+             </button>
+             <span className="text-[15px] font-bold text-foreground">أكتوبر 2026</span>
+-            <button type="button" className="p-1 hover:bg-secondary rounded-lg">
++            <button type="button" className="p-1 hover:bg-secondary ">
+               <ChevronLeft className="size-5 text-foreground" />
+             </button>
+           </div>
+@@ -1188,7 +1200,7 @@ function PanelContent({
+                   disabled={isFriday}
+                   onClick={() => { setBookingDay(d); setBookingTime(null); }}
+                   className={cn(
+-                    "h-10 w-full flex items-center justify-center text-[15px] font-bold transition-all rounded-xl",
++                    "h-10 w-full flex items-center justify-center text-[15px] font-bold transition-all ",
+                     isFriday ? "text-muted-foreground/30" : 
+                     isSelected ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" : "text-foreground hover:bg-secondary"
+                   )}
+@@ -1216,7 +1228,7 @@ function PanelContent({
+                     type="button"
+                     onClick={() => setBookingTime(time)}
+                     className={cn(
+-                      "h-[44px] rounded-xl text-[14px] font-bold transition-all border-2",
++                      "h-[44px]  text-[14px] font-bold transition-all border-2",
+                       isSelected
+                         ? "bg-primary border-primary text-primary-foreground shadow-md shadow-primary/20"
+                         : "bg-background border-border text-foreground hover:border-primary/50"
+@@ -1236,7 +1248,7 @@ function PanelContent({
+               if (bookingTime) go(16, 1);
+             }}
+             className={cn(
+-              "h-[54px] w-full rounded-2xl text-lg font-bold transition-all",
++              "h-[54px] w-full  text-lg font-bold transition-all",
+               bookingTime
+                 ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25"
+                 : "bg-primary/10 hover:bg-primary/20 text-primary"
+@@ -1254,7 +1266,7 @@ function PanelContent({
+     return (
+       <div className="flex flex-col gap-6 pt-2 pb-4">
+         <div className="flex items-center justify-between" dir="ltr">
+-          <button type="button" onClick={() => go(15, -1)} className="rounded-xl border-2 border-border p-1.5 hover:bg-secondary transition-colors">
++          <button type="button" onClick={() => go(15, -1)} className=" border-2 border-border p-1.5 hover:bg-secondary transition-colors">
+             <X className="size-5 text-foreground" />
+           </button>
+           <h2 className="text-[22px] font-extrabold text-foreground" dir="rtl">
+@@ -1277,7 +1289,7 @@ function PanelContent({
+                 placeholder="الاسم الكامل"
+                 value={parentName}
+                 onChange={(e) => setParentName?.(e.target.value)}
+-                className="h-12 w-full rounded-xl border-2 border-border bg-background px-4 text-[15px] outline-none focus:border-primary transition-colors text-right pl-4 pr-11"
++                className="h-12 w-full  border-2 border-border bg-background px-4 text-[15px] outline-none focus:border-primary transition-colors text-right pl-4 pr-11"
+               />
+               <User className="absolute right-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground/50" />
+             </div>
+@@ -1288,7 +1300,7 @@ function PanelContent({
+             <label className="text-[14px] font-bold text-foreground">
+               رقم الجوال <span className="text-destructive">*</span>
+             </label>
+-            <div className="relative flex items-center h-12 w-full rounded-xl border-2 border-border bg-background overflow-hidden focus-within:border-primary transition-colors">
++            <div className="relative flex items-center h-12 w-full  border-2 border-border bg-background overflow-hidden focus-within:border-primary transition-colors">
+               <input
+                 type="tel"
+                 placeholder="05XXXXXXXX"
+@@ -1318,7 +1330,7 @@ function PanelContent({
+                 placeholder="email@example.com"
+                 value={email}
+                 onChange={(e) => setEmail?.(e.target.value)}
+-                className="h-12 w-full rounded-xl border-2 border-border bg-background px-4 text-[15px] outline-none focus:border-primary transition-colors text-left pl-4 pr-11"
++                className="h-12 w-full  border-2 border-border bg-background px-4 text-[15px] outline-none focus:border-primary transition-colors text-left pl-4 pr-11"
+                 dir="ltr"
+               />
+               <Mail className="absolute right-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground/50" />
+@@ -1341,7 +1353,7 @@ function PanelContent({
+                     if (newList[0]) newList[0].name = e.target.value;
+                     setChildrenList?.(newList);
+                   }}
+-                  className="h-12 w-full rounded-xl border-2 border-border bg-background px-4 text-[15px] outline-none focus:border-primary transition-colors pr-11"
++                  className="h-12 w-full  border-2 border-border bg-background px-4 text-[15px] outline-none focus:border-primary transition-colors pr-11"
+                 />
+                 <Smile className="absolute right-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground/50" />
+               </div>
+@@ -1361,7 +1373,7 @@ function PanelContent({
+                     if (newList[0]) newList[0].age = e.target.value;
+                     setChildrenList?.(newList);
+                   }}
+-                  className="h-12 w-full rounded-xl border-2 border-border bg-background px-4 text-[15px] outline-none focus:border-primary transition-colors pr-11"
++                  className="h-12 w-full  border-2 border-border bg-background px-4 text-[15px] outline-none focus:border-primary transition-colors pr-11"
+                 />
+                 <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground/50" />
+               </div>
+@@ -1371,7 +1383,7 @@ function PanelContent({
+           {/* Add Child Button */}
+           <button
+             type="button"
+-            className="flex items-center justify-center gap-2 h-12 w-full rounded-xl bg-secondary hover:bg-secondary/80 text-foreground text-[15px] font-bold transition-colors mt-2"
++            className="flex items-center justify-center gap-2 h-12 w-full  bg-secondary hover:bg-secondary/80 text-foreground text-[15px] font-bold transition-colors mt-2"
+           >
+             <Plus className="size-5" />
+             اضافة طفل
+@@ -1383,14 +1395,14 @@ function PanelContent({
+           <Button
+             variant="outline"
+             onClick={() => go(15, -1)}
+-            className="h-[50px] flex-[0.8] rounded-2xl text-[15px] font-bold border-2 hover:bg-secondary transition-all text-foreground"
++            className="h-[50px] flex-[0.8]  text-[15px] font-bold border-2 hover:bg-secondary transition-all text-foreground"
+           >
+             <ArrowRight className="ml-2 size-5" />
+             السابق
+           </Button>
+           <Button
+             onClick={() => go(17, 1)}
+-            className="h-[50px] flex-[2] rounded-2xl text-[15px] font-bold bg-primary/20 hover:bg-primary/30 text-primary transition-all shadow-none"
++            className="h-[50px] flex-[2]  text-[15px] font-bold bg-primary/20 hover:bg-primary/30 text-primary transition-all shadow-none"
+           >
+             التالي — التأكيد
+             <ArrowLeft className="mr-2 size-5" />
+@@ -1412,7 +1424,7 @@ function PanelContent({
+     return (
+       <div className="flex flex-col gap-6 pt-2 pb-4">
+         <div className="flex items-center justify-between" dir="ltr">
+-          <button type="button" onClick={() => onCreate?.()} className="rounded-xl border-2 border-border p-1.5 hover:bg-secondary transition-colors">
++          <button type="button" onClick={() => onCreate?.()} className=" border-2 border-border p-1.5 hover:bg-secondary transition-colors">
+             <X className="size-5 text-foreground" />
+           </button>
+           <h2 className="text-[22px] font-extrabold text-foreground" dir="rtl">
+@@ -1460,14 +1472,14 @@ function PanelContent({
+           <Button
+             variant="outline"
+             onClick={() => go(16, -1)}
+-            className="h-[54px] flex-[0.7] rounded-xl text-[16px] font-bold border-2 hover:bg-secondary transition-all text-foreground"
++            className="h-[54px] flex-[0.7]  text-[16px] font-bold border-2 hover:bg-secondary transition-all text-foreground"
+           >
+             تعديل
+             <Pencil className="mr-2 size-4" />
+           </Button>
+           <Button
+             onClick={() => go(18, 1)}
+-            className="h-[54px] flex-[2] rounded-xl text-[16px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-md shadow-primary/20"
++            className="h-[54px] flex-[2]  text-[16px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-md shadow-primary/20"
+           >
+             تأكيد الحجز
+             <Bookmark className="mr-2 size-5" />
+@@ -1489,9 +1501,6 @@ function PanelContent({
+     return (
+       <div className="flex flex-col pt-4 pb-4 min-h-[380px]">
+         <div className="flex items-start justify-between" dir="ltr">
+-          <button type="button" onClick={() => onCreate?.()} className="rounded-xl border-2 border-border p-1.5 hover:bg-secondary transition-colors mt-1">
+-            <X className="size-5 text-foreground" />
+-          </button>
+           <div className="flex flex-col items-end gap-1.5" dir="rtl">
+             <h2 className="text-[24px] font-extrabold text-foreground">
+               تم تأكيد الحجز
+@@ -1516,7 +1525,7 @@ function PanelContent({
+         <div className="mt-auto px-4 w-full flex justify-center" dir="rtl">
+           <Button
+             onClick={() => onCreate?.()}
+-            className="h-[54px] w-[80%] rounded-xl text-[16px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-md shadow-primary/20"
++            className="h-[54px] w-[80%]  text-[16px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-md shadow-primary/20"
+           >
+             العودة للصفحة الرئيسية
+             <ArrowLeft className="mr-2 size-5" />

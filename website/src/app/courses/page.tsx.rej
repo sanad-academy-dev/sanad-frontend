@@ -1,0 +1,28 @@
+diff a/website/src/app/courses/page.tsx b/website/src/app/courses/page.tsx	(rejected hunks)
+@@ -68,7 +68,7 @@ export default async function CoursesPage() {
+                 <button
+                   key={filter}
+                   type="button"
+-                  className="flex items-center justify-between gap-6 rounded-lg border border-border px-4 py-2 text-base text-muted-foreground transition-colors hover:bg-background"
++                  className="flex items-center justify-between gap-6  border border-border px-4 py-2 text-base text-muted-foreground transition-colors hover:bg-background"
+                 >
+                   <span className="whitespace-nowrap">{filter}</span>
+                   <ChevronDown className="size-4 shrink-0" />
+@@ -79,7 +79,7 @@ export default async function CoursesPage() {
+ 
+           {/* شريط التبويبات */}
+           <div className="flex">
+-            <div className="inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-lg border border-border p-1">
++            <div className="inline-flex max-w-full items-center gap-1 overflow-x-auto  border border-border p-1">
+               {TABS.map((tab, i) => (
+                 <Fragment key={tab}>
+                   {i > 0 && (
+@@ -90,7 +90,7 @@ export default async function CoursesPage() {
+                   )}
+                   <button
+                     type="button"
+-                    className={`shrink-0 whitespace-nowrap rounded-lg px-4 py-2 text-base font-medium transition-colors ${
++                    className={`shrink-0 whitespace-nowrap  px-4 py-2 text-base font-medium transition-colors ${
+                       i === 0
+                         ? "bg-primary text-primary-foreground"
+                         : "text-foreground hover:bg-background"

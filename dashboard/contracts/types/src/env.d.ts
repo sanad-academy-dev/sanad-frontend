@@ -1,0 +1,28 @@
+export declare const env: Readonly<{
+    VAN_APP_ORIGINS?: string | undefined;
+    CRM_SECRET_KEY?: string | undefined;
+    S3_ENDPOINT?: string | undefined;
+    OPENAI_API_KEY?: string | undefined;
+    ANTHROPIC_API_KEY?: string | undefined;
+    AGENT_DEFAULT_PROVIDER?: "openai" | "anthropic" | undefined;
+    LIVEKIT_URL?: string | undefined;
+    LIVEKIT_API_KEY?: string | undefined;
+    LIVEKIT_API_SECRET?: string | undefined;
+    CRON_SECRET?: string | undefined;
+    VITE_SENTRY_DSN?: string | undefined;
+    PORT: number;
+    NODE_ENV: "development" | "production" | "test";
+    DATABASE_URL: string;
+    BETTER_AUTH_URL: string;
+    BETTER_AUTH_SECRET: string;
+    BETTER_AUTH_API_KEY: string;
+    GOOGLE_CLIENT_ID: string;
+    GOOGLE_CLIENT_SECRET: string;
+    EMAIL_USER: string;
+    EMAIL_PASSWORD: string;
+    S3_BUCKET: string;
+    S3_REGION: string;
+    S3_ACCESS_KEY: string;
+    S3_SECRET_KEY: string;
+    VITE_API_URL: string;
+}>;

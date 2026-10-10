@@ -1,0 +1,58 @@
+import type { Prisma } from "@/generated/prisma/client";
+export { EndOfServiceReason, EndOfServiceStatus } from "@/generated/prisma/enums";
+declare const settlementSelect: {
+    readonly id: true;
+    readonly code: true;
+    readonly staffId: true;
+    readonly staffName: true;
+    readonly staffCode: true;
+    readonly reason: true;
+    readonly status: true;
+    readonly monthlyWage: true;
+    readonly startDate: true;
+    readonly endDate: true;
+    readonly serviceYears: true;
+    readonly serviceMonths: true;
+    readonly serviceDays: true;
+    readonly firstFiveMonths: true;
+    readonly beyondFiveMonths: true;
+    readonly fullAward: true;
+    readonly factor: true;
+    readonly finalAmount: true;
+    readonly notes: true;
+    readonly approvedAt: true;
+    readonly paidAt: true;
+    readonly createdAt: true;
+};
+export type EosSettlementResponse = Prisma.EndOfServiceSettlementGetPayload<{
+    select: typeof settlementSelect;
+}>;
+export declare const eosSelects: {
+    settlementSelect: {
+        readonly id: true;
+        readonly code: true;
+        readonly staffId: true;
+        readonly staffName: true;
+        readonly staffCode: true;
+        readonly reason: true;
+        readonly status: true;
+        readonly monthlyWage: true;
+        readonly startDate: true;
+        readonly endDate: true;
+        readonly serviceYears: true;
+        readonly serviceMonths: true;
+        readonly serviceDays: true;
+        readonly firstFiveMonths: true;
+        readonly beyondFiveMonths: true;
+        readonly fullAward: true;
+        readonly factor: true;
+        readonly finalAmount: true;
+        readonly notes: true;
+        readonly approvedAt: true;
+        readonly paidAt: true;
+        readonly createdAt: true;
+    };
+};
+export type CreateEosInput = Pick<Prisma.EndOfServiceSettlementUncheckedCreateInput, "staffId" | "reason" | "monthlyWage" | "startDate" | "endDate" | "serviceYears" | "serviceMonths" | "serviceDays" | "firstFiveMonths" | "beyondFiveMonths" | "fullAward" | "factor" | "finalAmount"> & Partial<Pick<Prisma.EndOfServiceSettlementUncheckedCreateInput, "notes">>;
+export declare const EOS_STATUS_LABEL: Record<string, string>;
+export declare const EOS_REASON_LABEL: Record<string, string>;

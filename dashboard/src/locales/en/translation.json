@@ -1,0 +1,1073 @@
+{
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "common": {
+    "actions": {
+      "add": "Add",
+      "search": "Search",
+      "video": "Video",
+      "invoice": "Invoice",
+      "moreOptions": "More options",
+      "halfWidth": "Half width",
+      "fullWidth": "Full width",
+      "hide": "Hide",
+      "show": "Show",
+      "copy": "Copy",
+      "remove": "Remove"
+    },
+    "states": {
+      "checkConnection": "Check your connection and try again.",
+      "notAvailable": "Not available"
+    }
+  },
+  "quickAdd": {
+    "title": "Quick add",
+    "items": {
+      "appointment": "New appointment",
+      "patient": "New patient",
+      "owner": "New owner",
+      "staff": "New staff member",
+      "product": "New product",
+      "expense": "New expense",
+      "discount": "New discount",
+      "carePlan": "New care plan",
+      "branch": "New branch"
+    }
+  },
+  "clinicProfile": {
+    "bookOnline": "Book online",
+    "verified": "Verified",
+    "unnamedClinic": "Clinic",
+    "empty": {
+      "title": "Clinic profile isn't set up yet",
+      "description": "Fill in your clinic details in Settings to publish this page."
+    }
+  },
+  "table": {
+    "noResults": "No results found"
+  },
+  "lang": {
+    "ar": "Arabic",
+    "en": "English"
+  },
+  "auth": {
+    "validation": {
+      "invalidEmail": "Invalid email address",
+      "passwordRequired": "Password is required",
+      "fullNameRequired": "Full name is required",
+      "phoneRequired": "Phone number is required",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "passwordUpperLower": "Include uppercase and lowercase letters",
+      "passwordNeedsNumber": "Include at least one number",
+      "passwordNeedsSymbol": "Include at least one special character",
+      "confirmPasswordRequired": "Please confirm your password",
+      "passwordsDoNotMatch": "Passwords do not match"
+    },
+    "login": {
+      "subtitle": "Smart veterinary clinic management system",
+      "continueWithGoogle": "Continue with Google",
+      "or": "Or",
+      "email": "Email",
+      "emailPlaceholder": "m@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "forgetPassword": "Forgot password?",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "submit": "Login",
+      "submitting": "Logging in...",
+      "legalPrefix": "By clicking continue, you agree to our",
+      "termsOfService": "Terms of Service",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "errors": {
+        "loginFailed": "Login failed"
+      }
+    },
+    "forgetPassword": {
+      "step1": {
+        "title": "Forgot your password?",
+        "subtitle": "Enter your email and we'll send you a verification code to reset your password",
+        "emailLabel": "Email",
+        "emailPlaceholder": "example@email.com",
+        "submit": "Send verification code",
+        "submitting": "Sending...",
+        "rememberPassword": "Remember your password?",
+        "signIn": "Sign in"
+      },
+      "step2": {
+        "title": "Check your inbox",
+        "subtitle": "We sent you a temporary code. Check your inbox at",
+        "submit": "Verify code",
+        "submitting": "Verifying...",
+        "noCode": "Didn't receive the code? Check spam or request a new one after",
+        "seconds": "seconds",
+        "resend": "Resend code",
+        "changeEmail": "Change email address",
+        "otpInvalid": "Please enter all 6 digits"
+      },
+      "step3": {
+        "title": "New password",
+        "subtitle": "Create a strong password to protect your account",
+        "requirements": "Password requirements:",
+        "req8Chars": "At least 8 characters",
+        "reqUpperLower": "Uppercase and lowercase letter",
+        "reqNumber": "At least one number",
+        "newPasswordLabel": "New password",
+        "newPasswordPlaceholder": "••••••••",
+        "confirmPasswordLabel": "Confirm password",
+        "confirmPasswordPlaceholder": "••••••••",
+        "submit": "Save new password",
+        "submitting": "Saving...",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password"
+      },
+      "errors": {
+        "sendFailed": "Failed to send verification code",
+        "verifyFailed": "Invalid or expired code",
+        "resetFailed": "Failed to reset password",
+        "resetSuccess": "Password reset successfully"
+      }
+    },
+    "register": {
+      "subtitle": "Create a new account",
+      "continueWithGoogle": "Continue with Google",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "John Doe",
+      "email": "Email",
+      "emailPlaceholder": "m@example.com",
+      "phone": "Phone Number",
+      "phonePlaceholder": "+1 (555) 000-0000",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "passwordStrength": {
+        "label": "Password strength",
+        "weak": "Weak",
+        "fair": "Fair",
+        "good": "Good",
+        "strong": "Strong"
+      },
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordPlaceholder": "••••••••",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "submit": "Create Account",
+      "submitting": "Creating account...",
+      "errors": {
+        "registerFailed": "Registration failed"
+      },
+      "legalPrefix": "By clicking continue, you agree to our",
+      "termsOfService": "Terms of Service",
+      "and": "and",
+      "privacyPolicy": "Privacy Policy",
+      "haveAccount": "Already have an account?",
+      "signIn": "Sign in"
+    }
+  },
+  "success": {
+    "title": "Done!",
+    "subtitle": "Your password has been updated successfully. You can now sign in.",
+    "goToLogin": "Go to sign in"
+  },
+  "invite": {
+    "banner": "You've been invited by {{name}} to join {{clinic}} as {{role}}",
+    "roleMember": "Member",
+    "roleAdmin": "Admin",
+    "subtitle": "Complete your registration to join the clinic",
+    "notFound": "Invite not found.",
+    "expired": "This invite has expired or has already been used.",
+    "joinFailed": "Failed to join clinic"
+  },
+  "tasks": {
+    "title": "My tasks",
+    "views": {
+      "all": "All",
+      "forMe": "Assigned to me",
+      "done": "Shared with me"
+    },
+    "stats": {
+      "total": {
+        "title": "Total tasks",
+        "tooltip": "Total number of registered tasks"
+      },
+      "pending": {
+        "title": "Pending",
+        "tooltip": "Tasks that have not started yet"
+      },
+      "inProgress": {
+        "title": "In progress",
+        "tooltip": "Tasks currently in progress"
+      },
+      "completed": {
+        "title": "Completed",
+        "tooltip": "Completed tasks"
+      },
+      "cancelled": {
+        "title": "Cancelled",
+        "tooltip": "Cancelled tasks"
+      }
+    },
+    "toolbar": {
+      "searchPlaceholder": "Search tasks...",
+      "filter": "Filter",
+      "help": "Help",
+      "export": "Export",
+      "view": "View"
+    },
+    "addTaskModal": {
+      "draftRestored": "Draft restored from your previous session.",
+      "discardDraft": "Discard"
+    },
+    "validation": {
+      "titleRequired": "Task title is required",
+      "typeRequired": "Task type is required",
+      "statusRequired": "Task status is required",
+      "priorityRequired": "Task priority is required",
+      "invalidDate": "Invalid date"
+    },
+    "labels": {
+      "status": {
+        "QUEUE": "Queue",
+        "PENDING": "Pending",
+        "NOT_YET_STARTED": "Not started",
+        "IN_PROGRESS": "In progress",
+        "COMPLETED": "Completed",
+        "CANCELLED": "Cancelled",
+        "DUPLICATE": "Duplicate"
+      },
+      "priority": {
+        "URGENT": "Urgent",
+        "HIGH": "High",
+        "MEDIUM": "Medium",
+        "LOW": "Low"
+      },
+      "type": {
+        "ADMINISTRATIVE": "Administrative",
+        "PHARMACEUTICALS": "Pharmacy",
+        "INVENTORY": "Inventory",
+        "FINANCE": "Finance",
+        "LABORATORY": "Laboratory",
+        "COSMETICS": "Grooming",
+        "MEDICAL": "Medical"
+      }
+    },
+    "dates": {
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "yesterday": "Yesterday"
+    },
+    "card": {
+      "subtasksProgress": "{{completed}}/{{total}} subtasks",
+      "comments": "{{count}} comments",
+      "accept": "Accept",
+      "decline": "Decline"
+    },
+    "sheet": {
+      "acceptTask": "Accept task",
+      "declineTask": "Decline task",
+      "description": "Description",
+      "noDescription": "No description",
+      "subtasks": "Subtasks",
+      "addSubtask": "Add task",
+      "subtaskPlaceholder": "Subtask name",
+      "attachments": "Documents and links",
+      "addAttachment": "Add document or link",
+      "activity": "Activity",
+      "details": "Details",
+      "reschedule": "Reschedule",
+      "cancelTask": "Cancel task",
+      "assignees": "Assignees",
+      "sendMessage": "Send message",
+      "createdAt": "Task created at"
+    },
+    "activity": {
+      "commented": "commented",
+      "statusChanged": "changed status from {{from}} to {{to}}",
+      "priorityPart": "Priority: {{priority}}",
+      "deadlinePart": "Deadline: {{deadline}}",
+      "accepted": "accepted the task",
+      "declined": "declined the task",
+      "empty": "No activity yet.",
+      "commentPlaceholder": "Add a comment..."
+    },
+    "acceptDialog": {
+      "title": "Accept task",
+      "deadline": "Deadline",
+      "clearDate": "Clear date",
+      "noPriority": "No priority",
+      "helper": "Choose a priority and deadline before accepting this task",
+      "emailNotification": "Email notification",
+      "submit": "Accept"
+    },
+    "declineDialog": {
+      "title": "Decline task",
+      "assignTo": "Assign to...",
+      "noUsers": "No users found",
+      "noReason": "No reason",
+      "helper": "Choose a reason for declining this task",
+      "submit": "Decline"
+    },
+    "discard": {
+      "title": "Unsaved data",
+      "description": "You will lose the entered data if you leave now",
+      "filledFields": "Filled fields:",
+      "discard": "Discard and leave",
+      "continue": "Continue creating task",
+      "fields": {
+        "title": "Task name",
+        "content": "Description",
+        "type": "Task type",
+        "deadline": "Deadline",
+        "images": "Links and documents",
+        "priority": "Priority",
+        "assigneeIds": "Assignees"
+      }
+    },
+    "toasts": {
+      "createLoading": "Creating task...",
+      "createSuccess": "Task created successfully",
+      "createError": "Failed to create task",
+      "acceptLoading": "Accepting task...",
+      "acceptSuccess": "Task accepted successfully",
+      "acceptError": "Failed to accept task",
+      "declineLoading": "Declining task...",
+      "declineSuccess": "Task declined",
+      "declineError": "Failed to decline task",
+      "updateStatusLoading": "Updating status...",
+      "updateStatusSuccess": "Status updated",
+      "updateStatusError": "Failed to update status",
+      "subtaskCompleted": "Subtask completed",
+      "copyTaskCode": "Task code copied",
+      "copied": "Copied"
+    },
+    "errors": {
+      "fetchTask": "Could not load task",
+      "fetchActivity": "Could not load activity",
+      "addComment": "Failed to add comment",
+      "updateSubtask": "Failed to update subtask",
+      "addSubtask": "Failed to add subtask"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to أكاديمية سند.",
+    "header": {
+      "goodMorning": "Good morning",
+      "goodEvening": "Good evening"
+    },
+    "dateFilter": {
+      "day": "Day",
+      "week": "Week",
+      "today": "Today",
+      "previous": "Previous",
+      "next": "Next",
+      "visitsCount": "{{count}} visits",
+      "scheduledCount": "{{count}} scheduled"
+    },
+    "aiShiftDistribution": "AI Shift Distribution",
+    "stats": {
+      "clients": {
+        "title": "Total clients",
+        "tooltip": "Clients who submitted requests today"
+      },
+      "patients": {
+        "title": "Total patients",
+        "tooltip": "Patients registered in the clinic"
+      },
+      "appointments": {
+        "title": "Total appointments",
+        "tooltip": "Appointments registered today"
+      },
+      "doctors": {
+        "title": "Total doctors",
+        "tooltip": "Doctors registered in the clinic"
+      },
+      "services": {
+        "title": "Total services",
+        "tooltip": "Services available in the clinic"
+      }
+    },
+    "cards": {
+      "labels": {
+        "revenue": "Monthly revenue",
+        "clinicCases": "Clinic cases",
+        "performanceDistribution": "Performance distribution",
+        "notes": "My notes",
+        "appointments": "My appointments",
+        "tasks": "My tasks",
+        "criticalAlerts": "Critical case alerts",
+        "inventoryAlerts": "Inventory alerts",
+        "appointmentVolume": "Appointment volume",
+        "upcomingAppointments": "Upcoming appointments",
+        "staffWorkload": "Today's staff workload",
+        "appointmentKpis": "Appointment overview",
+        "vaccinationDue": "Vaccinations due"
+      },
+      "appointments": {
+        "filters": {
+          "all": "All",
+          "queue": "Queue",
+          "late": "Late",
+          "done": "Done"
+        },
+        "status": {
+          "SCHEDULED": "Upcoming",
+          "WAITING": "Queue",
+          "CHECK_IN": "Queue",
+          "IN_SERVICE": "In service",
+          "HOSPITALIZED": "Hospitalized",
+          "AWAITING_PAYMENT": "Awaiting payment",
+          "DONE": "Done",
+          "CANCELLED": "Cancelled",
+          "late": "Late"
+        },
+        "errorTitle": "Could not load appointments.",
+        "emptyTitle": "No appointments today.",
+        "emptyDescription": "Your appointments for today will appear here.",
+        "addNew": "Add new appointment",
+        "actions": "Actions",
+        "accept": "Accept appointment",
+        "decline": "Decline appointment",
+        "suggestAlternative": "Suggest another time"
+      },
+      "tasks": {
+        "errorTitle": "Could not load tasks.",
+        "emptyTitle": "You do not have any tasks yet.",
+        "emptyDescription": "Create a task for the team and track progress from here.",
+        "unassigned": "Unassigned",
+        "late": "Late"
+      },
+      "criticalAlerts": {
+        "errorTitle": "Could not load alerts.",
+        "emptyTitle": "No critical cases.",
+        "emptyDescription": "Cases that need urgent follow-up will appear here.",
+        "hospitalize": "Admit to hospital"
+      },
+      "inventoryAlerts": {
+        "addProduct": "Add product",
+        "openProduct": "Open product",
+        "errorTitle": "Could not load inventory alerts.",
+        "emptyTitle": "No inventory alerts.",
+        "emptyDescription": "Products that reached their reorder point will appear here.",
+        "remaining": "Remaining",
+        "reorderPoint": "Reorder point",
+        "requestReplenishment": "Request replenishment"
+      },
+      "performanceDistribution": {
+        "total": "Total",
+        "patients": "Patients",
+        "services": "Services",
+        "categories": {
+          "dogs": "Dogs",
+          "cats": "Cats",
+          "birds": "Birds",
+          "other": "Other",
+          "tests": "Tests",
+          "vaccinations": "Vaccinations",
+          "operations": "Operations",
+          "medications": "Medications",
+          "grooming": "Grooming"
+        }
+      },
+      "appointmentVolume": {
+        "errorTitle": "Could not load appointment volume.",
+        "busyTimes": "Busy times",
+        "colorKey": "Color key",
+        "appointmentsCount": "{{count}} appointments"
+      },
+      "upcomingAppointments": {
+        "errorTitle": "Could not load upcoming appointments.",
+        "emptyTitle": "No upcoming appointments.",
+        "emptyDescription": "Newly booked appointments will appear here.",
+        "minShort": "min",
+        "viewMore": "View more"
+      },
+      "staffWorkload": {
+        "errorTitle": "Could not load staff workload.",
+        "emptyTitle": "No active staff.",
+        "emptyDescription": "Add staff to see today's workload here.",
+        "overload": "Overload"
+      },
+      "appointmentKpis": {
+        "errorTitle": "Could not load appointment overview.",
+        "vsYesterday": "vs yesterday",
+        "noBaseline": "No data yesterday",
+        "total": {
+          "title": "Total appointments",
+          "tooltip": "All appointments scheduled for today."
+        },
+        "inProgress": {
+          "title": "In progress",
+          "tooltip": "Appointments currently checked in or in service."
+        },
+        "completed": {
+          "title": "Completed",
+          "tooltip": "Appointments marked done today."
+        },
+        "paid": {
+          "title": "Paid",
+          "tooltip": "Today's appointments with a fully paid invoice."
+        }
+      }
+    },
+    "customize": {
+      "trigger": "Customize dashboard",
+      "title": "Customize dashboard",
+      "description": "Customize visible dashboard widgets, colors, and ordering.",
+      "notice": "Widget changes are applied to the dashboard automatically.",
+      "colorTheme": "Color theme",
+      "selectColor": "Select color {{color}}",
+      "widgetOrder": "Widget order",
+      "dragToReorder": "Drag and drop to reorder",
+      "state": {
+        "hidden": "Hidden",
+        "expanded": "Full width",
+        "compact": "Half width"
+      },
+      "showCard": "Show card",
+      "hideCard": "Hide card"
+    },
+    "addTaskModal": {
+      "trigger": "Create first task",
+      "title": "Add new task",
+      "submit": "Create task",
+      "missingFields": "Complete these fields to create the task: {{fields}}",
+      "actions": {
+        "attachFiles": "Attach files",
+        "removeAttachment": "Remove attachment",
+        "reset": "Reset"
+      },
+      "fields": {
+        "titleLabel": "Title",
+        "titlePlaceholder": "Enter task title...",
+        "descriptionLabel": "Description",
+        "descriptionPlaceholder": "Enter task description...",
+        "typeLabel": "Task type",
+        "typePlaceholder": "Select task type...",
+        "statusLabel": "Status",
+        "statusPlaceholder": "Select status...",
+        "priorityLabel": "Priority",
+        "priorityPlaceholder": "Choose priority...",
+        "assigneeLabel": "Assignees",
+        "assigneePlaceholder": "Assign to...",
+        "attachmentsTotal": "Total: {{files}} attachments · {{size}}",
+        "deadlineLabel": "Deadline",
+        "deadlinePresetPlaceholder": "Quick deadline...",
+        "deadlineCalendarPlaceholder": "Pick a date...",
+        "deadlineReset": "Reset",
+        "deadlinePresets": {
+          "today": "Today",
+          "tomorrow": "Tomorrow",
+          "afterWeek": "After a week"
+        },
+        "emailNotification": "Email notification",
+        "createMultiple": "Create more"
+      },
+      "taskTypes": {
+        "ADMINISTRATIVE": "Administrative",
+        "PHARMACEUTICALS": "Pharmaceuticals",
+        "INVENTORY": "Inventory",
+        "FINANCE": "Finance",
+        "LABORATORY": "Laboratory",
+        "COSMETICS": "Cosmetics",
+        "MEDICAL": "Medical"
+      },
+      "taskStatuses": {
+        "PENDING": "Pending",
+        "NOT_YET_STARTED": "Not started yet",
+        "IN_PROGRESS": "In progress",
+        "COMPLETED": "Completed",
+        "CANCELLED": "Cancelled",
+        "DUPLICATE": "Duplicate",
+        "QUEUE": "Queue"
+      },
+      "taskPriorities": {
+        "URGENT": "Urgent",
+        "HIGH": "High",
+        "MEDIUM": "Medium",
+        "LOW": "Low"
+      },
+      "toasts": {
+        "loading": "Creating task...",
+        "success": "Task created successfully",
+        "error": "Failed to create task"
+      }
+    }
+  },
+  "sidebar": {
+    "sections": {
+      "services": "Management",
+      "care": "Care",
+      "management": "Operations",
+      "crm": "CRM"
+    },
+    "items": {
+      "dashboard": "Dashboard",
+      "inbox": "Inbox",
+      "tasks": "My Tasks",
+      "appointments": "My Appointments",
+      "patients": "Patients",
+      "owners": "Owners",
+      "doctors": "Doctors",
+      "staff": "Human Resources",
+      "analyses": "Analyses",
+      "operations": "Operations",
+      "medications": "Medications",
+      "vaccinations": "Vaccinations",
+      "training": "Training Courses",
+      "nutrition": "Nutrition",
+      "grooming": "Grooming",
+      "inpatients": "Inpatients",
+      "mobileClinic": "Mobile Clinics",
+      "messages": "Messages",
+      "calendar": "Calendar",
+      "finance": "Finance",
+      "inventory": "Inventory",
+      "marketing": "Marketing",
+      "reports": "Reports",
+      "documents": "Documents",
+      "settings": "Settings",
+      "videoCall": "Video Call",
+      "labTests": "Lab Tests",
+      "radiology": "Radiology",
+      "leads": "Leads",
+      "deals": "Deals",
+      "emailTemplates": "Email Templates",
+      "memberships": "Memberships",
+      "loyaltyProgram": "Loyalty Program"
+    },
+    "user": {
+      "logout": "Log out",
+      "branchLabel": "Active branch",
+      "manageBranches": "Manage branches",
+      "settings": "Settings",
+      "appearance": "Appearance",
+      "languageLabel": "Change language",
+      "roles": {
+        "ADMIN": "Admin",
+        "MEMBER": "Member"
+      }
+    }
+  },
+  "videoCall": {
+    "lobby": {
+      "title": "Video Call",
+      "description": "Start a new call or join with a room code",
+      "start": "Start a new call",
+      "or": "or",
+      "roomPlaceholder": "Room code",
+      "join": "Join"
+    },
+    "room": {
+      "code": "Room code",
+      "copy": "Copy invite link",
+      "copied": "Invite link copied",
+      "leave": "Leave",
+      "back": "Back",
+      "connecting": "Connecting...",
+      "error": "Failed to join the call"
+    },
+    "guest": {
+      "title": "Join the call",
+      "description": "Enter your name to join the video call",
+      "namePlaceholder": "Your name",
+      "join": "Join",
+      "ended": "The call has ended — you can close this page",
+      "rejoin": "Rejoin"
+    }
+  },
+  "staff": {
+    "prefix": {
+      "MR": "Mr.",
+      "MRS": "Mrs.",
+      "MS": "Ms.",
+      "DR": "Dr.",
+      "PROF": "Prof."
+    },
+    "status": {
+      "PENDING": "Pending",
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive"
+    }
+  },
+  "settings": {
+    "sidebar": {
+      "sections": {
+        "clinic": "Clinic",
+        "operations": "Operations",
+        "system": "System"
+      },
+      "items": {
+        "clinicInformation": "My Clinic Information",
+        "notifications": "Notifications",
+        "securityAccess": "Security & Access",
+        "integrationsAccounts": "Integrations & Accounts",
+        "features": "Features",
+        "cases": "Cases",
+        "specialties": "Specialties",
+        "services": "Services",
+        "branchesTeams": "Branches & Teams",
+        "attendance": "Attendance",
+        "automation": "Automation",
+        "digitalPayments": "Digital Payments",
+        "accountsSettings": "Accounts Settings",
+        "settings": "Settings",
+        "medicalProtocols": "Medical Protocols",
+        "scheduling": "Scheduling",
+        "yards": "Yards",
+        "rolesPermissions": "Roles & Permissions",
+        "subscriptionInvoices": "Subscription & Invoices",
+        "drugStandards": "Drug standards"
+      }
+    },
+    "drugStandards": {
+      "title": "Registered drug standards",
+      "description": "Choose which regulatory registries supply products to this clinic",
+      "empty": "No standards are available yet",
+      "suggested": "Suggested for your country",
+      "meta": "{{count}} products · data release {{version}}",
+      "coverageTitle": "What does {{name}} cover?",
+      "viewSource": "View the official source",
+      "viewProducts": "View products"
+    }
+  },
+  "agent": {
+    "open": "AI Assistant",
+    "title": "ONIX AI ",
+    "beta": "Beta",
+    "greeting": "Hi! How can I help?",
+    "greetingSubtitle": "Ask Oaks anything, or search for a record.",
+    "placeholder": "Ask Oaks anything...",
+    "send": "Send",
+    "thinking": "Working, please wait...",
+    "error": "Something went wrong contacting the assistant.",
+    "allCommands": "All commands",
+    "contextUnknown": "AI Assistant",
+    "addFirstSkill": "Add first skill",
+    "learningNote": "Still learning — mistakes may happen",
+    "newChat": "New chat",
+    "history": "History",
+    "noHistory": "No previous chats",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "deleteChat": "Delete chat"
+  },
+  "accounting": {
+    "docstatus": {
+      "draft": "Draft",
+      "submitted": "Submitted",
+      "cancelled": "Cancelled"
+    },
+    "vouchers": {
+      "stats": {
+        "draftTooltip": "Not yet submitted — no ledger impact.",
+        "submittedTooltip": "Submitted documents, each holding a gap-free sequential number.",
+        "cancelledTooltip": "Cancelled documents — number and audit trail retained."
+      },
+      "title": "Demo Vouchers",
+      "create": "New voucher",
+      "createTitle": "Create draft",
+      "editTitle": "Edit voucher",
+      "searchPlaceholder": "Search by title or number",
+      "noDocumentNo": "No number (draft)",
+      "amended": "Amended from a cancelled doc",
+      "amountLockedAfterSubmit": "Amount cannot be changed after submit — title only.",
+      "fields": {
+        "title": "Title",
+        "amount": "Amount",
+        "postingDate": "Posting date"
+      },
+      "columns": {
+        "documentNo": "Document no.",
+        "title": "Title",
+        "amount": "Amount",
+        "postingDate": "Posting date",
+        "status": "Status",
+        "amendedFrom": "Amendment"
+      },
+      "actions": {
+        "menu": "Actions",
+        "edit": "Edit",
+        "submit": "Submit",
+        "cancel": "Cancel",
+        "amend": "Amend"
+      },
+      "empty": {
+        "title": "No vouchers yet",
+        "description": "Create a draft to walk the lifecycle: create → submit → cancel → amend."
+      }
+    },
+    "settings": {
+      "title": "Accounts Settings",
+      "description": "Accounting module flags — they apply to the whole company.",
+      "save": "Save",
+      "cancel": "Cancel",
+      "noResults": "No results"
+    },
+    "nav": {
+      "accounts": "Chart of Accounts",
+      "fiscalYears": "Fiscal Years",
+      "costCenters": "Cost Centers",
+      "costCenterAllocations": "Cost Center Allocations",
+      "modesOfPayment": "Modes of Payment",
+      "currencyExchanges": "Exchange Rates",
+      "journalEntries": "Journal Entries",
+      "generalLedger": "General Ledger",
+      "trialBalance": "Trial Balance",
+      "parties": "Party Accounts",
+      "paymentTerms": "Payment Terms",
+      "partyTrialBalance": "Party Trial Balance",
+      "paymentLedger": "Payment Ledger",
+      "taxes": "Taxes",
+      "salesInvoices": "Sales Invoices",
+      "memberships": "Memberships",
+      "insurance": "Insurance",
+      "insuranceClaims": "Insurance Claims",
+      "salesRegister": "Sales Register",
+      "purchaseInvoices": "Purchase Invoices",
+      "purchaseRegister": "Purchase Register",
+      "paymentEntries": "Payment Entries",
+      "paymentReconciliation": "Payment Reconciliation",
+      "paymentReports": "Payment Reports",
+      "revaluations": "Currency Revaluation",
+      "financialStatements": "Financial Statements",
+      "receivables": "Receivables Ageing",
+      "ledgerAnalytics": "Ledger Analytics",
+      "bankReconciliation": "Bank Reconciliation",
+      "banks": "Banks & Bank Accounts",
+      "bankReports": "Bank Reports",
+      "adapterReconciliation": "Adapter Reconciliation",
+      "bankClearance": "Bank Clearance",
+      "bankRules": "Bank Rules",
+      "governance": "Governance",
+      "extended": "Extended Operations",
+      "insuranceClaimsRegister": "Insurance Claims Register",
+      "membershipRevenue": "Membership Revenue",
+      "benefitUsage": "Benefit Usage"
+    },
+    "salesInvoice": {
+      "status": {
+        "draft": "Draft",
+        "submitted": "Submitted",
+        "unpaid": "Unpaid",
+        "partlyPaid": "Partly Paid",
+        "paid": "Paid",
+        "overdue": "Overdue",
+        "return": "Return",
+        "creditNoteIssued": "Credit Note Issued",
+        "internalTransfer": "Internal Transfer",
+        "consolidated": "Consolidated",
+        "cancelled": "Cancelled"
+      }
+    },
+    "purchaseInvoice": {
+      "status": {
+        "draft": "Draft",
+        "submitted": "Submitted",
+        "unpaid": "Unpaid",
+        "partlyPaid": "Partly Paid",
+        "paid": "Paid",
+        "overdue": "Overdue",
+        "return": "Return",
+        "debitNoteIssued": "Debit Note Issued",
+        "internalTransfer": "Internal Transfer",
+        "cancelled": "Cancelled"
+      }
+    },
+    "paymentEntry": {
+      "status": {
+        "draft": "Draft",
+        "submitted": "Submitted",
+        "cancelled": "Cancelled"
+      }
+    }
+  },
+  "finance": {
+    "nav": {
+      "groups": {
+        "dailyOperations": "Daily Operations",
+        "membershipInsurance": "Memberships & Insurance",
+        "books": "Books",
+        "reports": "Financial Reports",
+        "settings": "Financial Settings",
+        "loyalty": "Loyalty"
+      },
+      "invoices": "Invoices",
+      "expenses": "Expenses",
+      "carePlans": "Care Plans",
+      "enrollments": "Subscriptions",
+      "accountingSettings": "Accounting Settings",
+      "more": "More"
+    }
+  },
+  "reports": {
+    "stats": {
+      "reports": "Reports",
+      "reportsTooltip": "Ready-made reports available to you — reports ship with the build, not from the UI.",
+      "widgets": "Widgets in use",
+      "widgetsTooltip": "Total widgets across every report available to you.",
+      "categories": "Categories",
+      "categoriesTooltip": "Report categories represented in the list.",
+      "lastUpdated": "Last updated",
+      "lastUpdatedTooltip": "Most recent change to a report definition in this build."
+    },
+    "categories": {
+      "all": "All"
+    },
+    "list": {
+      "searchPlaceholder": "Search reports...",
+      "builtIn": "Built-in",
+      "rowMeta": "{{count}} widgets · updated {{date}}",
+      "cannotDelete": "Cannot be deleted — reports are defined in code and added by developers.",
+      "deleteAria": "Delete report",
+      "exportRow": "Export report as CSV",
+      "createWithAi": "Create report with AI",
+      "devOnly": "Reports are authored in code — developers add them; they cannot be created from the UI.",
+      "empty": "No matching reports."
+    },
+    "presets": {
+      "last30": "30 days",
+      "last90": "90 days",
+      "ytd": "Year to date",
+      "last12m": "12 months"
+    },
+    "detail": {
+      "breadcrumb": "Report breadcrumb",
+      "from": "From",
+      "to": "To",
+      "save": "Save",
+      "exportCsv": "Export CSV",
+      "exportPdf": "Export PDF",
+      "addWidget": "Add widget",
+      "devOnlyWidget": "Widgets are defined with the report in code — developers add them.",
+      "showHidden": "Show {{count}} hidden widgets",
+      "loading": "Preparing report...",
+      "refreshing": "Refreshing..."
+    },
+    "widget": {
+      "actions": "Widget options",
+      "exportCsv": "Export CSV",
+      "hide": "Hide widget"
+    },
+    "toast": {
+      "exporting": "Preparing file...",
+      "exported": "Report exported",
+      "viewSaved": "View saved for this report"
+    },
+    "errors": {
+      "load": "Could not load the report"
+    }
+  },
+  "documents": {
+    "categories": {
+      "LICENSE": "Licences",
+      "REGISTRATION": "Official records",
+      "CONTRACT": "Contracts",
+      "INSURANCE": "Insurance",
+      "POLICY": "Policies",
+      "FINANCIAL": "Financial",
+      "OTHER": "Other",
+      "all": "All"
+    },
+    "stats": {
+      "total": "Total documents",
+      "totalTooltip": "Every clinic document stored in the vault.",
+      "expiring": "Expiring soon",
+      "expiringTooltip": "Documents that lapse within 30 days — these need renewing.",
+      "expired": "Expired",
+      "expiredTooltip": "Documents past their expiry date that have not been renewed.",
+      "addedThisMonth": "Added this month",
+      "addedThisMonthTooltip": "Documents uploaded since the start of the current month."
+    },
+    "expiry": {
+      "all": "All statuses",
+      "expiring": "Expiring soon",
+      "expired": "Expired",
+      "valid": "Valid",
+      "none": "No expiry date",
+      "expiredSince": "Expired {{days}} days ago",
+      "expiresToday": "Expires today",
+      "expiresIn": "Expires in {{days}} days"
+    },
+    "table": {
+      "document": "Document",
+      "category": "Category",
+      "branch": "Branch",
+      "expiresAt": "Expiry date",
+      "size": "Size",
+      "author": "Added by",
+      "allBranches": "All branches"
+    },
+    "list": {
+      "searchPlaceholder": "Search documents...",
+      "add": "Upload document",
+      "emptyTitle": "No documents yet",
+      "emptyDescription": "Upload the clinic's paperwork — practice licence, commercial register, contracts and insurance policies — and track their expiry dates in one place."
+    },
+    "actions": {
+      "options": "Options",
+      "download": "Download",
+      "openLink": "Open link",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "sheet": {
+      "addTitle": "Upload document",
+      "editTitle": "Edit document",
+      "file": "File",
+      "link": "Link",
+      "pickFile": "Click to choose a file",
+      "linkPlaceholder": "https://www.example.com",
+      "switchToLink": "Switch to link",
+      "switchToFile": "Switch to file",
+      "title": "Document title",
+      "titlePlaceholder": "e.g. Practice licence",
+      "category": "Category",
+      "categoryPlaceholder": "Choose a category",
+      "branch": "Branch",
+      "issuedAt": "Issue date",
+      "expiresAt": "Expiry date",
+      "pickDate": "Choose a date",
+      "noExpiry": "No expiry date",
+      "notes": "Notes",
+      "notesPlaceholder": "Extra details about this document (optional)",
+      "cancel": "Cancel",
+      "save": "Save changes",
+      "submit": "Upload document",
+      "fileTooLarge": "File is too large",
+      "fileRequired": "A file is required",
+      "saveFailed": "Could not save the document"
+    },
+    "delete": {
+      "title": "Delete document",
+      "description": "Delete «{{title}}»? This action cannot be undone.",
+      "fileWarning": "The uploaded file will be deleted too.",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    }
+  },
+  "crm": {
+    "nav": {
+      "reports": "Reports",
+      "group": "CRM",
+      "leads": "Leads",
+      "deals": "Deals",
+      "tasks": "Tasks",
+      "emailTemplates": "Email Templates",
+      "whatsapp": "WhatsApp",
+      "slaPolicies": "SLA Policies",
+      "settings": "Settings"
+    }
+  },
+  "loyalty": {
+    "nav": {
+      "program": "Loyalty Program",
+      "ledger": "Points Ledger",
+      "reports": "Loyalty Reports"
+    }
+  }
+}

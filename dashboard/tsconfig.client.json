@@ -1,0 +1,19 @@
+{
+	"$comment": "Dashboard browser application only. Backend types and browser-safe contracts resolve from sanad-contracts; no local server, database, Prisma, or migration source is part of this program.",
+	"extends": "./tsconfig.base.json",
+	"compilerOptions": {
+		"noEmit": true,
+		"incremental": true,
+		"disableSourceOfProjectReferenceRedirect": true,
+		"tsBuildInfoFile": "./tsbuild/client.tsbuildinfo"
+	},
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx",
+		"src/**/*.json",
+		"vite.config.ts",
+		"vitest.config.ts",
+		"vitest.fast.config.ts"
+	],
+	"exclude": []
+}

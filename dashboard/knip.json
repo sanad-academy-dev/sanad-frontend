@@ -1,0 +1,15 @@
+{
+  "$schema": "https://unpkg.com/knip@latest/schema.json",
+  "entry": [
+    "vite.config.ts",
+    "prisma/seed.ts",
+    "scripts/**/*.ts",
+    "src/routes/**/*.{ts,tsx}"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "prisma/**/*.ts",
+    "scripts/**/*.ts"
+  ],
+  "ignore": ["generated/prismabox/**"]
+}

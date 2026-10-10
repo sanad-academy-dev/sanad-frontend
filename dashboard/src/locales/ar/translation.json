@@ -1,0 +1,1073 @@
+{
+  "pagination": {
+    "previous": "السابق",
+    "next": "التالي"
+  },
+  "common": {
+    "actions": {
+      "add": "إضافة",
+      "search": "بحث",
+      "video": "فيديو",
+      "invoice": "فاتورة",
+      "moreOptions": "خيارات إضافية",
+      "halfWidth": "نصف العرض",
+      "fullWidth": "العرض الكامل",
+      "hide": "إخفاء",
+      "show": "إظهار",
+      "copy": "نسخ",
+      "remove": "إزالة"
+    },
+    "states": {
+      "checkConnection": "تحقق من اتصالك وحاول مجدداً.",
+      "notAvailable": "غير متوفر"
+    }
+  },
+  "quickAdd": {
+    "title": "إضافة سريعة",
+    "items": {
+      "appointment": "زيارة جديدة",
+      "patient": "طفل جديد",
+      "owner": "وليّ أمر جديد",
+      "staff": "موظف جديد",
+      "product": "منتج جديد",
+      "expense": "مصروف جديد",
+      "discount": "خصم جديد",
+      "carePlan": "خطة رعاية جديدة",
+      "branch": "فرع جديد"
+    }
+  },
+  "clinicProfile": {
+    "bookOnline": "حجز أونلاين",
+    "verified": "موثق",
+    "unnamedClinic": "الأكاديمية",
+    "empty": {
+      "title": "لم يتم إعداد صفحة الأكاديمية بعد",
+      "description": "أكمل بيانات الأكاديمية في الإعدادات لتظهر هنا."
+    }
+  },
+  "table": {
+    "noResults": "لا توجد نتائج"
+  },
+  "lang": {
+    "ar": "العربية",
+    "en": "الانجليزية"
+  },
+  "auth": {
+    "validation": {
+      "invalidEmail": "عنوان البريد الإلكتروني غير صالح",
+      "passwordRequired": "كلمة المرور مطلوبة",
+      "fullNameRequired": "الاسم الكامل مطلوب",
+      "phoneRequired": "رقم الهاتف مطلوب",
+      "passwordMinLength": "يجب أن تكون كلمة المرور 8 أحرف على الأقل",
+      "passwordUpperLower": "يجب أن تحتوي على حرف كبير وحرف صغير",
+      "passwordNeedsNumber": "يجب أن تحتوي على رقم واحد على الأقل",
+      "passwordNeedsSymbol": "يجب أن تحتوي على رمز خاص واحد على الأقل",
+      "confirmPasswordRequired": "يرجى تأكيد كلمة المرور",
+      "passwordsDoNotMatch": "كلمتا المرور غير متطابقتين"
+    },
+    "login": {
+      "subtitle": "نظام إدارة الأكاديميات البيطرية الذكي",
+      "continueWithGoogle": "المتابعة باستخدام جوجل",
+      "or": "أو",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "m@example.com",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "••••••••",
+      "forgetPassword": "نسيت كلمة المرور؟",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور",
+      "submit": "تسجيل الدخول",
+      "submitting": "جارٍ تسجيل الدخول...",
+      "legalPrefix": "بالمتابعة، فإنك توافق على",
+      "termsOfService": "شروط الخدمة",
+      "and": "و",
+      "privacyPolicy": "سياسة الخصوصية",
+      "noAccount": "ليس لديك حساب؟",
+      "signUp": "إنشاء حساب",
+      "errors": {
+        "loginFailed": "فشل تسجيل الدخول"
+      }
+    },
+    "forgetPassword": {
+      "step1": {
+        "title": "نسيت كلمة المرور؟",
+        "subtitle": "أدخل بريدك الإلكتروني وسنرسل لك رمز التحقق لإعادة تعيين كلمة المرور",
+        "emailLabel": "البريد الإلكتروني",
+        "emailPlaceholder": "example@email.com",
+        "submit": "إرسال رمز التحقق",
+        "submitting": "جارٍ الإرسال...",
+        "rememberPassword": "تذكّرت كلمة المرور؟",
+        "signIn": "سجّل دخول"
+      },
+      "step2": {
+        "title": "تحقّق من بريدك",
+        "subtitle": "أرسلنا لك رمز تسجيل مؤقت. تأكد من صندوق الوارد عندك",
+        "submit": "تحقق من الرمز",
+        "submitting": "جارٍ التحقق...",
+        "noCode": "ما وصلك الرمز؟ شبّك على الهملات أو تقدر تطلب رمز جديد بعد",
+        "seconds": "ثانية",
+        "resend": "أعد إرسال الرمز",
+        "changeEmail": "تغيير البريد الإلكتروني",
+        "otpInvalid": "يرجى إدخال جميع الأرقام الستة"
+      },
+      "step3": {
+        "title": "كلمة مرور جديدة",
+        "subtitle": "أنشئ كلمة مرور قوية لحماية حسابك",
+        "requirements": "متطلبات كلمة المرور:",
+        "req8Chars": "8 أحرف على الأقل",
+        "reqUpperLower": "حرف كبير وحرف صغير",
+        "reqNumber": "رقم واحد على الأقل",
+        "newPasswordLabel": "كلمة المرور الجديدة",
+        "newPasswordPlaceholder": "••••••••",
+        "confirmPasswordLabel": "تأكيد كلمة المرور",
+        "confirmPasswordPlaceholder": "••••••••",
+        "submit": "حفظ كلمة المرور الجديدة",
+        "submitting": "جارٍ الحفظ...",
+        "showPassword": "إظهار كلمة المرور",
+        "hidePassword": "إخفاء كلمة المرور"
+      },
+      "errors": {
+        "sendFailed": "فشل إرسال رمز التحقق",
+        "verifyFailed": "الرمز غير صحيح أو منتهي الصلاحية",
+        "resetFailed": "فشل إعادة تعيين كلمة المرور",
+        "resetSuccess": "تم إعادة تعيين كلمة المرور بنجاح"
+      }
+    },
+    "register": {
+      "subtitle": "إنشاء حساب جديد",
+      "continueWithGoogle": "المتابعة باستخدام جوجل",
+      "fullName": "الاسم الكامل",
+      "fullNamePlaceholder": "محمد أحمد",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "m@example.com",
+      "phone": "رقم الهاتف",
+      "phonePlaceholder": "+1 (555) 000-0000",
+      "password": "كلمة المرور",
+      "passwordPlaceholder": "••••••••",
+      "passwordStrength": {
+        "label": "قوة كلمة المرور",
+        "weak": "ضعيفة",
+        "fair": "مقبولة",
+        "good": "جيدة",
+        "strong": "قوية"
+      },
+      "confirmPassword": "تأكيد كلمة المرور",
+      "confirmPasswordPlaceholder": "••••••••",
+      "showPassword": "إظهار كلمة المرور",
+      "hidePassword": "إخفاء كلمة المرور",
+      "submit": "إنشاء حساب",
+      "submitting": "جارٍ إنشاء الحساب...",
+      "errors": {
+        "registerFailed": "فشل إنشاء الحساب"
+      },
+      "legalPrefix": "بالمتابعة، فإنك توافق على",
+      "termsOfService": "شروط الخدمة",
+      "and": "و",
+      "privacyPolicy": "سياسة الخصوصية",
+      "haveAccount": "لديك حساب بالفعل؟",
+      "signIn": "تسجيل الدخول"
+    }
+  },
+  "success": {
+    "title": "تم بنجاح!",
+    "subtitle": "تم تحديث كلمة المرور الخاصة بك بنجاح. يمكنك الآن تسجيل الدخول.",
+    "goToLogin": "الذهاب لتسجيل الدخول"
+  },
+  "invite": {
+    "banner": "لقد دعاك {{name}} للانضمام إلى {{clinic}} بدور {{role}}",
+    "roleMember": "عضو",
+    "roleAdmin": "مشرف",
+    "subtitle": "أكمل تسجيلك للانضمام إلى الأكاديمية",
+    "notFound": "لم يتم العثور على الدعوة.",
+    "expired": "انتهت صلاحية هذه الدعوة أو تم استخدامها بالفعل.",
+    "joinFailed": "فشل الانضمام إلى الأكاديمية"
+  },
+  "tasks": {
+    "title": "مهامي",
+    "views": {
+      "all": "الكل",
+      "forMe": "مخصصة لي",
+      "done": "مشارك فيها"
+    },
+    "stats": {
+      "total": {
+        "title": "إجمالي المهام",
+        "tooltip": "العدد الكلي للمهام المسجلة"
+      },
+      "pending": {
+        "title": "قيد الانتظار",
+        "tooltip": "المهام التي لم تبدأ بعد"
+      },
+      "inProgress": {
+        "title": "قيد التنفيذ",
+        "tooltip": "المهام الجارية حالياً"
+      },
+      "completed": {
+        "title": "تمت",
+        "tooltip": "المهام المكتملة"
+      },
+      "cancelled": {
+        "title": "ملغاة",
+        "tooltip": "المهام الملغاة"
+      }
+    },
+    "toolbar": {
+      "searchPlaceholder": "ابحث عن مهمة...",
+      "filter": "فلترة",
+      "help": "نساعدك",
+      "export": "تصدير",
+      "view": "العرض"
+    },
+    "addTaskModal": {
+      "draftRestored": "تمت استعادة المسودة من جلستك السابقة.",
+      "discardDraft": "تجاهل"
+    },
+    "validation": {
+      "titleRequired": "عنوان المهمة مطلوب",
+      "typeRequired": "نوع المهمة مطلوب",
+      "statusRequired": "حالة المهمة مطلوبة",
+      "priorityRequired": "أولوية المهمة مطلوبة",
+      "invalidDate": "التاريخ غير صالح"
+    },
+    "labels": {
+      "status": {
+        "QUEUE": "الطابور",
+        "PENDING": "قيد الانتظار",
+        "NOT_YET_STARTED": "لم تبدأ بعد",
+        "IN_PROGRESS": "قيد التنفيذ",
+        "COMPLETED": "تمت",
+        "CANCELLED": "ملغاة",
+        "DUPLICATE": "مكررة"
+      },
+      "priority": {
+        "URGENT": "عاجل",
+        "HIGH": "عالية",
+        "MEDIUM": "متوسطة",
+        "LOW": "منخفضة"
+      },
+      "type": {
+        "ADMINISTRATIVE": "إداري",
+        "PHARMACEUTICALS": "صيدليات",
+        "INVENTORY": "مخزون",
+        "FINANCE": "مالي",
+        "LABORATORY": "مختبر",
+        "COSMETICS": "تجميل",
+        "MEDICAL": "طبي"
+      }
+    },
+    "dates": {
+      "today": "اليوم",
+      "tomorrow": "غداً",
+      "yesterday": "أمس"
+    },
+    "card": {
+      "subtasksProgress": "{{completed}}/{{total}} فرعي",
+      "comments": "تعليقات {{count}}",
+      "accept": "قبول",
+      "decline": "رفض"
+    },
+    "sheet": {
+      "acceptTask": "قبول المهمة",
+      "declineTask": "رفض المهمة",
+      "description": "الوصف",
+      "noDescription": "لا يوجد وصف",
+      "subtasks": "المهام الفرعية",
+      "addSubtask": "أضف مهمة",
+      "subtaskPlaceholder": "اسم المهمة الفرعية",
+      "attachments": "المستندات والروابط",
+      "addAttachment": "أضف مستندًا أو رابطًا",
+      "activity": "النشاط",
+      "details": "التفاصيل",
+      "reschedule": "إعادة الجدولة",
+      "cancelTask": "إلغاء المهمة",
+      "assignees": "المسؤولون",
+      "sendMessage": "إرسال رسالة",
+      "createdAt": "وقت إنشاء المهمة"
+    },
+    "activity": {
+      "commented": "علّق",
+      "statusChanged": "غيّر الحالة من {{from}} إلى {{to}}",
+      "priorityPart": "الأولوية: {{priority}}",
+      "deadlinePart": "الموعد: {{deadline}}",
+      "accepted": "قبِل المهمة",
+      "declined": "رفض المهمة",
+      "empty": "لا يوجد نشاط بعد.",
+      "commentPlaceholder": "أضف تعليقًا..."
+    },
+    "acceptDialog": {
+      "title": "قبول المهمة",
+      "deadline": "موعد التسليم",
+      "clearDate": "إزالة التاريخ",
+      "noPriority": "بدون أولوية",
+      "helper": "حدد أولوية وتاريخ التسليم قبل قبول هذه المهمة",
+      "emailNotification": "إشعار عبر البريد",
+      "submit": "قبول"
+    },
+    "declineDialog": {
+      "title": "رفض مهمة",
+      "assignTo": "إسناد إلى...",
+      "noUsers": "لا يوجد مستخدمون",
+      "noReason": "بدون سبب",
+      "helper": "حدد سبب الرفض لهذه المهمة",
+      "submit": "رفض"
+    },
+    "discard": {
+      "title": "بيانات غير محفوظة",
+      "description": "ستفقد البيانات المدخلة إذا خرجت الآن",
+      "filledFields": "الحقول المدخلة:",
+      "discard": "تجاهل والخروج",
+      "continue": "متابعة إنشاء المهمة",
+      "fields": {
+        "title": "اسم المهمه",
+        "content": "الوصف",
+        "type": "نوع المهمة",
+        "deadline": "تاريخ التسليم",
+        "images": "روابط ومستندات",
+        "priority": "الأولوية",
+        "assigneeIds": "المسؤولون"
+      }
+    },
+    "toasts": {
+      "createLoading": "جارٍ إنشاء المهمة...",
+      "createSuccess": "تم إنشاء المهمة بنجاح",
+      "createError": "فشل إنشاء المهمة",
+      "acceptLoading": "جارٍ قبول المهمة...",
+      "acceptSuccess": "تم قبول المهمة بنجاح",
+      "acceptError": "فشل قبول المهمة",
+      "declineLoading": "جارٍ رفض المهمة...",
+      "declineSuccess": "تم رفض المهمة",
+      "declineError": "فشل رفض المهمة",
+      "updateStatusLoading": "جارٍ تحديث الحالة...",
+      "updateStatusSuccess": "تم تحديث الحالة",
+      "updateStatusError": "فشل تحديث الحالة",
+      "subtaskCompleted": "تم إنجاز المهمة الفرعية",
+      "copyTaskCode": "تم نسخ كود المهمة",
+      "copied": "تم النسخ"
+    },
+    "errors": {
+      "fetchTask": "تعذّر جلب المهمة",
+      "fetchActivity": "تعذّر جلب النشاط",
+      "addComment": "فشل إضافة التعليق",
+      "updateSubtask": "فشل تحديث المهمة الفرعية",
+      "addSubtask": "فشل إضافة المهمة الفرعية"
+    }
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "welcome": "مرحبا بك في أكاديمية سند.",
+    "header": {
+      "goodMorning": "صباح الخير",
+      "goodEvening": "مساء الخير"
+    },
+    "dateFilter": {
+      "day": "يوم",
+      "week": "أسبوع",
+      "today": "اليوم",
+      "previous": "السابق",
+      "next": "التالي",
+      "visitsCount": "{{count}} زيارة",
+      "scheduledCount": "{{count}} مجدولة"
+    },
+    "aiShiftDistribution": "توزيع الشيفتات بالAI",
+    "stats": {
+      "clients": {
+        "title": "إجمالي العملاء",
+        "tooltip": "العملاء الذين قدموا الطلبات اليوم"
+      },
+      "patients": {
+        "title": "إجمالي الأطفال",
+        "tooltip": "الأطفال المسجلون في الأكاديمية"
+      },
+      "appointments": {
+        "title": "إجمالي الزيارات",
+        "tooltip": "الزيارات المسجلة اليوم"
+      },
+      "doctors": {
+        "title": "إجمالي المدرّبين",
+        "tooltip": "المدرّبين المسجلون في الأكاديمية"
+      },
+      "services": {
+        "title": "إجمالي الدورات",
+        "tooltip": "الدورات المتاحة في الأكاديمية"
+      }
+    },
+    "cards": {
+      "labels": {
+        "revenue": "الإيرادات الشهرية",
+        "clinicCases": "حالات الأكاديمية",
+        "performanceDistribution": "توزيع الأداء",
+        "notes": "ملاحظاتي",
+        "appointments": "زياراتي",
+        "tasks": "مهامي",
+        "criticalAlerts": "تنبيهات الحالات الحرجة",
+        "inventoryAlerts": "تنبيهات المخزون",
+        "appointmentVolume": "كثافة الزيارات",
+        "upcomingAppointments": "الزيارات القادمة",
+        "staffWorkload": "جهد عمل الفريق اليوم",
+        "appointmentKpis": "نظرة عامة على الزيارات",
+        "vaccinationDue": "الجرعات المستحقة"
+      },
+      "appointments": {
+        "filters": {
+          "all": "الكل",
+          "queue": "الطابور",
+          "late": "متأخر",
+          "done": "مكتمل"
+        },
+        "status": {
+          "SCHEDULED": "قادم",
+          "WAITING": "طابور",
+          "CHECK_IN": "طابور",
+          "IN_SERVICE": "جاري",
+          "HOSPITALIZED": "مقيم",
+          "AWAITING_PAYMENT": "انتظار الدفع",
+          "DONE": "مكتمل",
+          "CANCELLED": "ملغي",
+          "late": "متأخر"
+        },
+        "errorTitle": "تعذّر تحميل الزيارات.",
+        "emptyTitle": "لا توجد زيارات اليوم.",
+        "emptyDescription": "ستظهر هنا زياراتك لهذا اليوم.",
+        "addNew": "إضافة زيارة جديدة",
+        "actions": "إجراءات",
+        "accept": "قبول الزيارة",
+        "decline": "رفض الزيارة",
+        "suggestAlternative": "اقتراح زيارة بديلة"
+      },
+      "tasks": {
+        "errorTitle": "تعذّر تحميل المهام.",
+        "emptyTitle": "لا تملك أي مهام حتى الآن.",
+        "emptyDescription": "قم بإنشاء مهمة للفريق وتابع التقدم من هنا.",
+        "unassigned": "غير مسند",
+        "late": "متأخرة"
+      },
+      "criticalAlerts": {
+        "errorTitle": "تعذّر تحميل التنبيهات.",
+        "emptyTitle": "لا توجد حالات حرجة.",
+        "emptyDescription": "ستظهر هنا الحالات التي تحتاج إلى متابعة عاجلة.",
+        "hospitalize": "دخول التنويم"
+      },
+      "inventoryAlerts": {
+        "addProduct": "إضافة منتج",
+        "openProduct": "فتح المنتج",
+        "errorTitle": "تعذّر تحميل تنبيهات المخزون.",
+        "emptyTitle": "لا توجد تنبيهات مخزون.",
+        "emptyDescription": "ستظهر هنا المنتجات التي وصلت إلى نقطة إعادة الطلب.",
+        "remaining": "متبقي",
+        "reorderPoint": "نقطة الإعادة",
+        "requestReplenishment": "طلب تجديد المخزون"
+      },
+      "performanceDistribution": {
+        "total": "إجمالي",
+        "patients": "الأطفال",
+        "services": "الدورات",
+        "categories": {
+          "dogs": "برمجة",
+          "cats": "تصميم",
+          "birds": "روبوتات",
+          "other": "أخرى",
+          "tests": "اختبارات",
+          "vaccinations": "شهادات",
+          "operations": "مشاريع",
+          "medications": "مواد",
+          "grooming": "معسكرات"
+        }
+      },
+      "appointmentVolume": {
+        "errorTitle": "تعذّر تحميل كثافة الزيارات.",
+        "busyTimes": "أوقات الذروة",
+        "colorKey": "مفتاح الألوان",
+        "appointmentsCount": "{{count}} زيارة"
+      },
+      "upcomingAppointments": {
+        "errorTitle": "تعذّر تحميل الزيارات القادمة.",
+        "emptyTitle": "لا توجد زيارات قادمة.",
+        "emptyDescription": "ستظهر الزيارات المحجوزة حديثًا هنا.",
+        "minShort": "د",
+        "viewMore": "عرض المزيد"
+      },
+      "staffWorkload": {
+        "errorTitle": "تعذّر تحميل حِمل عمل الفريق.",
+        "emptyTitle": "لا يوجد موظفون نشطون.",
+        "emptyDescription": "أضف موظفين لعرض حِمل عمل اليوم هنا.",
+        "overload": "تحميل زائد"
+      },
+      "appointmentKpis": {
+        "errorTitle": "تعذّر تحميل نظرة عامة على الزيارات.",
+        "vsYesterday": "مقارنة بالأمس",
+        "noBaseline": "لا بيانات للأمس",
+        "total": {
+          "title": "إجمالي الزيارات",
+          "tooltip": "جميع الزيارات المجدولة لليوم."
+        },
+        "inProgress": {
+          "title": "قيد التنفيذ",
+          "tooltip": "الزيارات التي تم تسجيل دخولها أو الجارية حاليًا."
+        },
+        "completed": {
+          "title": "مكتملة",
+          "tooltip": "الزيارات المكتملة اليوم."
+        },
+        "paid": {
+          "title": "مدفوعة",
+          "tooltip": "زيارات اليوم ذات الفاتورة المدفوعة بالكامل."
+        }
+      }
+    },
+    "customize": {
+      "trigger": "خصّص رئيسيتك",
+      "title": "خصّص رئيسيتك",
+      "description": "تخصيص ويدجت لوحة التحكم الظاهرة والألوان والترتيب.",
+      "notice": "سيتم تطبيق تغييرات الويدجت تلقائياً على الرئيسية.",
+      "colorTheme": "سمة الألوان",
+      "selectColor": "اختيار اللون {{color}}",
+      "widgetOrder": "ترتيب الويدجت",
+      "dragToReorder": "اسحب وافلت لإعادة الترتيب",
+      "state": {
+        "hidden": "مخفي",
+        "expanded": "عرض كامل",
+        "compact": "نصف عرض"
+      },
+      "showCard": "إظهار البطاقة",
+      "hideCard": "إخفاء البطاقة"
+    },
+    "addTaskModal": {
+      "trigger": "إنشاء أول مهمة",
+      "title": "أضف مهمة جديدة",
+      "submit": "إنشاء مهمة",
+      "missingFields": "أكمل الحقول التالية لتفعيل المهمة: {{fields}}",
+      "actions": {
+        "attachFiles": "إرفاق ملفات",
+        "removeAttachment": "إزالة المرفق",
+        "reset": "إعادة الضبط"
+      },
+      "fields": {
+        "titleLabel": "العنوان",
+        "titlePlaceholder": "أدخل اسم المهمة...",
+        "descriptionLabel": "الوصف",
+        "descriptionPlaceholder": "أدخل وصف المهمة...",
+        "typeLabel": "نوع المهمة",
+        "typePlaceholder": "اختر نوع المهمة...",
+        "statusLabel": "الحالة",
+        "statusPlaceholder": "اختر الحالة...",
+        "priorityLabel": "الأولوية",
+        "priorityPlaceholder": "حدد الأولوية...",
+        "assigneeLabel": "المكلّفون",
+        "assigneePlaceholder": "تعيين إلى...",
+        "attachmentsTotal": "الإجمالي: {{files}} مرفق · {{size}}",
+        "deadlineLabel": "تاريخ التسليم",
+        "deadlinePresetPlaceholder": "موعد سريع...",
+        "deadlineCalendarPlaceholder": "اختر تاريخًا...",
+        "deadlineReset": "إعادة الضبط",
+        "deadlinePresets": {
+          "today": "اليوم",
+          "tomorrow": "غدًا",
+          "afterWeek": "بعد أسبوع"
+        },
+        "emailNotification": "إشعار عبر البريد",
+        "createMultiple": "أنشئ المزيد"
+      },
+      "taskTypes": {
+        "ADMINISTRATIVE": "إدارية",
+        "PHARMACEUTICALS": "أدوية",
+        "INVENTORY": "مخزون",
+        "FINANCE": "مالية",
+        "LABORATORY": "التحاليل",
+        "COSMETICS": "التجميل",
+        "MEDICAL": "طبية"
+      },
+      "taskStatuses": {
+        "PENDING": "قيد الانتظار",
+        "NOT_YET_STARTED": "لم تبدأ بعد",
+        "IN_PROGRESS": "قيد التنفيذ",
+        "COMPLETED": "تمت",
+        "CANCELLED": "ملغاة",
+        "DUPLICATE": "مكررة",
+        "QUEUE": "الطابور"
+      },
+      "taskPriorities": {
+        "URGENT": "عاجلة",
+        "HIGH": "مرتفعة",
+        "MEDIUM": "متوسطة",
+        "LOW": "منخفضة"
+      },
+      "toasts": {
+        "loading": "جارٍ إنشاء المهمة...",
+        "success": "تم إنشاء المهمة بنجاح",
+        "error": "فشل إنشاء المهمة"
+      }
+    }
+  },
+  "sidebar": {
+    "sections": {
+      "services": "الإدارة",
+      "care": "المتابعة",
+      "management": "التشغيل",
+      "crm": "إدارة العملاء"
+    },
+    "items": {
+      "dashboard": "الرئيسية",
+      "inbox": "الوارد",
+      "tasks": "مهامي",
+      "appointments": "الزيارات",
+      "patients": "الأطفال",
+      "owners": "أولياء الأمور",
+      "doctors": "المدرّبين",
+      "staff": "الموارد البشرية",
+      "analyses": "التقييمات",
+      "operations": "الأنشطة",
+      "medications": "المواد",
+      "vaccinations": "الشهادات",
+      "training": "الدورات",
+      "nutrition": "المسارات",
+      "grooming": "المعسكرات",
+      "inpatients": "التنويم",
+      "mobileClinic": "الفعاليات",
+      "messages": "الرسائل",
+      "calendar": "التقويم",
+      "finance": "المالية",
+      "inventory": "المخزون",
+      "marketing": "التسويق",
+      "reports": "التقارير",
+      "documents": "المستندات",
+      "settings": "الإعدادات",
+      "videoCall": "مكالمة فيديو",
+      "labTests": "التحليلات",
+      "radiology": "الأشعة",
+      "leads": "العملاء المحتملون",
+      "deals": "الصفقات",
+      "emailTemplates": "قوالب البريد",
+      "memberships": "العضويات",
+      "loyaltyProgram": "برنامج الولاء"
+    },
+    "user": {
+      "logout": "تسجيل الخروج",
+      "branchLabel": "الفرع النشط",
+      "manageBranches": "إدارة الفروع",
+      "settings": "الإعدادات",
+      "appearance": "المظهر",
+      "languageLabel": "تغيير اللغة",
+      "roles": {
+        "ADMIN": "مدير",
+        "MEMBER": "عضو"
+      }
+    }
+  },
+  "videoCall": {
+    "lobby": {
+      "title": "مكالمة فيديو",
+      "description": "ابدأ مكالمة جديدة أو انضم باستخدام كود القاعة",
+      "start": "بدء مكالمة جديدة",
+      "or": "أو",
+      "roomPlaceholder": "كود القاعة",
+      "join": "انضمام"
+    },
+    "room": {
+      "code": "كود القاعة",
+      "copy": "نسخ رابط الدعوة",
+      "copied": "تم نسخ رابط الدعوة",
+      "leave": "مغادرة",
+      "back": "رجوع",
+      "connecting": "جارٍ الاتصال...",
+      "error": "تعذر الانضمام إلى المكالمة"
+    },
+    "guest": {
+      "title": "الانضمام إلى المكالمة",
+      "description": "أدخل اسمك للانضمام إلى مكالمة الفيديو",
+      "namePlaceholder": "اسمك",
+      "join": "انضمام",
+      "ended": "انتهت المكالمة — يمكنك إغلاق هذه الصفحة",
+      "rejoin": "الانضمام مجددًا"
+    }
+  },
+  "staff": {
+    "prefix": {
+      "MR": "السيد",
+      "MRS": "السيدة",
+      "MS": "الآنسة",
+      "DR": "د.",
+      "PROF": "أ.د."
+    },
+    "status": {
+      "PENDING": "في الانتظار",
+      "ACTIVE": "نشط",
+      "INACTIVE": "غير نشط"
+    }
+  },
+  "settings": {
+    "sidebar": {
+      "sections": {
+        "clinic": "الأكاديمية",
+        "operations": "التشغيل",
+        "system": "النظام"
+      },
+      "items": {
+        "clinicInformation": "معلومات أكاديميتي",
+        "notifications": "الإشعارات",
+        "securityAccess": "الأمان والوصول",
+        "integrationsAccounts": "التكاملات والحسابات",
+        "features": "الميزات",
+        "cases": "الحالات",
+        "specialties": "التخصصات",
+        "services": "الدورات",
+        "branchesTeams": "الفروع",
+        "attendance": "الحضور والانصراف",
+        "automation": "الأتمتة",
+        "digitalPayments": "الدفع الرقمي",
+        "accountsSettings": "إعدادات الحسابات",
+        "settings": "إعدادات",
+        "medicalProtocols": "البروتوكولات الطبية",
+        "scheduling": "الجدولة",
+        "yards": "الساحات",
+        "rolesPermissions": "الأدوار والصلاحيات",
+        "subscriptionInvoices": "الاشتراك والفواتير",
+        "drugStandards": "معايير الأدوية"
+      }
+    },
+    "drugStandards": {
+      "title": "معايير الأدوية المسجَّلة",
+      "description": "اختر سجلات الجهات الرقابية التي تظهر مستحضراتها في الأكاديمية",
+      "empty": "لا توجد معايير متاحة حاليًا",
+      "suggested": "مقترح لدولتك",
+      "meta": "{{count}} مستحضر · إصدار البيانات {{version}}",
+      "coverageTitle": "ما الذي يغطيه {{name}}؟",
+      "viewSource": "عرض المصدر الرسمي",
+      "viewProducts": "عرض المستحضرات"
+    }
+  },
+  "agent": {
+    "open": "المساعد الذكي",
+    "title": "أونكس AI ",
+    "beta": "تجريبي",
+    "greeting": "أهلاً! كيف أساعدك؟",
+    "greetingSubtitle": "اسأل أوكس عن أي شيء، أو ابحث عن سجل.",
+    "placeholder": "اسأل أونكس عن أي شئ...",
+    "send": "إرسال",
+    "thinking": "جاري العمل، يرجى الانتظار...",
+    "error": "حدث خطأ أثناء التواصل مع المساعد.",
+    "allCommands": "عرض جميع الأوامر",
+    "contextUnknown": "المساعد الذكي",
+    "addFirstSkill": "إضافة أول مهارة",
+    "learningNote": "ما زال يتعلم وقد تحدث بعض الأخطاء",
+    "newChat": "محادثة جديدة",
+    "history": "السجل",
+    "noHistory": "لا توجد محادثات سابقة",
+    "expand": "توسيع",
+    "collapse": "تصغير",
+    "deleteChat": "حذف المحادثة"
+  },
+  "accounting": {
+    "docstatus": {
+      "draft": "مسودة",
+      "submitted": "مُرحَّل",
+      "cancelled": "ملغى"
+    },
+    "vouchers": {
+      "stats": {
+        "draftTooltip": "مستندات لم تُرحَّل بعد — لا أثر لها على الدفتر.",
+        "submittedTooltip": "مستندات مُرحَّلة، أُسند لها رقم متسلسل بلا فجوات.",
+        "cancelledTooltip": "مستندات مُلغاة — يبقى رقمها وأثر تدقيقها."
+      },
+      "title": "مستندات تجريبية",
+      "create": "مستند جديد",
+      "createTitle": "إنشاء مسودة",
+      "editTitle": "تعديل المستند",
+      "searchPlaceholder": "ابحث بالعنوان أو الرقم",
+      "noDocumentNo": "بلا رقم (مسودة)",
+      "amended": "معدَّل عن مستند ملغى",
+      "amountLockedAfterSubmit": "لا يمكن تعديل المبلغ بعد الترحيل — العنوان فقط.",
+      "fields": {
+        "title": "العنوان",
+        "amount": "المبلغ",
+        "postingDate": "تاريخ الترحيل"
+      },
+      "columns": {
+        "documentNo": "رقم المستند",
+        "title": "العنوان",
+        "amount": "المبلغ",
+        "postingDate": "تاريخ الترحيل",
+        "status": "الحالة",
+        "amendedFrom": "التعديل"
+      },
+      "actions": {
+        "menu": "إجراءات",
+        "edit": "تعديل",
+        "submit": "ترحيل",
+        "cancel": "إلغاء",
+        "amend": "إنشاء نسخة معدَّلة"
+      },
+      "empty": {
+        "title": "لا توجد مستندات بعد",
+        "description": "أنشئ مسودة لتجربة دورة الحياة: إنشاء ← ترحيل ← إلغاء ← تعديل."
+      }
+    },
+    "settings": {
+      "title": "إعدادات الحسابات",
+      "description": "مفاتيح الوحدة المحاسبية — تسري على المنشأة كاملة.",
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "noResults": "لا توجد نتائج"
+    },
+    "nav": {
+      "accounts": "شجرة الحسابات",
+      "fiscalYears": "السنوات المالية",
+      "costCenters": "مراكز التكلفة",
+      "costCenterAllocations": "توزيع مراكز التكلفة",
+      "modesOfPayment": "طرق الدفع",
+      "currencyExchanges": "أسعار الصرف",
+      "journalEntries": "قيود اليومية",
+      "generalLedger": "دفتر الأستاذ العام",
+      "trialBalance": "ميزان المراجعة",
+      "parties": "حسابات الأطراف",
+      "paymentTerms": "شروط الدفع",
+      "partyTrialBalance": "ميزان مراجعة الأطراف",
+      "paymentLedger": "سجل الذمم",
+      "taxes": "الضرائب",
+      "salesInvoices": "فواتير المبيعات",
+      "memberships": "العضويات",
+      "insurance": "التأمين",
+      "insuranceClaims": "المطالبات التأمينية",
+      "salesRegister": "سجل المبيعات",
+      "purchaseInvoices": "فواتير المشتريات",
+      "purchaseRegister": "سجل المشتريات",
+      "paymentEntries": "سندات القبض والصرف",
+      "paymentReconciliation": "تسوية المدفوعات",
+      "paymentReports": "تقارير المدفوعات",
+      "revaluations": "إعادة تقييم العملات",
+      "financialStatements": "القوائم المالية",
+      "receivables": "أعمار الذمم",
+      "ledgerAnalytics": "تحليلات الدفاتر",
+      "bankReconciliation": "التسوية البنكية",
+      "banks": "البنوك والحسابات البنكية",
+      "bankReports": "تقارير البنوك",
+      "adapterReconciliation": "تقرير المطابقة",
+      "bankClearance": "مقاصة البنك",
+      "bankRules": "قواعد البنك",
+      "governance": "الحوكمة",
+      "extended": "العمليات الممتدّة",
+      "insuranceClaimsRegister": "سجل المطالبات التأمينية",
+      "membershipRevenue": "إيراد العضويات",
+      "benefitUsage": "استخدام المزايا"
+    },
+    "salesInvoice": {
+      "status": {
+        "draft": "مسودة",
+        "submitted": "مُرحّلة",
+        "unpaid": "غير مدفوعة",
+        "partlyPaid": "مدفوعة جزئيًا",
+        "paid": "مدفوعة",
+        "overdue": "متأخرة",
+        "return": "مرتجع",
+        "creditNoteIssued": "صدر إشعار دائن",
+        "internalTransfer": "تحويل داخلي",
+        "consolidated": "مُجمّعة",
+        "cancelled": "ملغاة"
+      }
+    },
+    "purchaseInvoice": {
+      "status": {
+        "draft": "مسودة",
+        "submitted": "مُرحّلة",
+        "unpaid": "غير مدفوعة",
+        "partlyPaid": "مدفوعة جزئيًا",
+        "paid": "مدفوعة",
+        "overdue": "متأخرة",
+        "return": "مرتجع",
+        "debitNoteIssued": "صدر إشعار مدين",
+        "internalTransfer": "تحويل داخلي",
+        "cancelled": "ملغاة"
+      }
+    },
+    "paymentEntry": {
+      "status": {
+        "draft": "مسودة",
+        "submitted": "مُرحَّل",
+        "cancelled": "ملغى"
+      }
+    }
+  },
+  "finance": {
+    "nav": {
+      "groups": {
+        "dailyOperations": "العمليات اليومية",
+        "membershipInsurance": "العضويات والتأمين",
+        "books": "الدفاتر",
+        "reports": "التقارير المالية",
+        "settings": "الإعدادات المالية",
+        "loyalty": "الولاء"
+      },
+      "invoices": "الفواتير",
+      "expenses": "المصروفات",
+      "carePlans": "الخطط التعليمية",
+      "enrollments": "الاشتراكات",
+      "accountingSettings": "إعدادات المحاسبة",
+      "more": "المزيد"
+    }
+  },
+  "reports": {
+    "stats": {
+      "reports": "التقارير",
+      "reportsTooltip": "عدد التقارير الجاهزة المتاحة لك — التقارير تُضاف من الكود لا من الواجهة.",
+      "widgets": "الودجات المستدورة",
+      "widgetsTooltip": "مجموع الودجات في كل التقارير المتاحة لك.",
+      "categories": "الفئات",
+      "categoriesTooltip": "عدد فئات التقارير الممثَّلة في القائمة.",
+      "lastUpdated": "آخر تحديث",
+      "lastUpdatedTooltip": "أحدث تاريخ تعديل لتعريف تقرير في هذه النسخة."
+    },
+    "categories": {
+      "all": "الكل"
+    },
+    "list": {
+      "searchPlaceholder": "ابحث في التقارير...",
+      "builtIn": "افتراضي",
+      "rowMeta": "{{count}} ودجات · آخر تحديث {{date}}",
+      "cannotDelete": "لا يمكن حذفه — التقارير مُعرَّفة في الكود ويضيفها المطوّرون.",
+      "deleteAria": "حذف التقرير",
+      "exportRow": "تصدير التقرير CSV",
+      "createWithAi": "إنشاء تقرير بالذكاء الاصطناعي",
+      "devOnly": "التقارير تُنشأ من الكود — يضيفها المطوّرون ولا تُنشأ من الواجهة.",
+      "empty": "لا تقارير مطابقة."
+    },
+    "presets": {
+      "last30": "٣٠ يومًا",
+      "last90": "٩٠ يومًا",
+      "ytd": "من بداية السنة",
+      "last12m": "١٢ شهرًا"
+    },
+    "detail": {
+      "breadcrumb": "مسار التقرير",
+      "from": "من تاريخ",
+      "to": "إلى تاريخ",
+      "save": "حفظ",
+      "exportCsv": "تصدير CSV",
+      "exportPdf": "تصدير PDF",
+      "addWidget": "إضافة ويدجت",
+      "devOnlyWidget": "الودجات تُعرَّف مع التقرير في الكود — يضيفها المطوّرون.",
+      "showHidden": "إظهار {{count}} ودجت مخفية",
+      "loading": "جارٍ تحضير التقرير...",
+      "refreshing": "جارٍ التحديث..."
+    },
+    "widget": {
+      "actions": "خيارات الودجت",
+      "exportCsv": "تصدير CSV",
+      "hide": "إخفاء الودجت"
+    },
+    "toast": {
+      "exporting": "جارٍ تحضير الملف...",
+      "exported": "تم تصدير التقرير",
+      "viewSaved": "تم حفظ العرض لهذا التقرير"
+    },
+    "errors": {
+      "load": "تعذّر تحميل التقرير"
+    }
+  },
+  "documents": {
+    "categories": {
+      "LICENSE": "التراخيص",
+      "REGISTRATION": "السجلات الرسمية",
+      "CONTRACT": "العقود",
+      "INSURANCE": "التأمين",
+      "POLICY": "السياسات",
+      "FINANCIAL": "مالية",
+      "OTHER": "أخرى",
+      "all": "الكل"
+    },
+    "stats": {
+      "total": "إجمالي المستندات",
+      "totalTooltip": "كل مستندات الأكاديمية المحفوظة في الخزانة.",
+      "expiring": "تنتهي قريبًا",
+      "expiringTooltip": "مستندات ينتهي سريانها خلال 30 يومًا — تحتاج تجديدًا.",
+      "expired": "منتهية",
+      "expiredTooltip": "مستندات تجاوزت تاريخ انتهائها ولم تُجدَّد بعد.",
+      "addedThisMonth": "أُضيفت هذا الشهر",
+      "addedThisMonthTooltip": "المستندات المرفوعة منذ بداية الشهر الحالي."
+    },
+    "expiry": {
+      "all": "كل الحالات",
+      "expiring": "تنتهي قريبًا",
+      "expired": "منتهية",
+      "valid": "سارية",
+      "none": "بلا تاريخ انتهاء",
+      "expiredSince": "منتهية منذ {{days}} يومًا",
+      "expiresToday": "تنتهي اليوم",
+      "expiresIn": "تنتهي خلال {{days}} يومًا"
+    },
+    "table": {
+      "document": "المستند",
+      "category": "التصنيف",
+      "branch": "الفرع",
+      "expiresAt": "تاريخ الانتهاء",
+      "size": "الحجم",
+      "author": "أضافه",
+      "allBranches": "كل الفروع"
+    },
+    "list": {
+      "searchPlaceholder": "ابحث عن مستند...",
+      "add": "رفع مستند",
+      "emptyTitle": "لا توجد مستندات",
+      "emptyDescription": "ارفع أوراق الأكاديمية — رخصة المزاولة، السجل التجاري، العقود ووثائق التأمين — لتتابع تواريخ انتهائها من مكان واحد."
+    },
+    "actions": {
+      "options": "خيارات",
+      "download": "تنزيل",
+      "openLink": "فتح الرابط",
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "sheet": {
+      "addTitle": "رفع مستند",
+      "editTitle": "تعديل المستند",
+      "file": "الملف",
+      "link": "الرابط",
+      "pickFile": "اضغط لاختيار ملف",
+      "linkPlaceholder": "https://www.example.com",
+      "switchToLink": "التبديل إلى رابط",
+      "switchToFile": "التبديل إلى ملف",
+      "title": "عنوان المستند",
+      "titlePlaceholder": "مثال: رخصة مزاولة المهنة",
+      "category": "التصنيف",
+      "categoryPlaceholder": "اختر التصنيف",
+      "branch": "الفرع",
+      "issuedAt": "تاريخ الإصدار",
+      "expiresAt": "تاريخ الانتهاء",
+      "pickDate": "اختر التاريخ",
+      "noExpiry": "بلا تاريخ انتهاء",
+      "notes": "ملاحظات",
+      "notesPlaceholder": "تفاصيل إضافية عن المستند (اختياري)",
+      "cancel": "إلغاء",
+      "save": "حفظ التعديل",
+      "submit": "رفع المستند",
+      "fileTooLarge": "حجم الملف كبير جدًا",
+      "fileRequired": "يجب رفع ملف",
+      "saveFailed": "فشل حفظ المستند"
+    },
+    "delete": {
+      "title": "حذف المستند",
+      "description": "هل أنت متأكد من حذف «{{title}}»؟ لا يمكن التراجع عن هذا الإجراء.",
+      "fileWarning": "سيُحذف الملف المرفوع أيضًا.",
+      "confirm": "حذف",
+      "cancel": "إلغاء"
+    }
+  },
+  "crm": {
+    "nav": {
+      "reports": "التقارير",
+      "group": "إدارة العملاء",
+      "leads": "العملاء المحتملون",
+      "deals": "الصفقات",
+      "tasks": "المهام",
+      "emailTemplates": "قوالب البريد",
+      "whatsapp": "واتساب",
+      "slaPolicies": "سياسات الاستجابة",
+      "settings": "الإعدادات"
+    }
+  },
+  "loyalty": {
+    "nav": {
+      "program": "برنامج الولاء",
+      "ledger": "حركة النقاط",
+      "reports": "تقارير الولاء"
+    }
+  }
+}

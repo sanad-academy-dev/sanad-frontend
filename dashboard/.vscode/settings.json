@@ -1,0 +1,42 @@
+{
+	"i18n-ally.localesPaths": ["src/locales"],
+	"i18n-ally.keystyle": "nested",
+
+	// ── Memory / stability ─────────────────────────────────────────────────────
+	// `prisma generate` rewrites ~1,000 files under generated/, a build rewrites
+	// ~1,300 under .output/, and a typecheck rewrites ~1,000 under tsbuild/. With no
+	// excludes, every one of those churns fires the file watcher, which wakes the
+	// extension host and tsserver into re-indexing the workspace — the Code.exe that
+	// the Windows event log caught at 10 GB right before a crash. None of these
+	// directories is tracked by git, so nothing here hides real source.
+	"files.watcherExclude": {
+		"**/.git/objects/**": true,
+		"**/.git/subtree-cache/**": true,
+		"**/node_modules/**": true,
+		"**/generated/**": true,
+		"**/tsbuild/**": true,
+		"**/.output/**": true,
+		"**/.nitro/**": true,
+		"**/.tanstack/**": true,
+		"**/dist/**": true
+	},
+	"search.exclude": {
+		"**/node_modules": true,
+		"**/generated": true,
+		"**/tsbuild": true,
+		"**/.output": true,
+		"**/.nitro": true,
+		"**/.tanstack": true,
+		"**/dist": true,
+		"**/bun.lock": true
+	},
+	"search.followSymlinks": false,
+	// Keep the semantic server's ceiling explicit — it holds roughly the same program
+	// `tsc` does, and this repo's client program alone peaks near 9 GB in tsc.
+	"typescript.tsserver.maxTsServerMemory": 3072,
+	// Nothing here needs @types fetched from npm at edit time; it only adds a process.
+	"typescript.disableAutomaticTypeAcquisition": true,
+	// Stop VS Code scanning for tasks it will never run.
+	"typescript.tsc.autoDetect": "off",
+	"npm.autoDetect": "off"
+}

@@ -1,0 +1,32 @@
+import { spawn } from "node:child_process";
+import fs from "node:fs";
+const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const [,, OUT, COOKIE] = process.argv;
+const p = spawn(CHROME, ["--headless=new","--remote-debugging-port=9366","--disable-gpu","--window-size=1800,1000","--hide-scrollbars","about:blank"]);
+const wait = (ms)=>new Promise(r=>setTimeout(r,ms));
+await wait(2500);
+const list = await (await fetch("http://127.0.0.1:9366/json/list")).json();
+const t = list.find(x=>x.type==="page");
+const WebSocket = (await import("ws")).default;
+const ws = new WebSocket(t.webSocketDebuggerUrl,{perMessageDeflate:false});
+let id=0; const pending=new Map();
+ws.on("message",(d)=>{const m=JSON.parse(d);if(m.id&&pending.has(m.id)){pending.get(m.id)(m);pending.delete(m.id);}});
+await new Promise(r=>ws.on("open",r));
+const send=(m,pr={})=>new Promise(r=>{const i=++id;pending.set(i,r);ws.send(JSON.stringify({id:i,method:m,params:pr}));});
+const evalJs=async(e)=>{const r=await send("Runtime.evaluate",{expression:e,returnByValue:true});return r.result.result.value;};
+const clickExpr=async(expr)=>{const v=await evalJs(`(()=>{const e=${expr};if(!e)return null;const r=e.getBoundingClientRect();return JSON.stringify({x:r.x+r.width/2,y:r.y+r.height/2})})()`);if(!v)return false;const pt=JSON.parse(v);for(const type of ["mousePressed","mouseReleased"]){await send("Input.dispatchMouseEvent",{type,x:pt.x,y:pt.y,button:"left",clickCount:1,buttons:type==="mousePressed"?1:0});await wait(140);}return true;};
+const shot=async(file,scale=1.4)=>{const raw=await evalJs(`(()=>{const el=document.querySelector('[data-slot="sheet-content"]');if(!el)return null;const r=el.getBoundingClientRect();return JSON.stringify({x:Math.max(0,r.x),y:Math.max(0,r.y),width:r.width,height:Math.min(r.height,900)})})()`);if(!raw)return false;const {result}=await send("Page.captureScreenshot",{format:"png",captureBeyondViewport:false,clip:{...JSON.parse(raw),scale}});fs.writeFileSync(file,Buffer.from(result.data,"base64"));return true;};
+await send("Page.enable"); await send("Runtime.enable"); await send("Network.enable");
+await send("Network.setCookie",{name:"better-auth.session_token",value:COOKIE,domain:"localhost",path:"/",httpOnly:true});
+await send("Page.navigate",{url:"http://localhost:3001/services/staff"});
+for (let i=0;i<40;i++){ await wait(1000); if (await evalJs(`document.body.innerText.includes("جدولة مناوبة بـ AI")`)) break; }
+await wait(2500);
+console.log("open ai:", await clickExpr(`[...document.querySelectorAll('button')].find(x=>x.textContent.includes('جدولة مناوبة بـ AI'))`)); await wait(1500);
+console.log("sheet side:", await evalJs(`(()=>{const el=document.querySelector('[data-slot="sheet-content"]');if(!el)return 'none';const r=el.getBoundingClientRect();return el.getAttribute('data-side')+' | x='+Math.round(r.x)+' w='+Math.round(r.width)})()`));
+console.log("settings shot:", await shot(OUT.replace(".png","-settings.png")));
+console.log("suggest:", await clickExpr(`[...document.querySelectorAll('[data-slot="sheet-content"] button')].find(x=>x.textContent.trim().startsWith('اقترح الجدول'))`));
+for (let i=0;i<60;i++){ await wait(2000); if (await evalJs(`document.body.innerText.includes("اقتراح بـ")`)) break; }
+console.log("plan:", await evalJs(`(()=>{const m=document.body.innerText.match(/اقتراح بـ[^\\n]*/);return m?m[0]:'none'})()`));
+console.log("rows:", await evalJs(`document.querySelectorAll('[data-slot="sheet-content"] tbody tr').length`));
+console.log("preview shot:", await shot(OUT.replace(".png","-plan.png")));
+ws.close(); p.kill(); process.exit(0);

@@ -1,0 +1,214 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "public/**"
+      - "prisma/**"
+      - "package.json"
+      - "bun.lock"
+      - "Dockerfile"
+      - ".dockerignore"
+      - ".github/workflows/docker-image.yml"
+      - "prisma.config.ts"
+      - "tsconfig*.json"
+      - "vite.config.ts"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/elite-vet
+  NODE_OPTIONS: --max-old-space-size=4096
+
+jobs:
+  migrate:
+    name: Validate migrations against empty Postgres
+    # Runner is a repo VARIABLE, not a literal (2026-08-21) — see migrate-check.yml for
+    # the full note. Default stays hosted; CI_RUNNER=self-hosted moves it local.
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Replaces the old `services: postgres` block, which only runs on a hosted Linux
+      # runner — that restriction is precisely what tied this workflow to billed minutes.
+      # It exports DATABASE_URL for every step below and publishes on 127.0.0.1:55432,
+      # NOT 5432, which on a self-hosted runner is the developer's own dev database.
+      - name: Start throwaway Postgres
+        uses: ./.github/actions/ephemeral-postgres
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Cache Bun install cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Generate Prisma client
+        run: bunx prisma generate
+
+      - name: Validate Prisma schema
+        run: bun --bun run prisma validate
+
+      # (The readiness wait that used to sit here moved into the action, which probes with
+      # `docker exec` — the host's pg_isready is guaranteed on ubuntu-latest but not on a
+      # macOS runner.)
+      - name: Apply migrations to empty database
+        run: bun --bun run prisma migrate deploy
+
+      - name: Verify schema matches migrations
+        run: bun --bun run prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code
+        continue-on-error: true
+
+      # A hosted runner is thrown away after the job; a self-hosted one is not. Without
+      # this the container outlives the run and holds the port for the next one.
+      - name: Stop throwaway Postgres
+        if: always()
+        run: docker rm -f elite-vet-ci-postgres >/dev/null 2>&1 || true
+
+  build-and-push:
+    name: Build and push image
+    # Runner is a repo VARIABLE, not a literal (2026-08-21) — see migrate-check.yml for
+    # the full note. Default stays hosted; CI_RUNNER=self-hosted moves it local.
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+    needs: migrate
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Cache Bun install cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Generate Prisma client
+        run: bunx prisma generate
+
+      # `vite build` (via the tanstackStart plugin) generates the gitignored
+      # src/routeTree.gen.ts, which is why this ran before the typecheck that used to
+      # follow it. That typecheck is gone — see below.
+      - name: Build app
+        env:
+          VITE_API_URL: ${{ vars.VITE_API_URL }}
+          VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
+        run: bun run build
+
+      # NO TYPECHECK HERE, and do not "restore" one — read CLAUDE.md rule 14 first.
+      #
+      # A `- name: Typecheck / run: bun run typecheck` step lived here until 2026-08-21.
+      # It was a COLD whole-program `tsc --noEmit` at a 12GB ceiling — precisely what the
+      # owner removed from CI on 2026-08-18 after it was SIGKILLed three times (measured:
+      # peak 10,046 MB; 9GB ceiling passes but takes 33 minutes on CI against 5m26s
+      # locally; 7GB is a clean V8 OOM). b77a5c3 stripped it from pr-full-checks.yml and
+      # wrote the decision into rule 14, but missed this file, so the very next push to
+      # main (c7f66b2, 2026-08-19) died here — and every push since, including the
+      # accounting merge. The two-day billing outage then hid it: the jobs never started,
+      # so nobody saw a step fail. Deploys have been broken since 2026-08-17 (20b2a01).
+      #
+      # Types are still gated, just not here: pr-checks.yml runs `bun run typecheck`
+      # incrementally against a cached tsbuild/ on EVERY push to a PR, and since [P13.6]
+      # pr-full-checks.yml also runs the whole graph COLD behind the `full-ci` label.
+      # That is where a type error should stop a change — before merge, not while
+      # deploying what is already on main. [P13.6] made a cold tsc affordable again, but
+      # it still does not belong on the deploy path: it would not add a gate, only a way
+      # for a deploy of already-merged code to fail.
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,prefix=
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          target: runtime-prebuilt
+          platforms: linux/amd64
+          provenance: false
+          sbom: false
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,mode=max
+          build-args: |
+            VITE_API_URL=${{ vars.VITE_API_URL }}
+            VITE_SENTRY_DSN=${{ vars.VITE_SENTRY_DSN }}
+
+      - name: Verify Dokploy application
+        env:
+          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+          DOKPLOY_APP_ID: ${{ secrets.DOKPLOY_APP_ID }}
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+        run: |
+          test -n "$DOKPLOY_API_KEY" || { echo "DOKPLOY_API_KEY is not configured" >&2; exit 1; }
+          test -n "$DOKPLOY_APP_ID" || { echo "DOKPLOY_APP_ID is not configured" >&2; exit 1; }
+          test -n "$DOKPLOY_URL" || { echo "DOKPLOY_URL is not configured" >&2; exit 1; }
+          dokploy_url="${DOKPLOY_URL%/}"
+
+          curl --silent --fail-with-body --show-error \
+            --request GET \
+            --header "x-api-key: $DOKPLOY_API_KEY" \
+            "$dokploy_url/api/application.one?applicationId=$DOKPLOY_APP_ID" >/dev/null || {
+              echo "::error::Dokploy could not find DOKPLOY_APP_ID. Open Dokploy, copy the Application ID for the elite-vet app, and update the GitHub Actions secret." >&2
+              exit 1
+            }
+
+      - name: Trigger Dokploy deploy
+        env:
+          DOKPLOY_API_KEY: ${{ secrets.DOKPLOY_API_KEY }}
+          DOKPLOY_APP_ID: ${{ secrets.DOKPLOY_APP_ID }}
+          DOKPLOY_URL: ${{ secrets.DOKPLOY_URL }}
+        run: |
+          dokploy_url="${DOKPLOY_URL%/}"
+
+          curl --silent --fail-with-body --show-error \
+            --request POST \
+            --header "x-api-key: $DOKPLOY_API_KEY" \
+            --header "Content-Type: application/json" \
+            --data "{\"applicationId\": \"$DOKPLOY_APP_ID\"}" \
+            "$dokploy_url/api/application.deploy"

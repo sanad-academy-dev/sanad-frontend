@@ -1,0 +1,164 @@
+name: PR Checks
+
+# FAST gate — runs on EVERY push to a PR. Typecheck + the pure (non-DB) test suite,
+# roughly two minutes. Deliberately does NOT run the DB suites, the production build or
+# the walkthrough e2e; those live in pr-full-checks.yml behind the `full-ci` label.
+#
+# WHY THE SPLIT (owner 2026-08-17, after free Actions minutes ran out mid-phase): every
+# intermediate commit used to pay ~15 minutes for suites that only matter at a phase gate,
+# which was most of the burn. Migration drift still runs on every push separately
+# (migrate-check.yml, ~1 min) because it is cheap and catches a whole class of prod break.
+#
+# THIS JOB IS NOT THE GATE. CLAUDE.md rule 11 is unchanged and explicitly survives this
+# split: a green fast job is NOT evidence for a task's CI cell. Only a concluded green
+# FULL run is. Fast-green + full-not-run ⇒ the cell stays ⏳.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "prisma/**"
+      - "scripts/**"
+      - "package.json"
+      - "bun.lock"
+      # [P13.6] the graph is four files now, not one — a change to any project's
+      # include/options must re-run this job.
+      - "tsconfig*.json"
+      - "vite.config.ts"
+      - "vitest.config.ts"
+      - "vitest.fast.config.ts"
+      - "prisma.config.ts"
+      - ".github/workflows/pr-checks.yml"
+
+concurrency:
+  group: pr-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fast:
+    name: Typecheck & pure tests (fast)
+    # Runner is a repo VARIABLE, not a literal (2026-08-21) — see migrate-check.yml for
+    # the full note. Default stays hosted; CI_RUNNER=self-hosted moves it local.
+    runs-on: ${{ vars.CI_RUNNER || 'ubuntu-latest' }}
+
+    # No Postgres service and NO DATABASE_URL on purpose. A test that reaches the database
+    # transitively then fails loudly at import instead of silently doing nothing — that is
+    # the signal to classify it into the full suite (see vitest.fast.config.ts).
+    env:
+      # [2026-09-04] Heap ceiling for `bun run typecheck` (scripts/typecheck.mjs).
+      #
+      # CI needs more than the dev box. The shared hardcoded ceiling was lowered
+      # 12288 -> 9216 on 2026-09-03 for a 32 GB Windows machine (CLAUDE.md rule 13:
+      # a 12 GB tsc on top of VS Code and Docker exhausts its COMMIT limit), and that
+      # silently lowered it here too — where this job runs ALONE with 8 GB of extra
+      # swap provisioned below. Both CI tiers then OOMed.
+      #
+      # Measured cold on 2026-09-04, one process per program:
+      #   generated 7,582 MB · server 8,886 MB · client 9,819 MB
+      # The client program alone exceeds 9216 — and does so WITHOUT the reminders
+      # module too (9,571 MB with it removed), i.e. the graph had already outgrown the
+      # ceiling before that work: inpatients and emergency landed after the 8.66 GB
+      # figure in rule 14's table was measured.
+      #
+      # 11264 sits above the measured peak with ~1.4 GB of headroom, and below the
+      # 12288 that was SIGKILLed in 2026-08 — that was the pre-[P13.6] MONOLITH on a
+      # SHARED runner, not one program per process on a dedicated one.
+      TYPECHECK_HEAP_MB: 11264
+      NODE_ENV: production
+      BETTER_AUTH_URL: http://localhost:3000
+      BETTER_AUTH_SECRET: ci-dummy-not-a-real-secret
+      BETTER_AUTH_API_KEY: ci-dummy-not-a-real-key
+      GOOGLE_CLIENT_ID: ci-dummy
+      GOOGLE_CLIENT_SECRET: ci-dummy
+      EMAIL_USER: ci@example.com
+      EMAIL_PASSWORD: ci-dummy
+      S3_BUCKET: ci-dummy
+      S3_REGION: us-east-1
+      S3_ACCESS_KEY: ci-dummy
+      S3_SECRET_KEY: ci-dummy
+      VITE_API_URL: ${{ vars.VITE_API_URL || 'http://localhost:3000' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.14
+
+      - name: Cache Bun install cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      # `bun install` already runs `prisma generate` via postinstall — a second explicit
+      # `bunx prisma generate` step was pure duplication (20s a run, both workflows).
+      - name: Install dependencies (runs prisma generate via postinstall)
+        run: bun install --frozen-lockfile
+
+      # src/routeTree.gen.ts is gitignored and normally emitted by the vite build, which
+      # is the only reason typecheck used to sit behind a ~2-minute bundle. This calls the
+      # same @tanstack/router-generator the plugin wraps — seconds, byte-identical output.
+      - name: Generate route tree
+        run: bun run gen:routetree
+
+      # Measured: a cold whole-program typecheck is 10m37s here and was 87% of this job.
+      # Restoring tsc's .tsbuildinfo makes it 19s when no TypeScript changed and a few
+      # minutes when it did — tsc re-checks changed files AND their dependents, verified
+      # locally by injecting a type error against a warm cache and watching it fail. The
+      # key is per-SHA with a rolling restore, so each run seeds the next.
+      # [P13.6] The cache now covers the whole tsbuild/ directory: the generated
+      # project's emitted .d.ts AND all three .tsbuildinfo files. Restoring only the
+      # buildinfo would be worse than useless — tsc would consider the project
+      # up-to-date while its declaration outputs were missing.
+      - name: Restore typecheck cache
+        uses: actions/cache@v4
+        with:
+          path: tsbuild
+          key: tsbuild-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            tsbuild-${{ runner.os }}-
+
+      # SAFETY NET, not the mechanism. [P13.6] makes the typecheck fit by compiling the
+      # generated Prisma mass to .d.ts once so `skipLibCheck` can actually skip it; this
+      # step only covers the cold-cache case where a from-scratch build still spikes.
+      # It should rarely engage after the cutover.
+      #
+      # Hosted runners ALREADY have an active /swapfile, so resizing that one fails with
+      # `fallocate: fallocate failed: Text file busy` — the kernel refusing to touch a
+      # file in use as swap. (First attempt did exactly that on the CRM branch: two runs
+      # dead in ~1 min, before the typecheck even started.) This ADDS swap on the
+      # runner's large temp disk instead of disturbing the one it depends on.
+      - name: Provision additional swap (safety net for a cold typecheck)
+        run: |
+          sudo fallocate -l 8G /mnt/swapfile
+          sudo chmod 600 /mnt/swapfile
+          sudo mkswap /mnt/swapfile
+          sudo swapon /mnt/swapfile
+
+      # [P13.6] Each project is incremental against its own .tsbuildinfo, so only the
+      # projects whose inputs changed are re-checked. Measured on a 16 GB box at the
+      # shipped 10240 MB ceiling:
+      #   nothing changed          generated 0s  + server 18s  + client  20s  =  38s
+      #   one client file edited   generated 1s  + server 14s  + client 244s  = 259s
+      #   cold, no cache           generated 178s + server 308s + client 458s = 944s
+      # Note the 244s: an edited file re-checks its DEPENDENTS too, and a widely-imported
+      # one pulls in most of the client project. "Incremental" bounds the work to one
+      # project, it does not make an edit free.
+      #
+      # ON CI, COLD IS SLOWER AND VARIES BY RUNNER. Measured on the [P13.6] merge head:
+      # this job's cold typecheck took 1,636s while the full tier's identical
+      # `typecheck-cold` took 955s on its own runner — same work, same swap, 71% apart.
+      # So: ~1-5 min when tsbuild/ restores, 16-27 min when it does not. A slow run here
+      # is usually a cache miss, not a hang — check the "Restore typecheck cache" step
+      # before assuming the worst.
+      - name: Typecheck (composed projects)
+        run: bun run typecheck
+
+      - name: Run pure tests (no database)
+        run: bun run test:fast

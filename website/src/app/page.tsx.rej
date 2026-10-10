@@ -1,0 +1,66 @@
+diff a/website/src/app/page.tsx b/website/src/app/page.tsx	(rejected hunks)
+@@ -52,41 +52,55 @@ export default async function Home() {
+       </div> */}
+ 
+       {/* شعارات الشركات */}
+-      <BrandMarquee />
+-
+-      {/* استكشاف فئات الدورات */}
+-      <CourseCategories  />
++      <div id="partners">
++        <BrandMarquee />
++      </div>
+ 
+       {/* الدورات الأكثر طلباً */}
+       {/* <FeaturedCourses courses={courses} /> */}
+ 
+       {/* مسارات التعلم */}
+-      <LearningPaths />
++      <div id="paths">
++        <LearningPaths />
++      </div>
+ 
+       {/* لماذا سند */}
+-      <WhySanad />
++      <div id="about">
++        <WhySanad />
++      </div>
+ 
+       {/* رحلة الطالب */}
+       <JourneyChild />
+ 
+       {/*  مستويات مسارات التعلم  */}
+-      <Levels />
++      <div id="levels">
++        <Levels />
++      </div>
+ 
+       {/* الفيد باك  */}
+       <TestimonialsSection />
+ 
+       
+       {/* باقات الاشتراك */}
+-      <Pricing />
++      <div id="pricing">
++        <Pricing />
++      </div>
+ 
+       {/* أسئلة أولياء الأمور */}
+       <Faq />
+ 
++      {/* استكشاف فئات الدورات */}
++      <div id="bootcamps">
++        <CourseCategories  />
++      </div>
++
+       {/* بانر الدعوة للإجراء */}
+       <CtaBanner />
+ 
+       {/* الفوتر */}
+-      <Footer />
++      <div id="footer">
++        <Footer />
++      </div>
+ 
+       {/* المساعد الذكي */}
+       <AiAgent />

@@ -1,0 +1,11 @@
+{
+	"name": "@sanad/contracts",
+	"private": true,
+	"version": "0.1.0",
+	"type": "module",
+	"description": "Browser-safe contracts shared by Sanad frontend applications",
+	"exports": {
+		"./runtime/*": "./runtime/*.ts",
+		"./*": "./src/*"
+	}
+}

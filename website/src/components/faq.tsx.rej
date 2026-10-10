@@ -1,0 +1,93 @@
+diff a/website/src/components/faq.tsx b/website/src/components/faq.tsx	(rejected hunks)
+@@ -215,7 +215,7 @@ export function ScrollSpine({
+         aria-hidden
+         style={{ top: markTop, height: markHeight }}
+         className={cn(
+-          "absolute rounded-lg bg-foreground/[0.06]",
++          "absolute  bg-foreground/[0.06]",
+           inline ? "-start-2 end-0" : "start-1/2 w-5 -translate-x-1/2",
+         )}
+       />
+@@ -257,17 +257,17 @@ export function ScrollSpine({
+                 }}
+                 onBlur={() => setPreview((p) => (p === i ? null : p))}
+                 className={cn(
+-                  "group/band absolute touch-manipulation rounded-md text-start outline-hidden transition-[scale] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-foreground active:scale-[0.96] motion-reduce:transition-none",
++                  "group/band absolute touch-manipulation  text-start outline-hidden transition-[scale] duration-150 ease-out focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-foreground active:scale-[0.96] motion-reduce:transition-none",
+                   inline ? "inset-y-0 -start-2 end-0 ps-5" : "inset-0",
+                 )}
+               >
+                 {inline ? (
+                   <span
+                     className={cn(
+-                      "block truncate text-[13px] leading-4 transition-[color] duration-150 ease-out",
++                      "block truncate text-[15px] leading-6 transition-[color] duration-150 ease-out",
+                       active
+-                        ? "font-medium text-foreground"
+-                        : "text-muted-foreground group-hover/band:text-foreground",
++                        ? "font-bold text-foreground"
++                        : "font-medium text-muted-foreground group-hover/band:text-foreground",
+                     )}
+                   >
+                     {items[i].label}
+@@ -364,14 +364,14 @@ export default function Faq() {
+   const scroller = useRef<HTMLDivElement>(null);
+ 
+   return (
+-    <section className="w-full bg-card">
+-      <Container className="flex flex-col gap-8 border-t border-border py-16">
+-        <div className="flex items-center justify-between gap-6">
+-          <div className="flex flex-col gap-3 text-right">
+-            <h2 className="text-2xl font-bold text-foreground">
++    <section className="relative w-full overflow-hidden bg-card border-t border-border">
++      <Container className="relative z-10 flex flex-col gap-12 py-20 md:py-28">
++        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
++          <div className="flex flex-col gap-3 text-center md:text-right">
++            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight">
+               أسئلة أولياء الأمور
+             </h2>
+-            <p className="text-base text-muted-foreground">
++            <p className="text-lg text-muted-foreground">
+               إجابات واضحة على الأسئلة الأكثر شيوعاً
+             </p>
+           </div>
+@@ -379,16 +379,16 @@ export default function Faq() {
+             href="https://wa.me/+201022805731"
+             target="_blank"
+             rel="noopener noreferrer"
+-            className="flex shrink-0 items-center gap-2 rounded-lg bg-[#25D366]/10 px-8 py-2.5 text-xl font-medium text-[#25D366] transition-colors hover:bg-[#25D366]/20"
++            className="flex shrink-0 items-center justify-center gap-2  bg-[#25D366]/10 px-6 py-3.5 text-lg md:text-xl font-bold text-[#25D366] transition-colors hover:bg-[#25D366]/20 shadow-sm hover:shadow-md"
+           >
+             تواصل معنا
+-            <FaWhatsapp className="size-5" />
++            <FaWhatsapp className="size-6" />
+           </a>
+         </div>
+ 
+-        <div className="@container xl:w-3/4 mx-auto mt-6 py-8 flex h-[630px] w-full max-w-full overflow-hidden rounded-2xl border border-border bg-muted/30 shadow-sm">
+-          <div className="flex w-12 shrink-0 flex-col items-center border-s border-border pt-8 @min-[520px]:w-[280px] @min-[520px]:items-stretch @min-[520px]:pe-5 @min-[520px]:ps-6">
+-            <p className="mb-6 hidden text-sm font-semibold tracking-wide text-muted-foreground uppercase @min-[520px]:block text-right">
++        <div className="@container mt-4 flex h-[630px] w-full max-w-full overflow-hidden  border-2 border-border bg-muted/30 shadow-sm">
++          <div className="flex w-12 shrink-0 flex-col items-center border-s border-border pt-8 @min-[520px]:w-[340px] @min-[520px]:items-stretch @min-[520px]:pe-6 @min-[520px]:ps-8">
++            <p className="mb-6 hidden text-base font-semibold tracking-wide text-muted-foreground uppercase @min-[520px]:block text-right">
+               في هذا القسم
+             </p>
+             <ScrollSpine
+@@ -405,14 +405,14 @@ export default function Faq() {
+             aria-label="الأسئلة الشائعة"
+             className="min-w-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-width:none] outline-hidden [&::-webkit-scrollbar]:hidden [mask-image:linear-gradient(to_bottom,black_calc(100%-48px),transparent)] focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-primary"
+           >
+-            <article className="px-8 pt-8 pb-40 text-base leading-relaxed text-pretty text-foreground text-right">
++            <article className="px-8 pt-8 pb-40 text-lg leading-relaxed text-pretty text-foreground text-right">
+               {SECTIONS.map((s) => (
+                 <section key={s.id}>
+-                  <h3 id={s.id} className="mt-8 scroll-mt-6 text-xl font-semibold text-foreground first:mt-0">
++                  <h3 id={s.id} className="mt-10 scroll-mt-6 text-2xl font-bold text-foreground first:mt-0">
+                     {s.heading}
+                   </h3>
+                   {s.body.map((p) => (
+-                    <p key={p.slice(0, 24)} className="my-4 text-muted-foreground">
++                    <p key={p.slice(0, 24)} className="my-5 text-muted-foreground">
+                       {p}
+                     </p>
+                   ))}

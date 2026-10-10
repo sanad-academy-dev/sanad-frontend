@@ -1,0 +1,29 @@
+{
+	"$comment": "[P13.6] Shared compiler options. NOT a project — no `include`, never built directly; every project extends it so a flag changes in exactly one place.",
+	"compilerOptions": {
+		"target": "ES2022",
+		"jsx": "react-jsx",
+		"module": "ESNext",
+		"lib": ["ES2022", "DOM", "DOM.Iterable"],
+		"types": ["vite/client"],
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true,
+		"verbatimModuleSyntax": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noFallthroughCasesInSwitch": true,
+		"noUncheckedSideEffectImports": true,
+		"allowJs": true,
+		"resolveJsonModule": true,
+		"paths": {
+			"@/*": ["./src/*"],
+			"@/server/*": ["./contracts/types/src/server/*"],
+			"@/generated/*": ["./contracts/generated/*"],
+			"@sanad/contracts/types/*": ["./contracts/types/src/*"],
+			"@sanad/contracts/runtime/*": ["./contracts/runtime/*"],
+			"@sanad/contracts/*": ["./contracts/src/*"]
+		}
+	}
+}

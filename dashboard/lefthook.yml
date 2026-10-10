@@ -1,0 +1,28 @@
+# ⚠ NOT ACTIVE. `git config core.hooksPath` points at `.husky/_`, so husky owns the hooks
+# and nothing here runs — the real pre-push guards live in `.husky/pre-push`. Kept only
+# because the dependency is still installed. Do not "fix" a hook by editing this file.
+#
+# [P13.6] note if it is ever revived: `bun run typecheck {staged_files}` cannot work —
+# typecheck is now `tsc -p <project>`, and tsc rejects source files on the command line
+# alongside `-p` (TS5042). It also runs `parallel: true` with the build, which CLAUDE.md
+# rule 13 forbids: two large tsc programs at once starve each other into an OOM kill.
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: packages audit
+      run: bun audit
+
+    - name: gems audit
+      run: bun audit
+
+    - run: bun run format {staged_files}
+      glob: "src/**/*.{ts,tsx}"
+
+    - run: bun run build {staged_files}
+      glob: "src/**/*.{ts,tsx}"
+
+    - run: bun run typecheck {staged_files}
+      glob: "src/**/*.{ts,tsx}"
+
+    - run: bun run env:sync:prod

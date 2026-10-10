@@ -1,0 +1,22 @@
+diff a/website/src/components/join-button.tsx b/website/src/components/join-button.tsx	(rejected hunks)
+@@ -36,7 +36,7 @@ export function JoinButton({
+       <Button 
+         variant={variant}
+         onClick={() => setOpen(true)}
+-        className={cn("rounded-[10px] h-auto px-4 py-2 text-sm font-medium cursor-pointer", className)}
++        className={cn(" h-auto px-4 py-2 text-sm font-medium cursor-pointer", className)}
+       >
+         {children || (
+           <>
+@@ -56,7 +56,10 @@ export function JoinButton({
+             onClick={() => setOpen(false)}
+           >
+             <div onClick={(e) => e.stopPropagation()} className="w-full max-w-[800px] mx-auto">
+-              <MultiStepForm onCreate={() => setTimeout(() => setOpen(false), 2000)} />
++              <MultiStepForm 
++                onCreate={() => setTimeout(() => setOpen(false), 2000)} 
++                onClose={() => setOpen(false)}
++              />
+             </div>
+           </motion.div>
+         </AnimatePresence>,
