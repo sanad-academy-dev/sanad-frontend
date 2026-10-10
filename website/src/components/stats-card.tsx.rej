@@ -1,0 +1,10 @@
+diff a/website/src/components/stats-card.tsx b/website/src/components/stats-card.tsx	(rejected hunks)
+@@ -45,7 +45,7 @@ function AnimatedStat({ value }: { value: string }) {
+ 
+ export default function StatsCard() {
+   return (
+-    <div className="mx-auto w-full max-w-[978px] rounded-[24px] border border-border/50 bg-card px-2 shadow-sm">
++    <div className="mx-auto w-full max-w-[978px]  border border-border/50 bg-card px-2 shadow-sm">
+       <ul
+         dir="ltr"
+         className="grid grid-cols-2 items-center gap-y-4 sm:grid-cols-4 lg:flex lg:justify-center lg:gap-x-[60px]"
