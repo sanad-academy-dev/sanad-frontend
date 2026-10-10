@@ -23,6 +23,9 @@ const thmanyah = localFont({
 export const metadata: Metadata = {
   title: "سند | علّم ابنك تقنيات المستقبل",
   description: "نحوّل شغف ابنك بالأجهزة إلى مهارات حقيقية بطريقة ممتعة وسهلة",
+  icons: {
+    icon: "/logos/favicon.svg",
+  },
 };
 
 export default function RootLayout({
