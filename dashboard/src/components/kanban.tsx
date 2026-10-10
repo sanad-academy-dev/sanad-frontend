@@ -1,5 +1,6 @@
 "use client";
 
+// dashboard/src/components/kanban.tsx
 import type {
 	Announcements,
 	DndContextProps,
