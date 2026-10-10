@@ -1,14 +1,32 @@
-import { IconCheck, IconClock, IconFileDescription } from "@tabler/icons-react";
+import {
+	IconCheck,
+	IconClock,
+	IconFileDescription,
+	IconDots,
+	IconEye,
+	IconEdit,
+	IconTrash,
+} from "@tabler/icons-react";
 import { type ColumnDef, createColumnHelper, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
 import { TableDataView } from "@/components/common/table-data-view";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import type { Campaign } from "../types/campaign.types";
+import { AddCampaignSheet } from "./add-campaign-sheet";
 
 interface CampaignsTableProps {
 	data: Campaign[];
@@ -18,6 +36,7 @@ const columnHelper = createColumnHelper<Campaign>();
 
 export function CampaignsTable({ data }: CampaignsTableProps) {
 	const [rowSelection, setRowSelection] = useState({});
+	const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
 	const navigate = useNavigate({ from: "/digital-registration" });
 
 	// إضافة النوع بشكل صريح هنا لتفادي أي تعارض في الأنواع
@@ -137,8 +156,50 @@ export function CampaignsTable({ data }: CampaignsTableProps) {
 				size: 120,
 				cell: (info) => <div className="text-[13px] font-medium text-foreground">{info.getValue()}</div>,
 			}),
+			columnHelper.display({
+				id: "actions",
+				size: 50,
+				cell: ({ row }) => (
+					<div onClick={(e) => e.stopPropagation()}>
+						<DropdownMenu dir="rtl">
+							<DropdownMenuTrigger asChild>
+								<Button variant="ghost" className="h-8 w-8 p-0">
+									<span className="sr-only">فتح القائمة</span>
+									<IconDots className="h-4 w-4 text-muted-foreground" />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end" className="w-[160px]">
+								<DropdownMenuItem
+									onClick={() => {
+										navigate({
+											to: "/digital-registration/$campaignId",
+											params: { campaignId: row.original.id },
+										});
+									}}
+									className="cursor-pointer"
+								>
+									<IconEye className="me-2 h-4 w-4" />
+									عرض التفاصيل
+								</DropdownMenuItem>
+								<DropdownMenuSeparator />
+								<DropdownMenuItem
+									className="cursor-pointer"
+									onClick={() => setEditingCampaign(row.original)}
+								>
+									<IconEdit className="me-2 h-4 w-4" />
+									تعديل
+								</DropdownMenuItem>
+								<DropdownMenuItem className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
+									<IconTrash className="me-2 h-4 w-4" />
+									حذف
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
+				),
+			}),
 		],
-		[],
+		[navigate],
 	);
 
 	const table = useReactTable({
@@ -152,15 +213,22 @@ export function CampaignsTable({ data }: CampaignsTableProps) {
 	});
 
 	return (
-		<TableDataView
-			table={table}
-			columns={columns}
-			onRowClick={(row) => {
-				navigate({
-					to: "/digital-registration/$campaignId",
-					params: { campaignId: row.original.id },
-				});
-			}}
-		/>
+		<>
+			<TableDataView
+				table={table}
+				columns={columns}
+				onRowClick={(row) => {
+					navigate({
+						to: "/digital-registration/$campaignId",
+						params: { campaignId: row.original.id },
+					});
+				}}
+			/>
+			<AddCampaignSheet
+				open={!!editingCampaign}
+				onClose={() => setEditingCampaign(null)}
+				campaign={editingCampaign}
+			/>
+		</>
 	);
 }

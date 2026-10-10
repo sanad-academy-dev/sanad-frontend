@@ -5,22 +5,54 @@ import { FieldLabel } from "@/components/common/field-label";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import type { Campaign } from "../types/campaign.types";
 
-export function AddCampaignSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
+export function AddCampaignSheet({
+	open,
+	onClose,
+	campaign,
+}: {
+	open: boolean;
+	onClose: () => void;
+	campaign?: Campaign | null;
+}) {
+	const isEditing = !!campaign;
+
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		onClose();
 	};
 
 	return (
-		<Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
-			<SheetContent side="left" showCloseButton={false} className="w-full sm:max-w-xl! gap-0 flex flex-col p-0">
-				<FormHeader title="حملة جديدة" onClose={onClose} />
-				
+		<Sheet
+			open={open}
+			onOpenChange={(isOpen) => !isOpen && onClose()}
+		>
+			<SheetContent
+				side="left"
+				showCloseButton={false}
+				className="w-full sm:max-w-xl! gap-0 flex flex-col p-0"
+			>
+				<FormHeader
+					title={isEditing ? "تعديل الحملة" : "حملة جديدة"}
+					onClose={onClose}
+				/>
+
 				<div className="flex-1 overflow-y-auto">
-					<form id="add-campaign-form" onSubmit={handleSubmit} className="flex flex-col gap-0" dir="rtl">
+					<form
+						id="add-campaign-form"
+						onSubmit={handleSubmit}
+						className="flex flex-col gap-0"
+						dir="rtl"
+					>
 						<div className="px-4 pt-4 pb-2">
 							<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
 								معلومات الحملة
@@ -33,16 +65,52 @@ export function AddCampaignSheet({ open, onClose }: { open: boolean; onClose: ()
 								<FieldLabel required>
 									<Label className="text-sm font-medium">اسم الحملة</Label>
 								</FieldLabel>
-								<Select defaultValue="">
-									<SelectTrigger className="w-full text-right text-sm" dir="rtl">
+								<Select defaultValue={campaign?.name || ""}>
+									<SelectTrigger
+										className="w-full text-right text-sm"
+										dir="rtl"
+									>
 										<SelectValue placeholder="يُرجى تعبئة اسم الحملة" />
 									</SelectTrigger>
 									<SelectContent dir="rtl">
-										<SelectItem value="حملة التسجيل - الفصل الأول" className="text-right">حملة التسجيل - الفصل الأول</SelectItem>
-										<SelectItem value="حملة التسجيل المبكر" className="text-right">حملة التسجيل المبكر</SelectItem>
-										<SelectItem value="حملة الفصل الدراسي" className="text-right">حملة الفصل الدراسي</SelectItem>
-										<SelectItem value="حملة البرنامج الصيفي" className="text-right">حملة البرنامج الصيفي</SelectItem>
-										<SelectItem value="يوم مفتوح" className="text-right">يوم مفتوح</SelectItem>
+										<SelectItem
+											value="حملة التسجيل - الفصل الأول"
+											className="text-right"
+										>
+											حملة التسجيل - الفصل الأول
+										</SelectItem>
+										<SelectItem
+											value="حملة التسجيل المبكر"
+											className="text-right"
+										>
+											حملة التسجيل المبكر
+										</SelectItem>
+										<SelectItem
+											value="حملة الفصل الدراسي"
+											className="text-right"
+										>
+											حملة الفصل الدراسي
+										</SelectItem>
+										<SelectItem
+											value="حملة البرنامج الصيفي"
+											className="text-right"
+										>
+											حملة البرنامج الصيفي
+										</SelectItem>
+										<SelectItem
+											value="يوم مفتوح"
+											className="text-right"
+										>
+											يوم مفتوح
+										</SelectItem>
+										{isEditing && campaign.name && (
+											<SelectItem
+												value={campaign.name}
+												className="text-right"
+											>
+												{campaign.name}
+											</SelectItem>
+										)}
 									</SelectContent>
 								</Select>
 							</div>
@@ -52,14 +120,40 @@ export function AddCampaignSheet({ open, onClose }: { open: boolean; onClose: ()
 								<FieldLabel required>
 									<Label className="text-sm font-medium">الفئة العمرية</Label>
 								</FieldLabel>
-								<Select defaultValue="">
-									<SelectTrigger className="w-full text-right text-sm" dir="rtl">
+								<Select defaultValue={campaign?.ageGroup || ""}>
+									<SelectTrigger
+										className="w-full text-right text-sm"
+										dir="rtl"
+									>
 										<SelectValue placeholder="اختر..." />
 									</SelectTrigger>
 									<SelectContent dir="rtl">
-										<SelectItem value="2-3" className="text-right">2-3 سنوات</SelectItem>
-										<SelectItem value="3-4" className="text-right">3-4 سنوات</SelectItem>
-										<SelectItem value="4-5" className="text-right">4-5 سنوات</SelectItem>
+										<SelectItem
+											value="2-3"
+											className="text-right"
+										>
+											2-3 سنوات
+										</SelectItem>
+										<SelectItem
+											value="3-4"
+											className="text-right"
+										>
+											3-4 سنوات
+										</SelectItem>
+										<SelectItem
+											value="4-5"
+											className="text-right"
+										>
+											4-5 سنوات
+										</SelectItem>
+										{isEditing && campaign.ageGroup && (
+											<SelectItem
+												value={campaign.ageGroup}
+												className="text-right"
+											>
+												{campaign.ageGroup}
+											</SelectItem>
+										)}
 									</SelectContent>
 								</Select>
 							</div>
@@ -68,13 +162,31 @@ export function AddCampaignSheet({ open, onClose }: { open: boolean; onClose: ()
 							<div className="flex flex-col gap-1.5">
 								<Label className="text-sm font-medium">الفصل المستهدف</Label>
 								<Select defaultValue="">
-									<SelectTrigger className="w-full text-right text-sm" dir="rtl">
+									<SelectTrigger
+										className="w-full text-right text-sm"
+										dir="rtl"
+									>
 										<SelectValue placeholder="اختر..." />
 									</SelectTrigger>
 									<SelectContent dir="rtl">
-										<SelectItem value="النجوم" className="text-right">النجوم</SelectItem>
-										<SelectItem value="القمر" className="text-right">القمر</SelectItem>
-										<SelectItem value="الشمس" className="text-right">الشمس</SelectItem>
+										<SelectItem
+											value="النجوم"
+											className="text-right"
+										>
+											النجوم
+										</SelectItem>
+										<SelectItem
+											value="القمر"
+											className="text-right"
+										>
+											القمر
+										</SelectItem>
+										<SelectItem
+											value="الشمس"
+											className="text-right"
+										>
+											الشمس
+										</SelectItem>
 									</SelectContent>
 								</Select>
 							</div>
@@ -84,7 +196,16 @@ export function AddCampaignSheet({ open, onClose }: { open: boolean; onClose: ()
 								<FieldLabel required>
 									<Label className="text-sm font-medium">تاريخ البدء</Label>
 								</FieldLabel>
-								<Input type="date" className="text-sm" />
+								{/* Extracting 'YYYY-MM-DD' safely if startDate is present in a different format */}
+								<Input
+									type="date"
+									className="text-sm"
+									defaultValue={
+										campaign?.startDate
+											? new Date(campaign.startDate).toISOString().split("T")[0]
+											: ""
+									}
+								/>
 							</div>
 
 							{/* تاريخ الانتهاء */}
@@ -92,7 +213,10 @@ export function AddCampaignSheet({ open, onClose }: { open: boolean; onClose: ()
 								<FieldLabel required>
 									<Label className="text-sm font-medium">تاريخ الانتهاء</Label>
 								</FieldLabel>
-								<Input type="date" className="text-sm" />
+								<Input
+									type="date"
+									className="text-sm"
+								/>
 							</div>
 
 							{/* المقاعد المتاحة */}
@@ -100,15 +224,48 @@ export function AddCampaignSheet({ open, onClose }: { open: boolean; onClose: ()
 								<FieldLabel required>
 									<Label className="text-sm font-medium">المقاعد المتاحة</Label>
 								</FieldLabel>
-								<Select defaultValue="">
-									<SelectTrigger className="w-full text-right text-sm" dir="rtl">
+								<Select
+									defaultValue={campaign?.maxCapacity ? String(campaign.maxCapacity) : ""}
+								>
+									<SelectTrigger
+										className="w-full text-right text-sm"
+										dir="rtl"
+									>
 										<SelectValue placeholder="اختر..." />
 									</SelectTrigger>
 									<SelectContent dir="rtl">
-										<SelectItem value="15" className="text-right">15</SelectItem>
-										<SelectItem value="20" className="text-right">20</SelectItem>
-										<SelectItem value="25" className="text-right">25</SelectItem>
-										<SelectItem value="30" className="text-right">30</SelectItem>
+										<SelectItem
+											value="15"
+											className="text-right"
+										>
+											15
+										</SelectItem>
+										<SelectItem
+											value="20"
+											className="text-right"
+										>
+											20
+										</SelectItem>
+										<SelectItem
+											value="25"
+											className="text-right"
+										>
+											25
+										</SelectItem>
+										<SelectItem
+											value="30"
+											className="text-right"
+										>
+											30
+										</SelectItem>
+										{isEditing && campaign.maxCapacity && (
+											<SelectItem
+												value={String(campaign.maxCapacity)}
+												className="text-right"
+											>
+												{campaign.maxCapacity}
+											</SelectItem>
+										)}
 									</SelectContent>
 								</Select>
 							</div>
@@ -116,18 +273,34 @@ export function AddCampaignSheet({ open, onClose }: { open: boolean; onClose: ()
 							{/* المتطلبات */}
 							<div className="flex flex-col gap-1.5">
 								<Label className="text-sm font-medium">المتطلبات</Label>
-								<Textarea placeholder="شهادة ميلاد، صورة هوية ولي الأمر، شهادة تطعيم..." className="text-sm min-h-24 resize-none" />
+								<Textarea
+									placeholder="شهادة ميلاد، صورة هوية ولي الأمر، شهادة تطعيم..."
+									className="text-sm min-h-24 resize-none"
+								/>
 							</div>
 						</div>
 					</form>
 				</div>
-				
-				<FormFooter continueAdding={false} onContinueAddingChange={() => {}} disabled={false}>
-					<Button type="button" variant="outline" size="sm" onClick={onClose}>
+
+				<FormFooter
+					continueAdding={false}
+					onContinueAddingChange={() => {}}
+					disabled={false}
+				>
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={onClose}
+					>
 						إلغاء
 					</Button>
-					<Button type="submit" form="add-campaign-form" size="sm">
-						إنشاء الحملة
+					<Button
+						type="submit"
+						form="add-campaign-form"
+						size="sm"
+					>
+						{isEditing ? "حفظ التعديلات" : "إنشاء الحملة"}
 					</Button>
 				</FormFooter>
 			</SheetContent>
