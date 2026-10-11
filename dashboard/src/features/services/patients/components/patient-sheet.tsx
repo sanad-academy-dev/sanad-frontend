@@ -22,6 +22,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { AddOwnerDialog } from "@/features/services/patients/components/add-owner-dialog";
 import { DiscardConfirmDialog } from "@/features/services/patients/components/discard-confirm-dialog";
@@ -69,6 +70,7 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 		defaultValues: patient
 			? {
 					name: patient.name,
+					gender: patient.gender,
 					ownerId: patient.owner?.id ?? "",
 					age: patient.age ?? undefined,
 					birthDate: toDateInput(patient.birthDate),
@@ -83,6 +85,7 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 		if (open && patient) {
 			reset({
 				name: patient.name,
+				gender: patient.gender,
 				ownerId: patient.owner?.id ?? "",
 				age: patient.age ?? undefined,
 				birthDate: toDateInput(patient.birthDate),
@@ -100,6 +103,7 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 	const filledFields = [
 		values.name?.trim() ? "name" : null,
 		values.ownerId ? "ownerId" : null,
+		values.gender ? "gender" : null,
 		values.age != null && values.age !== ("" as unknown as number) ? "age" : null,
 		values.birthDate?.trim() ? "birthDate" : null,
 		values.weight != null && values.weight !== ("" as unknown as number) ? "weight" : null,
@@ -152,7 +156,11 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 		onClose();
 	};
 
-	useHotkey("Mod+Enter", () => handleSubmit(onSubmit)(), {
+	const onInvalid = (errors: any) => {
+		console.warn("[PatientSheet] Form validation failed:", errors);
+	};
+
+	useHotkey("Mod+Enter", () => handleSubmit(onSubmit, onInvalid)(), {
 		enabled: open && !readOnly,
 	});
 
@@ -189,7 +197,7 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 
 					<form
 						id="patient-sheet-form"
-						onSubmit={handleSubmit(onSubmit)}
+						onSubmit={handleSubmit(onSubmit, onInvalid)}
 						className="flex flex-col gap-4 px-4 py-4 overflow-y-auto flex-1"
 						dir="rtl"
 					>
@@ -283,6 +291,49 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 											</SelectContent>
 										</Select>
 										<FieldError errors={[errors.ownerId]} />
+									</Field>
+								)}
+							/>
+						</div>
+
+						{/* الجنس */}
+						<div className="flex flex-col gap-1.5">
+							<FieldLabel required={!readOnly}>
+								<Label
+									className="text-sm font-medium"
+									htmlFor="patient-sheet-gender"
+								>
+									الجنس
+								</Label>
+							</FieldLabel>
+							<Controller
+								name="gender"
+								control={control}
+								render={({ field }) => (
+									<Field data-invalid={!!errors.gender}>
+										<Tabs
+											value={field.value ?? ""}
+											onValueChange={readOnly ? undefined : field.onChange}
+											dir="rtl"
+										>
+											<TabsList className="w-full bg-transparent gap-3">
+												<TabsTrigger
+													value="MALE"
+													className="flex-1 border border-border h-9"
+													disabled={isPending || readOnly}
+												>
+													ذكر
+												</TabsTrigger>
+												<TabsTrigger
+													value="FEMALE"
+													className="flex-1 border border-border h-9"
+													disabled={isPending || readOnly}
+												>
+													أنثى
+												</TabsTrigger>
+											</TabsList>
+										</Tabs>
+										<FieldError errors={[errors.gender]} />
 									</Field>
 								)}
 							/>

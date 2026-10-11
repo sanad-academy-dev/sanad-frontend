@@ -1,9 +1,10 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Stats } from "@/components/common/stats";
 import { PatientsTable } from "@/features/services/patients/patients-table";
+import { usePatients } from "@/features/services/patients/hooks/use-patients";
+import { usePatientStats } from "@/features/services/patients/hooks/use-patient-stats";
 import { getSession } from "@/functions/get-session";
 import { PERMISSIONS } from "@/lib/permissions";
-import { ANIMALS_STATS } from "../management/settings/animals";
 
 export const Route = createFileRoute("/_pathless-layout/services/patients")({
 	component: RouteComponent,
@@ -20,11 +21,14 @@ export const Route = createFileRoute("/_pathless-layout/services/patients")({
 });
 
 function RouteComponent() {
+	const { patients } = usePatients();
+	const stats = usePatientStats(patients);
+
 	return (
 		<div className="flex flex-1 flex-col">
 			<Stats
 				className="px-4"
-				stats={ANIMALS_STATS}
+				stats={stats}
 			/>
 			<PatientsTable />
 		</div>

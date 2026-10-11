@@ -143,12 +143,7 @@ export function SettingsSidebar(props: React.ComponentProps<typeof Sidebar>) {
 						icon: <IconCalendar className="size-[14px]" />,
 						isActive: isActive("/management/settings/scheduling"),
 					},
-					{
-						title: "السلالات",
-						url: "/management/settings/animals",
-						icon: <IconPaw className="size-[14px]" />,
-						isActive: isActive("/management/settings/animals"),
-					},
+
 					{
 						title: t("settings.sidebar.items.drugStandards"),
 						url: "/management/settings/drug-standards",

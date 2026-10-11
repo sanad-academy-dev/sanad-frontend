@@ -113,16 +113,17 @@ const SlotChip = ({
 		);
 	}
 
-	// فراغ تاريخ/وقت: حقل datetime أصلي — كان يسقط لقائمة اختيار فارغة ("لا توجد نتائج")
-	// القيمة المحلية (بتوقيت الأكاديمية) تمرّ في resolved_fields ويثبّتها الخادم على +03
+	// فراغ تاريخ/وقت: حقل date أصلي لمثل تاريخ الميلاد أو datetime-local للمواعيد
+	// القيمة تمرّ في resolved_fields
 	if (segment.kind === "date") {
+		const isDateOnly = segment.field === "birthDate" || segment.field.toLowerCase().includes("birth");
 		return (
 			<input
-				type="datetime-local"
+				type={isDateOnly ? "date" : "datetime-local"}
 				value={value?.value ?? ""}
 				onChange={(e) => {
-					const v = e.target.value; // "2026-07-22T10:00"
-					const label = v ? v.replace("T", " الساعة ") : "";
+					const v = e.target.value;
+					const label = !isDateOnly && v ? v.replace("T", " الساعة ") : v;
 					onSet(v, label);
 				}}
 				dir="ltr"
