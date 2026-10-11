@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Clock, Video, Globe, ChevronRight, ChevronLeft } from "lucide-react";
+import { Clock, Video, ChevronRight, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 

@@ -1,26 +1,17 @@
 import Image from "next/image";
 
 import Hero from "@/components/hero";
-import StatsCard from "@/components/stats-card";
 import BrandMarquee from "@/components/brand-marquee";
 import CourseCategories from "@/components/course-categories";
-// import FeaturedCourses from "@/components/featured-courses";
 import LearningPaths from "@/components/learning-paths";
 import Pricing from "@/components/pricing";
 import Faq from "@/components/faq";
 import CtaBanner from "@/components/cta-banner";
-import { getCourses, getCategories } from "@/lib/courses";
 import Levels from "@/components/levels";
 import JourneyChild from "@/components/journey-child";
-import TestimonialsSection from "@/components/testimonials";
 import WhySanad from "@/components/why-sanad";
-import Support from "@/app/contact/components/support";
+
 export default async function Home() {
-  // المحتوى يُجلب ديناميكياً من داشبورد سند
-  const [{ courses }, { categories }] = await Promise.all([
-    getCourses(),
-    getCategories(),
-  ]);
 
   return (
     <main>

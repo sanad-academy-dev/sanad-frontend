@@ -210,46 +210,6 @@ function Row({
   );
 }
 
-function Struck({
-  show,
-  reduceMotion,
-  children,
-}: {
-  show: boolean;
-  reduceMotion: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <AnimatePresence initial={false}>
-      {show && (
-        <motion.s
-          initial={{ opacity: 0, filter: "blur(4px)" }}
-          animate={{ opacity: 1, filter: "blur(0px)" }}
-          exit={{
-            opacity: 0,
-            filter: "blur(2px)",
-            transition: { duration: 0.15 },
-          }}
-          transition={{ duration: reduceMotion ? 0 : 0.2, ease: EASE_OUT }}
-          className="relative text-[15px] text-muted-foreground tabular-nums no-underline"
-        >
-          {children}
-          <motion.span
-            aria-hidden
-            className="absolute inset-x-[-2px] top-1/2 h-[1.5px] origin-left bg-muted-foreground"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{
-              duration: reduceMotion ? 0 : 0.3,
-              delay: reduceMotion ? 0 : 0.08,
-              ease: EASE_OUT,
-            }}
-          />
-        </motion.s>
-      )}
-    </AnimatePresence>
-  );
-}
 
 function RollingMoney({
   value,
@@ -350,54 +310,6 @@ function Glyph({
   );
 }
 
-function PlanBadge({
-  plan,
-  rank,
-  reduceMotion,
-}: {
-  plan: Plan;
-  rank: number;
-  reduceMotion: boolean;
-}) {
-  return (
-    <motion.span
-      layout={!reduceMotion}
-      transition={{ type: "spring", duration: 0.35, bounce: 0.15 }}
-      className={cn(
-        "relative inline-flex h-9 items-center gap-1.5 overflow-hidden rounded-full px-4 text-[14px] font-medium transition-[background-color,color,box-shadow] duration-300 ease-out",
-        rank <= 1 && "bg-secondary text-foreground",
-        rank > 1 && rank <= 3 &&
-          "bg-background text-foreground shadow-[inset_0_0_0_1px_var(--foreground)]",
-        rank > 3 && "bg-primary text-primary-foreground",
-      )}
-    >
-      <motion.span
-        layout={reduceMotion ? false : "position"}
-        className="text-[12px] opacity-70"
-      >
-        الباقة:
-      </motion.span>
-      <AnimatePresence initial={false} mode="popLayout">
-        <motion.span
-          key={plan.name}
-          layout={reduceMotion ? false : "position"}
-          initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          exit={{
-            opacity: 0,
-            y: -6,
-            filter: "blur(2px)",
-            transition: { duration: 0.15 },
-          }}
-          transition={{ duration: reduceMotion ? 0 : 0.25, ease: EASE_OUT }}
-        >
-          {plan.name}
-        </motion.span>
-      </AnimatePresence>
-    </motion.span>
-  );
-}
-
 function LevelSlider({
   value,
   min,
@@ -418,9 +330,10 @@ function LevelSlider({
   const fill = useSpring(at(value), { visualDuration: 0.2, bounce: 0 });
   
   useEffect(() => {
-    if (reduceMotion) fill.jump(at(value));
-    else fill.set(at(value));
-  }, [value, reduceMotion, fill]);
+    const target = (value - min) / (max - min);
+    if (reduceMotion) fill.jump(target);
+    else fill.set(target);
+  }, [value, min, max, reduceMotion, fill]);
 
   const scaleX = fill;
   const right = useTransform(fill, (f) => `calc(${f * 100}% - ${f * 20}px)`);

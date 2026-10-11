@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { CheckCircle2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { cn } from "@/lib/utils";
 import Container from "./container";
 import { MultiStepForm } from "./multi-step-form";
 import { Button } from "@/components/ui/button";

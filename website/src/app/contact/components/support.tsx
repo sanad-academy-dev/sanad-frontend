@@ -8,6 +8,7 @@ import { SectionHeader } from "@/components/ui/header";
 import { MultiStepForm } from "../../../components/multi-step-form";
 import { Button } from "@/components/ui/button";
 import { PopupContact } from "./popup-contact";
+import { cn } from "@/lib/utils";
 
 type SupportCard = {
   title: string;
@@ -85,7 +86,7 @@ export default function Support({ withBorder = true }: { withBorder?: boolean } 
           className="text-center items-center"
         />
 
-        <div className="w-full rounded-3xl border border-border bg-card overflow-hidden shadow-sm" dir="rtl">
+        <div className={cn("w-full rounded-3xl bg-card overflow-hidden shadow-sm", withBorder && "border border-border")} dir="rtl">
           {/* Top Banner */}
           <div className="flex flex-col md:flex-row md:items-end justify-between p-8 md:p-12 border-b border-border gap-8">
             <div className="flex flex-col items-start gap-4 max-w-2xl">

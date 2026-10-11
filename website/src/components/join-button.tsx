@@ -2,11 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { ArrowLeft, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
+import type { VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { MultiStepForm } from "@/components/multi-step-form";
+
+type ButtonVariantProps = VariantProps<typeof buttonVariants>;
 
 export function JoinButton({ 
   className, 
@@ -16,8 +19,8 @@ export function JoinButton({
 }: { 
   className?: string;
   children?: React.ReactNode;
-  variant?: any;
-  size?: any;
+  variant?: ButtonVariantProps["variant"];
+  size?: ButtonVariantProps["size"];
 }) {
   const [open, setOpen] = useState(false);
 

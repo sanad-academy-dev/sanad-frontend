@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Calendar as CalendarIcon, MessageSquare, Clock, Video, Globe, ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { X, Calendar as CalendarIcon, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MessageForm } from "./message";
 import { Call } from "./call";

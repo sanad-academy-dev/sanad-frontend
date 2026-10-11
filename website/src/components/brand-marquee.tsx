@@ -21,18 +21,18 @@ export default function BrandMarquee() {
             fade={false}
             className="text-lg text-muted-foreground font-bold"
             items={[
-              { name: "", icon: <Image src="/assets/marquee-1.jpeg" alt="شريك 1" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
-              { name: "", icon: <Image src="/assets/marquee-2.jpeg" alt="شريك 2" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
-              { name: "", icon: <Image src="/assets/marquee-3.jpeg" alt="شريك 3" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
-              { name: "", icon: <Image src="/assets/marquee-1.jpeg" alt="شريك 1" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
-              { name: "", icon: <Image src="/assets/marquee-2.jpeg" alt="شريك 2" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
-              { name: "", icon: <Image src="/assets/marquee-3.jpeg" alt="شريك 3" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
-              { name: "", icon: <Image src="/assets/marquee-1.jpeg" alt="شريك 1" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
-              { name: "", icon: <Image src="/assets/marquee-2.jpeg" alt="شريك 2" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
-              { name: "", icon: <Image src="/assets/marquee-3.jpeg" alt="شريك 3" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
-              { name: "", icon: <Image src="/assets/marquee-1.jpeg" alt="شريك 1" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
-              { name: "", icon: <Image src="/assets/marquee-2.jpeg" alt="شريك 2" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
-              { name: "", icon: <Image src="/assets/marquee-3.jpeg" alt="شريك 3" width={100} height={40} className="object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-1.jpeg" alt="شريك 1" width={100} height={40} className="h-10 w-[100px] object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-2.jpeg" alt="شريك 2" width={100} height={40} className="h-10 w-[100px] object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-3.jpeg" alt="شريك 3" width={100} height={40} className="h-10 w-[100px] object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-1.jpeg" alt="شريك 1" width={100} height={40} className="h-10 w-[100px] object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-2.jpeg" alt="شريك 2" width={100} height={40} className="h-10 w-[100px] object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-3.jpeg" alt="شريك 3" width={100} height={40} className="h-10 w-[100px] object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-1.jpeg" alt="شريك 1" width={100} height={40} className="h-10 w-[100px] object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-2.jpeg" alt="شريك 2" width={100} height={40} className="h-10 w-[100px] object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-3.jpeg" alt="شريك 3" width={100} height={40} className="h-10 w-[100px] object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-1.jpeg" alt="شريك 1" width={100} height={40} className="h-10 w-[100px] object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-2.jpeg" alt="شريك 2" width={100} height={40} className="h-10 w-[100px] object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
+              { name: "", icon: <Image src="/assets/marquee-3.jpeg" alt="شريك 3" width={100} height={40} className="h-10 w-[100px] object-contain grayscale hover:grayscale-0 transition-all opacity-70 hover:opacity-100" /> },
             ]}
           />
         </div>

@@ -1,12 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { animate, motion, useMotionValue, useTransform, useReducedMotion } from "framer-motion";
-import { Headset } from "lucide-react";
+import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { FaWhatsapp } from "react-icons/fa";
 import { cn } from "@/lib/utils";
 import Container from "@/components/container";
 import { SectionHeader } from "@/components/ui/header";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 
 export type SpineItem = { id: string; label: string };
 

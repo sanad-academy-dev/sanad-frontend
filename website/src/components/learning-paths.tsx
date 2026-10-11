@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { ArrowLeft, Gamepad2, Code2, Globe, Cpu, Sparkles } from "lucide-react";
 import {
   motion,
@@ -11,7 +11,6 @@ import {
 } from "framer-motion";
 
 import Container from "@/components/container";
-import Link from "next/link";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
 import { JoinButton } from "@/components/join-button";
@@ -209,15 +208,6 @@ export type LearningPathData = {
   icon: React.ElementType;
 };
 
-const TABS = [
-  "البرمجة",
-  "التصميم",
-  "الذكاء الاصطناعي",
-  "الأمن السيبراني",
-  "علوم البيانات",
-  "التسويق",
-  "تطوير مواقع الويب",
-];
 
 const PATHS: LearningPathData[] = [
   {
@@ -381,10 +371,19 @@ function LearningPathCard({ path }: { path: LearningPathData }) {
 
 const INTERVAL = 3000;
 const SCROLL_QUIET = 200;
+const subscribeToHydration = () => () => {};
+const getHydratedSnapshot = () => true;
+const getServerHydrationSnapshot = () => false;
 
 export default function LearningPaths() {
   const courses = PATHS;
-  const reduceMotion = useReducedMotion();
+  const systemReduceMotion = useReducedMotion();
+  const hydrated = useSyncExternalStore(
+    subscribeToHydration,
+    getHydratedSnapshot,
+    getServerHydrationSnapshot,
+  );
+  const reduceMotion = hydrated && (systemReduceMotion ?? false);
   const scrollerRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
   const regionRef = useRef<HTMLElement>(null);
@@ -510,35 +509,6 @@ export default function LearningPaths() {
             className="items-center"
           />
 
-            {/* شريط الفلترة */}
-          {/* <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex w-full md:w-auto">
-              <div className="inline-flex max-w-full items-center gap-1 overflow-x-auto border border-border p-1 [scrollbar-width:none]">
-                {TABS.map((tab, i) => (
-                  <Fragment key={tab}>
-                    {i > 0 && (
-                      <span
-                        aria-hidden
-                        className="h-[34px] w-px shrink-0 bg-border"
-                      />
-                    )}
-                    <button
-                      type="button"
-                      className={`cursor-pointer shrink-0 whitespace-nowrap px-4 py-2 text-sm font-medium transition-colors ${
-                        i === 0
-                          ? "bg-primary text-primary-foreground"
-                          : "text-foreground hover:bg-muted"
-                      }`}
-                    >
-                      {tab}
-                    </button>
-                  </Fragment>
-                ))}
-              </div>
-            </div> 
-
-
-            </div>*/}
           
           </div>
 

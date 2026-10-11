@@ -232,7 +232,7 @@ export default function JourneyChild() {
                   
                   {/* Right/Left Card (Desktop) */}
                   <div className={`hidden md:flex w-full ${isEven ? 'justify-start' : 'justify-end'}`}>
-                    <StationCard station={station} isActive={isActive} isEven={isEven} className="shrink-0" />
+                    <StationCard station={station} isActive={isActive} className="shrink-0" />
                   </div>
 
                   {/* Shared Node */}
@@ -253,7 +253,7 @@ export default function JourneyChild() {
 
                   {/* Card (Mobile) */}
                   <div className="flex md:hidden col-start-2 items-center ps-2">
-                    <StationCard station={station} isActive={isActive} isEven={true} />
+                    <StationCard station={station} isActive={isActive} />
                   </div>
                 </div>
               );
@@ -306,7 +306,9 @@ export default function JourneyChild() {
   );
 }
 
-function StationCard({ station, isActive, isEven, className }: { station: any, isActive: boolean, isEven: boolean, className?: string }) {
+type Station = (typeof stations)[number];
+
+function StationCard({ station, isActive, className }: { station: Station; isActive: boolean; className?: string }) {
   return (
     <div className={`p-6 w-full max-w-[360px] transition-all duration-500 relative overflow-hidden border text-right ${isActive ? 'bg-primary/5 border-primary/30 shadow-lg shadow-primary/5' : 'bg-muted/30 border-border hover:border-primary/50'} ${className ?? ''}`} style={{ borderRadius: 'var(--radius)' }}>
       <div className="flex items-start gap-4">

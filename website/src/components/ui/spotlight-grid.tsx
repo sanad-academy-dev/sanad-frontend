@@ -11,10 +11,8 @@ export type Feature = {
 
 function FeatureCard({
   feature,
-  index,
 }: {
   feature: Feature;
-  index: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [isLit, setIsLit] = useState(false);
@@ -86,8 +84,8 @@ export function SpotlightGrid({ features }: { features: Feature[] }) {
       dir="rtl"
       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
     >
-      {features.map((feature, i) => (
-        <FeatureCard key={feature.title} feature={feature} index={i} />
+      {features.map((feature) => (
+        <FeatureCard key={feature.title} feature={feature} />
       ))}
     </div>
   );

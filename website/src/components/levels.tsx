@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Container from './container';
 import { SectionHeader } from "@/components/ui/header";
-import { Compass, Brain, Code2, Layers, Sparkles, TrendingUp, Check, Target, ChevronLeft } from 'lucide-react';
+import { Compass, Brain, Code2, Layers, Sparkles, TrendingUp, Check } from 'lucide-react';
 
 const stages = [
   {

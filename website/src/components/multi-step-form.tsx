@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useLayoutEffect, useRef, useState, useEffect } from "react";
+import { useLayoutEffect, useRef, useState, useEffect } from "react";
 import {
   AnimatePresence,
   animate,
@@ -12,7 +12,7 @@ import {
 } from "framer-motion";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
-import { Compass, Users, Gamepad2, Calendar, BookOpen, X, ChevronRight, ChevronLeft, Check, ArrowLeft, Clock, User, Mail, Smile, Plus, ArrowRight, ChevronDown, Pencil, Bookmark, Share2 } from "lucide-react";
+import { Compass, Users, Gamepad2, Calendar, BookOpen, X, ChevronRight, ChevronLeft, ArrowLeft, Clock, User, Mail, Smile, Plus, ArrowRight, ChevronDown, Pencil, Bookmark } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Panel = -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18;
@@ -54,7 +54,6 @@ export function MultiStepForm({
   onClose?: () => void;
 }) {
   const reduceMotion = useReducedMotion();
-  const uid = useId();
   const [panel, setPanel] = useState<Panel>(-1);
   const [direction, setDirection] = useState<1 | -1>(1);
   

@@ -1,14 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
-
-const REDUCE = "(prefers-reduced-motion: reduce)";
-const subscribeReduce = (onChange: () => void) => {
-  const query = window.matchMedia(REDUCE);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
-};
 
 // The markup differs with reduced motion (one copy or two, dimmed or not),
 // so hydration renders the server's answer first and switches right after,

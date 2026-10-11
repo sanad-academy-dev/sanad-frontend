@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, useId } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import {  ChevronDown, Languages, Menu, X,  Sparkles } from "lucide-react";
+import {  ChevronDown, Menu, X,  Sparkles } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -113,15 +113,15 @@ type Size = { w: number; h: number };
 type Active = { index: number; center: number };
 
 function SectionLinks({
-  children,
+  items,
   onNavigate,
 }: {
-  children: { label: string; href: string; badge?: string }[];
+  items: { label: string; href: string; badge?: string }[];
   onNavigate?: () => void;
 }) {
   return (
     <ul className="grid gap-1 p-2 min-w-44">
-      {children.map((child) => (
+      {items.map((child) => (
         <li key={child.label}>
           <Link
             href={child.href}
@@ -147,7 +147,7 @@ function DesktopNav({
   isActive,
 }: {
   links: NavLink[];
-  t: any;
+  t: (typeof THEME)[Variant];
   isActive: (href: string) => boolean;
 }) {
   const navRef = useRef<HTMLElement>(null);
@@ -360,7 +360,7 @@ function DesktopNav({
                   style={{ width }}
                 >
                   <SectionLinks 
-                    children={links[active.index]?.children || []} 
+                    items={links[active.index]?.children || []} 
                     onNavigate={() => close()} 
                   />
                 </motion.div>
@@ -381,27 +381,12 @@ function DesktopNav({
               }}
               className="absolute top-0 left-0 w-max max-w-full"
             >
-              <SectionLinks children={link.children} />
+              <SectionLinks items={link.children} />
             </div>
           );
         })}
       </div>
     </nav>
-  );
-}
-
-function LanguageToggle({ className }: { className?: string }) {
-  return (
-    <button
-      type="button"
-      aria-label="تبديل اللغة"
-      className={cn(
-        "flex size-6 items-center justify-center transition-opacity hover:opacity-70",
-        className,
-      )}
-    >
-      <Languages className="size-5" />
-    </button>
   );
 }
 
