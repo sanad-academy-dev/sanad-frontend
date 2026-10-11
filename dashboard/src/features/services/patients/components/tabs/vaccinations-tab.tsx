@@ -91,8 +91,6 @@ export function VaccinationsTab({ patientId }: PatientTabProps) {
 									name: patient?.name ?? "",
 									code: patient?.code ?? "",
 									birthDate: status?.birthDate,
-									animalTypeName: patient?.animalType?.arName,
-									animalStrainName: patient?.animalStrain?.arName,
 									ownerName: patient?.owner?.name,
 									ownerPhone: patient?.owner?.phone,
 								},

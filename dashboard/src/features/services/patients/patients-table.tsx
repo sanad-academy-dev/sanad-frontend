@@ -75,13 +75,6 @@ export function PatientsTable() {
 				),
 			},
 			{
-				accessorKey: "animalType",
-				header: "النوع",
-				cell: ({ row }) => (
-					<span className="text-sm">{row.original.animalType?.arName ?? "—"}</span>
-				),
-			},
-			{
 				accessorKey: "owner",
 				header: "وليّ الأمر",
 				cell: ({ row }) => {

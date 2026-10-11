@@ -156,10 +156,7 @@ function CrmLeadPage() {
 							label="المصدر"
 							value={lead.source?.name}
 						/>
-						<Detail
-							label="نوع الطفل"
-							value={lead.petSpecies}
-						/>
+
 						<Detail
 							label="عدد الأطفال"
 							value={

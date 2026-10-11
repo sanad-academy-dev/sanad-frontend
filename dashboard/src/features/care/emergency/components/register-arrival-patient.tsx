@@ -12,7 +12,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { useRegisterArrivalPatient } from "@/features/care/emergency/hooks/use-emergency";
-import { useAnimalTypes } from "@/features/settings/animals/hooks/use-animal-types";
+
 import { Gender } from "@/generated/prisma/enums";
 import { useI18n } from "@/hooks/use-i18n";
 
@@ -57,17 +57,17 @@ export const RegisterArrivalPatient = ({
 }) => {
 	const { isRtl } = useI18n();
 	const dir = isRtl ? "rtl" : "ltr";
-	const { animalTypes, isLoading: typesLoading } = useAnimalTypes();
+
 	const { registerPatient, isPending } = useRegisterArrivalPatient();
 
 	const [name, setName] = useState(provisionalLabel?.trim() ?? "");
 	const [gender, setGender] = useState<Gender | "">("");
-	const [animalTypeId, setAnimalTypeId] = useState("");
+
 	const [birthDate, setBirthDate] = useState("");
 	const [weight, setWeight] = useState("");
 
 	const canSubmit =
-		!isPending && name.trim().length > 0 && gender !== "" && !!animalTypeId && !!birthDate;
+		!isPending && name.trim().length > 0 && gender !== "" && !!birthDate;
 
 	const submit = async () => {
 		if (!canSubmit) return;
@@ -75,7 +75,7 @@ export const RegisterArrivalPatient = ({
 			arrivalId,
 			name: name.trim(),
 			gender: gender as Gender,
-			animalTypeId,
+
 			birthDate,
 			weight: weight.trim() ? Number(weight) : null,
 		});
@@ -104,32 +104,7 @@ export const RegisterArrivalPatient = ({
 					/>
 				</div>
 
-				<div className="flex flex-col gap-2">
-					<Label>النوع</Label>
-					<Select
-						value={animalTypeId}
-						onValueChange={setAnimalTypeId}
-						disabled={isPending || typesLoading}
-					>
-						<SelectTrigger>
-							<SelectValue placeholder="اختر النوع" />
-						</SelectTrigger>
-						{/* popper إلزامي: الافتراضي يُعرض خارج الشاشة في RTL */}
-						<SelectContent
-							position="popper"
-							dir={dir}
-						>
-							{animalTypes.map((t) => (
-								<SelectItem
-									key={t.id}
-									value={t.id}
-								>
-									{t.arName}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</div>
+
 
 				<div className="flex flex-col gap-2">
 					<Label>الجنس</Label>

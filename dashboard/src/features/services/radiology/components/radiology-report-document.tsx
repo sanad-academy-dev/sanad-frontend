@@ -97,10 +97,7 @@ export function RadiologyReportDocument({
 					label="وليّ الأمر"
 					value={order.owner?.name ?? "—"}
 				/>
-				<Row
-					label="النوع"
-					value={patient.animalType?.arName ?? "—"}
-				/>
+
 				<Row
 					label="الفحص"
 					value={item.service.name}

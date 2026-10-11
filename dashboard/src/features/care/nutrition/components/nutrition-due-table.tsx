@@ -86,7 +86,7 @@ export function NutritionDueTable({
 					<div className="flex min-w-0 flex-col">
 						<span className="truncate font-medium">{row.original.patientName}</span>
 						<span className="truncate text-xs tabular-nums text-muted-foreground">
-							{row.original.patientCode} · {row.original.animalTypeName}
+							{row.original.patientCode}
 						</span>
 					</div>
 				),

@@ -54,8 +54,6 @@ import {
 } from "@/features/finance/care-plans/data/care-plans";
 import { useCarePlan } from "@/features/finance/care-plans/hooks/use-care-plan";
 import { useCarePlanMutations } from "@/features/finance/care-plans/hooks/use-care-plan-mutations";
-import { useAnimalStrains } from "@/features/settings/animals/hooks/use-animal-strains";
-import { useAnimalTypes } from "@/features/settings/animals/hooks/use-animal-types";
 import { cn } from "@/lib/utils";
 import type { CarePlanListItemResponse } from "@/server/care-plans/care-plans.type";
 
@@ -282,17 +280,11 @@ export function CreateCarePlanSheet({
 	const navigate = useNavigate();
 	const { services, accordionGroups, isLoading: servicesLoading } = useServicesForPicker();
 	const selectedService = services.find((s) => s.id === values.serviceId);
-	const { animalTypes, isLoading: typesLoading } = useAnimalTypes();
-	const { strains, isLoading: strainsLoading } = useAnimalStrains();
 	const { create, update, isCreating, isUpdating } = useCarePlanMutations();
 	const { plan: planDetail, isLoading: isLoadingDetail } = useCarePlan(
 		isEditing ? plan.id : undefined,
 	);
 	const isSaving = isCreating || isUpdating;
-
-	const filteredStrains = values.animalTypeId
-		? strains.filter((s) => s.animalTypeId === values.animalTypeId)
-		: strains;
 
 	useEffect(() => {
 		if (!open) return;
@@ -659,68 +651,7 @@ export function CreateCarePlanSheet({
 								</Popover>
 							</Field>
 
-							<div className="grid grid-cols-2 gap-3">
-								<Field>
-									<Label className="justify-start gap-1.5">
-										نوع الطفل المستفيد
-										<RequiredMark />
-									</Label>
-									<Select
-										value={values.animalTypeId}
-										onValueChange={(v) => {
-											setField("animalTypeId", v);
-											if (values.animalStrainId) setField("animalStrainId", undefined);
-										}}
-										disabled={typesLoading || readOnly}
-										dir="rtl"
-									>
-										<SelectTrigger className="w-full">
-											<SelectValue placeholder="اختر..." />
-										</SelectTrigger>
-										<SelectContent dir="rtl">
-											{animalTypes.map((type) => (
-												<SelectItem
-													key={type.id}
-													value={type.id}
-													className="text-right"
-												>
-													{type.arName}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-								</Field>
 
-								<Field>
-									<Label className="justify-start gap-1.5">
-										السلالة المستفيد
-										<RequiredMark />
-									</Label>
-									<Select
-										value={values.animalStrainId}
-										onValueChange={(v) => setField("animalStrainId", v)}
-										disabled={!values.animalTypeId || strainsLoading || readOnly}
-										dir="rtl"
-									>
-										<SelectTrigger className="w-full">
-											<SelectValue
-												placeholder={values.animalTypeId ? "اختر..." : "اختر النوع أولاً"}
-											/>
-										</SelectTrigger>
-										<SelectContent dir="rtl">
-											{filteredStrains.map((strain) => (
-												<SelectItem
-													key={strain.id}
-													value={strain.id}
-													className="text-right"
-												>
-													{strain.arName}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-								</Field>
-							</div>
 
 							<Field>
 								<div

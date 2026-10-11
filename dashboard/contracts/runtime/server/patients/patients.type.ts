@@ -8,9 +8,9 @@ export type { Gender };
 
 export const createPatientSchema = z.object({
 	name: z.string({ error: "اسم الطفل مطلوب" }).min(1, "اسم الطفل مطلوب"),
-	gender: z.enum(Gender, { error: "الجنس مطلوب" }),
-	animalTypeId: z.string({ error: "نوع الطفل مطلوب" }).min(1, "نوع الطفل مطلوب"),
-	animalStrainId: z.string().optional(),
+	gender: z.enum(["MALE", "FEMALE", "UNKNOWN"], { error: "الجنس مطلوب" }),
+	// المرضى بشر: نوع الحيوان والسلالة غير مطلوبة — الحقول تبقى في القاعدة
+	// للتوافق مع وحدات التطعيم والحجوزات، لكنها لا تُطلب عند إنشاء مريض.
 	ownerId: z.string({ error: "وليّ الأمر مطلوب" }).min(1, "وليّ الأمر مطلوب"),
 	age: z.coerce
 		.number({ error: "العمر يجب أن يكون رقمًا" })
@@ -44,9 +44,7 @@ export type CreatePatientInput = Pick<
 	| "clinicId"
 	| "name"
 	| "gender"
-	| "animalTypeId"
 	| "ownerId"
-	| "animalStrainId"
 	| "age"
 	| "birthDate"
 	| "weight"
@@ -71,8 +69,6 @@ export type PatientResponse = Prisma.PatientGetPayload<{
 		createdAt: true;
 		updatedAt: true;
 		owner: { select: { id: true; code: true; name: true; phone: true; email: true } };
-		animalType: { select: { id: true; arName: true; enName: true } };
-		animalStrain: { select: { id: true; arName: true; enName: true } };
 	};
 }>;
 

@@ -1,4 +1,4 @@
-import { IconChevronLeft, IconClock } from "@tabler/icons-react";
+import { IconChevronLeft, IconClock, IconUser } from "@tabler/icons-react";
 import type { SVGProps } from "react";
 
 import { CardContent } from "@/components/ui/card";
@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BaseDashboardCard } from "@/features/dashboard/components/base-dashboard-card";
 import { useUpcomingAppointments } from "@/features/dashboard/hooks/use-upcoming-appointments";
 import type { DashboardCardProps } from "@/features/dashboard/types/dashboard-card.types";
-import { getAnimalIcon } from "@/features/services/owners/utils/animal-icon";
+
 import type { AppointmentStatus } from "@/generated/prisma/enums";
 import { useI18n } from "@/hooks/use-i18n";
 import { getDateFormatter } from "@/lib/locale-format";
@@ -78,7 +78,7 @@ export function UpcomingAppointmentsCard({ expanded, onToggleExpanded }: Dashboa
 							const start = new Date(appt.startsAt);
 							const end = new Date(start.getTime() + appt.durationMinutes * 60 * 1000);
 							const serviceName = appt.services[0]?.service.name;
-							const AnimalIcon = getAnimalIcon(appt.patient?.animalType?.enName ?? null);
+							const AnimalIcon = IconUser;
 
 							return (
 								<div

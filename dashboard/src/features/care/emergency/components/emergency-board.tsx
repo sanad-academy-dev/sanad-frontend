@@ -85,7 +85,7 @@ export type BoardRow = {
 		id: string;
 		name: string;
 		code: string;
-		animalType: { arName: string } | null;
+
 		alerts: { id: string; kind: string; label: string; severity: string }[];
 	} | null;
 	owner: { id: string; name: string; phone: string } | null;
@@ -339,11 +339,7 @@ const BoardCard = ({
 				<div className="flex items-center gap-2">
 					<IconPaw className="size-4 shrink-0 text-muted-foreground" />
 					<span className="font-medium text-sm">{row.patient?.name ?? "غير مسجَّل"}</span>
-					{row.patient?.animalType?.arName ? (
-						<span className="text-muted-foreground text-xs">
-							{row.patient.animalType.arName}
-						</span>
-					) : null}
+
 					{row.triageCategory ? <TriageBadge category={row.triageCategory} /> : null}
 					{att != null ? (
 						<Badge

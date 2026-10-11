@@ -14,7 +14,7 @@ export type BookingDraftFields = {
 	ownerPhone: string;
 	ownerEmail: string;
 	patientName: string;
-	patientAnimalTypeId: string;
+	patientGender: string;
 };
 
 type BookingDraftStore = BookingDraftFields & {
@@ -34,7 +34,7 @@ const defaults: BookingDraftFields = {
 	ownerPhone: "",
 	ownerEmail: "",
 	patientName: "",
-	patientAnimalTypeId: "",
+	patientGender: "",
 };
 
 const stores = new Map<string, ReturnType<typeof createDraftStore>>();

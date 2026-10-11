@@ -26,9 +26,6 @@ export type CertificatePatient = {
 	name: string;
 	code: string;
 	birthDate?: Date | string | null;
-	gender?: string | null;
-	animalTypeName?: string | null;
-	animalStrainName?: string | null;
 	ownerName?: string | null;
 	ownerPhone?: string | null;
 };
@@ -140,7 +137,6 @@ export function printVaccinationCertificate({
 <table class="kv">
 	${row("اسم الطفل", patient.name)}
 	${row("رقم الملف", patient.code)}
-	${row("النوع / السلالة", [patient.animalTypeName, patient.animalStrainName].filter(Boolean).join(" — ") || "—")}
 	${row("تاريخ الميلاد", day(patient.birthDate))}
 	${row("وليّ الأمر", [patient.ownerName, patient.ownerPhone].filter(Boolean).join(" — ") || "—")}
 </table>

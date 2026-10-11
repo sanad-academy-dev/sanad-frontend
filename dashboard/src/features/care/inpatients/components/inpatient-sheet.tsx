@@ -378,7 +378,7 @@ type StayDetail = {
 	dischargeSummaryAr: string | null;
 	dischargeInstructionsAr: string | null;
 	dailyRateSnapshot: string | number | null;
-	patient: { id: string; name: string; code: string; animalType: { arName: string } };
+	patient: { id: string; name: string; code: string };
 	owner: { id: string; name: string; phone: string };
 	attendingStaff: { id: string; name: string };
 	cageAssignments: { cage: { id: string; name: string; room: { name: string } } }[];

@@ -18,8 +18,6 @@ import {
 } from "@/features/services/patients/hooks/use-autosave-patient";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import type { PatientTabProps } from "@/features/services/patients/types/tabs.types";
-import { useAnimalStrains } from "@/features/settings/animals/hooks/use-animal-strains";
-import { useAnimalTypes } from "@/features/settings/animals/hooks/use-animal-types";
 import { cn } from "@/lib/utils";
 import type { PatientResponse } from "@/server/patients/patients.type";
 
@@ -254,12 +252,6 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 	const { patients: allPatients, isLoading: isLoadingPatients } = usePatients();
 	const patient: PatientResponse | undefined = allPatients.find((p) => p.id === patientId);
 	const { autosave } = useAutosavePatient(patientId);
-	const { animalTypes } = useAnimalTypes();
-	const { strains } = useAnimalStrains();
-
-	const filteredStrains = patient?.animalType?.id
-		? strains.filter((s) => s.animalTypeId === patient.animalType?.id)
-		: [];
 
 	function patch(data: PatientAutosaveInput) {
 		autosave(data);
@@ -339,87 +331,6 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 			<div className="flex flex-col gap-3">
 				<p className="font-bold text-base">نظرة عامة</p>
 				<div className="grid grid-cols-2 gap-3">
-					<InfoField
-						label="نوع الطفل"
-						icon={<IconPaw className="size-3.5" />}
-					>
-						<Select
-							value={patient.animalType?.id ?? undefined}
-							onValueChange={(value) => patch({ animalTypeId: value })}
-							dir="rtl"
-						>
-							<SelectTrigger
-								size="sm"
-								className="h-7 border-0 bg-transparent px-0 shadow-none hover:bg-muted/60 focus:ring-0 font-medium"
-							>
-								<SelectValue placeholder="—" />
-							</SelectTrigger>
-							<SelectContent>
-								{animalTypes.map((type) => (
-									<SelectItem
-										key={type.id}
-										value={type.id}
-									>
-										{type.arName}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</InfoField>
-
-					<InfoField
-						label="السلالة"
-						icon={<IconPaw className="size-3.5" />}
-					>
-						<Select
-							value={patient.animalStrain?.id ?? undefined}
-							onValueChange={(value) => patch({ animalStrainId: value })}
-							disabled={!patient.animalType?.id}
-							dir="rtl"
-						>
-							<SelectTrigger
-								size="sm"
-								className="h-7 border-0 bg-transparent px-0 shadow-none hover:bg-muted/60 focus:ring-0 font-medium"
-							>
-								<SelectValue placeholder="—" />
-							</SelectTrigger>
-							<SelectContent>
-								{filteredStrains.map((strain) => (
-									<SelectItem
-										key={strain.id}
-										value={strain.id}
-									>
-										{strain.arName}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</InfoField>
-
-					<InfoField
-						label="الجنس"
-						icon={<IconPaw className="size-3.5" />}
-					>
-						<Select
-							value={patient.gender ?? undefined}
-							onValueChange={(value) =>
-								patch({ gender: value as PatientAutosaveInput["gender"] })
-							}
-							dir="rtl"
-						>
-							<SelectTrigger
-								size="sm"
-								className="h-7 border-0 bg-transparent px-0 shadow-none hover:bg-muted/60 focus:ring-0 font-medium"
-							>
-								<SelectValue placeholder="—" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="MALE">ذكر</SelectItem>
-								<SelectItem value="FEMALE">أنثى</SelectItem>
-							</SelectContent>
-						</Select>
-					</InfoField>
-
 					<InfoField
 						label="العمر (سنوات)"
 						icon={<IconScale className="size-3.5" />}

@@ -36,18 +36,17 @@ export const useAppointmentNotes = (appointmentId: string, enabled = true) => {
 /** القالب المُقترح لهذه الشكوى ونوع الطفل — يسقط إلى GENERAL_V1 */
 export const useResolvedTemplate = (
 	complaint: string | null,
-	animalTypeId: string | null,
 	consultationTypeId: string | null,
 	enabled = true,
 ) => {
 	const { data, isLoading } = useQuery<ExamTemplateResponse | null>({
-		queryKey: ["exam-templates", "resolve", complaint, animalTypeId, consultationTypeId],
+		queryKey: ["exam-templates", "resolve", complaint, consultationTypeId],
 		enabled,
 		queryFn: async () => {
 			const res = await api["exam-templates"].resolve.get({
 				query: {
 					...(complaint ? { complaint } : {}),
-					...(animalTypeId ? { animalTypeId } : {}),
+
 					...(consultationTypeId ? { consultationTypeId } : {}),
 				},
 			});

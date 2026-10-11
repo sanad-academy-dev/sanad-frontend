@@ -2,18 +2,16 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/lib/api";
-import type { CreatePatientFormInput, PatientResponse } from "@/server/patients/patients.type";
+import type { CreatePatientFormInput, PatientResponse } from "@sanad/contracts/runtime/server/patients/patients.type";
 
 export const useCreatePatient = () => {
 	const queryClient = useQueryClient();
 
 	const { mutateAsync, isPending } = useMutation({
 		mutationFn: async (data: CreatePatientFormInput): Promise<PatientResponse> => {
-			const res = await api.patients.post({
+		const res = await api.patients.post({
 				name: data.name,
 				gender: data.gender,
-				animalTypeId: data.animalTypeId,
-				animalStrainId: data.animalStrainId ?? undefined,
 				ownerId: data.ownerId,
 				// كان مفقودًا من الحمولة: الحقل موجود في النموذج منذ إضافته، لكن هذه
 				// الدالة تعدّد الحقول يدويًا فسقط منها — فكان تاريخ الميلاد يُكتب في

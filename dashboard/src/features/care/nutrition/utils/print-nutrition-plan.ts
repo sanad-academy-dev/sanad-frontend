@@ -183,8 +183,7 @@ export const printNutritionPlan = (plan: NutritionPlanDetailResponse, clinicName
 	<div>
 		<h1>خطة التغذية — ${escapeHtml(plan.patient.name)}</h1>
 		<div class="sub">
-			${escapeHtml(plan.patient.animalType?.arName ?? "")}
-			${plan.patient.owner?.name ? `· وليّ الأمر: ${escapeHtml(plan.patient.owner.name)}` : ""}
+			${plan.patient.owner?.name ? `وليّ الأمر: ${escapeHtml(plan.patient.owner.name)}` : ""}
 			· ${escapeHtml(GOAL_LABELS[plan.goal])}
 		</div>
 	</div>

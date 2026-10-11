@@ -149,14 +149,14 @@ export const BookingWizard = ({
 				ownerPhone: draft.ownerPhone,
 				ownerEmail: draft.ownerEmail,
 				patientName: draft.patientName,
-				patientAnimalTypeId: draft.patientAnimalTypeId,
+				patientGender: draft.patientGender,
 			}).success,
 		[
 			draft.ownerName,
 			draft.ownerPhone,
 			draft.ownerEmail,
 			draft.patientName,
-			draft.patientAnimalTypeId,
+			draft.patientGender,
 		],
 	);
 
@@ -208,7 +208,7 @@ export const BookingWizard = ({
 				ownerPhone: draft.ownerPhone,
 				ownerEmail: draft.ownerEmail || undefined,
 				patientName: draft.patientName,
-				patientAnimalTypeId: draft.patientAnimalTypeId,
+				patientGender: draft.patientGender,
 				attachments: files,
 			});
 			draft.reset();
@@ -259,7 +259,7 @@ export const BookingWizard = ({
 				ownerPhone: draft.ownerPhone,
 				ownerEmail: draft.ownerEmail,
 				patientName: draft.patientName,
-				patientAnimalTypeId: draft.patientAnimalTypeId,
+				patientGender: draft.patientGender,
 			});
 			if (!result.success) {
 				setStep2Errors(zodIssuesToErrors(result.error.issues));

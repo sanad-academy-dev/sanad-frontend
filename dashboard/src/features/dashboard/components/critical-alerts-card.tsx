@@ -1,11 +1,11 @@
-import { IconArrowsExchange } from "@tabler/icons-react";
+import { IconArrowsExchange, IconUser } from "@tabler/icons-react";
 
 import { CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BaseDashboardCard } from "@/features/dashboard/components/base-dashboard-card";
 import { useCriticalAlerts } from "@/features/dashboard/hooks/use-critical-alerts";
 import type { DashboardCardProps } from "@/features/dashboard/types/dashboard-card.types";
-import { getAnimalIcon } from "@/features/services/owners/utils/animal-icon";
+
 import { useI18n } from "@/hooks/use-i18n";
 import { getDateFormatter } from "@/lib/locale-format";
 
@@ -64,7 +64,7 @@ export function CriticalAlertsCard({ expanded, onToggleExpanded }: DashboardCard
 				) : (
 					<div className="flex flex-col gap-1.5">
 						{alerts.map((alert) => {
-							const AnimalIcon = getAnimalIcon(alert.patient?.animalType?.enName ?? null);
+							const AnimalIcon = IconUser;
 
 							return (
 								<div

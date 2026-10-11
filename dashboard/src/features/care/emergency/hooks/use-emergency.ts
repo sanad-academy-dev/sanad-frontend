@@ -314,7 +314,7 @@ export const useRegisterArrivalPatient = () => {
 			arrivalId: string;
 			name: string;
 			gender: string;
-			animalTypeId: string;
+
 			birthDate: string;
 			ownerId?: string | null;
 			weight?: number | null;

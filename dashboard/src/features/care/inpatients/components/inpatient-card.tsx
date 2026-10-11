@@ -29,7 +29,7 @@ export type InpatientCardData = {
 	kind: InpatientStayKind;
 	acuity: InpatientAcuity;
 	admittedAt: string | Date | null;
-	patient: { name: string; code: string; animalType: { arName: string } };
+	patient: { name: string; code: string };
 	owner: { name: string };
 	attendingStaff: { name: string };
 	cageAssignments: { cage: { name: string; room: { name: string } } }[];
@@ -86,7 +86,7 @@ export function InpatientCard({
 					<div className="min-w-0">
 						<div className="truncate text-sm font-medium">{stay.patient.name}</div>
 						<div className="truncate text-xs text-muted-foreground">
-							{stay.patient.animalType.arName} · {stay.owner.name}
+							{stay.owner.name}
 						</div>
 					</div>
 					<span className={cn("shrink-0 text-[11px]", acuity.text)}>{acuity.label}</span>

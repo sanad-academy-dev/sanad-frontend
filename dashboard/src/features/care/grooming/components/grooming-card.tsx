@@ -105,10 +105,7 @@ export function GroomingCard({
 		card.intake?.mattingGrade === MattingGrade.SEVERE ||
 		card.intake?.mattingGrade === MattingGrade.PELTED;
 
-	// السطر تحت اسم الطفل: النوع ثم السلالة ثم وليّ الأمر
 	const patientMeta = [
-		card.patient.animalType?.arName,
-		card.patient.animalStrain?.arName,
 		card.owner?.name,
 	]
 		.filter(Boolean)

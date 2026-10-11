@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/lib/api";
-import type { CreatePatientFormInput, PatientResponse } from "@/server/patients/patients.type";
+import type { CreatePatientFormInput, PatientResponse } from "@sanad/contracts/runtime/server/patients/patients.type";
 
 /**
  * مخطّط النموذج بلا وليّ الأمر — الحوار يُنشئ الطفل تحت وليّ أمر يعرفه سياقه.
@@ -21,8 +21,6 @@ export const useCreatePatientDialog = () => {
 			const res = await api.patients.post({
 				name: data.name,
 				gender: data.gender,
-				animalTypeId: data.animalTypeId,
-				animalStrainId: data.animalStrainId ?? undefined,
 				birthDate: data.birthDate,
 				age: data.age ?? undefined,
 				weight: data.weight ?? undefined,

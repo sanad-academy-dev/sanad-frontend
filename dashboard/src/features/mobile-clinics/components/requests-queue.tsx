@@ -140,11 +140,7 @@ export function RequestsQueue() {
 										<span className="inline-flex items-center gap-1.5">
 											<IconUser className="size-3 shrink-0" />
 											<span className="truncate text-foreground">{request.petName}</span>
-											{request.animalType && (
-												<span className="shrink-0 text-muted-foreground">
-													({request.animalType.arName})
-												</span>
-											)}
+
 										</span>
 									)}
 								</div>

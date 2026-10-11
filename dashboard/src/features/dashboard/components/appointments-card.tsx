@@ -1,4 +1,4 @@
-import { IconClock, IconPlus } from "@tabler/icons-react";
+import { IconClock, IconPlus, IconUser } from "@tabler/icons-react";
 import { useState } from "react";
 
 import { CalendarBackdrop } from "@/components/common/calendar-backdrop";
@@ -16,7 +16,7 @@ import {
 } from "@/features/dashboard/components/dashboard-date-range-filter";
 import { useAppointments } from "@/features/dashboard/hooks/use-appointments";
 import type { DashboardCardProps } from "@/features/dashboard/types/dashboard-card.types";
-import { getAnimalIcon } from "@/features/services/owners/utils/animal-icon";
+
 import type { AppointmentStatus } from "@/generated/prisma/enums";
 import { useI18n } from "@/hooks/use-i18n";
 import { getDateFormatter } from "@/lib/locale-format";
@@ -177,7 +177,7 @@ export function AppointmentsCard({ expanded, onToggleExpanded }: DashboardCardPr
 								const start = new Date(appt.startsAt);
 								const end = new Date(start.getTime() + appt.durationMinutes * 60 * 1000);
 								const serviceName = appt.services[0]?.service.name;
-								const AnimalIcon = getAnimalIcon(appt.patient?.animalType?.enName ?? null);
+								const AnimalIcon = IconUser;
 								const late = isLate(appt);
 								const statusLabel = late
 									? t("dashboard.cards.appointments.status.late")

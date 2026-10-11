@@ -19,7 +19,7 @@ export type CreatePublicBookingPayload = {
 	ownerPhone: string;
 	ownerEmail?: string;
 	patientName: string;
-	patientAnimalTypeId: string;
+	patientGender: string;
 	attachments: File[];
 };
 
@@ -53,7 +53,7 @@ export const useCreatePublicBooking = () => {
 				ownerPhone: payload.ownerPhone,
 				ownerEmail: payload.ownerEmail,
 				patientName: payload.patientName,
-				patientAnimalTypeId: payload.patientAnimalTypeId,
+				patientGender: payload.patientGender,
 				attachments: payload.attachments.length > 0 ? payload.attachments : undefined,
 			});
 			if (res.error) {

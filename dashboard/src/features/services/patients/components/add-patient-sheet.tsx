@@ -1,8 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+	type CreatePatientFormInput,
+	createPatientSchema,
+	type PatientResponse,
+} from "@sanad/contracts/runtime/server/patients/patients.type";
 import { IconPlus } from "@tabler/icons-react";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import type { z } from "zod";
 import { FieldLabel } from "@/components/common/field-label";
 import { FormFooter } from "@/components/common/form-footer";
 import { FormHeader } from "@/components/common/form-header";
@@ -24,14 +30,7 @@ import { AddOwnerDialog } from "@/features/services/patients/components/add-owne
 import { DiscardConfirmDialog } from "@/features/services/patients/components/discard-confirm-dialog";
 import { useCreatePatient } from "@/features/services/patients/hooks/use-create-patient";
 import { useOwners } from "@/features/services/patients/hooks/use-owners";
-import { useAnimalStrains } from "@/features/settings/animals/hooks/use-animal-strains";
-import { useAnimalTypes } from "@/features/settings/animals/hooks/use-animal-types";
 import { useFormProgress } from "@/hooks/use-form-progress";
-import {
-	type CreatePatientFormInput,
-	createPatientSchema,
-	type PatientResponse,
-} from "@sanad/contracts/runtime/server/patients/patients.type";
 
 export function AddPatientSheet({
 	open,
@@ -44,8 +43,6 @@ export function AddPatientSheet({
 	defaultOwnerId?: string;
 	onSuccess?: (patient: PatientResponse) => void | Promise<void>;
 }) {
-	const { animalTypes, isLoading: typesLoading } = useAnimalTypes();
-	const { strains, isLoading: strainsLoading } = useAnimalStrains();
 	const { owners, isLoading: ownersLoading } = useOwners();
 	const { createPatient, isPending } = useCreatePatient();
 
@@ -62,7 +59,7 @@ export function AddPatientSheet({
 		watch,
 		setValue,
 		formState: { errors },
-	} = useForm({
+	} = useForm<z.input<typeof createPatientSchema>, any, CreatePatientFormInput>({
 		resolver: zodResolver(createPatientSchema),
 		defaultValues: { active: true },
 	});
@@ -76,10 +73,8 @@ export function AddPatientSheet({
 
 	const filledFields = [
 		values.name?.trim() ? "name" : null,
-		values.gender ? "gender" : null,
-		values.animalTypeId ? "animalTypeId" : null,
-		values.animalStrainId ? "animalStrainId" : null,
 		values.ownerId ? "ownerId" : null,
+		values.gender ? "gender" : null,
 		values.age != null && values.age !== ("" as unknown as number) ? "age" : null,
 		values.birthDate?.trim() ? "birthDate" : null,
 		values.weight != null && values.weight !== ("" as unknown as number) ? "weight" : null,
@@ -93,6 +88,7 @@ export function AddPatientSheet({
 			reset();
 			onClose();
 		}
+		
 	};
 
 	const handleConfirmDiscard = () => {
@@ -100,10 +96,6 @@ export function AddPatientSheet({
 		reset();
 		onClose();
 	};
-
-	const filteredStrains = values.animalTypeId
-		? strains.filter((s) => s.animalTypeId === values.animalTypeId)
-		: [];
 
 	const formProgress = useFormProgress({ schema: createPatientSchema, values });
 
@@ -181,113 +173,6 @@ export function AddPatientSheet({
 
 								<div className="flex flex-col gap-1.5">
 									<FieldLabel required>
-										<Label className="text-sm font-medium">الجنس</Label>
-									</FieldLabel>
-									<Controller
-										name="gender"
-										control={control}
-										render={({ field }) => (
-											<Tabs
-												value={field.value ?? ""}
-												onValueChange={field.onChange}
-											>
-												<TabsList className="w-full bg-transparent gap-3">
-													<TabsTrigger
-														value="MALE"
-														className="flex-1 border border-border h-9"
-													>
-														ذكر
-													</TabsTrigger>
-													<TabsTrigger
-														value="FEMALE"
-														className="flex-1 border border-border h-9"
-													>
-														أنثى
-													</TabsTrigger>
-												</TabsList>
-											</Tabs>
-										)}
-									/>
-								</div>
-
-								<div className="grid grid-cols-2 gap-3">
-									<div className="flex flex-col gap-1.5">
-										<FieldLabel required>
-											<Label className="text-sm font-medium">نوع الطفل</Label>
-										</FieldLabel>
-										<Controller
-											name="animalTypeId"
-											control={control}
-											render={({ field }) => (
-												<Field data-invalid={!!errors.animalTypeId}>
-													<Select
-														value={field.value ?? ""}
-														onValueChange={field.onChange}
-														disabled={typesLoading}
-														dir="rtl"
-													>
-														<SelectTrigger
-															aria-invalid={!!errors.animalTypeId}
-															className="w-full text-right text-sm"
-														>
-															<SelectValue placeholder="اختر النوع..." />
-														</SelectTrigger>
-														<SelectContent dir="rtl">
-															{animalTypes.map((type) => (
-																<SelectItem
-																	key={type.id}
-																	value={type.id}
-																	className="text-right"
-																>
-																	{type.arName}
-																</SelectItem>
-															))}
-														</SelectContent>
-													</Select>
-													<FieldError errors={[errors.animalTypeId]} />
-												</Field>
-											)}
-										/>
-									</div>
-
-									<div className="flex flex-col gap-1.5">
-										<Label className="text-sm font-medium">السلالة</Label>
-										<Controller
-											name="animalStrainId"
-											control={control}
-											render={({ field }) => (
-												<Select
-													value={field.value ?? ""}
-													onValueChange={field.onChange}
-													disabled={!values.animalTypeId || strainsLoading}
-													dir="rtl"
-												>
-													<SelectTrigger className="w-full text-right text-sm">
-														<SelectValue
-															placeholder={
-																values.animalTypeId ? "اختر السلالة..." : "اختر النوع أولاً"
-															}
-														/>
-													</SelectTrigger>
-													<SelectContent dir="rtl">
-														{filteredStrains.map((strain) => (
-															<SelectItem
-																key={strain.id}
-																value={strain.id}
-																className="text-right"
-															>
-																{strain.arName}
-															</SelectItem>
-														))}
-													</SelectContent>
-												</Select>
-											)}
-										/>
-									</div>
-								</div>
-
-								<div className="flex flex-col gap-1.5">
-									<FieldLabel required>
 										<Label className="text-sm font-medium">وليّ الأمر</Label>
 									</FieldLabel>
 									<Controller
@@ -344,6 +229,49 @@ export function AddPatientSheet({
 													</SelectContent>
 												</Select>
 												<FieldError errors={[errors.ownerId]} />
+											</Field>
+										)}
+									/>
+								</div>
+
+								{/* الجنس */}
+								<div className="flex flex-col gap-1.5">
+									<FieldLabel required>
+										<Label
+											className="text-sm font-medium"
+											htmlFor="patient-gender"
+										>
+											الجنس
+										</Label>
+									</FieldLabel>
+									<Controller
+										name="gender"
+										control={control}
+										render={({ field }) => (
+											<Field data-invalid={!!errors.gender}>
+												<Tabs
+													value={field.value ?? ""}
+													onValueChange={field.onChange}
+													dir="rtl"
+												>
+													<TabsList className="w-full bg-transparent gap-3">
+														<TabsTrigger
+															value="MALE"
+															className="flex-1 border border-border h-9"
+															disabled={isPending}
+														>
+															ذكر
+														</TabsTrigger>
+														<TabsTrigger
+															value="FEMALE"
+															className="flex-1 border border-border h-9"
+															disabled={isPending}
+														>
+															أنثى
+														</TabsTrigger>
+													</TabsList>
+												</Tabs>
+												<FieldError errors={[errors.gender]} />
 											</Field>
 										)}
 									/>

@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createPatientSchema } from "@sanad/contracts/runtime/server/patients/patients.type";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { Controller, useForm } from "react-hook-form";
 import type { z } from "zod";
@@ -17,13 +18,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useCreatePatientDialog } from "@/features/services/owners/hooks/use-create-patient-dialog";
-import { useAnimalStrains } from "@/features/settings/animals/hooks/use-animal-strains";
-import { useAnimalTypes } from "@/features/settings/animals/hooks/use-animal-types";
 import { useFormProgress } from "@/hooks/use-form-progress";
-import { createPatientSchema } from "@sanad/contracts/runtime/server/patients/patients.type";
 
 const addPatientDialogSchema = createPatientSchema.omit({ ownerId: true });
 
@@ -35,8 +32,6 @@ interface AddPatientDialogProps {
 
 export function AddPatientDialog({ open, onClose, onSuccess }: AddPatientDialogProps) {
 	const { createPatient, isPending } = useCreatePatientDialog();
-	const { animalTypes, isLoading: typesLoading } = useAnimalTypes();
-	const { strains, isLoading: strainsLoading } = useAnimalStrains();
 
 	const {
 		register,
@@ -45,18 +40,17 @@ export function AddPatientDialog({ open, onClose, onSuccess }: AddPatientDialogP
 		reset,
 		watch,
 		formState: { errors },
-	} = useForm({
+	} = useForm<
+		z.input<typeof addPatientDialogSchema>,
+		any,
+		z.infer<typeof addPatientDialogSchema>
+	>({
 		resolver: zodResolver(addPatientDialogSchema),
 		defaultValues: { active: true },
 	});
 
 	const values = watch();
 	const formProgress = useFormProgress({ schema: addPatientDialogSchema, values });
-
-	const animalTypeId = values.animalTypeId;
-	const filteredStrains = animalTypeId
-		? strains.filter((s) => s.animalTypeId === animalTypeId)
-		: [];
 
 	const onSubmit = async (data: z.infer<typeof addPatientDialogSchema>) => {
 		const patient = await createPatient(data);
@@ -120,109 +114,59 @@ export function AddPatientDialog({ open, onClose, onSuccess }: AddPatientDialogP
 
 					<div className="flex flex-col gap-1.5">
 						<FieldLabel required>
-							<Label className="text-sm font-medium">الجنس</Label>
+							<Label
+								className="text-sm font-medium"
+								htmlFor="dialog-patient-gender"
+							>
+								الجنس
+							</Label>
 						</FieldLabel>
 						<Controller
 							name="gender"
 							control={control}
 							render={({ field }) => (
-								<Tabs
-									value={field.value ?? ""}
-									onValueChange={field.onChange}
-								>
-									<TabsList className="w-full bg-transparent gap-3">
-										<TabsTrigger
-											value="MALE"
-											className="flex-1 border border-border h-9"
-											disabled={isPending}
-										>
-											ذكر
-										</TabsTrigger>
-										<TabsTrigger
-											value="FEMALE"
-											className="flex-1 border border-border h-9"
-											disabled={isPending}
-										>
-											أنثى
-										</TabsTrigger>
-									</TabsList>
-								</Tabs>
-							)}
-						/>
-					</div>
-
-					<div className="grid grid-cols-2 gap-3">
-						<div className="flex flex-col gap-1.5">
-							<FieldLabel required>
-								<Label className="text-sm font-medium">نوع الطفل</Label>
-							</FieldLabel>
-							<Controller
-								name="animalTypeId"
-								control={control}
-								render={({ field }) => (
-									<Field data-invalid={!!errors.animalTypeId}>
-										<Select
-											value={field.value ?? ""}
-											onValueChange={field.onChange}
-											disabled={typesLoading || isPending}
-											dir="rtl"
-										>
-											<SelectTrigger
-												aria-invalid={!!errors.animalTypeId}
-												className="w-full text-right text-sm"
-											>
-												<SelectValue placeholder="اختر النوع..." />
-											</SelectTrigger>
-											<SelectContent dir="rtl">
-												{animalTypes.map((type) => (
-													<SelectItem
-														key={type.id}
-														value={type.id}
-														className="text-right"
-													>
-														{type.arName}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-										<FieldError errors={[errors.animalTypeId]} />
-									</Field>
-								)}
-							/>
-						</div>
-
-						<div className="flex flex-col gap-1.5">
-							<Label className="text-sm font-medium">السلالة</Label>
-							<Controller
-								name="animalStrainId"
-								control={control}
-								render={({ field }) => (
+								<Field data-invalid={!!errors.gender}>
 									<Select
 										value={field.value ?? ""}
 										onValueChange={field.onChange}
-										disabled={!animalTypeId || strainsLoading || isPending}
 										dir="rtl"
+										disabled={isPending}
 									>
-										<SelectTrigger className="w-full text-right text-sm">
-											<SelectValue
-												placeholder={animalTypeId ? "اختر السلالة..." : "اختر النوع أولاً"}
-											/>
+										<SelectTrigger
+											id="dialog-patient-gender"
+											aria-invalid={!!errors.gender}
+											className="w-full text-right text-sm"
+										>
+											<SelectValue placeholder="اختر الجنس..." />
 										</SelectTrigger>
-										<SelectContent dir="rtl">
-											{filteredStrains.map((strain) => (
-												<SelectItem
-													key={strain.id}
-													value={strain.id}
-													className="text-right"
-												>
-													{strain.arName}
-												</SelectItem>
-											))}
+										<SelectContent
+											dir="rtl"
+											position="popper"
+										>
+											<SelectItem
+												value="MALE"
+												className="text-right"
+											>
+												ذكر
+											</SelectItem>
+											<SelectItem
+												value="FEMALE"
+												className="text-right"
+											>
+												أنثى
+											</SelectItem>
+											<SelectItem
+												value="UNKNOWN"
+												className="text-right"
+											>
+												غير معروف
+											</SelectItem>
 										</SelectContent>
 									</Select>
-								)}
-							/>
-						</div>
+									<FieldError errors={[errors.gender]} />
+								</Field>
+							)}
+						/>
 					</div>
 
 					<div className="grid grid-cols-2 gap-3">

@@ -1,9 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+	type CreatePatientFormInput,
+	createPatientSchema,
+} from "@sanad/contracts/runtime/server/patients/patients.type";
 import { IconPencil, IconPlus, IconUserPlus } from "@tabler/icons-react";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useEffect, useState } from "react";
 import { Controller, type Resolver, type SubmitHandler, useForm } from "react-hook-form";
-
 import { FieldLabel } from "@/components/common/field-label";
 import { FormFooter } from "@/components/common/form-footer";
 import { FormHeader } from "@/components/common/form-header";
@@ -19,7 +22,6 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { AddOwnerDialog } from "@/features/services/patients/components/add-owner-dialog";
 import { DiscardConfirmDialog } from "@/features/services/patients/components/discard-confirm-dialog";
@@ -27,14 +29,8 @@ import { FIELD_LABELS } from "@/features/services/patients/data/constants";
 import { useCreatePatient } from "@/features/services/patients/hooks/use-create-patient";
 import { useOwners } from "@/features/services/patients/hooks/use-owners";
 import { useUpdatePatient } from "@/features/services/patients/hooks/use-update-patient";
-import { useAnimalStrains } from "@/features/settings/animals/hooks/use-animal-strains";
-import { useAnimalTypes } from "@/features/settings/animals/hooks/use-animal-types";
 import { useFormProgress } from "@/hooks/use-form-progress";
 import type { PatientResponse } from "@/server/patients/patients.type";
-import {
-	type CreatePatientFormInput,
-	createPatientSchema,
-} from "@sanad/contracts/runtime/server/patients/patients.type";
 
 /** `<input type="date">` لا يقبل إلا YYYY-MM-DD — والقيمة تصل من الخادم ISO كاملة. */
 const toDateInput = (value: Date | string | null | undefined) =>
@@ -52,8 +48,6 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 
 	const { createPatient, isPending: isCreating } = useCreatePatient();
 	const { updatePatient, isPending: isUpdating } = useUpdatePatient();
-	const { animalTypes, isLoading: typesLoading } = useAnimalTypes();
-	const { strains, isLoading: strainsLoading } = useAnimalStrains();
 	const { owners, isLoading: ownersLoading } = useOwners();
 	const isPending = isCreating || isUpdating;
 
@@ -75,9 +69,6 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 		defaultValues: patient
 			? {
 					name: patient.name,
-					gender: patient.gender,
-					animalTypeId: patient.animalType?.id ?? "",
-					animalStrainId: patient.animalStrain?.id ?? undefined,
 					ownerId: patient.owner?.id ?? "",
 					age: patient.age ?? undefined,
 					birthDate: toDateInput(patient.birthDate),
@@ -92,9 +83,6 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 		if (open && patient) {
 			reset({
 				name: patient.name,
-				gender: patient.gender,
-				animalTypeId: patient.animalType?.id ?? "",
-				animalStrainId: patient.animalStrain?.id ?? undefined,
 				ownerId: patient.owner?.id ?? "",
 				age: patient.age ?? undefined,
 				birthDate: toDateInput(patient.birthDate),
@@ -111,9 +99,6 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 
 	const filledFields = [
 		values.name?.trim() ? "name" : null,
-		values.gender ? "gender" : null,
-		values.animalTypeId ? "animalTypeId" : null,
-		values.animalStrainId ? "animalStrainId" : null,
 		values.ownerId ? "ownerId" : null,
 		values.age != null && values.age !== ("" as unknown as number) ? "age" : null,
 		values.birthDate?.trim() ? "birthDate" : null,
@@ -125,10 +110,6 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 
 	// عدد مرات تعديل السجل المحفوظ في قاعدة البيانات — لا علاقة له بالتغييرات الحالية
 	const changesCount = patient?.editsCount ?? 0;
-
-	const filteredStrains = values.animalTypeId
-		? strains.filter((s) => s.animalTypeId === values.animalTypeId)
-		: [];
 
 	const handleCloseAttempt = () => {
 		if (readOnly) {
@@ -175,11 +156,7 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 		enabled: open && !readOnly,
 	});
 
-	const title = readOnly
-		? "بيانات الطفل"
-		: isEdit
-			? "تعديل بيانات الطفل"
-			: "إضافة طفل جديد";
+	const title = readOnly ? "بيانات الطفل" : isEdit ? "تعديل بيانات الطفل" : "إضافة طفل جديد";
 
 	return (
 		<>
@@ -236,117 +213,6 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 								/>
 								<FieldError errors={[errors.name]} />
 							</Field>
-						</div>
-
-						<div className="flex flex-col gap-1.5">
-							<FieldLabel required={!readOnly}>
-								<Label className="text-sm font-medium">الجنس</Label>
-							</FieldLabel>
-							<Controller
-								name="gender"
-								control={control}
-								render={({ field }) => (
-									<Tabs
-										value={field.value ?? ""}
-										onValueChange={readOnly ? undefined : field.onChange}
-									>
-										<TabsList className="w-full bg-transparent gap-3">
-											<TabsTrigger
-												value="MALE"
-												className="flex-1 border border-border h-9"
-												disabled={isPending || readOnly}
-											>
-												ذكر
-											</TabsTrigger>
-											<TabsTrigger
-												value="FEMALE"
-												className="flex-1 border border-border h-9"
-												disabled={isPending || readOnly}
-											>
-												أنثى
-											</TabsTrigger>
-										</TabsList>
-									</Tabs>
-								)}
-							/>
-						</div>
-
-						<div className="grid grid-cols-2 gap-3">
-							<div className="flex flex-col gap-1.5">
-								<FieldLabel required={!readOnly}>
-									<Label className="text-sm font-medium">نوع الطفل</Label>
-								</FieldLabel>
-								<Controller
-									name="animalTypeId"
-									control={control}
-									render={({ field }) => (
-										<Field data-invalid={!!errors.animalTypeId}>
-											<Select
-												value={field.value ?? ""}
-												onValueChange={readOnly ? undefined : field.onChange}
-												disabled={typesLoading || isPending || readOnly}
-												dir="rtl"
-											>
-												<SelectTrigger
-													aria-invalid={!!errors.animalTypeId}
-													className="w-full text-right text-sm"
-												>
-													<SelectValue placeholder="اختر النوع..." />
-												</SelectTrigger>
-												<SelectContent dir="rtl">
-													{animalTypes.map((type) => (
-														<SelectItem
-															key={type.id}
-															value={type.id}
-															className="text-right"
-														>
-															{type.arName}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											<FieldError errors={[errors.animalTypeId]} />
-										</Field>
-									)}
-								/>
-							</div>
-
-							<div className="flex flex-col gap-1.5">
-								<Label className="text-sm font-medium">السلالة</Label>
-								<Controller
-									name="animalStrainId"
-									control={control}
-									render={({ field }) => (
-										<Select
-											value={field.value ?? ""}
-											onValueChange={readOnly ? undefined : field.onChange}
-											disabled={
-												!values.animalTypeId || strainsLoading || isPending || readOnly
-											}
-											dir="rtl"
-										>
-											<SelectTrigger className="w-full text-right text-sm">
-												<SelectValue
-													placeholder={
-														values.animalTypeId ? "اختر السلالة..." : "اختر النوع أولاً"
-													}
-												/>
-											</SelectTrigger>
-											<SelectContent dir="rtl">
-												{filteredStrains.map((strain) => (
-													<SelectItem
-														key={strain.id}
-														value={strain.id}
-														className="text-right"
-													>
-														{strain.arName}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-									)}
-								/>
-							</div>
 						</div>
 
 						<div className="flex flex-col gap-1.5">

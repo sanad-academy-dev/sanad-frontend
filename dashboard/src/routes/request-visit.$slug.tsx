@@ -247,55 +247,17 @@ function RequestVisitPage() {
 					</Button>
 				</div>
 
-				<div className="grid grid-cols-2 gap-3">
-					<div className="flex flex-col gap-1.5">
-						<Label className="text-sm font-medium">اسم الطفل</Label>
-						<Field data-invalid={!!errors.petName}>
-							<Input
-								className="text-sm"
-								aria-invalid={!!errors.petName}
-								disabled={submitMut.isPending}
-								{...register("petName")}
-							/>
-							<FieldError errors={[errors.petName]} />
-						</Field>
-					</div>
-
-					<Controller
-						name="animalTypeId"
-						control={control}
-						render={({ field }) => (
-							<div className="flex flex-col gap-1.5">
-								<Label className="text-sm font-medium">النوع</Label>
-								<Field data-invalid={!!errors.animalTypeId}>
-									<Select
-										dir="rtl"
-										value={field.value || undefined}
-										onValueChange={field.onChange}
-										disabled={submitMut.isPending}
-									>
-										<SelectTrigger
-											className="w-full text-sm"
-											aria-invalid={!!errors.animalTypeId}
-										>
-											<SelectValue placeholder="اختر" />
-										</SelectTrigger>
-										<SelectContent position="popper">
-											{availability.animalTypes.map((type) => (
-												<SelectItem
-													key={type.id}
-													value={type.id}
-												>
-													{type.arName}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
-									<FieldError errors={[errors.animalTypeId]} />
-								</Field>
-							</div>
-						)}
-					/>
+				<div className="flex flex-col gap-1.5">
+					<Label className="text-sm font-medium">اسم الطفل</Label>
+					<Field data-invalid={!!errors.petName}>
+						<Input
+							className="text-sm"
+							aria-invalid={!!errors.petName}
+							disabled={submitMut.isPending}
+							{...register("petName")}
+						/>
+						<FieldError errors={[errors.petName]} />
+					</Field>
 				</div>
 
 				{/* أكاديمية لم تُدرج دورات متنقلة بعد: إخفاء الحقل أصدق من عرض قائمة فارغة */}

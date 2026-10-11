@@ -112,9 +112,6 @@ export function RadiologyCard({
 	// السطر تحت اسم الطفل: الكود ثم النوع/السلالة ثم وليّ الأمر
 	const patientMeta = [
 		order.patient.code,
-		[order.patient.animalType.arName, order.patient.animalStrain?.arName]
-			.filter(Boolean)
-			.join(" / "),
 		order.owner.name,
 	]
 		.filter(Boolean)

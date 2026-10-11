@@ -75,10 +75,10 @@ export const step2BookingSchema = z.object({
 		.trim()
 		.min(1, "اسم الطفل مطلوب")
 		.max(80, "الاسم طويل جدًا"),
-	patientAnimalTypeId: z
-		.string({ error: "نوع الطفل مطلوب" })
+	patientGender: z
+		.string({ error: "الجنس مطلوب" })
 		.trim()
-		.min(1, "نوع الطفل مطلوب"),
+		.min(1, "الجنس مطلوب"),
 });
 
 export type Step2BookingFormInput = z.input<typeof step2BookingSchema>;

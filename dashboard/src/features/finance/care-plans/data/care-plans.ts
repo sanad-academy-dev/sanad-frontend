@@ -10,8 +10,6 @@ import type {
 export interface CreateCarePlanFormValues {
 	name: string;
 	serviceId: string | undefined;
-	animalTypeId: string | undefined;
-	animalStrainId: string | undefined;
 	notes: string;
 	visitDuration: string | undefined;
 	price: string;
@@ -20,8 +18,6 @@ export interface CreateCarePlanFormValues {
 export const CREATE_CARE_PLAN_FORM_DEFAULTS: CreateCarePlanFormValues = {
 	name: "",
 	serviceId: undefined,
-	animalTypeId: undefined,
-	animalStrainId: undefined,
 	notes: "",
 	visitDuration: undefined,
 	price: "",
@@ -30,16 +26,12 @@ export const CREATE_CARE_PLAN_FORM_DEFAULTS: CreateCarePlanFormValues = {
 export const CARE_PLAN_REQUIRED_FIELDS = [
 	"name",
 	"serviceId",
-	"animalTypeId",
-	"animalStrainId",
 	"price",
 ] as const satisfies readonly (keyof CreateCarePlanFormValues)[];
 
 export const CARE_PLAN_FIELD_LABELS: Record<keyof CreateCarePlanFormValues, string> = {
 	name: "اسم الخطة",
 	serviceId: "نوع الدورة",
-	animalTypeId: "نوع الطفل المستفيد",
-	animalStrainId: "السلالة المستفيد",
 	notes: "ملاحظات",
 	visitDuration: "المدة التقديرية",
 	price: "السعر",
@@ -162,8 +154,6 @@ export const toCreateCarePlanPayload = (
 ): CreateCarePlanInput => ({
 	name: values.name,
 	serviceId: values.serviceId ?? "",
-	animalTypeId: values.animalTypeId ?? "",
-	animalStrainId: values.animalStrainId ?? "",
 	notes: values.notes.trim() ? values.notes : null,
 	visitDurationMins: values.visitDuration ? Number(values.visitDuration) : null,
 	price: Number(values.price) || 0,
@@ -183,8 +173,6 @@ export const fromCarePlanDetailResponse = (
 	values: {
 		name: plan.name,
 		serviceId: plan.service.id,
-		animalTypeId: plan.animalType.id,
-		animalStrainId: plan.animalStrain.id,
 		notes: plan.notes ?? "",
 		visitDuration: plan.visitDurationMins != null ? String(plan.visitDurationMins) : undefined,
 		price: String(plan.price),

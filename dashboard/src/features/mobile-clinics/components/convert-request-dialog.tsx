@@ -92,8 +92,6 @@ export function ConvertRequestDialog({
 		onClose();
 	};
 
-	// التحويل يُنشئ سجلّ طفل، والطفل يلزمه نوع — فالطلب بلا نوع لا يُحوَّل قبل استكماله
-	const missingAnimalType = request !== null && request.animalType === null;
 
 	return (
 		<Dialog
@@ -113,12 +111,7 @@ export function ConvertRequestDialog({
 					</DialogTitle>
 				</DialogHeader>
 
-				{missingAnimalType ? (
-					<p className="text-sm text-destructive">
-						الطلب بلا نوع طفل، والتحويل يُنشئ سجلّ طفل يحتاجه. تواصل مع وليّ الأمر ثم عدّل الطلب
-						قبل التحويل.
-					</p>
-				) : (
+
 					<form
 						id="convert-request-form"
 						onSubmit={handleSubmit(onSubmit)}
@@ -273,7 +266,7 @@ export function ConvertRequestDialog({
 							)}
 						/>
 					</form>
-				)}
+
 
 				{/* تذييل موحّد: border-t px-4 py-2 وأزرار sm — نفس نمط بقيّة النوافذ */}
 				<div className="flex items-center justify-end gap-2 border-t pt-3">
@@ -289,7 +282,7 @@ export function ConvertRequestDialog({
 						type="submit"
 						form="convert-request-form"
 						size="sm"
-						disabled={isMutating || missingAnimalType || !isValid}
+						disabled={isMutating || !isValid}
 					>
 						<IconTruck className="size-3.5" />
 						إنشاء الزيارة

@@ -29,7 +29,7 @@ const paragraphs = (text: string | null | undefined): string =>
 export type DischargePrintInput = {
 	code: string;
 	clinicName?: string | null;
-	patient: { name: string; code: string; animalType?: { arName: string } | null };
+	patient: { name: string; code: string };
 	owner: { name: string; phone?: string | null };
 	attendingStaff: { name: string };
 	admittedAt: string | Date | null;
@@ -100,7 +100,7 @@ export const printDischargeSummary = (input: DischargePrintInput) => {
 <h2>بيانات الطفل ووليّ الأمر</h2>
 <div class="grid">
   <div><span class="k">الطفل:</span> ${escapeHtml(input.patient.name)} (${escapeHtml(input.patient.code)})</div>
-  <div><span class="k">النوع:</span> ${escapeHtml(input.patient.animalType?.arName ?? "—")}</div>
+
   <div><span class="k">وليّ الأمر:</span> ${escapeHtml(input.owner.name)}</div>
   <div><span class="k">الهاتف:</span> <span dir="ltr">${escapeHtml(input.owner.phone ?? "—")}</span></div>
   <div><span class="k">تاريخ الدخول:</span> ${day(input.admittedAt)}</div>

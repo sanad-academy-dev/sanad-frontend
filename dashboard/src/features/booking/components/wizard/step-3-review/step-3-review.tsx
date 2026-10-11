@@ -5,7 +5,6 @@ import {
 	ReviewRow,
 	SectionCard,
 } from "@/features/booking/components/wizard/step-3-review/section-card";
-import { usePublicClinicAnimalTypes } from "@/features/booking/hooks/use-public-clinic-animal-types";
 import { useBookingDraftStore } from "@/features/booking/stores/booking-draft.store";
 import type { FileWithPreview } from "@/hooks/use-file-upload";
 import { getFileUrl } from "@/lib/file-url";
@@ -72,10 +71,7 @@ export const Step3Review = ({
 	onChangeSlot,
 }: Step3ReviewProps) => {
 	const draft = useBookingDraftStore(clinicSlug);
-	const { animalTypes } = usePublicClinicAnimalTypes(clinicSlug);
 
-	const animalTypeName =
-		animalTypes.find((t) => t.id === draft.patientAnimalTypeId)?.arName ?? "";
 	const consultationTypeName =
 		selectedStaff.consultationTypes.find((c) => c.id === draft.consultationTypeId)?.name ?? "";
 	const staffName = selectedStaff.prefix ? `د. ${selectedStaff.name}` : selectedStaff.name;
@@ -161,10 +157,6 @@ export const Step3Review = ({
 				<ReviewRow
 					label="الطفل"
 					value={draft.patientName}
-				/>
-				<ReviewRow
-					label="النوع"
-					value={animalTypeName}
 				/>
 			</SectionCard>
 

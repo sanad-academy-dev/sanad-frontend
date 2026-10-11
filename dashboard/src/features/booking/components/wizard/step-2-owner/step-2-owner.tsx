@@ -10,7 +10,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { usePublicClinicAnimalTypes } from "@/features/booking/hooks/use-public-clinic-animal-types";
 import { useBookingDraftStore } from "@/features/booking/stores/booking-draft.store";
 
 type Step2OwnerProps = {
@@ -20,7 +19,6 @@ type Step2OwnerProps = {
 
 export const Step2Owner = ({ clinicSlug, errors }: Step2OwnerProps) => {
 	const draft = useBookingDraftStore(clinicSlug);
-	const { animalTypes, isLoading: isLoadingTypes } = usePublicClinicAnimalTypes(clinicSlug);
 
 	return (
 		<div className="flex flex-col gap-8">
@@ -129,44 +127,41 @@ export const Step2Owner = ({ clinicSlug, errors }: Step2OwnerProps) => {
 					<FieldError errors={errors.patientName ? [{ message: errors.patientName }] : []} />
 				</Field>
 
-				<Field data-invalid={!!errors.patientAnimalTypeId}>
+			</section>
+
+			<section className="flex flex-col gap-5">
+				<Field data-invalid={!!errors.patientGender}>
 					<label
-						htmlFor="patient-animal-type"
+						htmlFor="patient-gender"
 						className="text-sm font-medium text-foreground"
 					>
-						نوع الطفل <span className="text-destructive">*</span>
+						الجنس <span className="text-destructive">*</span>
 					</label>
 					<Select
-						value={draft.patientAnimalTypeId || undefined}
-						onValueChange={(value) => draft.setField("patientAnimalTypeId", value)}
-						disabled={isLoadingTypes}
+						value={draft.patientGender || undefined}
+						onValueChange={(val) => draft.setField("patientGender", val)}
 						dir="rtl"
 					>
 						<SelectTrigger
-							id="patient-animal-type"
-							aria-invalid={!!errors.patientAnimalTypeId}
-							className="w-full"
+							id="patient-gender"
+							aria-invalid={!!errors.patientGender}
+							className="text-right"
 						>
-							<SelectValue
-								placeholder={isLoadingTypes ? "جاري التحميل..." : "اختر نوع الطفل"}
-							/>
+							<SelectValue placeholder="اختر الجنس" />
 						</SelectTrigger>
-						<SelectContent>
-							{animalTypes.map((t) => (
-								<SelectItem
-									key={t.id}
-									value={t.id}
-								>
-									{t.arName}
-								</SelectItem>
-							))}
+						<SelectContent dir="rtl">
+							<SelectItem value="MALE" className="text-right">
+								ذكر
+							</SelectItem>
+							<SelectItem value="FEMALE" className="text-right">
+								أنثى
+							</SelectItem>
+							<SelectItem value="UNKNOWN" className="text-right">
+								غير معروف
+							</SelectItem>
 						</SelectContent>
 					</Select>
-					<FieldError
-						errors={
-							errors.patientAnimalTypeId ? [{ message: errors.patientAnimalTypeId }] : []
-						}
-					/>
+					<FieldError errors={errors.patientGender ? [{ message: errors.patientGender }] : []} />
 				</Field>
 			</section>
 		</div>

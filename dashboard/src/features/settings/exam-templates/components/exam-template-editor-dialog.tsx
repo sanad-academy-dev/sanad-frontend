@@ -14,7 +14,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { useAnimalTypes } from "@/features/settings/animals/hooks/use-animal-types";
+
 import { ExamBlockEditor } from "@/features/settings/exam-templates/components/exam-block-editor";
 import {
 	emptyBlock,
@@ -36,7 +36,7 @@ export type TemplateDraft = {
 	key: string;
 	titleAr: string;
 	presentingComplaint: string;
-	animalTypeId: string | null;
+
 	blocks: ExamBlock[];
 	isDefault: boolean;
 	active: boolean;
@@ -50,7 +50,7 @@ export const draftFromTemplate = (template: ExamTemplateResponse): TemplateDraft
 	key: template.key,
 	titleAr: template.titleAr,
 	presentingComplaint: template.presentingComplaint ?? "",
-	animalTypeId: template.animalTypeId,
+
 	blocks: (template.blocks ?? []) as unknown as ExamBlock[],
 	isDefault: template.isDefault,
 	active: template.active,
@@ -62,7 +62,7 @@ export const emptyDraft = (): TemplateDraft => ({
 	key: "",
 	titleAr: "",
 	presentingComplaint: "",
-	animalTypeId: null,
+
 	blocks: [emptyBlock("prose", "S", "block_1")],
 	isDefault: false,
 	active: true,
@@ -83,7 +83,7 @@ export const ExamTemplateEditorDialog = ({
 	draft: TemplateDraft | null;
 	onClose: () => void;
 }) => {
-	const { animalTypes } = useAnimalTypes();
+
 	const { saveTemplate, isPending } = useExamTemplateMutations();
 	const [form, setForm] = useState<TemplateDraft | null>(draft);
 	const [error, setError] = useState<string | null>(null);
@@ -119,7 +119,7 @@ export const ExamTemplateEditorDialog = ({
 			key: form.key.trim(),
 			titleAr: form.titleAr.trim(),
 			presentingComplaint: form.presentingComplaint.trim() || null,
-			animalTypeId: form.animalTypeId,
+
 			blocks: parsed.blocks,
 			isDefault: form.isDefault,
 			active: form.active,
@@ -197,31 +197,7 @@ export const ExamTemplateEditorDialog = ({
 								onChange={(event) => patch({ presentingComplaint: event.target.value })}
 							/>
 						</div>
-						<div className="space-y-1">
-							<Label className="text-xs">النوع</Label>
-							<Select
-								value={form.animalTypeId ?? ANY_SPECIES}
-								disabled={isPending}
-								onValueChange={(value) =>
-									patch({ animalTypeId: value === ANY_SPECIES ? null : value })
-								}
-							>
-								<SelectTrigger className="h-8 w-full">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent position="popper">
-									<SelectItem value={ANY_SPECIES}>كل الأنواع</SelectItem>
-									{animalTypes.map((type) => (
-										<SelectItem
-											key={type.id}
-											value={type.id}
-										>
-											{type.arName}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</div>
+
 					</div>
 
 					<div className="flex flex-wrap items-center gap-4">

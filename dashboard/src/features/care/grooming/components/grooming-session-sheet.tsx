@@ -243,12 +243,7 @@ export function GroomingSessionSheet({
 									<ContactBlock
 										title="الطفل"
 										name={session.patient.name}
-										meta={[
-											session.patient.animalType?.arName,
-											session.patient.animalStrain?.arName,
-										]
-											.filter(Boolean)
-											.join(" · ")}
+										meta={null}
 										avatarClassName="bg-primary"
 									/>
 

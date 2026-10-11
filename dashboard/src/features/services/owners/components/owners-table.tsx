@@ -9,6 +9,7 @@ import {
 	IconPhone,
 	IconPlus,
 	IconTrash,
+	IconUser,
 } from "@tabler/icons-react";
 import {
 	type ColumnDef,
@@ -43,7 +44,7 @@ import { OwnerSheet } from "@/features/services/owners/components/owner-sheet";
 import { PortalPasswordDialog } from "@/features/services/owners/components/portal-password-dialog";
 import { useOwners } from "@/features/services/owners/hooks/use-owners";
 import { useUpdateOwner } from "@/features/services/owners/hooks/use-update-owner";
-import { getAnimalIcon } from "@/features/services/owners/utils/animal-icon";
+
 import type { OwnerRelationship, OwnerResponse } from "@/server/owners/owners.type";
 
 const MAX_VISIBLE_PETS = 5;
@@ -88,13 +89,12 @@ function PetIcons({ patients }: { patients: OwnerResponse["patients"] }) {
 	return (
 		<div className="flex items-center gap-1">
 			{visible.map((patient) => {
-				const Icon = getAnimalIcon(patient.animalType?.enName);
 				return (
 					<div
 						key={patient.id}
 						className="flex items-center justify-center size-7 rounded-md bg-muted text-muted-foreground"
 					>
-						<Icon className="size-4" />
+						<IconUser className="size-4" />
 					</div>
 				);
 			})}

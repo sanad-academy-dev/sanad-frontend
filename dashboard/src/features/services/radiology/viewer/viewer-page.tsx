@@ -124,7 +124,6 @@ export function RadiologyStudyViewer({ studyId }: { studyId: string }) {
 						</span>
 						<span className="truncate text-xs text-neutral-400">
 							{[
-								item.order.patient.animalType?.arName,
 								item.order.patient.age != null ? `${item.order.patient.age} سنة` : null,
 								item.order.owner.name,
 							]

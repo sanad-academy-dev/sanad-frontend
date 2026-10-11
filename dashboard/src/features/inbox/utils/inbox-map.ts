@@ -105,7 +105,6 @@ function mapPatient(item: InboxItemResponse | InboxItemDetailResponse) {
 	return {
 		code: item.patient.code,
 		name: item.patient.name,
-		species: item.patient.animalType?.arName ?? "",
 	};
 }
 

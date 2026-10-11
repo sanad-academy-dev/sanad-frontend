@@ -303,17 +303,6 @@ export function PatientProfileSheet({ patient, open, onClose }: PatientProfileSh
 										<span className="text-sm">{patient?.active ? "نشط" : "غير نشط"}</span>
 									</div>
 
-									{/* animal type */}
-									{patient?.animalType?.arName && (
-										<div className="flex items-center gap-1.5">
-											<IconPaw className="size-4 text-muted-foreground" />
-											<span className="text-sm">
-												{patient.animalType.arName}
-												{patient.animalStrain?.arName && ` — ${patient.animalStrain.arName}`}
-											</span>
-										</div>
-									)}
-
 									{/* age */}
 									{patient?.age != null && (
 										<div className="flex items-center gap-1.5">

@@ -13,25 +13,12 @@ import { LuSyringe } from "react-icons/lu";
 import { TableDataView } from "@/components/common/table-data-view";
 import { TableToolbar } from "@/components/common/table-toolbar";
 import { Button } from "@/components/ui/button";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { VaccinationStatusBadge } from "@/features/services/vaccinations/components/vaccination-status-badge";
 import { buildWhatsAppLink } from "@/features/services/vaccinations/utils/vaccination-reminder";
 import type { VaccinationDueRow } from "@/server/vaccinations/vaccinations.type";
 
 const dateFmt = new Intl.DateTimeFormat("ar", { dateStyle: "medium" });
-
-const SPECIES_FILTER = [
-	{ value: "ALL", label: "كل الأنواع" },
-	{ value: "DOG", label: "كلاب" },
-	{ value: "CAT", label: "قطط" },
-] as const;
 
 const lateness = (days: number | null) => {
 	if (days === null) return "—";
@@ -47,8 +34,7 @@ export function VaccinationDueTable({
 	clinicName,
 	search,
 	onSearchChange,
-	species,
-	onSpeciesChange,
+
 	onAdminister,
 }: {
 	rows: VaccinationDueRow[];
@@ -57,8 +43,6 @@ export function VaccinationDueTable({
 	clinicName: string;
 	search: string;
 	onSearchChange: (value: string) => void;
-	species: string;
-	onSpeciesChange: (value: string) => void;
 	onAdminister: (patientId: string | null, dueAntigenCodes?: string[]) => void;
 }) {
 	const columns = useMemo<ColumnDef<VaccinationDueRow>[]>(
@@ -75,13 +59,7 @@ export function VaccinationDueTable({
 					</div>
 				),
 			},
-			{
-				accessorKey: "animalTypeName",
-				header: "النوع",
-				cell: ({ row }) => (
-					<span className="text-muted-foreground">{row.original.animalTypeName}</span>
-				),
-			},
+
 			{
 				accessorKey: "ownerName",
 				header: "وليّ الأمر",
@@ -205,26 +183,6 @@ export function VaccinationDueTable({
 				searchPlaceholder="ابحث باسم الطفل أو وليّ الأمر..."
 				searchValue={search}
 				onSearchChange={onSearchChange}
-				leftExtra={
-					<Select
-						value={species}
-						onValueChange={onSpeciesChange}
-					>
-						<SelectTrigger className="h-6 w-32">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent position="popper">
-							{SPECIES_FILTER.map((option) => (
-								<SelectItem
-									key={option.value}
-									value={option.value}
-								>
-									{option.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				}
 				actions={
 					<Button
 						size="sm"

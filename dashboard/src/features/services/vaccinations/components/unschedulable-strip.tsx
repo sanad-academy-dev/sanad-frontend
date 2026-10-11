@@ -96,8 +96,7 @@ function BirthDateDialog({
 										<div className="flex min-w-0 flex-col">
 											<span className="truncate font-medium">{patient.patientName}</span>
 											<span className="truncate text-xs text-muted-foreground">
-												{patient.animalTypeName}
-												{patient.ownerName ? ` — ${patient.ownerName}` : ""}
+												{patient.ownerName ?? ""}
 											</span>
 										</div>
 									</td>

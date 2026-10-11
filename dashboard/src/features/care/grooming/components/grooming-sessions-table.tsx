@@ -72,18 +72,7 @@ export function GroomingSessionsTable({
 					</div>
 				),
 			},
-			{
-				id: "animal",
-				header: "النوع والسلالة",
-				cell: ({ row }) => (
-					<div className="flex min-w-0 flex-col">
-						<span className="truncate">{row.original.patient.animalType?.arName ?? "—"}</span>
-						<span className="truncate text-muted-foreground text-xs">
-							{row.original.patient.animalStrain?.arName ?? "—"}
-						</span>
-					</div>
-				),
-			},
+
 			{
 				id: "owner",
 				header: "وليّ الأمر",

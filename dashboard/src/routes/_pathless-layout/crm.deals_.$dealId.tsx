@@ -141,10 +141,7 @@ function CrmDealPage() {
 								label="المدينة"
 								value={deal.city}
 							/>
-							<Detail
-								label="نوع الطفل"
-								value={deal.petSpecies}
-							/>
+
 							{/* §5 — snapshot copied at conversion; on a direct deal it is the one
 							    the creator picked. Either way it is the deal's own column now. */}
 							<Detail
