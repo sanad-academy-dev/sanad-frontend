@@ -109,7 +109,10 @@ export function AddOwnerSheet({
 		onClose();
 	};
 
-	useHotkey("Mod+Enter", () => handleSubmit(onSubmit)(), { enabled: open });
+	useHotkey("Mod+Enter", () => handleSubmit(onSubmit)(), {
+		enabled: open,
+		conflictBehavior: "replace",
+	});
 
 	const handleCloseAttempt = () => {
 		if (filledFields.length > 0) {

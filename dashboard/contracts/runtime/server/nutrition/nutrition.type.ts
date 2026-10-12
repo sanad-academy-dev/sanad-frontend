@@ -186,7 +186,6 @@ export type NutritionDueRow = {
 	patientId: string;
 	patientName: string;
 	patientCode: string;
-	animalTypeName: string;
 	// [RC0] المُعرّف لا الاسم وحده — قائمة الاستدعاء تُجمَّع بوليّ الأمر (انظر GroomingDueRow)
 	ownerId: string | null;
 	ownerName: string | null;

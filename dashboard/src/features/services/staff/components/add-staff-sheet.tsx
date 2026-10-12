@@ -92,7 +92,10 @@ export function AddStaffSheet({ open, onClose, onCreated }: AddStaffSheetProps) 
 		}
 	};
 
-	useHotkey("Mod+Enter", () => handleSubmit(onSubmit)(), { enabled: open });
+	useHotkey("Mod+Enter", () => handleSubmit(onSubmit)(), {
+		enabled: open,
+		conflictBehavior: "replace",
+	});
 
 	return (
 		<Sheet

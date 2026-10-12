@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createOwnerSchema } from "@sanad/contracts/runtime/server/owners/owners.type";
 import {
 	IconArrowsDiagonal,
 	IconArrowsDiagonalMinimize2,
@@ -10,7 +11,6 @@ import { useHotkey } from "@tanstack/react-hotkeys";
 import { useEffect, useState } from "react";
 import { Controller, type Resolver, type SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { FieldLabel } from "@/components/common/field-label";
 import { FormFooter } from "@/components/common/form-footer";
 import { FormHeader } from "@/components/common/form-header";
@@ -51,7 +51,6 @@ import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { useFormProgress } from "@/hooks/use-form-progress";
 import { cn } from "@/lib/utils";
 import type { OwnerResponse } from "@/server/owners/owners.type";
-import { createOwnerSchema } from "@sanad/contracts/runtime/server/owners/owners.type";
 
 const ownerSheetCreateSchema = createOwnerSchema.extend({
 	patientIds: z.array(z.string()).min(1, "يرجى اختيار طفل واحد على الأقل"),
@@ -204,6 +203,7 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 
 	useHotkey("Mod+Enter", () => handleSubmit(onSubmit)(), {
 		enabled: open && !readOnly,
+		conflictBehavior: "replace",
 	});
 
 	const title = readOnly
@@ -401,7 +401,9 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 										>
 											<ComboboxChips aria-invalid={!!errors.patientIds}>
 												{(field.value ?? []).map((id) => {
-													const patient = patients.find((p) => p.id === id);
+													const patient =
+														patients.find((p) => p.id === id) ??
+														owner?.patients?.find((p) => p.id === id);
 													return patient ? (
 														<ComboboxChip
 															key={id}

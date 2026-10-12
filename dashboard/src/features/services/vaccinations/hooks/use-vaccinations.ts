@@ -231,12 +231,14 @@ export const useVaccinationRecords = (
 		skip?: number;
 		take?: number;
 	} = {},
+	options?: { enabled?: boolean },
 ) => {
 	const { data, isLoading } = useQuery<{
 		items: VaccinationRecordResponse[];
 		total: number;
 	}>({
 		queryKey: vaccinationKeys.records(filters),
+		enabled: options?.enabled ?? true,
 		queryFn: async () => {
 			const res = await api.vaccinations.records.get({ query: filters });
 			if (res.error) throw new Error("فشل جلب سجلّ التطعيمات");

@@ -41,7 +41,10 @@ const STATUS_TONE = (status: PrescriptionStatus) => {
 
 export function MedicationsTab({ patientId }: PatientTabProps) {
 	const { enabled } = usePharmacySettings();
-	const { prescriptions, isLoading } = usePatientPrescriptions(patientId, !!patientId);
+	const { prescriptions, isLoading } = usePatientPrescriptions(
+		patientId,
+		!!patientId && enabled,
+	);
 
 	return (
 		<TabsContent

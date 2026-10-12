@@ -52,7 +52,10 @@ export function AddOwnerDialog({ open, onClose, onSuccess }: AddOwnerDialogProps
 		onClose();
 	};
 
-	useHotkey("Mod+Enter", () => handleSubmit(onSubmit)(), { enabled: open });
+	useHotkey("Mod+Enter", () => handleSubmit(onSubmit)(), {
+		enabled: open,
+		conflictBehavior: "replace",
+	});
 
 	return (
 		<Dialog

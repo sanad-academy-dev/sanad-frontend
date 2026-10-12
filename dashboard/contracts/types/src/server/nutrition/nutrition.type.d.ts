@@ -608,13 +608,12 @@ export type NutritionDueRow = {
     patientId: string;
     patientName: string;
     patientCode: string;
-    animalTypeName: string;
     ownerId: string | null;
     ownerName: string | null;
     ownerPhone: string | null;
     goal: NutritionGoal;
     nextRecheckAt: Date | null;
-    /** سالب = متأخّر */
+    /** سالب = متأخّر */  
     daysUntil: number | null;
     currentWeightKg: number;
     idealWeightKg: number | null;

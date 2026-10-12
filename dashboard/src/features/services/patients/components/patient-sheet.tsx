@@ -162,6 +162,7 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 
 	useHotkey("Mod+Enter", () => handleSubmit(onSubmit, onInvalid)(), {
 		enabled: open && !readOnly,
+		conflictBehavior: "replace",
 	});
 
 	const title = readOnly ? "بيانات الطفل" : isEdit ? "تعديل بيانات الطفل" : "إضافة طفل جديد";
@@ -213,7 +214,7 @@ export function PatientSheet({ open, onClose, patient, readOnly = false }: Patie
 							<Field data-invalid={!!errors.name}>
 								<Input
 									id="patient-sheet-name"
-									placeholder="مثال: بسبوسة"
+									placeholder="مثال: يوسف"
 									className="text-sm"
 									aria-invalid={!!errors.name}
 									disabled={isPending || readOnly}

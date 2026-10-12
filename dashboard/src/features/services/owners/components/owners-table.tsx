@@ -72,7 +72,7 @@ function OwnerAvatar({ name }: { name: string }) {
 		.join("")
 		.toUpperCase();
 	return (
-		<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary primarytext-xs font-semibold border border-primary/20">
+		<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-semibold border border-primary/20">
 			{initials}
 		</div>
 	);
@@ -87,14 +87,16 @@ function PetIcons({ patients }: { patients: OwnerResponse["patients"] }) {
 	}
 
 	return (
-		<div className="flex items-center gap-1">
+		<div className="flex items-center gap-1.5 flex-wrap">
 			{visible.map((patient) => {
 				return (
 					<div
 						key={patient.id}
-						className="flex items-center justify-center size-7 rounded-md bg-muted text-muted-foreground"
+						className="inline-flex items-center gap-1 h-7 px-2 rounded-md bg-primary/10 text-primary text-xs font-medium"
+						title={patient.name}
 					>
-						<IconUser className="size-4" />
+						<IconUser className="size-3.5" />
+						<span className="truncate max-w-[80px]">{patient.name}</span>
 					</div>
 				);
 			})}

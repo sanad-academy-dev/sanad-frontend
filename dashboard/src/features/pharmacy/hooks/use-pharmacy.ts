@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/lib/api";
+import type { PrescriptionListResponse } from "@/server/pharmacy/prescriptions.type";
 
 /**
  * رسالة الخطأ من الخادم بنصّها.
@@ -125,17 +126,20 @@ export const usePrescriptions = (
 };
 
 /** وصفات طفل بعينه — تبويب الأدوية في ملفّه (§11.5) */
-export const usePatientPrescriptions = (patientId: string, enabled = true) => {
+export const usePatientPrescriptions = (
+	patientId: string,
+	enabled = true,
+): { prescriptions: PrescriptionListResponse[]; isLoading: boolean } => {
 	const { data, isLoading } = useQuery({
 		enabled: enabled && !!patientId,
 		queryKey: pharmacyKeys.prescriptions({ patientId }),
 		queryFn: async () => {
 			const { data, error } = await api.prescriptions.get({ query: { patientId } });
 			if (error) throw new Error("تعذّر تحميل الوصفات");
-			return data;
+			return (data as PrescriptionListResponse[]) ?? [];
 		},
 	});
-	return { prescriptions: data ?? [], isLoading };
+	return { prescriptions: (data as PrescriptionListResponse[]) ?? [], isLoading };
 };
 /** عدّادات الشاشة العليا — استعلام تجميع واحد في الخادم لا أربعة */
 export const usePrescriptionsSummary = (enabled = true) => {
