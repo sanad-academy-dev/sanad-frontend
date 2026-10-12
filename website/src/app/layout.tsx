@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import AiAgent from "@/components/ai-againt";
+import { TrialModal } from "@/components/trial-modal";
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'});
 
@@ -42,6 +43,7 @@ export default function RootLayout({
         </div>
         <Footer />
         <AiAgent />
+        <TrialModal />
       </body>
     </html>
   );
