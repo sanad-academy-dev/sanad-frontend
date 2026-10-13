@@ -375,8 +375,8 @@
         "tooltip": "العملاء الذين قدموا الطلبات اليوم"
       },
       "patients": {
-        "title": "إجمالي الأطفال",
-        "tooltip": "الأطفال المسجلون في الأكاديمية"
+        "title": "إجمالي الطلاب",
+        "tooltip": "الطلاب المسجلون في الأكاديمية"
       },
       "appointments": {
         "title": "إجمالي الزيارات",
@@ -459,7 +459,7 @@
       },
       "performanceDistribution": {
         "total": "إجمالي",
-        "patients": "الأطفال",
+        "patients": "الطلاب",
         "services": "الدورات",
         "categories": {
           "dogs": "برمجة",
@@ -610,16 +610,17 @@
       "inbox": "الوارد",
       "tasks": "مهامي",
       "appointments": "الزيارات",
-      "patients": "الأطفال",
+      "patients": "الطلاب",
       "owners": "أولياء الأمور",
       "doctors": "المدرّبين",
       "staff": "الموارد البشرية",
-      "analyses": "التقييمات",
+      "analyses": "التقارير",
       "operations": "الأنشطة",
       "medications": "المواد",
       "vaccinations": "الشهادات",
       "training": "الدورات",
-      "quizzes": "الاختبارات",
+      "quizzes": "التقييمات",
+      "attendance": "الحضور والانصراف",
       "nutrition": "المسارات",
       "grooming": "المعسكرات",
       "inpatients": "التنويم",

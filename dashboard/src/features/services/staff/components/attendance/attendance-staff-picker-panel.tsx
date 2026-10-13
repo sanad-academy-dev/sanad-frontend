@@ -62,17 +62,26 @@ export function AttendanceStaffPickerPanel({
 	onClose,
 	onNext,
 	title = "تسجيل حضور وانصراف",
+	customItems,
+	customRecords,
+	targetLabel = "الموظفين",
 }: {
 	open: boolean;
 	onClose: () => void;
 	onNext: (selected: PickedSelection[]) => void;
 	title?: string;
+	customItems?: { id: string; name: string; code: string; role?: string }[];
+	customRecords?: any[];
+	targetLabel?: string;
 }) {
 	const { staff } = useStaff();
+	const activeItems = customItems ?? staff;
 
-	// حالة اليوم وسجلّها لكل موظف — للشارات وتمرير وقت الحضور للخطوة التالية
+	// حالة اليوم وسجلّها لكل شخص — للشارات وتمرير وقت الحضور للخطوة التالية
 	const today = useMemo(() => new Date(), []);
-	const { records } = useAttendance(today, today);
+	const { records: defaultRecords } = useAttendance(today, today);
+	const records = customRecords ?? defaultRecords;
+
 	const recordByStaff = useMemo(() => {
 		const map = new Map<string, (typeof records)[number]>();
 		for (const r of records) map.set(r.staffId, r);
@@ -99,27 +108,27 @@ export function AttendanceStaffPickerPanel({
 
 	const filtered = useMemo(() => {
 		const q = search.trim().toLowerCase();
-		return staff.filter((s) => {
+		return activeItems.filter((s) => {
 			if (q && !s.name.toLowerCase().includes(q) && !s.code.toLowerCase().includes(q)) {
 				return false;
 			}
 			if (filterKey !== "all" && statusByStaff.get(s.id) !== filterKey) return false;
 			return true;
 		});
-	}, [staff, search, filterKey, statusByStaff]);
+	}, [activeItems, search, filterKey, statusByStaff]);
 
 	const allChecked = filtered.length > 0 && filtered.every((s) => selected.has(s.id));
 
-	// تنبيه: الموظفون المختارون المسجَّلون كغائبين لهذا اليوم
+	// تنبيه: المختارون المسجَّلون كغائبين لهذا اليوم
 	const absentNotice = useMemo(() => {
-		const names = staff
+		const names = activeItems
 			.filter((s) => selected.has(s.id) && statusByStaff.get(s.id) === "ABSENT")
 			.map((s) => s.name.split(" ")[0]);
 		if (names.length === 0) return null;
 		return names.length === 1
 			? `تم تسجيل ${names[0]} كغائب لهذا اليوم`
 			: `تم تسجيل ${names.join("، ")} كغائبين لهذا اليوم`;
-	}, [staff, selected, statusByStaff]);
+	}, [activeItems, selected, statusByStaff]);
 
 	const toggleAll = (checked: boolean) => {
 		setSelected((prev) => {
@@ -141,7 +150,10 @@ export function AttendanceStaffPickerPanel({
 		});
 	};
 
-	const filterLabel = FILTERS.find((f) => f.key === filterKey)?.label ?? "كل الموظفين";
+	const filterLabel =
+		filterKey === "all"
+			? `كل ${targetLabel}`
+			: (FILTERS.find((f) => f.key === filterKey)?.label ?? `كل ${targetLabel}`);
 
 	return (
 		<Sheet

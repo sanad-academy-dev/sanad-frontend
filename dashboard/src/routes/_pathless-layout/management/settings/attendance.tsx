@@ -42,7 +42,7 @@ function RouteComponent() {
 	useEffect(() => {
 		setOrigin(window.location.origin);
 	}, []);
-	const kioskUrl = origin ? `${origin.replace(/\/$/, "")}/services/staff` : "";
+	const kioskUrl = origin ? `${origin.replace(/\/$/, "")}/services/attendance` : "";
 
 	const savePin = () => {
 		const next = pin.replace(/\D/g, "");

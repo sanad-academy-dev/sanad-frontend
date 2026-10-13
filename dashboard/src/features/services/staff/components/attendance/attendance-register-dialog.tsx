@@ -72,6 +72,8 @@ export function AttendanceRegisterDialog({
 	defaultCheckOutTime,
 	defaultShowCheckOut,
 	onClose,
+	onSave,
+	targetLabel = "الموظف",
 }: {
 	open: boolean;
 	staffId: string | null;
@@ -82,6 +84,15 @@ export function AttendanceRegisterDialog({
 	defaultCheckOutTime?: string;
 	defaultShowCheckOut?: boolean;
 	onClose: () => void;
+	onSave?: (args: {
+		staffId: string;
+		date: string;
+		status: "PRESENT";
+		hours: number;
+		checkIn: string;
+		checkOut: string | null;
+	}) => Promise<unknown>;
+	targetLabel?: string;
 }) {
 	const { upsertAsync, isPending } = useUpsertAttendance();
 
@@ -142,15 +153,27 @@ export function AttendanceRegisterDialog({
 		}
 		const time12 = format(new Date(`2000-01-01T${summaryTime}:00`), "hh:mm");
 		try {
-			await upsertAsync({
-				staffId,
-				date: dateValue,
-				status: "PRESENT",
-				hours,
-				checkIn,
-				checkOut,
-			});
-			showRegisterToast(`تم تسجيل ${verb} ${staffName} في ${time12} ${period} بنجاح`);
+			if (onSave) {
+				await onSave({
+					staffId,
+					date: dateValue,
+					status: "PRESENT",
+					hours,
+					checkIn,
+					checkOut,
+				});
+			} else {
+				await upsertAsync({
+					staffId,
+					date: dateValue,
+					status: "PRESENT",
+					hours,
+					checkIn,
+					checkOut,
+				});
+			}
+			const displayName = targetLabel === "الطالب" ? `الطالب ${staffName}` : staffName;
+			showRegisterToast(`تم تسجيل ${verb} ${displayName} في ${time12} ${period} بنجاح`);
 			onClose();
 		} catch (err) {
 			toast.error(err instanceof Error ? err.message : "فشل التسجيل", {

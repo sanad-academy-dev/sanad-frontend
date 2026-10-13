@@ -9,6 +9,14 @@ export const ATTENDANCE_STATS: StatItem[] = [
 	{ title: "معدل الالتزام بالدوام", value: 0, tooltip: "نسبة الالتزام بجلسات الدوام" },
 ];
 
+export const STUDENT_ATTENDANCE_STATS: StatItem[] = [
+	{ title: "# للطلاب", value: 0, tooltip: "إجمالي عدد الطلاب المسجلين" },
+	{ title: "# حاضرين", value: 0, tooltip: "عدد الطلاب الحاضرين اليوم" },
+	{ title: "# غائبين", value: 0, tooltip: "عدد الطلاب الغائبين اليوم" },
+	{ title: "# في أجازة", value: 0, tooltip: "عدد الطلاب في إجازة اليوم" },
+	{ title: "معدل الالتزام بالحضور", value: 0, tooltip: "نسبة الالتزام بالحضور" },
+];
+
 // حالات الحضور (مفهرسة بقيمة enum) — تُستخدم لتلوين خلايا الشبكة
 export const ATTENDANCE_STATUSES = [
 	{ key: "present", label: "حاضر", color: "#16A34A" },

@@ -15,7 +15,7 @@ export function QuizzesHeader() {
 			className="flex items-center gap-[12px]"
 			dir="rtl"
 		>
-			<h1 className="text-sm font-bold text-foreground">الاختبارات</h1>
+			<h1 className="text-sm font-bold text-foreground">التقييمات</h1>
 		</div>,
 		slot,
 	);

@@ -1,7 +1,6 @@
 // تبويبات وحدة الموارد البشرية المعروضة في الهيدر العلوي
 export type StaffModuleTab =
 	| "employees"
-	| "attendance"
 	| "shifts"
 	| "payroll"
 	| "jobs"
@@ -13,7 +12,6 @@ export const STAFF_MODULE_TABS: {
 	disabled: boolean;
 }[] = [
 	{ value: "employees", label: "الموظفين", disabled: false },
-	{ value: "attendance", label: "الحضور والانصراف", disabled: false },
 	{ value: "shifts", label: "المناوبات", disabled: false },
 	{ value: "payroll", label: "مسير الرواتب", disabled: false },
 	{ value: "jobs", label: "الوظائف", disabled: false },

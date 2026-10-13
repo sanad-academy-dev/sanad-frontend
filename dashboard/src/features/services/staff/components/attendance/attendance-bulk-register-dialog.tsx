@@ -58,10 +58,21 @@ export function AttendanceBulkRegisterDialog({
 	staff,
 	mode = "checkin",
 	onClose,
+	onSave,
+	targetLabel = "الموظفين",
 }: {
 	staff: BulkPickedStaff[] | null;
 	mode?: BulkRegisterMode;
 	onClose: () => void;
+	onSave?: (args: {
+		staffId: string;
+		date: string;
+		status: "PRESENT";
+		hours: number;
+		checkIn: string;
+		checkOut: string | null;
+	}) => Promise<unknown>;
+	targetLabel?: string;
 }) {
 	const open = !!staff && staff.length > 0;
 	const isCheckout = mode === "checkout";
@@ -148,7 +159,8 @@ export function AttendanceBulkRegisterDialog({
 							) / 100;
 						if (hours < 0) hours = 0;
 					}
-					return upsertAsync({
+					const saveFn = onSave ?? upsertAsync;
+					return saveFn({
 						staffId: s.id,
 						date: dateValue,
 						status: "PRESENT",

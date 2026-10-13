@@ -375,8 +375,8 @@
         "tooltip": "Clients who submitted requests today"
       },
       "patients": {
-        "title": "Total patients",
-        "tooltip": "Patients registered in the clinic"
+        "title": "Total Students",
+        "tooltip": "Students registered in the academy"
       },
       "appointments": {
         "title": "Total appointments",
@@ -459,7 +459,7 @@
       },
       "performanceDistribution": {
         "total": "Total",
-        "patients": "Patients",
+        "patients": "Students",
         "services": "Services",
         "categories": {
           "dogs": "Dogs",
@@ -610,7 +610,7 @@
       "inbox": "Inbox",
       "tasks": "My Tasks",
       "appointments": "My Appointments",
-      "patients": "Patients",
+      "patients": "Students",
       "owners": "Owners",
       "doctors": "Doctors",
       "staff": "Human Resources",
@@ -619,7 +619,8 @@
       "medications": "Medications",
       "vaccinations": "Vaccinations",
       "training": "Training Courses",
-      "quizzes": "Quizzes",
+      "quizzes": "Assessments",
+      "attendance": "Attendance",
       "nutrition": "Nutrition",
       "grooming": "Grooming",
       "inpatients": "Inpatients",

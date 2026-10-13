@@ -146,9 +146,19 @@ function DateField({ value, onChange }: { value: string; onChange: (v: string) =
 export function AttendanceBulkAbsenceDialog({
 	staff,
 	onClose,
+	onSave,
+	targetLabel = "الموظفين",
 }: {
 	staff: BulkPickedStaff[] | null;
 	onClose: () => void;
+	onSave?: (args: {
+		staffId: string;
+		date: string;
+		status: "ABSENT";
+		hours?: number;
+		notes?: string;
+	}) => Promise<unknown>;
+	targetLabel?: string;
 }) {
 	const open = !!staff && staff.length > 0;
 	const { upsertAsync, isPending } = useUpsertAttendance();
@@ -194,11 +204,12 @@ export function AttendanceBulkAbsenceDialog({
 		const note = [reason, notes].filter(Boolean).join(" — ");
 
 		const toastId = toast.loading("جارٍ تسجيل الغياب...", { position: "bottom-left" });
+		const saveFn = onSave ?? upsertAsync;
 		try {
 			await Promise.all(
 				targets.flatMap((s) =>
 					days.map((d) =>
-						upsertAsync({
+						saveFn({
 							staffId: s.id,
 							date: format(d, "yyyy-MM-dd"),
 							status: "ABSENT",

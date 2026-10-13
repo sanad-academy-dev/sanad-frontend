@@ -65,6 +65,11 @@ import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import { useStaffFilters } from "@/features/services/staff/hooks/use-staff-filters";
 import { useUpsertAttendance } from "@/features/services/staff/hooks/use-upsert-attendance";
 import { exportStaffCsv } from "@/features/services/staff/utils/export-staff";
+import { usePatients } from "@/features/services/patients/hooks/use-patients";
+import {
+	useStudentAttendance,
+	useUpsertStudentAttendance,
+} from "@/features/services/attendance/hooks/use-student-attendance";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
 import { cn } from "@/lib/utils";
 
@@ -151,7 +156,7 @@ function CellActionsMenu({
 	);
 }
 
-function StaffAvatar({ name }: { name: string }) {
+function StaffAvatar({ name, isStudent = false }: { name: string; isStudent?: boolean }) {
 	const initials = name
 		.split(" ")
 		.slice(0, 2)
@@ -159,14 +164,25 @@ function StaffAvatar({ name }: { name: string }) {
 		.join("")
 		.toUpperCase();
 	return (
-		<div className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-[#6366F1] text-[9px] font-normal text-white">
+		<div
+			className={cn(
+				"flex size-[18px] shrink-0 items-center justify-center rounded-full text-[9px] font-normal text-white",
+				isStudent ? "bg-[#10B981]" : "bg-[#6366F1]",
+			)}
+		>
 			{initials}
 		</div>
 	);
 }
 
-export function AttendanceView() {
-	const { staff, isLoading } = useStaff();
+export function AttendanceView({
+	targetType = "students",
+}: {
+	targetType?: "students" | "staff";
+}) {
+	const isStudents = targetType === "students";
+	const { staff, isLoading: isStaffLoading } = useStaff();
+	const { patients, isLoading: isPatientsLoading } = usePatients();
 	const { filterGroups, applyStaffFilters } = useStaffFilters(staff);
 	const { clinicInfo } = useClinicInfo();
 	// وضع الكشك متاح فقط إذا فُعِّل من الإعدادات وله رمز PIN مخزّن
@@ -184,8 +200,14 @@ export function AttendanceView() {
 	);
 
 	// سجلات الحضور للأسبوع المعروض
-	const { records } = useAttendance(weekStart, addDays(weekStart, 6));
-	const { upsert } = useUpsertAttendance();
+	const { records: staffRecords } = useAttendance(weekStart, addDays(weekStart, 6));
+	const { records: studentRecords } = useStudentAttendance(weekStart, addDays(weekStart, 6));
+	const records = isStudents ? studentRecords : staffRecords;
+
+	const { upsert: upsertStaff, upsertAsync: upsertStaffAsync } = useUpsertAttendance();
+	const { upsert: upsertStudent, upsertAsync: upsertStudentAsync } = useUpsertStudentAttendance();
+	const upsert = isStudents ? upsertStudent : upsertStaff;
+	const upsertAsync = isStudents ? upsertStudentAsync : upsertStaffAsync;
 
 	// نافذة تسجيل الحضور/الانصراف
 	const [registerCell, setRegisterCell] = useState<{
@@ -264,12 +286,24 @@ export function AttendanceView() {
 
 	const rows = useMemo(() => {
 		const q = search.trim().toLowerCase();
+		if (isStudents) {
+			const list = patients.map((p) => ({
+				id: p.id,
+				name: p.name,
+				code: p.code,
+				role: "طالب",
+			}));
+			if (!q) return list;
+			return list.filter(
+				(s) => s.name.toLowerCase().includes(q) || s.code.toLowerCase().includes(q),
+			);
+		}
 		const list = applyStaffFilters(staff);
 		if (!q) return list;
 		return list.filter(
 			(s) => s.name.toLowerCase().includes(q) || s.code.toLowerCase().includes(q),
 		);
-	}, [staff, search, applyStaffFilters]);
+	}, [isStudents, patients, staff, search, applyStaffFilters]);
 
 	// ترقيم الصفحات
 	const [pageSize, setPageSize] = useState(15);
@@ -300,6 +334,8 @@ export function AttendanceView() {
 				defaultCheckInTime={registerCell?.defaultCheckIn}
 				defaultShowCheckOut={registerCell?.withCheckout}
 				onClose={() => setRegisterCell(null)}
+				onSave={isStudents ? upsertStudentAsync : undefined}
+				targetLabel={isStudents ? "الطالب" : "الموظف"}
 			/>
 
 			<AttendanceLeaveDialog
@@ -310,6 +346,8 @@ export function AttendanceView() {
 				date={leaveCell?.date ?? null}
 				onClose={() => setLeaveCell(null)}
 				onSubmitted={(id) => setReviewRequestId(id)}
+				onSave={isStudents ? upsertStudentAsync : undefined}
+				targetLabel={isStudents ? "الطالب" : "الموظف"}
 			/>
 
 			<AttendanceAbsenceDialog
@@ -319,6 +357,8 @@ export function AttendanceView() {
 				staffCode={absenceCell?.staffCode ?? null}
 				date={absenceCell?.date ?? null}
 				onClose={() => setAbsenceCell(null)}
+				onSave={isStudents ? upsertStudentAsync : undefined}
+				targetLabel={isStudents ? "الطالب" : "الموظف"}
 			/>
 
 			<LeaveReviewDialog
@@ -339,18 +379,32 @@ export function AttendanceView() {
 
 			<KioskScreen
 				open={kioskActive}
+				targetType={targetType}
 				onExit={() => setKioskActive(false)}
 			/>
 
 			<AttendanceStaffPickerPanel
 				open={pickerOpen}
 				title={
-					pickerIntent === "leave"
-						? "تسجيل أجازة"
-						: pickerIntent === "absence"
-							? "تسجيل غياب"
-							: "تسجيل حضور وانصراف"
+					isStudents
+						? pickerIntent === "leave"
+							? "تسجيل إجازة طالب"
+							: pickerIntent === "absence"
+								? "تسجيل غياب طالب"
+								: "تسجيل حضور وانصراف الطلاب"
+						: pickerIntent === "leave"
+							? "تسجيل أجازة"
+							: pickerIntent === "absence"
+								? "تسجيل غياب"
+								: "تسجيل حضور وانصراف"
 				}
+				customItems={
+					isStudents
+						? patients.map((p) => ({ id: p.id, name: p.name, code: p.code, role: "طالب" }))
+						: undefined
+				}
+				customRecords={isStudents ? studentRecords : undefined}
+				targetLabel={isStudents ? "الطلاب" : "الموظفين"}
 				onClose={() => setPickerOpen(false)}
 				onNext={(selected) => {
 					setPickerOpen(false);
@@ -376,6 +430,8 @@ export function AttendanceView() {
 				staff={bulkStaff}
 				mode={bulkMode}
 				onClose={() => setBulkStaff(null)}
+				onSave={isStudents ? upsertStudentAsync : undefined}
+				targetLabel={isStudents ? "الطلاب" : "الموظفين"}
 			/>
 
 			<AttendanceBulkLeaveDialog
@@ -392,12 +448,18 @@ export function AttendanceView() {
 			<AttendanceBulkAbsenceDialog
 				staff={bulkAbsenceStaff}
 				onClose={() => setBulkAbsenceStaff(null)}
+				onSave={isStudents ? upsertStudentAsync : undefined}
+				targetLabel={isStudents ? "الطلاب" : "الموظفين"}
 			/>
 
 			{/* شريط الأدوات */}
 			<TableToolbar
 				className="border-t"
-				searchPlaceholder="ابحث عن المدرّب بالاسم،المعرف..."
+				searchPlaceholder={
+					isStudents
+						? "ابحث عن الطالب بالاسم، المعرف..."
+						: "ابحث عن المدرّب بالاسم،المعرف..."
+				}
 				searchValue={search}
 				onSearchChange={setSearch}
 				// نفس ترتيب صفحة الموظفين: [التصفية] [تصدير] بمقاس xs موحّد
@@ -549,7 +611,9 @@ export function AttendanceView() {
 						<tr>
 							<th className="sticky right-0 z-20 h-[34px] min-w-[180px] border-t border-l border-[#F5F5F6] bg-white px-3">
 								<div className="flex items-center justify-between gap-1">
-									<span className="text-[12px] font-normal text-[#6B6B67]">اسم الموظف</span>
+									<span className="text-[12px] font-normal text-[#6B6B67]">
+										{isStudents ? "اسم الطالب" : "اسم الموظف"}
+									</span>
 									<IconSortDescending className="size-[15px] text-[#6B6B67]" />
 								</div>
 							</th>
@@ -574,8 +638,11 @@ export function AttendanceView() {
 													</span>
 												)}
 											</span>
-											{/* عدد الموظفين — يسار */}
-											<span className="flex items-center gap-1 text-[12px] text-[#6B6B67]">
+											{/* عدد الطلاب أو الموظفين — يسار */}
+											<span
+												className="flex items-center gap-1 text-[12px] text-[#6B6B67]"
+												title={isStudents ? "عدد الطلاب" : "عدد الموظفين"}
+											>
 												<IconUser className="size-3" />
 												<span className="tabular-nums">{rows.length}</span>
 											</span>
@@ -590,7 +657,7 @@ export function AttendanceView() {
 							<tr key={s.id}>
 								<td className="sticky right-0 z-10 h-[34px] border-t border-l border-[#F5F5F6] bg-white px-3">
 									<div className="flex items-center gap-1.5">
-										<StaffAvatar name={s.name} />
+										<StaffAvatar name={s.name} isStudent={isStudents} />
 										<span
 											dir="rtl"
 											className="truncate text-right text-[12px] text-[#08090A]"

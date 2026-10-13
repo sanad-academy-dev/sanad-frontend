@@ -123,6 +123,8 @@ export function AttendanceLeaveDialog({
 	date,
 	onClose,
 	onSubmitted,
+	onSave,
+	targetLabel = "الموظف",
 }: {
 	open: boolean;
 	staffId: string | null;
@@ -131,6 +133,14 @@ export function AttendanceLeaveDialog({
 	date: Date | null;
 	onClose: () => void;
 	onSubmitted: (requestId: string) => void;
+	onSave?: (args: {
+		staffId: string;
+		date: string;
+		status: "LEAVE";
+		hours?: number;
+		notes?: string;
+	}) => Promise<unknown>;
+	targetLabel?: string;
 }) {
 	const { createLeaveRequest, isPending } = useCreateLeaveRequest();
 	const { balance } = useLeaveBalance(staffId, open);
@@ -192,6 +202,32 @@ export function AttendanceLeaveDialog({
 
 	const handleSubmit = async () => {
 		if (!staffId || !canSubmit) return;
+
+		if (onSave) {
+			const intervalDays = eachDayOfInterval({
+				start: new Date(`${startDate}T00:00:00`),
+				end: new Date(`${endDate}T00:00:00`),
+			});
+			const noteText = [leaveType, notes].filter(Boolean).join(" — ");
+			await Promise.all(
+				intervalDays.map((d) =>
+					onSave({
+						staffId,
+						date: format(d, "yyyy-MM-dd"),
+						status: "LEAVE",
+						hours: 0,
+						notes: noteText || undefined,
+					}),
+				),
+			);
+			toast.success(
+				`تم تسجيل إجازة ${targetLabel === "الطالب" ? "الطالب " : ""}${staffName} بنجاح`,
+				{ position: "bottom-left" },
+			);
+			onClose();
+			return;
+		}
+
 		const days = eachDayOfInterval({
 			start: new Date(`${startDate}T00:00:00`),
 			end: new Date(`${endDate}T00:00:00`),

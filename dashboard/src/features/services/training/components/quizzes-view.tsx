@@ -27,9 +27,9 @@ import {
 import type { QuizListItemResponse, QuizStatsResponse } from "@/server/quizzes/quizzes.type";
 
 const buildQuizStats = (s?: QuizStatsResponse) => [
-	{ title: "إجمالي الاختبارات", value: s?.total ?? 0, tooltip: "العدد الكلي للاختبارات" },
-	{ title: "منشورة", value: s?.published ?? 0, tooltip: "الاختبارات المنشورة" },
-	{ title: "مسودّات", value: s?.draft ?? 0, tooltip: "الاختبارات قيد الإعداد" },
+	{ title: "إجمالي التقييمات", value: s?.total ?? 0, tooltip: "العدد الكلي للتقييمات" },
+	{ title: "منشورة", value: s?.published ?? 0, tooltip: "التقييمات المنشورة" },
+	{ title: "مسودّات", value: s?.draft ?? 0, tooltip: "التقييمات قيد الإعداد" },
 ];
 
 export function QuizzesView() {
@@ -152,14 +152,14 @@ export function QuizzesView() {
 			<div className="min-h-0 flex-1 overflow-auto bg-background py-3">
 				{quizzesLoading ? (
 					<p className="px-3 py-16 text-center text-[13px] text-muted-foreground">
-						جارٍ تحميل الاختبارات...
+						جارٍ تحميل التقييمات...
 					</p>
 				) : filteredQuizzes.length === 0 ? (
 					<div className="flex flex-col items-center gap-3 px-3 py-16 text-center">
 						<h2 className="text-[14px] font-bold text-foreground">
 							{quizzes.length === 0
-								? "لا يوجد أي اختبارات حتى الآن"
-								: "لا توجد اختبارات مطابقة"}
+								? "لا يوجد أي تقييمات حتى الآن"
+								: "لا توجد تقييمات مطابقة"}
 						</h2>
 						<p className="max-w-[280px] text-[12px] text-muted-foreground">
 							أنشئ اختباراً لتقييم معرفة موظفيك ورصد نتائجهم.

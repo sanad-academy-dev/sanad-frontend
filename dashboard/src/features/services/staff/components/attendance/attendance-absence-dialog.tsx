@@ -111,6 +111,8 @@ export function AttendanceAbsenceDialog({
 	staffName,
 	staffCode,
 	onClose,
+	onSave,
+	targetLabel = "الموظف",
 }: {
 	open: boolean;
 	staffId: string | null;
@@ -118,6 +120,14 @@ export function AttendanceAbsenceDialog({
 	staffCode: string | null;
 	date: Date | null;
 	onClose: () => void;
+	onSave?: (args: {
+		staffId: string;
+		date: string;
+		status: "ABSENT";
+		hours?: number;
+		notes?: string;
+	}) => Promise<unknown>;
+	targetLabel?: string;
 }) {
 	const { upsertAsync, isPending } = useUpsertAttendance();
 
@@ -154,11 +164,12 @@ export function AttendanceAbsenceDialog({
 			end: new Date(`${endDate}T00:00:00`),
 		});
 		const note = [reason, notes].filter(Boolean).join(" — ");
+		const saveFn = onSave ?? upsertAsync;
 
 		await toast.promise(
 			Promise.all(
 				days.map((d) =>
-					upsertAsync({
+					saveFn({
 						staffId,
 						date: format(d, "yyyy-MM-dd"),
 						status: "ABSENT",
@@ -168,8 +179,8 @@ export function AttendanceAbsenceDialog({
 				),
 			),
 			{
-				loading: "جارٍ تسجيل الغياب...",
-				success: "تم تسجيل الغياب",
+				loading: `جارٍ تسجيل غياب ${targetLabel === "الطالب" ? "الطالب" : "الموظف"}...`,
+				success: `تم تسجيل غياب ${targetLabel === "الطالب" ? "الطالب " : ""}${staffName}`,
 				error: (err: Error) => err.message || "فشل تسجيل الغياب",
 				position: "bottom-left",
 			},

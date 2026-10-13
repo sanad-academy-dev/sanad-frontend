@@ -1,5 +1,4 @@
 // تبويبات وحدة الموارد البشرية تُحقَن في الهيدر العلوي (جنب عنوان "الموارد البشرية") عبر portal
-import { IconLock } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -12,12 +11,9 @@ import { cn } from "@/lib/utils";
 export function StaffHeader({
 	active,
 	onChange,
-	attendanceEnabled = true,
 }: {
 	active: StaffModuleTab;
 	onChange: (tab: StaffModuleTab) => void;
-	// تبويب الحضور والانصراف مقفول ما لم يُفعَّل من الإعدادات
-	attendanceEnabled?: boolean;
 }) {
 	const [slot, setSlot] = useState<HTMLElement | null>(null);
 
@@ -38,13 +34,11 @@ export function StaffHeader({
 			<nav className="flex items-center gap-[3.49px]">
 				{STAFF_MODULE_TABS.map((tab) => {
 					const isActive = active === tab.value;
-					const isLocked = tab.value === "attendance" && !attendanceEnabled;
 					return (
 						<button
 							key={tab.value}
 							type="button"
 							disabled={tab.disabled}
-							// نُبقيه قابلًا للنقر عند القفل لعرض رسالة، ونمنع الانتقال في الأب
 							onClick={() => onChange(tab.value)}
 							className={cn(
 								"flex h-[25px] items-center justify-center gap-[4px] rounded-[4px] px-[14px] text-[11px] font-medium leading-[16px]",
@@ -52,10 +46,8 @@ export function StaffHeader({
 									? "border-[0.75px] border-[#E5E7EB] bg-[#F9FAFB] text-[#1F2937]"
 									: "text-[#6B7280]",
 								tab.disabled && "cursor-not-allowed opacity-60",
-								isLocked && "cursor-not-allowed text-[#9B9B9D]",
 							)}
 						>
-							{isLocked && <IconLock className="size-[12px]" />}
 							{tab.label}
 						</button>
 					);

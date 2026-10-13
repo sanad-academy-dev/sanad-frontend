@@ -12,29 +12,29 @@ export function usePatientStats(patients: PatientResponse[]): StatItem[] {
 
 		return [
 			{
-				title: "إجمالي الأطفال",
+				title: "إجمالي الطلاب",
 				value: total,
-				tooltip: "إجمالي الأطفال المسجلين في الأكاديمية",
+				tooltip: "إجمالي الطلاب المسجلين في الأكاديمية",
 			},
 			{
-				title: "الأطفال النشطين",
+				title: "الطلاب النشطين",
 				value: active,
-				tooltip: "عدد الأطفال النشطين حاليًا",
+				tooltip: "عدد الطلاب النشطين حاليًا",
 			},
 			{
 				title: "ذكور",
 				value: male,
-				tooltip: "إجمالي عدد الأطفال الذكور",
+				tooltip: "إجمالي عدد الطلاب الذكور",
 			},
 			{
 				title: "إناث",
 				value: female,
-				tooltip: "إجمالي عدد الأطفال الإناث",
+				tooltip: "إجمالي عدد الطالبات",
 			},
 			{
 				title: "مرتبط بوليّ أمر",
 				value: withOwner,
-				tooltip: "الأطفال المرتبطين بملف ولي أمر",
+				tooltip: "الطلاب المرتبطين بملف ولي أمر",
 			},
 		];
 	}, [patients]);

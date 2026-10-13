@@ -19,6 +19,8 @@ import { AttendanceRegisterDialog } from "@/features/services/staff/components/a
 import { KioskPinDialog } from "@/features/services/staff/components/attendance/kiosk-pin-dialog";
 import { useAttendance } from "@/features/services/staff/hooks/use-attendance";
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
+import { usePatients } from "@/features/services/patients/hooks/use-patients";
+import { useStudentAttendance, useUpsertStudentAttendance } from "@/features/services/attendance/hooks/use-student-attendance";
 import { cn } from "@/lib/utils";
 import type { AttendanceResponse } from "@/server/attendance/attendance.type";
 
@@ -62,10 +64,36 @@ function StatCard({ value, label }: { value: string; label: string }) {
 	);
 }
 
-export function KioskScreen({ open, onExit }: { open: boolean; onExit: () => void }) {
+export function KioskScreen({
+	open,
+	onExit,
+	targetType = "students",
+}: {
+	open: boolean;
+	onExit: () => void;
+	targetType?: "students" | "staff";
+}) {
+	const isStudents = targetType === "students";
 	const { staff } = useStaff();
+	const { patients } = usePatients();
 	const today = useMemo(() => new Date(), []);
-	const { records } = useAttendance(today, today);
+	const { records: staffRecords } = useAttendance(today, today);
+	const { records: studentRecords } = useStudentAttendance(today, today);
+	const records = isStudents ? studentRecords : staffRecords;
+	const { upsertAsync: upsertStudentAsync } = useUpsertStudentAttendance();
+
+	const activeItems = useMemo(() => {
+		if (isStudents) {
+			return patients.map((p) => ({
+				id: p.id,
+				name: p.name,
+				code: p.code,
+				role: "طالب",
+				email: p.owner?.email,
+			}));
+		}
+		return staff;
+	}, [isStudents, patients, staff]);
 
 	const [now, setNow] = useState(() => new Date());
 	const [search, setSearch] = useState("");
@@ -102,7 +130,7 @@ export function KioskScreen({ open, onExit }: { open: boolean; onExit: () => voi
 
 	const rows = useMemo(() => {
 		const q = search.trim().toLowerCase();
-		return staff
+		return activeItems
 			.map((s) => ({
 				staff: s,
 				state: cellState(recordByStaff.get(s.id)),
@@ -115,24 +143,24 @@ export function KioskScreen({ open, onExit }: { open: boolean; onExit: () => voi
 				if (filter !== "all" && state !== filter) return false;
 				return true;
 			});
-	}, [staff, search, filter, recordByStaff]);
+	}, [activeItems, search, filter, recordByStaff]);
 
 	const stats = useMemo(() => {
-		const present = staff.filter(
+		const present = activeItems.filter(
 			(s) => cellState(recordByStaff.get(s.id)) === "present",
 		).length;
-		const left = staff.filter((s) => cellState(recordByStaff.get(s.id)) === "left").length;
+		const left = activeItems.filter((s) => cellState(recordByStaff.get(s.id)) === "left").length;
 		const leave = records.filter((r) => r.status === "LEAVE").length;
-		const absent = staff.length - present - left - leave;
-		const compliance = staff.length ? Math.round(((present + left) / staff.length) * 100) : 0;
-		return { total: staff.length, present, absent: Math.max(absent, 0), leave, compliance };
-	}, [staff, records, recordByStaff]);
+		const absent = activeItems.length - present - left - leave;
+		const compliance = activeItems.length ? Math.round(((present + left) / activeItems.length) * 100) : 0;
+		return { total: activeItems.length, present, absent: Math.max(absent, 0), leave, compliance };
+	}, [activeItems, records, recordByStaff]);
 
-	// بحث بالـ PIN Code: يجد الموظف بالكود ويفتح تسجيل الحضور/الانصراف حسب حالته
+	// بحث بالـ PIN Code: يجد الشخص بالكود ويفتح تسجيل الحضور/الانصراف حسب حالته
 	const handlePinSearch = () => {
 		const q = pinCode.trim().toLowerCase();
 		if (!q) return;
-		const found = staff.find(
+		const found = activeItems.find(
 			(s) => s.code.toLowerCase() === q || s.code.toLowerCase().includes(q),
 		);
 		if (!found) {
@@ -469,6 +497,8 @@ export function KioskScreen({ open, onExit }: { open: boolean; onExit: () => voi
 				defaultCheckInTime={registerCell?.defaultCheckIn}
 				defaultCheckOutTime={registerCell?.defaultCheckOut}
 				defaultShowCheckOut={registerCell?.withCheckout}
+				onSave={isStudents ? upsertStudentAsync : undefined}
+				targetLabel={isStudents ? "الطالب" : "الموظف"}
 				onClose={() => {
 					setRegisterCell(null);
 					setPinCode("");
