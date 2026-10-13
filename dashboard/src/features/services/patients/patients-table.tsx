@@ -45,7 +45,7 @@ function OwnerAvatar({ name }: { name: string }) {
 		.join("")
 		.toUpperCase();
 	return (
-		<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary primarytext-xs font-semibold border border-primary/20">
+		<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-semibold border border-primary/20">
 			{initials}
 		</div>
 	);

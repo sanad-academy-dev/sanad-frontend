@@ -9,7 +9,6 @@ import {
 	IconCopy,
 	IconDots,
 	IconEdit,
-	IconPaw,
 	IconPhone,
 	IconTrash,
 	IconUser,
@@ -337,19 +336,29 @@ export function PatientProfileSheet({ patient, open, onClose }: PatientProfileSh
 							</div>
 
 							<div className="col-span-7 overflow-y-auto">
-								<OverviewTab patientId={patient?.id ?? ""} />
-								<HistoryTab
-									patientId={patient?.id ?? ""}
-									onNavigateTab={setActiveTab}
-								/>
-								<VaccinationsTab patientId={patient?.id ?? ""} />
-								<InpatientsTab patientId={patient?.id ?? ""} />
-								<MedicationsTab patientId={patient?.id ?? ""} />
-								<NutritionTab patientId={patient?.id ?? ""} />
-								<VitalSignsTab patientId={patient?.id ?? ""} />
-								<DocumentsTab patientId={patient?.id ?? ""} />
-								<ConsentsTab patientId={patient?.id ?? ""} />
-								<SubscriptionsTab patientId={patient?.id ?? ""} />
+								{activeTab === "overview" && <OverviewTab patientId={patient?.id ?? ""} />}
+								{activeTab === "history" && (
+									<HistoryTab
+										patientId={patient?.id ?? ""}
+										onNavigateTab={setActiveTab}
+									/>
+								)}
+								{activeTab === "vaccinations" && (
+									<VaccinationsTab patientId={patient?.id ?? ""} />
+								)}
+								{activeTab === "inpatients" && <InpatientsTab patientId={patient?.id ?? ""} />}
+								{activeTab === "medications" && (
+									<MedicationsTab patientId={patient?.id ?? ""} />
+								)}
+								{activeTab === "nutrition" && <NutritionTab patientId={patient?.id ?? ""} />}
+								{activeTab === "vital-signs" && (
+									<VitalSignsTab patientId={patient?.id ?? ""} />
+								)}
+								{activeTab === "documents" && <DocumentsTab patientId={patient?.id ?? ""} />}
+								{activeTab === "consents" && <ConsentsTab patientId={patient?.id ?? ""} />}
+								{activeTab === "subscriptions" && (
+									<SubscriptionsTab patientId={patient?.id ?? ""} />
+								)}
 							</div>
 						</div>
 					</Tabs>

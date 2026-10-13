@@ -161,7 +161,7 @@ export function AddQuizSheet({
 		hydratedRef.current = editQuizId;
 		reset(toFormValues(quiz));
 		setQuizId(editQuizId);
-		setFurthest(2);
+		setFurthest(3);
 	}, [editQuizId, quiz, reset]);
 
 	// مسح خطأ النشر عند مغادرة الخطوة المعنيّة

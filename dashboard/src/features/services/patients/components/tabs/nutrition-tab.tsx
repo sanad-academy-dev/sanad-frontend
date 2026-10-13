@@ -1,6 +1,9 @@
+import {
+	GOAL_LABELS,
+	PLAN_STATUS_LABELS,
+} from "@sanad/contracts/runtime/server/nutrition/nutrition.type";
 import { IconPlus, IconScaleOutline } from "@tabler/icons-react";
 import { useState } from "react";
-
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,7 +20,6 @@ import {
 import type { PatientTabProps } from "@/features/services/patients/types/tabs.types";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
 import type { NutritionPlanStatus } from "@/generated/prisma/enums";
-import { GOAL_LABELS, PLAN_STATUS_LABELS } from "@sanad/contracts/runtime/server/nutrition/nutrition.type";
 
 // تبويب التغذية في ملف الطفل — الخطة السارية أولًا، ثم منحنى الوزن، ثم التاريخ.
 //
@@ -38,7 +40,10 @@ const STATUS_TONE: Record<
 };
 
 export function NutritionTab({ patientId }: PatientTabProps) {
-	const { plans, isLoading } = useNutritionPlans({ patientId: patientId || undefined });
+	const { plans, isLoading } = useNutritionPlans(
+		{ patientId: patientId || undefined },
+		{ enabled: Boolean(patientId) },
+	);
 	const { points } = useWeightHistory(patientId || undefined);
 	const { clinicInfo } = useClinicInfo();
 

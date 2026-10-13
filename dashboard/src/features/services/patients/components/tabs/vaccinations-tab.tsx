@@ -1,7 +1,7 @@
+import { DUE_STATUS_LABELS } from "@sanad/contracts/runtime/server/vaccinations/vaccinations.type";
 import { IconPrinter } from "@tabler/icons-react";
 import { useState } from "react";
 import { LuSyringe } from "react-icons/lu";
-
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -24,7 +24,6 @@ import {
 } from "@/features/services/vaccinations/hooks/use-vaccinations";
 import { printVaccinationCertificate } from "@/features/services/vaccinations/utils/print-vaccination-certificate";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
-import { DUE_STATUS_LABELS } from "@sanad/contracts/runtime/server/vaccinations/vaccinations.type";
 
 const dateFmt = new Intl.DateTimeFormat("ar", { dateStyle: "medium" });
 
@@ -32,7 +31,8 @@ export function VaccinationsTab({ patientId }: PatientTabProps) {
 	const [administerOpen, setAdministerOpen] = useState(false);
 	const { status, isLoading } = usePatientVaccinationStatus(patientId || undefined);
 	const { records, isLoading: recordsLoading } = useVaccinationRecords(
-		patientId ? { patientId, includeVoided: true } : {},
+		{ patientId, includeVoided: true },
+		{ enabled: Boolean(patientId) },
 	);
 	const { clinicInfo } = useClinicInfo();
 	const { patients } = usePatients();

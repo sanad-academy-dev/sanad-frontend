@@ -17,7 +17,6 @@ export function DigitalRegistrationHeader() {
 			className="flex items-center gap-[12px]"
 			dir={isRtl ? "rtl" : "ltr"}
 		>
-			<span className="h-[18px] w-px bg-[#E5E7EB]" />
 			<h1 className="text-sm font-bold text-foreground">التسجيل الرقمي</h1>
 		</div>,
 		slot,

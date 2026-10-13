@@ -64,7 +64,10 @@ export function AddPatientDialog({ open, onClose, onSuccess }: AddPatientDialogP
 		onClose();
 	};
 
-	useHotkey("Mod+Enter", () => handleSubmit(onSubmit)(), { enabled: open });
+	useHotkey("Mod+Enter", () => handleSubmit(onSubmit)(), {
+		enabled: open,
+		conflictBehavior: "replace",
+	});
 
 	return (
 		<Dialog

@@ -65,12 +65,8 @@ export type OwnerResponse = Prisma.OwnerGetPayload<{
         patients: {
             select: {
                 id: true;
-                animalType: {
-                    select: {
-                        arName: true;
-                        enName: true;
-                    };
-                };
+                name: true;
+                gender: true;
             };
         };
     };

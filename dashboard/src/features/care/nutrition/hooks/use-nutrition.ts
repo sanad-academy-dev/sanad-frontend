@@ -112,9 +112,11 @@ export const useNutritionPlans = (
 		q?: string;
 		take?: number;
 	} = {},
+	options?: { enabled?: boolean },
 ) => {
 	const { data, isLoading, isError } = useQuery<NutritionPlanListResponse[]>({
 		queryKey: nutritionKeys.plans(filters),
+		enabled: options?.enabled ?? true,
 		queryFn: async () => {
 			const res = await api.nutrition.plans.get({ query: filters });
 			if (res.error) throw new Error("فشل جلب خطط التغذية");

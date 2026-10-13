@@ -1,5 +1,5 @@
 import { IconAlertTriangle, IconCheck, IconCopy, IconDeviceMobile } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -39,6 +39,8 @@ export const PortalPasswordDialog = ({
 }) => {
 	const { data: status } = usePortalStatus(owner?.id ?? null, open);
 	const issue = useIssuePortalPassword();
+	const issueRef = useRef(issue);
+	issueRef.current = issue;
 	const [password, setPassword] = useState<string | null>(null);
 	const [copied, setCopied] = useState(false);
 
@@ -47,9 +49,9 @@ export const PortalPasswordDialog = ({
 		if (!open) {
 			setPassword(null);
 			setCopied(false);
-			issue.reset();
+			issueRef.current.reset();
 		}
-	}, [open, issue]);
+	}, [open]);
 
 	if (!owner) return null;
 

@@ -1,14 +1,7 @@
-import { IconCake, IconPaw, IconScale, IconUsers, IconWeight } from "@tabler/icons-react";
+import { IconCake, IconScale, IconUsers, IconWeight } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 
 import { Input } from "@/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
@@ -288,7 +281,7 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 			dir="rtl"
 		>
 			<div className="rounded-lg border p-4 flex gap-3 items-start">
-				<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary primarytext-sm font-semibold">
+				<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-semibold">
 					{getInitials(patient.name)}
 				</div>
 				<div className="flex flex-col gap-2 flex-1 min-w-0">

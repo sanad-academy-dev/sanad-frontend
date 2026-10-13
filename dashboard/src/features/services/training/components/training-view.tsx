@@ -15,28 +15,20 @@ import { TableToolbar } from "@/components/common/table-toolbar";
 import { Button } from "@/components/ui/button";
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import { AddCourseSheet } from "@/features/services/training/components/add-course-sheet";
-import { AddQuizSheet } from "@/features/services/training/components/add-quiz-sheet";
 import { AssignEmployeeDialog } from "@/features/services/training/components/assign-employee-dialog";
 import { CloneSuccessToast } from "@/features/services/training/components/clone-success-toast";
 import { CourseCard } from "@/features/services/training/components/course-card";
 import { CourseTable } from "@/features/services/training/components/course-table";
 import { CreateContentMenu } from "@/features/services/training/components/create-content-menu";
 import { DeleteCourseDialog } from "@/features/services/training/components/delete-course-dialog";
-import { DeleteQuizDialog } from "@/features/services/training/components/delete-quiz-dialog";
 import {
 	DisableCourseDialog,
 	EnableCourseDialog,
 } from "@/features/services/training/components/disable-course-dialog";
-import { QuizCard } from "@/features/services/training/components/quiz-card";
-import { QuizDetailsSheet } from "@/features/services/training/components/quiz-details-sheet";
-import { QuizManagerDialog } from "@/features/services/training/components/quiz-manager-dialog";
-import { QuizPlayerDialog } from "@/features/services/training/components/quiz-player-dialog";
-import { QuizTable } from "@/features/services/training/components/quiz-table";
 import {
 	type FilterGroup,
 	TrainingFiltersMenu,
 } from "@/features/services/training/components/training-filters-menu";
-import { UnpublishQuizDialog } from "@/features/services/training/components/unpublish-quiz-dialog";
 import {
 	type CoursesView,
 	ViewOptionsMenu,
@@ -53,16 +45,8 @@ import {
 	useDuplicateCourse,
 	useRestoreCourse,
 } from "@/features/services/training/hooks/use-courses";
-import {
-	useDeleteQuiz,
-	usePublishQuiz,
-	useQuizStats,
-	useQuizzes,
-	useUnpublishQuiz,
-} from "@/features/services/training/hooks/use-quizzes";
 import type { TrainingTab } from "@/features/services/training/types/training-tabs.types";
 import { exportCoursesCsv } from "@/features/services/training/utils/export-courses";
-import type { QuizListItemResponse, QuizStatsResponse } from "@/server/quizzes/quizzes.type";
 import type {
 	CourseListItemResponse,
 	CourseLocationMode,
@@ -94,16 +78,8 @@ const buildStats = (s?: CourseStatsResponse) => [
 	},
 ];
 
-// بطاقات إحصائية للاختبارات — الترتيب هو ترتيب DOM في RTL
-const buildQuizStats = (s?: QuizStatsResponse) => [
-	{ title: "إجمالي الاختبارات", value: s?.total ?? 0, tooltip: "العدد الكلي للاختبارات" },
-	{ title: "منشورة", value: s?.published ?? 0, tooltip: "الاختبارات المنشورة" },
-	{ title: "مسودّات", value: s?.draft ?? 0, tooltip: "الاختبارات قيد الإعداد" },
-];
-
 export function TrainingView({ tab }: { tab: TrainingTab }) {
 	const navigate = useNavigate();
-	const isQuizTab = tab === "quiz";
 	const { stats } = useCourseStats();
 	const { courses, isLoading } = useCourses();
 	const { deleteCourse } = useDeleteCourse();
@@ -111,22 +87,6 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 	const { archiveCourse } = useArchiveCourse();
 	const { restoreCourse } = useRestoreCourse();
 	const { staff } = useStaff();
-
-	// الاختبارات (تبويب «اختبار»)
-	const { quizzes, isLoading: quizzesLoading } = useQuizzes();
-	const { stats: quizStats } = useQuizStats();
-	const { deleteQuiz } = useDeleteQuiz();
-	const { publishQuiz } = usePublishQuiz();
-	const { unpublishQuiz } = useUnpublishQuiz();
-	const [quizAddOpen, setQuizAddOpen] = useState(false);
-	const [quizEditId, setQuizEditId] = useState<string | null>(null);
-	const [deletingQuiz, setDeletingQuiz] = useState<QuizListItemResponse | null>(null);
-	const [playingQuizId, setPlayingQuizId] = useState<string | null>(null);
-	const [resultsQuizId, setResultsQuizId] = useState<string | null>(null);
-	// الاختبار المعروضة تفاصيله قبل البدء (لوحة من يسار الشاشة)
-	const [preStartQuizId, setPreStartQuizId] = useState<string | null>(null);
-	// الاختبار المطلوب إلغاء نشره — يفتح حوار تأكيد
-	const [unpublishingQuiz, setUnpublishingQuiz] = useState<QuizListItemResponse | null>(null);
 
 	const [search, setSearch] = useState("");
 	// فلاتر متعدّدة الاختيار — قائمة فارغة = بلا تصفية
@@ -150,52 +110,30 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 		setEditId(null);
 		setAddOpen(true);
 	};
+
 	const handleEdit = (course: CourseListItemResponse) => {
 		setEditId(course.id);
 		setAddOpen(true);
 	};
-	// «فتح» يفتح باني الدورة (نفس اللوحة الجانبية على معرّف الدورة)
-	const handleOpen = handleEdit;
 
-	// ==== إجراءات الاختبارات ====
-	const openQuizCreate = () => {
-		setQuizEditId(null);
-		setQuizAddOpen(true);
-	};
-	const handleQuizEdit = (quiz: QuizListItemResponse) => {
-		setQuizEditId(quiz.id);
-		setQuizAddOpen(true);
-	};
-	const handleQuizPublish = (quiz: QuizListItemResponse) => {
-		toast.promise(publishQuiz(quiz.id), {
-			loading: "جارٍ نشر الاختبار...",
-			success: "تم نشر الاختبار",
-			error: (e: Error) => e.message || "تعذّر نشر الاختبار",
-		});
-	};
-	const handleQuizUnpublish = (quiz: QuizListItemResponse) => {
-		setUnpublishingQuiz(quiz);
-	};
-
-	// استنساخ: يعرض صفّ التقدّم المضمّن أثناء العملية، ثم توست نجاح مع «تراجع» (يحذف النسخة)
 	const handleDuplicate = async (course: CourseListItemResponse) => {
-		if (cloning) return; // استنساخ واحد في كل مرة
 		setCloning(course);
 		try {
-			const created = await duplicateCourse(course.id);
-			const newId = (created as { id?: string } | null)?.id;
-			toast.custom(
-				(id) => (
-					<CloneSuccessToast
-						name={course.name}
-						onUndo={() => {
-							if (newId) deleteCourse(newId);
-							toast.dismiss(id);
-						}}
-					/>
-				),
-				{ duration: 6000 },
-			);
+			const res = await duplicateCourse(course.id);
+			if (res?.id) {
+				toast.custom(
+					(t) => (
+						<CloneSuccessToast
+							name={res.name}
+							onUndo={() => {
+								toast.dismiss(t);
+								deleteCourse(res.id);
+							}}
+						/>
+					),
+					{ duration: 5000 },
+				);
+			}
 		} catch {
 			toast.error("تعذّر استنساخ الدورة");
 		} finally {
@@ -270,22 +208,14 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 		return oldestFirst ? [...list].reverse() : list;
 	}, [courses, tab, search, typeFilters, locationFilters, trainerFilters, oldestFirst]);
 
-	// تصفية الاختبارات بالبحث فقط (لا فلاتر خاصة بالدورات)
-	const filteredQuizzes = useMemo(() => {
-		const q = search.trim();
-		const list = quizzes.filter((z) => (q ? z.title.includes(q) || z.code.includes(q) : true));
-		return oldestFirst ? [...list].reverse() : list;
-	}, [quizzes, search, oldestFirst]);
-
 	return (
 		<div
 			className="flex min-h-0 flex-1 flex-col"
 			dir="rtl"
 		>
-			{/* تبويب «اختبار» له بطاقاته الثلاث؛ بقيّة التبويبات بطاقات الدورات الأربع */}
 			<Stats
-				className={isQuizTab ? "grid-cols-3 gap-3 px-3" : "grid-cols-4 gap-3 px-3"}
-				stats={isQuizTab ? buildQuizStats(quizStats) : buildStats(stats)}
+				className="grid-cols-4 gap-3 px-3"
+				stats={buildStats(stats)}
 				variant="compact"
 			/>
 
@@ -295,7 +225,6 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 				searchPlaceholder="ابحث عن اسم التدريب / المعرّف..."
 				searchClassName="w-[320px]"
 				searchValue={search}
-				onSearchChange={setSearch}
 				// «فلترة» القياسي مخفيّ لأن TrainingFiltersMenu في leftExtra يقوم بدوره
 				showFilter={false}
 				showExport={false}
@@ -329,7 +258,7 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 				actions={
 					<CreateContentMenu
 						onSelectCourse={handleAdd}
-						onSelectQuiz={openQuizCreate}
+						onSelectQuiz={() => navigate({ to: "/services/quizzes" })}
 					>
 						<Button
 							type="button"
@@ -344,7 +273,7 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 			/>
 
 			{/* شرائح الفلاتر النشطة */}
-			{!isQuizTab && filters.length > 0 && (
+			{filters.length > 0 && (
 				<div className="flex flex-wrap items-center gap-2 border-b-[0.5px] border-border px-3 py-2">
 					{filters.map((f) => (
 						<span
@@ -377,12 +306,6 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 				editCourseId={editId}
 			/>
 
-			<AddQuizSheet
-				open={quizAddOpen}
-				onClose={() => setQuizAddOpen(false)}
-				editQuizId={quizEditId}
-			/>
-
 			<AssignEmployeeDialog
 				course={assigning}
 				onClose={() => setAssigning(null)}
@@ -390,63 +313,7 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 
 			{/* المحتوى */}
 			<div className="min-h-0 flex-1 overflow-auto bg-background py-3">
-				{isQuizTab ? (
-					quizzesLoading ? (
-						<p className="px-3 py-16 text-center text-[13px] text-muted-foreground">
-							جارٍ تحميل الاختبارات...
-						</p>
-					) : filteredQuizzes.length === 0 ? (
-						<div className="flex flex-col items-center gap-3 px-3 py-16 text-center">
-							<h2 className="text-[14px] font-bold text-foreground">
-								{quizzes.length === 0
-									? "لا يوجد أي اختبارات حتى الآن"
-									: "لا توجد اختبارات مطابقة"}
-							</h2>
-							<p className="max-w-[280px] text-[12px] text-muted-foreground">
-								أنشئ اختباراً لتقييم معرفة موظفيك ورصد نتائجهم.
-							</p>
-							{quizzes.length === 0 && (
-								<Button
-									type="button"
-									onClick={openQuizCreate}
-									className="h-9 rounded-lg px-4 text-[12px]"
-								>
-									إنشاء اختبار
-								</Button>
-							)}
-						</div>
-					) : view === "grid" ? (
-						// عرض «قائمة» (بطاقات) للاختبارات — نفس مبدّل العرض المستخدم للدورات
-						<div className="grid grid-cols-1 gap-3 px-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-							{filteredQuizzes.map((quiz) => (
-								<QuizCard
-									key={quiz.id}
-									quiz={quiz}
-									onOpen={() => setResultsQuizId(quiz.id)}
-									onEdit={() => handleQuizEdit(quiz)}
-									onPlay={() => setPreStartQuizId(quiz.id)}
-									onResults={() => setResultsQuizId(quiz.id)}
-									onPublish={() => handleQuizPublish(quiz)}
-									onUnpublish={() => handleQuizUnpublish(quiz)}
-									onDelete={() => setDeletingQuiz(quiz)}
-								/>
-							))}
-						</div>
-					) : (
-						<QuizTable
-							quizzes={filteredQuizzes}
-							isLoading={false}
-							onEdit={handleQuizEdit}
-							onPublish={handleQuizPublish}
-							onUnpublish={handleQuizUnpublish}
-							onDelete={setDeletingQuiz}
-							onPlay={(q) => setPreStartQuizId(q.id)}
-							onResults={(q) => setResultsQuizId(q.id)}
-							// النقر على صفّ الاختبار يفتح المعيَّنين ونتائجهم، والتعديل من قائمة الخيارات
-							onRowOpen={(q) => setResultsQuizId(q.id)}
-						/>
-					)
-				) : isLoading ? (
+				{isLoading ? (
 					<p className="px-3 py-16 text-center text-[13px] text-muted-foreground">
 						جارٍ تحميل الدورات...
 					</p>
@@ -458,25 +325,21 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 							className="h-[220px] w-[220px] max-w-full object-contain"
 						/>
 						<h2 className="text-[14px] font-bold text-foreground">
-							{courses.length === 0 ? "لا يوجد أي دورات حتى الآن" : "لا توجد دورات مطابقة"}
+							{courses.length === 0
+								? "لا يوجد أي دورات تدريبية حتى الآن"
+								: "لا توجد دورات مطابقة"}
 						</h2>
 						<p className="max-w-[280px] text-[12px] text-muted-foreground">
-							{tab === "library"
-								? "لا توجد دورات منشورة بعد."
-								: "أنشئ أول دورة تدريبية لتطوير مهارات موظفيك، من مكان واحد."}
+							ابدأ بإنشاء أول دورة تدريبية لتدريب وتطوير موظفي عيادتك.
 						</p>
 						{courses.length === 0 && (
-							<CreateContentMenu
-								onSelectCourse={handleAdd}
-								onSelectQuiz={openQuizCreate}
+							<Button
+								type="button"
+								onClick={handleAdd}
+								className="h-9 rounded-lg px-4 text-[12px]"
 							>
-								<Button
-									type="button"
-									className="h-9 rounded-lg px-4 text-[12px]"
-								>
-									إنشاء محتوى
-								</Button>
-							</CreateContentMenu>
+								إنشاء دورة تدريبية
+							</Button>
 						)}
 					</div>
 				) : view === "grid" ? (
@@ -485,8 +348,8 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 							<CourseCard
 								key={course.id}
 								course={course}
-								onDelete={() => setDeleting(course)}
 								onEdit={() => handleEdit(course)}
+								onDelete={() => setDeleting(course)}
 							/>
 						))}
 					</div>
@@ -494,20 +357,14 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 					<CourseTable
 						courses={filtered}
 						isLoading={false}
-						onDelete={setDeleting}
+						cloningCourseId={cloning?.id}
+						onOpen={(c) => navigate({ to: `/services/training/course/${c.id}` })}
 						onEdit={handleEdit}
-						onOpen={handleOpen}
 						onDuplicate={handleDuplicate}
 						onDisable={setDisabling}
 						onEnable={setEnabling}
+						onDelete={setDeleting}
 						onAssign={setAssigning}
-						onRowOpen={(c) =>
-							navigate({
-								to: "/services/training/course/$courseId",
-								params: { courseId: c.id },
-							})
-						}
-						cloningCourseId={cloning?.id ?? null}
 					/>
 				)}
 			</div>
@@ -537,45 +394,6 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 					if (enabling) restoreCourse(enabling.id);
 					setEnabling(null);
 				}}
-			/>
-
-			<DeleteQuizDialog
-				quiz={deletingQuiz}
-				onClose={() => setDeletingQuiz(null)}
-				onConfirm={() => {
-					if (deletingQuiz) deleteQuiz(deletingQuiz.id);
-					setDeletingQuiz(null);
-				}}
-			/>
-
-			<UnpublishQuizDialog
-				quiz={unpublishingQuiz}
-				onClose={() => setUnpublishingQuiz(null)}
-				onConfirm={() => {
-					if (unpublishingQuiz) unpublishQuiz(unpublishingQuiz.id);
-					setUnpublishingQuiz(null);
-				}}
-			/>
-
-			<QuizDetailsSheet
-				quizId={preStartQuizId}
-				onClose={() => setPreStartQuizId(null)}
-				onStart={(id) => {
-					setPreStartQuizId(null);
-					setPlayingQuizId(id);
-				}}
-			/>
-
-			<QuizPlayerDialog
-				open={!!playingQuizId}
-				quizId={playingQuizId}
-				onClose={() => setPlayingQuizId(null)}
-			/>
-
-			<QuizManagerDialog
-				open={!!resultsQuizId}
-				quizId={resultsQuizId}
-				onClose={() => setResultsQuizId(null)}
 			/>
 		</div>
 	);

@@ -1,6 +1,6 @@
 import { type CollisionDetection, pointerWithin, rectIntersection } from "@dnd-kit/core";
 import { useMemo, useState } from "react";
-import { IconClock, IconFileDescription, IconUser, IconPlayerPauseFilled, IconActivity, IconHourglass, IconCheck, IconX } from "@tabler/icons-react";
+import { IconClock, IconFileDescription, IconUser, IconPlayerPauseFilled, IconActivity, IconHourglass, IconCheck, IconX, IconClipboardCheck } from "@tabler/icons-react";
 
 import {
 	KanbanBoard,
@@ -13,7 +13,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { AppointmentColumnHeader } from "@/features/appointments/components/appointment-column-header";
 import type { AppointmentColumn, AppointmentColumnId } from "@/features/appointments/types/appointment.types";
-import { CampaignRequestDialog } from "./campaign-request-dialog";
+import { CampaignRequestSheet } from "./campaign-request-sheet";
 
 const collisionDetection: CollisionDetection = (args) => {
 	const pointerCollisions = pointerWithin(args);
@@ -23,6 +23,7 @@ const collisionDetection: CollisionDetection = (args) => {
 // Dummy columns matching the Appointments style
 const CAMPAIGN_COLUMNS: AppointmentColumn[] = [
 	{ id: "queue" as AppointmentColumnId, name: "طابور الانتظار", count: 0, icon: <IconClock className="size-4" />, accent: "neutral" },
+	{ id: "check-in" as AppointmentColumnId, name: "التقييم", count: 0, icon: <IconClipboardCheck className="size-4" />, accent: "purple" },
 	{ id: "in-service" as AppointmentColumnId, name: "قيد المراجعة", count: 0, icon: <IconActivity className="size-4" />, accent: "amber" },
 	{ id: "awaiting-payment" as AppointmentColumnId, name: "انتظار الرد", count: 0, icon: <IconHourglass className="size-4" />, accent: "blue" },
 	{ id: "done" as AppointmentColumnId, name: "تم القبول", count: 0, icon: <IconCheck className="size-4" />, accent: "emerald" },
@@ -201,7 +202,7 @@ export function CampaignRequestsKanban() {
 				)}
 			</KanbanProvider>
 
-			<CampaignRequestDialog 
+			<CampaignRequestSheet 
 				request={selectedRequest}
 				open={!!selectedRequest}
 				onOpenChange={(open) => !open && setSelectedRequest(null)}

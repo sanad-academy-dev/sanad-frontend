@@ -107,7 +107,10 @@ export function AddPatientSheet({
 		onClose();
 	};
 
-	useHotkey("Mod+Enter", () => handleSubmit(onSubmit)(), { enabled: open });
+	useHotkey("Mod+Enter", () => handleSubmit(onSubmit)(), {
+		enabled: open,
+		conflictBehavior: "replace",
+	});
 
 	return (
 		<>
