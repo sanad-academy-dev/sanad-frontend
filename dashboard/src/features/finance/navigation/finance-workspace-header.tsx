@@ -163,6 +163,8 @@ export function FinanceWorkspaceHeader() {
 	const activeGroup = groups.find((group) => group.key === activeKey);
 	const { visible, overflow } = splitOverflow(activeGroup?.items ?? []);
 
+	if (visible.length + overflow.length <= 1) return null;
+
 	const goTo = (item: FinanceNavItem) =>
 		navigate({ to: item.url, search: item.search as never });
 

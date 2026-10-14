@@ -640,7 +640,13 @@
       "deals": "Deals",
       "emailTemplates": "Email Templates",
       "memberships": "Memberships",
-      "loyaltyProgram": "Loyalty Program"
+      "loyaltyProgram": "Loyalty Program",
+      "invoices": "Invoices",
+      "expenses": "Expenses",
+      "carePlans": "Care Plans",
+      "enrollments": "Subscriptions",
+      "salesInvoices": "Sales Invoices",
+      "purchaseInvoices": "Purchase Invoices"
     },
     "user": {
       "logout": "Log out",
@@ -892,6 +898,8 @@
     "nav": {
       "groups": {
         "dailyOperations": "Daily Operations",
+        "invoices": "Invoices",
+        "expenses": "Expenses",
         "membershipInsurance": "Memberships & Insurance",
         "books": "Books",
         "reports": "Financial Reports",

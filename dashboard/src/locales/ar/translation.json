@@ -640,7 +640,13 @@
       "deals": "الصفقات",
       "emailTemplates": "قوالب البريد",
       "memberships": "العضويات",
-      "loyaltyProgram": "برنامج الولاء"
+      "loyaltyProgram": "برنامج الولاء",
+      "invoices": "الفواتير",
+      "expenses": "المصروفات",
+      "carePlans": "الخطط التعليمية",
+      "enrollments": "الاشتراكات",
+      "salesInvoices": "فواتير المبيعات",
+      "purchaseInvoices": "فواتير المشتريات"
     },
     "user": {
       "logout": "تسجيل الخروج",
@@ -892,6 +898,8 @@
     "nav": {
       "groups": {
         "dailyOperations": "العمليات اليومية",
+        "invoices": "الفواتير",
+        "expenses": "المصروفات",
         "membershipInsurance": "العضويات والتأمين",
         "books": "الدفاتر",
         "reports": "التقارير المالية",
@@ -900,6 +908,7 @@
       },
       "invoices": "الفواتير",
       "expenses": "المصروفات",
+      
       "carePlans": "الخطط التعليمية",
       "enrollments": "الاشتراكات",
       "accountingSettings": "إعدادات المحاسبة",

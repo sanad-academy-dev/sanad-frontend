@@ -40,11 +40,19 @@ describe("finance workspace — active group from route", () => {
 		expect(activeGroupKeyOf("/management/accounting/trial-balance", undefined)).toBe(
 			"reports",
 		);
+		expect(activeGroupKeyOf("/management/accounting/sales-invoices", undefined)).toBe(
+			"salesInvoices",
+		);
+		expect(activeGroupKeyOf("/management/accounting/purchase-invoices", undefined)).toBe(
+			"purchaseInvoices",
+		);
 	});
 
 	it("disambiguates the legacy hub by ?tab= (default: invoices)", () => {
-		expect(activeGroupKeyOf("/management/finance", undefined)).toBe("dailyOperations");
-		expect(activeGroupKeyOf("/management/finance", "expenses")).toBe("dailyOperations");
+		expect(activeGroupKeyOf("/management/finance", undefined)).toBe("invoices");
+		expect(activeGroupKeyOf("/management/finance", "expenses")).toBe("expenses");
+		expect(activeGroupKeyOf("/management/finance", "care-plans")).toBe("carePlans");
+		expect(activeGroupKeyOf("/management/finance", "enrollments")).toBe("enrollments");
 	});
 
 	it("resolves إعدادات المحاسبة inside the workspace, and unknown routes to null", () => {
@@ -71,10 +79,10 @@ describe("finance workspace — landing", () => {
 		expect(target?.url).toBe(books.items[0]?.url);
 	});
 
-	it("resolveWorkspaceEntry: full permissions + no memory → default home (الفواتير)", () => {
+	it("resolveWorkspaceEntry: full permissions + no memory → default home (payment-entries)", () => {
 		const entry = resolveWorkspaceEntry(null, {}, seeEverything);
-		expect(entry.url).toBe("/management/finance");
-		expect(entry.search?.tab).toBe("invoices");
+		expect(entry.url).toBe("/management/accounting/payment-entries");
+		expect(entry.search?.tab).toBeUndefined();
 	});
 
 	it("resolveWorkspaceEntry: memory wins while still permitted", () => {
@@ -103,7 +111,7 @@ describe("finance workspace — visibility + overflow", () => {
 	it("drops empty groups", () => {
 		const groups = visibleGroupsFor(holding(["finance_invoices.view_full"]));
 		expect(groups).toHaveLength(1);
-		expect(groups[0]?.key).toBe("dailyOperations");
+		expect(groups[0]?.key).toBe("invoices");
 		expect(groups[0]?.items).toHaveLength(1);
 	});
 
@@ -123,6 +131,12 @@ describe("[NAV-3] sidebar sub-menu — workspaceGroupLinks", () => {
 		const links = workspaceGroupLinks(seeEverything, {}, null);
 		expect(links?.map((l) => l.key)).toEqual([
 			"dailyOperations",
+			"invoices",
+			"expenses",
+			"carePlans",
+			"enrollments",
+			"salesInvoices",
+			"purchaseInvoices",
 			"membershipInsurance",
 			// [LY-P0] «الولاء» — مجموعةٌ شقيقة للعضويات (Loyalty BRD §10.1)
 			"loyalty",

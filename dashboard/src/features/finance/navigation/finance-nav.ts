@@ -86,6 +86,12 @@ export type FinanceNavItem = {
 
 export type FinanceNavGroupKey =
 	| "dailyOperations"
+	| "invoices"
+	| "expenses"
+	| "carePlans"
+	| "enrollments"
+	| "salesInvoices"
+	| "purchaseInvoices"
 	| "membershipInsurance"
 	| "loyalty"
 	| "books"
@@ -110,50 +116,6 @@ export const FINANCE_NAV_GROUPS: FinanceNavGroup[] = [
 		key: "dailyOperations",
 		titleKey: "finance.nav.groups.dailyOperations",
 		items: [
-			{
-				titleKey: "finance.nav.invoices",
-				url: FINANCE_ROUTE,
-				search: { tab: "invoices" },
-				icon: IconFileInvoice,
-				gate: { kind: "resource", resource: FINANCE_RESOURCES.invoices },
-			},
-			{
-				titleKey: "finance.nav.expenses",
-				url: FINANCE_ROUTE,
-				search: { tab: "expenses" },
-				icon: IconReceipt2,
-				gate: { kind: "resource", resource: FINANCE_RESOURCES.expenses },
-			},
-			{
-				titleKey: "finance.nav.carePlans",
-				url: FINANCE_ROUTE,
-				search: { tab: "care-plans" },
-				icon: IconHeartHandshake,
-				gate: { kind: "resource", resource: FINANCE_RESOURCES.carePlans },
-			},
-			{
-				titleKey: "finance.nav.enrollments",
-				url: FINANCE_ROUTE,
-				search: { tab: "enrollments" },
-				icon: IconRepeat,
-				gate: { kind: "resource", resource: FINANCE_RESOURCES.carePlans },
-			},
-			{
-				// [P5.7] «فواتير المبيعات» (المحاسبية) joins العمليات اليومية per the §10.3
-				// placement law — contract C3: the legacy operational invoices keep their tab
-				titleKey: "accounting.nav.salesInvoices",
-				url: "/management/accounting/sales-invoices",
-				icon: IconFileDollar,
-				gate: { kind: "accounting", doctype: "sales_invoice" },
-			},
-			{
-				// [P6.5] «فواتير المشتريات» joins العمليات اليومية per the §10.3 placement law —
-				// contract C3: the legacy «المصروفات» expense tab is untouched
-				titleKey: "accounting.nav.purchaseInvoices",
-				url: "/management/accounting/purchase-invoices",
-				icon: IconShoppingCart,
-				gate: { kind: "accounting", doctype: "purchase_invoice" },
-			},
 			{
 				// [P7.9] «سندات القبض والصرف» joins العمليات اليومية per the owner directive
 				titleKey: "accounting.nav.paymentEntries",
@@ -195,6 +157,82 @@ export const FINANCE_NAV_GROUPS: FinanceNavGroup[] = [
 				url: "/management/accounting/bank-rules",
 				icon: IconWand,
 				gate: { kind: "accounting", doctype: "bank_transaction" },
+			},
+		],
+	},
+	{
+		key: "invoices",
+		titleKey: "sidebar.items.invoices",
+		items: [
+			{
+				titleKey: "sidebar.items.invoices",
+				url: FINANCE_ROUTE,
+				search: { tab: "invoices" },
+				icon: IconFileInvoice,
+				gate: { kind: "resource", resource: FINANCE_RESOURCES.invoices },
+			},
+		],
+	},
+	{
+		key: "expenses",
+		titleKey: "sidebar.items.expenses",
+		items: [
+			{
+				titleKey: "sidebar.items.expenses",
+				url: FINANCE_ROUTE,
+				search: { tab: "expenses" },
+				icon: IconReceipt2,
+				gate: { kind: "resource", resource: FINANCE_RESOURCES.expenses },
+			},
+		],
+	},
+	{
+		key: "carePlans",
+		titleKey: "sidebar.items.carePlans",
+		items: [
+			{
+				titleKey: "sidebar.items.carePlans",
+				url: FINANCE_ROUTE,
+				search: { tab: "care-plans" },
+				icon: IconHeartHandshake,
+				gate: { kind: "resource", resource: FINANCE_RESOURCES.carePlans },
+			},
+		],
+	},
+	{
+		key: "enrollments",
+		titleKey: "sidebar.items.enrollments",
+		items: [
+			{
+				titleKey: "sidebar.items.enrollments",
+				url: FINANCE_ROUTE,
+				search: { tab: "enrollments" },
+				icon: IconRepeat,
+				gate: { kind: "resource", resource: FINANCE_RESOURCES.carePlans },
+			},
+		],
+	},
+	{
+		key: "salesInvoices",
+		titleKey: "sidebar.items.salesInvoices",
+		items: [
+			{
+				titleKey: "sidebar.items.salesInvoices",
+				url: "/management/accounting/sales-invoices",
+				icon: IconFileDollar,
+				gate: { kind: "accounting", doctype: "sales_invoice" },
+			},
+		],
+	},
+	{
+		key: "purchaseInvoices",
+		titleKey: "sidebar.items.purchaseInvoices",
+		items: [
+			{
+				titleKey: "sidebar.items.purchaseInvoices",
+				url: "/management/accounting/purchase-invoices",
+				icon: IconShoppingCart,
+				gate: { kind: "accounting", doctype: "purchase_invoice" },
 			},
 		],
 	},

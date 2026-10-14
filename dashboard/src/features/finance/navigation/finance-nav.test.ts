@@ -49,13 +49,15 @@ describe("finance nav config", () => {
 		}
 	});
 
-	it("declares the six workflow groups in order", () => {
-		// [MI-NAV] «العضويات والتأمين» joined as a sibling group (MI BRD §17.2 row 10,
-		// owner 2026-08-24) — MI is a full module and gets module-level navigation.
-		// [LY-P0] «الولاء» joined next to it on the same reasoning (Loyalty BRD §10.1):
-		// a full module, and its complement — membership is bought, loyalty accrues.
+	it("declares the workflow groups in order", () => {
 		expect(FINANCE_NAV_GROUPS.map((g) => g.titleKey)).toEqual([
 			"finance.nav.groups.dailyOperations",
+			"sidebar.items.invoices",
+			"sidebar.items.expenses",
+			"sidebar.items.carePlans",
+			"sidebar.items.enrollments",
+			"sidebar.items.salesInvoices",
+			"sidebar.items.purchaseInvoices",
 			"finance.nav.groups.membershipInsurance",
 			"finance.nav.groups.loyalty",
 			"finance.nav.groups.books",
@@ -119,8 +121,8 @@ describe("finance nav config", () => {
 	it("shows a receptionist holding invoices only ONE group with ONE item", () => {
 		const groups = visibleGroups([`${FINANCE_RESOURCES.invoices}.view_full`]);
 		expect(groups).toHaveLength(1);
-		expect(groups[0]?.titleKey).toBe("finance.nav.groups.dailyOperations");
-		expect(groups[0]?.items.map((i) => i.titleKey)).toEqual(["finance.nav.invoices"]);
+		expect(groups[0]?.titleKey).toBe("sidebar.items.invoices");
+		expect(groups[0]?.items.map((i) => i.titleKey)).toEqual(["sidebar.items.invoices"]);
 	});
 
 	it("shows an accountant holding every read permission all non-empty groups", () => {
@@ -129,6 +131,12 @@ describe("finance nav config", () => {
 		// group and [LY-P0] the loyalty one — all six render for a reader who holds everything
 		expect(groups.map((g) => g.titleKey)).toEqual([
 			"finance.nav.groups.dailyOperations",
+			"sidebar.items.invoices",
+			"sidebar.items.expenses",
+			"sidebar.items.carePlans",
+			"sidebar.items.enrollments",
+			"sidebar.items.salesInvoices",
+			"sidebar.items.purchaseInvoices",
 			"finance.nav.groups.membershipInsurance",
 			"finance.nav.groups.loyalty",
 			"finance.nav.groups.books",
