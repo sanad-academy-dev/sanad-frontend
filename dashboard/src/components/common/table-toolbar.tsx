@@ -35,6 +35,8 @@ interface TableToolbarProps {
 	leftExtra?: ReactNode;
 	/** المجموعة اليمنى — أزرار أيقونات ثانوية + زر الإضافة الأساسي */
 	actions?: ReactNode;
+	/** مُعالج النقر على زر التصدير */
+	onExport?: () => void;
 }
 
 // شريط أدوات موحّد لجداول العرض — بحث (يسار) + أزرار قياسية + إجراءات (يمين)
@@ -52,6 +54,7 @@ export function TableToolbar({
 	showView = true,
 	leftExtra,
 	actions,
+	onExport,
 }: TableToolbarProps) {
 	return (
 		<div className={cn("flex items-center justify-between gap-3 px-4 py-2", className)}>
@@ -103,6 +106,7 @@ export function TableToolbar({
 					<Button
 						size={buttonSize}
 						variant="outline"
+						onClick={onExport}
 					>
 						<IconDownload />
 						تصدير

@@ -12,7 +12,7 @@ import {
 } from "framer-motion";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
-import { Compass, Users, Gamepad2, Calendar, BookOpen, X, ChevronRight, ChevronLeft, ArrowLeft, Clock, User, Mail, Smile, Plus, ArrowRight, ChevronDown, Pencil, Bookmark } from "lucide-react";
+import { Compass, Users, Gamepad2, Calendar, BookOpen, X, ChevronRight, ChevronLeft, ArrowLeft, Clock, User, Mail, Smile, Plus, ArrowRight, ChevronDown, Pencil, Bookmark, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type Panel = -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18;
@@ -76,6 +76,55 @@ export function MultiStepForm({
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [childrenList, setChildrenList] = useState([{ name: "", age: "" }]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [requestCode, setRequestCode] = useState<string | null>(null);
+
+  const daysOfWeek = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
+  const getDayName = (d: number | null) => {
+    if (!d) return "";
+    const blanks = [0, 1, 2, 3];
+    const idx = (d + blanks.length - 1) % 7;
+    return daysOfWeek[idx];
+  };
+
+  const handleConfirmBooking = async () => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      const student = childrenList[0] || { name: "", age: "" };
+      const ageVal = student.age ? `${student.age} سنوات` : age ? `${age} سنوات` : null;
+
+      const payload = {
+        source: "WEBSITE",
+        studentName: student.name.trim() || "طالب جديد",
+        ageLabel: ageVal,
+        targetClass: c1 || "مسار تمهيدي",
+        guardianName: parentName.trim() || "ولي أمر",
+        guardianPhone: phone.trim() || "0500000000",
+        guardianEmail: email.trim() || null,
+        notes: `الموعد المختار: ${getDayName(bookingDay)} ${bookingDay || ""} أكتوبر - الساعة: ${bookingTime || "غير محدد"}. إجابات التقييم: مسار=${c1 || ""}, هدف=${c2 || ""}, برامج=${c5?.join(", ") || ""}`,
+      };
+
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.message || "فشل إرسال طلب الحجز");
+      }
+
+      setRequestCode(data.requestCode || null);
+      go(18, 1);
+    } catch (err: any) {
+      setSubmitError(err?.message || "حدث خطأ أثناء تأكيد الحجز، يرجى المحاولة مرة أخرى.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const bodyRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
@@ -179,6 +228,10 @@ export function MultiStepForm({
       setEmail={setEmail}
       childrenList={childrenList}
       setChildrenList={setChildrenList}
+      isSubmitting={isSubmitting}
+      submitError={submitError}
+      requestCode={requestCode}
+      onConfirmBooking={handleConfirmBooking}
       go={go}
       onCreate={onCreate}
     />
@@ -291,6 +344,10 @@ function PanelContent({
   setEmail,
   childrenList,
   setChildrenList,
+  isSubmitting,
+  submitError,
+  requestCode,
+  onConfirmBooking,
   go,
   onCreate,
 }: {
@@ -331,6 +388,10 @@ function PanelContent({
   setEmail?: (v: string) => void;
   childrenList?: { name: string; age: string }[];
   setChildrenList?: (v: { name: string; age: string }[]) => void;
+  isSubmitting?: boolean;
+  submitError?: string | null;
+  requestCode?: string | null;
+  onConfirmBooking?: () => void;
   go: (next: Panel, dir: 1 | -1) => void;
   onCreate?: () => void;
 }) {
@@ -1466,22 +1527,39 @@ function PanelContent({
           </div>
         </div>
 
+        {submitError && (
+          <div className="p-3 mx-2 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium text-center">
+            {submitError}
+          </div>
+        )}
+
         {/* Action Buttons */}
         <div className="flex gap-3 px-2 mt-8" dir="rtl">
           <Button
             variant="outline"
+            disabled={isSubmitting}
             onClick={() => go(16, -1)}
-            className="h-[54px] flex-[0.7] rounded text-[16px] font-bold border-2 hover:bg-secondary transition-all text-foreground"
+            className="h-[54px] flex-[0.7] rounded text-[16px] font-bold border-2 hover:bg-secondary transition-all text-foreground disabled:opacity-50"
           >
             تعديل
             <Pencil className="mr-2 size-4" />
           </Button>
           <Button
-            onClick={() => go(18, 1)}
-            className="h-[54px] flex-[2] rounded text-[16px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-md shadow-primary/20"
+            onClick={() => onConfirmBooking?.()}
+            disabled={isSubmitting}
+            className="h-[54px] flex-[2] rounded text-[16px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-md shadow-primary/20 disabled:opacity-50"
           >
-            تأكيد الحجز
-            <Bookmark className="mr-2 size-5" />
+            {isSubmitting ? (
+              <>
+                جاري تأكيد الحجز...
+                <Loader2 className="mr-2 size-5 animate-spin" />
+              </>
+            ) : (
+              <>
+                تأكيد الحجز
+                <Bookmark className="mr-2 size-5" />
+              </>
+            )}
           </Button>
         </div>
       </div>
@@ -1513,15 +1591,23 @@ function PanelContent({
           </div>
         </div>
 
-        <div className="h-px w-full bg-border/60 mt-6 mb-16"></div>
+        <div className="h-px w-full bg-border/60 mt-6 mb-12"></div>
 
-        <div className="flex flex-col items-center justify-center gap-3 text-center mb-16 px-4">
+        <div className="flex flex-col items-center justify-center gap-3 text-center mb-12 px-4">
           <h3 className="text-[22px] font-extrabold text-foreground">
-            تم استلام طلب الحجز
+            تم استلام طلب الحجز بنجاح
           </h3>
           <p className="text-[15px] font-medium text-muted-foreground max-w-[340px]">
             سنرسل تأكيد الحجز على بريدك الإلكتروني ونتواصل معك قبل الموعد بيوم
           </p>
+          {requestCode && (
+            <div className="mt-3 inline-flex items-center gap-2 rounded-xl bg-primary/10 border border-primary/20 px-4 py-2 text-sm font-bold text-primary">
+              رقم المتابعة الخاص بطلبك:
+              <span dir="ltr" className="font-mono tracking-wider font-extrabold text-foreground">
+                {requestCode}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="mt-auto px-4 w-full flex justify-center" dir="rtl">

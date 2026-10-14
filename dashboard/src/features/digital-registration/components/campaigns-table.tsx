@@ -7,7 +7,14 @@ import {
 	IconEdit,
 	IconTrash,
 } from "@tabler/icons-react";
-import { type ColumnDef, createColumnHelper, getCoreRowModel, useReactTable } from "@tanstack/react-table";
+import {
+	type ColumnDef,
+	createColumnHelper,
+	getCoreRowModel,
+	getFilteredRowModel,
+	getPaginationRowModel,
+	useReactTable,
+} from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -27,17 +34,32 @@ import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 import type { Campaign } from "../types/campaign.types";
 import { AddCampaignSheet } from "./add-campaign-sheet";
+import { useDeleteCampaign } from "../hooks/use-digital-registration";
 
 interface CampaignsTableProps {
 	data: Campaign[];
+	globalFilter?: string;
+	onGlobalFilterChange?: (val: string) => void;
+	statusFilter?: string;
 }
 
 const columnHelper = createColumnHelper<Campaign>();
 
-export function CampaignsTable({ data }: CampaignsTableProps) {
+export function CampaignsTable({
+	data,
+	globalFilter = "",
+	onGlobalFilterChange,
+	statusFilter = "ALL",
+}: CampaignsTableProps) {
 	const [rowSelection, setRowSelection] = useState({});
 	const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
 	const navigate = useNavigate({ from: "/digital-registration" });
+	const deleteMutation = useDeleteCampaign();
+
+	const filteredData = useMemo(() => {
+		if (!statusFilter || statusFilter === "ALL") return data;
+		return data.filter((c) => c.status === statusFilter);
+	}, [data, statusFilter]);
 
 	// إضافة النوع بشكل صريح هنا لتفادي أي تعارض في الأنواع
 	const columns = useMemo<ColumnDef<Campaign, any>[]>(
@@ -189,7 +211,14 @@ export function CampaignsTable({ data }: CampaignsTableProps) {
 									<IconEdit className="me-2 h-4 w-4" />
 									تعديل
 								</DropdownMenuItem>
-								<DropdownMenuItem className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive">
+								<DropdownMenuItem
+									className="cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+									onClick={() => {
+										if (window.confirm(`هل أنت متأكد من حذف حملة «${row.original.name}»؟`)) {
+											deleteMutation.mutate(row.original.id);
+										}
+									}}
+								>
 									<IconTrash className="me-2 h-4 w-4" />
 									حذف
 								</DropdownMenuItem>
@@ -203,12 +232,16 @@ export function CampaignsTable({ data }: CampaignsTableProps) {
 	);
 
 	const table = useReactTable({
-		data,
+		data: filteredData,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
+		getFilteredRowModel: getFilteredRowModel(),
+		getPaginationRowModel: getPaginationRowModel(),
 		onRowSelectionChange: setRowSelection,
+		onGlobalFilterChange,
 		state: {
 			rowSelection,
+			globalFilter,
 		},
 	});
 
