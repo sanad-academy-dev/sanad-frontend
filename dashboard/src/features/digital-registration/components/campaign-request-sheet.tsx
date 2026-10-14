@@ -4,15 +4,19 @@ import {
 	IconAlertCircle,
 	IconArrowUp,
 	IconAt,
+	IconBrandWhatsapp,
 	IconBuilding,
 	IconCake,
 	IconCalendar,
+	IconCalendarPlus,
 	IconCheck,
 	IconCircle,
 	IconCircleCheck,
 	IconClock,
 	IconDots,
 	IconDownload,
+	IconEdit,
+	IconExternalLink,
 	IconEye,
 	IconEyeOff,
 	IconFileText,
@@ -23,10 +27,13 @@ import {
 	IconMessage,
 	IconMoodSmile,
 	IconPhone,
+	IconSend,
 	IconUser,
 	IconUserCircle,
 	IconX,
 } from "@tabler/icons-react";
+import { Link } from "@tanstack/react-router";
+import { toast } from "sonner";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -41,8 +48,17 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/lib/auth/client";
+import { getFileUrl } from "@/lib/file-url";
 import { cn } from "@/lib/utils";
-import type { CampaignRequestItem } from "./campaign-requests-kanban";
+import type { CampaignRequestItem, RequestNotificationItem } from "../types/campaign-request.types";
+import {
+	useAddRequestComment,
+	useDeleteRequestComment,
+	useMarkNotificationSent,
+	useRequestNotifications,
+} from "../hooks/use-digital-registration";
+import { EditRequestDialog } from "./edit-request-dialog";
+import { ScheduleAssessmentDialog } from "./schedule-assessment-dialog";
 
 type IconType = ComponentType<{ className?: string }>;
 
@@ -72,10 +88,18 @@ function DetailRow({
 function AttachmentRow({
 	label,
 	size,
+	fileUrl,
 }: {
 	label: string;
 	size: string;
+	fileUrl?: string;
 }) {
+	const resolvedUrl = fileUrl
+		? fileUrl.startsWith("http")
+			? fileUrl
+			: getFileUrl(fileUrl)
+		: undefined;
+
 	return (
 		<div
 			className="flex items-center gap-2 rounded-[4px] border bg-muted/40 px-3 py-2"
@@ -89,26 +113,37 @@ function AttachmentRow({
 					{label}
 				</span>
 				<span className="text-[10px] text-muted-foreground">
-					مستند PDF · {size}
+					{size}
 				</span>
 			</div>
 			<div className="flex items-center gap-1">
-				<button
-					type="button"
-					className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
-					title="تنزيل"
-				>
-					<IconDownload className="size-3.5" />
-					<span className="sr-only">تنزيل</span>
-				</button>
-				<button
-					type="button"
-					className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
-					title="عرض"
-				>
-					<IconEye className="size-3.5" />
-					<span className="sr-only">عرض</span>
-				</button>
+				{resolvedUrl ? (
+					<>
+						<a
+							href={resolvedUrl}
+							download
+							target="_blank"
+							rel="noopener noreferrer"
+							className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+							title="تنزيل المستند"
+						>
+							<IconDownload className="size-3.5" />
+							<span className="sr-only">تنزيل</span>
+						</a>
+						<a
+							href={resolvedUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground"
+							title="عرض المستند"
+						>
+							<IconEye className="size-3.5" />
+							<span className="sr-only">عرض</span>
+						</a>
+					</>
+				) : (
+					<span className="text-[10px] text-muted-foreground">مرفق</span>
+				)}
 			</div>
 		</div>
 	);
@@ -294,6 +329,132 @@ function CommentItemView({
 	);
 }
 
+function NotificationOutboxCard({
+	item,
+	onMarkSent,
+	isPending,
+}: {
+	item: RequestNotificationItem;
+	onMarkSent: (id: string) => void;
+	isPending: boolean;
+}) {
+	const isWhatsapp = item.channel === "WHATSAPP";
+	const isSent = item.status === "SENT";
+
+	return (
+		<div
+			className="rounded-lg border bg-card/70 p-3 space-y-2 text-right transition-all hover:border-primary/40 shadow-xs"
+			dir="rtl"
+		>
+			<div className="flex items-center justify-between gap-2">
+				<div className="flex items-center gap-1.5">
+					{isWhatsapp ? (
+						<span className="inline-flex items-center gap-1 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200 px-2 py-0.5 text-[10px] font-bold">
+							<IconBrandWhatsapp className="size-3 text-emerald-600" />
+							واتساب
+						</span>
+					) : (
+						<span className="inline-flex items-center gap-1 rounded bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200 px-2 py-0.5 text-[10px] font-bold">
+							<IconMail className="size-3 text-blue-600" />
+							بريد إلكتروني
+						</span>
+					)}
+
+					<span className="text-[10px] text-muted-foreground font-mono" dir="ltr">
+						{item.toAddress || "غير محدد"}
+					</span>
+				</div>
+
+				<div className="flex items-center gap-1.5">
+					{isSent ? (
+						<Badge
+							variant="outline"
+							className="border-emerald-500/30 text-emerald-600 bg-emerald-50 dark:bg-emerald-950/30 text-[10px] gap-1 font-semibold"
+						>
+							<IconCheck className="size-3 text-emerald-600" />
+							تم الإرسال
+						</Badge>
+					) : item.status === "AWAITING_MANUAL" ? (
+						<Badge
+							variant="outline"
+							className="border-amber-500/30 text-amber-600 bg-amber-50 dark:bg-amber-950/30 text-[10px] gap-1 font-semibold"
+						>
+							<IconClock className="size-3 text-amber-600" />
+							بانتظار الإرسال
+						</Badge>
+					) : item.status === "FAILED" ? (
+						<Badge
+							variant="outline"
+							className="border-rose-500/30 text-rose-600 bg-rose-50 dark:bg-rose-950/30 text-[10px] gap-1 font-semibold"
+						>
+							فشل الإرسال
+						</Badge>
+					) : (
+						<Badge variant="outline" className="text-[10px] font-semibold">
+							في الطابور الآلي
+						</Badge>
+					)}
+				</div>
+			</div>
+
+			{item.subject && (
+				<p className="text-xs font-bold text-foreground">
+					{item.subject}
+				</p>
+			)}
+
+			<p className="text-[11px] text-muted-foreground whitespace-pre-wrap leading-relaxed bg-muted/40 p-2.5 rounded-md border border-border/40 text-right">
+				{item.body}
+			</p>
+
+			<div className="flex items-center justify-between gap-2 pt-1 border-t border-border/40">
+				<span className="text-[10px] text-muted-foreground">
+					{new Date(item.createdAt).toLocaleDateString("ar-EG", {
+						month: "numeric",
+						day: "numeric",
+						hour: "2-digit",
+						minute: "2-digit",
+					})}
+				</span>
+
+				{isWhatsapp && item.manualLink && !isSent && (
+					<div className="flex items-center gap-2">
+						<Button
+							asChild
+							size="sm"
+							className="h-7 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold gap-1.5 shadow-sm"
+						>
+							<a href={item.manualLink} target="_blank" rel="noopener noreferrer">
+								<IconBrandWhatsapp className="size-3.5" />
+								فتح واتساب وإرسال
+							</a>
+						</Button>
+
+						<Button
+							type="button"
+							size="sm"
+							variant="outline"
+							className="h-7 text-xs gap-1 border-emerald-300 text-emerald-700 hover:bg-emerald-50 dark:border-emerald-700 dark:text-emerald-300 font-semibold"
+							onClick={() => onMarkSent(item.id)}
+							disabled={isPending}
+						>
+							<IconCheck className="size-3.5" />
+							تأكيد الإرسال
+						</Button>
+					</div>
+				)}
+
+				{isSent && item.sentAt && (
+					<span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+						<IconCheck className="size-3" />
+						أُرسل {new Date(item.sentAt).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })}
+					</span>
+				)}
+			</div>
+		</div>
+	);
+}
+
 const STATUS_META: Record<string, { label: string; className: string }> = {
 	queue: {
 		label: "طابور الانتظار",
@@ -321,60 +482,16 @@ const STATUS_META: Record<string, { label: string; className: string }> = {
 	},
 };
 
-const APPROVAL_STEPS: TimelineStep[] = [
-	{
-		id: "1",
-		title: "استلام الطلب",
-		byName: "النظام",
-		dateLabel: "01/02/2026",
-		status: "done",
-		statusBadge: "مكتمل",
-	},
-	{
-		id: "2",
-		title: "مراجعة المستندات",
-		byName: "فاطمة السالم",
-		dateLabel: "01/02/2026",
-		status: "active",
-		statusBadge: "قيد المراجعة",
-	},
-	{
-		id: "3",
-		title: "مراجعة الطبيب",
-		byName: "د. أحمد العمري",
-		status: "pending",
-	},
-	{
-		id: "4",
-		title: "اعتماد المدير",
-		byName: "أحمد المالكي",
-		status: "pending",
-	},
-	{
-		id: "5",
-		title: "مراجعة المحاسب",
-		byName: "سارة المحمد",
-		status: "pending",
-	},
-];
-
-const INITIAL_COMMENTS: CommentItem[] = [
-	{
-		id: "c-1",
-		authorName: "د. أحمد العمري",
-		body: "يحتاج متابعة خاصة في التكيف الاجتماعي ومراجعة تقرير الحساسية قبل اعتماد الفصل.",
-		createdAt: "منذ ساعتين",
-	},
-];
-
 export function CampaignRequestSheet({
 	request,
 	open,
 	onOpenChange,
+	campaignId,
 	onAccept,
 	onWaitlist,
 	onReject,
 }: {
+	campaignId?: string;
 	request: CampaignRequestItem | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
@@ -383,14 +500,38 @@ export function CampaignRequestSheet({
 	onReject?: (request: CampaignRequestItem) => void;
 }) {
 	const { data: session } = useSession();
-	const [hasChronic, setHasChronic] = useState(true);
+	const [hasChronic, setHasChronic] = useState(
+		request?.hasChronicDiseases ?? Boolean(request?.chronicDiseases),
+	);
+	const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+	const [isScheduleAssessmentOpen, setIsScheduleAssessmentOpen] = useState(false);
 	const [commentsOpen, setCommentsOpen] = useState(false);
-	const [comments, setComments] = useState<CommentItem[]>(INITIAL_COMMENTS);
 	const [commentDraft, setCommentDraft] = useState("");
+
+	useEffect(() => {
+		if (request) {
+			setHasChronic(request.hasChronicDiseases ?? Boolean(request.chronicDiseases));
+		}
+	}, [request]);
+
+	const addCommentMutation = useAddRequestComment(campaignId || "");
+	const deleteCommentMutation = useDeleteRequestComment(campaignId || "");
+
+	const { data: notifications = [], isLoading: isLoadingNotifications } =
+		useRequestNotifications(request?.id || "");
+	const markNotificationSentMutation = useMarkNotificationSent(
+		campaignId || "",
+		request?.id || "",
+	);
 
 	if (!request) return null;
 
-	const currentUserName = session?.user?.name || "المشرف الحالي";
+	const comments = (request.comments || []).map((c) => ({
+		id: c.id,
+		authorName: c.authorName,
+		body: c.body,
+		createdAt: c.createdAt,
+	}));
 
 	const statusMeta =
 		STATUS_META[request.column] ?? {
@@ -398,34 +539,41 @@ export function CampaignRequestSheet({
 			className: "bg-amber-50 text-amber-700 border-amber-200",
 		};
 
-	const isMale = request.patientDetails?.includes("ذكر");
-	const ageLabel = request.patientDetails?.split("-")[0]?.trim() || "2 سنوات";
+	const isMale = request.gender === "MALE" || request.patientDetails?.includes("ذكر");
+	const ageLabel = request.ageLabel || request.patientDetails?.split("-")[0]?.trim() || "غير محدد";
 
 	const handleAddComment = () => {
 		const trimmed = commentDraft.trim();
 		if (!trimmed) return;
-		const newComment: CommentItem = {
-			id: `c-${Date.now()}`,
-			authorName: currentUserName,
-			body: trimmed,
-			createdAt: "الآن",
-		};
-		setComments((prev) => [newComment, ...prev]);
+		addCommentMutation.mutate({
+			requestId: request.id,
+			content: trimmed,
+		});
 		setCommentDraft("");
 	};
 
-	const handleEditComment = (id: string, text: string) => {
-		setComments((prev) =>
-			prev.map((c) => (c.id === id ? { ...c, body: text } : c)),
-		);
+	const handleEditComment = (_id: string, _text: string) => {
+		// Not implemented in backend yet, reserved
 	};
 
 	const handleDeleteComment = (id: string) => {
-		setComments((prev) => prev.filter((c) => c.id !== id));
+		deleteCommentMutation.mutate(id);
+	};
+
+	const handleMarkSent = (outboxId: string) => {
+		markNotificationSentMutation.mutate(outboxId, {
+			onSuccess: () => {
+				toast.success("تم تأكيد إرسال الإشعار وتوثيقه في السجل الزمني");
+			},
+			onError: (err: any) => {
+				toast.error(err.message || "حدث خطأ أثناء تأكيد الإرسال");
+			},
+		});
 	};
 
 	return (
-		<Sheet open={open} onOpenChange={onOpenChange}>
+		<>
+			<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent
 				side="left"
 				dir="rtl"
@@ -456,8 +604,19 @@ export function CampaignRequestSheet({
 							<span className="font-semibold text-muted-foreground">تفاصيل الطلب</span>
 						</h2>
 
-						{/* عناصر أقصى اليسار في الهيدر: زر التعليقات وزر الإغلاق */}
+						{/* عناصر أقصى اليسار في الهيدر: زر التعديل، زر التعليقات وزر الإغلاق */}
 						<div className="flex items-center gap-1.5">
+							<Button
+								type="button"
+								size="sm"
+								variant="outline"
+								className="h-7 gap-1.5 text-xs font-normal hover:border-primary/50 text-foreground"
+								onClick={() => setIsEditDialogOpen(true)}
+							>
+								<IconEdit className="size-3.5 text-primary" />
+								تعديل البيانات
+							</Button>
+
 							<Button
 								type="button"
 								size="sm"
@@ -511,6 +670,160 @@ export function CampaignRequestSheet({
 							</div>
 						</div>
 
+						{/* بانر اعتماد القبول والروابط المباشرة */}
+						{request.convertedPatientId && (
+							<div
+								className="flex flex-col gap-2 rounded-md border border-emerald-200 bg-emerald-50/80 dark:bg-emerald-950/30 dark:border-emerald-800 p-3"
+								dir="rtl"
+							>
+								<div className="flex items-center justify-between gap-2">
+									<div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-300">
+										<IconCheck className="size-4 shrink-0 text-emerald-600" />
+										<span>تم اعتماد الطالب وإنشاء السجلات في المنظومة</span>
+									</div>
+									{request.convertedPatientCode && (
+										<Badge variant="outline" className="font-mono text-[11px] bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-900/50 dark:text-emerald-200 font-bold px-2">
+											{request.convertedPatientCode}
+										</Badge>
+									)}
+								</div>
+
+								<p className="text-[11px] text-muted-foreground leading-relaxed">
+									تم ترحيل بيانات الطالب وولي الأمر تلقائياً. يمكنك الانتقال المباشر لملفاتهما في الأقسام الرسمية:
+								</p>
+
+								<div className="flex items-center gap-2 pt-1 flex-wrap">
+									<Button
+										asChild
+										size="sm"
+										variant="outline"
+										className="h-7 text-xs bg-white dark:bg-card border-emerald-300 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-700 dark:text-emerald-300 gap-1.5 font-semibold"
+									>
+										<Link to="/services/patients">
+											<IconUser className="size-3.5" />
+											فتح ملف الطالب الأكاديمي
+											<IconExternalLink className="size-3" />
+										</Link>
+									</Button>
+
+									{request.convertedOwnerId && (
+										<Button
+											asChild
+											size="sm"
+											variant="outline"
+											className="h-7 text-xs bg-white dark:bg-card border-emerald-300 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-700 dark:text-emerald-300 gap-1.5 font-semibold"
+										>
+											<Link to="/services/owners">
+												<IconUserCircle className="size-3.5" />
+												فتح ملف ولي الأمر
+												<IconExternalLink className="size-3" />
+											</Link>
+										</Button>
+									)}
+								</div>
+							</div>
+						)}
+
+						{/* كرت موعد الفحص والتقييم الرسمي */}
+						{request.assessmentAppointment ? (
+							<div
+								className="flex flex-col gap-2 rounded-md border border-purple-200 bg-purple-50/70 dark:bg-purple-950/30 dark:border-purple-800 p-3"
+								dir="rtl"
+							>
+								<div className="flex items-center justify-between gap-2">
+									<div className="flex items-center gap-1.5 text-xs font-bold text-purple-800 dark:text-purple-300">
+										<IconCalendar className="size-4 shrink-0 text-purple-600" />
+										<span>موعد جلسة التقييم والفحص المقررة</span>
+									</div>
+									<Badge
+										variant="outline"
+										className="font-mono text-[11px] bg-purple-100 text-purple-800 border-purple-300 dark:bg-purple-900/50 dark:text-purple-200 font-bold px-2"
+									>
+										{request.assessmentAppointment.code}
+									</Badge>
+								</div>
+
+								<div className="grid grid-cols-2 gap-2 text-xs pt-1">
+									<div>
+										<span className="text-muted-foreground block text-[11px]">التاريخ والوقت:</span>
+										<span className="font-semibold text-foreground">
+											{new Date(request.assessmentAppointment.startsAt).toLocaleDateString("ar-EG", {
+												weekday: "long",
+												year: "numeric",
+												month: "long",
+												day: "numeric",
+											})}{" "}
+											- {new Date(request.assessmentAppointment.startsAt).toLocaleTimeString("ar-EG", {
+												hour: "2-digit",
+												minute: "2-digit",
+											})}
+										</span>
+									</div>
+
+									<div>
+										<span className="text-muted-foreground block text-[11px]">الأخصائي المسؤول:</span>
+										<span className="font-semibold text-foreground">
+											{request.assessmentAppointment.staffName || "فريق التقييم العام"}
+										</span>
+									</div>
+								</div>
+
+								<div className="flex items-center gap-2 pt-1 flex-wrap">
+									<Button
+										type="button"
+										size="sm"
+										variant="outline"
+										className="h-7 text-xs bg-white dark:bg-card border-purple-300 text-purple-700 hover:bg-purple-100 dark:border-purple-700 dark:text-purple-300 gap-1.5 font-semibold"
+										onClick={() => setIsScheduleAssessmentOpen(true)}
+									>
+										<IconCalendarPlus className="size-3.5" />
+										تعديل / إعادة جدولة الموعد
+									</Button>
+
+									<Button
+										asChild
+										size="sm"
+										variant="outline"
+										className="h-7 text-xs bg-white dark:bg-card border-purple-300 text-purple-700 hover:bg-purple-100 dark:border-purple-700 dark:text-purple-300 gap-1.5 font-semibold"
+									>
+										<Link to="/appointments">
+											<IconCalendar className="size-3.5" />
+											عرض في تقويم المواعيد
+											<IconExternalLink className="size-3" />
+										</Link>
+									</Button>
+								</div>
+							</div>
+						) : request.status !== "REJECTED" && request.status !== "ACCEPTED" ? (
+							<div
+								className="flex items-center justify-between gap-3 rounded-md border border-dashed border-purple-300 bg-purple-50/40 dark:bg-purple-950/20 p-3"
+								dir="rtl"
+							>
+								<div className="flex items-center gap-2.5 text-xs">
+									<div className="flex size-7 shrink-0 items-center justify-center rounded bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300">
+										<IconCalendarPlus className="size-4" />
+									</div>
+									<div>
+										<span className="font-semibold block text-foreground">
+											جلسة الفحص والتقييم لم تُجدول بعد
+										</span>
+										<span className="text-[11px] text-muted-foreground">
+											ثبّت موعداً رسمياً في تقويم المركز لتحويل الطلب لطابور التقييم
+										</span>
+									</div>
+								</div>
+								<Button
+									type="button"
+									size="sm"
+									className="h-7 text-xs bg-purple-600 hover:bg-purple-700 text-white font-semibold gap-1 shrink-0 shadow-sm"
+									onClick={() => setIsScheduleAssessmentOpen(true)}
+								>
+									<IconCalendarPlus className="size-3.5" />
+									تثبيت الموعد
+								</Button>
+							</div>
+						) : null}
+
 						{/* بيانات الطفل */}
 						<div className="space-y-1.5">
 							<span className="text-[11px] font-semibold text-foreground">
@@ -525,7 +838,11 @@ export function CampaignRequestSheet({
 								<DetailRow
 									icon={IconCalendar}
 									label="تاريخ الميلاد"
-									value="01/01/2023"
+									value={
+										request.birthDate
+											? new Date(request.birthDate).toLocaleDateString("ar-EG")
+											: "غير محدد"
+									}
 								/>
 								<DetailRow
 									icon={isMale ? IconGenderMale : IconGenderFemale}
@@ -539,13 +856,13 @@ export function CampaignRequestSheet({
 								/>
 								<DetailRow
 									icon={IconBuilding}
-									label="الفصل المطلوب"
-									value="النجوم"
+									label="الفصل / المسار المطلوب"
+									value={request.targetClass || "المسار التمهيدي"}
 								/>
 								<DetailRow
 									icon={IconCalendar}
 									label="تاريخ التقديم"
-									value={request.date || "01/02/2026"}
+									value={request.date || "-"}
 								/>
 							</div>
 						</div>
@@ -559,7 +876,7 @@ export function CampaignRequestSheet({
 								<DetailRow
 									icon={IconHeartbeat}
 									label="فصيلة الدم"
-									value="A+"
+									value={request.bloodType || "غير محدد"}
 								/>
 								<div
 									className="flex items-center justify-between gap-3 py-1"
@@ -570,19 +887,25 @@ export function CampaignRequestSheet({
 										حساسية
 									</span>
 									<div className="flex items-center gap-1 flex-wrap">
-										<Badge
-											variant="outline"
-											className="bg-amber-50 text-amber-700 border-amber-200 text-[11px] font-medium px-2 py-0.5"
-										>
-											حساسية فول سوداني
-										</Badge>
+										{request.allergies ? (
+											<Badge
+												variant="outline"
+												className="bg-amber-50 text-amber-700 border-amber-200 text-[11px] font-medium px-2 py-0.5"
+											>
+												{request.allergies}
+											</Badge>
+										) : (
+											<span className="text-xs text-muted-foreground">
+												لا توجد حساسية مسجلة
+											</span>
+										)}
 									</div>
 								</div>
 
 								<div className="flex items-center justify-between border rounded-[4px] p-2.5 bg-destructive/5 border-destructive/20 mt-1">
 									<div className="flex items-center gap-2 text-destructive font-medium text-xs">
 										<IconHeartbeat className="size-4" />
-										<span>حالات مزمنة</span>
+										<span>حالات صحية أو أمراض مزمنة</span>
 									</div>
 									<Switch
 										checked={hasChronic}
@@ -591,9 +914,13 @@ export function CampaignRequestSheet({
 									/>
 								</div>
 
-								{hasChronic && (
+								{hasChronic ? (
 									<div className="rounded-[4px] border border-destructive/20 bg-destructive/5 p-2 text-center text-xs font-medium text-destructive">
-										ربو خفيف - الأدوية: بخاخ فنتولين عند الحاجة
+										{request.chronicDiseases || "توجد حالات صحية مسجلة"}
+									</div>
+								) : (
+									<div className="rounded-[4px] border border-emerald-200 bg-emerald-50 dark:bg-emerald-950/20 dark:border-emerald-900 p-2 text-center text-xs font-medium text-emerald-700 dark:text-emerald-400">
+										لا توجد حالات صحية مزمنة مسجلة
 									</div>
 								)}
 							</div>
@@ -615,7 +942,7 @@ export function CampaignRequestSheet({
 													{request.guardianName?.slice(0, 2) || "وا"}
 												</AvatarFallback>
 											</Avatar>
-											<span>{request.guardianName || "محمد السالم"}</span>
+											<span>{request.guardianName || "-"}</span>
 										</div>
 									}
 								/>
@@ -623,20 +950,86 @@ export function CampaignRequestSheet({
 									icon={IconPhone}
 									label="رقم الهاتف"
 									value={
-										<span dir="ltr" className="tabular-nums font-mono text-xs">
-											0584505412
-										</span>
+										request.guardianPhone ? (
+											<a
+												href={`tel:${request.guardianPhone}`}
+												dir="ltr"
+												className="tabular-nums font-mono text-xs text-primary hover:underline"
+											>
+												{request.guardianPhone}
+											</a>
+										) : (
+											<span className="text-xs text-muted-foreground">-</span>
+										)
 									}
 								/>
 								<DetailRow
 									icon={IconMail}
 									label="البريد الإلكتروني"
 									value={
-										<span dir="ltr" className="font-mono text-xs">
-											mohammed@email.com
-										</span>
+										request.guardianEmail ? (
+											<a
+												href={`mailto:${request.guardianEmail}`}
+												dir="ltr"
+												className="font-mono text-xs text-primary hover:underline"
+											>
+												{request.guardianEmail}
+											</a>
+										) : (
+											<span className="text-xs text-muted-foreground">-</span>
+										)
 									}
 								/>
+								{request.guardianNationalId && (
+									<DetailRow
+										icon={IconUserCircle}
+										label="الهوية الوطنية / الإقامة"
+										value={
+											<span dir="ltr" className="font-mono text-xs text-foreground">
+												{request.guardianNationalId}
+											</span>
+										}
+									/>
+								)}
+							</div>
+						</div>
+
+						{/* إشعارات ولي الأمر (Notification Outbox) */}
+						<div className="space-y-2">
+							<div
+								className="flex items-center justify-between gap-2"
+								dir="rtl"
+							>
+								<span className="flex items-center gap-1.5 text-[11px] font-semibold text-foreground">
+									<IconBrandWhatsapp className="size-3.5 text-emerald-600" />
+									صندوق إشعارات ولي الأمر
+								</span>
+								<span className="text-[10px] text-muted-foreground">
+									{notifications.length > 0
+										? `${notifications.length} رسائل`
+										: "0 رسائل"}
+								</span>
+							</div>
+
+							<div className="space-y-2">
+								{isLoadingNotifications ? (
+									<div className="rounded-[4px] border border-dashed p-3 text-center text-xs text-muted-foreground">
+										جاري تحميل الإشعارات...
+									</div>
+								) : notifications.length === 0 ? (
+									<div className="rounded-[4px] border border-dashed p-3 text-center text-xs text-muted-foreground bg-muted/20">
+										لا توجد إشعارات مسجلة لهذا المتقدم بعد.
+									</div>
+								) : (
+									notifications.map((item) => (
+										<NotificationOutboxCard
+											key={item.id}
+											item={item}
+											onMarkSent={handleMarkSent}
+											isPending={markNotificationSentMutation.isPending}
+										/>
+									))
+								)}
 							</div>
 						</div>
 
@@ -650,15 +1043,26 @@ export function CampaignRequestSheet({
 									المستندات والملفات
 								</span>
 								<span className="text-[10px] text-muted-foreground">
-									{request.documents
-										? `${request.documents.count} من ${request.documents.total} مستندات`
-										: "3 مستندات"}
+									{request.documents?.items?.length
+										? `${request.documents.items.length} مستندات`
+										: "0 مستندات"}
 								</span>
 							</div>
 							<div className="space-y-1.5">
-								<AttachmentRow label="شهادة الميلاد.pdf" size="1.2 MB" />
-								<AttachmentRow label="كارت التطعيمات واللقاحات.pdf" size="850 KB" />
-								<AttachmentRow label="الهوية الوطنية لولي الأمر.pdf" size="2.1 MB" />
+								{request.documents?.items && request.documents.items.length > 0 ? (
+									request.documents.items.map((doc) => (
+										<AttachmentRow
+											key={doc.id}
+											label={doc.title}
+											size={doc.fileSize || "1.0 MB"}
+											fileUrl={doc.fileUrl}
+										/>
+									))
+								) : (
+									<div className="rounded-[4px] border border-dashed p-3 text-center text-xs text-muted-foreground">
+										لا توجد مستندات أو مرفقات مرفوعة مع هذا الطلب
+									</div>
+								)}
 							</div>
 						</div>
 
@@ -668,13 +1072,33 @@ export function CampaignRequestSheet({
 								سلسلة الموافقات
 							</span>
 							<div className="space-y-0 pt-1">
-								{APPROVAL_STEPS.map((step, i) => (
+								{request.timeline && request.timeline.length > 0 ? (
+									request.timeline.map((step, i) => (
+										<TimelineStepItem
+											key={step.id}
+											step={{
+												id: step.id,
+												title: step.title,
+												byName: step.actorName,
+												statusBadge: step.statusBadge || undefined,
+												status: step.isCompleted ? "done" : "active",
+											}}
+											isLast={i === (request.timeline?.length || 1) - 1}
+										/>
+									))
+								) : (
 									<TimelineStepItem
-										key={step.id}
-										step={step}
-										isLast={i === APPROVAL_STEPS.length - 1}
+										step={{
+											id: "step-initial",
+											title: "تم استلام الطلب",
+											byName: request.source ? `بوابة ${request.source}` : "بوابة التسجيل الرقمي",
+											dateLabel: request.date,
+											status: "done",
+											statusBadge: "مكتمل",
+										}}
+										isLast={true}
 									/>
-								))}
+								)}
 							</div>
 						</div>
 					</div>
@@ -828,6 +1252,25 @@ export function CampaignRequestSheet({
 				)}
 			</SheetContent>
 		</Sheet>
+
+		{request && (
+			<EditRequestDialog
+				open={isEditDialogOpen}
+				onOpenChange={setIsEditDialogOpen}
+				request={request}
+				campaignId={campaignId || ""}
+			/>
+		)}
+
+		{request && (
+			<ScheduleAssessmentDialog
+				open={isScheduleAssessmentOpen}
+				onOpenChange={setIsScheduleAssessmentOpen}
+				request={request}
+				campaignId={campaignId || ""}
+			/>
+		)}
+	</>
 	);
 }
 

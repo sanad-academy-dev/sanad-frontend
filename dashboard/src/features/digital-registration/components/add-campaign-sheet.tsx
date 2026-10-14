@@ -17,6 +17,7 @@ import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { IconCertificate, IconId, IconVaccine } from "@tabler/icons-react";
 import type { Campaign } from "../types/campaign.types";
+import { useCreateCampaign, useUpdateCampaign } from "../hooks/use-digital-registration";
 
 export function AddCampaignSheet({
 	open,
@@ -28,22 +29,75 @@ export function AddCampaignSheet({
 	campaign?: Campaign | null;
 }) {
 	const isEditing = !!campaign;
+	const [name, setName] = useState("");
+	const [ageGroup, setAgeGroup] = useState("");
+	const [targetClass, setTargetClass] = useState("");
+	const [capacity, setCapacity] = useState("30");
+	const [startDate, setStartDate] = useState("");
+	const [endDate, setEndDate] = useState("");
+	const [status, setStatus] = useState<"ACTIVE" | "DRAFT" | "COMPLETED" | "CLOSED">("ACTIVE");
 	const [requireId, setRequireId] = useState(true);
 	const [requireVaccine, setRequireVaccine] = useState(true);
 	const [requireBirthCert, setRequireBirthCert] = useState(true);
 
+	const createMutation = useCreateCampaign();
+	const updateMutation = useUpdateCampaign();
+
 	useEffect(() => {
 		if (open) {
-			setRequireId(true);
-			setRequireVaccine(true);
-			setRequireBirthCert(true);
+			if (campaign) {
+				setName(campaign.name || "");
+				setAgeGroup(campaign.ageGroup || "");
+				setTargetClass(campaign.targetClass || "");
+				setCapacity(String(campaign.maxCapacity || campaign.capacity || 30));
+				setStartDate(campaign.startDate ? campaign.startDate.split("T")[0] : "");
+				setEndDate(campaign.endDate ? campaign.endDate.split("T")[0] : "");
+				setStatus(campaign.status || "ACTIVE");
+				setRequireId(campaign.requireId ?? true);
+				setRequireVaccine(campaign.requireVaccine ?? true);
+				setRequireBirthCert(campaign.requireBirthCert ?? true);
+			} else {
+				setName("");
+				setAgeGroup("2-3");
+				setTargetClass("النجوم");
+				setCapacity("30");
+				setStartDate("");
+				setEndDate("");
+				setStatus("ACTIVE");
+				setRequireId(true);
+				setRequireVaccine(true);
+				setRequireBirthCert(true);
+			}
 		}
 	}, [open, campaign]);
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
+		if (!name.trim()) return;
+
+		const payload: Partial<Campaign> = {
+			name: name.trim(),
+			ageGroup: ageGroup.trim() || "2-3 سنوات",
+			targetClass: targetClass.trim() || null,
+			capacity: Number(capacity) || 30,
+			status,
+			startDate: startDate ? new Date(startDate).toISOString() : null,
+			endDate: endDate ? new Date(endDate).toISOString() : null,
+			requireId,
+			requireVaccine,
+			requireBirthCert,
+		};
+
+		if (isEditing && campaign) {
+			await updateMutation.mutateAsync({ id: campaign.id, data: payload });
+		} else {
+			await createMutation.mutateAsync(payload);
+		}
+
 		onClose();
 	};
+
+	const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
 	return (
 		<Sheet
@@ -81,7 +135,8 @@ export function AddCampaignSheet({
 								</FieldLabel>
 								<Input
 									name="name"
-									defaultValue={campaign?.name || ""}
+									value={name}
+									onChange={(e) => setName(e.target.value)}
 									placeholder="يُرجى كتابة اسم الحملة..."
 									className="w-full text-right text-sm"
 									required
@@ -93,170 +148,132 @@ export function AddCampaignSheet({
 								<FieldLabel required>
 									<Label className="text-sm font-medium">الفئة العمرية</Label>
 								</FieldLabel>
-								<Select defaultValue={campaign?.ageGroup || ""}>
-									<SelectTrigger
-										className="w-full text-right text-sm"
-										dir="rtl"
-									>
-										<SelectValue placeholder="اختر..." />
+								<Select value={ageGroup} onValueChange={setAgeGroup}>
+									<SelectTrigger className="w-full text-right text-sm" dir="rtl">
+										<SelectValue placeholder="اختر الفئة العمرية..." />
 									</SelectTrigger>
 									<SelectContent dir="rtl">
-										<SelectItem
-											value="2-3"
-											className="text-right"
-										>
+										<SelectItem value="2-3 سنوات" className="text-right">
 											2-3 سنوات
 										</SelectItem>
-										<SelectItem
-											value="3-4"
-											className="text-right"
-										>
+										<SelectItem value="3-4 سنوات" className="text-right">
 											3-4 سنوات
 										</SelectItem>
-										<SelectItem
-											value="4-5"
-											className="text-right"
-										>
+										<SelectItem value="4-5 سنوات" className="text-right">
 											4-5 سنوات
 										</SelectItem>
-										{isEditing && campaign.ageGroup && (
-											<SelectItem
-												value={campaign.ageGroup}
-												className="text-right"
-											>
-												{campaign.ageGroup}
-											</SelectItem>
-										)}
+										<SelectItem value="6-9 سنوات" className="text-right">
+											6-9 سنوات
+										</SelectItem>
+										<SelectItem value="10-14 سنة" className="text-right">
+											10-14 سنة
+										</SelectItem>
 									</SelectContent>
 								</Select>
 							</div>
 
 							{/* الفصل المستهدف */}
 							<div className="flex flex-col gap-1.5">
-								<Label className="text-sm font-medium">الفصل المستهدف</Label>
-								<Select defaultValue="">
-									<SelectTrigger
-										className="w-full text-right text-sm"
-										dir="rtl"
-									>
-										<SelectValue placeholder="اختر..." />
+								<Label className="text-sm font-medium">الفصل / المسار المستهدف</Label>
+								<Select value={targetClass} onValueChange={setTargetClass}>
+									<SelectTrigger className="w-full text-right text-sm" dir="rtl">
+										<SelectValue placeholder="اختر الفصل..." />
 									</SelectTrigger>
 									<SelectContent dir="rtl">
-										<SelectItem
-											value="النجوم"
-											className="text-right"
-										>
+										<SelectItem value="النجوم" className="text-right">
 											النجوم
 										</SelectItem>
-										<SelectItem
-											value="القمر"
-											className="text-right"
-										>
+										<SelectItem value="القمر" className="text-right">
 											القمر
 										</SelectItem>
-										<SelectItem
-											value="الشمس"
-											className="text-right"
-										>
+										<SelectItem value="الشمس" className="text-right">
 											الشمس
+										</SelectItem>
+										<SelectItem value="المستكشف" className="text-right">
+											مسار المستكشف
+										</SelectItem>
+										<SelectItem value="المفكر" className="text-right">
+											مسار المفكر
 										</SelectItem>
 									</SelectContent>
 								</Select>
 							</div>
 
-							{/* تاريخ البدء */}
+							{/* حالة الحملة */}
 							<div className="flex flex-col gap-1.5">
-								<FieldLabel required>
-									<Label className="text-sm font-medium">تاريخ البدء</Label>
-								</FieldLabel>
-								{/* Extracting 'YYYY-MM-DD' safely if startDate is present in a different format */}
-								<Input
-									type="date"
-									className="text-sm"
-									defaultValue={
-										campaign?.startDate
-											? new Date(campaign.startDate).toISOString().split("T")[0]
-											: ""
-									}
-								/>
+								<Label className="text-sm font-medium">حالة الحملة</Label>
+								<Select value={status} onValueChange={(val: any) => setStatus(val)}>
+									<SelectTrigger className="w-full text-right text-sm" dir="rtl">
+										<SelectValue placeholder="اختر الحالة..." />
+									</SelectTrigger>
+									<SelectContent dir="rtl">
+										<SelectItem value="ACTIVE" className="text-right">
+											نشط (مفتوحة للتسجيل)
+										</SelectItem>
+										<SelectItem value="DRAFT" className="text-right">
+											مسودة
+										</SelectItem>
+										<SelectItem value="COMPLETED" className="text-right">
+											مكتملة (ممتلئة)
+										</SelectItem>
+										<SelectItem value="CLOSED" className="text-right">
+											مغلقة
+										</SelectItem>
+									</SelectContent>
+								</Select>
 							</div>
 
-							{/* تاريخ الانتهاء */}
-							<div className="flex flex-col gap-1.5">
-								<FieldLabel required>
-									<Label className="text-sm font-medium">تاريخ الانتهاء</Label>
-								</FieldLabel>
-								<Input
-									type="date"
-									className="text-sm"
-								/>
+							{/* تاريخ البدء والانتهاء */}
+							<div className="grid grid-cols-2 gap-3">
+								<div className="flex flex-col gap-1.5">
+									<FieldLabel>
+										<Label className="text-sm font-medium">تاريخ البدء</Label>
+									</FieldLabel>
+									<Input
+										type="date"
+										className="text-sm"
+										value={startDate}
+										onChange={(e) => setStartDate(e.target.value)}
+									/>
+								</div>
+
+								<div className="flex flex-col gap-1.5">
+									<FieldLabel>
+										<Label className="text-sm font-medium">تاريخ الانتهاء</Label>
+									</FieldLabel>
+									<Input
+										type="date"
+										className="text-sm"
+										value={endDate}
+										onChange={(e) => setEndDate(e.target.value)}
+									/>
+								</div>
 							</div>
 
 							{/* المقاعد المتاحة */}
 							<div className="flex flex-col gap-1.5">
 								<FieldLabel required>
-									<Label className="text-sm font-medium">المقاعد المتاحة</Label>
+									<Label className="text-sm font-medium">السعة (عدد المقاعد المتاحة)</Label>
 								</FieldLabel>
-								<Select
-									defaultValue={campaign?.maxCapacity ? String(campaign.maxCapacity) : ""}
-								>
-									<SelectTrigger
-										className="w-full text-right text-sm"
-										dir="rtl"
-									>
-										<SelectValue placeholder="اختر..." />
-									</SelectTrigger>
-									<SelectContent dir="rtl">
-										<SelectItem
-											value="15"
-											className="text-right"
-										>
-											15
-										</SelectItem>
-										<SelectItem
-											value="20"
-											className="text-right"
-										>
-											20
-										</SelectItem>
-										<SelectItem
-											value="25"
-											className="text-right"
-										>
-											25
-										</SelectItem>
-										<SelectItem
-											value="30"
-											className="text-right"
-										>
-											30
-										</SelectItem>
-										{isEditing && campaign.maxCapacity && (
-											<SelectItem
-												value={String(campaign.maxCapacity)}
-												className="text-right"
-											>
-												{campaign.maxCapacity}
-											</SelectItem>
-										)}
-									</SelectContent>
-								</Select>
+								<Input
+									type="number"
+									min="1"
+									max="500"
+									value={capacity}
+									onChange={(e) => setCapacity(e.target.value)}
+									className="text-sm text-right"
+									required
+								/>
 							</div>
 
-							{/* المتطلبات */}
+							{/* المتطلبات والمستندات المشروطة */}
 							<div className="flex flex-col gap-2">
-								<Label className="text-sm font-medium">المتطلبات</Label>
+								<Label className="text-sm font-medium">المستندات المطلوبة للتقديم</Label>
 								<div className="flex flex-col gap-2">
 									<div
 										role="button"
 										tabIndex={0}
 										onClick={() => setRequireId((prev) => !prev)}
-										onKeyDown={(e) => {
-											if (e.key === "Enter" || e.key === " ") {
-												e.preventDefault();
-												setRequireId((prev) => !prev);
-											}
-										}}
 										className={cn(
 											"flex items-center justify-between rounded-md border p-2.5 cursor-pointer transition-colors select-none",
 											requireId
@@ -271,7 +288,7 @@ export function AddCampaignSheet({
 													requireId ? "text-primary" : "text-muted-foreground",
 												)}
 											/>
-											<span className="text-sm font-medium">صورة الهوية</span>
+											<span className="text-sm font-medium">الهوية الوطنية لولي الأمر</span>
 										</div>
 										<Switch
 											checked={requireId}
@@ -284,12 +301,6 @@ export function AddCampaignSheet({
 										role="button"
 										tabIndex={0}
 										onClick={() => setRequireVaccine((prev) => !prev)}
-										onKeyDown={(e) => {
-											if (e.key === "Enter" || e.key === " ") {
-												e.preventDefault();
-												setRequireVaccine((prev) => !prev);
-											}
-										}}
 										className={cn(
 											"flex items-center justify-between rounded-md border p-2.5 cursor-pointer transition-colors select-none",
 											requireVaccine
@@ -304,7 +315,7 @@ export function AddCampaignSheet({
 													requireVaccine ? "text-primary" : "text-muted-foreground",
 												)}
 											/>
-											<span className="text-sm font-medium">شهادة التطعيم</span>
+											<span className="text-sm font-medium">شهادة التطعيم واللقاحات</span>
 										</div>
 										<Switch
 											checked={requireVaccine}
@@ -317,12 +328,6 @@ export function AddCampaignSheet({
 										role="button"
 										tabIndex={0}
 										onClick={() => setRequireBirthCert((prev) => !prev)}
-										onKeyDown={(e) => {
-											if (e.key === "Enter" || e.key === " ") {
-												e.preventDefault();
-												setRequireBirthCert((prev) => !prev);
-											}
-										}}
 										className={cn(
 											"flex items-center justify-between rounded-md border p-2.5 cursor-pointer transition-colors select-none",
 											requireBirthCert
@@ -337,7 +342,7 @@ export function AddCampaignSheet({
 													requireBirthCert ? "text-primary" : "text-muted-foreground",
 												)}
 											/>
-											<span className="text-sm font-medium">شهادة الميلاد</span>
+											<span className="text-sm font-medium">شهادة ميلاد الطفل</span>
 										</div>
 										<Switch
 											checked={requireBirthCert}
@@ -354,7 +359,7 @@ export function AddCampaignSheet({
 				<FormFooter
 					continueAdding={false}
 					onContinueAddingChange={() => {}}
-					disabled={false}
+					disabled={isSubmitting}
 				>
 					<Button
 						type="button"
@@ -368,8 +373,13 @@ export function AddCampaignSheet({
 						type="submit"
 						form="add-campaign-form"
 						size="sm"
+						disabled={isSubmitting}
 					>
-						{isEditing ? "حفظ التعديلات" : "إنشاء الحملة"}
+						{isSubmitting
+							? "جاري الحفظ..."
+							: isEditing
+								? "حفظ التعديلات"
+								: "إنشاء الحملة"}
 					</Button>
 				</FormFooter>
 			</SheetContent>
