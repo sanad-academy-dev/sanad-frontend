@@ -29,7 +29,7 @@ export function AttendanceHeader({
 			<nav className="flex items-center gap-[3.49px]">
 				<button
 					type="button"
-					onClick={() => onChange("students")}
+					onClick={() => active !== "students" && onChange("students")}
 					className={cn(
 						"flex h-[25px] items-center justify-center rounded-[4px] px-[14px] text-[11px] font-medium leading-[16px] transition-colors",
 						active === "students"
@@ -41,7 +41,7 @@ export function AttendanceHeader({
 				</button>
 				<button
 					type="button"
-					onClick={() => onChange("staff")}
+					onClick={() => active !== "staff" && onChange("staff")}
 					className={cn(
 						"flex h-[25px] items-center justify-center rounded-[4px] px-[14px] text-[11px] font-medium leading-[16px] transition-colors",
 						active === "staff"

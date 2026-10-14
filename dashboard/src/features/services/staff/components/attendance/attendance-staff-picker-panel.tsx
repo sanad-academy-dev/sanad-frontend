@@ -23,6 +23,7 @@ import {
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { useAttendance } from "@/features/services/staff/hooks/use-attendance";
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
+import { cn } from "@/lib/utils";
 
 // شارة الحالة لكل سجل حضور اليوم (نص + أيقونة + لون) — مطابقة لتصميم Figma
 const STATUS_BADGE: Record<string, { label: string; color: string; Icon: FC<IconProps> }> = {
@@ -70,28 +71,42 @@ export function AttendanceStaffPickerPanel({
 	onClose: () => void;
 	onNext: (selected: PickedSelection[]) => void;
 	title?: string;
-	customItems?: { id: string; name: string; code: string; role?: string }[];
+	customItems?: { id: string; name: string; code: string; role?: string | { name?: string } }[];
 	customRecords?: any[];
 	targetLabel?: string;
 }) {
+	const isStudent = targetLabel === "الطلاب";
 	const { staff } = useStaff();
 	const activeItems = customItems ?? staff;
 
 	// حالة اليوم وسجلّها لكل شخص — للشارات وتمرير وقت الحضور للخطوة التالية
 	const today = useMemo(() => new Date(), []);
+	const todayKey = useMemo(() => {
+		const now = new Date();
+		return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+	}, []);
 	const { records: defaultRecords } = useAttendance(today, today);
 	const records = customRecords ?? defaultRecords;
 
+	// تصفية السجلات ليوم اليوم فقط لضمان دقة الشارات والبيانات
+	const todayRecords = useMemo(() => {
+		return records.filter((r) => {
+			if (!r.date) return false;
+			const dStr = typeof r.date === "string" ? r.date.slice(0, 10) : new Date(r.date).toISOString().slice(0, 10);
+			return dStr === todayKey;
+		});
+	}, [records, todayKey]);
+
 	const recordByStaff = useMemo(() => {
 		const map = new Map<string, (typeof records)[number]>();
-		for (const r of records) map.set(r.staffId, r);
+		for (const r of todayRecords) map.set(r.staffId, r);
 		return map;
-	}, [records]);
+	}, [todayRecords]);
 	const statusByStaff = useMemo(() => {
 		const map = new Map<string, string>();
-		for (const r of records) map.set(r.staffId, r.status);
+		for (const r of todayRecords) map.set(r.staffId, r.status);
 		return map;
-	}, [records]);
+	}, [todayRecords]);
 
 	const [search, setSearch] = useState("");
 	const [filterKey, setFilterKey] = useState<(typeof FILTERS)[number]["key"]>("all");
@@ -206,7 +221,11 @@ export function AttendanceStaffPickerPanel({
 						<input
 							value={search}
 							onChange={(e) => setSearch(e.target.value)}
-							placeholder="بحث بالاسم الموظف أو بالمعرف..."
+							placeholder={
+								isStudent
+									? "بحث باسم الطالب أو بالمعرف..."
+									: "بحث باسم الموظف أو بالمعرف..."
+							}
 							className="h-[25px] w-full rounded-[4px] border-[0.75px] border-[#E5E5E5] pr-7 pl-2 text-right text-[10px] text-[#08090A] outline-none placeholder:text-[#08090A]/50"
 						/>
 					</div>
@@ -265,7 +284,7 @@ export function AttendanceStaffPickerPanel({
 					</div>
 				)}
 
-				{/* قائمة الموظفين */}
+				{/* قائمة الموظفين / الطلاب */}
 				<div
 					className="flex min-h-0 flex-1 flex-col gap-[1.5px] overflow-y-auto px-3 py-2"
 					dir="rtl"
@@ -274,6 +293,10 @@ export function AttendanceStaffPickerPanel({
 						const status = statusByStaff.get(s.id);
 						const badge = status ? STATUS_BADGE[status] : undefined;
 						const checked = selected.has(s.id);
+						const roleText =
+							typeof s.role === "string"
+								? s.role
+								: (s.role?.name ?? (isStudent ? "طالب" : "—"));
 						return (
 							<button
 								key={s.id}
@@ -289,7 +312,12 @@ export function AttendanceStaffPickerPanel({
 									className="pointer-events-none size-4 rounded-[4px] border-[1.5px] border-[#E5E5E5]"
 								/>
 								{/* الأفاتار */}
-								<span className="flex size-[23px] shrink-0 items-center justify-center rounded-full bg-[#4F6AE0] text-[9px] text-white">
+								<span
+									className={cn(
+										"flex size-[23px] shrink-0 items-center justify-center rounded-full text-[9px] text-white",
+										isStudent ? "bg-[#10B981]" : "bg-[#4F6AE0]",
+									)}
+								>
 									{initialsOf(s.name)}
 								</span>
 								{/* الاسم + التخصص·المعرف */}
@@ -298,7 +326,7 @@ export function AttendanceStaffPickerPanel({
 										{s.name}
 									</span>
 									<span className="truncate text-right text-[9px] text-[#9B9B9D]">
-										{s.role?.name ?? "—"} · {s.code}
+										{roleText} · {s.code}
 									</span>
 								</div>
 								{/* شارة الحالة — يسار */}
@@ -319,7 +347,7 @@ export function AttendanceStaffPickerPanel({
 					})}
 					{filtered.length === 0 && (
 						<div className="py-12 text-center text-xs text-muted-foreground">
-							لا يوجد موظفين مطابقين
+							لا يوجد {targetLabel} مطابقين
 						</div>
 					)}
 				</div>
@@ -334,7 +362,7 @@ export function AttendanceStaffPickerPanel({
 						disabled={selected.size === 0}
 						onClick={() =>
 							onNext(
-								staff
+								activeItems
 									.filter((s) => selected.has(s.id))
 									.map((s) => {
 										const rec = recordByStaff.get(s.id);

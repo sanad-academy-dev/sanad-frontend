@@ -123,12 +123,23 @@ export function AttendanceBulkLeaveDialog({
 	staff,
 	onClose,
 	onSubmitted,
+	onSave,
+	targetLabel = "الموظفين",
 }: {
 	staff: BulkPickedStaff[] | null;
 	onClose: () => void;
-	onSubmitted: (reviews: BulkLeaveReview[]) => void;
+	onSubmitted?: (reviews: BulkLeaveReview[]) => void;
+	onSave?: (args: {
+		staffId: string;
+		date: string;
+		status: "LEAVE";
+		hours?: number;
+		notes?: string;
+	}) => Promise<unknown>;
+	targetLabel?: string;
 }) {
 	const open = !!staff && staff.length > 0;
+	const isStudent = targetLabel === "الطلاب";
 	const { createLeaveRequestAsync, isPending } = useCreateLeaveRequest();
 
 	const [leaveType, setLeaveType] = useState("");
@@ -166,13 +177,38 @@ export function AttendanceBulkLeaveDialog({
 	const handleSubmit = async () => {
 		if (!staff || !canSubmit) return;
 		const targets = staff.filter((s) => selectedIds.has(s.id));
-		const days = eachDayOfInterval({
+		const intervalDays = eachDayOfInterval({
 			start: new Date(`${startDate}T00:00:00`),
 			end: new Date(`${endDate}T00:00:00`),
-		}).length;
+		});
 
 		const toastId = toast.loading("جارٍ تسجيل الإجازات...", { position: "bottom-left" });
 		try {
+			if (onSave) {
+				const noteText = [leaveType, notes].filter(Boolean).join(" — ");
+				await Promise.all(
+					targets.flatMap((s) =>
+						intervalDays.map((d) =>
+							onSave({
+								staffId: s.id,
+								date: format(d, "yyyy-MM-dd"),
+								status: "LEAVE",
+								hours: 0,
+								notes: noteText || undefined,
+							}),
+						),
+					),
+				);
+				toast.dismiss(toastId);
+				toast.success(
+					`تم تسجيل إجازة لعدد (${targets.length}) ${isStudent ? "طلاب" : "موظفين"} بنجاح`,
+					{ position: "bottom-left" },
+				);
+				onClose();
+				return;
+			}
+
+			const days = intervalDays.length;
 			const created = await Promise.all(
 				targets.map(async (s) => {
 					const res = await createLeaveRequestAsync({
@@ -189,7 +225,7 @@ export function AttendanceBulkLeaveDialog({
 			toast.dismiss(toastId);
 			onClose();
 			// فتح لوحة مراجعة الطلبات للموظفين المختارين
-			onSubmitted(created);
+			onSubmitted?.(created);
 		} catch (err) {
 			toast.error((err as Error).message || "فشل تسجيل الإجازات", {
 				id: toastId,
@@ -218,7 +254,9 @@ export function AttendanceBulkLeaveDialog({
 					<div className="flex items-center gap-1.5">
 						<span className="text-[10px] font-bold text-[#08090A]">الحضور والانصراف</span>
 						<IconChevronLeft className="size-[9px] text-[#272829]" />
-						<span className="text-[10px] font-bold text-[#08090A]">تسجيل أجازة</span>
+						<span className="text-[10px] font-bold text-[#08090A]">
+							{isStudent ? "تسجيل إجازة الطلاب" : "تسجيل أجازة"}
+						</span>
 					</div>
 					<div className="flex items-center gap-1.5">
 						<button
@@ -241,10 +279,12 @@ export function AttendanceBulkLeaveDialog({
 
 				{/* الجسم */}
 				<div className="flex flex-col gap-4 px-[15px] py-3">
-					{/* الموظفون المحددون — صندوق أصفر مع شارات قابلة للاختيار */}
+					{/* الموظفون / الطلاب المحددون — صندوق أصفر مع شارات قابلة للاختيار */}
 					<div className="flex flex-col gap-[5px] rounded-[4px] bg-[#FFFBEA] p-[7.5px]">
 						<div className="flex items-center justify-between">
-							<span className="text-[10px] text-[#08090A]">الموظفون المحددون ({count})</span>
+							<span className="text-[10px] text-[#08090A]">
+								{isStudent ? "الطلاب المحددون" : "الموظفون المحددون"} ({count})
+							</span>
 							<span className="rounded-[4px] bg-[#3B82F6]/[0.05] px-1.5 py-[1.5px] text-[8px] font-semibold text-[#6366F1]">
 								تسجيل جماعي
 							</span>
@@ -265,7 +305,12 @@ export function AttendanceBulkLeaveDialog({
 										)}
 									>
 										<span className="text-[9px] text-[#08090A]">{s.name}</span>
-										<span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-[#6366F1] text-[6px] font-semibold text-[#F5F5F6]">
+										<span
+											className={cn(
+												"flex size-4 shrink-0 items-center justify-center rounded-full text-[6px] font-semibold text-[#F5F5F6]",
+												isStudent ? "bg-[#10B981]" : "bg-[#6366F1]",
+											)}
+										>
 											{initialsOf(s.name)}
 										</span>
 									</button>
@@ -343,7 +388,9 @@ export function AttendanceBulkLeaveDialog({
 				<div className="flex items-center justify-between border-t border-[#E5E5E5] px-3 py-[7.5px]">
 					<div className="flex items-center gap-1.5">
 						<span className="text-[10px] text-[#737373]">
-							إشعار المدير / الموظف عبر البريد
+							{isStudent
+								? "إشعار ولي الأمر عبر الرسائل"
+								: "إشعار المدير / الموظف عبر البريد"}
 						</span>
 						<Switch
 							checked={notifyManager}

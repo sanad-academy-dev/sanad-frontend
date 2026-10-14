@@ -170,7 +170,12 @@ export function KioskScreen({
 		const record = recordByStaff.get(found.id);
 		const st = cellState(record);
 		if (st === "left") {
-			toast.error("هذا الموظف سجّل حضوره وانصرافه اليوم", { position: "bottom-left" });
+			toast.error(
+				isStudents
+					? "هذا الطالب سجّل حضوره وانصرافه اليوم"
+					: "هذا الموظف سجّل حضوره وانصرافه اليوم",
+				{ position: "bottom-left" },
+			);
 			return;
 		}
 		setPinError(false);
@@ -408,13 +413,18 @@ export function KioskScreen({
 									key={s.id}
 									className="flex flex-col items-center gap-2 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white p-3"
 								>
-									<span className="flex size-11 items-center justify-center rounded-full bg-[#6366F1] text-[13px] font-bold text-white">
+									<span
+										className={cn(
+											"flex size-11 items-center justify-center rounded-full text-[13px] font-bold text-white",
+											isStudents ? "bg-[#10B981]" : "bg-[#6366F1]",
+										)}
+									>
 										{initialsOf(s.name)}
 									</span>
 									<div className="flex flex-col items-center gap-0.5">
 										<span className="text-[13px] font-bold text-[#08090A]">{s.name}</span>
 										<span className="text-[10px] text-[#9B9B9D]">
-											{s.role?.name ?? "—"} · {s.code}
+											{(typeof s.role === "string" ? s.role : s.role?.name) ?? "—"} · {s.code}
 										</span>
 									</div>
 

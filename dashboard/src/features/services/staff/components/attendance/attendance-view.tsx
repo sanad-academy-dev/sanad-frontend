@@ -24,6 +24,7 @@ import { addDays, addWeeks, format, isToday, startOfWeek } from "date-fns";
 import { arSA } from "date-fns/locale";
 import type { FC, ReactNode } from "react";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { showFeatureLockedToast } from "@/components/common/feature-locked-toast";
 import { FiltersMenu } from "@/components/common/filters-menu";
 import { TablePagination } from "@/components/common/table-pagination";
@@ -64,7 +65,7 @@ import { useLeaveRequests } from "@/features/services/staff/hooks/use-leave-requ
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import { useStaffFilters } from "@/features/services/staff/hooks/use-staff-filters";
 import { useUpsertAttendance } from "@/features/services/staff/hooks/use-upsert-attendance";
-import { exportStaffCsv } from "@/features/services/staff/utils/export-staff";
+import { downloadCsv } from "@/lib/csv";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import {
 	useStudentAttendance,
@@ -93,6 +94,45 @@ const fmtTime24 = (iso: string | Date | null) => (iso ? format(new Date(iso), "H
 // مفتاح اليوم (yyyy-MM-dd) من تاريخ السجل سواء كان نصًا أو كائن Date
 const dayKey = (d: string | Date) =>
 	(typeof d === "string" ? d : d.toISOString()).slice(0, 10);
+
+// تصدير كشف الحضور الأسبوعي كملف CSV للطلاب أو الموظفين
+function exportAttendanceWeekCsv({
+	rows,
+	days,
+	recordByCell,
+	isStudents,
+}: {
+	rows: { id: string; name: string; code?: string }[];
+	days: Date[];
+	recordByCell: Map<string, { status: string; hours: number; checkIn: string | Date | null; checkOut: string | Date | null }>;
+	isStudents: boolean;
+}) {
+	const headers = [
+		isStudents ? "اسم الطالب" : "اسم الموظف",
+		"المعرّف",
+		...days.map((d) => format(d, "yyyy-MM-dd")),
+		"إجمالي الساعات",
+	];
+	const csvRows = rows.map((r) => {
+		let totalHours = 0;
+		const dayCells = days.map((d) => {
+			const rec = recordByCell.get(`${r.id}_${format(d, "yyyy-MM-dd")}`);
+			if (!rec) return "—";
+			totalHours += rec.hours || 0;
+			if (rec.status === "PRESENT") {
+				const inTime = fmtTime24(rec.checkIn);
+				const outTime = fmtTime24(rec.checkOut);
+				return `حاضر${inTime ? ` (${inTime}${outTime ? ` - ${outTime}` : ""})` : ""}`;
+			}
+			if (rec.status === "ABSENT") return "غياب";
+			if (rec.status === "LEAVE") return "إجازة";
+			if (rec.status === "LATE") return "متأخر";
+			return rec.status;
+		});
+		return [r.name, r.code ?? "", ...dayCells, `${totalHours} ساعة`];
+	});
+	downloadCsv(isStudents ? "student-attendance" : "staff-attendance", headers, csvRows);
+}
 
 // أيقونة كل عنصر في دليل الألوان
 const LEGEND_ICONS: Record<AttendanceLegendKey, FC<IconProps>> = {
@@ -183,6 +223,7 @@ export function AttendanceView({
 	const isStudents = targetType === "students";
 	const { staff, isLoading: isStaffLoading } = useStaff();
 	const { patients, isLoading: isPatientsLoading } = usePatients();
+	const isLoading = isStudents ? isPatientsLoading : isStaffLoading;
 	const { filterGroups, applyStaffFilters } = useStaffFilters(staff);
 	const { clinicInfo } = useClinicInfo();
 	// وضع الكشك متاح فقط إذا فُعِّل من الإعدادات وله رمز PIN مخزّن
@@ -203,6 +244,10 @@ export function AttendanceView({
 	const { records: staffRecords } = useAttendance(weekStart, addDays(weekStart, 6));
 	const { records: studentRecords } = useStudentAttendance(weekStart, addDays(weekStart, 6));
 	const records = isStudents ? studentRecords : staffRecords;
+
+	// سجلات حضور اليوم المحددة للتسجيل الجماعي والشارات الحالية
+	const todayDate = useMemo(() => new Date(), []);
+	const { records: todayStudentRecords } = useStudentAttendance(todayDate, todayDate);
 
 	const { upsert: upsertStaff, upsertAsync: upsertStaffAsync } = useUpsertAttendance();
 	const { upsert: upsertStudent, upsertAsync: upsertStudentAsync } = useUpsertStudentAttendance();
@@ -245,12 +290,12 @@ export function AttendanceView({
 	const [kioskOpen, setKioskOpen] = useState(false);
 	const [kioskActive, setKioskActive] = useState(false);
 
-	// لوحة اختيار الموظفين للتسجيل الجماعي (تنفتح من اليسار)
+	// لوحة اختيار الموظفين/الطلاب للتسجيل الجماعي (تنفتح من اليسار)
 	const [pickerOpen, setPickerOpen] = useState(false);
-	// نيّة اللوحة: تسجيل حضور/انصراف، تسجيل إجازة، أو تسجيل غياب
-	const [pickerIntent, setPickerIntent] = useState<"register" | "leave" | "absence">(
-		"register",
-	);
+	// نيّة اللوحة: تسجيل حضور/انصراف، تسجيل إجازة، تسجيل غياب، أو تسجيل تأخر
+	const [pickerIntent, setPickerIntent] = useState<
+		"register" | "leave" | "absence" | "late"
+	>("register");
 
 	// نافذة التسجيل الجماعي (الخطوة الثانية بعد اختيار الموظفين)
 	const [bulkStaff, setBulkStaff] = useState<BulkPickedStaff[] | null>(null);
@@ -391,19 +436,23 @@ export function AttendanceView({
 							? "تسجيل إجازة طالب"
 							: pickerIntent === "absence"
 								? "تسجيل غياب طالب"
-								: "تسجيل حضور وانصراف الطلاب"
+								: pickerIntent === "late"
+									? "تسجيل تأخر طالب"
+									: "تسجيل حضور وانصراف الطلاب"
 						: pickerIntent === "leave"
 							? "تسجيل أجازة"
 							: pickerIntent === "absence"
 								? "تسجيل غياب"
-								: "تسجيل حضور وانصراف"
+								: pickerIntent === "late"
+									? "تسجيل تأخر"
+									: "تسجيل حضور وانصراف"
 				}
 				customItems={
 					isStudents
 						? patients.map((p) => ({ id: p.id, name: p.name, code: p.code, role: "طالب" }))
 						: undefined
 				}
-				customRecords={isStudents ? studentRecords : undefined}
+				customRecords={isStudents ? todayStudentRecords : undefined}
 				targetLabel={isStudents ? "الطلاب" : "الموظفين"}
 				onClose={() => setPickerOpen(false)}
 				onNext={(selected) => {
@@ -416,6 +465,28 @@ export function AttendanceView({
 					if (pickerIntent === "absence") {
 						// تسجيل غياب جماعي
 						setBulkAbsenceStaff(selected.map((s) => ({ id: s.id, name: s.name })));
+						return;
+					}
+					if (pickerIntent === "late") {
+						// تسجيل تأخر جماعي لليوم
+						const todayStr = format(new Date(), "yyyy-MM-dd");
+						const label = isStudents ? "طلاب" : "موظفين";
+						Promise.all(
+							selected.map((s) =>
+								upsertAsync({
+									staffId: s.id,
+									date: todayStr,
+									status: "LATE",
+									hours: 0,
+								}),
+							),
+						)
+							.then(() => {
+								toast.success(`تم تسجيل تأخر (${selected.length}) ${label} بنجاح`);
+							})
+							.catch((err) => {
+								toast.error(err?.message || "فشل تسجيل التأخر");
+							});
 						return;
 					}
 					// إن كان كل المختارين حاضرين اليوم → وضع تسجيل الانصراف
@@ -438,6 +509,8 @@ export function AttendanceView({
 				staff={bulkLeaveStaff}
 				onClose={() => setBulkLeaveStaff(null)}
 				onSubmitted={(reviews) => setBulkLeaveReviews(reviews)}
+				onSave={isStudents ? upsertStudentAsync : undefined}
+				targetLabel={isStudents ? "الطلاب" : "الموظفين"}
 			/>
 
 			<AttendanceBulkLeaveReviewDialog
@@ -475,7 +548,14 @@ export function AttendanceView({
 							type="button"
 							variant="outline"
 							size="xs"
-							onClick={() => exportStaffCsv(rows)}
+							onClick={() =>
+								exportAttendanceWeekCsv({
+									rows,
+									days,
+									recordByCell,
+									isStudents,
+								})
+							}
 							disabled={rows.length === 0}
 							className="gap-1.5 px-2"
 						>
@@ -583,7 +663,12 @@ export function AttendanceView({
 																	setPickerIntent("absence");
 																	setPickerOpen(true);
 																}
-															: undefined
+															: action.status === "LATE"
+																? () => {
+																		setPickerIntent("late");
+																		setPickerOpen(true);
+																	}
+																: undefined
 											}
 											className={cn(
 												"flex h-6 items-center justify-start gap-1.5 rounded-[4px] px-[9px] text-right text-[10px] font-medium text-[#08090A]",
@@ -797,7 +882,7 @@ export function AttendanceView({
 									colSpan={days.length + 1}
 									className="py-12 text-center text-sm text-muted-foreground"
 								>
-									لا يوجد موظفين لعرض حضورهم
+									{isStudents ? "لا يوجد طلاب لعرض حضورهم" : "لا يوجد موظفين لعرض حضورهم"}
 								</td>
 							</tr>
 						)}

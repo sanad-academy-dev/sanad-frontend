@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
 const ABSENCE_REASONS = ["مرض مفاجئ", "ظرف طارئ", "بدون إذن", "أخرى"] as const;
 
 // توست نجاح مخصّص — أسفل اليسار
-function showAbsenceToast(count: number) {
+function showAbsenceToast(count: number, isStudent = false) {
 	toast.custom(
 		(id) => (
 			<div className="flex w-[310px] items-center gap-2 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white px-1 py-3 shadow-[0px_4px_24px_rgba(0,0,0,0.08)]">
@@ -45,7 +45,9 @@ function showAbsenceToast(count: number) {
 					<IconX className="size-3" />
 				</button>
 				<span className="flex-1 text-right text-[10px] font-medium leading-[19px] text-black">
-					تم تسجيل غياب لعدد ({count}) موظفين بنجاح
+					{isStudent
+						? `تم تسجيل غياب لعدد (${count}) طلاب بنجاح`
+						: `تم تسجيل غياب لعدد (${count}) موظفين بنجاح`}
 				</span>
 				<IconCircleCheckFilled className="size-5 shrink-0 text-[#008A2E]" />
 			</div>
@@ -160,6 +162,7 @@ export function AttendanceBulkAbsenceDialog({
 	}) => Promise<unknown>;
 	targetLabel?: string;
 }) {
+	const isStudent = targetLabel === "الطلاب";
 	const open = !!staff && staff.length > 0;
 	const { upsertAsync, isPending } = useUpsertAttendance();
 
@@ -220,7 +223,7 @@ export function AttendanceBulkAbsenceDialog({
 				),
 			);
 			toast.dismiss(toastId);
-			showAbsenceToast(targets.length);
+			showAbsenceToast(targets.length, isStudent);
 			onClose();
 		} catch (err) {
 			toast.error((err as Error).message || "فشل تسجيل الغياب", {
@@ -250,7 +253,9 @@ export function AttendanceBulkAbsenceDialog({
 					<div className="flex items-center gap-1.5">
 						<span className="text-[10px] font-bold text-[#08090A]">الحضور والانصراف</span>
 						<IconChevronLeft className="size-[9px] text-[#272829]" />
-						<span className="text-[10px] font-bold text-[#08090A]">تسجيل غياب</span>
+						<span className="text-[10px] font-bold text-[#08090A]">
+							{isStudent ? "تسجيل غياب الطلاب" : "تسجيل غياب"}
+						</span>
 					</div>
 					<div className="flex items-center gap-1.5">
 						<button
@@ -273,10 +278,12 @@ export function AttendanceBulkAbsenceDialog({
 
 				{/* الجسم */}
 				<div className="flex flex-col gap-4 px-[15px] py-3">
-					{/* الموظفون المحددون — صندوق أصفر مع شارات قابلة للاختيار */}
+					{/* الموظفون / الطلاب المحددون — صندوق أصفر مع شارات قابلة للاختيار */}
 					<div className="flex flex-col gap-[5px] rounded-[4px] bg-[#FFFBEA] p-[7.5px]">
 						<div className="flex items-center justify-between">
-							<span className="text-[10px] text-[#08090A]">الموظفون المحددون ({count})</span>
+							<span className="text-[10px] text-[#08090A]">
+								{isStudent ? "الطلاب المحددون" : "الموظفون المحددون"} ({count})
+							</span>
 							<span className="rounded-[4px] bg-[#3B82F6]/[0.05] px-1.5 py-[1.5px] text-[8px] font-semibold text-[#6366F1]">
 								تسجيل جماعي
 							</span>
@@ -297,7 +304,12 @@ export function AttendanceBulkAbsenceDialog({
 										)}
 									>
 										<span className="text-[9px] text-[#08090A]">{s.name}</span>
-										<span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-[#6366F1] text-[6px] font-semibold text-[#F5F5F6]">
+										<span
+											className={cn(
+												"flex size-4 shrink-0 items-center justify-center rounded-full text-[6px] font-semibold text-[#F5F5F6]",
+												isStudent ? "bg-[#10B981]" : "bg-[#6366F1]",
+											)}
+										>
 											{initialsOf(s.name)}
 										</span>
 									</button>
@@ -365,7 +377,9 @@ export function AttendanceBulkAbsenceDialog({
 				<div className="flex items-center justify-between border-t border-[#E5E5E5] px-3 py-[7.5px]">
 					<div className="flex items-center gap-1.5">
 						<span className="text-[10px] text-[#737373]">
-							إشعار المدير / الموظف عبر البريد
+							{isStudent
+								? "إشعار ولي الأمر عبر الرسائل"
+								: "إشعار المدير / الموظف عبر البريد"}
 						</span>
 						<Switch
 							checked={notifyManager}

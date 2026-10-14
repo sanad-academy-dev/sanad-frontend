@@ -74,6 +74,7 @@ export function AttendanceBulkRegisterDialog({
 	}) => Promise<unknown>;
 	targetLabel?: string;
 }) {
+	const isStudent = targetLabel === "الطلاب";
 	const open = !!staff && staff.length > 0;
 	const isCheckout = mode === "checkout";
 	const { upsertAsync, isPending } = useUpsertAttendance();
@@ -136,8 +137,8 @@ export function AttendanceBulkRegisterDialog({
 
 		const count = targets.length;
 		const successMsg = isCheckout
-			? `تم تسجيل انصراف (${count}) بنجاح`
-			: `تم تسجيل حضور (${count}) بنجاح`;
+			? `تم تسجيل انصراف (${count}) ${isStudent ? "طالب" : "موظف"} بنجاح`
+			: `تم تسجيل حضور (${count}) ${isStudent ? "طالب" : "موظف"} بنجاح`;
 		const toastId = toast.loading(
 			isCheckout ? "جارٍ تسجيل الانصراف..." : "جارٍ تسجيل الحضور...",
 			{ position: "bottom-left" },
@@ -222,7 +223,9 @@ export function AttendanceBulkRegisterDialog({
 					<div className="flex items-center gap-1.5">
 						<span className="text-[10px] font-bold text-[#08090A]">الحضور والانصراف</span>
 						<IconChevronLeft className="size-[9px] text-[#272829]" />
-						<span className="text-[10px] font-bold text-[#08090A]">تسجيل حضور وانصراف</span>
+						<span className="text-[10px] font-bold text-[#08090A]">
+							{isStudent ? "تسجيل حضور وانصراف الطلاب" : "تسجيل حضور وانصراف"}
+						</span>
 					</div>
 					<div className="flex items-center gap-1.5">
 						<button
@@ -245,10 +248,12 @@ export function AttendanceBulkRegisterDialog({
 
 				{/* الجسم */}
 				<div className="flex flex-col gap-4 px-[15px] py-3">
-					{/* الموظفون المحددون — صندوق أصفر مع شارات */}
+					{/* الموظفون / الطلاب المحددون — صندوق أصفر مع شارات */}
 					<div className="flex flex-col gap-[5px] rounded-[4px] bg-[#FFFBEA] p-[7.5px]">
 						<div className="flex items-center justify-between">
-							<span className="text-[10px] text-[#08090A]">الموظفون المحددون ({count})</span>
+							<span className="text-[10px] text-[#08090A]">
+								{isStudent ? "الطلاب المحددون" : "الموظفون المحددون"} ({count})
+							</span>
 							<span className="rounded-[4px] bg-[#3B82F6]/[0.05] px-1.5 py-[1.5px] text-[8px] font-semibold text-[#6366F1]">
 								تسجيل جماعي
 							</span>
@@ -269,7 +274,12 @@ export function AttendanceBulkRegisterDialog({
 										)}
 									>
 										<span className="text-[9px] text-[#08090A]">{s.name}</span>
-										<span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-[#6366F1] text-[6px] font-semibold text-[#F5F5F6]">
+										<span
+											className={cn(
+												"flex size-4 shrink-0 items-center justify-center rounded-full text-[6px] font-semibold text-[#F5F5F6]",
+												isStudent ? "bg-[#10B981]" : "bg-[#6366F1]",
+											)}
+										>
 											{initialsOf(s.name)}
 										</span>
 									</button>
@@ -449,7 +459,9 @@ export function AttendanceBulkRegisterDialog({
 				{/* التذييل — زر التسجيل (يسار) + إشعار المدير (يمين) */}
 				<div className="flex items-center justify-between border-t border-[#E5E5E5] px-3 py-[7.5px]">
 					<div className="flex items-center gap-1.5">
-						<span className="text-[10px] text-[#737373]">إشعار المدير عبر البريد</span>
+						<span className="text-[10px] text-[#737373]">
+							{isStudent ? "إشعار ولي الأمر عبر الرسائل" : "إشعار المدير عبر البريد"}
+						</span>
 						<Switch
 							checked={notifyManager}
 							onCheckedChange={setNotifyManager}
