@@ -430,7 +430,10 @@ export function CampaignRequestSheet({
 				side="left"
 				dir="rtl"
 				showCloseButton={false}
-				className="w-full flex-row items-stretch gap-3 border-none! bg-transparent! p-0 shadow-none! sm:max-w-xl!"
+				className={cn(
+					"w-full flex-row items-stretch gap-3 border-none! bg-transparent! p-0 shadow-none! sm:max-w-xl! transition-[max-width] duration-300 ease-out",
+					commentsOpen && "sm:max-w-[calc(var(--container-xl,36rem)+384px+12px)]!",
+				)}
 				onEscapeKeyDown={(e) => {
 					if (commentsOpen) {
 						e.preventDefault();
@@ -724,12 +727,12 @@ export function CampaignRequestSheet({
 					</div>
 				</div>
 
-				{/* لوحة التعليقات الجانبية — تظهر من اليمين تماماً كما في شيت التحاليل */}
+				{/* لوحة التعليقات الجانبية — تظهر بجانب اللوحة الرئيسية من اليمين */}
 				{commentsOpen && (
 					<aside
 						dir="rtl"
 						aria-label="تعليقات الطلب"
-						className="fixed inset-y-2 right-2 w-80 sm:w-96 z-50 flex flex-col gap-0 rounded-lg border bg-popover text-sm text-popover-foreground shadow-2xl animate-in fade-in-0 slide-in-from-right-10 duration-200"
+						className="order-1 flex min-h-0 w-80 sm:w-96 shrink-0 flex-col rounded-lg border bg-popover text-sm text-popover-foreground shadow-lg animate-in fade-in-0 duration-200"
 					>
 						<div className="flex items-center justify-between gap-2 border-b px-4 py-2.5">
 							<h2 className="flex min-w-0 items-center gap-2 text-sm font-bold">

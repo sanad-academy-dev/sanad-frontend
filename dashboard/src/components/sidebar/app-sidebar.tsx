@@ -18,6 +18,7 @@ import {
   IconReportAnalytics,
   IconScissors,
   IconSettings,
+  IconSpeakerphone,
   IconStethoscope,
   IconTrendingUp,
   IconUser,
@@ -220,6 +221,12 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             url: "/digital-registration",
             icon: <IconFileDescription className="size-[14px]" />,
             isActive: isActive("/digital-registration"),
+          },
+          {
+            title: "الإعلانات",
+            url: "/announcements",
+            icon: <IconSpeakerphone className="size-[14px]" />,
+            isActive: isActive("/announcements"),
           },
           /* {
 						title: t("sidebar.items.labTests"),

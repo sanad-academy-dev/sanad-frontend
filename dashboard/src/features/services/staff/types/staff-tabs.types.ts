@@ -3,8 +3,7 @@ export type StaffModuleTab =
 	| "employees"
 	| "shifts"
 	| "payroll"
-	| "jobs"
-	| "announcements";
+	| "jobs";
 
 export const STAFF_MODULE_TABS: {
 	value: StaffModuleTab;
@@ -15,5 +14,4 @@ export const STAFF_MODULE_TABS: {
 	{ value: "shifts", label: "المناوبات", disabled: false },
 	{ value: "payroll", label: "مسير الرواتب", disabled: false },
 	{ value: "jobs", label: "الوظائف", disabled: false },
-	{ value: "announcements", label: "الإعلان", disabled: false },
 ];

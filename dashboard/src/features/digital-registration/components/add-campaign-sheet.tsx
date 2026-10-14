@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { FormHeader } from "@/components/common/form-header";
 import { FormFooter } from "@/components/common/form-footer";
@@ -12,7 +13,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
+import { IconCertificate, IconId, IconVaccine } from "@tabler/icons-react";
 import type { Campaign } from "../types/campaign.types";
 
 export function AddCampaignSheet({
@@ -25,6 +28,17 @@ export function AddCampaignSheet({
 	campaign?: Campaign | null;
 }) {
 	const isEditing = !!campaign;
+	const [requireId, setRequireId] = useState(true);
+	const [requireVaccine, setRequireVaccine] = useState(true);
+	const [requireBirthCert, setRequireBirthCert] = useState(true);
+
+	useEffect(() => {
+		if (open) {
+			setRequireId(true);
+			setRequireVaccine(true);
+			setRequireBirthCert(true);
+		}
+	}, [open, campaign]);
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -65,54 +79,13 @@ export function AddCampaignSheet({
 								<FieldLabel required>
 									<Label className="text-sm font-medium">اسم الحملة</Label>
 								</FieldLabel>
-								<Select defaultValue={campaign?.name || ""}>
-									<SelectTrigger
-										className="w-full text-right text-sm"
-										dir="rtl"
-									>
-										<SelectValue placeholder="يُرجى تعبئة اسم الحملة" />
-									</SelectTrigger>
-									<SelectContent dir="rtl">
-										<SelectItem
-											value="حملة التسجيل - الفصل الأول"
-											className="text-right"
-										>
-											حملة التسجيل - الفصل الأول
-										</SelectItem>
-										<SelectItem
-											value="حملة التسجيل المبكر"
-											className="text-right"
-										>
-											حملة التسجيل المبكر
-										</SelectItem>
-										<SelectItem
-											value="حملة الفصل الدراسي"
-											className="text-right"
-										>
-											حملة الفصل الدراسي
-										</SelectItem>
-										<SelectItem
-											value="حملة البرنامج الصيفي"
-											className="text-right"
-										>
-											حملة البرنامج الصيفي
-										</SelectItem>
-										<SelectItem
-											value="يوم مفتوح"
-											className="text-right"
-										>
-											يوم مفتوح
-										</SelectItem>
-										{isEditing && campaign.name && (
-											<SelectItem
-												value={campaign.name}
-												className="text-right"
-											>
-												{campaign.name}
-											</SelectItem>
-										)}
-									</SelectContent>
-								</Select>
+								<Input
+									name="name"
+									defaultValue={campaign?.name || ""}
+									placeholder="يُرجى كتابة اسم الحملة..."
+									className="w-full text-right text-sm"
+									required
+								/>
 							</div>
 
 							{/* الفئة العمرية */}
@@ -271,12 +244,108 @@ export function AddCampaignSheet({
 							</div>
 
 							{/* المتطلبات */}
-							<div className="flex flex-col gap-1.5">
+							<div className="flex flex-col gap-2">
 								<Label className="text-sm font-medium">المتطلبات</Label>
-								<Textarea
-									placeholder="شهادة ميلاد، صورة هوية ولي الأمر، شهادة تطعيم..."
-									className="text-sm min-h-24 resize-none"
-								/>
+								<div className="flex flex-col gap-2">
+									<div
+										role="button"
+										tabIndex={0}
+										onClick={() => setRequireId((prev) => !prev)}
+										onKeyDown={(e) => {
+											if (e.key === "Enter" || e.key === " ") {
+												e.preventDefault();
+												setRequireId((prev) => !prev);
+											}
+										}}
+										className={cn(
+											"flex items-center justify-between rounded-md border p-2.5 cursor-pointer transition-colors select-none",
+											requireId
+												? "border-primary/40 bg-primary/5"
+												: "border-border bg-background hover:bg-muted/50",
+										)}
+									>
+										<div className="flex items-center gap-2.5">
+											<IconId
+												className={cn(
+													"size-4",
+													requireId ? "text-primary" : "text-muted-foreground",
+												)}
+											/>
+											<span className="text-sm font-medium">صورة الهوية</span>
+										</div>
+										<Switch
+											checked={requireId}
+											onCheckedChange={setRequireId}
+											onClick={(e) => e.stopPropagation()}
+										/>
+									</div>
+
+									<div
+										role="button"
+										tabIndex={0}
+										onClick={() => setRequireVaccine((prev) => !prev)}
+										onKeyDown={(e) => {
+											if (e.key === "Enter" || e.key === " ") {
+												e.preventDefault();
+												setRequireVaccine((prev) => !prev);
+											}
+										}}
+										className={cn(
+											"flex items-center justify-between rounded-md border p-2.5 cursor-pointer transition-colors select-none",
+											requireVaccine
+												? "border-primary/40 bg-primary/5"
+												: "border-border bg-background hover:bg-muted/50",
+										)}
+									>
+										<div className="flex items-center gap-2.5">
+											<IconVaccine
+												className={cn(
+													"size-4",
+													requireVaccine ? "text-primary" : "text-muted-foreground",
+												)}
+											/>
+											<span className="text-sm font-medium">شهادة التطعيم</span>
+										</div>
+										<Switch
+											checked={requireVaccine}
+											onCheckedChange={setRequireVaccine}
+											onClick={(e) => e.stopPropagation()}
+										/>
+									</div>
+
+									<div
+										role="button"
+										tabIndex={0}
+										onClick={() => setRequireBirthCert((prev) => !prev)}
+										onKeyDown={(e) => {
+											if (e.key === "Enter" || e.key === " ") {
+												e.preventDefault();
+												setRequireBirthCert((prev) => !prev);
+											}
+										}}
+										className={cn(
+											"flex items-center justify-between rounded-md border p-2.5 cursor-pointer transition-colors select-none",
+											requireBirthCert
+												? "border-primary/40 bg-primary/5"
+												: "border-border bg-background hover:bg-muted/50",
+										)}
+									>
+										<div className="flex items-center gap-2.5">
+											<IconCertificate
+												className={cn(
+													"size-4",
+													requireBirthCert ? "text-primary" : "text-muted-foreground",
+												)}
+											/>
+											<span className="text-sm font-medium">شهادة الميلاد</span>
+										</div>
+										<Switch
+											checked={requireBirthCert}
+											onCheckedChange={setRequireBirthCert}
+											onClick={(e) => e.stopPropagation()}
+										/>
+									</div>
+								</div>
 							</div>
 						</div>
 					</form>

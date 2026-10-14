@@ -3,7 +3,6 @@ import { useState } from "react";
 
 import { Stats } from "@/components/common/stats";
 import type { StatItem } from "@/features/dashboard/types/dashboard.types";
-import { AnnouncementsView } from "@/features/services/staff/components/announcements/announcements-view";
 import { JobsView } from "@/features/services/staff/components/jobs/jobs-view";
 import { PayrollView } from "@/features/services/staff/components/payroll/payroll-view";
 import { ShiftsView } from "@/features/services/staff/components/shifts/shifts-view";
@@ -47,8 +46,6 @@ function RouteComponent() {
 			)}
 
 			{tab === "shifts" && <ShiftsView />}
-
-			{tab === "announcements" && <AnnouncementsView />}
 
 			{tab === "payroll" && <PayrollView />}
 
