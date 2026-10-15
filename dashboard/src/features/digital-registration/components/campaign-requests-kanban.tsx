@@ -51,6 +51,8 @@ const columnToStatusMap: Record<string, "QUEUE" | "EVALUATION" | "REVIEW" | "AWA
 	cancelled: "REJECTED",
 };
 
+const EMPTY_REQUESTS: CampaignRequestItem[] = [];
+
 export function CampaignRequestsKanban({
 	campaignId,
 	searchQuery,
@@ -60,25 +62,24 @@ export function CampaignRequestsKanban({
 	searchQuery?: string;
 	genderFilter?: string;
 }) {
-	const { data: serverRequests = [], isLoading } = useCampaignRequests(campaignId);
+	const { data: serverRequests = EMPTY_REQUESTS, isLoading } = useCampaignRequests(campaignId);
 	const updateStatusMutation = useUpdateRequestStatus(campaignId);
 
-	const [data, setData] = useState<CampaignRequestItem[]>([]);
-	const [selectedRequest, setSelectedRequest] = useState<CampaignRequestItem | null>(null);
+	const [localData, setLocalData] = useState<CampaignRequestItem[] | null>(null);
+	const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
+	const data = localData ?? serverRequests;
+
+	// Reset local optimistic data whenever server query refreshes
 	useEffect(() => {
-		if (serverRequests) {
-			setData(serverRequests);
-		}
+		setLocalData(null);
 	}, [serverRequests]);
 
-	// Update selectedRequest live when serverRequests change (e.g. after comments or status changes)
-	useEffect(() => {
-		if (selectedRequest) {
-			const updated = serverRequests.find((r) => r.id === selectedRequest.id);
-			if (updated) setSelectedRequest(updated);
-		}
-	}, [serverRequests]);
+	// Derive selectedRequest directly from data (stable, reactive, zero infinite loop)
+	const selectedRequest = useMemo(() => {
+		if (!selectedRequestId) return null;
+		return data.find((r) => r.id === selectedRequestId) || null;
+	}, [data, selectedRequestId]);
 
 	const filteredData = useMemo(() => {
 		return data.filter((item) => {
@@ -127,12 +128,7 @@ export function CampaignRequestsKanban({
 			return old && old.column !== item.column;
 		});
 
-		setData((prev) =>
-			prev.map((item) => {
-				const updated = nextData.find((d) => d.id === item.id);
-				return updated || item;
-			}),
-		);
+		setLocalData(nextData);
 
 		if (changedItem) {
 			const newStatus = columnToStatusMap[changedItem.column] || "QUEUE";
@@ -179,7 +175,7 @@ export function CampaignRequestsKanban({
 									<Card
 										className="cursor-pointer flex flex-col gap-3 rounded-md border bg-background p-3 shadow-sm text-start hover:border-primary/50 transition-colors"
 										dir="rtl"
-										onClick={() => setSelectedRequest(item)}
+										onClick={() => setSelectedRequestId(item.id)}
 									>
 										{/* Top row: Status Badge and Code */}
 										<div className="flex items-start justify-between gap-2">
@@ -299,7 +295,7 @@ export function CampaignRequestsKanban({
 				campaignId={campaignId}
 				request={selectedRequest}
 				open={!!selectedRequest}
-				onOpenChange={(open) => !open && setSelectedRequest(null)}
+				onOpenChange={(open) => !open && setSelectedRequestId(null)}
 				onAccept={(req) => {
 					updateStatusMutation.mutate({
 						requestId: req.id,

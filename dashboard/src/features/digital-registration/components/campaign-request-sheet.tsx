@@ -482,6 +482,8 @@ const STATUS_META: Record<string, { label: string; className: string }> = {
 	},
 };
 
+const EMPTY_NOTIFICATIONS: RequestNotificationItem[] = [];
+
 export function CampaignRequestSheet({
 	request,
 	open,
@@ -512,12 +514,12 @@ export function CampaignRequestSheet({
 		if (request) {
 			setHasChronic(request.hasChronicDiseases ?? Boolean(request.chronicDiseases));
 		}
-	}, [request]);
+	}, [request?.id, request?.hasChronicDiseases, request?.chronicDiseases]);
 
 	const addCommentMutation = useAddRequestComment(campaignId || "");
 	const deleteCommentMutation = useDeleteRequestComment(campaignId || "");
 
-	const { data: notifications = [], isLoading: isLoadingNotifications } =
+	const { data: notifications = EMPTY_NOTIFICATIONS, isLoading: isLoadingNotifications } =
 		useRequestNotifications(request?.id || "");
 	const markNotificationSentMutation = useMarkNotificationSent(
 		campaignId || "",
