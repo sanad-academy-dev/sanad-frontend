@@ -518,6 +518,7 @@ export function CampaignRequestSheet({
 	open,
 	onOpenChange,
 	campaignId,
+	isUpdating,
 	onStatusChange,
 	onAccept,
 	onWaitlist,
@@ -527,6 +528,7 @@ export function CampaignRequestSheet({
 	request: CampaignRequestItem | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	isUpdating?: boolean;
 	onStatusChange?: (request: CampaignRequestItem, status: CampaignRequestItem["status"]) => void;
 	onAccept?: (request: CampaignRequestItem) => void;
 	onWaitlist?: (request: CampaignRequestItem) => void;
@@ -702,44 +704,53 @@ export function CampaignRequestSheet({
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="start" className="w-48 text-right">
 									<DropdownMenuItem
-										disabled={request.status === "QUEUE"}
-										onClick={() => onStatusChange?.(request, "QUEUE") || onWaitlist?.(request)}
+										disabled={request.status === "QUEUE" || isUpdating}
+										onClick={() => {
+											if (onWaitlist) onWaitlist(request);
+											else onStatusChange?.(request, "QUEUE");
+										}}
 									>
 										<IconClock className="size-3.5 text-amber-600 me-2" />
 										<span>طابور الانتظار</span>
 									</DropdownMenuItem>
 									<DropdownMenuItem
-										disabled={request.status === "EVALUATION"}
+										disabled={request.status === "EVALUATION" || isUpdating}
 										onClick={() => onStatusChange?.(request, "EVALUATION")}
 									>
 										<IconClipboardCheck className="size-3.5 text-purple-600 me-2" />
 										<span>التقييم</span>
 									</DropdownMenuItem>
 									<DropdownMenuItem
-										disabled={request.status === "REVIEW"}
+										disabled={request.status === "REVIEW" || isUpdating}
 										onClick={() => onStatusChange?.(request, "REVIEW")}
 									>
 										<IconActivity className="size-3.5 text-blue-600 me-2" />
 										<span>قيد المراجعة</span>
 									</DropdownMenuItem>
 									<DropdownMenuItem
-										disabled={request.status === "AWAITING_REPLY"}
+										disabled={request.status === "AWAITING_REPLY" || isUpdating}
 										onClick={() => onStatusChange?.(request, "AWAITING_REPLY")}
 									>
 										<IconHourglass className="size-3.5 text-indigo-600 me-2" />
 										<span>انتظار الرد</span>
 									</DropdownMenuItem>
 									<DropdownMenuItem
-										disabled={request.status === "ACCEPTED"}
-										onClick={() => onAccept?.(request) || onStatusChange?.(request, "ACCEPTED")}
+										disabled={request.status === "ACCEPTED" || isUpdating}
+										onClick={() => {
+											if (onAccept) onAccept(request);
+											else onStatusChange?.(request, "ACCEPTED");
+										}}
 									>
 										<IconCheck className="size-3.5 text-emerald-600 me-2" />
 										<span>اعتماد وقبول الطلب</span>
 									</DropdownMenuItem>
 									<DropdownMenuItem
-										disabled={request.status === "REJECTED"}
+										disabled={request.status === "REJECTED" || isUpdating}
 										className="text-destructive focus:text-destructive"
-										onClick={() => onReject?.(request) || onStatusChange?.(request, "REJECTED")}
+										onClick={() => {
+											if (onReject) onReject(request);
+											else onStatusChange?.(request, "REJECTED");
+										}}
 									>
 										<IconX className="size-3.5 me-2" />
 										<span>رفض الطلب</span>
@@ -1199,13 +1210,18 @@ export function CampaignRequestSheet({
 								<Button
 									type="button"
 									size="sm"
+									disabled={isUpdating}
 									className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 h-8 text-xs font-semibold shadow-xs"
 									onClick={() => {
-										onAccept?.(request) || onStatusChange?.(request, "ACCEPTED");
+										if (onAccept) {
+											onAccept(request);
+										} else if (onStatusChange) {
+											onStatusChange(request, "ACCEPTED");
+										}
 									}}
 								>
 									<IconCheck className="size-3.5" />
-									قبول الطلب واعتماد الطالب
+									{isUpdating ? "جاري الاعتماد والقبول..." : "قبول الطلب واعتماد الطالب"}
 								</Button>
 							) : (
 								<Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300 text-xs font-semibold gap-1 py-1 px-2.5">
@@ -1221,6 +1237,7 @@ export function CampaignRequestSheet({
 										type="button"
 										variant="outline"
 										size="sm"
+										disabled={isUpdating}
 										className="h-8 text-xs gap-1.5 font-medium"
 									>
 										<IconArrowsExchange className="size-3.5 text-muted-foreground" />
@@ -1230,28 +1247,31 @@ export function CampaignRequestSheet({
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="start" className="w-48 text-right">
 									<DropdownMenuItem
-										disabled={request.status === "QUEUE"}
-										onClick={() => onStatusChange?.(request, "QUEUE") || onWaitlist?.(request)}
+										disabled={request.status === "QUEUE" || isUpdating}
+										onClick={() => {
+											if (onWaitlist) onWaitlist(request);
+											else onStatusChange?.(request, "QUEUE");
+										}}
 									>
 										<IconClock className="size-3.5 text-amber-600 me-2" />
 										<span>طابور الانتظار</span>
 									</DropdownMenuItem>
 									<DropdownMenuItem
-										disabled={request.status === "EVALUATION"}
+										disabled={request.status === "EVALUATION" || isUpdating}
 										onClick={() => onStatusChange?.(request, "EVALUATION")}
 									>
 										<IconClipboardCheck className="size-3.5 text-purple-600 me-2" />
 										<span>التقييم</span>
 									</DropdownMenuItem>
 									<DropdownMenuItem
-										disabled={request.status === "REVIEW"}
+										disabled={request.status === "REVIEW" || isUpdating}
 										onClick={() => onStatusChange?.(request, "REVIEW")}
 									>
 										<IconActivity className="size-3.5 text-blue-600 me-2" />
 										<span>قيد المراجعة</span>
 									</DropdownMenuItem>
 									<DropdownMenuItem
-										disabled={request.status === "AWAITING_REPLY"}
+										disabled={request.status === "AWAITING_REPLY" || isUpdating}
 										onClick={() => onStatusChange?.(request, "AWAITING_REPLY")}
 									>
 										<IconHourglass className="size-3.5 text-indigo-600 me-2" />
@@ -1267,6 +1287,7 @@ export function CampaignRequestSheet({
 									type="button"
 									variant="outline"
 									size="sm"
+									disabled={isUpdating}
 									className="gap-1.5 h-8 text-xs font-medium text-purple-700 border-purple-200 hover:bg-purple-50 dark:text-purple-300 dark:border-purple-800"
 									onClick={() => {
 										onStatusChange?.(request, "EVALUATION");
@@ -1280,6 +1301,7 @@ export function CampaignRequestSheet({
 									type="button"
 									variant="outline"
 									size="sm"
+									disabled={isUpdating}
 									className="gap-1.5 h-8 text-xs font-medium text-blue-700 border-blue-200 hover:bg-blue-50 dark:text-blue-300 dark:border-blue-800"
 									onClick={() => {
 										onStatusChange?.(request, "REVIEW");
@@ -1293,9 +1315,11 @@ export function CampaignRequestSheet({
 									type="button"
 									variant="outline"
 									size="sm"
+									disabled={isUpdating}
 									className="gap-1.5 h-8 text-xs font-medium"
 									onClick={() => {
-										onWaitlist?.(request) || onStatusChange?.(request, "QUEUE");
+										if (onWaitlist) onWaitlist(request);
+										else onStatusChange?.(request, "QUEUE");
 									}}
 								>
 									<IconClock className="size-3.5" />
@@ -1308,9 +1332,11 @@ export function CampaignRequestSheet({
 									type="button"
 									variant="outline"
 									size="sm"
+									disabled={isUpdating}
 									className="border-destructive/30 text-destructive hover:bg-destructive/5 hover:text-destructive gap-1.5 h-8 text-xs font-medium"
 									onClick={() => {
-										onReject?.(request) || onStatusChange?.(request, "REJECTED");
+										if (onReject) onReject(request);
+										else onStatusChange?.(request, "REJECTED");
 									}}
 								>
 									<IconX className="size-3.5" />

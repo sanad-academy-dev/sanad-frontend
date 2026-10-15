@@ -382,6 +382,7 @@ export function CampaignRequestsKanban({
 				request={selectedRequest}
 				open={!!selectedRequest}
 				onOpenChange={(open) => !open && setSelectedRequestId(null)}
+				isUpdating={updateStatusMutation.isPending}
 				onStatusChange={handleStatusChange}
 				onAccept={(req) => handleStatusChange(req, "ACCEPTED")}
 				onWaitlist={(req) => handleStatusChange(req, "QUEUE")}
