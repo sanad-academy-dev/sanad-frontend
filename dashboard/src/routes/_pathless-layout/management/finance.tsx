@@ -258,11 +258,42 @@ function RouteComponent() {
 
 				{tab === "discounts" && <DiscountsTab />}
 
-				{tab === "care-plans" && <CarePlansTab />}
+				{tab === "care-plans" && (
+					<>
+						<div className="px-[9px] pt-3">
+							<h1 className="font-medium text-lg">الخطط التعليمية</h1>
+							<p className="text-muted-foreground text-sm">
+								إدارة باقات وخطط الرعاية والتعليم ومتابعة تفاصيلها.
+							</p>
+						</div>
+						<CarePlansTab />
+					</>
+				)}
 
-				{tab === "enrollments" && <EnrollmentsTab />}
+				{tab === "enrollments" && (
+					<>
+						<div className="px-[9px] pt-3">
+							<h1 className="font-medium text-lg">الاشتراكات</h1>
+							<p className="text-muted-foreground text-sm">
+								متابعة اشتراكات الطلاب في الخطط التعليمية ومعدل التقدم.
+							</p>
+						</div>
+						<hr className="my-2" />
+						<EnrollmentsTab />
+					</>
+				)}
 
-				{tab === "expenses" && <ExpensesTab />}
+				{tab === "expenses" && (
+					<>
+						<div className="px-[9px] pt-3">
+							<h1 className="font-medium text-lg">المصروفات</h1>
+							<p className="text-muted-foreground text-sm">
+								إدارة وتتبع طلبات الصرف والمصروفات التشغيلية.
+							</p>
+						</div>
+						<ExpensesTab />
+					</>
+				)}
 
 				{/* Full invoice pay modal */}
 				{payTarget && !successInvoice && (

@@ -9,68 +9,101 @@ export type { Gender };
 export const createPatientSchema = z.object({
 	name: z.string({ error: "اسم الطفل مطلوب" }).min(1, "اسم الطفل مطلوب"),
 	gender: z.enum(["MALE", "FEMALE", "UNKNOWN"], { error: "الجنس مطلوب" }),
-	// المرضى بشر: نوع الحيوان والسلالة غير مطلوبة — الحقول تبقى في القاعدة
-	// للتوافق مع وحدات التطعيم والحجوزات، لكنها لا تُطلب عند إنشاء مريض.
-	ownerId: z.string({ error: "وليّ الأمر مطلوب" }).min(1, "وليّ الأمر مطلوب"),
+	ownerId: z.string().optional(),
+	guardianName: z.string().optional(),
+	guardianRelationship: z.string().optional(),
+	guardianPhone: z.string().optional(),
+	guardianEmail: z.string().optional(),
+	emergencyContactPhone: z.string().optional(),
+	emergencyContactName: z.string().optional(),
 	age: z.coerce
 		.number({ error: "العمر يجب أن يكون رقمًا" })
 		.min(0, "العمر يجب أن يكون 0 على الأقل")
 		.optional(),
-	// تاريخ الميلاد **إلزامي** عند الإنشاء: هو المرجع الوحيد الذي تُشتق منه جدولة
-	// التطعيم بالعمر، وبوابة التجميل تقرأ منه سنّ الطفل. حقل `age` رقم حرّ بلا لحظة
-	// قياس فلا يصلح بديلًا — وتركه اختياريًا كان يُنتج ملفات لا تُجدوَل أبدًا وتظهر في
-	// شريط «تاريخ الميلاد ناقص» بلا من يُكملها.
-	// العمود في القاعدة يبقى nullable: الملفات المُنشأة قبل هذا الشرط موجودة فعلًا،
-	// والإلزام يخصّ المسار الجديد لا الماضي.
-	// نص لا Date: القيمة تصل من <input type="date"> نصًّا وتُرسَل نصًّا وتقبلها Prisma
-	// نصًّا. التحويل إلى Date هنا كان سيجعل نوع النموذج يخالف نوع الطلب بلا فائدة.
 	birthDate: z
 		.string({ error: "تاريخ الميلاد مطلوب" })
-		.min(1, "تاريخ الميلاد مطلوب")
-		.refine((value) => !Number.isNaN(Date.parse(value)), "تاريخ الميلاد غير صالح")
-		.refine((value) => Date.parse(value) <= Date.now(), "تاريخ الميلاد لا يكون في المستقبل"),
+		.min(1, "تاريخ الميلاد مطلوب"),
+	nationalId: z.string().optional(),
+	classroom: z.string().optional(),
+	bloodType: z.string().optional(),
+	developmentStatus: z.string().optional().default("NORMAL"),
+	allergies: z.string().optional(),
+	pocketMoneyEnabled: z.boolean().optional().default(true),
+	transportation: z.string().optional(),
+	feeType: z.string().optional(),
+	healthConditions: z.string().optional(),
+	previousNursery: z.string().optional(),
 	weight: z.coerce
 		.number({ error: "الوزن يجب أن يكون رقمًا" })
 		.min(0, "الوزن يجب أن يكون 0 على الأقل")
 		.optional(),
 	notes: z.string().optional(),
 	active: z.boolean().optional().default(true),
+	status: z.string().optional().default("ACTIVE"),
 });
 
 export type CreatePatientFormInput = z.infer<typeof createPatientSchema>;
 
-export type CreatePatientInput = Pick<
-	Prisma.PatientUncheckedCreateInput,
-	| "clinicId"
-	| "name"
-	| "gender"
-	| "ownerId"
-	| "age"
-	| "birthDate"
-	| "weight"
-	| "notes"
-	| "active"
->;
+export type CreatePatientInput = {
+	clinicId?: string;
+	name: string;
+	gender: Gender;
+	ownerId?: string | null;
+	guardianName?: string;
+	guardianPhone?: string;
+	guardianEmail?: string;
+	guardianRelationship?: string | null;
+	emergencyContactPhone?: string | null;
+	emergencyContactName?: string | null;
+	age?: number | null;
+	birthDate?: string | Date | null;
+	nationalId?: string | null;
+	classroom?: string | null;
+	bloodType?: string | null;
+	developmentStatus?: string | null;
+	allergies?: string | null;
+	pocketMoneyEnabled?: boolean;
+	transportation?: string | null;
+	feeType?: string | null;
+	healthConditions?: string | null;
+	previousNursery?: string | null;
+	weight?: number | null;
+	notes?: string | null;
+	active?: boolean;
+	status?: string;
+};
 
 export type UpdatePatientInput = Partial<Omit<CreatePatientInput, "clinicId">>;
 
-export type PatientResponse = Prisma.PatientGetPayload<{
-	select: {
-		id: true;
-		code: true;
-		name: true;
-		gender: true;
-		age: true;
-		birthDate: true;
-		weight: true;
-		notes: true;
-		active: true;
-		editsCount: true;
-		createdAt: true;
-		updatedAt: true;
-		owner: { select: { id: true; code: true; name: true; phone: true; email: true } };
-	};
-}>;
+export type PatientResponse = {
+	id: string;
+	code: string;
+	name: string;
+	gender: Gender;
+	age: number | null;
+	birthDate: Date | string | null;
+	weight: number | null;
+	notes: string | null;
+	active: boolean;
+	status: string;
+	nationalId?: string | null;
+	classroom?: string | null;
+	bloodType?: string | null;
+	developmentStatus?: string | null;
+	allergies?: string | null;
+	pocketMoneyEnabled?: boolean;
+	transportation?: string | null;
+	feeType?: string | null;
+	healthConditions?: string | null;
+	previousNursery?: string | null;
+	guardianRelationship?: string | null;
+	emergencyContactPhone?: string | null;
+	emergencyContactName?: string | null;
+	editsCount: number;
+	createdAt: Date | string;
+	updatedAt: Date | string;
+	owner: { id: string; code: string; name: string; phone: string | null; email: string | null } | null;
+};
 
 export const transferPatientOwnershipSchema = z.object({
 	ownerId: z.string({ error: "وليّ الأمر مطلوب" }).min(1, "وليّ الأمر مطلوب"),

@@ -646,7 +646,11 @@
       "carePlans": "الخطط التعليمية",
       "enrollments": "الاشتراكات",
       "salesInvoices": "فواتير المبيعات",
-      "purchaseInvoices": "فواتير المشتريات"
+      "purchaseInvoices": "فواتير المشتريات",
+      "books": "الدفاتر",
+      "journalEntries": "الدفاتر",
+      "financialStatements": "التقارير المالية",
+      "fiscalYears": "الإعدادات المالية"
     },
     "user": {
       "logout": "تسجيل الخروج",

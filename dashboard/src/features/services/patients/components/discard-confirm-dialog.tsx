@@ -13,27 +13,35 @@ import { FIELD_LABELS } from "@/features/services/patients/data/constants";
 
 interface DiscardConfirmDialogProps {
 	open: boolean;
-	filledFields: string[];
-	onDiscard: () => void;
-	onResume: () => void;
+	filledFields?: string[];
+	onDiscard?: () => void;
+	onResume?: () => void;
+	onConfirm?: () => void;
+	onCancel?: () => void;
 	fieldLabels?: Record<string, string>;
 	resumeLabel?: string;
 }
 
 export function DiscardConfirmDialog({
 	open,
-	filledFields,
+	filledFields = [],
 	onDiscard,
 	onResume,
+	onConfirm,
+	onCancel,
 	fieldLabels,
 	resumeLabel = "متابعة إضافة الطفل",
 }: DiscardConfirmDialogProps) {
+	const handleDiscard = onDiscard ?? onConfirm ?? (() => {});
+	const handleResume = onResume ?? onCancel ?? (() => {});
 	const labels = fieldLabels ?? FIELD_LABELS;
+	const fields = filledFields ?? [];
+
 	return (
 		<Dialog
 			open={open}
 			onOpenChange={(isOpen) => {
-				if (!isOpen) onResume();
+				if (!isOpen) handleResume();
 			}}
 		>
 			<DialogContent
@@ -56,19 +64,19 @@ export function DiscardConfirmDialog({
 
 				<Separator />
 
-				{filledFields.length > 0 && (
+				{fields.length > 0 && (
 					<div className="px-5 py-4">
 						<div className="rounded-lg bg-muted/60 px-4 py-3">
 							<p className="text-xs text-muted-foreground mb-2.5 font-medium">
 								الحقول المدخلة:
 							</p>
 							<div className="flex flex-wrap gap-2">
-								{filledFields.map((field) => (
+								{fields.map((field) => (
 									<span
 										key={field}
 										className="text-xs font-medium px-2.5 py-1 rounded-md bg-amber-100 text-amber-700"
 									>
-										{labels[field]}
+										{labels[field] ?? field}
 									</span>
 								))}
 							</div>
@@ -82,14 +90,14 @@ export function DiscardConfirmDialog({
 					<Button
 						variant="destructive"
 						size="sm"
-						onClick={onDiscard}
+						onClick={handleDiscard}
 					>
 						تجاهل والخروج
 					</Button>
 					<Button
 						variant="outline"
 						size="sm"
-						onClick={onResume}
+						onClick={handleResume}
 					>
 						{resumeLabel}
 					</Button>

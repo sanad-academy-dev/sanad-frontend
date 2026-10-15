@@ -21,6 +21,7 @@ import {
 	useMatch,
 	useNavigate,
 	useRouterState,
+	useSearch,
 } from "@tanstack/react-router";
 import type { ComponentType } from "react";
 import { useState } from "react";
@@ -47,6 +48,8 @@ import { AddAppointmentModal } from "@/features/appointments/components/add-appo
 import { CreateCarePlanSheet } from "@/features/finance/care-plans/components/create-care-plan-sheet";
 import { AddDiscountSheet } from "@/features/finance/discounts/components/add-discount-sheet";
 import { CreateExpenseSheet } from "@/features/finance/expenses/components/create-expense-sheet";
+import { FINANCE_NAV_GROUPS } from "@/features/finance/navigation/finance-nav";
+import { activeGroupKeyOf } from "@/features/finance/navigation/finance-workspace";
 import { useInboxStream } from "@/features/inbox/hooks/use-inbox-stream";
 import { AddProductSheet } from "@/features/inventory/components/add-product-sheet";
 import { useChatEvents } from "@/features/messages/hooks/use-chat-events";
@@ -142,6 +145,7 @@ function RouteComponent() {
 		shouldThrow: false,
 	});
 	const { pathname } = useLocation();
+	const search = useSearch({ strict: false }) as { tab?: string };
 	const { t, isRtl } = useI18n();
 	const navigate = useNavigate();
 
@@ -159,6 +163,14 @@ function RouteComponent() {
 	const pageTitle = (() => {
 		// صفحة ترسم مسارها بنفسها (تفاصيل تقرير مثلًا) — لا نضيف عنوانًا مشتقًا بجانبه
 		if (titleSuppressed) return "";
+		const financeGroupKey = activeGroupKeyOf(pathname, search?.tab);
+		if (financeGroupKey) {
+			const group = FINANCE_NAV_GROUPS.find((g) => g.key === financeGroupKey);
+			if (group) {
+				const groupTitle = t(group.titleKey);
+				if (groupTitle !== group.titleKey) return groupTitle;
+			}
+		}
 		const lastSegment = pathname.split("/").filter(Boolean).pop() ?? "";
 		const camelKey = lastSegment.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
 		const key = `sidebar.items.${camelKey}`;

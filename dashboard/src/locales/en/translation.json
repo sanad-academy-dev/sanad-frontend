@@ -646,7 +646,11 @@
       "carePlans": "Care Plans",
       "enrollments": "Subscriptions",
       "salesInvoices": "Sales Invoices",
-      "purchaseInvoices": "Purchase Invoices"
+      "purchaseInvoices": "Purchase Invoices",
+      "books": "Books",
+      "journalEntries": "Books",
+      "financialStatements": "Financial Statements",
+      "fiscalYears": "Financial Settings"
     },
     "user": {
       "logout": "Log out",
