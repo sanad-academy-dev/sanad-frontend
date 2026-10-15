@@ -4,7 +4,9 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { FormHeader } from "@/components/common/form-header";
 import { FormFooter } from "@/components/common/form-footer";
 import { FieldLabel } from "@/components/common/field-label";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
 	Select,
 	SelectContent,
@@ -14,6 +16,8 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
+import { IconStethoscope, IconUser, IconUserCheck } from "@tabler/icons-react";
 import { useCreateRequest } from "../hooks/use-digital-registration";
 
 export function AddRequestSheet({
@@ -39,7 +43,7 @@ export function AddRequestSheet({
 	const [guardianPhone, setGuardianPhone] = useState("");
 	const [guardianEmail, setGuardianEmail] = useState("");
 	const [guardianNationalId, setGuardianNationalId] = useState("");
-	const [source, setSource] = useState<"DIRECT_LINK" | "REFERRAL" | "SOCIAL" | "OTHER">("OTHER");
+	const [source, setSource] = useState<"WEBSITE" | "DIRECT_LINK" | "REFERRAL" | "SOCIAL" | "OTHER">("OTHER");
 
 	const [error, setError] = useState<string | null>(null);
 
@@ -69,14 +73,17 @@ export function AddRequestSheet({
 
 		if (!studentName.trim()) {
 			setError("اسم الطالب مطلوب");
+			toast.error("اسم الطالب مطلوب");
 			return;
 		}
 		if (!guardianName.trim()) {
 			setError("اسم ولي الأمر مطلوب");
+			toast.error("اسم ولي الأمر مطلوب");
 			return;
 		}
 		if (!guardianPhone.trim()) {
 			setError("رقم جوال ولي الأمر مطلوب");
+			toast.error("رقم جوال ولي الأمر مطلوب");
 			return;
 		}
 
@@ -85,7 +92,7 @@ export function AddRequestSheet({
 				campaignId,
 				studentName: studentName.trim(),
 				gender,
-				birthDate: birthDate || null,
+				birthDate: birthDate ? new Date(birthDate).toISOString() : null,
 				ageLabel: ageLabel.trim() || null,
 				targetClass: targetClass.trim() || null,
 				bloodType: bloodType.trim() || null,
@@ -109,223 +116,302 @@ export function AddRequestSheet({
 		}
 	};
 
+	const isSubmitting = createMutation.isPending;
+
 	return (
-		<Sheet open={open} onOpenChange={(v) => !v && onClose()}>
-			<SheetContent className="flex flex-col gap-0 p-0 sm:max-w-md w-full" dir="rtl">
+		<Sheet open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+			<SheetContent
+				side="left"
+				showCloseButton={false}
+				className="w-full sm:max-w-xl! gap-0 flex flex-col p-0"
+			>
 				<FormHeader
 					title="تسجيل متقدم جديد بالحملة"
-					description="إدخال طلب تسجيل حضوري أو عبر الهاتف لضمه إلى طابور الفحص والتقييم"
+					onClose={onClose}
 				/>
 
-				<form onSubmit={handleSubmit} className="flex flex-1 flex-col overflow-y-auto">
-					<div className="flex-1 space-y-4 p-4">
+				<div className="flex-1 overflow-y-auto">
+					<form
+						id="add-request-form"
+						onSubmit={handleSubmit}
+						className="flex flex-col gap-4 p-4"
+						dir="rtl"
+					>
 						{error && (
-							<div className="rounded-md bg-destructive/10 border border-destructive/20 p-2.5 text-xs font-semibold text-destructive text-center">
+							<div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3 text-xs font-semibold text-destructive text-center">
 								{error}
 							</div>
 						)}
 
-						{/* بيانات الطالب */}
-						<div className="space-y-3 rounded-lg border p-3 bg-muted/20">
-							<span className="text-xs font-bold text-foreground block border-b pb-1">
-								بيانات الطالب الأساسية
-							</span>
+						{/* 1) بيانات الطالب الأساسية */}
+						<div className="flex flex-col gap-3 rounded-xl border bg-card/60 p-4 shadow-2xs">
+							<div className="flex items-center gap-2 border-b pb-2 text-primary font-semibold text-sm">
+								<IconUser className="size-4" />
+								<span>بيانات الطالب الأساسية</span>
+							</div>
 
-							<div className="space-y-1">
-								<FieldLabel required>اسم الطالب الكامل</FieldLabel>
+							<div className="flex flex-col gap-1.5">
+								<FieldLabel required>
+									<Label className="text-xs font-medium">اسم الطالب الكامل</Label>
+								</FieldLabel>
 								<Input
 									value={studentName}
 									onChange={(e) => setStudentName(e.target.value)}
 									placeholder="مثال: تركي فهد الدوسري"
-									className="h-8 text-xs"
+									className="text-sm text-right"
 									required
 								/>
 							</div>
 
-							<div className="grid grid-cols-2 gap-2">
-								<div className="space-y-1">
-									<FieldLabel>الجنس</FieldLabel>
+							<div className="grid grid-cols-2 gap-3">
+								<div className="flex flex-col gap-1.5">
+									<FieldLabel required>
+										<Label className="text-xs font-medium">الجنس</Label>
+									</FieldLabel>
 									<Select value={gender} onValueChange={(val: any) => setGender(val)}>
-										<SelectTrigger className="h-8 text-xs">
-											<SelectValue />
+										<SelectTrigger className="text-sm text-right" dir="rtl">
+											<SelectValue placeholder="اختر الجنس" />
 										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="MALE">ذكر</SelectItem>
-											<SelectItem value="FEMALE">أنثى</SelectItem>
-											<SelectItem value="UNKNOWN">غير محدد</SelectItem>
+										<SelectContent dir="rtl">
+											<SelectItem value="MALE" className="text-right">ذكر</SelectItem>
+											<SelectItem value="FEMALE" className="text-right">أنثى</SelectItem>
+											<SelectItem value="UNKNOWN" className="text-right">غير محدد</SelectItem>
 										</SelectContent>
 									</Select>
 								</div>
 
-								<div className="space-y-1">
-									<FieldLabel>الفئة العمرية / العمر</FieldLabel>
+								<div className="flex flex-col gap-1.5">
+									<FieldLabel>
+										<Label className="text-xs font-medium">الفئة العمرية / العمر</Label>
+									</FieldLabel>
 									<Input
 										value={ageLabel}
 										onChange={(e) => setAgeLabel(e.target.value)}
 										placeholder="مثال: 8 سنوات"
-										className="h-8 text-xs"
+										className="text-sm text-right"
 									/>
 								</div>
 							</div>
 
-							<div className="grid grid-cols-2 gap-2">
-								<div className="space-y-1">
-									<FieldLabel>تاريخ الميلاد</FieldLabel>
+							<div className="grid grid-cols-2 gap-3">
+								<div className="flex flex-col gap-1.5">
+									<FieldLabel>
+										<Label className="text-xs font-medium">تاريخ الميلاد</Label>
+									</FieldLabel>
 									<Input
 										type="date"
 										value={birthDate}
 										onChange={(e) => setBirthDate(e.target.value)}
-										className="h-8 text-xs"
+										className="text-sm"
 									/>
 								</div>
 
-								<div className="space-y-1">
-									<FieldLabel>المسار المطلوب</FieldLabel>
+								<div className="flex flex-col gap-1.5">
+									<FieldLabel>
+										<Label className="text-xs font-medium">الفصل / المسار المطلوب</Label>
+									</FieldLabel>
 									<Input
 										value={targetClass}
 										onChange={(e) => setTargetClass(e.target.value)}
-										placeholder="المسار التمهيدي"
-										className="h-8 text-xs"
+										placeholder="المسار التمهيدي العام"
+										className="text-sm text-right"
 									/>
 								</div>
 							</div>
 						</div>
 
-						{/* البيانات الطبية */}
-						<div className="space-y-3 rounded-lg border p-3 bg-muted/20">
-							<span className="text-xs font-bold text-foreground block border-b pb-1">
-								المعلومات الصحية
-							</span>
+						{/* 2) البيانات الصحية والطبية */}
+						<div className="flex flex-col gap-3 rounded-xl border bg-card/60 p-4 shadow-2xs">
+							<div className="flex items-center gap-2 border-b pb-2 text-primary font-semibold text-sm">
+								<IconStethoscope className="size-4" />
+								<span>المعلومات الصحية والطبية</span>
+							</div>
 
-							<div className="grid grid-cols-2 gap-2">
-								<div className="space-y-1">
-									<FieldLabel>فصيلة الدم</FieldLabel>
+							<div className="grid grid-cols-2 gap-3">
+								<div className="flex flex-col gap-1.5">
+									<FieldLabel>
+										<Label className="text-xs font-medium">فصيلة الدم</Label>
+									</FieldLabel>
 									<Select value={bloodType} onValueChange={setBloodType}>
-										<SelectTrigger className="h-8 text-xs">
+										<SelectTrigger className="text-sm text-right" dir="rtl">
 											<SelectValue placeholder="اختر الفصيلة" />
 										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="O+">O+</SelectItem>
-											<SelectItem value="A+">A+</SelectItem>
-											<SelectItem value="B+">B+</SelectItem>
-											<SelectItem value="AB+">AB+</SelectItem>
-											<SelectItem value="O-">O-</SelectItem>
-											<SelectItem value="A-">A-</SelectItem>
-											<SelectItem value="B-">B-</SelectItem>
-											<SelectItem value="AB-">AB-</SelectItem>
+										<SelectContent dir="rtl">
+											<SelectItem value="O+" className="text-right">O+</SelectItem>
+											<SelectItem value="A+" className="text-right">A+</SelectItem>
+											<SelectItem value="B+" className="text-right">B+</SelectItem>
+											<SelectItem value="AB+" className="text-right">AB+</SelectItem>
+											<SelectItem value="O-" className="text-right">O-</SelectItem>
+											<SelectItem value="A-" className="text-right">A-</SelectItem>
+											<SelectItem value="B-" className="text-right">B-</SelectItem>
+											<SelectItem value="AB-" className="text-right">AB-</SelectItem>
 										</SelectContent>
 									</Select>
 								</div>
 
-								<div className="space-y-1">
-									<FieldLabel>الحساسيات إن وجدت</FieldLabel>
+								<div className="flex flex-col gap-1.5">
+									<FieldLabel>
+										<Label className="text-xs font-medium">الحساسيات إن وجدت</Label>
+									</FieldLabel>
 									<Input
 										value={allergies}
 										onChange={(e) => setAllergies(e.target.value)}
 										placeholder="فول سوداني، بنسلين..."
-										className="h-8 text-xs"
+										className="text-sm text-right"
 									/>
 								</div>
 							</div>
 
-							<div className="space-y-2 pt-1">
-								<div className="flex items-center justify-between">
-									<span className="text-xs font-medium text-foreground">هل يعاني من حالات مزمنة؟</span>
-									<Switch checked={hasChronic} onCheckedChange={setHasChronic} />
+							{/* خيار الحالات المزمنة */}
+							<div
+								role="button"
+								tabIndex={0}
+								onClick={() => setHasChronic((prev) => !prev)}
+								className={cn(
+									"flex items-center justify-between rounded-lg border p-3 cursor-pointer transition-colors select-none",
+									hasChronic
+										? "border-amber-500/40 bg-amber-500/5"
+										: "border-border bg-background hover:bg-muted/50",
+								)}
+							>
+								<div className="flex flex-col gap-0.5">
+									<span className="text-sm font-medium">حالات صحية أو أمراض مزمنة</span>
+									<span className="text-xs text-muted-foreground">
+										هل يعاني الطالب من أي حالات مزمنة أو يحتاج متابعة دوائية؟
+									</span>
 								</div>
+								<Switch
+									checked={hasChronic}
+									onCheckedChange={setHasChronic}
+									onClick={(e) => e.stopPropagation()}
+								/>
+							</div>
 
-								{hasChronic && (
-									<Input
+							{hasChronic && (
+								<div className="flex flex-col gap-1.5 pt-1">
+									<Label className="text-xs font-medium">توضيح الحالة الصحية والأدوية</Label>
+									<Textarea
 										value={chronicDiseases}
 										onChange={(e) => setChronicDiseases(e.target.value)}
-										placeholder="توضيح الحالة الصحية..."
-										className="h-8 text-xs"
+										placeholder="يرجى ذكر الحالة بالتفصيل، وأي أدوية أو تعليمات إسعافية..."
+										className="text-sm text-right min-h-20 resize-none"
 									/>
-								)}
-							</div>
+								</div>
+							)}
 						</div>
 
-						{/* بيانات ولي الأمر */}
-						<div className="space-y-3 rounded-lg border p-3 bg-muted/20">
-							<span className="text-xs font-bold text-foreground block border-b pb-1">
-								بيانات ولي الأمر
-							</span>
+						{/* 3) بيانات ولي الأمر ومصدر التسجيل */}
+						<div className="flex flex-col gap-3 rounded-xl border bg-card/60 p-4 shadow-2xs">
+							<div className="flex items-center gap-2 border-b pb-2 text-primary font-semibold text-sm">
+								<IconUserCheck className="size-4" />
+								<span>بيانات ولي الأمر ومصدر التسجيل</span>
+							</div>
 
-							<div className="space-y-1">
-								<FieldLabel required>اسم ولي الأمر</FieldLabel>
+							<div className="flex flex-col gap-1.5">
+								<FieldLabel required>
+									<Label className="text-xs font-medium">اسم ولي الأمر</Label>
+								</FieldLabel>
 								<Input
 									value={guardianName}
 									onChange={(e) => setGuardianName(e.target.value)}
-									placeholder="الاسم الثلاثي"
-									className="h-8 text-xs"
+									placeholder="الاسم الثلاثي لولي الأمر"
+									className="text-sm text-right"
 									required
 								/>
 							</div>
 
-							<div className="grid grid-cols-2 gap-2">
-								<div className="space-y-1">
-									<FieldLabel required>رقم الجوال</FieldLabel>
+							<div className="grid grid-cols-2 gap-3">
+								<div className="flex flex-col gap-1.5">
+									<FieldLabel required>
+										<Label className="text-xs font-medium">رقم الجوال</Label>
+									</FieldLabel>
 									<Input
 										value={guardianPhone}
 										onChange={(e) => setGuardianPhone(e.target.value)}
 										placeholder="05XXXXXXXX"
 										dir="ltr"
-										className="h-8 text-xs text-right font-mono"
+										className="text-sm text-right font-mono"
 										required
 									/>
 								</div>
 
-								<div className="space-y-1">
-									<FieldLabel>البريد الإلكتروني</FieldLabel>
+								<div className="flex flex-col gap-1.5">
+									<FieldLabel>
+										<Label className="text-xs font-medium">البريد الإلكتروني</Label>
+									</FieldLabel>
 									<Input
 										type="email"
 										value={guardianEmail}
 										onChange={(e) => setGuardianEmail(e.target.value)}
 										placeholder="mail@domain.com"
 										dir="ltr"
-										className="h-8 text-xs text-right font-mono"
+										className="text-sm text-right font-mono"
 									/>
 								</div>
 							</div>
 
-							<div className="grid grid-cols-2 gap-2">
-								<div className="space-y-1">
-									<FieldLabel>الهوية الوطنية / الإقامة</FieldLabel>
+							<div className="grid grid-cols-2 gap-3">
+								<div className="flex flex-col gap-1.5">
+									<FieldLabel>
+										<Label className="text-xs font-medium">الهوية الوطنية / الإقامة</Label>
+									</FieldLabel>
 									<Input
 										value={guardianNationalId}
 										onChange={(e) => setGuardianNationalId(e.target.value)}
 										placeholder="10XXXXXXXX"
-										className="h-8 text-xs"
+										dir="ltr"
+										className="text-sm text-right font-mono"
 									/>
 								</div>
 
-								<div className="space-y-1">
-									<FieldLabel>مصدر التسجيل</FieldLabel>
+								<div className="flex flex-col gap-1.5">
+									<FieldLabel>
+										<Label className="text-xs font-medium">قناة / مصدر التسجيل</Label>
+									</FieldLabel>
 									<Select value={source} onValueChange={(v: any) => setSource(v)}>
-										<SelectTrigger className="h-8 text-xs">
-											<SelectValue />
+										<SelectTrigger className="text-sm text-right" dir="rtl">
+											<SelectValue placeholder="اختر المصدر" />
 										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="OTHER">حضور مباشر (مقر الأكاديمية)</SelectItem>
-											<SelectItem value="DIRECT_LINK">اتصال هاتفي</SelectItem>
-											<SelectItem value="REFERRAL">توصية / إحالة</SelectItem>
-											<SelectItem value="SOCIAL">سوشيال ميديا</SelectItem>
+										<SelectContent dir="rtl">
+											<SelectItem value="OTHER" className="text-right">حضور مباشر (مقر الأكاديمية)</SelectItem>
+											<SelectItem value="DIRECT_LINK" className="text-right">اتصال هاتفي / رابط مباشر</SelectItem>
+											<SelectItem value="REFERRAL" className="text-right">توصية / إحالة</SelectItem>
+											<SelectItem value="SOCIAL" className="text-right">شبكات التواصل الاجتماعي</SelectItem>
+											<SelectItem value="WEBSITE" className="text-right">الموقع الإلكتروني</SelectItem>
 										</SelectContent>
 									</Select>
 								</div>
 							</div>
 						</div>
-					</div>
+					</form>
+				</div>
 
-					<FormFooter
-						submitLabel="تسجيل وإضافة للطابور"
-						isSubmitting={createMutation.isPending}
-						onCancel={() => {
+				<FormFooter
+					continueAdding={false}
+					onContinueAddingChange={() => {}}
+					disabled={isSubmitting}
+				>
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={() => {
 							resetForm();
 							onClose();
 						}}
-					/>
-				</form>
+						disabled={isSubmitting}
+					>
+						إلغاء
+					</Button>
+					<Button
+						type="submit"
+						form="add-request-form"
+						size="sm"
+						disabled={isSubmitting}
+					>
+						{isSubmitting ? "جاري الحفظ..." : "تسجيل وإضافة للطابور"}
+					</Button>
+				</FormFooter>
 			</SheetContent>
 		</Sheet>
 	);
