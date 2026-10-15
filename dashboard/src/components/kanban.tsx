@@ -91,6 +91,7 @@ export const KanbanBoard = ({ id, children, className }: KanbanBoardProps) => {
 export type KanbanCardProps<T extends KanbanItemProps = KanbanItemProps> = T & {
 	children?: ReactNode;
 	className?: string;
+	disabled?: boolean;
 };
 
 export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
@@ -98,10 +99,12 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
 	name,
 	children,
 	className,
+	disabled,
 }: KanbanCardProps<T>) => {
 	const { attributes, listeners, setNodeRef, transition, transform, isDragging } = useSortable(
 		{
 			id,
+			disabled,
 		},
 	);
 	const { activeCardId } = useContext(KanbanContext) as KanbanContextProps;
@@ -254,12 +257,18 @@ export const KanbanProvider = <
 		if (activeColumn !== overColumn) {
 			let newData = [...data];
 			const activeIndex = newData.findIndex((item) => item.id === active.id);
-			const overIndex = newData.findIndex((item) => item.id === over.id);
+			if (activeIndex !== -1) {
+				newData[activeIndex] = { ...newData[activeIndex], column: overColumn };
+				const overIndex = overItem
+					? newData.findIndex((item) => item.id === over.id)
+					: -1;
 
-			newData[activeIndex].column = overColumn;
-			newData = arrayMove(newData, activeIndex, overIndex);
+				if (overIndex !== -1) {
+					newData = arrayMove(newData, activeIndex, overIndex);
+				}
 
-			onDataChange?.(newData);
+				onDataChange?.(newData);
+			}
 		}
 
 		onDragOver?.(event);
@@ -272,18 +281,40 @@ export const KanbanProvider = <
 
 		const { active, over } = event;
 
-		if (!over || active.id === over.id) {
+		if (!over) {
 			return;
 		}
 
+		const activeItem = data.find((item) => item.id === active.id);
+		if (!activeItem) {
+			return;
+		}
+
+		const overItem = data.find((item) => item.id === over.id);
+		const overColumn =
+			overItem?.column || columns.find((col) => col.id === over.id)?.id || activeItem.column;
+
 		let newData = [...data];
-
 		const oldIndex = newData.findIndex((item) => item.id === active.id);
-		const newIndex = newData.findIndex((item) => item.id === over.id);
+		if (oldIndex === -1) return;
 
-		newData = arrayMove(newData, oldIndex, newIndex);
+		let hasChanges = false;
+		if (newData[oldIndex].column !== overColumn) {
+			newData[oldIndex] = { ...newData[oldIndex], column: overColumn };
+			hasChanges = true;
+		}
 
-		onDataChange?.(newData);
+		if (overItem && active.id !== over.id) {
+			const newIndex = newData.findIndex((item) => item.id === over.id);
+			if (newIndex !== -1 && oldIndex !== newIndex) {
+				newData = arrayMove(newData, oldIndex, newIndex);
+				hasChanges = true;
+			}
+		}
+
+		if (hasChanges) {
+			onDataChange?.(newData);
+		}
 	};
 
 	const announcements: Announcements = {

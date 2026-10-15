@@ -1,5 +1,5 @@
 import { type CollisionDetection, pointerWithin, rectIntersection } from "@dnd-kit/core";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
 	IconActivity,
 	IconCalendar,
@@ -73,14 +73,18 @@ export function CampaignRequestsKanban({
 	const { data: serverRequests = EMPTY_REQUESTS, isLoading } = useCampaignRequests(campaignId);
 	const updateStatusMutation = useUpdateRequestStatus(campaignId);
 
-	const [localData, setLocalData] = useState<CampaignRequestItem[] | null>(null);
+	const [data, setData] = useState<CampaignRequestItem[]>([]);
+	const lastKnownColumns = useRef<Map<string, AppointmentColumnId>>(new Map());
 	const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
-	const data = localData ?? serverRequests;
-
-	// Reset local optimistic data whenever server query refreshes
+	// Sync local state whenever server query refreshes
 	useEffect(() => {
-		setLocalData(null);
+		if (serverRequests) {
+			lastKnownColumns.current = new Map(
+				serverRequests.map((r) => [r.id, r.column as AppointmentColumnId]),
+			);
+			setData(serverRequests);
+		}
 	}, [serverRequests]);
 
 	// Derive selectedRequest directly from data (stable, reactive, zero infinite loop)
@@ -143,10 +147,12 @@ export function CampaignRequestsKanban({
 		};
 		const newColumn = statusToColumnMap[newStatus] || "queue";
 		const meta = COLUMN_STATUS_MAP[newColumn];
+		const prevCol = lastKnownColumns.current.get(req.id) || (req.column as AppointmentColumnId);
 
-		setLocalData((prev) => {
-			const current = prev ?? serverRequests;
-			return current.map((item) =>
+		lastKnownColumns.current.set(req.id, newColumn);
+
+		setData((prev) =>
+			prev.map((item) =>
 				item.id === req.id
 					? {
 							...item,
@@ -156,8 +162,8 @@ export function CampaignRequestsKanban({
 							statusVariant: meta?.variant || item.statusVariant,
 					  }
 					: item,
-			);
-		});
+			),
+		);
 
 		updateStatusMutation.mutate(
 			{
@@ -169,7 +175,20 @@ export function CampaignRequestsKanban({
 					toast.success(`تم تحديث حالة الطلب إلى "${meta?.label || newStatus}" بنجاح`);
 				},
 				onError: (err: any) => {
-					setLocalData(null);
+					lastKnownColumns.current.set(req.id, prevCol);
+					setData((prev) =>
+						prev.map((item) =>
+							item.id === req.id
+								? {
+										...item,
+										column: prevCol,
+										status: req.status,
+										statusLabel: req.statusLabel,
+										statusVariant: req.statusVariant,
+								  }
+								: item,
+						),
+					);
 					toast.error(err.message || "فشل تحديث حالة الطلب");
 				},
 			},
@@ -177,35 +196,43 @@ export function CampaignRequestsKanban({
 	};
 
 	const handleDataChange = (nextData: CampaignRequestItem[]) => {
-		// Detect which item changed column
-		const changedItem = nextData.find((item) => {
-			const old = data.find((d) => d.id === item.id);
-			return old && old.column !== item.column;
-		});
+		const committed: CampaignRequestItem[] = [];
 
-		if (changedItem) {
-			const meta = COLUMN_STATUS_MAP[changedItem.column] || COLUMN_STATUS_MAP.queue;
+		for (const item of nextData) {
+			const prevCol = lastKnownColumns.current.get(item.id);
 
-			const updatedMap = new Map(nextData.map((d) => [d.id, d]));
-			const fullUpdatedData = data.map((item) => {
-				if (item.id === changedItem.id) {
-					return {
-						...item,
-						column: changedItem.column,
-						status: meta.status,
-						statusLabel: meta.label,
-						statusVariant: meta.variant,
-					};
-				}
-				const inNext = updatedMap.get(item.id);
-				return inNext || item;
-			});
+			// If column hasn't changed, retain as is
+			if (!prevCol || prevCol === item.column) {
+				committed.push(item);
+				continue;
+			}
 
-			setLocalData(fullUpdatedData);
+			// Column changed!
+			const oldItem = data.find((d) => d.id === item.id);
+			if (oldItem?.status === "ACCEPTED") {
+				toast.error("لا يمكن نقل أو تغيير مرحلة طالب تم اعتماده وقبوله نهائياً");
+				committed.push({ ...item, column: prevCol });
+				continue;
+			}
+
+			const targetColumn = item.column as AppointmentColumnId;
+			const meta = COLUMN_STATUS_MAP[targetColumn] || COLUMN_STATUS_MAP.queue;
+
+			// Synchronously record new column in ref so consecutive drag events don't duplicate
+			lastKnownColumns.current.set(item.id, targetColumn);
+
+			const updatedItem: CampaignRequestItem = {
+				...item,
+				column: targetColumn,
+				status: meta.status,
+				statusLabel: meta.label,
+				statusVariant: meta.variant,
+			};
+			committed.push(updatedItem);
 
 			updateStatusMutation.mutate(
 				{
-					requestId: changedItem.id,
+					requestId: item.id,
 					status: meta.status,
 				},
 				{
@@ -213,16 +240,30 @@ export function CampaignRequestsKanban({
 						toast.success(`تم نقل الطلب إلى "${meta.label}" بنجاح`);
 					},
 					onError: (err: any) => {
-						setLocalData(null);
+						lastKnownColumns.current.set(item.id, prevCol);
+						setData((prev) =>
+							prev.map((d) =>
+								d.id === item.id
+									? {
+											...d,
+											column: prevCol,
+											status: oldItem?.status || d.status,
+											statusLabel: oldItem?.statusLabel || d.statusLabel,
+											statusVariant: oldItem?.statusVariant || d.statusVariant,
+									  }
+									: d,
+							),
+						);
 						toast.error(err.message || "فشل تحديث حالة الطلب");
 					},
 				},
 			);
-		} else {
-			const updatedMap = new Map(nextData.map((d) => [d.id, d]));
-			const fullUpdatedData = data.map((item) => updatedMap.get(item.id) || item);
-			setLocalData(fullUpdatedData);
 		}
+
+		// Merge committed items with any items that might be currently filtered out
+		const committedMap = new Map(committed.map((d) => [d.id, d]));
+		const mergedData = data.map((d) => committedMap.get(d.id) || d);
+		setData(mergedData);
 	};
 
 	return (
@@ -256,10 +297,14 @@ export function CampaignRequestsKanban({
 									id={item.id}
 									name={item.name}
 									column={item.column}
+									disabled={item.status === "ACCEPTED"}
 									className="border-0 bg-transparent p-0 shadow-none"
 								>
 									<Card
-										className="cursor-pointer flex flex-col gap-3 rounded-md border bg-background p-3 shadow-sm text-start hover:border-primary/50 transition-colors"
+										className={cn(
+											"flex flex-col gap-3 rounded-md border bg-background p-3 shadow-sm text-start hover:border-primary/50 transition-colors",
+											item.status === "ACCEPTED" ? "cursor-pointer" : "cursor-grab"
+										)}
 										dir="rtl"
 										onClick={() => setSelectedRequestId(item.id)}
 									>
@@ -268,23 +313,32 @@ export function CampaignRequestsKanban({
 											<span className="text-[13px] font-medium text-muted-foreground">
 												{item.code}
 											</span>
-											<Badge
-												variant="outline"
-												className={cn(
-													"gap-1 py-1 px-3 text-[11px] font-semibold border",
-													item.statusVariant === "warning" &&
-														"border-amber-200 bg-amber-50 text-amber-600 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-400",
-													item.statusVariant === "info" &&
-														"border-blue-200 bg-blue-50 text-blue-600 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-400",
-													item.statusVariant === "default" &&
-														"border-emerald-200 bg-emerald-50 text-emerald-600 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-400",
-												)}
-											>
-												{item.statusVariant === "warning" && (
-													<IconPlayerPauseFilled size={12} className="me-1" />
-												)}
-												{item.statusLabel}
-											</Badge>
+											{(() => {
+												const cardMeta = COLUMN_STATUS_MAP[item.column as AppointmentColumnId] || {
+													status: item.status,
+													label: item.statusLabel,
+													variant: item.statusVariant,
+												};
+												return (
+													<Badge
+														variant="outline"
+														className={cn(
+															"gap-1 py-1 px-3 text-[11px] font-semibold border",
+															cardMeta.variant === "warning" &&
+																"border-amber-200 bg-amber-50 text-amber-600 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-400",
+															cardMeta.variant === "info" &&
+																"border-blue-200 bg-blue-50 text-blue-600 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-400",
+															cardMeta.variant === "default" &&
+																"border-emerald-200 bg-emerald-50 text-emerald-600 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-400",
+														)}
+													>
+														{cardMeta.variant === "warning" && (
+															<IconPlayerPauseFilled size={12} className="me-1" />
+														)}
+														{cardMeta.label}
+													</Badge>
+												);
+											})()}
 										</div>
 
 										{/* Middle row: Patient info and Date */}
