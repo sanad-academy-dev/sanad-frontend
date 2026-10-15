@@ -68,36 +68,65 @@ export function CampaignsTable({
 				id: "select",
 				size: 50,
 				header: ({ table }) => (
-					<Checkbox
-						checked={table.getIsAllPageRowsSelected()}
-						onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-						aria-label="Select all"
-					/>
+					<div onClick={(e) => e.stopPropagation()} className="flex items-center justify-center">
+						<Checkbox
+							checked={
+								table.getIsAllPageRowsSelected() ||
+								(table.getIsSomePageRowsSelected() && "indeterminate")
+							}
+							onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+							aria-label="تحديد الكل"
+							className="translate-y-0.5"
+						/>
+					</div>
 				),
 				cell: ({ row }) => (
-					<Checkbox
-						checked={row.getIsSelected()}
-						onCheckedChange={(value) => row.toggleSelected(!!value)}
-						aria-label="Select row"
-					/>
+					<div onClick={(e) => e.stopPropagation()} className="flex items-center justify-center">
+						<Checkbox
+							checked={row.getIsSelected()}
+							onCheckedChange={(value) => row.toggleSelected(!!value)}
+							aria-label="تحديد الصف"
+							className="translate-y-0.5"
+						/>
+					</div>
 				),
+				enableSorting: false,
+				enableHiding: false,
 			}),
 			columnHelper.accessor("name", {
 				header: "الحملة",
 				size: 350,
-				cell: (info) => (
-					<div className="flex items-center gap-3">
-						<div className="flex size-8 shrink-0 items-center justify-center rounded border border-muted bg-white text-muted-foreground shadow-sm">
-							<IconFileDescription size={18} />
+				cell: (info) => {
+					const c = info.row.original;
+					return (
+						<div className="flex items-center gap-3">
+							<div className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-primary/10 bg-primary/5 text-primary shadow-2xs">
+								<IconFileDescription size={18} />
+							</div>
+							<div className="flex flex-col text-start gap-1">
+								<span className="font-semibold text-foreground text-[14px] leading-tight">
+									{info.getValue()}
+								</span>
+								<div className="flex items-center gap-1.5 text-xs text-muted-foreground flex-wrap">
+									<span
+										dir="ltr"
+										className="font-mono text-[11px] font-medium px-1.5 py-0.5 rounded bg-muted/80 text-foreground/80 border border-border/50"
+									>
+										{c.code}
+									</span>
+									<span className="text-muted-foreground/40">•</span>
+									<span className="font-medium">{c.ageGroup}</span>
+									{c.targetClass && (
+										<>
+											<span className="text-muted-foreground/40">•</span>
+											<span className="text-primary/90 font-medium">{c.targetClass}</span>
+										</>
+									)}
+								</div>
+							</div>
 						</div>
-						<div className="flex flex-col text-start">
-							<span className="font-semibold text-foreground text-[14px]">{info.getValue()}</span>
-							<span className="text-xs text-muted-foreground">
-								{info.row.original.code} - {info.row.original.ageGroup}
-							</span>
-						</div>
-					</div>
-				),
+					);
+				},
 			}),
 			columnHelper.accessor("requests", {
 				header: "الطلبات",
@@ -174,9 +203,42 @@ export function CampaignsTable({
 				},
 			}),
 			columnHelper.accessor("startDate", {
-				header: "البداية",
-				size: 120,
-				cell: (info) => <div className="text-[13px] font-medium text-foreground">{info.getValue()}</div>,
+				header: "تاريخ البدء",
+				size: 130,
+				cell: (info) => {
+					const val = info.getValue();
+					if (!val) {
+						return <span className="text-xs text-muted-foreground/60 font-medium">—</span>;
+					}
+					try {
+						const d = new Date(val);
+						if (isNaN(d.getTime())) {
+							return <span className="text-xs text-muted-foreground/60 font-medium">—</span>;
+						}
+						return (
+							<div className="flex flex-col text-start">
+								<span className="text-[13px] font-medium text-foreground tabular-nums">
+									{new Intl.DateTimeFormat("ar-SA-u-ca-gregory-nu-latn", {
+										year: "numeric",
+										month: "short",
+										day: "numeric",
+									}).format(d)}
+								</span>
+								{info.row.original.endDate && (
+									<span className="text-[11px] text-muted-foreground tabular-nums">
+										إلى: {new Intl.DateTimeFormat("ar-SA-u-ca-gregory-nu-latn", {
+											year: "numeric",
+											month: "short",
+											day: "numeric",
+										}).format(new Date(info.row.original.endDate))}
+									</span>
+								)}
+							</div>
+						);
+					} catch {
+						return <span className="text-xs text-muted-foreground">{String(val)}</span>;
+					}
+				},
 			}),
 			columnHelper.display({
 				id: "actions",
@@ -239,6 +301,8 @@ export function CampaignsTable({
 		getPaginationRowModel: getPaginationRowModel(),
 		onRowSelectionChange: setRowSelection,
 		onGlobalFilterChange,
+		getRowId: (row) => row.id,
+		enableRowSelection: true,
 		state: {
 			rowSelection,
 			globalFilter,
