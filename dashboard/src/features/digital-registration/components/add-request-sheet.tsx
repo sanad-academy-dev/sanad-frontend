@@ -169,7 +169,7 @@ export function AddRequestSheet({
 										<Label className="text-xs font-medium">الجنس</Label>
 									</FieldLabel>
 									<Select value={gender} onValueChange={(val: any) => setGender(val)}>
-										<SelectTrigger className="text-sm text-right" dir="rtl">
+										<SelectTrigger className="w-full text-sm text-right" dir="rtl">
 											<SelectValue placeholder="اختر الجنس" />
 										</SelectTrigger>
 										<SelectContent dir="rtl">
@@ -233,7 +233,7 @@ export function AddRequestSheet({
 										<Label className="text-xs font-medium">فصيلة الدم</Label>
 									</FieldLabel>
 									<Select value={bloodType} onValueChange={setBloodType}>
-										<SelectTrigger className="text-sm text-right" dir="rtl">
+										<SelectTrigger className="w-full text-sm text-right" dir="rtl">
 											<SelectValue placeholder="اختر الفصيلة" />
 										</SelectTrigger>
 										<SelectContent dir="rtl">
@@ -369,7 +369,7 @@ export function AddRequestSheet({
 										<Label className="text-xs font-medium">قناة / مصدر التسجيل</Label>
 									</FieldLabel>
 									<Select value={source} onValueChange={(v: any) => setSource(v)}>
-										<SelectTrigger className="text-sm text-right" dir="rtl">
+										<SelectTrigger className="w-full text-sm text-right" dir="rtl">
 											<SelectValue placeholder="اختر المصدر" />
 										</SelectTrigger>
 										<SelectContent dir="rtl">
