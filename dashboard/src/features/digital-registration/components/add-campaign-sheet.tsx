@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { FormHeader } from "@/components/common/form-header";
 import { FormFooter } from "@/components/common/form-footer";
@@ -14,6 +15,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { IconCertificate, IconId, IconVaccine } from "@tabler/icons-react";
 import type { Campaign } from "../types/campaign.types";
@@ -30,8 +32,8 @@ export function AddCampaignSheet({
 }) {
 	const isEditing = !!campaign;
 	const [name, setName] = useState("");
-	const [ageGroup, setAgeGroup] = useState("");
-	const [targetClass, setTargetClass] = useState("");
+	const [ageGroup, setAgeGroup] = useState("2-3 سنوات");
+	const [targetClass, setTargetClass] = useState("النجوم");
 	const [capacity, setCapacity] = useState("30");
 	const [startDate, setStartDate] = useState("");
 	const [endDate, setEndDate] = useState("");
@@ -39,6 +41,7 @@ export function AddCampaignSheet({
 	const [requireId, setRequireId] = useState(true);
 	const [requireVaccine, setRequireVaccine] = useState(true);
 	const [requireBirthCert, setRequireBirthCert] = useState(true);
+	const [notes, setNotes] = useState("");
 
 	const createMutation = useCreateCampaign();
 	const updateMutation = useUpdateCampaign();
@@ -47,8 +50,8 @@ export function AddCampaignSheet({
 		if (open) {
 			if (campaign) {
 				setName(campaign.name || "");
-				setAgeGroup(campaign.ageGroup || "");
-				setTargetClass(campaign.targetClass || "");
+				setAgeGroup(campaign.ageGroup || "2-3 سنوات");
+				setTargetClass(campaign.targetClass || "النجوم");
 				setCapacity(String(campaign.maxCapacity || campaign.capacity || 30));
 				setStartDate(campaign.startDate ? campaign.startDate.split("T")[0] : "");
 				setEndDate(campaign.endDate ? campaign.endDate.split("T")[0] : "");
@@ -56,9 +59,10 @@ export function AddCampaignSheet({
 				setRequireId(campaign.requireId ?? true);
 				setRequireVaccine(campaign.requireVaccine ?? true);
 				setRequireBirthCert(campaign.requireBirthCert ?? true);
+				setNotes(campaign.notes || "");
 			} else {
 				setName("");
-				setAgeGroup("2-3");
+				setAgeGroup("2-3 سنوات");
 				setTargetClass("النجوم");
 				setCapacity("30");
 				setStartDate("");
@@ -67,13 +71,22 @@ export function AddCampaignSheet({
 				setRequireId(true);
 				setRequireVaccine(true);
 				setRequireBirthCert(true);
+				setNotes("");
 			}
 		}
 	}, [open, campaign]);
 
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!name.trim()) return;
+		if (!name.trim()) {
+			toast.error("اسم الحملة مطلوب");
+			return;
+		}
+
+		if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
+			toast.error("تاريخ البدء لا يمكن أن يكون بعد تاريخ الانتهاء");
+			return;
+		}
 
 		const payload: Partial<Campaign> = {
 			name: name.trim(),
@@ -86,15 +99,21 @@ export function AddCampaignSheet({
 			requireId,
 			requireVaccine,
 			requireBirthCert,
+			notes: notes.trim() || null,
 		};
 
-		if (isEditing && campaign) {
-			await updateMutation.mutateAsync({ id: campaign.id, data: payload });
-		} else {
-			await createMutation.mutateAsync(payload);
+		try {
+			if (isEditing && campaign) {
+				await updateMutation.mutateAsync({ id: campaign.id, data: payload });
+				toast.success("تم تحديث بيانات الحملة بنجاح");
+			} else {
+				await createMutation.mutateAsync(payload);
+				toast.success("تم إنشاء الحملة الجديدة بنجاح");
+			}
+			onClose();
+		} catch (err: any) {
+			toast.error(err.message || "حدث خطأ أثناء حفظ الحملة");
 		}
-
-		onClose();
 	};
 
 	const isSubmitting = createMutation.isPending || updateMutation.isPending;
@@ -194,6 +213,9 @@ export function AddCampaignSheet({
 										</SelectItem>
 										<SelectItem value="المفكر" className="text-right">
 											مسار المفكر
+										</SelectItem>
+										<SelectItem value="عام" className="text-right">
+											عام (كافة المسارات)
 										</SelectItem>
 									</SelectContent>
 								</Select>
@@ -351,6 +373,18 @@ export function AddCampaignSheet({
 										/>
 									</div>
 								</div>
+							</div>
+
+							{/* ملاحظات أو وصف إضافي */}
+							<div className="flex flex-col gap-1.5">
+								<Label className="text-sm font-medium">ملاحظات أو وصف إضافي للحملة</Label>
+								<Textarea
+									name="notes"
+									value={notes}
+									onChange={(e) => setNotes(e.target.value)}
+									placeholder="أضف أي ملاحظات أو شروط خاصة بالحملة..."
+									className="w-full text-right text-sm min-h-20 resize-none"
+								/>
 							</div>
 						</div>
 					</form>
