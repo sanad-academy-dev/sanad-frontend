@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import type { ComponentType } from "react";
 import {
+	IconActivity,
 	IconAlertCircle,
+	IconArrowsExchange,
 	IconArrowUp,
 	IconAt,
 	IconBrandWhatsapp,
@@ -10,8 +12,10 @@ import {
 	IconCalendar,
 	IconCalendarPlus,
 	IconCheck,
+	IconChevronDown,
 	IconCircle,
 	IconCircleCheck,
+	IconClipboardCheck,
 	IconClock,
 	IconDots,
 	IconDownload,
@@ -23,6 +27,7 @@ import {
 	IconGenderFemale,
 	IconGenderMale,
 	IconHeartbeat,
+	IconHourglass,
 	IconMail,
 	IconMessage,
 	IconMoodSmile,
@@ -458,27 +463,51 @@ function NotificationOutboxCard({
 const STATUS_META: Record<string, { label: string; className: string }> = {
 	queue: {
 		label: "طابور الانتظار",
-		className: "bg-amber-50 text-amber-700 border-amber-200",
+		className: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800",
+	},
+	QUEUE: {
+		label: "طابور الانتظار",
+		className: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800",
 	},
 	"check-in": {
 		label: "التقييم",
-		className: "bg-purple-50 text-purple-700 border-purple-200",
+		className: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800",
+	},
+	EVALUATION: {
+		label: "التقييم",
+		className: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800",
 	},
 	"in-service": {
 		label: "قيد المراجعة",
-		className: "bg-blue-50 text-blue-700 border-blue-200",
+		className: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800",
+	},
+	REVIEW: {
+		label: "قيد المراجعة",
+		className: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800",
 	},
 	"awaiting-payment": {
 		label: "انتظار الرد",
-		className: "bg-indigo-50 text-indigo-700 border-indigo-200",
+		className: "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800",
+	},
+	AWAITING_REPLY: {
+		label: "انتظار الرد",
+		className: "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800",
 	},
 	done: {
 		label: "تم القبول",
-		className: "bg-emerald-50 text-emerald-700 border-emerald-200",
+		className: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800",
+	},
+	ACCEPTED: {
+		label: "تم القبول",
+		className: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800",
 	},
 	cancelled: {
 		label: "مرفوض",
-		className: "bg-rose-50 text-rose-700 border-rose-200",
+		className: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800",
+	},
+	REJECTED: {
+		label: "مرفوض",
+		className: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800",
 	},
 };
 
@@ -489,6 +518,7 @@ export function CampaignRequestSheet({
 	open,
 	onOpenChange,
 	campaignId,
+	onStatusChange,
 	onAccept,
 	onWaitlist,
 	onReject,
@@ -497,6 +527,7 @@ export function CampaignRequestSheet({
 	request: CampaignRequestItem | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	onStatusChange?: (request: CampaignRequestItem, status: CampaignRequestItem["status"]) => void;
 	onAccept?: (request: CampaignRequestItem) => void;
 	onWaitlist?: (request: CampaignRequestItem) => void;
 	onReject?: (request: CampaignRequestItem) => void;
@@ -536,6 +567,7 @@ export function CampaignRequestSheet({
 	}));
 
 	const statusMeta =
+		STATUS_META[request.status] ??
 		STATUS_META[request.column] ?? {
 			label: request.statusLabel || "معلق",
 			className: "bg-amber-50 text-amber-700 border-amber-200",
@@ -654,20 +686,73 @@ export function CampaignRequestSheet({
 							className="flex items-center justify-between gap-2"
 							dir="rtl"
 						>
-							<span
-								className={cn(
-									"rounded-[4px] px-2 py-0.5 text-[11px] font-medium border",
-									statusMeta.className,
-								)}
-							>
-								{statusMeta.label}
-							</span>
+							<DropdownMenu dir="rtl">
+								<DropdownMenuTrigger asChild>
+									<button
+										type="button"
+										className={cn(
+											"inline-flex items-center gap-1 rounded-[4px] px-2 py-0.5 text-[11px] font-semibold border cursor-pointer hover:opacity-85 transition-opacity",
+											statusMeta.className,
+										)}
+										title="انقر لتغيير مرحلة وحالة الطلب"
+									>
+										<span>{statusMeta.label}</span>
+										<IconChevronDown className="size-3 opacity-70" />
+									</button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="start" className="w-48 text-right">
+									<DropdownMenuItem
+										disabled={request.status === "QUEUE"}
+										onClick={() => onStatusChange?.(request, "QUEUE") || onWaitlist?.(request)}
+									>
+										<IconClock className="size-3.5 text-amber-600 me-2" />
+										<span>طابور الانتظار</span>
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										disabled={request.status === "EVALUATION"}
+										onClick={() => onStatusChange?.(request, "EVALUATION")}
+									>
+										<IconClipboardCheck className="size-3.5 text-purple-600 me-2" />
+										<span>التقييم</span>
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										disabled={request.status === "REVIEW"}
+										onClick={() => onStatusChange?.(request, "REVIEW")}
+									>
+										<IconActivity className="size-3.5 text-blue-600 me-2" />
+										<span>قيد المراجعة</span>
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										disabled={request.status === "AWAITING_REPLY"}
+										onClick={() => onStatusChange?.(request, "AWAITING_REPLY")}
+									>
+										<IconHourglass className="size-3.5 text-indigo-600 me-2" />
+										<span>انتظار الرد</span>
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										disabled={request.status === "ACCEPTED"}
+										onClick={() => onAccept?.(request) || onStatusChange?.(request, "ACCEPTED")}
+									>
+										<IconCheck className="size-3.5 text-emerald-600 me-2" />
+										<span>اعتماد وقبول الطلب</span>
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										disabled={request.status === "REJECTED"}
+										className="text-destructive focus:text-destructive"
+										onClick={() => onReject?.(request) || onStatusChange?.(request, "REJECTED")}
+									>
+										<IconX className="size-3.5 me-2" />
+										<span>رفض الطلب</span>
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+
 							<div className="flex items-center gap-2">
 								<span className="text-sm font-bold text-foreground">
 									{request.patientName}
 								</span>
-								<span className="text-xs text-muted-foreground tabular-nums">
-									.{request.code}#
+								<span className="font-mono text-xs text-muted-foreground" dir="ltr">
+									#{request.code}
 								</span>
 							</div>
 						</div>
@@ -810,7 +895,9 @@ export function CampaignRequestSheet({
 											جلسة الفحص والتقييم لم تُجدول بعد
 										</span>
 										<span className="text-[11px] text-muted-foreground">
-											ثبّت موعداً رسمياً في تقويم المركز لتحويل الطلب لطابور التقييم
+											{request.status === "EVALUATION"
+												? "ثبّت موعداً رسمياً بالتقويم لتحديد جلسة التقييم والفحص للطالب"
+												: "ثبّت موعداً رسمياً في تقويم المركز لتحويل الطلب لطابور التقييم"}
 										</span>
 									</div>
 								</div>
@@ -1106,49 +1193,135 @@ export function CampaignRequestSheet({
 					</div>
 
 					{/* التذييل والأزرار */}
-					<div className="flex items-center justify-between gap-3 border-t px-4 py-2.5 bg-background">
+					<div className="flex items-center justify-between gap-3 border-t px-4 py-2.5 bg-background flex-wrap">
 						<div className="flex items-center gap-2">
-							<Button
-								type="button"
-								size="sm"
-								className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 h-8 text-xs font-medium"
-								onClick={() => {
-									onAccept?.(request);
-									onOpenChange(false);
-								}}
-							>
-								<IconCheck className="size-3.5" />
-								قبول الطلب
-							</Button>
+							{request.status !== "ACCEPTED" ? (
+								<Button
+									type="button"
+									size="sm"
+									className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 h-8 text-xs font-semibold shadow-xs"
+									onClick={() => {
+										onAccept?.(request) || onStatusChange?.(request, "ACCEPTED");
+									}}
+								>
+									<IconCheck className="size-3.5" />
+									قبول الطلب واعتماد الطالب
+								</Button>
+							) : (
+								<Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-300 dark:bg-emerald-950 dark:text-emerald-300 text-xs font-semibold gap-1 py-1 px-2.5">
+									<IconCheck className="size-3.5" />
+									طالب معتمد ومقبول
+								</Badge>
+							)}
+
+							{/* قائمة تغيير المرحلة */}
+							<DropdownMenu dir="rtl">
+								<DropdownMenuTrigger asChild>
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										className="h-8 text-xs gap-1.5 font-medium"
+									>
+										<IconArrowsExchange className="size-3.5 text-muted-foreground" />
+										نقل إلى مرحلة...
+										<IconChevronDown className="size-3 opacity-60" />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="start" className="w-48 text-right">
+									<DropdownMenuItem
+										disabled={request.status === "QUEUE"}
+										onClick={() => onStatusChange?.(request, "QUEUE") || onWaitlist?.(request)}
+									>
+										<IconClock className="size-3.5 text-amber-600 me-2" />
+										<span>طابور الانتظار</span>
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										disabled={request.status === "EVALUATION"}
+										onClick={() => onStatusChange?.(request, "EVALUATION")}
+									>
+										<IconClipboardCheck className="size-3.5 text-purple-600 me-2" />
+										<span>التقييم</span>
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										disabled={request.status === "REVIEW"}
+										onClick={() => onStatusChange?.(request, "REVIEW")}
+									>
+										<IconActivity className="size-3.5 text-blue-600 me-2" />
+										<span>قيد المراجعة</span>
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										disabled={request.status === "AWAITING_REPLY"}
+										onClick={() => onStatusChange?.(request, "AWAITING_REPLY")}
+									>
+										<IconHourglass className="size-3.5 text-indigo-600 me-2" />
+										<span>انتظار الرد</span>
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
 						</div>
 
 						<div className="flex items-center gap-2">
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								className="gap-1.5 h-8 text-xs font-medium"
-								onClick={() => {
-									onWaitlist?.(request);
-									onOpenChange(false);
-								}}
-							>
-								<IconClock className="size-3.5" />
-								قائمة الانتظار
-							</Button>
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								className="border-destructive/30 text-destructive hover:bg-destructive/5 hover:text-destructive gap-1.5 h-8 text-xs font-medium"
-								onClick={() => {
-									onReject?.(request);
-									onOpenChange(false);
-								}}
-							>
-								<IconX className="size-3.5" />
-								رفض
-							</Button>
+							{request.status === "QUEUE" ? (
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									className="gap-1.5 h-8 text-xs font-medium text-purple-700 border-purple-200 hover:bg-purple-50 dark:text-purple-300 dark:border-purple-800"
+									onClick={() => {
+										onStatusChange?.(request, "EVALUATION");
+									}}
+								>
+									<IconClipboardCheck className="size-3.5 text-purple-600" />
+									تحويل للتقييم
+								</Button>
+							) : request.status === "EVALUATION" ? (
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									className="gap-1.5 h-8 text-xs font-medium text-blue-700 border-blue-200 hover:bg-blue-50 dark:text-blue-300 dark:border-blue-800"
+									onClick={() => {
+										onStatusChange?.(request, "REVIEW");
+									}}
+								>
+									<IconActivity className="size-3.5 text-blue-600" />
+									نقل للمراجعة
+								</Button>
+							) : request.status !== "ACCEPTED" ? (
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									className="gap-1.5 h-8 text-xs font-medium"
+									onClick={() => {
+										onWaitlist?.(request) || onStatusChange?.(request, "QUEUE");
+									}}
+								>
+									<IconClock className="size-3.5" />
+									قائمة الانتظار
+								</Button>
+							) : null}
+
+							{request.status !== "REJECTED" ? (
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									className="border-destructive/30 text-destructive hover:bg-destructive/5 hover:text-destructive gap-1.5 h-8 text-xs font-medium"
+									onClick={() => {
+										onReject?.(request) || onStatusChange?.(request, "REJECTED");
+									}}
+								>
+									<IconX className="size-3.5" />
+									رفض
+								</Button>
+							) : (
+								<Badge variant="outline" className="bg-rose-50 text-rose-700 border-rose-300 dark:bg-rose-950 dark:text-rose-300 text-xs font-semibold gap-1 py-1 px-2.5">
+									<IconX className="size-3.5" />
+									طلب مرفوض
+								</Badge>
+							)}
 						</div>
 					</div>
 				</div>

@@ -152,6 +152,7 @@ export function useUpdateRequestStatus(campaignId: string) {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({ queryKey: ["digital-registration", "notifications"] });
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
 		},
@@ -309,6 +310,7 @@ export function useScheduleAssessmentAppointment(campaignId: string) {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({ queryKey: ["digital-registration", "notifications"] });
 			queryClient.invalidateQueries({ queryKey: ["appointments"] });
 		},
 	});

@@ -24,6 +24,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { AppointmentColumnHeader } from "@/features/appointments/components/appointment-column-header";
 import type { AppointmentColumn, AppointmentColumnId } from "@/features/appointments/types/appointment.types";
+import { toast } from "sonner";
 import { CampaignRequestSheet } from "./campaign-request-sheet";
 import type { CampaignRequestItem } from "../types/campaign-request.types";
 import { useCampaignRequests, useUpdateRequestStatus } from "../hooks/use-digital-registration";
@@ -42,13 +43,20 @@ const CAMPAIGN_COLUMNS: AppointmentColumn[] = [
 	{ id: "cancelled" as AppointmentColumnId, name: "مرفوض", count: 0, icon: <IconX className="size-4" />, accent: "red" },
 ];
 
-const columnToStatusMap: Record<string, "QUEUE" | "EVALUATION" | "REVIEW" | "AWAITING_REPLY" | "ACCEPTED" | "REJECTED"> = {
-	queue: "QUEUE",
-	"check-in": "EVALUATION",
-	"in-service": "REVIEW",
-	"awaiting-payment": "AWAITING_REPLY",
-	done: "ACCEPTED",
-	cancelled: "REJECTED",
+const COLUMN_STATUS_MAP: Record<
+	AppointmentColumnId,
+	{
+		status: CampaignRequestItem["status"];
+		label: string;
+		variant: "warning" | "info" | "default";
+	}
+> = {
+	queue: { status: "QUEUE", label: "طابور الانتظار", variant: "warning" },
+	"check-in": { status: "EVALUATION", label: "التقييم", variant: "info" },
+	"in-service": { status: "REVIEW", label: "قيد المراجعة", variant: "info" },
+	"awaiting-payment": { status: "AWAITING_REPLY", label: "انتظار الرد", variant: "warning" },
+	done: { status: "ACCEPTED", label: "تم القبول", variant: "default" },
+	cancelled: { status: "REJECTED", label: "مرفوض", variant: "default" },
 };
 
 const EMPTY_REQUESTS: CampaignRequestItem[] = [];
@@ -121,6 +129,53 @@ export function CampaignRequestsKanban({
 		}));
 	}, [filteredData]);
 
+	const handleStatusChange = (
+		req: CampaignRequestItem,
+		newStatus: CampaignRequestItem["status"],
+	) => {
+		const statusToColumnMap: Record<CampaignRequestItem["status"], AppointmentColumnId> = {
+			QUEUE: "queue",
+			EVALUATION: "check-in",
+			REVIEW: "in-service",
+			AWAITING_REPLY: "awaiting-payment",
+			ACCEPTED: "done",
+			REJECTED: "cancelled",
+		};
+		const newColumn = statusToColumnMap[newStatus] || "queue";
+		const meta = COLUMN_STATUS_MAP[newColumn];
+
+		setLocalData((prev) => {
+			const current = prev ?? serverRequests;
+			return current.map((item) =>
+				item.id === req.id
+					? {
+							...item,
+							column: newColumn,
+							status: newStatus,
+							statusLabel: meta?.label || item.statusLabel,
+							statusVariant: meta?.variant || item.statusVariant,
+					  }
+					: item,
+			);
+		});
+
+		updateStatusMutation.mutate(
+			{
+				requestId: req.id,
+				status: newStatus,
+			},
+			{
+				onSuccess: () => {
+					toast.success(`تم تحديث حالة الطلب إلى "${meta?.label || newStatus}" بنجاح`);
+				},
+				onError: (err: any) => {
+					setLocalData(null);
+					toast.error(err.message || "فشل تحديث حالة الطلب");
+				},
+			},
+		);
+	};
+
 	const handleDataChange = (nextData: CampaignRequestItem[]) => {
 		// Detect which item changed column
 		const changedItem = nextData.find((item) => {
@@ -128,14 +183,45 @@ export function CampaignRequestsKanban({
 			return old && old.column !== item.column;
 		});
 
-		setLocalData(nextData);
-
 		if (changedItem) {
-			const newStatus = columnToStatusMap[changedItem.column] || "QUEUE";
-			updateStatusMutation.mutate({
-				requestId: changedItem.id,
-				status: newStatus,
+			const meta = COLUMN_STATUS_MAP[changedItem.column] || COLUMN_STATUS_MAP.queue;
+
+			const updatedMap = new Map(nextData.map((d) => [d.id, d]));
+			const fullUpdatedData = data.map((item) => {
+				if (item.id === changedItem.id) {
+					return {
+						...item,
+						column: changedItem.column,
+						status: meta.status,
+						statusLabel: meta.label,
+						statusVariant: meta.variant,
+					};
+				}
+				const inNext = updatedMap.get(item.id);
+				return inNext || item;
 			});
+
+			setLocalData(fullUpdatedData);
+
+			updateStatusMutation.mutate(
+				{
+					requestId: changedItem.id,
+					status: meta.status,
+				},
+				{
+					onSuccess: () => {
+						toast.success(`تم نقل الطلب إلى "${meta.label}" بنجاح`);
+					},
+					onError: (err: any) => {
+						setLocalData(null);
+						toast.error(err.message || "فشل تحديث حالة الطلب");
+					},
+				},
+			);
+		} else {
+			const updatedMap = new Map(nextData.map((d) => [d.id, d]));
+			const fullUpdatedData = data.map((item) => updatedMap.get(item.id) || item);
+			setLocalData(fullUpdatedData);
 		}
 	};
 
@@ -296,24 +382,10 @@ export function CampaignRequestsKanban({
 				request={selectedRequest}
 				open={!!selectedRequest}
 				onOpenChange={(open) => !open && setSelectedRequestId(null)}
-				onAccept={(req) => {
-					updateStatusMutation.mutate({
-						requestId: req.id,
-						status: "ACCEPTED",
-					});
-				}}
-				onWaitlist={(req) => {
-					updateStatusMutation.mutate({
-						requestId: req.id,
-						status: "QUEUE",
-					});
-				}}
-				onReject={(req) => {
-					updateStatusMutation.mutate({
-						requestId: req.id,
-						status: "REJECTED",
-					});
-				}}
+				onStatusChange={handleStatusChange}
+				onAccept={(req) => handleStatusChange(req, "ACCEPTED")}
+				onWaitlist={(req) => handleStatusChange(req, "QUEUE")}
+				onReject={(req) => handleStatusChange(req, "REJECTED")}
 			/>
 		</div>
 	);
