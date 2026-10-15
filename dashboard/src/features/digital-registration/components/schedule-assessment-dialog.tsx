@@ -196,7 +196,7 @@ export function ScheduleAssessmentDialog({
 								<SelectTrigger className="w-full h-9 text-xs bg-background">
 									<SelectValue placeholder={isLoadingStaff ? "جاري تحميل قائمة الكادر..." : "اختر الأخصائي المسؤول"} />
 								</SelectTrigger>
-								<SelectContent dir="rtl">
+								<SelectContent dir="rtl" position="popper" sideOffset={4} className="w-[--radix-select-trigger-width]">
 									{staff.map((s) => (
 										<SelectItem key={s.id} value={s.id}>
 											<div className="flex items-center gap-2">
@@ -253,7 +253,7 @@ export function ScheduleAssessmentDialog({
 								<SelectTrigger className="w-full h-9 text-xs bg-background">
 									<SelectValue />
 								</SelectTrigger>
-								<SelectContent dir="rtl">
+								<SelectContent dir="rtl" position="popper" sideOffset={4} className="w-[--radix-select-trigger-width]">
 									<SelectItem value="30">تقييم سريع ومبدئي (30 دقيقة)</SelectItem>
 									<SelectItem value="45">تقييم قياسي شامل (45 دقيقة)</SelectItem>
 									<SelectItem value="60">جلسة فحص وتدقيق كاملة (60 دقيقة)</SelectItem>
