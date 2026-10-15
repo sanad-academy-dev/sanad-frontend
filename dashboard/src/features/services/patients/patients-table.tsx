@@ -16,7 +16,7 @@ import {
 	IconEdit,
 	IconEye,
 	IconMoodSmile,
-	IconPause,
+	IconPlayerPause,
 	IconPlus,
 	IconTrash,
 	IconUser,
@@ -298,7 +298,7 @@ export function PatientsTable() {
 										<IconChevronDown className="size-3.5" />
 										{isPendingOrSuspended ? (
 											<>
-												<IconPause className="size-3" />
+												<IconPlayerPause className="size-3" />
 												معلق
 											</>
 										) : (
@@ -321,7 +321,7 @@ export function PatientsTable() {
 										onClick={() => handleStatusChange(p, "SUSPENDED")}
 										className="gap-2 text-xs"
 									>
-										<IconPause className="size-3.5 text-amber-600" />
+										<IconPlayerPause className="size-3.5 text-amber-600" />
 										معلق
 									</DropdownMenuItem>
 								</DropdownMenuContent>
