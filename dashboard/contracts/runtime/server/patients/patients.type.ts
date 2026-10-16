@@ -99,6 +99,9 @@ export type PatientResponse = {
 	guardianRelationship?: string | null;
 	emergencyContactPhone?: string | null;
 	emergencyContactName?: string | null;
+	guardianName?: string | null;
+	guardianPhone?: string | null;
+	guardianEmail?: string | null;
 	editsCount: number;
 	createdAt: Date | string;
 	updatedAt: Date | string;

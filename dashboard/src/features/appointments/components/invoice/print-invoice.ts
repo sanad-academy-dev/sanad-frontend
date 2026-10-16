@@ -1,99 +1,110 @@
 import type {
-	AppointmentProductResponse,
-	AppointmentResponse,
-	AppointmentServiceResponse,
+  AppointmentProductResponse,
+  AppointmentResponse,
+  AppointmentServiceResponse,
 } from "@/server/appointments/appointments.type";
 import type { InvoiceResponse } from "@/server/invoices/invoices.type";
 
 // الكمية المحاسَبة = الكمية − المجانية (صفر إن كان الصنف مجانيًا بالكامل)
 const billableProductQty = (p: {
-	quantity: number;
-	freeQuantity: number;
-	fullyFree: boolean;
+  quantity: number;
+  freeQuantity: number;
+  fullyFree: boolean;
 }) => (p.fullyFree ? 0 : Math.max(0, p.quantity - p.freeQuantity));
 
 // يتحمّل Decimal ونصًّا ورقمًا وقيمًا فارغة — انظر التعليق في payment-success-modal
 const formatMoney = (value: unknown) => {
-	const n = value == null ? 0 : Number(value);
-	return Number.isFinite(n) ? n.toLocaleString("en-US", { maximumFractionDigits: 2 }) : "0";
+  const n = value == null ? 0 : Number(value);
+  return Number.isFinite(n)
+    ? n.toLocaleString("en-US", { maximumFractionDigits: 2 })
+    : "0";
 };
 
 const paymentMethodLabel = (method: InvoiceResponse["paymentMethod"]) =>
-	method === "CASH" ? "كاش" : "—";
+  method === "CASH" ? "كاش" : "—";
 
 export interface InvoicePrintData {
-	invoice: InvoiceResponse;
-	services: AppointmentServiceResponse[];
-	products?: AppointmentProductResponse[];
-	appointment?: AppointmentResponse;
-	ownerName: string;
-	patientName: string;
+  invoice: InvoiceResponse;
+  services: AppointmentServiceResponse[];
+  products?: AppointmentProductResponse[];
+  appointment?: AppointmentResponse;
+  ownerName: string;
+  patientName: string;
 }
 
 // يبني فاتورة مستقلّة (RTL) ويفتحها في نافذة منفصلة ثم يستدعي حوار الطباعة.
 // نافذة منفصلة بدل طباعة الصفحة كاملة لأن اللوحة عنصر ثابت overlay داخل التطبيق
 // (نفس أسلوب print-expense-receipt.ts).
 export function printInvoice({
-	invoice,
-	services,
-	products = [],
-	appointment,
-	ownerName,
-	patientName,
+  invoice,
+  services,
+  products = [],
+  appointment,
+  ownerName,
+  patientName,
 }: InvoicePrintData) {
-	const win = window.open("", "_blank", "width=720,height=900");
-	if (!win) return;
+  const win = window.open("", "_blank", "width=720,height=900");
+  if (!win) return;
 
-	// null-safe: أي حقل مفقود (code/اسم…) لا يجب أن يرمي استثناءً فيترك نافذة بيضاء
-	const esc = (s: unknown) =>
-		String(s ?? "").replace(
-			/[&<>"']/g,
-			(c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] ?? c,
-		);
+  // null-safe: أي حقل مفقود (code/اسم…) لا يجب أن يرمي استثناءً فيترك نافذة بيضاء
+  const esc = (s: unknown) =>
+    String(s ?? "").replace(
+      /[&<>"']/g,
+      (c) =>
+        ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;",
+        })[c] ?? c,
+    );
 
-	const paidDateLabel = invoice.paidAt
-		? new Intl.DateTimeFormat("ar-SA", {
-				day: "numeric",
-				month: "long",
-				year: "numeric",
-			}).format(new Date(invoice.paidAt))
-		: "";
+  const paidDateLabel = invoice.paidAt
+    ? new Intl.DateTimeFormat("ar-SA", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      }).format(new Date(invoice.paidAt))
+    : "";
 
-	const consultationFee = Number(appointment?.consultationFeeSnapshot ?? 0);
+  const consultationFee = Number(appointment?.consultationFeeSnapshot ?? 0);
 
-	// صفوف بنود الفاتورة: الكشف ثم الدورات ثم الأصناف
-	const lineRows: [string, string][] = [];
-	if (consultationFee > 0) {
-		lineRows.push([
-			appointment?.consultationType?.name ?? "كشف",
-			`${formatMoney(consultationFee)} ر.س`,
-		]);
-	}
-	for (const row of services) {
-		lineRows.push([
-			row.service.name,
-			`${formatMoney(Number(row.priceSnapshot) * row.quantity)} ر.س`,
-		]);
-	}
-	for (const row of products) {
-		const qty = billableProductQty(row);
-		lineRows.push([
-			row.nameSnapshot,
-			qty === 0 ? "مجاني" : `${formatMoney(Number(row.priceSnapshot) * qty)} ر.س`,
-		]);
-	}
+  // صفوف بنود الفاتورة: الكشف ثم الدورات ثم الأصناف
+  const lineRows: [string, string][] = [];
+  if (consultationFee > 0) {
+    lineRows.push([
+      appointment?.consultationType?.name ?? "كشف",
+      `${formatMoney(consultationFee)} ج.م`,
+    ]);
+  }
+  for (const row of services) {
+    lineRows.push([
+      row.service.name,
+      `${formatMoney(Number(row.priceSnapshot) * row.quantity)} ج.م`,
+    ]);
+  }
+  for (const row of products) {
+    const qty = billableProductQty(row);
+    lineRows.push([
+      row.nameSnapshot,
+      qty === 0
+        ? "مجاني"
+        : `${formatMoney(Number(row.priceSnapshot) * qty)} ج.م`,
+    ]);
+  }
 
-	const summaryRows: [string, string][] = [
-		["المجموع الفرعي", `${formatMoney(invoice.subtotal)} ر.س`],
-		[
-			`ضريبة القيمة المضافة (${invoice.vatRate?.toString() ?? "0"}%)`,
-			`${formatMoney(invoice.vatAmount)} ر.س`,
-		],
-		["الخصم", `${formatMoney(invoice.discount)} ر.س`],
-		["وسيلة الدفع", paymentMethodLabel(invoice.paymentMethod)],
-	];
+  const summaryRows: [string, string][] = [
+    ["المجموع الفرعي", `${formatMoney(invoice.subtotal)} ج.م`],
+    [
+      `ضريبة القيمة المضافة (${invoice.vatRate?.toString() ?? "0"}%)`,
+      `${formatMoney(invoice.vatAmount)} ج.م`,
+    ],
+    ["الخصم", `${formatMoney(invoice.discount)} ج.م`],
+    ["وسيلة الدفع", paymentMethodLabel(invoice.paymentMethod)],
+  ];
 
-	const html = `<!doctype html>
+  const html = `<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8" />
@@ -126,7 +137,7 @@ export function printInvoice({
 
 	<div class="total">
 		<p class="caption">المبلغ الإجمالي</p>
-		<span class="amount">${esc(formatMoney(invoice.total))} ر.س</span>
+		<span class="amount">${esc(formatMoney(invoice.total))} ج.م</span>
 	</div>
 
 	<p class="meta">
@@ -137,21 +148,21 @@ export function printInvoice({
 	<h2>ملخص الدورة</h2>
 	<table>
 		${lineRows
-			.map(
-				([l, v]) =>
-					`<tr><td class="label">${esc(l)}</td><td class="value">${esc(v)}</td></tr>`,
-			)
-			.join("")}
+      .map(
+        ([l, v]) =>
+          `<tr><td class="label">${esc(l)}</td><td class="value">${esc(v)}</td></tr>`,
+      )
+      .join("")}
 	</table>
 
 	<h2>تفاصيل المعاملة</h2>
 	<table>
 		${summaryRows
-			.map(
-				([l, v]) =>
-					`<tr><td class="label">${esc(l)}</td><td class="value">${esc(v)}</td></tr>`,
-			)
-			.join("")}
+      .map(
+        ([l, v]) =>
+          `<tr><td class="label">${esc(l)}</td><td class="value">${esc(v)}</td></tr>`,
+      )
+      .join("")}
 	</table>
 
 	<p class="foot">وثيقة رسمية صادرة عن نظام إدارة الأكاديمية — تاريخ الطباعة: ${new Date().toLocaleDateString("en-CA")}</p>
@@ -159,19 +170,19 @@ export function printInvoice({
 </body>
 </html>`;
 
-	win.document.open();
-	win.document.write(html);
-	win.document.close();
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
 
-	// نستدعي الطباعة من النافذة الأصل بعد اكتمال التحميل بدل الاعتماد على سكربت مضمّن
-	// (قد لا يُنفَّذ سكربت document.write في بعض المتصفحات) — مع مهلة احتياطية.
-	const triggerPrint = () => {
-		win.focus();
-		win.print();
-	};
-	if (win.document.readyState === "complete") {
-		setTimeout(triggerPrint, 200);
-	} else {
-		win.addEventListener("load", () => setTimeout(triggerPrint, 200));
-	}
+  // نستدعي الطباعة من النافذة الأصل بعد اكتمال التحميل بدل الاعتماد على سكربت مضمّن
+  // (قد لا يُنفَّذ سكربت document.write في بعض المتصفحات) — مع مهلة احتياطية.
+  const triggerPrint = () => {
+    win.focus();
+    win.print();
+  };
+  if (win.document.readyState === "complete") {
+    setTimeout(triggerPrint, 200);
+  } else {
+    win.addEventListener("load", () => setTimeout(triggerPrint, 200));
+  }
 }

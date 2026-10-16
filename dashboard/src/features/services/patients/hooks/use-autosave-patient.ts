@@ -2,7 +2,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/lib/api";
-import type { PatientResponse, UpdatePatientInput } from "@/server/patients/patients.type";
+import type {
+	PatientResponse,
+	UpdatePatientInput,
+} from "@sanad/contracts/runtime/server/patients/patients.type";
 
 // نوع النقل لا نوع الـ DAO: `birthDate` يسافر نصًّا (YYYY-MM-DD) بينما نوع Prisma
 // يقبل `Date | string`. تثبيت النص هنا يمنع تسرّب كائن Date إلى الطلب وإلى الكاش.

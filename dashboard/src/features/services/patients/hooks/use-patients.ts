@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { api } from "@/lib/api";
-import type { PatientResponse } from "@/server/patients/patients.type";
+import type { PatientResponse } from "@sanad/contracts/runtime/server/patients/patients.type";
 
 const EMPTY_PATIENTS: PatientResponse[] = [];
 

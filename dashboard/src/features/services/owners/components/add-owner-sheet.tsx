@@ -1,4 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+	createOwnerSchema,
+	type OwnerResponse,
+} from "@sanad/contracts/runtime/server/owners/owners.type";
 import { IconPlus } from "@tabler/icons-react";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useEffect, useState } from "react";
@@ -38,7 +42,6 @@ import { DiscardConfirmDialog } from "@/features/services/patients/components/di
 import { useCreateOwner } from "@/features/services/patients/hooks/use-create-owner";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { useFormProgress } from "@/hooks/use-form-progress";
-import { createOwnerSchema, type OwnerResponse } from "@sanad/contracts/runtime/server/owners/owners.type";
 
 const addOwnerSheetSchema = createOwnerSchema.extend({
 	patientIds: z.array(z.string()).min(1, "يرجى اختيار طفل واحد على الأقل"),
@@ -493,6 +496,9 @@ export function AddOwnerSheet({
 			<AddPatientDialog
 				open={patientDialogOpen}
 				onClose={() => setPatientDialogOpen(false)}
+				defaultGuardianName={watch("name")}
+				defaultGuardianPhone={watch("phone")}
+				defaultGuardianEmail={watch("email")}
 				onSuccess={(patientId) => {
 					const current = getValues("patientIds") ?? [];
 					if (!current.includes(patientId)) {

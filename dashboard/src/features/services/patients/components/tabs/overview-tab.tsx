@@ -1,8 +1,22 @@
-import { IconCake, IconScale, IconUsers, IconWeight } from "@tabler/icons-react";
+import type { PatientResponse } from "@sanad/contracts/runtime/server/patients/patients.type";
+import {
+	IconAlertCircle,
+	IconBus,
+	IconCake,
+	IconCoins,
+	IconCreditCard,
+	IconFirstAidKit,
+	IconPhoneCall,
+	IconScale,
+	IconSchool,
+	IconStethoscope,
+	IconUsers,
+	IconWeight,
+} from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
-
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
 import { TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -12,15 +26,18 @@ import {
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import type { PatientTabProps } from "@/features/services/patients/types/tabs.types";
 import { cn } from "@/lib/utils";
-import type { PatientResponse } from "@/server/patients/patients.type";
 
-function getInitials(name: string) {
-	return name
-		.split(" ")
-		.slice(0, 2)
-		.map((w) => w[0])
-		.join("")
-		.toUpperCase();
+function getInitials(name?: string | null) {
+	return (
+		(name ?? "")
+			.trim()
+			.split(/\s+/)
+			.filter(Boolean)
+			.slice(0, 2)
+			.map((w) => w[0])
+			.join("")
+			.toUpperCase() || "—"
+	);
 }
 
 function StatCard({
@@ -377,6 +394,141 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 								من العلامات الحيوية
 							</span>
 						</div>
+					</InfoField>
+				</div>
+			</div>
+
+			{/* بيانات الرسوم والمصروفات */}
+			<div className="flex flex-col gap-3">
+				<p className="font-bold text-base">بيانات الرسوم والمصروفات</p>
+				<div className="grid grid-cols-2 gap-3">
+					<InfoField
+						label="نوع الرسوم"
+						icon={<IconCreditCard className="size-3.5" />}
+					>
+						<EditableText
+							value={patient.feeType}
+							placeholder="حدد نوع الرسوم..."
+							onSave={(v) => patch({ feeType: v })}
+						/>
+					</InfoField>
+
+					<InfoField
+						label="تفعيل المصروفات"
+						icon={<IconCoins className="size-3.5" />}
+					>
+						<div className="flex items-center justify-between gap-2">
+							<span
+								className={cn(
+									"inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border",
+									patient.pocketMoneyEnabled !== false
+										? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300"
+										: "bg-muted text-muted-foreground border-border",
+								)}
+							>
+								{patient.pocketMoneyEnabled !== false ? "مفعّل" : "معطّل"}
+							</span>
+							<Switch
+								checked={patient.pocketMoneyEnabled !== false}
+								onCheckedChange={(val) => patch({ pocketMoneyEnabled: val })}
+							/>
+						</div>
+					</InfoField>
+
+					<InfoField
+						label="وسيلة النقل"
+						icon={<IconBus className="size-3.5" />}
+					>
+						<EditableText
+							value={patient.transportation}
+							placeholder="وسيلة النقل..."
+							onSave={(v) => patch({ transportation: v })}
+						/>
+					</InfoField>
+
+					<InfoField
+						label="الحضانة السابقة"
+						icon={<IconSchool className="size-3.5" />}
+					>
+						<EditableText
+							value={patient.previousNursery}
+							placeholder="الحضانة السابقة إن وجدت..."
+							onSave={(v) => patch({ previousNursery: v })}
+						/>
+					</InfoField>
+				</div>
+			</div>
+
+			{/* المعلومات الطبية والأكاديمية */}
+			<div className="flex flex-col gap-3">
+				<p className="font-bold text-base">المعلومات الطبية والأكاديمية</p>
+				<div className="grid grid-cols-2 gap-3">
+					<InfoField
+						label="الفصل"
+						icon={<IconSchool className="size-3.5" />}
+					>
+						<EditableText
+							value={patient.classroom || "النجوم"}
+							placeholder="الفصل..."
+							onSave={(v) => patch({ classroom: v })}
+						/>
+					</InfoField>
+
+					<InfoField
+						label="فصيلة الدم"
+						icon={<IconFirstAidKit className="size-3.5" />}
+					>
+						<EditableText
+							value={patient.bloodType || "A+"}
+							placeholder="فصيلة الدم..."
+							onSave={(v) => patch({ bloodType: v })}
+						/>
+					</InfoField>
+
+					<InfoField
+						label="الحالة النمائية"
+						icon={<IconStethoscope className="size-3.5" />}
+					>
+						<span>
+							{patient.developmentStatus === "ADVANCED"
+								? "متقدم"
+								: patient.developmentStatus === "NEEDS_FOLLOW_UP"
+									? "يحتاج متابعة"
+									: "طبيعي"}
+						</span>
+					</InfoField>
+
+					<InfoField
+						label="الحساسيات"
+						icon={<IconAlertCircle className="size-3.5 text-amber-500" />}
+					>
+						<EditableText
+							value={patient.allergies}
+							placeholder="الحساسيات المعروفة..."
+							onSave={(v) => patch({ allergies: v })}
+						/>
+					</InfoField>
+
+					<InfoField
+						label="حالات صحية"
+						icon={<IconFirstAidKit className="size-3.5 text-rose-500" />}
+					>
+						<EditableText
+							value={patient.healthConditions}
+							placeholder="حالات صحية خاصة..."
+							onSave={(v) => patch({ healthConditions: v })}
+						/>
+					</InfoField>
+
+					<InfoField
+						label="رقم وجهة الطوارئ"
+						icon={<IconPhoneCall className="size-3.5" />}
+					>
+						<span>
+							{patient.emergencyContactName
+								? `${patient.emergencyContactName} (${patient.emergencyContactPhone || "—"})`
+								: patient.emergencyContactPhone || "—"}
+						</span>
 					</InfoField>
 				</div>
 			</div>

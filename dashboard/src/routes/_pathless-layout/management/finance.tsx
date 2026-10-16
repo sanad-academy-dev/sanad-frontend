@@ -62,7 +62,7 @@ const paymentSubjectOf = (
 					id: onlyService.id,
 					name: onlyService.service.name,
 					badge: "دورة",
-					amountLabel: `${money(Number(onlyService.priceSnapshot) * onlyService.quantity)} ر.س`,
+					amountLabel: `${money(Number(onlyService.priceSnapshot) * onlyService.quantity)} ج.م`,
 				},
 			]
 		: [
@@ -72,7 +72,7 @@ const paymentSubjectOf = (
 								id: "consultation",
 								name: subject.consultationName ?? "كشف",
 								badge: "كشف",
-								amountLabel: `${money(subject.consultationFee)} ر.س`,
+								amountLabel: `${money(subject.consultationFee)} ج.م`,
 							},
 						]
 					: []),
@@ -80,7 +80,7 @@ const paymentSubjectOf = (
 					id: line.id,
 					name: line.name,
 					badge: subject.source === "LAB" ? "تحليل" : "دورة",
-					amountLabel: `${money(Number(line.priceSnapshot) * line.quantity)} ر.س`,
+					amountLabel: `${money(Number(line.priceSnapshot) * line.quantity)} ج.م`,
 				})),
 			];
 
@@ -157,7 +157,7 @@ function RouteComponent() {
 		{
 			title: "إجمالي الإيرادات",
 			value: stats?.revenue ?? 0,
-			valueLabel: `ر.س ${(stats?.revenue ?? 0).toLocaleString("ar-SA", { maximumFractionDigits: 2 })}`,
+			valueLabel: `ج.م ${(stats?.revenue ?? 0).toLocaleString("ar-SA", { maximumFractionDigits: 2 })}`,
 			// التفصيل يجعل الرقم قابلًا للتفسير بدل أن يكون مجموعًا مبهمًا
 			tooltip: `مجموع المحصّل — فواتير الجلسات: ${(stats?.invoiceRevenue ?? 0).toLocaleString("ar-SA", { maximumFractionDigits: 2 })} + مبيعات نقاط البيع: ${(stats?.salesRevenue ?? 0).toLocaleString("ar-SA", { maximumFractionDigits: 2 })}`,
 		},

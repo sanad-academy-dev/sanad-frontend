@@ -15,6 +15,7 @@ Add a new **المصروفات (Expenses)** tab to the finance management page (
 - Tab is **appended last** in the finance header (after invoices / discounts / care-plans / enrollments).
 
 Deferred to later passes:
+
 - Prisma `Expense` model + migration
 - Server module (`controller` / `model` / `dao` / `type`)
 - Real data wiring (stats, list, create/edit/delete)
@@ -55,10 +56,12 @@ src/features/finance/expenses/
 ```
 
 Wiring:
+
 - `finance-tabs.types.ts` — add `expenses` to `FinanceTab` union + `FINANCE_TABS` array (appended).
 - `finance.tsx` — render `<ExpensesTab />` when `tab === "expenses"`.
 
 ### Conventions honored
+
 - Tailwind CSS 4 utility classes only.
 - `Stats` common component with `variant="inventory"` and same padding as other tabs.
 - `<hr className="my-2" />` separators between stats / toolbar / content (matches other tabs).
@@ -84,16 +87,19 @@ Reference feature: `src/features/finance/care-plans/` (خطط الرعاية / `
 ## Status: ✅ Pass 1 complete (frontend UI)
 
 Files added:
+
 - `src/features/finance/expenses/components/expenses-tab.tsx`
 - `src/features/finance/expenses/components/expenses-toolbar.tsx`
 - `src/features/finance/expenses/components/expenses-empty.tsx`
 - `public/illustrations/expenses-empty.svg` — exact wallet SVG from Figma node `2928-39226` (CSS `var(--fill-0, …)` wrappers flattened to their hex fallbacks so it renders inside `<img>`).
 
 Files edited:
+
 - `src/features/finance/invoices/types/finance-tabs.types.ts` — added `expenses` tab (appended last).
 - `src/routes/_pathless-layout/management/finance.tsx` — render `<ExpensesTab />` on `tab === "expenses"`.
 
 Verification:
+
 - `bun run typecheck` (`tsc --noEmit`) — passes.
 - `bunx biome format` — clean.
 - All three new modules requested through the running Vite dev server (`http://localhost:3000/src/.../expenses-*.tsx`) — each returned valid transformed JS (no compile/import errors). This exercises the exact module the browser executes.
@@ -104,13 +110,16 @@ Verification:
 Implemented the create-expense side sheet from **5 Figma states** (nodes `2928-39479`, `2928-40041`, `2928-40443`, `2928-40845`, `2928-41247`) — which are all states of one sheet, not five sheets. Reference for structure/conventions: `create-care-plan-sheet.tsx` (خطط الرعاية).
 
 Files added:
+
 - `src/features/finance/expenses/data/expenses.ts` — UI-only form types (`CreateExpenseFormValues`, defaults, required fields, field labels, option lists, attachment factories). No Prisma model exists yet, so these are hand-written per the CLAUDE.md UI-only exception; structured to swap to `Prisma.ExpenseUncheckedCreateInput` + `z.infer` when the backend lands.
 - `src/features/finance/expenses/components/create-expense-sheet.tsx` — the sheet.
 
 Files edited:
+
 - `expenses-tab.tsx` — added `sheetOpen` state; `handleCreate` opens the sheet; renders `<CreateExpenseSheet>`. The toolbar `إنشاء مصروف` and empty-state CTA both open it.
 
 Sheet spec captured from Figma (RTL right→left, top→bottom):
+
 - Header `المصروفات ‹ طلب مصروف` + required-field progress bar (mirrors care-plans header).
 - Fields: `اسم المصروف`* | `مقدم الطلب`* · `القسم` | `الفئة` · `المبلغ (ريال سعودي)`* | `طريقة الدفع` · `الفرع`* (`*` = مطلوب).
 - `المستندات والروابط` — popover `أضف مستندًا أو رابطًا...` → `إضافة رابط` / `إضافة مستند`; link chip (purple pill + X) and document row (icon + filename + date + view/download/remove).
@@ -123,6 +132,7 @@ RTL: inherits `dir="rtl"` from `<html>`; the sheet + inner containers set `dir="
 Still frontend-only: `مراجعة الطلب` / `حفظ كمسودة` don't persist; `إضافة مستند` inserts a demo document (no real upload); option lists (departments/categories/payment methods) are placeholder data. Deferred: Prisma `Expense` model + API, real requester/branch data, unsaved-changes dialog, file upload.
 
 Verification (Pass 2):
+
 - `bun run typecheck` — passes.
 - `biome format` — clean.
 - `create-expense-sheet.tsx`, `expenses.ts`, `expenses-tab.tsx` all transform cleanly through the Vite dev server (every import resolves, JSX compiles).
@@ -133,13 +143,16 @@ Verification (Pass 2):
 After clicking **مراجعة الطلب** the request is "saved" (a local record is built) and the sheet switches — in place — to the review view (Figma node `2928-43993`): request summary + documents + the **مسار الموافقات** approval timeline + a comment box + a share/print/export footer.
 
 Files added:
+
 - `src/features/finance/expenses/data/expense-review.ts` — UI-only review types: `SubmittedExpenseRequest`, `ApprovalStep`/`ApprovalStepAction`/status enums, `EXPENSE_STATUS_LABELS`, `SEED_APPROVAL_STEPS` (6 steps matching the design), and `buildSubmittedExpenseRequest(values, attachments, code)` which maps form values → display labels.
 - `src/features/finance/expenses/components/expense-review-panel.tsx` — the review panel.
 
 Files edited:
+
 - `create-expense-sheet.tsx` — added `submittedRequest` + `approvalSteps` state; `مراجعة الطلب` now builds the record (`EXP-####` local code) and renders `<ExpenseReviewPanel>` instead of the form; `تعديل الطلب` returns to the form; approval action chips mark their step done (demo). Reset on sheet open.
 
 Review view spec (from Figma, RTL):
+
 - Header breadcrumb `المصروفات › طلب مصروف › مراجعة الطلب`.
 - Title `مراجعة … . EXP-####` + status pill `قيد المراجعة`.
 - Read-only detail rows (icon+label right, value left): مقدم الطلب، القسم، الفئة، الفرع، المورد، المبلغ، طريقة الدفع، التاريخ.
@@ -150,6 +163,7 @@ Review view spec (from Figma, RTL):
 Still frontend-only: the record is in component state (not persisted); approval chips, share/print/PDF, and the comment box are non-functional demos. Deferred to the backend pass: real Expense + ApprovalStep models, actual actor data, persistence, PDF export.
 
 Verification (Pass 3):
+
 - `bun run typecheck` — passes.
 - `biome format` — clean.
 - `expense-review-panel.tsx`, `expense-review.ts`, `create-expense-sheet.tsx` all transform cleanly through Vite.
@@ -160,19 +174,23 @@ Verification (Pass 3):
 The "ارسال طلب المصروف للمراجعة" step no longer shows a static `تم الارسال` badge — it shows an **إرسال للمراجعة** button that opens a send-request dialog (email-composer style, Figma nodes `2963-837922`, `2963-840131`, `2984-57466`). Until the request is sent, all approval action chips (`رفض`/`اعتماد`/`صرف المصروف`) are **disabled**. On send: the step flips to `تم الارسال`, the chips become clickable, and a success toast fires (`تم إرسال طلب الصرف بنجاح...`).
 
 Files added:
+
 - `src/features/finance/expenses/components/send-review-request-dialog.tsx` — the dialog (header breadcrumb, `إلى:` recipients with chips + `أضف مسؤول` popover picker, `الموضوع`, body with AI sparkle, PDF attachment chip, `قالب البريد` template dropdown + formatting toolbar, footer `إرسال الطلب`/`إلغاء`).
 
 Files edited:
+
 - `data/expense-review.ts` — `ApprovalStep.hasSendButton`; the seed "sent" step now uses `hasSendButton` (state `pending`) instead of a `تم الارسال` badge; added `SendReviewRequestValues` + `ReviewRequestRecipient`, seed recipients/options, `buildSendReviewRequestDefaults`, and email-template list.
 - `expense-review-panel.tsx` — renders the send button for `hasSendButton` steps (→ `تم الارسال` badge once sent); `ActionChip` gains a `disabled` prop; all action chips are disabled while `!reviewSent`; new `reviewSent` + `onSendReview` props.
 - `create-expense-sheet.tsx` — `sendDialogOpen` + `reviewSent` state; the send button opens `<SendReviewRequestDialog>`; on send marks the step done, enables chips, and toasts; approval actions no-op until sent.
 
 Design mapping:
+
 - Dialog #`2963-837922` = composed state; #`2963-840131` = recipient dropdown open (implemented as the `أضف مسؤول` popover with checkable options); #`2984-57466` = post-send success toast.
 
 Still frontend-only: recipients/templates are seed data; the AI sparkle, formatting toolbar, print/attach, and the email itself are non-functional; nothing is persisted.
 
 Verification (Pass 4):
+
 - `bun run typecheck` — passes.
 - `biome format` — clean.
 - `send-review-request-dialog.tsx`, `expense-review-panel.tsx`, `expense-review.ts`, `create-expense-sheet.tsx` all transform cleanly through Vite.
@@ -181,10 +199,12 @@ Verification (Pass 4):
 ## Pass 4b — Dialog RTL fixes (user-reported)
 
 Two bugs reported after Pass 4, fixed against Figma `2963-840581`:
+
 - **Duplicate close X**: the header's second button used `IconPlus` rotated 45° (renders as a ✕). Replaced with `IconArrowsDiagonal` (the ⤢ expand icon from the design) — now exactly one X + one expand icon.
 - **Broken RTL layout**: the dialog forced `flex flex-col`/`flex-1` inside `DialogContent`'s base `grid`, which broke height/scroll. Removed the flex override (block flow inside the grid, `max-h-[85vh]` + body `overflow-y-auto`, matching `payment-modal.tsx`). Toolbar and footer re-aligned to the design (`قالب البريد` + formatting icons on the left; `إرسال الطلب`/`إلغاء` on the left) via `flex-row-reverse` + `justify-end`. Added an sr-only `DialogTitle` for a11y.
 
 A second round of user feedback (side-by-side with the correct design) surfaced row-alignment bugs I then fixed:
+
 - **إلى:** row — label now rightmost, recipient chip beside it, `أضف مسؤول` on the far left (was: chip on the left, label far right).
 - **الموضوع** row — label rightmost with the subject text hugging it (was: full-width input pushing the label to the opposite edge).
 
@@ -195,6 +215,7 @@ Verified visually: rendered the dialog and review panel through a throwaway `/di
 **Exact مسار الموافقات icons** (Figma nodes `2928-44068/44085/44105/44125/44145`, `2963-840580`): the timeline was using Tabler approximations. Extracted the real HugeIcons SVGs from Figma and inlined them as `approval-step-icons.tsx` (`IconFileAdd`, `IconMailSend`, `IconDocumentValidation`, `IconValidationApproval`, `IconWebValidation`). `STEP_ICONS` now maps to these. Badge coloring matches the design: the `created` step is filled blue (`#4f6ae0`), the rest are light grey (`#f4f4f4`).
 
 **Card/list views + العرض toggle** (Figma `2928-38741`): the expenses tab now shows records (seed data) as a 4-column card grid by default, toggleable to a list via the **العرض** dropdown (بطاقات / قائمة).
+
 - `data/expense-records.ts` — `ExpenseRecord`, `ExpenseCardStatus` (+ colored badge meta), mini-stepper model, `ExpensesViewMode`, `SEED_EXPENSE_RECORDS`.
 - `expense-card.tsx` — status badge (top-left), title/subtitle, meta row (requester/code/amount/date), a mini horizontal stepper (إرسال → المدير العام → المدير المالي → الدفع with a blue connector over active nodes), and رفض/اعتماد/قبول action chips.
 - `expenses-grid.tsx` / `expenses-list.tsx` — the two views.
@@ -206,11 +227,13 @@ Verified with real headless-Chrome screenshots (throwaway `/dialog-preview` rout
 Still frontend-only: records are seed data; card action chips and the `...` menu are non-functional.
 
 ### Card RTL fix (important)
-The card grid rendered fully flipped at first because the Figma card is **not** an RTL component — it's an **LTR flex layout with right-aligned content** (`items-end`, `text-right`, `justify-between`, value-first DOM). Inside the app's `<html dir="rtl">` it inherited RTL and mirrored every row. Fix: `dir="ltr"` on the card root (Arabic words still render correctly via browser bidi; only the box layout stays LTR). This is now **Rule 0** in AGENTS.md → RTL Layout Rules: *read the design's actual flex direction via `get_design_context` first; some components need explicit `dir="ltr"`.*
+
+The card grid rendered fully flipped at first because the Figma card is **not** an RTL component — it's an **LTR flex layout with right-aligned content** (`items-end`, `text-right`, `justify-between`, value-first DOM). Inside the app's `<html dir="rtl">` it inherited RTL and mirrored every row. Fix: `dir="ltr"` on the card root (Arabic words still render correctly via browser bidi; only the box layout stays LTR). This is now **Rule 0** in AGENTS.md → RTL Layout Rules: _read the design's actual flex direction via `get_design_context` first; some components need explicit `dir="ltr"`._
 
 ## Pass 6 — اعتماد dialog + success toast
 
 **Approve dialog** (Figma `2963-841834`): clicking an `اعتماد` action chip on a `مراجعة المدير العام`/`اعتماد المدير المالي` step opens a confirmation dialog.
+
 - `approve-expense-dialog.tsx` — header breadcrumb (`اعتماد المدير العام › طلب مصروف › شراء … . EXP-#####`), intro question, a read-only details box (المبلغ/المصروف/القسم), `ملاحظات إضافية` textarea (prefilled), a `التوقيع` (`مطلوب`) signature drop-zone with `+ إضافة توقيع`, and a footer with the green `اعتماد المصروف` button + `إشعار المدير عبر البريد` toggle.
 - **RTL**: this dialog is also LTR-flow-with-right-alignment (confirmed via `get_design_context` — details rows are `justify-between`, value-first). Applied `dir="ltr"` to an **inner wrapper** (not `DialogContent`, so the dialog's centering transform still works). Verified centered + correct via screenshot.
 - Wiring (`create-expense-sheet.tsx`): `handleStepAction` opens the dialog for `approve` (reject applies directly); `handleConfirmApprove` marks the step done and fires the success toast.
@@ -220,12 +243,14 @@ The card grid rendered fully flipped at first because the Figma card is **not** 
 Still frontend-only: no persistence; the signature is a demo toggle; the "notify manager" switch is non-functional.
 
 ### Pass 6 follow-ups
+
 - **Footer + switch fix**: the footer's decision button belongs on the **right** (RTL primary-action position) with the notify toggle on its left. Since the dialog body is `dir="ltr"`, the footer needs its own `dir="rtl"`. The `Switch`'s RTL thumb-translation variants only work inside an RTL subtree, so this also fixed the toggle animating the wrong way.
 - **Reject variant**: generalized `approve-expense-dialog.tsx` → **`review-decision-dialog.tsx`** with a `decision: "approve" | "reject"` prop (`ReviewDecisionDialog`). Config-driven per decision: header label/color (`اعتماد المدير العام` green / `رفض المدير العام` rose), intro text, prefilled notes, button label/color/icon (`اعتماد المصروف` green + check / `رفض المصروف` rose + X-circle). Both `اعتماد` and `رفض` chips now open the dialog; on confirm, `handleConfirmDecision` marks the step done and fires the matching toast (`toast.success` for approve, `toast.error` for reject), each with a `تراجع` action that restores the step. Verified both variants by screenshot.
 
 ## Pass 7 — Delete-request dialog
 
 **Delete dialog** (Figma `2987-69379`): a `حذف الطلب` button (destructive, outline) added to the review panel footer opens a confirmation dialog.
+
 - `delete-expense-request-dialog.tsx` — red header (`حذف طلب مصروف` + trash icon, right) with breadcrumb; intro warning (`… لا يمكن التراجع عن هذا الإجراء`); a full read-only details box (status badge + 8 rows: مقدم الطلب/القسم/الفئة/الفرع/المورد/المبلغ/طريقة الدفع/التاريخ, value left / label+icon right); a rose **النتائج المترتبة** consequences box with two bullet points; footer with red `حذف الطلب` (⌘↵) button on the right + `ارسل اشعار` toggle on the left.
 - **RTL**: same LTR-flow-with-right-alignment pattern (confirmed via `get_design_context` — detail rows are `justify-between`, value-first). `dir="ltr"` inner wrapper + `dir="rtl"` footer. Verified centered & correct by screenshot.
 - Wiring: `ExpenseReviewPanel` gains an `onDelete` prop (new footer button); `create-expense-sheet.tsx` holds `deleteDialogOpen`, renders `DeleteExpenseRequestDialog`, and on confirm closes the sheet + toasts `تم حذف طلب المصروف`.
@@ -235,6 +260,7 @@ Still frontend-only: no persistence; the `ارسل اشعار` toggle is non-fun
 ## Pass 8 — Rejection summary (after رفض)
 
 **Rejection summary panel** (Figma `2973-56076`): after confirming رفض in the decision dialog, the sheet switches from the approval timeline to a read-only rejection summary.
+
 - `expense-rejection-summary.tsx` — red header (`رفض طلب المصروف`, right); a hero with the red rejection illustration + `تم رفض طلب الصرف وتحديث حالتها إلى مرفوضة` + subtext + `مقدم الطلب: … · 12 مايو 2026`; a **ملخص الطلب** order-summary table (البند/السعر); a **تفاصيل الطلب** box (7 rows: إجمالي المصروف/القسم/الفرع/طريقة الصرف/الحالة=مرفوضة in red/تاريخ القرار/اعتمد بواسطة, value left / label right); a rose **سبب الرفض** box; a footnote; footer with `تعديل الطلب` (right) + `إلغاء` (left).
 - Illustration: extracted the Figma SVG → `public/illustrations/expense-rejected.svg` (var() fills flattened to hex).
 - **RTL**: same LTR-flow pattern (confirmed via `get_design_context` — detail rows `justify-between`, value-first). `dir="ltr"` on the panel + `dir="rtl"` footer. Verified by screenshot.
@@ -249,6 +275,7 @@ Still frontend-only: no persistence; some summary fields (order-summary line, ط
 Everything above is **frontend-only** — all data is seed/UI state, and the UI-only types in `src/features/finance/expenses/data/*` violate the repo's "types must derive from the source of truth" rule as a deliberate stopgap. This plan replaces that stopgap with a real Prisma model + Elysia server module + Treaty-typed hooks, then rewires each screen. **Reference module to mirror throughout: `src/server/discounts/` (clinic-scoped CRUD with a status enum, unique code, Zod-in-`.type.ts`, TypeBox model).**
 
 ## Guiding rules (from AGENTS.md — do not skip)
+
 - **Migrations, never `db:push`** on shared DBs. Every schema change: edit `prisma/schema.prisma` → `bunx prisma migrate dev --name <change>` → commit schema + migration together. CI runs `prisma migrate diff` and fails on drift.
 - **Types derive from the source of truth**: response types = `Prisma.XGetPayload<{ select }>`; DAO input = `Pick`/`Omit`/`Partial` of `Prisma.XUncheckedCreateInput`; enums = re-export from `@/generated/prisma/enums`; form types = `z.infer`. No hand-written shapes once the model exists.
 - **`requireClinic` macro** on every route (returns 401 without `activeClinicId`); scope every query by `clinicId`.
@@ -262,6 +289,7 @@ Everything above is **frontend-only** — all data is seed/UI state, and the UI-
 Add to `prisma/schema.prisma` (mirroring the `Discount` model's conventions: `code @unique`, `clinicId` + `Clinic` relation with `onDelete: Cascade`, `@@map`, `status` enum, timestamps).
 
 ### Enums
+
 ```prisma
 enum ExpenseStatus {
   DRAFT          // مسودة
@@ -295,6 +323,7 @@ enum ExpenseReminderOffset { ONE_DAY TWO_DAYS THREE_DAYS }
 ```
 
 ### Models
+
 ```prisma
 model Expense {
   id              String               @id @default(cuid())
@@ -356,6 +385,7 @@ model ExpenseApprovalStep {
   @@map("expense_approval_step")
 }
 ```
+
 Add the reverse relations on `Clinic`, `User`, `Branch`, `Supplier` (Prisma requires both sides).
 
 **Migration:** `bunx prisma migrate dev --name add_expense_models`. Commit schema + migration together. The prismabox generators produce `generated/prismabox/ExpenseStatus` etc. for the TypeBox model automatically on generate.
@@ -367,6 +397,7 @@ Add the reverse relations on `Clinic`, `User`, `Branch`, `Supplier` (Prisma requ
 Four files, mirroring `discounts/`:
 
 ### `expenses.type.ts`
+
 - `export type { ExpenseStatus, ExpensePaymentMethod, ... }` re-exported from `@/generated/prisma/enums`.
 - `expenseSelect` (`satisfies Prisma.ExpenseSelect`) including `attachments`, `steps` (ordered), `requester { id, name }`, `decidedBy { id, name }`, `branch`, `supplier` — then `export type ExpenseResponse = Prisma.ExpenseGetPayload<{ select: typeof expenseSelect }>`.
 - `ExpenseListItemResponse` (lighter select for cards/list), `ExpenseStatsResponse` (`{ rejected, pendingReview, approved, total, totalAmount }` → drives the 4 stat cards).
@@ -374,9 +405,11 @@ Four files, mirroring `discounts/`:
 - DAO input types derived from `Prisma.ExpenseUncheckedCreateInput` via `Pick` (+ `attachments?: ...`, `steps?: ...`).
 
 ### `expenses.model.ts` (TypeBox, prismabox enums)
+
 - `expenses.create`, `expenses.update`, `expenses.setStatus`, `expenses.decision` (`{ decision: "approve"|"reject", reason?, signature?, notify? }`), `expenses.sendReview` (`{ recipientIds, subject, body }`), `expenses.addAttachment`.
 
 ### `expenses.dao.ts` (Prisma only, no business logic in controller)
+
 - `list(clinicId, { status?, search? })`, `getStats(clinicId)`, `getById(id, clinicId)`.
 - `create(clinicId, requesterId, input)` → `generateUniqueCode({ prefix: "EXP", isUnique })`, seed the `steps` (CREATED done, SENT_FOR_REVIEW pending, MANAGER_REVIEW, FINANCE_APPROVAL, DISBURSEMENT) in a nested `create`.
 - `update`, `remove` (returns `"not-found"` sentinel like discounts).
@@ -384,6 +417,7 @@ Four files, mirroring `discounts/`:
 - `applyDecision(id, clinicId, stepId, actorId, { decision, reason })` → mark step `APPROVED`/`REJECTED`, set `Expense.status`, `decisionAt`, `decidedById`, `rejectionReason`; a rejection ends the chain.
 
 ### `expenses.controller.ts` (Elysia + `requireClinic` macro, copy from discounts)
+
 Routes: `GET /` (list, `?status`/`?search`), `GET /stats`, `GET /:id`, `POST /`, `PATCH /:id`, `PATCH /:id/status`, `POST /:id/send-review`, `POST /:id/steps/:stepId/decision`, `POST /:id/attachments`, `DELETE /:id`. Arabic error messages; `status(404/409/201)` sentinels like discounts.
 
 **Register** in `src/server/index.ts`: import `expensesController`, add `.use(expensesController)`.
@@ -393,6 +427,7 @@ Routes: `GET /` (list, `?status`/`?search`), `GET /stats`, `GET /:id`, `POST /`,
 ## Phase 3 — Client hooks (`src/features/finance/expenses/hooks/`)
 
 Treaty client (`@/lib/api`), TanStack Query, named-object returns, `toast.promise` on mutations (Arabic messages), invalidate `["expenses"]` / `["expense-stats"]` on success:
+
 - `use-expenses.ts` — `useQuery(["expenses", { status, search }])`.
 - `use-expense-stats.ts` — drives the 4 stat cards (replaces the hardcoded `0`s in `expenses-tab.tsx`).
 - `use-expense.ts` — single expense (for the review panel / rejection summary).
@@ -403,6 +438,7 @@ Treaty client (`@/lib/api`), TanStack Query, named-object returns, `toast.promis
 ## Phase 4 — Rewire the UI (delete the stopgaps)
 
 Replace UI-only data with real types/data, keeping components' markup/RTL intact (they already match Figma):
+
 1. **`expenses-tab.tsx`** — `useExpenses()` + `useExpenseStats()`; remove `SEED_EXPENSE_RECORDS` and the hardcoded stats; keep grid/list/empty switch. Search → server `?search` (debounced) or keep client-side filter initially.
 2. **`create-expense-sheet.tsx`** — form uses `createExpenseSchema` via `zodResolver` (per the Forms convention — currently it's manual `useState`); `مراجعة الطلب` calls `create`; the review panel reads the created expense; `إرسال للمراجعة` → `sendReview`; approve/reject chips → `decide`; delete → `remove`. Real `EXP-####` from the server (drop the local `Math.random()` code).
 3. **Card/list/review/rejection/dialogs** — swap `ExpenseRecord`/`SubmittedExpenseRequest`/`ApprovalStep` (UI-only) for the derived server types (`ExpenseListItemResponse`, `ExpenseResponse`, and a step type from the payload). Component props change type; JSX stays.
@@ -412,21 +448,25 @@ Replace UI-only data with real types/data, keeping components' markup/RTL intact
 ---
 
 ## Phase 5 — Verify
+
 - `bun run typecheck` + `bun run format`.
 - `bunx prisma migrate diff --from-config-datasource --to-schema prisma/schema.prisma --exit-code` → 0 (no drift).
 - Drive the full flow through the real app (needs an authed session — see the auth note below): create → review → send → approve/reject → rejection summary / delete. Screenshot-verify RTL as before.
 - Add DAO unit tests (vitest) for `create` (code + seeded steps), `applyDecision` (status transitions), `getStats`.
 
 ## Decisions made
-- **No roles for now (single admin).** The app has no proper roles system yet, so we do **not** model `المدير العام` / `المدير المالي` as roles. All approval actions are performed by the one current admin user. `ExpenseApprovalStep.actorId` is simply the acting user (the admin), filled on action; the step *labels* (مراجعة المدير العام, اعتماد المدير المالي…) stay as display text. **Roles are a placeholder** — when a real roles system lands, revisit `applyDecision` to enforce which role may act on which step. Do not build role-gating now.
+
+- **No roles for now (single admin).** The app has no proper roles system yet, so we do **not** model `المدير العام` / `المدير المالي` as roles. All approval actions are performed by the one current admin user. `ExpenseApprovalStep.actorId` is simply the acting user (the admin), filled on action; the step _labels_ (مراجعة المدير العام, اعتماد المدير المالي…) stay as display text. **Roles are a placeholder** — when a real roles system lands, revisit `applyDecision` to enforce which role may act on which step. Do not build role-gating now.
 
 ## Open questions (resolve before / during Phase 1)
-- **Category / department**: FKs to existing models, new lookup tables, or plain enums? (The UI currently uses placeholder option lists.) — pick the lightest that fits `settings`. *Leaning: nullable string label columns for now, upgrade to FKs later.*
-- **Signature** (اعتماد/رفض dialogs): store as an uploaded image (uploads flow) or a boolean "signed" flag for now? *Leaning: boolean flag for now.*
-- **Stats semantics**: is `إجمالي المصروفات` a count or a summed amount? (UI shows a `ر.س` amount → summed amount.)
+
+- **Category / department**: FKs to existing models, new lookup tables, or plain enums? (The UI currently uses placeholder option lists.) — pick the lightest that fits `settings`. _Leaning: nullable string label columns for now, upgrade to FKs later._
+- **Signature** (اعتماد/رفض dialogs): store as an uploaded image (uploads flow) or a boolean "signed" flag for now? _Leaning: boolean flag for now._
+- **Stats semantics**: is `إجمالي المصروفات` a count or a summed amount? (UI shows a `ج.م` amount → summed amount.)
 - **Auth/seed for testing**: the app is behind `_pathless-layout`'s auth guard and the seed provisions no login user — add a dev-seed member so the flow (and screenshots) can be driven end-to-end.
 
 ## Suggested commit sequence
+
 1. `feat(expenses): add Expense/ExpenseAttachment/ExpenseApprovalStep models + migration`
 2. `feat(expenses): add server module (type/model/dao/controller) + register`
 3. `feat(expenses): add client hooks (list/stats/detail/mutations)`
@@ -448,7 +488,7 @@ Replace UI-only data with real types/data, keeping components' markup/RTL intact
   - `create-expense-sheet.tsx` → stores the created `ExpenseResponse`; `مراجعة الطلب` = `create()`, `إرسال للمراجعة` = `sendReview()`, approve/reject = `decide()`, delete = `remove()`. All views derive from the saved response via `fromExpenseResponse`.
   - Removed dead exports (`getModifiedExpenseFields`, `EXPENSE_FIELD_LABELS`, `EXPENSE_STATUS_LABELS`, `CARD_TO_REQUEST_STATUS`).
   - **Deliberately deferred** (follow-up): converting the create form from `useState<CreateExpenseFormValues>` to `zodResolver(createExpenseSchema)` — larger change, current form works. And `الفرع`/`المورد` selects still send `null` (form uses stub option values, not real branch/supplier ids) — wire when branch/supplier pickers use real data.
-- **Phase 5 ✅** — `tsc --noEmit` clean; `prisma migrate diff … --exit-code` → **0 (no drift)**; `GET /api/expenses` → **401** (route registered + `requireClinic` works, i.e. the module mounted with no runtime error); all rewired client modules transform through Vite. *Not done:* driving the logged-in UI flow end-to-end (auth wall + no seed login user) and DAO unit tests — both still pending a dev-seed member.
+- **Phase 5 ✅** — `tsc --noEmit` clean; `prisma migrate diff … --exit-code` → **0 (no drift)**; `GET /api/expenses` → **401** (route registered + `requireClinic` works, i.e. the module mounted with no runtime error); all rewired client modules transform through Vite. _Not done:_ driving the logged-in UI flow end-to-end (auth wall + no seed login user) and DAO unit tests — both still pending a dev-seed member.
 
 ## Testability & follow-ups (fixing "no E2E / no DAO tests")
 
@@ -469,6 +509,7 @@ Still deferred: the create form's **الفرع/المورد** selects use stub o
 ## Send-review dialog made functional (was all placeholders)
 
 Everything in `send-review-request-dialog.tsx` was UI-only; now it's real:
+
 - **Schema**: added `reviewSubject`, `reviewBody`, `reviewRecipientIds String[]`, `reviewSentAt` to `Expense` (migration `20260713112412_expense_review_request_fields`) + surfaced them in the response select.
 - **Server** (`sendForReview`): now accepts `{ recipientIds, subject, body }`, persists them + `status=PENDING_REVIEW` + marks the SENT step, then **best-effort emails** the chosen recipients via `sendEmail()` (resolves their `User.email` server-side; wrapped in try/catch so stub SMTP creds don't break the flow — logs and continues).
 - **Dialog**: recipients now come from **real clinic users** (`useClinicUsers` → `GET /users`), not the fake أحمد محمد seeds. Header (requester + code), subject, body, and the attachment list are all derived from the real expense. `قالب البريد` templates now actually rewrite subject/body; `إضافة موظف جديد` navigates to `/services/staff`. Dropped the purely-cosmetic toolbar icons (bold/align/emoji/AI sparkle) and the fake attachment.
@@ -480,6 +521,7 @@ Note: `EMAIL_USER` in `.env` is a stub, so real email delivery won't happen in d
 ## Disbursement flow + step gating + disbursed receipt
 
 Four fixes to the approval path (`expense-review.ts` mapper, `review-decision-dialog.tsx`, `expense-review-panel.tsx`, server `applyDecision`):
+
 1. **تأكيد الصرف now has a button** — the `DISBURSEMENT` step shows a single green **`صرف المصروف`** button (not the approve/reject pair). `STEP_META.actionable` is now `"approve" | "disburse" | false`; disburse → `DISBURSE_ACTION` (`kind: "disburse"`).
 2. **Step ordering enforced** — a step's action buttons only appear after **all prior actionable steps are done** (`priorActionableDone`). So `اعتماد المدير المالي` is not actionable until `مراجعة المدير العام` is approved.
 3. **Disburse reuses the decision dialog** with a new **`disburse`** variant — same dialog, header changes to **`تأكيد الصرف`** (green), intro/notes/button = صرف المصروف, check icon. `ReviewDecision` is now `approve | reject | disburse`.

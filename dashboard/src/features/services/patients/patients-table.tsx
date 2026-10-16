@@ -44,7 +44,7 @@ import { TransferOwnershipDialog } from "@/features/services/patients/components
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { useUpdatePatient } from "@/features/services/patients/hooks/use-update-patient";
 import { cn } from "@/lib/utils";
-import type { PatientResponse } from "@/server/patients/patients.type";
+import type { PatientResponse } from "@sanad/contracts/runtime/server/patients/patients.type";
 
 function getGuardianInitials(name?: string | null) {
 	if (!name) return "—";
@@ -243,6 +243,21 @@ export function PatientsTable() {
 				},
 			},
 			{
+				accessorKey: "feeType",
+				header: "نوع الرسوم",
+				cell: ({ row }) => {
+					const fee = row.original.feeType?.trim();
+					if (!fee) {
+						return <span className="text-xs text-muted-foreground">—</span>;
+					}
+					return (
+						<span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300">
+							{fee}
+						</span>
+					);
+				},
+			},
+			{
 				accessorKey: "pocketMoneyEnabled",
 				header: "المصروف",
 				cell: ({ row }) => {
@@ -372,7 +387,7 @@ export function PatientsTable() {
 									onSelect={() => setDisablingPatient(row.original)}
 								>
 									<IconBan className="size-4" />
-									تعطيل
+									{row.original.active ? "تعطيل" : "تفعيل"}
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem
@@ -401,6 +416,11 @@ export function PatientsTable() {
 		globalFilterFn: "includesString",
 	});
 
+	const activeViewingPatient = useMemo(() => {
+		if (!viewingPatient) return null;
+		return patients.find((p) => p.id === viewingPatient.id) ?? viewingPatient;
+	}, [patients, viewingPatient]);
+
 	return (
 		<>
 			<AddPatientSheet
@@ -408,26 +428,51 @@ export function PatientsTable() {
 				onClose={() => setAddSheetOpen(false)}
 			/>
 			<PatientProfileSheet
-				open={!!viewingPatient}
+				open={!!activeViewingPatient}
 				onClose={() => setViewingPatient(null)}
-				patient={viewingPatient}
+				patient={activeViewingPatient}
+				onPatientChange={(updated) => setViewingPatient(updated)}
 			/>
 			<PatientSheet
 				open={!!editingPatient}
 				onClose={() => setEditingPatient(null)}
 				patient={editingPatient}
+				onSuccess={(updated) => {
+					setEditingPatient(null);
+					if (viewingPatient?.id === updated.id) {
+						setViewingPatient(updated);
+					}
+				}}
 			/>
 			<DisablePatientDialog
 				patient={disablingPatient}
 				onClose={() => setDisablingPatient(null)}
+				onSuccess={(updated) => {
+					setDisablingPatient(null);
+					if (viewingPatient?.id === updated.id) {
+						setViewingPatient(updated);
+					}
+				}}
 			/>
 			<TransferOwnershipDialog
 				patient={transferringPatient}
 				onClose={() => setTransferringPatient(null)}
+				onSuccess={(updated) => {
+					setTransferringPatient(null);
+					if (viewingPatient?.id === updated.id) {
+						setViewingPatient(updated);
+					}
+				}}
 			/>
 			<DeletePatientDialog
 				patient={deletingPatient}
 				onClose={() => setDeletingPatient(null)}
+				onSuccess={(deletedId) => {
+					setDeletingPatient(null);
+					if (viewingPatient?.id === deletedId) {
+						setViewingPatient(null);
+					}
+				}}
 			/>
 
 			<div className="flex min-h-0 flex-1 flex-col">

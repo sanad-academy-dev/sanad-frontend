@@ -649,6 +649,10 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 				<AddPatientDialog
 					open={patientDialogOpen}
 					onClose={() => setPatientDialogOpen(false)}
+					defaultOwnerId={owner?.id}
+					defaultGuardianName={owner?.name}
+					defaultGuardianPhone={owner?.phone ?? undefined}
+					defaultGuardianEmail={owner?.email ?? undefined}
 					onSuccess={(patientId) => {
 						const current = getValues("patientIds") ?? [];
 						if (!current.includes(patientId)) {

@@ -1,7 +1,7 @@
 /**
  * [P5-UI-fix] Display formatting for accounting amounts and dates.
  *
- * The legacy invoices table formats money as `1,150 ر.س` and dates as `06/08/2026`; the
+ * The legacy invoices table formats money as `1,150 ج.م` and dates as `06/08/2026`; the
  * accounting screens must read identically. But that table gets there via
  * `Number(value).toLocaleString()`, and contract C2 forbids a JS float touching an amount —
  * a `Decimal(21,9)` ledger figure loses exactness the moment it becomes a `number`.
@@ -16,12 +16,12 @@ const NANO = 1_000_000_000n;
 
 /** Group the integer part in threes: "1150" → "1,150". */
 function groupDigits(digits: string): string {
-	let out = "";
-	for (let i = 0; i < digits.length; i++) {
-		if (i > 0 && (digits.length - i) % 3 === 0) out += ",";
-		out += digits[i];
-	}
-	return out;
+  let out = "";
+  for (let i = 0; i < digits.length; i++) {
+    if (i > 0 && (digits.length - i) % 3 === 0) out += ",";
+    out += digits[i];
+  }
+  return out;
 }
 
 /**
@@ -30,55 +30,60 @@ function groupDigits(digits: string): string {
  * reference's `maximumFractionDigits: 2` behavior.
  */
 function renderNano(nano: bigint, dp: number): string {
-	const negative = nano < 0n;
-	const abs = negative ? -nano : nano;
+  const negative = nano < 0n;
+  const abs = negative ? -nano : nano;
 
-	const scale = 10n ** BigInt(9 - dp);
-	// half-up at the cut point
-	const rounded = (abs + scale / 2n) / scale;
-	const unit = 10n ** BigInt(dp);
-	const whole = rounded / unit;
-	const frac = (rounded % unit).toString().padStart(dp, "0").replace(/0+$/, "");
+  const scale = 10n ** BigInt(9 - dp);
+  // half-up at the cut point
+  const rounded = (abs + scale / 2n) / scale;
+  const unit = 10n ** BigInt(dp);
+  const whole = rounded / unit;
+  const frac = (rounded % unit).toString().padStart(dp, "0").replace(/0+$/, "");
 
-	const magnitude = frac
-		? `${groupDigits(whole.toString())}.${frac}`
-		: groupDigits(whole.toString());
-	return negative && rounded !== 0n ? `-${magnitude}` : magnitude;
+  const magnitude = frac
+    ? `${groupDigits(whole.toString())}.${frac}`
+    : groupDigits(whole.toString());
+  return negative && rounded !== 0n ? `-${magnitude}` : magnitude;
 }
 
 /**
  * A ledger amount as a grouped display string, no currency suffix.
  * `"1150.000000000"` → `"1,150"` · `"1234.5"` → `"1,234.5"`
  */
-export function formatAmount(value: string | number | null | undefined, dp = 2): string {
-	if (value == null) return "0";
-	const raw = typeof value === "number" ? String(value) : value.trim();
-	if (raw === "") return "0";
+export function formatAmount(
+  value: string | number | null | undefined,
+  dp = 2,
+): string {
+  if (value == null) return "0";
+  const raw = typeof value === "number" ? String(value) : value.trim();
+  if (raw === "") return "0";
 
-	const negative = raw.startsWith("-");
-	// sign carried locally so the unparseable-input check below sees the magnitude
-	const nano = toNano(negative ? raw.slice(1) : raw);
-	if (nano === 0n && !/^-?0*(\.0*)?$/.test(raw)) {
-		// unparseable (scientific notation, stray characters) — show it rather than a false 0
-		return raw;
-	}
-	return renderNano(negative ? -nano : nano, dp);
+  const negative = raw.startsWith("-");
+  // sign carried locally so the unparseable-input check below sees the magnitude
+  const nano = toNano(negative ? raw.slice(1) : raw);
+  if (nano === 0n && !/^-?0*(\.0*)?$/.test(raw)) {
+    // unparseable (scientific notation, stray characters) — show it rather than a false 0
+    return raw;
+  }
+  return renderNano(negative ? -nano : nano, dp);
 }
 
-/** A ledger amount with the currency suffix, as the reference renders it: `1,150 ر.س`. */
+/** A ledger amount with the currency suffix, as the reference renders it: `1,150 ج.م`. */
 export function formatMoney(
-	value: string | number | null | undefined,
-	currencySymbol = "ر.س",
+  value: string | number | null | undefined,
+  currencySymbol = "ج.م",
 ): string {
-	return `${formatAmount(value)} ${currencySymbol}`;
+  return `${formatAmount(value)} ${currencySymbol}`;
 }
 
 /** `true` when the amount is greater than zero — for "does this row still owe?" checks. */
-export function isPositiveAmount(value: string | number | null | undefined): boolean {
-	if (value == null) return false;
-	const raw = typeof value === "number" ? String(value) : value.trim();
-	if (raw.startsWith("-")) return false;
-	return toNano(raw) > 0n;
+export function isPositiveAmount(
+  value: string | number | null | undefined,
+): boolean {
+  if (value == null) return false;
+  const raw = typeof value === "number" ? String(value) : value.trim();
+  if (raw.startsWith("-")) return false;
+  return toNano(raw) > 0n;
 }
 
 /** Σ of ledger amount strings, exact. Re-exported so screens need one import for totals. */
@@ -96,19 +101,21 @@ export { fromNano, NANO, toNano };
  */
 const ISO_DATE_PREFIX = /^(\d{4})-(\d{2})-(\d{2})/;
 
-export function formatDisplayDate(date: string | Date | null | undefined): string {
-	if (!date) return "—";
+export function formatDisplayDate(
+  date: string | Date | null | undefined,
+): string {
+  if (!date) return "—";
 
-	if (typeof date === "string") {
-		const iso = ISO_DATE_PREFIX.exec(date);
-		if (iso) {
-			const [, year, month, day] = iso;
-			return `${day}/${month}/${year}`;
-		}
-	}
+  if (typeof date === "string") {
+    const iso = ISO_DATE_PREFIX.exec(date);
+    if (iso) {
+      const [, year, month, day] = iso;
+      return `${day}/${month}/${year}`;
+    }
+  }
 
-	const d = typeof date === "string" ? new Date(date) : date;
-	if (Number.isNaN(d.getTime())) return "—";
-	const pad = (n: number) => String(n).padStart(2, "0");
-	return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+  const d = typeof date === "string" ? new Date(date) : date;
+  if (Number.isNaN(d.getTime())) return "—";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 }

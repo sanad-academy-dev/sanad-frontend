@@ -1,40 +1,47 @@
-import { type InvoiceListItemResponse, invoiceSubject } from "@sanad/contracts/runtime/server/invoices/invoices.type";
+import {
+  type InvoiceListItemResponse,
+  invoiceSubject,
+} from "@sanad/contracts/runtime/server/invoices/invoices.type";
 
 // مستند الفاتورة — يُبنى مرة واحدة ويُستعمل للطباعة والتحميل معًا،
 // فلا يختلف ما يُطبع عمّا يُحفَظ.
 
 /** Decimal يصل من الخادم ككائن — نمرّره عبر Number لا نوعًا ضيّقًا */
 const money = (value: unknown) =>
-	`${Number(value ?? 0).toLocaleString("en-US", { maximumFractionDigits: 2 })} ر.س`;
+  `${Number(value ?? 0).toLocaleString("en-US", { maximumFractionDigits: 2 })} ج.م`;
 
 const dateLabel = (value: Date | string) => {
-	const d = new Date(value);
-	const pad = (n: number) => String(n).padStart(2, "0");
-	return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
+  const d = new Date(value);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}`;
 };
 
 const STATUS_LABELS: Record<string, string> = {
-	PENDING: "غير مدفوعة",
-	PARTIAL: "دفع جزئي",
-	PAID: "مدفوعة",
-	VOIDED: "مسترجعة",
+  PENDING: "غير مدفوعة",
+  PARTIAL: "دفع جزئي",
+  PAID: "مدفوعة",
+  VOIDED: "مسترجعة",
 };
 
 const escapeHtml = (value: string) =>
-	value.replace(
-		/[&<>"']/g,
-		(ch) =>
-			({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch] ?? ch,
-	);
+  value.replace(
+    /[&<>"']/g,
+    (ch) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        ch
+      ] ?? ch,
+  );
 
 /** مستند HTML مستقل للفاتورة — صالح للطباعة أو الحفظ كملف */
-export const buildInvoiceDocument = (invoice: InvoiceListItemResponse): string => {
-	const subject = invoiceSubject(invoice);
-	const due = Math.max(0, Number(invoice.total) - Number(invoice.amountPaid));
+export const buildInvoiceDocument = (
+  invoice: InvoiceListItemResponse,
+): string => {
+  const subject = invoiceSubject(invoice);
+  const due = Math.max(0, Number(invoice.total) - Number(invoice.amountPaid));
 
-	const rows = subject.lines
-		.map(
-			(line) => `
+  const rows = subject.lines
+    .map(
+      (line) => `
 			<tr>
 				<td>${escapeHtml(line.name)}</td>
 				<td>${escapeHtml(line.category ?? "—")}</td>
@@ -42,21 +49,21 @@ export const buildInvoiceDocument = (invoice: InvoiceListItemResponse): string =
 				<td class="num">${money(line.priceSnapshot)}</td>
 				<td class="num">${money(Number(line.priceSnapshot) * line.quantity)}</td>
 			</tr>`,
-		)
-		.join("");
+    )
+    .join("");
 
-	const consultationRow =
-		subject.consultationFee && Number(subject.consultationFee) > 0
-			? `<tr>
+  const consultationRow =
+    subject.consultationFee && Number(subject.consultationFee) > 0
+      ? `<tr>
 					<td>${escapeHtml(subject.consultationName ?? "رسوم الكشف")}</td>
 					<td>رسوم الكشف</td>
 					<td class="num">1</td>
 					<td class="num">${money(subject.consultationFee)}</td>
 					<td class="num">${money(subject.consultationFee)}</td>
 				</tr>`
-			: "";
+      : "";
 
-	return `<!doctype html>
+  return `<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8" />
@@ -114,29 +121,29 @@ export const buildInvoiceDocument = (invoice: InvoiceListItemResponse): string =
 
 /** يفتح حوار الطباعة على نسخة الفاتورة — والمتصفّح يتيح «حفظ كـPDF» منه */
 export const printInvoice = (invoice: InvoiceListItemResponse) => {
-	const win = window.open("", "_blank", "width=900,height=1000");
-	if (!win) return false;
-	win.document.write(buildInvoiceDocument(invoice));
-	win.document.close();
-	// الطباعة بعد اكتمال التحميل وإلا خرجت الصفحة فارغة
-	win.onload = () => {
-		win.focus();
-		win.print();
-	};
-	return true;
+  const win = window.open("", "_blank", "width=900,height=1000");
+  if (!win) return false;
+  win.document.write(buildInvoiceDocument(invoice));
+  win.document.close();
+  // الطباعة بعد اكتمال التحميل وإلا خرجت الصفحة فارغة
+  win.onload = () => {
+    win.focus();
+    win.print();
+  };
+  return true;
 };
 
 /** يحفظ الفاتورة ملفًا محليًا دون خادم — نفس المستند المطبوع */
 export const downloadInvoice = (invoice: InvoiceListItemResponse) => {
-	const blob = new Blob([buildInvoiceDocument(invoice)], {
-		type: "text/html;charset=utf-8",
-	});
-	const url = URL.createObjectURL(blob);
-	const link = document.createElement("a");
-	link.href = url;
-	link.download = `فاتورة-${invoice.code}.html`;
-	document.body.appendChild(link);
-	link.click();
-	link.remove();
-	URL.revokeObjectURL(url);
+  const blob = new Blob([buildInvoiceDocument(invoice)], {
+    type: "text/html;charset=utf-8",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `فاتورة-${invoice.code}.html`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 };

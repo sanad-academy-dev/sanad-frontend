@@ -8,17 +8,17 @@
 
 ## 1. What we're building (in one paragraph)
 
-A chat-style **Agent** (branded **"أوكس AI" / Oaks AI**, Beta) docked as a side panel over the app that can take *real actions* in the system. The user picks a **preset command** ("skill") or types in natural language. The chosen preset renders **as a ready sentence with editable field-chips embedded inline** (mad-libs style) — some slots pre-filled from context, some placeholders to pick. The Agent (1) searches our own DB for the best-matching entities (owner, patient, doctor, service, room, slot) to fill slots, (2) shows the completed prompt for review, (3) on send, executes through the *existing* backend, and (4) streams back a **result card** showing exactly what was created (with its generated code, e.g. `#GAM-21`, and an execution time like "4 ثوانٍ"). The Agent **knows the current page** (e.g. "الموارد البشرية > الموظفين") and suggests context-relevant presets. A per-clinic **guardrails/settings** layer constrains what it may do.
+A chat-style **Agent** (branded **"أوكس AI" / Oaks AI**, Beta) docked as a side panel over the app that can take _real actions_ in the system. The user picks a **preset command** ("skill") or types in natural language. The chosen preset renders **as a ready sentence with editable field-chips embedded inline** (mad-libs style) — some slots pre-filled from context, some placeholders to pick. The Agent (1) searches our own DB for the best-matching entities (owner, patient, doctor, service, room, slot) to fill slots, (2) shows the completed prompt for review, (3) on send, executes through the _existing_ backend, and (4) streams back a **result card** showing exactly what was created (with its generated code, e.g. `#GAM-21`, and an execution time like "4 ثوانٍ"). The Agent **knows the current page** (e.g. "الموارد البشرية > الموظفين") and suggests context-relevant presets. A per-clinic **guardrails/settings** layer constrains what it may do.
 
-The design frames the product to the user as: *"أنشئ المهارات لتمكين الوكلاء AI من القيام بالمهام بدلاً منك"* — **"create skills that let AI agents do tasks for you."** Our **action presets** *are* those skills.
+The design frames the product to the user as: _"أنشئ المهارات لتمكين الوكلاء AI من القيام بالمهام بدلاً منك"_ — **"create skills that let AI agents do tasks for you."** Our **action presets** _are_ those skills.
 
 Three pillars, decided:
 
-| Pillar | Decision |
-|---|---|
-| **Autonomy** | **Propose → human confirms.** Reads may auto-run; every write requires an explicit send/confirm. Nothing hits the DB unconfirmed. |
-| **LLM provider** | **Multi-provider, user-selectable** via the Vercel AI SDK — OpenAI (`@ai-sdk/openai`) **and** Anthropic (`@ai-sdk/anthropic`), chosen per-conversation from the model picker (the design shows "Sonnet 4.2" selected). Behind a provider registry so adding/removing a model is config, not code. |
-| **Action model** | **Hybrid, template-first.** A catalog of typed **action presets**. Each preset carries a **prompt template with typed field-slots** (the inline mad-libs UI) *and* an input schema. The LLM (or a preset pick) selects the action; resolvers fill slots from DB search; the schema constrains, validates, and gates it. |
+| Pillar           | Decision                                                                                                                                                                                                                                                                                                                |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Autonomy**     | **Propose → human confirms.** Reads may auto-run; every write requires an explicit send/confirm. Nothing hits the DB unconfirmed.                                                                                                                                                                                       |
+| **LLM provider** | **Multi-provider, user-selectable** via the Vercel AI SDK — OpenAI (`@ai-sdk/openai`) **and** Anthropic (`@ai-sdk/anthropic`), chosen per-conversation from the model picker (the design shows "Sonnet 4.2" selected). Behind a provider registry so adding/removing a model is config, not code.                       |
+| **Action model** | **Hybrid, template-first.** A catalog of typed **action presets**. Each preset carries a **prompt template with typed field-slots** (the inline mad-libs UI) _and_ an input schema. The LLM (or a preset pick) selects the action; resolvers fill slots from DB search; the schema constrains, validates, and gates it. |
 
 ---
 
@@ -26,13 +26,13 @@ Three pillars, decided:
 
 The Figma flow is more specific than a generic chatbot — it drives several core decisions:
 
-| Frame | What it shows | Consequence for the build |
-|---|---|---|
-| `4060-407849` **Launcher** | Greeting + subtitle ("skills that let agents do tasks for you"), a row of **quick-action chips** (`إضافة موظفين`, `ملخص أسبوعي`, `إنشاء زيارات`, `عرض جميع الأوامر`), a **model picker** ("Sonnet 4.2"), and a composer breadcrumb showing the **current page** ("الموارد البشرية > الموظفين"). | Empty state = curated preset chips, not a blank box. Model picker is real (multi-provider). Context breadcrumb → §7 context contract. |
-| `4230-589021` **Command Library** | Agent is a **docked right-side panel** (Beta) over the live employees table; a **"مكتبة الأوامر" (Command Library)** popover with search + list (`إضافة موظف`, `إنشاء هيئة`, `إضافة مريض`, `إنشاء زيارة`). | Presets are a **browsable, searchable catalog** — first-class UI, not just LLM-internal tools. The panel overlays real pages (doesn't navigate away). |
-| `4063-415518` **Inline prompt** | The preset renders as a sentence with **editable field-chips**: *"أضف موظفًا باسم `[أحمد محمد]`, بتخصص `[حدد التخصص]`, بدوام `[حدد الدوام]`, بفرع `[حدد الفرع]`, وطبّق له دور `[حدد الدور]`, مع إرسال دعوة."* Some slots pre-filled, some placeholder. | **The signature interaction.** Preset = template string + typed slots. Slots are the schema fields; pre-fill comes from resolvers/context; placeholders are pickers. See §3.1. |
-| `4090-430178` **Working state** | Filled prompt shows as a user bubble; assistant shows *"جاري العمل، يرجى الانتظار..."* with **skeleton loaders**. | Streaming/pending UX. The stream carries status → skeleton → result. |
-| `4096-432029` **Result card** | Collapsible header *"استغرق التنفيذ 4 ثوانٍ"* (took 4s); *"تم إنشاء ملف للموظف #GAM-21"* (created record #GAM-21); an entity card (name, `D-1234`, "غير مفعل" badge) + a **details table** (phone, email, specialization, role, employment type, dates). | Result card shows the **generated code** (our `generateUniqueCode`), an **execution duration**, entity summary + field table, and a **status badge**. This is the post-write confirmation of what actually happened. |
+| Frame                             | What it shows                                                                                                                                                                                                                                                                                   | Consequence for the build                                                                                                                                                                                            |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `4060-407849` **Launcher**        | Greeting + subtitle ("skills that let agents do tasks for you"), a row of **quick-action chips** (`إضافة موظفين`, `ملخص أسبوعي`, `إنشاء زيارات`, `عرض جميع الأوامر`), a **model picker** ("Sonnet 4.2"), and a composer breadcrumb showing the **current page** ("الموارد البشرية > الموظفين"). | Empty state = curated preset chips, not a blank box. Model picker is real (multi-provider). Context breadcrumb → §7 context contract.                                                                                |
+| `4230-589021` **Command Library** | Agent is a **docked right-side panel** (Beta) over the live employees table; a **"مكتبة الأوامر" (Command Library)** popover with search + list (`إضافة موظف`, `إنشاء هيئة`, `إضافة مريض`, `إنشاء زيارة`).                                                                                      | Presets are a **browsable, searchable catalog** — first-class UI, not just LLM-internal tools. The panel overlays real pages (doesn't navigate away).                                                                |
+| `4063-415518` **Inline prompt**   | The preset renders as a sentence with **editable field-chips**: _"أضف موظفًا باسم `[أحمد محمد]`, بتخصص `[حدد التخصص]`, بدوام `[حدد الدوام]`, بفرع `[حدد الفرع]`, وطبّق له دور `[حدد الدور]`, مع إرسال دعوة."_ Some slots pre-filled, some placeholder.                                          | **The signature interaction.** Preset = template string + typed slots. Slots are the schema fields; pre-fill comes from resolvers/context; placeholders are pickers. See §3.1.                                       |
+| `4090-430178` **Working state**   | Filled prompt shows as a user bubble; assistant shows _"جاري العمل، يرجى الانتظار..."_ with **skeleton loaders**.                                                                                                                                                                               | Streaming/pending UX. The stream carries status → skeleton → result.                                                                                                                                                 |
+| `4096-432029` **Result card**     | Collapsible header _"استغرق التنفيذ 4 ثوانٍ"_ (took 4s); _"تم إنشاء ملف للموظف #GAM-21"_ (created record #GAM-21); an entity card (name, `D-1234`, "غير مفعل" badge) + a **details table** (phone, email, specialization, role, employment type, dates).                                        | Result card shows the **generated code** (our `generateUniqueCode`), an **execution duration**, entity summary + field table, and a **status badge**. This is the post-write confirmation of what actually happened. |
 
 ---
 
@@ -42,7 +42,7 @@ We are **greenfield** on AI — no `ai`, `@ai-sdk/*`, `openai`, `@anthropic-ai/*
 
 - **API layer:** Elysia at `src/routes/api.$.ts` → `src/server/app.ts` (prefix `/api`) → `src/server/index.ts` chains controllers. We add one new resource: `src/server/agent/`.
 - **Elysia ↔ AI SDK:** Elysia streams AI SDK responses natively (`return stream.toTextStreamResponse()` / `sse(stream.textStream)`). This is our transport.
-- **Actions = existing controllers.** The Agent does **not** get its own write paths. Every action calls the *same* DAOs/controllers the UI uses, so it inherits `clinicId` scoping, conflict checks, invoice locks, exam-completion rules, and Arabic error messages for free.
+- **Actions = existing controllers.** The Agent does **not** get its own write paths. Every action calls the _same_ DAOs/controllers the UI uses, so it inherits `clinicId` scoping, conflict checks, invoice locks, exam-completion rules, and Arabic error messages for free.
 - **Multi-tenancy:** the `requireClinic` macro already resolves `{ clinicId, userId }` from the better-auth session. The Agent runs **inside** that macro — it can only ever see/act on the active clinic.
 - **"Visit" = `Appointment`.** There is no `Visit` model. Everything visit-related maps to the `Appointment` resource (`src/server/appointments/`). See §7.
 - **Codes:** result cards show human codes (`#GAM-21`, `D-1234`) — exactly the `generateUniqueCode` outputs the DAOs already produce. Nothing new needed; we surface what the create returns.
@@ -53,31 +53,31 @@ We are **greenfield** on AI — no `ai`, `@ai-sdk/*`, `openai`, `@anthropic-ai/*
 
 ## 4. Core concept: the Action Preset (a "skill")
 
-The heart of the design. An **action preset** is a typed, self-describing unit of "something the Agent can do" — what the UI calls a *مهارة/أمر* (skill/command) in the Command Library. It is the bridge between the inline-prompt UX and safe, validated writes.
+The heart of the design. An **action preset** is a typed, self-describing unit of "something the Agent can do" — what the UI calls a _مهارة/أمر_ (skill/command) in the Command Library. It is the bridge between the inline-prompt UX and safe, validated writes.
 
 Each preset declares:
 
 ```ts
 // src/server/agent/actions/action.type.ts  (shape, illustrative)
 type ActionPreset<TInput> = {
-  key: string;                    // "create-visit", "add-employee", "find-patient"
-  subAgent: SubAgentKey;          // "hr" | "visits" | "inventory" | "workflow" | "reports" | "general"
-  kind: "read" | "write";         // gates autonomy: reads may auto-run, writes always confirm
-  title: string;                  // Arabic label shown in the Command Library
-  description: string;            // fed to the LLM so it knows when to pick this action
-  icon?: string;                  // Tabler icon for the chip/library row
+  key: string; // "create-visit", "add-employee", "find-patient"
+  subAgent: SubAgentKey; // "hr" | "visits" | "inventory" | "workflow" | "reports" | "general"
+  kind: "read" | "write"; // gates autonomy: reads may auto-run, writes always confirm
+  title: string; // Arabic label shown in the Command Library
+  description: string; // fed to the LLM so it knows when to pick this action
+  icon?: string; // Tabler icon for the chip/library row
 
   // Where this preset is most relevant — used for context-aware ranking (§7):
-  contexts?: string[];            // e.g. ["hr.employees"] → surfaced on the employees page
+  contexts?: string[]; // e.g. ["hr.employees"] → surfaced on the employees page
 
   inputSchema: z.ZodType<TInput>; // required + optional fields (source of truth for validation)
 
   // THE INLINE PROMPT (frame 4063): a sentence template with typed slots.
   // Slots reference schema fields; each renders as an editable chip.
-  promptTemplate: PromptTemplate<TInput>;   // see §4.1
+  promptTemplate: PromptTemplate<TInput>; // see §4.1
 
   // How the Agent fills slots it wasn't given, by searching our DB:
-  resolvers: FieldResolver<TInput>[];   // resolve ownerId from "Rex's owner", staffId from "Dr. Sara", …
+  resolvers: FieldResolver<TInput>[]; // resolve ownerId from "Rex's owner", staffId from "Dr. Sara", …
 
   // Guardrail hook — can this clinic/user run this now?
   guard: (ctx: AgentContext, input: Partial<TInput>) => GuardResult;
@@ -91,8 +91,9 @@ type ActionPreset<TInput> = {
 ```
 
 Why presets (vs. exposing raw endpoints to the LLM):
+
 - **Predictable & auditable** — a fixed, browsable catalog (the Command Library), each with its own guard, validation, template, and card.
-- **The inline-prompt UX** — a preset's `promptTemplate` *is* the mad-libs sentence; slots map 1:1 to schema fields.
+- **The inline-prompt UX** — a preset's `promptTemplate` _is_ the mad-libs sentence; slots map 1:1 to schema fields.
 - **Schema-constrained tool-calling** — the LLM still orchestrates freely, but its output validates against `inputSchema` before we build a prompt or execute. Bad/hallucinated fields fail closed.
 - **Guardrails per action** — a clinic can disable `create-visit` for MEMBER role without touching the model.
 
@@ -180,7 +181,7 @@ Resolvers return `{ status: "resolved" | "ambiguous" | "not-found", candidates, 
    └────────────────────────┘
 ```
 
-**Key rule:** the LLM turn can *read* and *draft*, but the **`execute()`** of any `kind: "write"` preset runs only from `/confirm`, after the user sends the filled prompt. The write goes through the existing DAO — all current guarantees hold. Execution **duration** is measured server-side and returned for the card header.
+**Key rule:** the LLM turn can _read_ and _draft_, but the **`execute()`** of any `kind: "write"` preset runs only from `/confirm`, after the user sends the filled prompt. The write goes through the existing DAO — all current guarantees hold. Execution **duration** is measured server-side and returned for the card header.
 
 ---
 
@@ -189,11 +190,11 @@ Resolvers return `{ status: "resolved" | "ambiguous" | "not-found", candidates, 
 1. **Launcher (frame 1):** user is on `الموارد البشرية > الموظفين`. The panel shows context-ranked chips; user opens the **Command Library (frame 2)** and picks `إضافة موظف`.
 2. **`GET /api/agent/presets?context=hr.employees`** already returned the ranked catalog; the chosen preset's `promptTemplate` renders **inline (frame 3)** with `name` pre-filled ("أحمد محمد") and the rest as placeholder chips. Page context pre-fills `branchId` where possible.
 3. User fills the chips (`select` chips fetch options from the relevant DAO, `clinicId`-scoped). Optionally edits the sentence in natural language.
-4. **Send → `POST /api/agent/chat`** with the message/filled input + context + history. `requireClinic` injects `{ clinicId, userId }`. Assistant streams *"جاري العمل..."* with **skeletons (frame 4)**.
+4. **Send → `POST /api/agent/chat`** with the message/filled input + context + history. `requireClinic` injects `{ clinicId, userId }`. Assistant streams _"جاري العمل..."_ with **skeletons (frame 4)**.
 5. **Resolvers** finalize any fuzzy slots (all reads, `clinicId`-scoped); ambiguities surface as picks.
 6. **Guard** checks `ClinicAgentSettings`: is `add-employee` enabled? role allowed? within limits?
-7. Agent **drafts an `AgentAction`** (`DRAFT`). For a write, the filled prompt *is* the confirmation — sending it is the confirm. (Optionally a lightweight "confirm" step for destructive/high-risk presets.)
-8. **`/confirm`** re-validates against `inputSchema`, re-runs the guard, times the call, then invokes **`staffDao.create(...)`** — the *same* path the Staff UI uses. Arabic errors, unique-code generation (`#GAM-21`), and validation come for free.
+7. Agent **drafts an `AgentAction`** (`DRAFT`). For a write, the filled prompt _is_ the confirmation — sending it is the confirm. (Optionally a lightweight "confirm" step for destructive/high-risk presets.)
+8. **`/confirm`** re-validates against `inputSchema`, re-runs the guard, times the call, then invokes **`staffDao.create(...)`** — the _same_ path the Staff UI uses. Arabic errors, unique-code generation (`#GAM-21`), and validation come for free.
 9. **Result card (frame 5)** streams back: header "استغرق التنفيذ 4 ثوانٍ", "تم إنشاء ملف للموظف #GAM-21", entity summary (name, `D-1234`, "غير مفعل" badge), and the details table. On a `409`/validation error, the Agent shows the Arabic error and can propose a fix (e.g. next open slot for visits).
 
 ---
@@ -217,20 +218,20 @@ The settings page (frame `4103-546221`) organizes actions into named **sub-agent
 
 Grounded in real endpoints and the Command Library in frame 2. "Visit" = `Appointment`.
 
-| Preset key | Sub-agent | Kind | Backed by | Contexts | Required (resolved where possible) |
-|---|---|---|---|---|---|
-| `find-patient` | general | read | `patientsDao.list`/`findById` | any | query |
-| `find-owner` | general | read | `ownersDao` | any | query |
-| `weekly-summary` (`ملخص أسبوعي`) | reports | read | dashboard/appointments DAOs | dashboard | period=week |
-| `list-visits` | visits | read | `appointmentsDao.list` | appointments, dashboard | period, view? |
-| `visit-details` | visits | read | `appointmentsDao.findById` | appointments | appointmentId |
-| **`create-visit`** (`إنشاء زيارة`) | visits | **write** | `appointmentsDao.create` | appointments, patients | ownerId, patientId, staffId, serviceIds[], startsAt |
-| `reschedule-visit` | visits | write | `PATCH …/reschedule` | appointments | appointmentId, startsAt |
-| `change-visit-status` | visits | write | `PATCH …/status` | appointments | appointmentId, status |
-| **`add-employee`** (`إضافة موظف`) | hr | **write** | `staffDao.create` | hr.employees | name, email, roleId, branchId (+specialization, employmentType) |
-| `create-owner` | general | write | `ownersDao.create` | owners, patients | name, phone |
-| `create-patient` (`إضافة مريض`) | general | write | `patientsDao.create` | patients | name, gender, animalTypeId (+ownerId) |
-| `create-task` | workflow | write | `tasksDao.create` | any | title, type |
+| Preset key                         | Sub-agent | Kind      | Backed by                     | Contexts                | Required (resolved where possible)                              |
+| ---------------------------------- | --------- | --------- | ----------------------------- | ----------------------- | --------------------------------------------------------------- |
+| `find-patient`                     | general   | read      | `patientsDao.list`/`findById` | any                     | query                                                           |
+| `find-owner`                       | general   | read      | `ownersDao`                   | any                     | query                                                           |
+| `weekly-summary` (`ملخص أسبوعي`)   | reports   | read      | dashboard/appointments DAOs   | dashboard               | period=week                                                     |
+| `list-visits`                      | visits    | read      | `appointmentsDao.list`        | appointments, dashboard | period, view?                                                   |
+| `visit-details`                    | visits    | read      | `appointmentsDao.findById`    | appointments            | appointmentId                                                   |
+| **`create-visit`** (`إنشاء زيارة`) | visits    | **write** | `appointmentsDao.create`      | appointments, patients  | ownerId, patientId, staffId, serviceIds[], startsAt             |
+| `reschedule-visit`                 | visits    | write     | `PATCH …/reschedule`          | appointments            | appointmentId, startsAt                                         |
+| `change-visit-status`              | visits    | write     | `PATCH …/status`              | appointments            | appointmentId, status                                           |
+| **`add-employee`** (`إضافة موظف`)  | hr        | **write** | `staffDao.create`             | hr.employees            | name, email, roleId, branchId (+specialization, employmentType) |
+| `create-owner`                     | general   | write     | `ownersDao.create`            | owners, patients        | name, phone                                                     |
+| `create-patient` (`إضافة مريض`)    | general   | write     | `patientsDao.create`          | patients                | name, gender, animalTypeId (+ownerId)                           |
+| `create-task`                      | workflow  | write     | `tasksDao.create`             | any                     | title, type                                                     |
 
 > `إنشاء هيئة` from the library (frame 2) maps to a body/committee resource — confirm which model before including; parked pending clarification. `وكيل المخزون`/`وكيل التمريض` (inventory/nursing sub-agents in the settings) are shown in the design but have no presets in v1 — they appear disabled until we add their actions.
 
@@ -267,6 +268,7 @@ src/server/agent/
 Register in `src/server/index.ts`: `.use(agentController)`.
 
 **Client feature:** `src/features/agent/`
+
 - components: `agent-panel` (docked), `agent-launcher` (greeting + chips), `command-library` (searchable preset list, grouped by sub-agent), `inline-prompt` (template → field-chips), `field-chip` (per-slot renderer), `working-skeleton`, `result-card`, `model-picker`.
 - settings components: `agent-settings-page` (sub-agent toggles + behavioral guardrails), `wallet-card` (balance + add-balance), `add-balance-modal` (frame 3), `usage-chart` (spend over time), `usage-log-table` (frame 2).
 - hooks: `use-agent-chat` (SSE stream — first SSE consumer in the app), `use-agent-presets` (context-ranked catalog), `use-route-context`, `use-agent-wallet`, `use-agent-usage`.
@@ -304,6 +306,7 @@ model ClinicAgentSettings {
 The settings page (frame `4103-546221`) exposes these as: the **per-sub-agent enable toggles**, the **"الحواجز السلوكية" (behavioral guardrails)** free-text (→ `instructions`), **"أوامر سير العمل"** (workflow prompts), **"سوق مهارات الـAI"** (skills marketplace — future), and **"التكاملات الخارجية"** (external integrations — future). Auto-refill lives on the balance detail page (frame `4170-550398`).
 
 Guardrails apply at **three** points, defensively:
+
 1. **Catalog assembly** — presets in a disabled sub-agent (or explicitly disabled, or role-gated) are never offered to the LLM or shown in the Command Library.
 2. **Balance check** — before a metered write executes, the wallet must have sufficient (or any) balance (§14). No balance → the action is blocked with an Arabic "أضف رصيدًا" prompt.
 3. **`execute()` / `/confirm`** — the guard re-runs server-side before the write. LLM output is never trusted to have respected the rules.
@@ -383,7 +386,7 @@ The balance ("الرصيد") is a **prepaid SAR wallet** each clinic tops up and
 model AgentWallet {
   id            String   @id @default(cuid())
   clinicId      String   @unique
-  balanceSar    Decimal  @default(0) @db.Decimal(10, 2)   // "متاح 100.00 ر.س" — cached running balance
+  balanceSar    Decimal  @default(0) @db.Decimal(10, 2)   // "متاح 100.00 ج.م" — cached running balance
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   clinic        Clinic   @relation(fields: [clinicId], references: [id], onDelete: Cascade)
@@ -409,7 +412,7 @@ model AgentWalletEntry {
 // enum AgentWalletEntryType { CREDIT DEBIT ADJUSTMENT }
 ```
 
-Credit and debit **always** go through the ledger inside a transaction that also updates `AgentWallet.balanceSar`; never mutate the balance directly. A DEBIT row and its `AgentAction` are written in the *same* transaction as the metered result, so spend and audit can never drift.
+Credit and debit **always** go through the ledger inside a transaction that also updates `AgentWallet.balanceSar`; never mutate the balance directly. A DEBIT row and its `AgentAction` are written in the _same_ transaction as the metered result, so spend and audit can never drift.
 
 ---
 
@@ -445,7 +448,7 @@ The design bills clinics through a **prepaid SAR wallet** (frames `4103-546221`,
 4. **Debit the wallet transactionally.** In one DB transaction: write the `AgentAction` (with `costSar`), append a `DEBIT` `AgentWalletEntry`, and decrement `AgentWallet.balanceSar`. Spend and audit can never drift.
 5. **Surface it.** `costSar` shows in the result card and the **usage log** (frame 2: user · timestamp · sub-agent · command · cost). The **spend chart** aggregates `AgentAction.costSar` by day.
 
-> The mock shows a flat "10 ر.س" per row — that's placeholder. With real metering, rows show the actual computed SAR (rounded), which varies by action complexity. If a fixed per-action price is ever wanted, it's a one-line swap in step 2–3.
+> The mock shows a flat "10 ج.م" per row — that's placeholder. With real metering, rows show the actual computed SAR (rounded), which varies by action complexity. If a fixed per-action price is ever wanted, it's a one-line swap in step 2–3.
 
 ### Balance & refill
 
@@ -462,15 +465,15 @@ The design bills clinics through a **prepaid SAR wallet** (frames `4103-546221`,
 
 ### Underlying LLM cost (what you actually pay the provider)
 
-This is what `MARKUP` must clear. Reference per 1M tokens: Claude Sonnet ≈ $3 in / $15 out; Claude Haiku ≈ $1 / $5; GPT-4o-class ≈ $2.50 / $10; mini ≈ $0.15 / $0.60. One *completed* action ≈ 2–4 round-trips (~15K input + ~1–2K output total):
+This is what `MARKUP` must clear. Reference per 1M tokens: Claude Sonnet ≈ $3 in / $15 out; Claude Haiku ≈ $1 / $5; GPT-4o-class ≈ $2.50 / $10; mini ≈ $0.15 / $0.60. One _completed_ action ≈ 2–4 round-trips (~15K input + ~1–2K output total):
 
-| Model | Provider cost / action | ≈ SAR before markup |
-|---|---|---|
-| Claude Sonnet | ~$0.05–0.08 | ~0.19–0.30 ر.س |
-| GPT-4o-class | ~$0.04–0.06 | ~0.15–0.23 ر.س |
-| Haiku / mini | ~$0.01–0.02 | ~0.04–0.08 ر.س |
+| Model         | Provider cost / action | ≈ SAR before markup |
+| ------------- | ---------------------- | ------------------- |
+| Claude Sonnet | ~$0.05–0.08            | ~0.19–0.30 ج.م      |
+| GPT-4o-class  | ~$0.04–0.06            | ~0.15–0.23 ج.م      |
+| Haiku / mini  | ~$0.01–0.02            | ~0.04–0.08 ج.م      |
 
-So the design's "10 ر.س"/action would be a **large** markup over raw cost — good for margin, but set `MARKUP` deliberately and transparently.
+So the design's "10 ج.م"/action would be a **large** markup over raw cost — good for margin, but set `MARKUP` deliberately and transparently.
 
 ### Build & infra cost (one-time)
 
@@ -511,6 +514,7 @@ So the design's "10 ر.س"/action would be a **large** markup over raw cost — 
 **Phase 0 — Spike (throwaway).** One read action (`find-patient`) end-to-end: Elysia route → provider registry (both OpenAI + Anthropic) → tool-call → resolver → streamed answer. Proves transport, multi-provider tool-calling, clinic scoping, and the structured-event stream shape. No persistence, no UI polish.
 
 **Phase 1 — Foundation.**
+
 - `ClinicAgentSettings`, `AgentConversation/Message/Action`, `AgentWallet/WalletEntry` models + migrations.
 - Preset framework (`action.type.ts` incl. `PromptTemplate`, sub-agent grouping, registry, guard + context ranking).
 - Provider registry (with per-model rates) + system prompt + resolver library + context contract.
@@ -518,19 +522,23 @@ So the design's "10 ر.س"/action would be a **large** markup over raw cost — 
 - Read actions: `find-patient`, `find-owner`, `list-visits`, `weekly-summary`, `visit-details`.
 
 **Phase 2 — The UI shell + flagship write.**
+
 - Docked panel, launcher (chips), **Command Library** (grouped by sub-agent), **inline-prompt renderer + field-chips**, working-skeleton, **result card**, model picker.
 - `add-employee` **or** `create-visit` (pick one) with full resolver chain + inline prompt + balance-check + `/confirm` execute + metered debit + result card (code, duration, cost, badge, field table). RTL-verified.
 - Audit trail + wallet debit wired to `AgentAction`/ledger.
 
 **Phase 3 — Billing UI + more writes.**
+
 - **AI & Agents settings page**: sub-agent toggles, behavioral-guardrails free-text, default provider.
 - **Wallet UI**: balance card, add-balance modal (no real payment), auto-refill toggle, **spend chart**, **usage log** table.
 - The other flagship + `reschedule-visit`, `change-visit-status`, `create-owner`, `create-patient`, `create-task`.
 
 **Phase 4 — Hardening.**
+
 - Rate limits / daily caps, richer ambiguity UX, conversation history, error recovery (auto-propose next slot on conflict), eval harness for action-selection + slot-fill accuracy, per-model Arabic validation.
 
 **Phase 5 — Real payment (later).**
+
 - Payment-gateway integration behind the existing `CREDIT` ledger + add-balance flow; real auto-refill charges.
 
 ---

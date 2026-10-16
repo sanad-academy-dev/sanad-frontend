@@ -16,32 +16,36 @@ import { api } from "@/lib/api";
  * Renders nothing at zero, and nothing when the reader lacks the ledger permission (the
  * query simply fails and we stay quiet) — a silent chip is correct, a lying one is not.
  */
-export const OwnerOpenBalanceChip = ({ ownerId }: { ownerId: string | null | undefined }) => {
-	const { data } = useQuery({
-		queryKey: ["accounting", "party-open-balance", "Owner", ownerId ?? ""],
-		enabled: Boolean(ownerId),
-		staleTime: 1000 * 15,
-		retry: false,
-		queryFn: async () => {
-			const { data, error } = await api.accounting
-				.parties({ partyType: "Owner" })({ partyId: ownerId as string })
-				["open-balance"].get();
-			if (error) return null;
-			return data;
-		},
-	});
+export const OwnerOpenBalanceChip = ({
+  ownerId,
+}: {
+  ownerId: string | null | undefined;
+}) => {
+  const { data } = useQuery({
+    queryKey: ["accounting", "party-open-balance", "Owner", ownerId ?? ""],
+    enabled: Boolean(ownerId),
+    staleTime: 1000 * 15,
+    retry: false,
+    queryFn: async () => {
+      const { data, error } = await api.accounting
+        .parties({ partyType: "Owner" })({ partyId: ownerId as string })
+        ["open-balance"].get();
+      if (error) return null;
+      return data;
+    },
+  });
 
-	if (!data || Number(data.outstanding) <= 0) return null;
+  if (!data || Number(data.outstanding) <= 0) return null;
 
-	return (
-		<div className="flex items-center gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-amber-900">
-			<span className="font-medium text-sm">رصيد مفتوح</span>
-			<span className="font-semibold text-sm tabular-nums">
-				{formatAmount(data.outstanding)} ر.س
-			</span>
-			<span className="text-xs">
-				على {data.voucherCount} مستند — يُحصَّل بسند قبض على طرف «وليّ الأمر»
-			</span>
-		</div>
-	);
+  return (
+    <div className="flex items-center gap-2 rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-amber-900">
+      <span className="font-medium text-sm">رصيد مفتوح</span>
+      <span className="font-semibold text-sm tabular-nums">
+        {formatAmount(data.outstanding)} ج.م
+      </span>
+      <span className="text-xs">
+        على {data.voucherCount} مستند — يُحصَّل بسند قبض على طرف «وليّ الأمر»
+      </span>
+    </div>
+  );
 };

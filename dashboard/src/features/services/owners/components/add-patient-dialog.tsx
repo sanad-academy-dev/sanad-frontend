@@ -1,37 +1,55 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createPatientSchema } from "@sanad/contracts/runtime/server/patients/patients.type";
-import { useHotkey } from "@tanstack/react-hotkeys";
-import { Controller, useForm } from "react-hook-form";
-import type { z } from "zod";
-import { FieldLabel } from "@/components/common/field-label";
-import { FormFooter } from "@/components/common/form-footer";
-import { FormHeader } from "@/components/common/form-header";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Field, FieldError } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { useCreatePatientDialog } from "@/features/services/owners/hooks/use-create-patient-dialog";
-import { useFormProgress } from "@/hooks/use-form-progress";
+	type CreatePatientFormInput,
+	createPatientSchema,
+} from "@sanad/contracts/runtime/server/patients/patients.type";
+import { IconLoader2, IconPlus, IconX } from "@tabler/icons-react";
+import { useHotkey } from "@tanstack/react-hotkeys";
+import { useEffect, useMemo, useState } from "react";
+import { type Resolver, useForm } from "react-hook-form";
 
-const addPatientDialogSchema = createPatientSchema.omit({ ownerId: true });
+import { FormFooter } from "@/components/common/form-footer";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { AddOwnerDialog } from "@/features/services/patients/components/add-owner-dialog";
+import { DiscardConfirmDialog } from "@/features/services/patients/components/discard-confirm-dialog";
+import { PatientFormContent } from "@/features/services/patients/components/patient-form-content";
+import {
+	calculatePatientProgress,
+	getPatientFilledFields,
+	INITIAL_PATIENT_FORM_VALUES,
+	PATIENT_FIELD_LABELS,
+} from "@/features/services/patients/data/patient-form-constants";
+import { useCreatePatient } from "@/features/services/patients/hooks/use-create-patient";
+import { useOwners } from "@/features/services/patients/hooks/use-owners";
 
-interface AddPatientDialogProps {
+export interface AddPatientDialogProps {
 	open: boolean;
 	onClose: () => void;
 	onSuccess?: (patientId: string) => void;
+	defaultOwnerId?: string;
+	defaultGuardianName?: string;
+	defaultGuardianPhone?: string;
+	defaultGuardianEmail?: string;
 }
 
-export function AddPatientDialog({ open, onClose, onSuccess }: AddPatientDialogProps) {
-	const { createPatient, isPending } = useCreatePatientDialog();
+export function AddPatientDialog({
+	open,
+	onClose,
+	onSuccess,
+	defaultOwnerId,
+	defaultGuardianName,
+	defaultGuardianPhone,
+	defaultGuardianEmail,
+}: AddPatientDialogProps) {
+	const { createPatient, isPending } = useCreatePatient();
+	const { owners, isLoading: ownersLoading } = useOwners();
+
+	const [ownerDialogOpen, setOwnerDialogOpen] = useState(false);
+	const [ownerSelectOpen, setOwnerSelectOpen] = useState(false);
+	const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
+	const [continueAdding, setContinueAdding] = useState(false);
+	const [showAdvanced, setShowAdvanced] = useState(false);
 
 	const {
 		register,
@@ -39,28 +57,92 @@ export function AddPatientDialog({ open, onClose, onSuccess }: AddPatientDialogP
 		control,
 		reset,
 		watch,
+		setValue,
 		formState: { errors },
-	} = useForm<
-		z.input<typeof addPatientDialogSchema>,
-		any,
-		z.infer<typeof addPatientDialogSchema>
-	>({
-		resolver: zodResolver(addPatientDialogSchema),
-		defaultValues: { active: true },
+	} = useForm<CreatePatientFormInput>({
+		resolver: zodResolver(createPatientSchema) as Resolver<CreatePatientFormInput>,
+		defaultValues: {
+			...INITIAL_PATIENT_FORM_VALUES,
+			ownerId: defaultOwnerId ?? "",
+			guardianName: defaultGuardianName ?? "",
+			guardianPhone: defaultGuardianPhone ?? "",
+			guardianEmail: defaultGuardianEmail ?? "",
+		},
 	});
 
 	const values = watch();
-	const formProgress = useFormProgress({ schema: addPatientDialogSchema, values });
 
-	const onSubmit = async (data: z.infer<typeof addPatientDialogSchema>) => {
-		const patient = await createPatient(data);
-		reset();
-		onClose();
-		onSuccess?.(patient.id);
+	useEffect(() => {
+		if (!open) return;
+
+		let initialGuardianName = defaultGuardianName ?? "";
+		let initialGuardianPhone = defaultGuardianPhone ?? "";
+		let initialGuardianEmail = defaultGuardianEmail ?? "";
+
+		if (defaultOwnerId && owners.length > 0) {
+			const found = owners.find((o) => o.id === defaultOwnerId);
+			if (found) {
+				initialGuardianName = found.name;
+				if (found.phone) initialGuardianPhone = found.phone;
+				if (found.email) initialGuardianEmail = found.email;
+			}
+		}
+
+		reset({
+			...INITIAL_PATIENT_FORM_VALUES,
+			ownerId: defaultOwnerId ?? "",
+			guardianName: initialGuardianName,
+			guardianPhone: initialGuardianPhone,
+			guardianEmail: initialGuardianEmail,
+		});
+		setShowAdvanced(false);
+	}, [
+		open,
+		defaultOwnerId,
+		defaultGuardianName,
+		defaultGuardianPhone,
+		defaultGuardianEmail,
+		owners,
+		reset,
+	]);
+
+	const requiredFieldsProgress = useMemo(() => calculatePatientProgress(values), [values]);
+
+	const filledFields = useMemo(() => getPatientFilledFields(values), [values]);
+
+	const handleCloseAttempt = () => {
+		if (filledFields.length > 2) {
+			setConfirmDiscardOpen(true);
+		} else {
+			reset();
+			onClose();
+		}
 	};
 
-	const handleClose = () => {
+	const handleConfirmDiscard = () => {
+		setConfirmDiscardOpen(false);
 		reset();
+		onClose();
+	};
+
+	const onSubmit = async (data: CreatePatientFormInput) => {
+		// اشتقاق العمر بالسنوات تلقائياً من تاريخ الميلاد
+		let age: number | undefined;
+		if (data.birthDate) {
+			const b = new Date(data.birthDate);
+			if (!Number.isNaN(b.getTime())) {
+				const now = new Date();
+				age = Math.max(0, now.getFullYear() - b.getFullYear());
+			}
+		}
+
+		const patient = await createPatient({
+			...data,
+			age,
+		});
+		onSuccess?.(patient.id);
+		reset();
+		if (continueAdding) return;
 		onClose();
 	};
 
@@ -70,217 +152,137 @@ export function AddPatientDialog({ open, onClose, onSuccess }: AddPatientDialogP
 	});
 
 	return (
-		<Dialog
-			open={open}
-			onOpenChange={(isOpen) => {
-				if (!isOpen) handleClose();
-			}}
-		>
-			<DialogContent
-				showCloseButton={false}
-				className="sm:max-w-xl p-0 gap-0"
-				dir="rtl"
+		<>
+			<Dialog
+				open={open}
+				onOpenChange={(isOpen) => {
+					if (!isOpen) handleCloseAttempt();
+				}}
 			>
-				<FormHeader
-					variant="dialog"
-					title="إضافة طفل جديد"
-					progress={formProgress}
-					onClose={handleClose}
-				/>
-
-				<form
-					id="add-patient-dialog-form"
-					onSubmit={handleSubmit(onSubmit)}
-					className="flex flex-col gap-4 px-4 py-4"
+				<DialogContent
+					showCloseButton={false}
+					className="w-full sm:max-w-xl max-h-[90vh] p-0 gap-0 flex flex-col overflow-hidden"
+					dir="rtl"
+					onInteractOutside={(e) => {
+						if (ownerDialogOpen || confirmDiscardOpen) {
+							e.preventDefault();
+							return;
+						}
+						e.preventDefault();
+						handleCloseAttempt();
+					}}
 				>
-					<div className="flex flex-col gap-1.5">
-						<FieldLabel required>
-							<Label
-								className="text-sm font-medium"
-								htmlFor="dialog-patient-name"
-							>
-								اسم الطفل
-							</Label>
-						</FieldLabel>
-						<Field data-invalid={!!errors.name}>
-							<Input
-								id="dialog-patient-name"
-								placeholder="مثال: بسبوسة"
-								className="text-sm"
-								aria-invalid={!!errors.name}
-								disabled={isPending}
-								{...register("name")}
-							/>
-							<FieldError errors={[errors.name]} />
-						</Field>
-					</div>
-
-					<div className="flex flex-col gap-1.5">
-						<FieldLabel required>
-							<Label
-								className="text-sm font-medium"
-								htmlFor="dialog-patient-gender"
-							>
-								الجنس
-							</Label>
-						</FieldLabel>
-						<Controller
-							name="gender"
-							control={control}
-							render={({ field }) => (
-								<Field data-invalid={!!errors.gender}>
-									<Select
-										value={field.value ?? ""}
-										onValueChange={field.onChange}
-										dir="rtl"
-										disabled={isPending}
-									>
-										<SelectTrigger
-											id="dialog-patient-gender"
-											aria-invalid={!!errors.gender}
-											className="w-full text-right text-sm"
-										>
-											<SelectValue placeholder="اختر الجنس..." />
-										</SelectTrigger>
-										<SelectContent
-											dir="rtl"
-											position="popper"
-										>
-											<SelectItem
-												value="MALE"
-												className="text-right"
-											>
-												ذكر
-											</SelectItem>
-											<SelectItem
-												value="FEMALE"
-												className="text-right"
-											>
-												أنثى
-											</SelectItem>
-											<SelectItem
-												value="UNKNOWN"
-												className="text-right"
-											>
-												غير معروف
-											</SelectItem>
-										</SelectContent>
-									</Select>
-									<FieldError errors={[errors.gender]} />
-								</Field>
-							)}
-						/>
-					</div>
-
-					<div className="grid grid-cols-2 gap-3">
-						<div className="flex flex-col gap-1.5">
-							<Label
-								className="text-sm font-medium"
-								htmlFor="dialog-patient-age"
-							>
-								العمر (سنوات)
-							</Label>
-							<Field data-invalid={!!errors.age}>
-								<Input
-									id="dialog-patient-age"
-									type="number"
-									min={0}
-									placeholder="مثال: 3"
-									className="text-sm"
-									aria-invalid={!!errors.age}
-									disabled={isPending}
-									{...register("age")}
-								/>
-								<FieldError errors={[errors.age]} />
-							</Field>
-						</div>
-
-						<div className="flex flex-col gap-1.5">
-							<Label
-								className="text-sm font-medium"
-								htmlFor="dialog-patient-weight"
-							>
-								الوزن (كيلو)
-							</Label>
-							<Field data-invalid={!!errors.weight}>
-								<Input
-									id="dialog-patient-weight"
-									type="number"
-									min={0}
-									step="0.1"
-									placeholder="مثال: 4.5"
-									className="text-sm"
-									aria-invalid={!!errors.weight}
-									disabled={isPending}
-									{...register("weight")}
-								/>
-								<FieldError errors={[errors.weight]} />
-							</Field>
-						</div>
-					</div>
-
-					{/* تاريخ الميلاد مطلوب: منه وحده تُشتق جدولة التطعيم بالعمر، والعمر رقم
-					    حرّ يشيخ في مكانه فلا يصلح بديلًا. */}
-					<div className="flex flex-col gap-1.5">
-						<FieldLabel required>
-							<Label
-								className="text-sm font-medium"
-								htmlFor="dialog-patient-birth-date"
-							>
-								تاريخ الميلاد
-							</Label>
-						</FieldLabel>
-						<Field data-invalid={!!errors.birthDate}>
-							<Input
-								id="dialog-patient-birth-date"
-								type="date"
-								max={new Date().toISOString().slice(0, 10)}
-								className="text-sm"
-								aria-invalid={!!errors.birthDate}
-								disabled={isPending}
-								{...register("birthDate")}
-							/>
-							<FieldError errors={[errors.birthDate]} />
-						</Field>
-					</div>
-
-					<div className="flex flex-col gap-1.5">
-						<Label
-							className="text-sm font-medium"
-							htmlFor="dialog-patient-notes"
+					{/* رأس النموذج المخصص والمطابق لنموذج الأطفال */}
+					<div className="flex items-center justify-between border-b px-4 py-3 shrink-0">
+						<DialogTitle className="text-base font-bold text-foreground">
+							إضافة طفل جديد
+						</DialogTitle>
+						<button
+							type="button"
+							onClick={handleCloseAttempt}
+							className="rounded-sm p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors cursor-pointer"
 						>
-							ملاحظات
-						</Label>
-						<Textarea
-							id="dialog-patient-notes"
-							placeholder="أي ملاحظات إضافية..."
-							className="text-sm min-h-20 resize-none"
-							disabled={isPending}
-							{...register("notes")}
-						/>
+							<IconX className="size-4" />
+							<span className="sr-only">إغلاق</span>
+						</button>
 					</div>
-				</form>
 
-				<FormFooter>
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						onClick={handleClose}
+					{/* شريط نسبة الإنجاز والتقدم */}
+					<div className="flex flex-col gap-1.5 border-b px-4 py-2.5 bg-muted/20 shrink-0">
+						<div className="flex items-center justify-between text-xs">
+							<span className="font-bold text-emerald-600">
+								{requiredFieldsProgress.percentage}%
+							</span>
+							<span className="text-muted-foreground">
+								{requiredFieldsProgress.completed} من {requiredFieldsProgress.total} حقول
+								مطلوبة
+							</span>
+						</div>
+						<div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+							<div
+								className="h-full bg-emerald-600 transition-all duration-300 rounded-full"
+								style={{ width: `${requiredFieldsProgress.percentage}%` }}
+							/>
+						</div>
+					</div>
+
+					<div className="flex-1 overflow-y-auto px-4 py-4 min-h-0">
+						<form
+							id="add-patient-dialog-form"
+							onSubmit={handleSubmit(onSubmit)}
+							className="flex flex-col gap-6"
+						>
+							<PatientFormContent
+								control={control}
+								register={register}
+								errors={errors}
+								watch={watch}
+								setValue={setValue}
+								isPending={isPending}
+								owners={owners}
+								ownersLoading={ownersLoading}
+								ownerSelectOpen={ownerSelectOpen}
+								setOwnerSelectOpen={setOwnerSelectOpen}
+								onAddOwnerClick={() => setOwnerDialogOpen(true)}
+								showAdvanced={showAdvanced}
+								setShowAdvanced={setShowAdvanced}
+								idPrefix="dialog-patient"
+							/>
+						</form>
+					</div>
+
+					<FormFooter
+						continueAdding={continueAdding}
+						onContinueAddingChange={setContinueAdding}
 						disabled={isPending}
+						showShortcut
+						className="shrink-0"
 					>
-						إلغاء
-					</Button>
-					<Button
-						type="submit"
-						form="add-patient-dialog-form"
-						size="sm"
-						disabled={isPending}
-					>
-						إضافة الطفل
-					</Button>
-				</FormFooter>
-			</DialogContent>
-		</Dialog>
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							onClick={handleCloseAttempt}
+							disabled={isPending}
+						>
+							إلغاء
+						</Button>
+						<Button
+							type="submit"
+							form="add-patient-dialog-form"
+							size="sm"
+							disabled={isPending}
+							className="gap-1.5"
+						>
+							{isPending && <IconLoader2 className="size-4 animate-spin" />}
+							<IconPlus className="size-4" />
+							إضافة الطفل
+						</Button>
+					</FormFooter>
+				</DialogContent>
+			</Dialog>
+
+			<DiscardConfirmDialog
+				open={confirmDiscardOpen}
+				filledFields={filledFields}
+				fieldLabels={PATIENT_FIELD_LABELS}
+				onDiscard={handleConfirmDiscard}
+				onResume={() => setConfirmDiscardOpen(false)}
+			/>
+
+			<AddOwnerDialog
+				open={ownerDialogOpen}
+				onClose={() => setOwnerDialogOpen(false)}
+				onSuccess={(newOwnerId) => {
+					setValue("ownerId", newOwnerId, { shouldValidate: true });
+					const found = owners.find((o) => o.id === newOwnerId);
+					if (found) {
+						setValue("guardianName", found.name, { shouldValidate: true });
+						if (found.phone) setValue("guardianPhone", found.phone, { shouldValidate: true });
+						if (found.email) setValue("guardianEmail", found.email);
+					}
+				}}
+			/>
+		</>
 	);
 }

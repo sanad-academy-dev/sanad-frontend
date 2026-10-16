@@ -19,9 +19,12 @@ export declare const createPatientSchema: z.ZodObject<{
     notes: z.ZodOptional<z.ZodString>;
     active: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
 }, z.core.$strip>;
-export type CreatePatientFormInput = z.infer<typeof createPatientSchema>;
-export type CreatePatientInput = Pick<Prisma.PatientUncheckedCreateInput, "clinicId" | "name" | "gender" | "animalTypeId" | "ownerId" | "animalStrainId" | "age" | "birthDate" | "weight" | "notes" | "active">;
-export type UpdatePatientInput = Partial<Omit<CreatePatientInput, "clinicId">>;
+export type CreatePatientInput = Pick<Prisma.PatientUncheckedCreateInput, "clinicId" | "name" | "gender" | "ownerId" | "age" | "birthDate" | "weight" | "notes" | "active" | "status" | "nationalId" | "classroom" | "bloodType" | "developmentStatus" | "allergies" | "pocketMoneyEnabled" | "transportation" | "feeType" | "healthConditions" | "previousNursery" | "guardianRelationship" | "emergencyContactPhone" | "emergencyContactName">;
+export type UpdatePatientInput = Partial<Omit<CreatePatientInput, "clinicId">> & {
+	guardianName?: string | null;
+	guardianPhone?: string | null;
+	guardianEmail?: string | null;
+};
 export type PatientResponse = Prisma.PatientGetPayload<{
     select: {
         id: true;

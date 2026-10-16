@@ -1,6 +1,7 @@
 import {
 	IconArrowsDiagonal,
 	IconArrowsDiagonalMinimize2,
+	IconArrowsExchange,
 	IconBan,
 	IconCake,
 	IconChevronLeft,
@@ -34,6 +35,7 @@ import { PatientPolicyCard } from "@/features/accounting/insurance/components/pa
 import { DeletePatientDialog } from "@/features/services/patients/components/delete-patient-dialog";
 import { DisablePatientDialog } from "@/features/services/patients/components/disable-patient-dialog";
 import { PatientSheet } from "@/features/services/patients/components/patient-sheet";
+import { TransferOwnershipDialog } from "@/features/services/patients/components/transfer-ownership-dialog";
 import { ConsentsTab } from "@/features/services/patients/components/tabs/consents-tab";
 import { DocumentsTab } from "@/features/services/patients/components/tabs/documents-tab";
 import { HistoryTab } from "@/features/services/patients/components/tabs/history-tab";
@@ -47,13 +49,19 @@ import { VitalSignsTab } from "@/features/services/patients/components/tabs/vita
 import type { PatientProfileSheetProps } from "@/features/services/patients/types/patient-profile-sheet.types";
 import { useI18n } from "@/hooks/use-i18n";
 import { cn } from "@/lib/utils";
-import type { PatientResponse } from "@/server/patients/patients.type";
+import type { PatientResponse } from "@sanad/contracts/runtime/server/patients/patients.type";
 
-export function PatientProfileSheet({ patient, open, onClose }: PatientProfileSheetProps) {
+export function PatientProfileSheet({
+	patient,
+	open,
+	onClose,
+	onPatientChange,
+}: PatientProfileSheetProps) {
 	const { isRtl } = useI18n();
 	const side = isRtl ? "left" : "right";
 
 	const [editTarget, setEditTarget] = useState<PatientResponse | null>(null);
+	const [transferTarget, setTransferTarget] = useState<PatientResponse | null>(null);
 	const [disableTarget, setDisableTarget] = useState<PatientResponse | null>(null);
 	const [deleteTarget, setDeleteTarget] = useState<PatientResponse | null>(null);
 	const [expanded, setExpanded] = useState(false);
@@ -123,10 +131,17 @@ export function PatientProfileSheet({ patient, open, onClose }: PatientProfileSh
 										</DropdownMenuItem>
 										<DropdownMenuItem
 											className="gap-2"
+											onSelect={() => patient && setTransferTarget(patient)}
+										>
+											<IconArrowsExchange className="size-4" />
+											نقل ملكية
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											className="gap-2"
 											onSelect={() => patient && setDisableTarget(patient)}
 										>
 											<IconBan className="size-4" />
-											تعطيل
+											{patient?.active ? "تعطيل" : "تفعيل"}
 										</DropdownMenuItem>
 										<DropdownMenuSeparator />
 										<DropdownMenuItem
@@ -295,11 +310,44 @@ export function PatientProfileSheet({ patient, open, onClose }: PatientProfileSh
 									{/* active flag */}
 									<div className="flex items-center gap-1.5">
 										{patient?.active ? (
-											<IconCircleCheck className="size-4 text-muted-foreground" />
+											<IconCircleCheck className="size-4 text-emerald-600" />
 										) : (
 											<IconCircleOff className="size-4 text-muted-foreground" />
 										)}
-										<span className="text-sm">{patient?.active ? "نشط" : "غير نشط"}</span>
+										<span className="text-sm font-medium">{patient?.active ? "نشط" : "غير نشط"}</span>
+									</div>
+
+									{/* classroom */}
+									{patient?.classroom && (
+										<div className="flex items-center justify-between gap-2">
+											<span className="text-xs text-muted-foreground">الفصل</span>
+											<span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200 border">
+												{patient.classroom}
+											</span>
+										</div>
+									)}
+
+									{/* feeType */}
+									<div className="flex items-center justify-between gap-2">
+										<span className="text-xs text-muted-foreground">نوع الرسوم</span>
+										<span className="text-xs font-medium">
+											{patient?.feeType || "—"}
+										</span>
+									</div>
+
+									{/* pocketMoneyEnabled */}
+									<div className="flex items-center justify-between gap-2">
+										<span className="text-xs text-muted-foreground">المصروف</span>
+										<span
+											className={cn(
+												"inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border",
+												patient?.pocketMoneyEnabled !== false
+													? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300"
+													: "bg-muted text-muted-foreground border-border",
+											)}
+										>
+											{patient?.pocketMoneyEnabled !== false ? "مفعّل" : "معطّل"}
+										</span>
 									</div>
 
 									{/* age */}
@@ -315,6 +363,34 @@ export function PatientProfileSheet({ patient, open, onClose }: PatientProfileSh
 										<div className="flex items-center gap-1.5">
 											<IconWeight className="size-4 text-muted-foreground" />
 											<span className="text-sm">{patient.weight} كجم</span>
+										</div>
+									)}
+
+									{/* nationalId */}
+									{patient?.nationalId && (
+										<div className="flex items-center justify-between gap-2">
+											<span className="text-xs text-muted-foreground">رقم الهوية</span>
+											<span className="text-xs font-mono tabular-nums">{patient.nationalId}</span>
+										</div>
+									)}
+
+									{/* bloodType */}
+									{patient?.bloodType && (
+										<div className="flex items-center justify-between gap-2">
+											<span className="text-xs text-muted-foreground">فصيلة الدم</span>
+											<span className="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-bold bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-400">
+												{patient.bloodType}
+											</span>
+										</div>
+									)}
+
+									{/* transportation */}
+									{patient?.transportation && (
+										<div className="flex items-center justify-between gap-2">
+											<span className="text-xs text-muted-foreground">وسيلة النقل</span>
+											<span className="text-xs truncate max-w-[130px]" title={patient.transportation}>
+												{patient.transportation}
+											</span>
 										</div>
 									)}
 								</div>
@@ -369,14 +445,34 @@ export function PatientProfileSheet({ patient, open, onClose }: PatientProfileSh
 				open={!!editTarget}
 				onClose={() => setEditTarget(null)}
 				patient={editTarget}
+				onSuccess={(updated) => {
+					setEditTarget(null);
+					onPatientChange?.(updated);
+				}}
 			/>
 			<DisablePatientDialog
 				patient={disableTarget}
 				onClose={() => setDisableTarget(null)}
+				onSuccess={(updated) => {
+					setDisableTarget(null);
+					onPatientChange?.(updated);
+				}}
+			/>
+			<TransferOwnershipDialog
+				patient={transferTarget}
+				onClose={() => setTransferTarget(null)}
+				onSuccess={(updated) => {
+					setTransferTarget(null);
+					onPatientChange?.(updated);
+				}}
 			/>
 			<DeletePatientDialog
 				patient={deleteTarget}
 				onClose={() => setDeleteTarget(null)}
+				onSuccess={() => {
+					setDeleteTarget(null);
+					onClose();
+				}}
 			/>
 		</>
 	);

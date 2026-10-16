@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
  * THE NUMBER IS FORCED LTR AND THE CURRENCY IS NOT. Arabic reads right to left, digits do
  * not, and a money figure that inherits the page's RTL flow renders its groups in the wrong
  * order. `dir="ltr"` on the wrapper fixes the box while the browser's bidi handling keeps
- * «ر.س» reading correctly beside it.
+ * «ج.م» reading correctly beside it.
  *
  * IT FORMATS BY DEFAULT. Passing a raw `Decimal(21,9)` string was the actual defect on two
  * screens, so `value` goes through `formatAmount` (exact, bigint-based, no JS float touches
@@ -21,27 +21,29 @@ import { cn } from "@/lib/utils";
  * `preformatted`. The safe thing is what happens when you do nothing.
  */
 export const AccountingAmount = ({
-	value,
-	muted,
-	preformatted = false,
-	className,
+  value,
+  muted,
+  preformatted = false,
+  className,
 }: {
-	value: string | number | null | undefined;
-	/** secondary figures (an already-settled balance, a zero) read quieter */
-	muted?: boolean;
-	/** the caller already ran `formatAmount`/`formatMoney` — do not format twice */
-	preformatted?: boolean;
-	className?: string;
+  value: string | number | null | undefined;
+  /** secondary figures (an already-settled balance, a zero) read quieter */
+  muted?: boolean;
+  /** the caller already ran `formatAmount`/`formatMoney` — do not format twice */
+  preformatted?: boolean;
+  className?: string;
 }) => (
-	<span
-		className={cn(
-			"inline-flex items-baseline justify-end gap-1 font-medium text-xs",
-			muted ? "text-muted-foreground" : "text-foreground",
-			className,
-		)}
-		dir="ltr"
-	>
-		<span className="tabular-nums">{preformatted ? (value ?? "") : formatAmount(value)}</span>
-		<span className="text-[10px] text-muted-foreground">ر.س</span>
-	</span>
+  <span
+    className={cn(
+      "inline-flex items-baseline justify-end gap-1 font-medium text-xs",
+      muted ? "text-muted-foreground" : "text-foreground",
+      className,
+    )}
+    dir="ltr"
+  >
+    <span className="tabular-nums">
+      {preformatted ? (value ?? "") : formatAmount(value)}
+    </span>
+    <span className="text-[10px] text-muted-foreground">ج.م</span>
+  </span>
 );
