@@ -8,6 +8,7 @@ import {
   IconCalendarCheck,
   IconCertificate,
   IconChecklist,
+  IconClock,
   IconCube,
   IconCurrencyDollar,
   IconFileDescription,
@@ -204,6 +205,12 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             url: "/services/quizzes",
             icon: <IconChecklist className="size-[14px]" />,
             isActive: isActive("/services/quizzes"),
+          },
+          {
+            title: t("sidebar.items.shifts"),
+            url: "/services/shifts",
+            icon: <IconClock className="size-[14px]" />,
+            isActive: isActive("/services/shifts"),
           },
           {
             title: t("sidebar.items.attendance"),

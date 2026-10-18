@@ -11,7 +11,6 @@ export const STAFF_MODULE_TABS: {
 	disabled: boolean;
 }[] = [
 	{ value: "employees", label: "الموظفين", disabled: false },
-	{ value: "shifts", label: "المناوبات", disabled: false },
 	{ value: "payroll", label: "مسير الرواتب", disabled: false },
 	{ value: "jobs", label: "الوظائف", disabled: false },
 ];

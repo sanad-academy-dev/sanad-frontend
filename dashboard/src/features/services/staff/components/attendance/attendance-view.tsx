@@ -71,8 +71,13 @@ import {
 	useStudentAttendance,
 	useUpsertStudentAttendance,
 } from "@/features/services/attendance/hooks/use-student-attendance";
+import { ShiftDetailsPanel } from "@/features/services/staff/components/shifts/shift-details-panel";
+import { SHIFT_TYPE_MAP } from "@/features/services/staff/data/shifts";
+import { useShifts } from "@/features/services/staff/hooks/use-shifts";
+import { useStudentShifts } from "@/features/services/attendance/hooks/use-student-shifts";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
 import { cn } from "@/lib/utils";
+import type { ShiftAssignmentResponse } from "@/server/shifts/shifts.type";
 
 // لون كل حالة حضور مفهرس بقيمة enum (PRESENT → present …)
 const STATUS_COLOR: Record<string, string> = Object.fromEntries(
@@ -161,17 +166,28 @@ const CELL_ACTIONS = [
 function CellActionsMenu({
 	children,
 	onPick,
+	onScheduleShift,
 }: {
 	children: ReactNode;
 	onPick: (action: (typeof CELL_ACTIONS)[number]) => void;
+	onScheduleShift?: () => void;
 }) {
 	return (
 		<DropdownMenu dir="rtl">
 			<DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
 			<DropdownMenuContent
 				align="center"
-				className="min-w-[150px] p-[3px]"
+				className="min-w-[155px] p-[3px]"
 			>
+				{onScheduleShift && (
+					<DropdownMenuItem
+						onSelect={onScheduleShift}
+						className="flex h-6 items-center justify-start gap-1.5 rounded-[4px] px-[9px] text-right text-[10px] font-semibold text-[#6366F1] bg-[#6366F1]/5 hover:bg-[#6366F1]/10"
+					>
+						<IconClock className="size-2.5 text-[#6366F1]" />
+						جدولة مناوبة لهذا اليوم
+					</DropdownMenuItem>
+				)}
 				{CELL_ACTIONS.map((action, i) => {
 					const ActionIcon = action.icon;
 					return (
@@ -180,7 +196,7 @@ function CellActionsMenu({
 							onSelect={() => onPick(action)}
 							className={cn(
 								"flex h-6 items-center justify-start gap-1.5 rounded-[4px] px-[9px] text-right text-[10px] font-medium text-[#08090A]",
-								i === 0 && "bg-[#9B9B9D]/[0.11]",
+								i === 0 && !onScheduleShift && "bg-[#9B9B9D]/[0.11]",
 							)}
 						>
 							<ActionIcon
@@ -245,6 +261,22 @@ export function AttendanceView({
 	const { records: studentRecords } = useStudentAttendance(weekStart, addDays(weekStart, 6));
 	const records = isStudents ? studentRecords : staffRecords;
 
+	// تعيينات المناوبات للأسبوع المعروض — لربط الحضور بأيام وساعات العمل المجدولة
+	const { shifts: staffShifts } = useShifts(weekStart, addDays(weekStart, 6));
+	const { shifts: studentShifts } = useStudentShifts(weekStart, addDays(weekStart, 6));
+	const shifts = isStudents ? studentShifts : staffShifts;
+
+	// خريطة سريعة: "staffId_yyyy-MM-dd" → تعيين المناوبة
+	const shiftByCell = useMemo(() => {
+		const map = new Map<string, ShiftAssignmentResponse>();
+		for (const s of shifts) {
+			const dStr =
+				typeof s.date === "string" ? s.date.slice(0, 10) : new Date(s.date).toISOString().slice(0, 10);
+			map.set(`${s.staffId}_${dStr}`, s);
+		}
+		return map;
+	}, [shifts]);
+
 	// سجلات حضور اليوم المحددة للتسجيل الجماعي والشارات الحالية
 	const todayDate = useMemo(() => new Date(), []);
 	const { records: todayStudentRecords } = useStudentAttendance(todayDate, todayDate);
@@ -260,8 +292,15 @@ export function AttendanceView({
 		staffName: string;
 		staffCode: string;
 		date: Date;
+		shift?: ShiftAssignmentResponse | null;
 		defaultCheckIn?: string; // HH:mm — لتعبئة الحضور عند إضافة انصراف
 		withCheckout?: boolean;
+	} | null>(null);
+
+	// لوحة تفاصيل وجدولة المناوبة (تفتح عند الضغط على جدولة مناوبة من الخلية)
+	const [shiftPanelPreset, setShiftPanelPreset] = useState<{
+		staffId?: string;
+		date?: Date;
 	} | null>(null);
 
 	// نافذة تسجيل الإجازة
@@ -376,12 +415,28 @@ export function AttendanceView({
 				staffName={registerCell?.staffName ?? null}
 				staffCode={registerCell?.staffCode ?? null}
 				date={registerCell?.date ?? null}
+				shift={registerCell?.shift}
 				defaultCheckInTime={registerCell?.defaultCheckIn}
 				defaultShowCheckOut={registerCell?.withCheckout}
 				onClose={() => setRegisterCell(null)}
 				onSave={isStudents ? upsertStudentAsync : undefined}
 				targetLabel={isStudents ? "الطالب" : "الموظف"}
 			/>
+
+			{shiftPanelPreset && (
+				<ShiftDetailsPanel
+					open={!!shiftPanelPreset}
+					staffId={shiftPanelPreset.staffId}
+					date={shiftPanelPreset.date}
+					isStudent={isStudents}
+					customStaff={
+						isStudents
+							? patients.map((p) => ({ id: p.id, name: p.name, code: p.code, role: "طالب" }))
+							: undefined
+					}
+					onClose={() => setShiftPanelPreset(null)}
+				/>
+			)}
 
 			<AttendanceLeaveDialog
 				open={!!leaveCell}
@@ -754,6 +809,7 @@ export function AttendanceView({
 								{days.map((day) => {
 									const dateKey = format(day, "yyyy-MM-dd");
 									const record = recordByCell.get(`${s.id}_${dateKey}`);
+									const shift = shiftByCell.get(`${s.id}_${dateKey}`);
 									const color = record ? STATUS_COLOR[record.status.toLowerCase()] : undefined;
 									// اختيار إجراء من قائمة الخلية: حاضر→نافذة، إجازة→نافذة، الباقي→تسجيل مباشر
 									const handlePick = (action: (typeof CELL_ACTIONS)[number]) => {
@@ -763,6 +819,7 @@ export function AttendanceView({
 												staffName: s.name,
 												staffCode: s.code,
 												date: day,
+												shift,
 												...(record?.checkIn
 													? { defaultCheckIn: fmtTime24(record.checkIn), withCheckout: true }
 													: {}),
@@ -791,7 +848,7 @@ export function AttendanceView({
 											staffId: s.id,
 											date: dateKey,
 											status: action.status,
-											hours: action.hours,
+											hours: shift?.hours ?? action.hours,
 										});
 									};
 									return (
@@ -800,12 +857,19 @@ export function AttendanceView({
 											className="h-[34px] border-t border-l border-[#F5F5F6] text-center"
 										>
 											{record && record.status === "PRESENT" && record.checkIn ? (
-												// حاضر (يمين) | فاصل | انصراف أو زر إضافة (يسار)
-												<div className="mx-auto flex w-fit items-center gap-3">
+												// حاضر (يمين) | فاصل | انصراف أو زر إضافة (يسار) + شارة المناوبة
+												<div className="mx-auto flex w-fit items-center gap-2">
 													{/* حاضر */}
 													<div className="flex items-center gap-1">
 														<div className="flex flex-col items-end leading-[12px]">
-															<span className="text-[8px] text-[#0CA644]">حاضر</span>
+															<div className="flex items-center gap-1">
+																<span className="text-[8px] text-[#0CA644]">حاضر</span>
+																{shift && (
+																	<span className="rounded bg-[#6366F1]/10 px-0.5 text-[7px] font-medium text-[#6366F1]">
+																		{SHIFT_TYPE_MAP[shift.type]?.shortLabel ?? "نوبة"}
+																	</span>
+																)}
+															</div>
 															<span className="text-[8px] text-[#0CA644] tabular-nums">
 																{fmtTime(record.checkIn)}
 															</span>
@@ -828,7 +892,12 @@ export function AttendanceView({
 														</div>
 													) : (
 														// زر إضافة انصراف (قائمة)
-														<CellActionsMenu onPick={handlePick}>
+														<CellActionsMenu
+															onPick={handlePick}
+															onScheduleShift={() =>
+																setShiftPanelPreset({ staffId: s.id, date: day })
+															}
+														>
 															<button
 																type="button"
 																className="flex size-3.5 items-center justify-center text-[#3B82F6]"
@@ -840,7 +909,12 @@ export function AttendanceView({
 													)}
 												</div>
 											) : (
-												<CellActionsMenu onPick={handlePick}>
+												<CellActionsMenu
+													onPick={handlePick}
+													onScheduleShift={() =>
+														setShiftPanelPreset({ staffId: s.id, date: day })
+													}
+												>
 													{record ? (
 														(() => {
 															const cell = STATUS_CELL[record.status] ?? {
@@ -860,13 +934,40 @@ export function AttendanceView({
 																</button>
 															);
 														})()
-													) : (
+													) : shift ? (
+														// مناوبة مجدولة لم يُسجل لها حضور بعد
 														<button
 															type="button"
-															className="mx-auto flex size-[18px] items-center justify-center rounded-[4px] bg-[#3B82F6]/[0.06] text-[#3B82F6] transition-colors hover:bg-[#3B82F6]/15"
-															aria-label="تسجيل حضور"
+															onClick={(e) => {
+																e.stopPropagation();
+																setRegisterCell({
+																	staffId: s.id,
+																	staffName: s.name,
+																	staffCode: s.code,
+																	date: day,
+																	shift,
+																});
+															}}
+															className="mx-auto flex h-[22px] items-center justify-center gap-1 rounded-[4px] px-1.5 text-[9px] font-medium transition-all hover:scale-105"
+															style={{
+																backgroundColor: `${SHIFT_TYPE_MAP[shift.type]?.color ?? "#6366F1"}15`,
+																color: SHIFT_TYPE_MAP[shift.type]?.color ?? "#6366F1",
+																border: `0.75px dashed ${SHIFT_TYPE_MAP[shift.type]?.color ?? "#6366F1"}60`,
+															}}
+															title={`مناوبة مجدولة (${shift.hours || 8}س): اضغط لتسجيل الحضور`}
 														>
-															<IconPlus className="size-2.5" />
+															<IconClock className="size-2.5 shrink-0" />
+															<span>{SHIFT_TYPE_MAP[shift.type]?.shortLabel ?? "مناوبة"}</span>
+															<span className="opacity-80 tabular-nums">({shift.hours || 8}س)</span>
+														</button>
+													) : (
+														// عطلة / لا توجد مناوبة عمل
+														<button
+															type="button"
+															className="mx-auto flex h-[18px] items-center justify-center gap-1 rounded-[4px] px-1 text-[9px] text-[#A1A1AA] hover:bg-muted/60 hover:text-[#08090A]"
+															title="عطلة / لا توجد مناوبة — انقر للجدولة أو التسجيل"
+														>
+															<span className="opacity-70">— عطلة —</span>
 														</button>
 													)}
 												</CellActionsMenu>

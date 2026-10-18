@@ -3,6 +3,7 @@ import {
 	IconCircleCheckFilled,
 	IconClock,
 	IconHelpCircle,
+	IconInfoCircle,
 	IconLogin,
 	IconPlus,
 	IconX,
@@ -17,8 +18,15 @@ import { Calendar } from "@/components/ui/calendar";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
+import { SHIFT_TYPE_MAP } from "@/features/services/staff/data/shifts";
 import { useUpsertAttendance } from "@/features/services/staff/hooks/use-upsert-attendance";
 import { cn } from "@/lib/utils";
+import type { ShiftType } from "@/server/shifts/shifts.type";
+
+const minutesToTime = (m: number | null | undefined) =>
+	m == null
+		? ""
+		: `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 
 // توست نجاح التسجيل (بطاقة بيضاء + علامة خضراء + زر إغلاق) — أسفل يسار
 function showRegisterToast(message: string) {
@@ -68,6 +76,7 @@ export function AttendanceRegisterDialog({
 	staffName,
 	staffCode,
 	date,
+	shift,
 	defaultCheckInTime,
 	defaultCheckOutTime,
 	defaultShowCheckOut,
@@ -80,6 +89,13 @@ export function AttendanceRegisterDialog({
 	staffName: string | null;
 	staffCode: string | null;
 	date: Date | null;
+	shift?: {
+		type: ShiftType;
+		startMinute?: number | null;
+		endMinute?: number | null;
+		hours?: number;
+		notes?: string | null;
+	} | null;
 	defaultCheckInTime?: string;
 	defaultCheckOutTime?: string;
 	defaultShowCheckOut?: boolean;
@@ -87,7 +103,7 @@ export function AttendanceRegisterDialog({
 	onSave?: (args: {
 		staffId: string;
 		date: string;
-		status: "PRESENT";
+		status: "PRESENT" | "LATE";
 		hours: number;
 		checkIn: string;
 		checkOut: string | null;
@@ -106,12 +122,24 @@ export function AttendanceRegisterDialog({
 	useEffect(() => {
 		if (open && date) {
 			setDateValue(format(date, "yyyy-MM-dd"));
-			setCheckInTime(defaultCheckInTime ?? "09:00");
-			setCheckOutTime(defaultCheckOutTime ?? "");
-			setShowCheckOut(defaultShowCheckOut ?? false);
+
+			// استخراج الأوقات المجدولة للمناوبة إذا وُجدت
+			let shiftStartStr = "09:00";
+			let shiftEndStr = "";
+			if (shift) {
+				const meta = SHIFT_TYPE_MAP[shift.type];
+				const sMin = shift.startMinute ?? meta?.defaultStart ?? 480;
+				const eMin = shift.endMinute ?? meta?.defaultEnd ?? 960;
+				shiftStartStr = minutesToTime(sMin);
+				shiftEndStr = minutesToTime(eMin);
+			}
+
+			setCheckInTime(defaultCheckInTime ?? (shift ? shiftStartStr : "09:00"));
+			setCheckOutTime(defaultCheckOutTime ?? (defaultShowCheckOut || shift ? shiftEndStr : ""));
+			setShowCheckOut(defaultShowCheckOut || !!shift);
 			setNotifyManager(false);
 		}
-	}, [open, date, defaultCheckInTime, defaultCheckOutTime, defaultShowCheckOut]);
+	}, [open, date, shift, defaultCheckInTime, defaultCheckOutTime, defaultShowCheckOut]);
 
 	const initials = (staffName ?? "")
 		.split(" ")
@@ -138,11 +166,21 @@ export function AttendanceRegisterDialog({
 			: "مساءً"
 		: "";
 
+	// حساب التأخر مقارنة ببدء المناوبة
+	const lateDiffMinutes = (() => {
+		if (!shift || !checkInTime) return 0;
+		const meta = SHIFT_TYPE_MAP[shift.type];
+		const sMin = shift.startMinute ?? meta?.defaultStart ?? 480;
+		const [h, m] = checkInTime.split(":").map(Number);
+		const actualInMinutes = (h || 0) * 60 + (m || 0);
+		return actualInMinutes - sMin;
+	})();
+
 	const handleSubmit = async () => {
 		if (!staffId || !dateValue) return;
 		const checkIn = `${dateValue}T${checkInTime}:00`;
 		let checkOut: string | null = null;
-		let hours = 0;
+		let hours = shift?.hours ?? 8;
 		if (showCheckOut && checkOutTime) {
 			checkOut = `${dateValue}T${checkOutTime}:00`;
 			hours =
@@ -151,13 +189,18 @@ export function AttendanceRegisterDialog({
 				) / 100;
 			if (hours < 0) hours = 0;
 		}
+
+		// تحديد الحالة تلقائيًا: إذا تأخر بأكثر من 15 دقيقة سماح
+		const statusToSave: "PRESENT" | "LATE" =
+			lateDiffMinutes > 15 ? "LATE" : "PRESENT";
+
 		const time12 = format(new Date(`2000-01-01T${summaryTime}:00`), "hh:mm");
 		try {
 			if (onSave) {
 				await onSave({
 					staffId,
 					date: dateValue,
-					status: "PRESENT",
+					status: statusToSave,
 					hours,
 					checkIn,
 					checkOut,
@@ -166,7 +209,7 @@ export function AttendanceRegisterDialog({
 				await upsertAsync({
 					staffId,
 					date: dateValue,
-					status: "PRESENT",
+					status: statusToSave,
 					hours,
 					checkIn,
 					checkOut,
@@ -221,9 +264,42 @@ export function AttendanceRegisterDialog({
 				</div>
 
 				{/* الجسم */}
-				<div className="flex flex-col gap-4 px-[15px] py-3">
+				<div className="flex flex-col gap-3.5 px-[15px] py-3">
+					{/* شريط المناوبة المجدولة المربوطة */}
+					{shift ? (
+						<div className="flex items-center justify-between gap-2 rounded-[4px] border border-[#6366F1]/20 bg-[#6366F1]/5 px-3 py-2.5">
+							<div className="flex items-center gap-2">
+								<IconClock className="size-4 shrink-0 text-[#6366F1]" />
+								<div className="flex flex-col text-right">
+									<span className="text-[12px] font-semibold text-[#08090A]">
+										المناوبة المجدولة: {SHIFT_TYPE_MAP[shift.type]?.label ?? shift.type}
+									</span>
+									<span className="text-[10px] text-[#6366F1]">
+										فترة العمل المقررة من {minutesToTime(shift.startMinute ?? 480)} إلى{" "}
+										{minutesToTime(shift.endMinute ?? 960)} ({shift.hours ?? 8} ساعات)
+									</span>
+								</div>
+							</div>
+							<div className="flex items-center gap-1.5">
+								{lateDiffMinutes > 15 && (
+									<span className="rounded-[4px] bg-[#DC2626]/10 px-2 py-0.5 text-[10px] font-medium text-[#DC2626]">
+										متأخر {lateDiffMinutes} دقيقة
+									</span>
+								)}
+								<span className="rounded-[4px] bg-[#6366F1]/10 px-2 py-0.5 text-[10px] font-medium text-[#6366F1]">
+									مربوط بالمناوبة
+								</span>
+							</div>
+						</div>
+					) : (
+						<div className="flex items-center justify-between gap-2 rounded-[4px] border border-dashed border-[#E5E5E5] bg-[#F9FAFB] px-3 py-2 text-[11px] text-[#737373]">
+							<span>لا توجد مناوبة عمل مجدولة لهذا اليوم (سيتم تسجيل دوام حر / استثنائي)</span>
+							<span className="rounded-[4px] bg-muted px-1.5 py-0.5 text-[9px]">دوام حر</span>
+						</div>
+					)}
+
 					{/* تنبيه ملخّص */}
-					<div className="flex items-center gap-2.5 rounded-[4px] bg-[#FFFBEA] px-2 py-3.5">
+					<div className="flex items-center gap-2.5 rounded-[4px] bg-[#FFFBEA] px-2 py-3">
 						<IconClock className="size-3.5 shrink-0 text-[#C34E00]" />
 						<span className="text-[12px] text-[#C34E00]">
 							{verb} {staffName} بتاريخ {summaryDate} - الساعة {summaryTime} {period}

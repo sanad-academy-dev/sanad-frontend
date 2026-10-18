@@ -1,11 +1,15 @@
 import {
+	IconCalendarEvent,
+	IconCheck,
 	IconChevronLeft,
 	IconChevronRight,
+	IconClock,
 	IconDownload,
 	IconPlus,
 	IconSortDescending,
 	IconSparkles,
 	IconUser,
+	IconX,
 } from "@tabler/icons-react";
 import { addDays, addWeeks, format, isToday, startOfWeek } from "date-fns";
 import { arSA } from "date-fns/locale";
@@ -16,6 +20,7 @@ import { TablePagination } from "@/components/common/table-pagination";
 import { TableToolbar } from "@/components/common/table-toolbar";
 import { Button } from "@/components/ui/button";
 import type { StatItem } from "@/features/dashboard/types/dashboard.types";
+import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { AiShiftsDialog } from "@/features/services/staff/components/shifts/ai-shifts-dialog";
 import { ShiftCellPopover } from "@/features/services/staff/components/shifts/shift-cell-popover";
 import { ShiftDetailsPanel } from "@/features/services/staff/components/shifts/shift-details-panel";
@@ -26,7 +31,15 @@ import { useShifts } from "@/features/services/staff/hooks/use-shifts";
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import { useStaffFilters } from "@/features/services/staff/hooks/use-staff-filters";
 import { useUpsertShift } from "@/features/services/staff/hooks/use-upsert-shift";
+import {
+	useDeleteStudentShift,
+	useStudentShifts,
+	useUpsertStudentShift,
+} from "@/features/services/attendance/hooks/use-student-shifts";
+import { useAttendance } from "@/features/services/staff/hooks/use-attendance";
+import { useStudentAttendance } from "@/features/services/attendance/hooks/use-student-attendance";
 import { exportStaffCsv } from "@/features/services/staff/utils/export-staff";
+import { cn } from "@/lib/utils";
 import type { ShiftType } from "@/server/shifts/shifts.type";
 
 // مفتاح اليوم (yyyy-MM-dd) من تاريخ التعيين سواء كان نصًا أو كائن Date
@@ -39,7 +52,7 @@ const minutesToTime = (m: number | null) =>
 		? ""
 		: `${String(Math.floor(m / 60) % 24).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 
-function StaffAvatar({ name }: { name: string }) {
+function StaffAvatar({ name, isStudent = false }: { name: string; isStudent?: boolean }) {
 	const initials = name
 		.split(" ")
 		.slice(0, 2)
@@ -47,15 +60,41 @@ function StaffAvatar({ name }: { name: string }) {
 		.join("")
 		.toUpperCase();
 	return (
-		<div className="flex size-[18px] shrink-0 items-center justify-center rounded-full bg-[#6366F1] text-[9px] font-normal text-white">
+		<div
+			className={cn(
+				"flex size-[18px] shrink-0 items-center justify-center rounded-full text-[9px] font-normal text-white",
+				isStudent ? "bg-[#10B981]" : "bg-[#6366F1]",
+			)}
+		>
 			{initials}
 		</div>
 	);
 }
 
-export function ShiftsView() {
-	const { staff, isLoading } = useStaff();
-	const { filterGroups, applyStaffFilters } = useStaffFilters(staff);
+export function ShiftsView({
+	initialTarget = "staff",
+	targetType: controlledTarget,
+	onTargetTypeChange,
+}: {
+	initialTarget?: "staff" | "students";
+	targetType?: "staff" | "students";
+	onTargetTypeChange?: (target: "staff" | "students") => void;
+} = {}) {
+	const [internalTarget, setInternalTarget] = useState<"staff" | "students">(initialTarget);
+	const targetType = controlledTarget ?? internalTarget;
+	const setTargetType = onTargetTypeChange ?? setInternalTarget;
+	const isStudents = targetType === "students";
+
+	const { staff, isLoading: isStaffLoading } = useStaff();
+	const { patients, isLoading: isPatientsLoading } = usePatients();
+	const isLoading = isStudents ? isPatientsLoading : isStaffLoading;
+
+	const studentItems = useMemo(
+		() => patients.map((p) => ({ id: p.id, name: p.name, code: p.code, role: { name: "طالب" }, active: true })),
+		[patients],
+	);
+	const rawItems = isStudents ? (studentItems as any) : staff;
+	const { filterGroups, applyStaffFilters } = useStaffFilters(rawItems);
 	const [search, setSearch] = useState("");
 	// أسبوع العرض — يبدأ من اليوم الحالي افتراضيًا (الأحد)
 	const [weekStart, setWeekStart] = useState(() =>
@@ -68,11 +107,37 @@ export function ShiftsView() {
 		[weekStart],
 	);
 
-	// تعيينات المناوبات للأسبوع المعروض
-	const { shifts } = useShifts(weekStart, addDays(weekStart, 6));
-	const { upsert, upsertAsync } = useUpsertShift();
-	const { remove } = useDeleteShift();
+	// تعيينات المناوبات للأسبوع المعروض (للموظفين أو للطلاب)
+	const { shifts: staffShifts } = useShifts(weekStart, addDays(weekStart, 6));
+	const { shifts: studentShifts } = useStudentShifts(weekStart, addDays(weekStart, 6));
+	const shifts = isStudents ? studentShifts : staffShifts;
+
+	const { upsert: upsertStaff, upsertAsync: upsertStaffAsync } = useUpsertShift();
+	const { remove: removeStaff } = useDeleteShift();
+	const { upsert: upsertStudent, upsertAsync: upsertStudentAsync } = useUpsertStudentShift();
+	const { remove: removeStudent } = useDeleteStudentShift();
+
+	const upsert = isStudents ? upsertStudent : upsertStaff;
+	const upsertAsync = isStudents ? upsertStudentAsync : upsertStaffAsync;
+	const remove = isStudents ? removeStudent : removeStaff;
+
 	const { requests: leaveRequests } = useLeaveRequests();
+
+	// سجلات الحضور والانصراف للأسبوع المعروض — لربط المناوبات بالحضور الفعلي
+	const { records: staffAttendance } = useAttendance(weekStart, addDays(weekStart, 6));
+	const { records: studentAttendance } = useStudentAttendance(weekStart, addDays(weekStart, 6));
+	const attendance = isStudents ? studentAttendance : staffAttendance;
+
+	// خريطة سجلات الحضور: "staffId_yyyy-MM-dd" → سجل الحضور
+	const attendanceByCell = useMemo(() => {
+		const map = new Map<string, (typeof attendance)[number]>();
+		for (const a of attendance) {
+			const dStr =
+				typeof a.date === "string" ? a.date.slice(0, 10) : new Date(a.date).toISOString().slice(0, 10);
+			map.set(`${a.staffId}_${dStr}`, a);
+		}
+		return map;
+	}, [attendance]);
 
 	// لوحة تفاصيل المناوبة الجانبية — فارغة من زر "جدولة مناوبة"، أو معبّأة عند الضغط على بادج نوبة
 	const [panelPreset, setPanelPreset] = useState<{
@@ -104,12 +169,12 @@ export function ShiftsView() {
 
 	const rows = useMemo(() => {
 		const q = search.trim().toLowerCase();
-		const list = applyStaffFilters(staff);
+		const list = applyStaffFilters(rawItems);
 		if (!q) return list;
 		return list.filter(
-			(s) => s.name.toLowerCase().includes(q) || s.code.toLowerCase().includes(q),
+			(s: any) => s.name.toLowerCase().includes(q) || (s.code && s.code.toLowerCase().includes(q)),
 		);
-	}, [staff, search, applyStaffFilters]);
+	}, [rawItems, search, applyStaffFilters]);
 
 	// بطاقات الإحصائيات — قيم حيّة من تعيينات الأسبوع
 	const stats: StatItem[] = useMemo(() => {
@@ -117,7 +182,11 @@ export function ShiftsView() {
 		for (const s of shifts) byType[s.type] += 1;
 		const onLeave = leaveRequests.filter((r) => r.status === "APPROVED").length;
 		return [
-			{ title: "# الموظفين", value: staff.length, tooltip: "إجمالي عدد الموظفين" },
+			{
+				title: isStudents ? "# الطلاب" : "# الموظفين",
+				value: rows.length,
+				tooltip: isStudents ? "إجمالي عدد الطلاب" : "إجمالي عدد الموظفين",
+			},
 			{
 				title: "# نوبة الصباح",
 				value: byType.MORNING,
@@ -129,14 +198,14 @@ export function ShiftsView() {
 				tooltip: "عدد مناوبات المساء هذا الأسبوع",
 			},
 			{ title: "# نوبة الليل", value: byType.NIGHT, tooltip: "عدد مناوبات الليل هذا الأسبوع" },
-			{ title: "# في أجازة", value: onLeave, tooltip: "عدد الموظفين في إجازة معتمدة" },
+			{ title: "# في أجازة", value: onLeave, tooltip: "عدد المسجلين في إجازة معتمدة" },
 		];
-	}, [shifts, staff.length, leaveRequests]);
+	}, [shifts, rows.length, leaveRequests, isStudents]);
 
 	// لوحة الجدولة بالذكاء الاصطناعي — تقترح جدول الأسبوع المعروض ثم يعتمده المستخدم
 	const [aiOpen, setAiOpen] = useState(false);
-	// معرّف الموظف → اسمه (لعرض الأسماء في معاينة الاقتراح)
-	const staffNames = useMemo(() => new Map(staff.map((s) => [s.id, s.name])), [staff]);
+	// معرّف الموظف/الطالب → اسمه (لعرض الأسماء في معاينة الاقتراح)
+	const staffNames = useMemo(() => new Map(rawItems.map((s: any) => [s.id, s.name])), [rawItems]);
 
 	// ترقيم الصفحات
 	const [pageSize, setPageSize] = useState(15);
@@ -172,6 +241,39 @@ export function ShiftsView() {
 				staffNames={staffNames}
 			/>
 
+			{/* شريط تبديل الفئة: الموظفين أو الطلاب */}
+			<div className="flex items-center justify-between border-t border-[#E5E5E5] bg-white px-3 py-1.5">
+				<div className="flex items-center gap-1.5 rounded-md bg-[#F4F4F5] p-0.5 text-[11px] font-medium">
+					<button
+						type="button"
+						onClick={() => setTargetType("staff")}
+						className={cn(
+							"rounded px-3 py-1 transition-all",
+							!isStudents
+								? "bg-white font-semibold text-[#08090A] shadow-sm"
+								: "text-[#71717A] hover:text-[#08090A]",
+						)}
+					>
+						الموظفين
+					</button>
+					<button
+						type="button"
+						onClick={() => setTargetType("students")}
+						className={cn(
+							"rounded px-3 py-1 transition-all",
+							isStudents
+								? "bg-white font-semibold text-[#08090A] shadow-sm"
+								: "text-[#71717A] hover:text-[#08090A]",
+						)}
+					>
+						الطلاب
+					</button>
+				</div>
+				<span className="text-[11px] text-[#71717A]">
+					{isStudents ? `مناوبات الطلاب (${rows.length} طالب)` : `مناوبات الموظفين (${rows.length} موظف)`}
+				</span>
+			</div>
+
 			<ShiftDetailsPanel
 				open={!!panelPreset}
 				staffId={panelPreset?.staffId}
@@ -179,16 +281,17 @@ export function ShiftsView() {
 				defaultType={panelPreset?.defaultType}
 				startMinute={panelPreset?.startMinute}
 				endMinute={panelPreset?.endMinute}
+				isStudent={isStudents}
+				customStaff={isStudents ? rawItems : undefined}
 				onClose={() => setPanelPreset(null)}
 			/>
 
 			{/* شريط الأدوات */}
 			<TableToolbar
 				className="border-t"
-				searchPlaceholder="ابحث عن الموظف بالاسم،المعرف..."
+				searchPlaceholder={isStudents ? "ابحث عن الطالب بالاسم، المعرف..." : "ابحث عن الموظف بالاسم، المعرف..."}
 				searchValue={search}
 				onSearchChange={setSearch}
-				// نفس ترتيب صفحة الموظفين: [التصفية] [تصدير] بمقاس xs موحّد
 				buttonSize="xs"
 				showFilter={false}
 				showView={false}
@@ -196,7 +299,6 @@ export function ShiftsView() {
 				leftExtra={
 					<>
 						<FiltersMenu groups={filterGroups} />
-						{/* ترتيب DOM في RTL: بعد التصفية فيظهر على يسارها */}
 						<Button
 							type="button"
 							variant="outline"
@@ -254,7 +356,7 @@ export function ShiftsView() {
 							className="h-[30px] gap-1.5 text-xs"
 						>
 							<IconPlus className="size-2.5" />
-							جدولة مناوبة
+							{isStudents ? "جدولة مناوبة طالب" : "جدولة مناوبة"}
 						</Button>
 					</>
 				}
@@ -267,7 +369,9 @@ export function ShiftsView() {
 						<tr>
 							<th className="sticky right-0 z-20 h-[34px] min-w-[180px] border-t border-l border-border bg-white px-3">
 								<div className="flex items-center justify-between gap-1">
-									<span className="text-[12px] font-normal text-[#6B6B67]">اسم الموظف</span>
+									<span className="text-[12px] font-normal text-[#6B6B67]">
+										{isStudents ? "اسم الطالب" : "اسم الموظف"}
+									</span>
 									<IconSortDescending className="size-[15px] text-[#6B6B67]" />
 								</div>
 							</th>
@@ -306,7 +410,7 @@ export function ShiftsView() {
 							<tr key={s.id}>
 								<td className="sticky right-0 z-10 h-[34px] border-t border-l border-border bg-white px-3">
 									<div className="flex items-center gap-1.5">
-										<StaffAvatar name={s.name} />
+										<StaffAvatar name={s.name} isStudent={isStudents} />
 										<span
 											dir="rtl"
 											className="truncate text-right text-[12px] text-[#08090A]"
@@ -318,6 +422,7 @@ export function ShiftsView() {
 								{days.map((day) => {
 									const dateKey = format(day, "yyyy-MM-dd");
 									const shift = shiftByCell.get(`${s.id}_${dateKey}`);
+									const att = attendanceByCell.get(`${s.id}_${dateKey}`);
 									const meta = shift ? SHIFT_TYPE_MAP[shift.type] : undefined;
 									// مناوبة ممتدة: ساعاتها أطول من الافتراضي لنوعها → لون برتقالي
 									const isExtended = !!shift && !!meta && shift.hours > meta.defaultHours;
@@ -328,7 +433,7 @@ export function ShiftsView() {
 											className="h-[34px] border-t border-l border-border text-center"
 										>
 											{shift && meta ? (
-												// خلية معيّنة: شارة النوبة — تفتح لوحة التفاصيل من اليسار ببيانات هذه النوبة
+												// خلية معيّنة: شارة النوبة مع حالة الحضور المربوط
 												<button
 													type="button"
 													onClick={() =>
@@ -340,24 +445,54 @@ export function ShiftsView() {
 															endMinute: shift.endMinute,
 														})
 													}
-													className="mx-auto flex h-4 items-center justify-center gap-1 rounded-[4px] px-1.5 text-[9px] font-medium"
+													className="mx-auto flex h-[22px] items-center justify-center gap-1.5 rounded-[4px] px-2 text-[9px] font-medium transition-all hover:scale-105"
 													style={{
 														backgroundColor: `${badgeColor}14`,
 														color: badgeColor,
 													}}
-													aria-label="تعديل المناوبة"
+													title={
+														att
+															? `مناوبة ${meta.label} • حالة الحضور: ${att.status === "PRESENT" ? "حاضر" : att.status === "LATE" ? "متأخر" : att.status === "LEAVE" ? "إجازة" : "غائب"} (${att.hours}س)`
+															: `مناوبة ${meta.label} (${shift.hours}س) • لم يسجل حضور بعد`
+													}
+													aria-label="تعديل المناوبة وحالة الحضور"
 												>
-													<span
-														className="size-1.5 rounded-full"
-														style={{ backgroundColor: badgeColor }}
-													/>
-													{isExtended ? "ممتدة" : meta.label}
-													{shift.startMinute != null && (
+													{att ? (
+														att.status === "PRESENT" ? (
+															<IconCheck className="size-2.5 text-[#16A34A]" />
+														) : att.status === "LATE" ? (
+															<IconClock className="size-2.5 text-[#F59E0B]" />
+														) : att.status === "LEAVE" ? (
+															<IconCalendarEvent className="size-2.5 text-[#A855F7]" />
+														) : (
+															<IconX className="size-2.5 text-[#DC2626]" />
+														)
+													) : (
+														<span
+															className="size-1.5 rounded-full"
+															style={{ backgroundColor: badgeColor }}
+														/>
+													)}
+													<span>{isExtended ? "ممتدة" : meta.label}</span>
+													{att?.status === "PRESENT" ? (
+														<span className="font-semibold text-[#16A34A] tabular-nums">
+															{att.hours}س
+														</span>
+													) : shift.startMinute != null ? (
 														<span className="tabular-nums opacity-80">
 															{minutesToTime(shift.startMinute)}
 														</span>
-													)}
+													) : null}
 												</button>
+											) : att ? (
+												// حضور استثنائي بدون مناوبة مجدولة
+												<span
+													className="mx-auto flex h-4 items-center justify-center gap-1 rounded-[4px] bg-[#6366F1]/10 px-1 text-[9px] font-medium text-[#6366F1]"
+													title="دوام بدون مناوبة مجدولة"
+												>
+													<IconCheck className="size-2 text-[#16A34A]" />
+													دوام ({att.hours}س)
+												</span>
 											) : (
 												// خلية فارغة: زر إضافة — يفتح popover الجدولة السريعة للأيام
 												<ShiftCellPopover
@@ -388,7 +523,7 @@ export function ShiftsView() {
 									colSpan={days.length + 1}
 									className="py-12 text-center text-sm text-muted-foreground"
 								>
-									لا يوجد موظفين لعرض مناوباتهم
+									{isStudents ? "لا يوجد طلاب لعرض مناوباتهم" : "لا يوجد موظفين لعرض مناوباتهم"}
 								</td>
 							</tr>
 						)}

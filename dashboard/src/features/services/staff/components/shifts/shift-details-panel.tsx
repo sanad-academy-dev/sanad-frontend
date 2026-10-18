@@ -7,7 +7,7 @@ import {
 	IconTrash,
 } from "@tabler/icons-react";
 import { format } from "date-fns";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { showSuccessToast } from "@/components/common/success-toast";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ import {
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { AttendanceLeaveDialog } from "@/features/services/staff/components/attendance/attendance-leave-dialog";
+import { AttendanceRegisterDialog } from "@/features/services/staff/components/attendance/attendance-register-dialog";
 import { LeaveReviewDialog } from "@/features/services/staff/components/attendance/leave-review-dialog";
 import { ShiftDeleteDialog } from "@/features/services/staff/components/shifts/shift-delete-dialog";
 import {
@@ -40,6 +41,14 @@ import { useLeaveBalance } from "@/features/services/staff/hooks/use-leave-balan
 import { useShifts } from "@/features/services/staff/hooks/use-shifts";
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import { useUpsertShift } from "@/features/services/staff/hooks/use-upsert-shift";
+import {
+	useDeleteStudentShift,
+	useStudentShifts,
+	useUpsertStudentShift,
+} from "@/features/services/attendance/hooks/use-student-shifts";
+import { useAttendance } from "@/features/services/staff/hooks/use-attendance";
+import { useStudentAttendance, useUpsertStudentAttendance } from "@/features/services/attendance/hooks/use-student-attendance";
+import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { cn } from "@/lib/utils";
 import type { ShiftType } from "@/server/shifts/shifts.type";
 
@@ -59,6 +68,14 @@ const time12 = (t: string) => {
 	return `${String(hh).padStart(2, "0")}:${String(m).padStart(2, "0")} ${period}`;
 };
 
+// تحويل أي صيغة تاريخ (نص ISO أو كائن Date) إلى "yyyy-MM-dd" بأمان وبدون أخطاء TS
+const toDayString = (d: unknown): string => {
+	if (!d) return "";
+	if (typeof d === "string") return d.slice(0, 10);
+	if (d instanceof Date) return format(d, "yyyy-MM-dd");
+	return "";
+};
+
 // اسم نوع المناوبة كصفة (للعرض في صف التفاصيل)
 const SHIFT_ADJECTIVE: Record<ShiftType, string> = {
 	MORNING: "صباحية",
@@ -73,13 +90,24 @@ const STAFF_STATUS_LABEL: Record<string, string> = {
 };
 
 function initialsOf(name: string) {
-	return name
+	return (name || "")
 		.split(" ")
 		.slice(0, 2)
-		.map((w) => w[0])
+		.map((w) => w[0] ?? "")
 		.join("")
 		.toUpperCase();
 }
+
+export type ShiftPerson = {
+	id: string;
+	name: string;
+	code?: string | null;
+	role?: string | { name?: string | null } | null;
+	branch?: { name?: string | null } | null;
+	primarySpecialization?: { name?: string | null } | null;
+	status?: string | null;
+	classroom?: string | null;
+};
 
 // حقل وقت مضغوط (أيقونة ساعة + الوقت بصيغة 12 ساعة + منتقي أصلي)
 function TimeField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
@@ -122,6 +150,8 @@ export function ShiftDetailsPanel({
 	defaultType,
 	startMinute: presetStartMinute,
 	endMinute: presetEndMinute,
+	isStudent = false,
+	customStaff,
 	onClose,
 }: {
 	open: boolean;
@@ -131,12 +161,39 @@ export function ShiftDetailsPanel({
 	// أوقات النوبة الفعلية عند الفتح من بادج نوبة موجودة (بالدقائق من منتصف الليل)
 	startMinute?: number | null;
 	endMinute?: number | null;
+	isStudent?: boolean;
+	customStaff?: ShiftPerson[];
 	onClose: () => void;
 }) {
-	const { staff } = useStaff();
-	const { upsertAsync, isPending } = useUpsertShift();
-	const { remove, removeAsync } = useDeleteShift();
+	const { staff: regularStaff } = useStaff();
+	const { patients } = usePatients();
+	const staffList: ShiftPerson[] = useMemo(() => {
+		if (customStaff) return customStaff;
+		if (isStudent) {
+			return patients.map((p) => ({
+				id: p.id,
+				name: p.name,
+				code: p.code,
+				role: "طالب",
+				branch: (p as any).branch ?? { name: "الفرع الرئيسي" },
+				primarySpecialization: null,
+				classroom: (p as any).classroom ?? "عام",
+				status: (p as any).status ?? (p.active ? "ACTIVE" : "INACTIVE"),
+			}));
+		}
+		return regularStaff as unknown as ShiftPerson[];
+	}, [customStaff, isStudent, patients, regularStaff]);
+
+	const { upsertAsync: upsertStaffShift, isPending: isStaffShiftPending } = useUpsertShift();
+	const { removeAsync: removeStaffShift } = useDeleteShift();
+	const { upsertAsync: upsertStudentShift, isPending: isStudentShiftPending } = useUpsertStudentShift();
+	const { removeAsync: removeStudentShift } = useDeleteStudentShift();
+	const { upsertAsync: upsertStudentAttendanceAsync } = useUpsertStudentAttendance();
 	const { createCompensatoryAsync } = useCreateCompensatoryEntry();
+
+	const upsertAsync = isStudent ? upsertStudentShift : upsertStaffShift;
+	const removeAsync = isStudent ? removeStudentShift : removeStaffShift;
+	const isPending = isStudent ? isStudentShiftPending : isStaffShiftPending;
 
 	const [staffId, setStaffId] = useState("");
 	const [dateValue, setDateValue] = useState("");
@@ -153,6 +210,8 @@ export function ShiftDetailsPanel({
 	const [leaveOpen, setLeaveOpen] = useState(false);
 	// شيت مراجعة طلب الإجازة (يُفتح بعد إنشاء الطلب)
 	const [reviewRequestId, setReviewRequestId] = useState<string | null>(null);
+	// دايالوج تسجيل الحضور المباشر
+	const [attendanceDialogOpen, setAttendanceDialogOpen] = useState(false);
 
 	// إعادة الضبط عند الفتح
 	useEffect(() => {
@@ -169,17 +228,26 @@ export function ShiftDetailsPanel({
 		setIsLeaveDay(false);
 	}, [open, presetStaffId, presetDate, defaultType, presetStartMinute, presetEndMinute]);
 
-	const selected = staff.find((s) => s.id === staffId);
-	const { balance } = useLeaveBalance(staffId || null, open && !!staffId);
+	const selected = staffList.find((s) => s.id === staffId);
+	const { balance } = useLeaveBalance(staffId || null, open && !!staffId && !isStudent);
 
-	// مناوبة الموظف في اليوم المحدد (لتمكين الحذف)
-	const { shifts } = useShifts(
-		dateValue ? new Date(`${dateValue}T00:00:00`) : new Date(),
-		dateValue ? new Date(`${dateValue}T00:00:00`) : new Date(),
-	);
+	// مناوبة الموظف/الطالب في اليوم المحدد (لتمكين الحذف)
+	const queryDate = dateValue ? new Date(`${dateValue}T00:00:00`) : new Date();
+	const { shifts: staffShifts } = useShifts(queryDate, queryDate);
+	const { shifts: studentShifts } = useStudentShifts(queryDate, queryDate);
+	const shifts = isStudent ? studentShifts : staffShifts;
 	const existingShift = shifts.find(
 		(sh) => sh.staffId === staffId && format(new Date(sh.date), "yyyy-MM-dd") === dateValue,
 	);
+
+	// سجل الحضور والانصراف المرتبط
+	const { records: staffAttendance } = useAttendance(queryDate, queryDate);
+	const { records: studentAttendance } = useStudentAttendance(queryDate, queryDate);
+	const attendanceRecords = isStudent ? studentAttendance : staffAttendance;
+	const attendanceRecord = attendanceRecords.find((r) => {
+		const rStaffId = (r as any).staffId || (r as any).studentId;
+		return rStaffId === staffId && toDayString(r.date) === dateValue;
+	});
 
 	const startMinute = timeToMinutes(startTime);
 	let endMinute = timeToMinutes(endTime);
@@ -200,7 +268,7 @@ export function ShiftDetailsPanel({
 		try {
 			// تعيين كيوم إجازة → إزالة أي مناوبة في هذا اليوم
 			if (isLeaveDay) {
-				if (existingShift) await remove({ staffId, date: dateValue });
+				if (existingShift) await removeAsync({ staffId, date: dateValue });
 				toast.success("تم تعيين اليوم كإجازة", { position: "bottom-left" });
 				onClose();
 				return;
@@ -344,7 +412,7 @@ export function ShiftDetailsPanel({
 				date={dateValue}
 				startTime={startTime}
 				endTime={endTime}
-				branchName={selected?.branch?.name ?? ""}
+				branchName={selected?.branch?.name ?? (isStudent ? "الفرع الرئيسي" : "")}
 				isPending={isPending}
 				onConfirm={handleDelete}
 			/>
@@ -413,7 +481,12 @@ export function ShiftDetailsPanel({
 								<div className="flex items-center gap-1">
 									{/* الأڤاتار يمين الاسم */}
 									{selected && (
-										<span className="flex size-[17px] items-center justify-center rounded-full bg-[#6366F1] text-[9px] text-white">
+										<span
+											className={cn(
+												"flex size-[17px] items-center justify-center rounded-full text-[9px] text-white",
+												isStudent ? "bg-[#10B981]" : "bg-[#6366F1]",
+											)}
+										>
 											{initialsOf(selected.name)}
 										</span>
 									)}
@@ -432,10 +505,10 @@ export function ShiftDetailsPanel({
 														"h-[22px] min-w-[140px] text-[11px] font-bold",
 											)}
 										>
-											<SelectValue placeholder="اختر الموظف..." />
+											<SelectValue placeholder={isStudent ? "اختر الطالب..." : "اختر الموظف..."} />
 										</SelectTrigger>
 										<SelectContent dir="rtl">
-											{staff.map((s) => (
+											{staffList.map((s) => (
 												<SelectItem
 													key={s.id}
 													value={s.id}
@@ -454,7 +527,9 @@ export function ShiftDetailsPanel({
 								</div>
 								{selected ? (
 									<span className="rounded-[4px] bg-[#3B82F6]/5 px-1.5 py-[1.5px] text-[8px] font-medium text-[#3B82F6]">
-										{STAFF_STATUS_LABEL[selected.status] ?? selected.status}
+										{selected.status && STAFF_STATUS_LABEL[selected.status]
+											? STAFF_STATUS_LABEL[selected.status]
+											: (selected.status ?? "نشط")}
 									</span>
 								) : (
 									<span />
@@ -463,48 +538,60 @@ export function ShiftDetailsPanel({
 
 							<span className="h-px w-full bg-[#E5E5E5]" />
 
-							{/* بطاقات رصيد الإجازة (يمينًا→يسارًا: رصيد الإجازة، مستخدم، متبقي) */}
-							<div className="flex w-full items-center gap-1.5">
-								<div className="flex h-[34px] flex-1 items-center justify-between rounded-[4px] border border-[#E5E5E5] px-1.5">
-									<span className="text-[12px] text-[#9B9B9D]">رصيد الإجازة</span>
-									<span className="text-[11px] font-medium text-[#08090A] tabular-nums">
-										{balance ? `${balance.allowance} يوم` : "—"}
-									</span>
+							{/* بطاقات رصيد الإجازة (يمينًا→يسارًا: رصيد الإجازة، مستخدم، متبقي) - للموظفين فقط */}
+							{!isStudent && (
+								<div className="flex w-full items-center gap-1.5">
+									<div className="flex h-[34px] flex-1 items-center justify-between rounded-[4px] border border-[#E5E5E5] px-1.5">
+										<span className="text-[12px] text-[#9B9B9D]">رصيد الإجازة</span>
+										<span className="text-[11px] font-medium text-[#08090A] tabular-nums">
+											{balance ? `${balance.allowance} يوم` : "—"}
+										</span>
+									</div>
+									<div className="flex h-[34px] flex-1 items-center justify-between rounded-[4px] border border-[#E5E5E5] px-1.5">
+										<span className="text-[12px] text-[#9B9B9D]">مستخدم</span>
+										<span className="text-[11px] font-medium text-[#08090A] tabular-nums">
+											{balance ? `${balance.taken} أيام` : "—"}
+										</span>
+									</div>
+									<div className="flex h-[34px] flex-1 items-center justify-between rounded-[4px] border border-[#E5E5E5] px-1.5">
+										<span className="text-[12px] text-[#9B9B9D]">متبقي</span>
+										<span className="text-[11px] font-medium text-[#08090A] tabular-nums">
+											{balance ? `${balance.remaining} يوم` : "—"}
+										</span>
+									</div>
 								</div>
-								<div className="flex h-[34px] flex-1 items-center justify-between rounded-[4px] border border-[#E5E5E5] px-1.5">
-									<span className="text-[12px] text-[#9B9B9D]">مستخدم</span>
-									<span className="text-[11px] font-medium text-[#08090A] tabular-nums">
-										{balance ? `${balance.taken} أيام` : "—"}
-									</span>
-								</div>
-								<div className="flex h-[34px] flex-1 items-center justify-between rounded-[4px] border border-[#E5E5E5] px-1.5">
-									<span className="text-[12px] text-[#9B9B9D]">متبقي</span>
-									<span className="text-[11px] font-medium text-[#08090A] tabular-nums">
-										{balance ? `${balance.remaining} يوم` : "—"}
-									</span>
-								</div>
-							</div>
+							)}
 
 							{/* تنبيه */}
 							<div className="flex w-full items-center gap-2.5 rounded-[4px] bg-[#FFFBEA] px-2 py-3.5">
 								<span className="flex-1 text-right text-[12px] text-[#C34E00]">
-									تأكد من عدم تعارض المناوبة مع زيارات الموظف المعتمدة خلال هذه الفترة.
+									{isStudent
+										? "تأكد من عدم تعارض المناوبة مع الحصص والأنشطة التدريبية للطالب خلال هذه الفترة."
+										: "تأكد من عدم تعارض المناوبة مع زيارات الموظف المعتمدة خلال هذه الفترة."}
 								</span>
 							</div>
 
 							{/* تفاصيل */}
 							<div className="flex w-full flex-col gap-2.5">
 								<DetailRow
-									label="التخصص"
-									value={selected?.primarySpecialization?.name ?? ""}
+									label={isStudent ? "الفصل / القاعة" : "التخصص"}
+									value={
+										isStudent
+											? (selected?.classroom ?? "عام")
+											: (selected?.primarySpecialization?.name ?? "—")
+									}
 								/>
 								<DetailRow
 									label="الفرع"
-									value={selected?.branch?.name ?? ""}
+									value={selected?.branch?.name ?? "الفرع الرئيسي"}
 								/>
 								<DetailRow
 									label="القسم"
-									value={selected?.role?.name ?? ""}
+									value={
+										typeof selected?.role === "string"
+											? selected.role
+											: (selected?.role?.name ?? (isStudent ? "طالب" : "—"))
+									}
 								/>
 								<DetailRow
 									label="نوع المناوبة"
@@ -521,7 +608,11 @@ export function ShiftDetailsPanel({
 								<DetailRow
 									label="الحالة"
 									value={
-										selected ? (STAFF_STATUS_LABEL[selected.status] ?? selected.status) : ""
+										selected
+											? (selected.status && STAFF_STATUS_LABEL[selected.status]
+													? STAFF_STATUS_LABEL[selected.status]
+													: (selected.status ?? "نشط"))
+											: ""
 									}
 								/>
 							</div>
@@ -602,6 +693,95 @@ export function ShiftDetailsPanel({
 							</div>
 						</div>
 
+						{/* شريط حالة وسجل الحضور والانصراف المرتبط بهذه المناوبة */}
+						<div className="flex w-full flex-col gap-2 rounded-[4px] border border-[#6366F1]/25 bg-[#F9FAFB] p-3 text-right">
+							<div className="flex items-center justify-between">
+								<div className="flex items-center gap-1.5">
+									<IconClock className="size-4 text-[#6366F1]" />
+									<span className="text-[12px] font-bold text-[#08090A]">
+										سجل الحضور والانصراف المرتبط
+									</span>
+								</div>
+								{attendanceRecord ? (
+									<span
+										className="rounded-[4px] px-2 py-0.5 text-[10px] font-semibold"
+										style={{
+											backgroundColor:
+												attendanceRecord.status === "PRESENT"
+													? "#DCFCE7"
+													: attendanceRecord.status === "LATE"
+														? "#FEF3C7"
+														: attendanceRecord.status === "LEAVE"
+															? "#F3E8FF"
+															: "#FEE2E2",
+											color:
+												attendanceRecord.status === "PRESENT"
+													? "#15803D"
+													: attendanceRecord.status === "LATE"
+														? "#B45309"
+														: attendanceRecord.status === "LEAVE"
+															? "#7E22CE"
+															: "#B91C1C",
+										}}
+									>
+										{attendanceRecord.status === "PRESENT"
+											? "حاضر"
+											: attendanceRecord.status === "LATE"
+												? "متأخر"
+												: attendanceRecord.status === "LEAVE"
+													? "إجازة"
+													: "غائب"}
+									</span>
+								) : (
+									<span className="rounded-[4px] bg-[#F4F4F5] px-2 py-0.5 text-[10px] font-medium text-[#71717A]">
+										لم يُسجّل حضور بعد
+									</span>
+								)}
+							</div>
+
+							{attendanceRecord ? (
+								<div className="grid grid-cols-3 gap-2 pt-1 text-[11px]">
+									<div className="flex flex-col gap-0.5">
+										<span className="text-[10px] text-muted-foreground">الحضور الفعلي</span>
+										<span className="font-semibold text-foreground tabular-nums">
+											{attendanceRecord.checkIn
+												? format(new Date(attendanceRecord.checkIn), "hh:mm a")
+												: "—"}
+										</span>
+									</div>
+									<div className="flex flex-col gap-0.5">
+										<span className="text-[10px] text-muted-foreground">الانصراف الفعلي</span>
+										<span className="font-semibold text-foreground tabular-nums">
+											{attendanceRecord.checkOut
+												? format(new Date(attendanceRecord.checkOut), "hh:mm a")
+												: "—"}
+										</span>
+									</div>
+									<div className="flex flex-col gap-0.5">
+										<span className="text-[10px] text-muted-foreground">الساعات الفعلية / المقررة</span>
+										<span className="font-semibold text-foreground tabular-nums">
+											{attendanceRecord.hours} / {hours} س
+										</span>
+									</div>
+								</div>
+							) : (
+								<div className="flex items-center justify-between pt-1">
+									<span className="text-[11px] text-muted-foreground">
+										المناوبة مجدولة ({hours} ساعات) بانتظار تسجيل الحضور والانصراف
+									</span>
+									<Button
+										type="button"
+										size="sm"
+										variant="outline"
+										onClick={() => setAttendanceDialogOpen(true)}
+										className="h-6 gap-1 border-[#6366F1]/30 text-[10px] font-medium text-[#6366F1] hover:bg-[#6366F1]/10"
+									>
+										تسجيل الحضور الآن
+									</Button>
+								</div>
+							)}
+						</div>
+
 						{/* النشاط */}
 						<div className="flex w-full flex-col gap-3">
 							<span className="w-full text-right text-[12px] font-bold text-[#08090A]">
@@ -639,6 +819,26 @@ export function ShiftDetailsPanel({
 							</div>
 						</div>
 					</div>
+
+					{/* حوار تسجيل الحضور المباشر المرتبط بهذه المناوبة */}
+					{attendanceDialogOpen && (
+						<AttendanceRegisterDialog
+							open={attendanceDialogOpen}
+							staffId={staffId}
+							staffName={selected?.name ?? null}
+							staffCode={selected?.code ?? null}
+							date={dateValue ? new Date(`${dateValue}T00:00:00`) : new Date()}
+							shift={{
+								type,
+								startMinute: timeToMinutes(startTime),
+								endMinute: timeToMinutes(endTime),
+								hours,
+							}}
+							targetLabel={isStudent ? "الطالب" : "الموظف"}
+							onSave={isStudent ? (upsertStudentAttendanceAsync as any) : undefined}
+							onClose={() => setAttendanceDialogOpen(false)}
+						/>
+					)}
 
 					{/* التذييل — حذف المناوبة يمين، حفظ يسار */}
 					<div className="flex items-center justify-between border-t px-4 py-2">
