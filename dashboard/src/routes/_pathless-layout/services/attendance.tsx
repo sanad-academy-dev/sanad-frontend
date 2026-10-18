@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_pathless-layout/services/attendance")({
 });
 
 function AttendanceRouteComponent() {
-	const [tab, setTab] = useState<AttendanceTab>("students");
+	const [tab, setTab] = useState<AttendanceTab>("staff");
 
 	const today = useMemo(() => new Date(), []);
 	const { staff } = useStaff();

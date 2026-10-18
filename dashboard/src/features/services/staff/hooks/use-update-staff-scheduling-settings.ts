@@ -45,6 +45,9 @@ export const useUpdateStaffSchedulingSettings = (staffId: string) => {
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: key });
+			queryClient.invalidateQueries({ queryKey: ["shifts"] });
+			queryClient.invalidateQueries({ queryKey: ["attendance"] });
+			queryClient.invalidateQueries({ queryKey: ["staff"] });
 		},
 	});
 

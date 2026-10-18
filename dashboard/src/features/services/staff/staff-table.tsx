@@ -236,7 +236,7 @@ export function StaffTable() {
 			},
 			{
 				id: "reservations",
-				header: "حالة الحجز",
+				header: " أيام العمل",
 				cell: ({ row }) => (
 					// biome-ignore lint/a11y/noStaticElementInteractions: حارس انتشار فقط لإيقاف فتح الصف
 					// biome-ignore lint/a11y/useKeyWithClickEvents: حارس انتشار فقط؛ عنصر التحكم داخله قابل للوصول بلوحة المفاتيح
@@ -250,7 +250,7 @@ export function StaffTable() {
 			},
 			{
 				id: "patients",
-				header: "عدد الأطفال",
+				header: "عدد الطلاب",
 				cell: () => <span className="text-sm tabular-nums text-muted-foreground">0</span>,
 			},
 			{

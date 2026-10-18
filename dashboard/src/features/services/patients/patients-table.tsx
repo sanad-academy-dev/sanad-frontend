@@ -116,7 +116,7 @@ export function PatientsTable() {
 			},
 			{
 				accessorKey: "name",
-				header: "الطفل",
+				header: "الطالب",
 				cell: ({ row }) => {
 					const p = row.original;
 					const isFemale = p.gender === "FEMALE";
@@ -478,7 +478,7 @@ export function PatientsTable() {
 			<div className="flex min-h-0 flex-1 flex-col">
 				<TableToolbar
 					className="border-t"
-					searchPlaceholder="ابحث باسم الطفل..."
+					searchPlaceholder="ابحث باسم الطالب..."
 					searchValue={(table.getState().globalFilter as string) ?? ""}
 					onSearchChange={(v) => table.setGlobalFilter(v)}
 					actions={
@@ -487,7 +487,7 @@ export function PatientsTable() {
 							onClick={() => setAddSheetOpen(true)}
 						>
 							<IconPlus className="size-4" />
-							إضافة طفل جديد
+							إضافة طالب جديد
 						</Button>
 					}
 				/>
@@ -498,10 +498,10 @@ export function PatientsTable() {
 					isPending={isLoading}
 					onRowClick={(row) => setViewingPatient(row.original)}
 					emptyState={{
-						title: "لا يوجد أطفال حتى الآن",
+						title: "لا يوجد طلاب حتى الآن",
 						description:
-							"ملفات الأطفال تساعدك على متابعة بياناتهم، وحضورهم، وفصولهم بشكل منظم",
-						action: { label: "إضافة طفل جديد", onClick: () => setAddSheetOpen(true) },
+							"ملفات الطلاب تساعدك على متابعة بياناتهم، وحضورهم، وفصولهم بشكل منظم",
+						action: { label: "إضافة طالب جديد", onClick: () => setAddSheetOpen(true) },
 					}}
 				/>
 			</div>

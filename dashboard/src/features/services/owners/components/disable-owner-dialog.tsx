@@ -115,7 +115,7 @@ export function DisableOwnerDialog({ owner, onClose }: DisableOwnerDialogProps) 
 							</li>
 							<li className="flex items-start gap-2 text-sm text-foreground">
 								<IconInfoCircle className="size-4 text-amber-500 shrink-0 mt-0.5" />
-								ستظل بيانات الأطفال والسجلات السابقة والفواتير محفوظة
+								ستظل بيانات الطلاب والسجلات السابقة والفواتير محفوظة
 							</li>
 						</ul>
 					</div>
@@ -123,7 +123,7 @@ export function DisableOwnerDialog({ owner, onClose }: DisableOwnerDialogProps) 
 					{hasPatients && (
 						<div className="flex flex-col gap-2">
 							<p className="text-sm text-foreground font-medium">
-								إسناد الأطفال لوليّ أمر جديد قبل التعطيل
+								إسناد الطلاب لوليّ أمر جديد قبل التعطيل
 								<span className="text-destructive me-1">*</span>
 							</p>
 							<Select
@@ -133,7 +133,7 @@ export function DisableOwnerDialog({ owner, onClose }: DisableOwnerDialogProps) 
 								disabled={isPending}
 							>
 								<SelectTrigger>
-									<SelectValue placeholder="إسناد الأطفال إلى..." />
+									<SelectValue placeholder="إسناد الطلاب إلى..." />
 								</SelectTrigger>
 								<SelectContent dir="rtl">
 									{otherOwners.map((o) => (

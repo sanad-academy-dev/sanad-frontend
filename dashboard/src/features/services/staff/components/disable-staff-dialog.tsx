@@ -85,7 +85,7 @@ export function DisableStaffDialog({ staff, onClose }: DisableStaffDialogProps) 
 						<ul className="flex flex-col gap-1.5">
 							<li className="flex items-start gap-2 text-sm text-foreground">
 								<IconInfoCircle className="size-4 text-amber-500 shrink-0 mt-0.5" />
-								لن يمكن حجز زيارات جديدة للطفل
+								لن يمكن حجز زيارات جديدة للطالب
 							</li>
 							<li className="flex items-start gap-2 text-sm text-foreground">
 								<IconInfoCircle className="size-4 text-amber-500 shrink-0 mt-0.5" />

@@ -4,7 +4,7 @@ export const OWNER_FIELD_LABELS: Record<string, string> = {
 	name: "اسم وليّ الأمر",
 	gender: "الجنس",
 	ownerType: "نوع العميل",
-	patientIds: "الأطفال المرتبطون",
+	patientIds: "الطلاب المرتبطون",
 	phone: "رقم الجوال",
 	email: "البريد الإلكتروني",
 	country: "الدولة",

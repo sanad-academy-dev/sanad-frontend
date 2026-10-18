@@ -385,7 +385,7 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 
 						<div className="flex flex-col gap-1.5">
 							<FieldLabel required={!isEdit && !readOnly}>
-								<Label className="text-sm font-medium">الأطفال المرتبطون</Label>
+								<Label className="text-sm font-medium">الطلاب المرتبطون</Label>
 							</FieldLabel>
 							<Controller
 								name="patientIds"

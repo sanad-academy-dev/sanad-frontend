@@ -35,7 +35,7 @@ export const ALLERGY_CHIPS = [
 export const HEALTH_CHIPS = ["لا يوجد", "ربو", "حساسية جلدية", "فرط حركة"] as const;
 
 export const PATIENT_FIELD_LABELS: Record<string, string> = {
-	name: "اسم الطفل",
+	name: "اسم الطالب",
 	birthDate: "تاريخ الميلاد",
 	gender: "الجنس",
 	nationalId: "رقم الهوية / الإقامة",

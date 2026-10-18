@@ -110,7 +110,7 @@ const SPECIALTY_OPTIONS = [
 
 const GOAL_OPTIONS = [
 	{ value: "APPOINTMENTS_MANAGEMENT", label: "إدارة الزيارات" },
-	{ value: "PATIENTS_MANAGEMENT", label: "إدارة الأطفال / أولياء الأمور" },
+	{ value: "PATIENTS_MANAGEMENT", label: "إدارة الطلاب / أولياء الأمور" },
 	{ value: "INVENTORY_MANAGEMENT", label: "إدارة المخزون / الموردين" },
 	{ value: "BILLING_MANAGEMENT", label: "إدارة الفوترة" },
 	{ value: "REVENUE_IMPROVEMENT", label: "تحسين الإيرادات" },
@@ -851,7 +851,7 @@ function ProfileStep({ onNext, onBack }: { onNext: () => void; onBack: () => voi
 							control={control}
 							render={({ field }) => (
 								<SelectField
-									label="نوع الأطفال التي تخدمها؟"
+									label="نوع الطلاب الذين تخدمهم؟"
 									options={ANIMAL_OPTIONS}
 									value={field.value}
 									onChange={field.onChange}
@@ -875,7 +875,7 @@ function ProfileStep({ onNext, onBack }: { onNext: () => void; onBack: () => voi
 							control={control}
 							render={({ field }) => (
 								<SelectField
-									label="متوسط الأطفال شهريًا؟"
+									label="متوسط الطلاب شهريًا؟"
 									options={MONTHLY_OPTIONS}
 									value={field.value}
 									onChange={field.onChange}

@@ -12,7 +12,8 @@ export function getRouter() {
 	const router = createTanStackRouter({
 		routeTree,
 		scrollRestoration: true,
-		defaultPreload: "intent",
+		defaultPreload: import.meta.env.DEV ? false : "intent",
+		defaultPreloadDelay: 300,
 		defaultPreloadStaleTime: 30_000,
 		defaultPendingMs: 300,
 		defaultPendingMinMs: 300,
@@ -36,7 +37,7 @@ export function getRouter() {
 
 	setupRouterSsrQueryIntegration({
 		router,
-		queryClient,
+		queryClient: queryClient as never,
 	});
 
 	return router;

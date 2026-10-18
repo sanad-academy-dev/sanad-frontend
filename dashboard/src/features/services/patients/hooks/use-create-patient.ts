@@ -44,7 +44,7 @@ export const useCreatePatient = () => {
 				// biome-ignore lint/suspicious/noExplicitAny: eden contracts type definition is narrower than backend schema
 			} as any);
 			if (res.error) {
-				const msg = (res.error.value as { message?: string })?.message || "فشل إضافة الطفل";
+				const msg = (res.error.value as { message?: string })?.message || "فشل إضافة الطالب";
 				throw new Error(msg);
 			}
 			return res.data as PatientResponse;
@@ -57,9 +57,9 @@ export const useCreatePatient = () => {
 	const createPatient = (data: CreatePatientFormInput): Promise<PatientResponse> => {
 		const promise = mutateAsync(data);
 		toast.promise(promise, {
-			loading: "جارٍ إضافة الطفل...",
-			success: "تمت إضافة الطفل بنجاح",
-			error: (err: Error) => err.message || "فشل إضافة الطفل",
+			loading: "جارٍ إضافة الطالب...",
+			success: "تمت إضافة الطالب بنجاح",
+			error: (err: Error) => err.message || "فشل إضافة الطالب",
 		});
 		return promise;
 	};

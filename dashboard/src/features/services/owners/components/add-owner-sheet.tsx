@@ -257,7 +257,7 @@ export function AddOwnerSheet({
 
 						<div className="flex flex-col gap-1.5">
 							<FieldLabel required>
-								<Label className="text-sm font-medium">الأطفال المرتبطون</Label>
+								<Label className="text-sm font-medium">الطلاب المرتبطون</Label>
 							</FieldLabel>
 							<Controller
 								name="patientIds"

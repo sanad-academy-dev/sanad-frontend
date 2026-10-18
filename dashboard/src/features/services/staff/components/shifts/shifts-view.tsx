@@ -42,9 +42,13 @@ import { exportStaffCsv } from "@/features/services/staff/utils/export-staff";
 import { cn } from "@/lib/utils";
 import type { ShiftType } from "@/server/shifts/shifts.type";
 
-// مفتاح اليوم (yyyy-MM-dd) من تاريخ التعيين سواء كان نصًا أو كائن Date
-const dayKey = (d: string | Date) =>
-	(typeof d === "string" ? d : d.toISOString()).slice(0, 10);
+// مفتاح اليوم (yyyy-MM-dd) من تاريخ التعيين أو الحضور سواء كان نصًا أو كائن Date
+const dayKey = (d: unknown): string => {
+	if (!d) return "";
+	if (typeof d === "string") return d.slice(0, 10);
+	if (d instanceof Date) return format(d, "yyyy-MM-dd");
+	return "";
+};
 
 // دقائق من منتصف الليل → "HH:mm"
 const minutesToTime = (m: number | null) =>
@@ -132,9 +136,8 @@ export function ShiftsView({
 	const attendanceByCell = useMemo(() => {
 		const map = new Map<string, (typeof attendance)[number]>();
 		for (const a of attendance) {
-			const dStr =
-				typeof a.date === "string" ? a.date.slice(0, 10) : new Date(a.date).toISOString().slice(0, 10);
-			map.set(`${a.staffId}_${dStr}`, a);
+			const personId = a.staffId || (a as { studentId?: string }).studentId;
+			map.set(`${personId}_${dayKey(a.date)}`, a);
 		}
 		return map;
 	}, [attendance]);
@@ -234,45 +237,12 @@ export function ShiftsView({
 				variant="inventory"
 			/>
 
-			<AiShiftsDialog
+			{/* <AiShiftsDialog
 				open={aiOpen}
 				onClose={() => setAiOpen(false)}
 				days={days.map((d) => format(d, "yyyy-MM-dd"))}
 				staffNames={staffNames}
-			/>
-
-			{/* شريط تبديل الفئة: الموظفين أو الطلاب */}
-			<div className="flex items-center justify-between border-t border-[#E5E5E5] bg-white px-3 py-1.5">
-				<div className="flex items-center gap-1.5 rounded-md bg-[#F4F4F5] p-0.5 text-[11px] font-medium">
-					<button
-						type="button"
-						onClick={() => setTargetType("staff")}
-						className={cn(
-							"rounded px-3 py-1 transition-all",
-							!isStudents
-								? "bg-white font-semibold text-[#08090A] shadow-sm"
-								: "text-[#71717A] hover:text-[#08090A]",
-						)}
-					>
-						الموظفين
-					</button>
-					<button
-						type="button"
-						onClick={() => setTargetType("students")}
-						className={cn(
-							"rounded px-3 py-1 transition-all",
-							isStudents
-								? "bg-white font-semibold text-[#08090A] shadow-sm"
-								: "text-[#71717A] hover:text-[#08090A]",
-						)}
-					>
-						الطلاب
-					</button>
-				</div>
-				<span className="text-[11px] text-[#71717A]">
-					{isStudents ? `مناوبات الطلاب (${rows.length} طالب)` : `مناوبات الموظفين (${rows.length} موظف)`}
-				</span>
-			</div>
+			/> */}
 
 			<ShiftDetailsPanel
 				open={!!panelPreset}

@@ -13,7 +13,7 @@ export const useDisablePatient = () => {
         status: active ? "ACTIVE" : "SUSPENDED",
       });
       if (res.error)
-        throw new Error(active ? "فشل تفعيل الطفل" : "فشل تعطيل الطفل");
+        throw new Error(active ? "فشل تفعيل الطالب" : "فشل تعطيل الطالب");
       return res.data;
     },
     onSuccess: () => {
@@ -23,10 +23,10 @@ export const useDisablePatient = () => {
 
   const disablePatient = (id: string, active = false) =>
     toast.promise(mutation.mutateAsync({ id, active }), {
-      loading: active ? "جارٍ تفعيل الطفل..." : "جارٍ تعطيل الطفل...",
-      success: active ? "تم تفعيل الطفل بنجاح" : "تم تعطيل الطفل بنجاح",
+      loading: active ? "جارٍ تفعيل الطالب..." : "جارٍ تعطيل الطالب...",
+      success: active ? "تم تفعيل الطالب بنجاح" : "تم تعطيل الطالب بنجاح",
       error: (err: Error) =>
-        err.message || (active ? "فشل تفعيل الطفل" : "فشل تعطيل الطفل"),
+        err.message || (active ? "فشل تفعيل الطالب" : "فشل تعطيل الطالب"),
     });
 
   return { disablePatient, isPending: mutation.isPending };

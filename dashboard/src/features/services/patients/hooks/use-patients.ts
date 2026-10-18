@@ -10,7 +10,7 @@ export const usePatients = () => {
 		queryKey: ["patients"],
 		queryFn: async () => {
 			const res = await api.patients.get();
-			if (res.error) throw new Error("فشل تحميل الأطفال");
+			if (res.error) throw new Error("فشل تحميل الطلاب");
 			return res.data as PatientResponse[];
 		},
 		staleTime: 1000 * 60 * 5,

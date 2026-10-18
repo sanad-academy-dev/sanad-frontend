@@ -20,7 +20,7 @@ function RouteComponent() {
 		<div className="mx-auto flex h-full w-full max-w-5xl flex-col gap-4 px-6">
 			<Container
 				title="البريد الإلكتروني"
-				description="تخصيص الإشعارات المُرسلة إلى الأطفال."
+				description="تخصيص الإشعارات المُرسلة إلى الطلاب."
 			>
 				<ContainerRow
 					title="فعّل إشعارت البريد الإلكتروني"

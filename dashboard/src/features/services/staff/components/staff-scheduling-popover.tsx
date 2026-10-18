@@ -1,4 +1,12 @@
-import { IconCircleCheck, IconCircleX } from "@tabler/icons-react";
+import {
+	IconCalendarEvent,
+	IconCalendarTime,
+	IconCircleCheck,
+	IconCircleX,
+	IconClock,
+	IconMoon,
+	IconSun,
+} from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
 import { Spinner } from "@/components/common/spinner";
@@ -20,14 +28,14 @@ import type { Weekday } from "@/generated/prisma/enums";
 import { cn } from "@/lib/utils";
 import type { StaffShift } from "@/server/staff-scheduling/staff-scheduling.type";
 
-const WORK_DAYS: { label: string; value: Weekday }[] = [
-	{ label: "سبت", value: "SATURDAY" },
-	{ label: "جمعة", value: "FRIDAY" },
-	{ label: "خميس", value: "THURSDAY" },
-	{ label: "اربعاء", value: "WEDNESDAY" },
-	{ label: "ثلاثاء", value: "TUESDAY" },
-	{ label: "اثنين", value: "MONDAY" },
-	{ label: "احد", value: "SUNDAY" },
+const WORK_DAYS: { label: string; shortLabel: string; value: Weekday }[] = [
+	{ label: "الأحد", shortLabel: "أحد", value: "SUNDAY" },
+	{ label: "الاثنين", shortLabel: "اثنين", value: "MONDAY" },
+	{ label: "الثلاثاء", shortLabel: "ثلاثاء", value: "TUESDAY" },
+	{ label: "الأربعاء", shortLabel: "أربعاء", value: "WEDNESDAY" },
+	{ label: "الخميس", shortLabel: "خميس", value: "THURSDAY" },
+	{ label: "الجمعة", shortLabel: "جمعة", value: "FRIDAY" },
+	{ label: "السبت", shortLabel: "سبت", value: "SATURDAY" },
 ];
 
 const SHIFT_OPTIONS: { value: StaffShift; label: string }[] = [
@@ -40,57 +48,6 @@ const DEFAULT_MORNING_START = 480; // 08:00
 const DEFAULT_MORNING_END = 720; // 12:00
 const DEFAULT_EVENING_START = 780; // 13:00
 const DEFAULT_EVENING_END = 1020; // 17:00
-
-function Row({
-	label,
-	children,
-	className,
-}: {
-	label: string;
-	children: React.ReactNode;
-	className?: string;
-}) {
-	return (
-		<div className={cn("flex items-start justify-between gap-3", className)}>
-			<span className="text-sm font-medium pt-1 shrink-0">{label}</span>
-			<div className="flex flex-col items-end gap-2">{children}</div>
-		</div>
-	);
-}
-
-function TimeRow({
-	label,
-	startMinute,
-	endMinute,
-	onStartChange,
-	onEndChange,
-	timeFormat,
-}: {
-	label: string;
-	startMinute: number;
-	endMinute: number;
-	onStartChange: (v: number) => void;
-	onEndChange: (v: number) => void;
-	timeFormat: "H12" | "H24";
-}) {
-	return (
-		<div className="flex items-center gap-1.5">
-			<span className="text-xs text-muted-foreground w-10 shrink-0">{label}</span>
-			<span className="text-xs text-muted-foreground">من</span>
-			<TimeSelect
-				value={startMinute}
-				onValueChange={onStartChange}
-				format={timeFormat}
-			/>
-			<span className="text-xs text-muted-foreground">إلى</span>
-			<TimeSelect
-				value={endMinute}
-				onValueChange={onEndChange}
-				format={timeFormat}
-			/>
-		</div>
-	);
-}
 
 function PopoverInner({
 	staffId,
@@ -113,8 +70,8 @@ function PopoverInner({
 
 	if (isLoading || !scheduling) {
 		return (
-			<div className="flex h-10 items-center justify-center p-4">
-				<Spinner className="size-4" />
+			<div className="flex h-36 items-center justify-center p-4">
+				<Spinner className="size-5 text-primary" />
 			</div>
 		);
 	}
@@ -150,34 +107,63 @@ function PopoverInner({
 
 	return (
 		<div
-			className="flex flex-col gap-3"
+			className="flex flex-col gap-4 text-right"
 			dir="rtl"
 		>
-			<p className="font-semibold text-sm">جدولة أيام العمل والمناوبات</p>
-			<div className="h-px bg-border" />
+			{/* العنوان ورأس النافذة */}
+			<div className="flex items-center justify-between pb-3 border-b border-slate-100">
+				<div className="flex items-center gap-2.5">
+					<div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+						<IconCalendarTime className="size-4" />
+					</div>
+					<div>
+						<h4 className="font-semibold text-sm text-slate-900">مواعيد وأيام العمل</h4>
+						<p className="text-[11px] text-muted-foreground">جدولة مناوبات وحضور الموظف</p>
+					</div>
+				</div>
+			</div>
 
-			<Row label="أيام العمل">
+			{/* أيام العمل */}
+			<div className="space-y-2">
+				<div className="flex items-center justify-between text-xs">
+					<span className="font-semibold text-slate-800 flex items-center gap-1.5">
+						<IconCalendarEvent className="size-4 text-primary" />
+						أيام العمل الأسبوعية
+					</span>
+					<span className="text-[11px] font-medium text-muted-foreground bg-slate-100 px-2 py-0.5 rounded-full">
+						{activeWeekdays.length} أيام محددة
+					</span>
+				</div>
+
 				<ToggleGroup
 					type="multiple"
 					value={activeWeekdays}
 					onValueChange={handleWorkDaysChange}
-					className="flex-wrap justify-end gap-1.5 bg-transparent"
+					className="grid grid-cols-7 gap-1.5 w-full bg-slate-50/80 p-2 rounded-xl border border-slate-200/70"
 				>
 					{WORK_DAYS.map((day) => (
 						<ToggleGroupItem
 							key={day.value}
 							value={day.value}
-							className="size-9! rounded-full! border bg-white text-xs font-medium text-muted-foreground shadow-none! hover:bg-white data-[state=on]:border-primary/20 data-[state=on]:bg-primary data-[state=on]:primarydata-[state=on]:shadow-md data-[state=on]:hover:bg-primary data-[state=on]:hover:text-white"
+							className={cn(
+								"h-9 w-full rounded-lg border text-xs font-medium transition-all cursor-pointer flex items-center justify-center p-0",
+								"bg-white border-slate-200/80 text-slate-600 hover:bg-slate-100 hover:text-slate-900 shadow-2xs",
+								"data-[state=on]:bg-primary data-[state=on]:text-white data-[state=on]:border-primary data-[state=on]:font-semibold data-[state=on]:shadow-xs data-[state=on]:hover:bg-primary/90 data-[state=on]:hover:text-white",
+							)}
 						>
-							{day.label}
+							{day.shortLabel}
 						</ToggleGroupItem>
 					))}
 				</ToggleGroup>
-			</Row>
+			</div>
 
-			<div className="flex flex-col gap-2">
-				<div className="flex items-center gap-2">
-					<span className="text-sm font-medium shrink-0">المناوبة</span>
+			{/* نوع المناوبة وتفاصيل الأوقات */}
+			<div className="space-y-3 pt-1">
+				<div className="flex items-center justify-between">
+					<span className="text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+						<IconClock className="size-4 text-primary" />
+						فترة المناوبة
+					</span>
 					<Select
 						value={shift ?? undefined}
 						onValueChange={handleShiftChange}
@@ -185,15 +171,16 @@ function PopoverInner({
 					>
 						<SelectTrigger
 							size="sm"
-							className="bg-white w-40"
+							className="w-44 bg-white border-slate-200/80 font-medium text-xs shadow-2xs h-9 rounded-lg"
 						>
-							<SelectValue placeholder="اختر" />
+							<SelectValue placeholder="اختر نوع المناوبة" />
 						</SelectTrigger>
-						<SelectContent>
+						<SelectContent align="end">
 							{SHIFT_OPTIONS.map((opt) => (
 								<SelectItem
 									key={opt.value}
 									value={opt.value}
+									className="text-xs font-medium cursor-pointer"
 								>
 									{opt.label}
 								</SelectItem>
@@ -202,27 +189,64 @@ function PopoverInner({
 					</Select>
 				</div>
 
-				{showMorning && (
-					<TimeRow
-						label="صباحي"
-						startMinute={morningStart}
-						endMinute={morningEnd}
-						onStartChange={(v) => updateSettings({ morningStartMinute: v })}
-						onEndChange={(v) => updateSettings({ morningEndMinute: v })}
-						timeFormat={timeFormat}
-					/>
-				)}
+				{/* صفوف أوقات المناوبة */}
+				{(showMorning || showEvening) && (
+					<div className="flex flex-col gap-2.5 rounded-xl bg-slate-50/80 p-3 border border-slate-200/70">
+						{showMorning && (
+							<div className="flex items-center justify-between gap-2">
+								<div className="flex items-center gap-1.5 text-xs font-semibold text-amber-700 bg-amber-500/10 border border-amber-500/20 px-2 py-1 rounded-md shrink-0">
+									<IconSun className="size-3.5 text-amber-600" />
+									<span>صباحي</span>
+								</div>
+								<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+									<span className="text-[11px] font-medium text-slate-500">من</span>
+									<TimeSelect
+										value={morningStart}
+										onValueChange={(v) => updateSettings({ morningStartMinute: v })}
+										format={timeFormat}
+									/>
+									<span className="text-[11px] font-medium text-slate-500">إلى</span>
+									<TimeSelect
+										value={morningEnd}
+										onValueChange={(v) => updateSettings({ morningEndMinute: v })}
+										format={timeFormat}
+									/>
+								</div>
+							</div>
+						)}
 
-				{showEvening && (
-					<TimeRow
-						label="مسائي"
-						startMinute={eveningStart}
-						endMinute={eveningEnd}
-						onStartChange={(v) => updateSettings({ eveningStartMinute: v })}
-						onEndChange={(v) => updateSettings({ eveningEndMinute: v })}
-						timeFormat={timeFormat}
-					/>
+						{showEvening && (
+							<div className="flex items-center justify-between gap-2">
+								<div className="flex items-center gap-1.5 text-xs font-semibold text-indigo-700 bg-indigo-500/10 border border-indigo-500/20 px-2 py-1 rounded-md shrink-0">
+									<IconMoon className="size-3.5 text-indigo-600" />
+									<span>مسائي</span>
+								</div>
+								<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+									<span className="text-[11px] font-medium text-slate-500">من</span>
+									<TimeSelect
+										value={eveningStart}
+										onValueChange={(v) => updateSettings({ eveningStartMinute: v })}
+										format={timeFormat}
+									/>
+									<span className="text-[11px] font-medium text-slate-500">إلى</span>
+									<TimeSelect
+										value={eveningEnd}
+										onValueChange={(v) => updateSettings({ eveningEndMinute: v })}
+										format={timeFormat}
+									/>
+								</div>
+							</div>
+						)}
+					</div>
 				)}
+			</div>
+
+			{/* شريط معلومات المزامنة التلقائية */}
+			<div className="flex items-start gap-2 rounded-xl bg-primary/5 border border-primary/15 p-2.5 text-xs text-primary">
+				<IconCircleCheck className="size-4 shrink-0 mt-0.5 text-primary" />
+				<span className="text-[11.5px] leading-relaxed">
+					تتم مزامنة مواعيد وأيام العمل تلقائياً مع جدول المناوبات وسجلات الحضور والانصراف.
+				</span>
 			</div>
 		</div>
 	);
@@ -247,26 +271,33 @@ export function StaffSchedulingPopover({
 			<PopoverTrigger asChild>
 				<button
 					type="button"
-					className="flex items-center gap-1 text-sm cursor-pointer hover:opacity-80 transition-opacity"
+					className={cn(
+						"inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium cursor-pointer transition-all border shadow-2xs",
+						isConfigured
+							? "bg-emerald-50 text-emerald-700 border-emerald-200/70 hover:bg-emerald-100/80"
+							: "bg-rose-50 text-rose-700 border-rose-200/70 hover:bg-rose-100/80",
+					)}
 				>
 					{isConfigured ? (
 						<>
-							<IconCircleCheck className="size-4 text-emerald-500" />
-							<span className="text-emerald-500">تم الاعداد</span>
+							<IconCircleCheck className="size-3.5 text-emerald-600" />
+							<span>تم الإعداد</span>
 						</>
 					) : (
 						<>
-							<IconCircleX className="size-4 text-red-500" />
-							<span className="text-red-500">يحتاج اعداد</span>
+							<IconCircleX className="size-3.5 text-rose-600" />
+							<span>يحتاج إعداد</span>
 						</>
 					)}
 				</button>
 			</PopoverTrigger>
+			
 			<PopoverContent
-				className="w-[440px] h-fit"
+				className="w-[450px] p-4 rounded-2xl shadow-xl border-slate-200/80"
 				align="start"
+				sideOffset={8}
 			>
-				{open && (
+				{ open && (
 					<PopoverInner
 						staffId={staffId}
 						onShiftChange={setCurrentShift}

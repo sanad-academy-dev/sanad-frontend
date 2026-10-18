@@ -158,7 +158,7 @@ function CrmLeadPage() {
 						/>
 
 						<Detail
-							label="عدد الأطفال"
+							label="عدد الطلاب"
 							value={
 								lead.petCount === null || lead.petCount === undefined
 									? null

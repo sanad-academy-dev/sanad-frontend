@@ -128,7 +128,7 @@ export function DeleteOwnerDialog({ owner, onClose }: DeleteOwnerDialogProps) {
 					{hasPatients && (
 						<div className="flex flex-col gap-2">
 							<p className="text-sm text-foreground font-medium">
-								إسناد الأطفال لوليّ أمر جديد قبل الحذف
+								إسناد الطلاب لوليّ أمر جديد قبل الحذف
 								<span className="text-destructive me-1">*</span>
 							</p>
 							<Select
@@ -138,7 +138,7 @@ export function DeleteOwnerDialog({ owner, onClose }: DeleteOwnerDialogProps) {
 								disabled={isPending}
 							>
 								<SelectTrigger>
-									<SelectValue placeholder="إسناد الأطفال إلى..." />
+									<SelectValue placeholder="إسناد الطلاب إلى..." />
 								</SelectTrigger>
 								<SelectContent dir="rtl">
 									{otherOwners.map((o) => (

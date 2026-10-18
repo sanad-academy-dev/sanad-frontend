@@ -232,7 +232,7 @@ export function OwnersTable() {
 			},
 			{
 				accessorKey: "patients",
-				header: "الأطفال",
+				header: "الطلاب",
 				cell: ({ row }) => <PetIcons patients={row.original.patients} />,
 			},
 			{
@@ -410,8 +410,8 @@ export function OwnersTable() {
 					isPending={isLoading}
 					onRowClick={(row) => setViewingOwner(row.original)}
 					emptyState={{
-						title: "لا يوجد ملاك حتى الآن",
-						description: "سجّل ملاك الأطفال لتتمكن من ربطهم بمرضاهم ومتابعة زياراتهم",
+						title: "لا يوجد أولياء أمور حتى الآن",
+						description: "سجّل أولياء الأمور لتتمكن من ربطهم بالطلاب ومتابعة زياراتهم",
 						action: { label: "إضافة وليّ أمر جديد", onClick: () => setSheetOpen(true) },
 					}}
 				/>

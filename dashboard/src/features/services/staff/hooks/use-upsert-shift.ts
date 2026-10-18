@@ -46,6 +46,9 @@ export const useUpsertShift = () => {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["shifts"] });
+			queryClient.invalidateQueries({ queryKey: ["staff"] });
+			queryClient.invalidateQueries({ queryKey: ["staff-scheduling"] });
+			queryClient.invalidateQueries({ queryKey: ["attendance"] });
 		},
 	});
 

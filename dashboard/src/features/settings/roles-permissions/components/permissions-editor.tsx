@@ -16,13 +16,13 @@ import type { PermissionSection, ViewLevel } from "../types/permissions.types";
 const PERMISSION_SECTIONS: PermissionSection[] = [
 	{
 		id: "patients_owners",
-		label: "الأطفال وأولياء الأمور",
+		label: "الطلاب وأولياء الأمور",
 		viewLimitedKey: PERMISSIONS.PATIENTS_OWNERS_VIEW_LIMITED,
 		viewFullKey: PERMISSIONS.PATIENTS_OWNERS_VIEW_FULL,
 		toggles: [
-			{ key: PERMISSIONS.PATIENTS_OWNERS_CREATE, label: "إضافة طفل / وليّ أمر" },
-			{ key: PERMISSIONS.PATIENTS_OWNERS_EDIT, label: "تعديل طفل / وليّ أمر" },
-			{ key: PERMISSIONS.PATIENTS_OWNERS_DELETE, label: "حذف طفل / وليّ أمر" },
+			{ key: PERMISSIONS.PATIENTS_OWNERS_CREATE, label: "إضافة طالب / وليّ أمر" },
+			{ key: PERMISSIONS.PATIENTS_OWNERS_EDIT, label: "تعديل طالب / وليّ أمر" },
+			{ key: PERMISSIONS.PATIENTS_OWNERS_DELETE, label: "حذف طالب / وليّ أمر" },
 		],
 	},
 	{

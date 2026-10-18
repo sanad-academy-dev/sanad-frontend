@@ -9,7 +9,7 @@ export const useDeletePatient = () => {
 	const mutation = useMutation({
 		mutationFn: async (id: string) => {
 			const res = await api.patients({ id }).delete();
-			if (res.error) throw new Error("فشل حذف الطفل");
+			if (res.error) throw new Error("فشل حذف الطالب");
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["patients"] });
@@ -18,9 +18,9 @@ export const useDeletePatient = () => {
 
 	const deletePatient = (id: string) =>
 		toast.promise(mutation.mutateAsync(id), {
-			loading: "جارٍ حذف الطفل...",
-			success: "تم حذف الطفل بنجاح",
-			error: (err: Error) => err.message || "فشل حذف الطفل",
+			loading: "جارٍ حذف الطالب...",
+			success: "تم حذف الطالب بنجاح",
+			error: (err: Error) => err.message || "فشل حذف الطالب",
 		});
 
 	return { deletePatient, isPending: mutation.isPending };

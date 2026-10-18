@@ -27,6 +27,19 @@ export function AttendanceHeader({
 			<span className="h-[18px] w-px bg-[#E5E7EB]" />
 
 			<nav className="flex items-center gap-[3.49px]">
+	    <button
+					type="button"
+					onClick={() => active !== "staff" && onChange("staff")}
+					className={cn(
+						"flex h-[25px] items-center justify-center rounded-[4px] px-[14px] text-[11px] font-medium leading-[16px] transition-colors",
+						active === "staff"
+							? "border-[0.75px] border-[#E5E7EB] bg-[#F9FAFB] text-[#1F2937]"
+							: "text-[#6B7280] hover:text-[#1F2937]",
+					)}
+				>
+					الموظفين
+				</button>
+
 				<button
 					type="button"
 					onClick={() => active !== "students" && onChange("students")}
@@ -39,18 +52,7 @@ export function AttendanceHeader({
 				>
 					الطلاب
 				</button>
-				<button
-					type="button"
-					onClick={() => active !== "staff" && onChange("staff")}
-					className={cn(
-						"flex h-[25px] items-center justify-center rounded-[4px] px-[14px] text-[11px] font-medium leading-[16px] transition-colors",
-						active === "staff"
-							? "border-[0.75px] border-[#E5E7EB] bg-[#F9FAFB] text-[#1F2937]"
-							: "text-[#6B7280] hover:text-[#1F2937]",
-					)}
-				>
-					الموظفين
-				</button>
+			
 			</nav>
 		</div>,
 		slot,

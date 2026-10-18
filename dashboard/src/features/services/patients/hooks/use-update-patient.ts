@@ -12,7 +12,7 @@ export const useUpdatePatient = () => {
 		mutationFn: async ({ id, data }: { id: string; data: PatchBody }) => {
 			const res = await api.patients({ id }).patch(data);
 			if (res.error) {
-				const msg = (res.error.value as { message?: string })?.message ?? "فشل تحديث الطفل";
+				const msg = (res.error.value as { message?: string })?.message ?? "فشل تحديث الطالب";
 				throw new Error(msg);
 			}
 			return res.data;
@@ -24,9 +24,9 @@ export const useUpdatePatient = () => {
 
 	const updatePatient = (id: string, data: PatchBody) =>
 		toast.promise(mutation.mutateAsync({ id, data }), {
-			loading: "جارٍ تحديث بيانات الطفل...",
-			success: "تم تحديث بيانات الطفل",
-			error: (err: Error) => err.message || "فشل تحديث الطفل",
+			loading: "جارٍ تحديث بيانات الطالب...",
+			success: "تم تحديث بيانات الطالب",
+			error: (err: Error) => err.message || "فشل تحديث الطالب",
 		});
 
 	return { updatePatient, isPending: mutation.isPending };

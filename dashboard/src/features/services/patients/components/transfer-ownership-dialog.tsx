@@ -126,7 +126,7 @@ export function TransferOwnershipDialog({
 			>
 				<FormHeader
 					variant="dialog"
-					title="نقل ملكية الطفل"
+					title="نقل تبعية الطالب"
 					identity={patient ? { name: patient.name, code: patient.code } : null}
 					progress={formProgress}
 					onClose={onClose}
@@ -168,7 +168,7 @@ export function TransferOwnershipDialog({
 								</div>
 							) : (
 								<p className="text-xs text-muted-foreground">
-									لا يوجد وليّ أمر مسجل حالياً لهذا الطفل
+									لا يوجد وليّ أمر مسجل حالياً لهذا الطالب
 								</p>
 							)}
 						</div>
@@ -255,7 +255,7 @@ export function TransferOwnershipDialog({
 							<Label className="text-sm text-muted-foreground">سبب نقل الملكية (اختياري)</Label>
 							<Textarea
 								className="min-h-20 resize-none text-sm"
-								placeholder="اذكر سبب نقل ملف الطفل أو أية ملاحظات إدارية..."
+								placeholder="اذكر سبب نقل ملف الطالب أو أية ملاحظات إدارية..."
 								disabled={isPending}
 								{...form.register("comment")}
 							/>
@@ -269,7 +269,7 @@ export function TransferOwnershipDialog({
 							>
 								<span className="text-sm font-medium">إشعار وليّ الأمر</span>
 								<span className="text-xs text-muted-foreground">
-									إرسال إشعار بتحديث ملف الطفل إلى وليّ الأمر الجديد
+									إرسال إشعار بتحديث ملف الطالب إلى وليّ الأمر الجديد
 								</span>
 							</Label>
 							<Switch
