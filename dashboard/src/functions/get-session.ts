@@ -1,7 +1,26 @@
 import { backendFetch } from "@/lib/backend-fetch";
 
-let cachedResult: { session: unknown; timestamp: number } | null = null;
-let inflightPromise: Promise<{ session: unknown }> | null = null;
+export type AuthSession = {
+	user?: {
+		id?: string;
+		email?: string;
+		name?: string;
+		role?: string;
+		[key: string]: unknown;
+	} | null;
+	session?: {
+		id?: string;
+		userId?: string;
+		role?: string;
+		permissions?: string | null;
+		activeClinicId?: string | null;
+		[key: string]: unknown;
+	} | null;
+	[key: string]: unknown;
+} | null;
+
+let cachedResult: { session: AuthSession; timestamp: number } | null = null;
+let inflightPromise: Promise<{ session: AuthSession }> | null = null;
 const CACHE_TTL_MS = 5000;
 
 export const invalidateSessionCache = () => {
@@ -9,7 +28,7 @@ export const invalidateSessionCache = () => {
 };
 
 /** يستعلم من خدمة التوثيق المستقلة؛ لا توجد جلسة أو قاعدة بيانات داخل الـDashboard. */
-export const getSession = async () => {
+export const getSession = async (): Promise<{ session: AuthSession }> => {
 	const now = Date.now();
 	if (cachedResult && now - cachedResult.timestamp < CACHE_TTL_MS) {
 		return { session: cachedResult.session };
@@ -26,7 +45,7 @@ export const getSession = async () => {
 				cachedResult = { session: null, timestamp: Date.now() };
 				return { session: null };
 			}
-			const session = await response.json();
+			const session = (await response.json()) as AuthSession;
 			cachedResult = { session, timestamp: Date.now() };
 			return { session };
 		} catch (error) {

@@ -34,6 +34,12 @@ export const ALLERGY_CHIPS = [
 
 export const HEALTH_CHIPS = ["لا يوجد", "ربو", "حساسية جلدية", "فرط حركة"] as const;
 
+export const LEVEL_OPTIONS = ["مبتدئ", "متوسط", "متقدم", "غير متأكد"] as const;
+
+export const LEARNING_METHOD_OPTIONS = ["حضوري", "أونلاين", "مدمج"] as const;
+
+export const PREFERRED_SHIFT_OPTIONS = ["صباحي", "مسائي"] as const;
+
 export const PATIENT_FIELD_LABELS: Record<string, string> = {
 	name: "اسم الطالب",
 	birthDate: "تاريخ الميلاد",
@@ -54,6 +60,10 @@ export const PATIENT_FIELD_LABELS: Record<string, string> = {
 	transportation: "وسيلة النقل",
 	feeType: "نوع الرسوم",
 	previousNursery: "الحضانة السابقة",
+	level: "المستوى",
+	learningMethod: "طريقة التعلم",
+	preferredShift: "المناوبة المفضلة",
+	address: "العنوان",
 	notes: "ملاحظات",
 };
 
@@ -78,6 +88,10 @@ export const INITIAL_PATIENT_FORM_VALUES = {
 	allergies: "لا يوجد",
 	healthConditions: "",
 	previousNursery: "",
+	level: "مبتدئ",
+	learningMethod: "حضوري",
+	preferredShift: "صباحي",
+	address: "",
 	notes: "",
 	active: true,
 	status: "ACTIVE",
@@ -119,6 +133,7 @@ export function getPatientFilledFields(values: Record<string, unknown>): string[
 		str(values.guardianEmail) ? "guardianEmail" : null,
 		str(values.emergencyContactPhone) ? "emergencyContactPhone" : null,
 		str(values.emergencyContactName) ? "emergencyContactName" : null,
+		str(values.address) ? "address" : null,
 		values.allergies && values.allergies !== "لا يوجد" ? "allergies" : null,
 		values.healthConditions && values.healthConditions !== "لا يوجد"
 			? "healthConditions"

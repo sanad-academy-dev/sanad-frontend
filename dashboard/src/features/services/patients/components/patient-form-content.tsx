@@ -3,6 +3,7 @@ import {
 	IconCalendar,
 	IconChevronDown,
 	IconChevronUp,
+	IconMapPin,
 	IconPlus,
 	IconStar,
 } from "@tabler/icons-react";
@@ -35,6 +36,9 @@ import {
 	CLASSROOM_OPTIONS,
 	FEE_TYPE_OPTIONS,
 	HEALTH_CHIPS,
+	LEARNING_METHOD_OPTIONS,
+	LEVEL_OPTIONS,
+	PREFERRED_SHIFT_OPTIONS,
 	RELATIONSHIP_OPTIONS,
 	TRANSPORT_OPTIONS,
 } from "@/features/services/patients/data/patient-form-constants";
@@ -257,6 +261,127 @@ export function PatientFormContent({
 							</Field>
 						)}
 					/>
+				</div>
+
+				{/* المستوى */}
+				<div className="flex flex-col gap-1.5">
+					<FieldLabel info="المستوى الأكاديمي أو التعليمي للطالب">
+						<Label className="text-sm font-medium">المستوى</Label>
+					</FieldLabel>
+					<Controller
+						name="level"
+						control={control}
+						render={({ field }) => (
+							<Field data-invalid={!!errors.level}>
+								<Select
+									value={field.value || "مبتدئ"}
+									onValueChange={field.onChange}
+									disabled={isPending || readOnly}
+									dir="rtl"
+								>
+									<SelectTrigger className="w-full text-right text-sm">
+										<SelectValue placeholder="اختر المستوى..." />
+									</SelectTrigger>
+									<SelectContent dir="rtl">
+										{LEVEL_OPTIONS.map((lvl) => (
+											<SelectItem key={lvl} value={lvl}>
+												{lvl}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<FieldError errors={[errors.level]} />
+							</Field>
+						)}
+					/>
+				</div>
+
+				{/* طريقة التعلم */}
+				<div className="flex flex-col gap-1.5">
+					<FieldLabel info="نمط الحضور وتلقي الدروس المفضل للطالب">
+						<Label className="text-sm font-medium">طريقة التعلم</Label>
+					</FieldLabel>
+					<Controller
+						name="learningMethod"
+						control={control}
+						render={({ field }) => (
+							<Field data-invalid={!!errors.learningMethod}>
+								<Select
+									value={field.value || "حضوري"}
+									onValueChange={field.onChange}
+									disabled={isPending || readOnly}
+									dir="rtl"
+								>
+									<SelectTrigger className="w-full text-right text-sm">
+										<SelectValue placeholder="اختر طريقة التعلم..." />
+									</SelectTrigger>
+									<SelectContent dir="rtl">
+										{LEARNING_METHOD_OPTIONS.map((method) => (
+											<SelectItem key={method} value={method}>
+												{method}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<FieldError errors={[errors.learningMethod]} />
+							</Field>
+						)}
+					/>
+				</div>
+
+				{/* المناوبة المفضلة */}
+				<div className="flex flex-col gap-1.5">
+					<FieldLabel info="الفترة المفضلة لحضور الحصص والأنشطة">
+						<Label className="text-sm font-medium">المناوبة المفضلة</Label>
+					</FieldLabel>
+					<Controller
+						name="preferredShift"
+						control={control}
+						render={({ field }) => (
+							<Field data-invalid={!!errors.preferredShift}>
+								<Select
+									value={field.value || "صباحي"}
+									onValueChange={field.onChange}
+									disabled={isPending || readOnly}
+									dir="rtl"
+								>
+									<SelectTrigger className="w-full text-right text-sm">
+										<SelectValue placeholder="اختر المناوبة المفضلة..." />
+									</SelectTrigger>
+									<SelectContent dir="rtl">
+										{PREFERRED_SHIFT_OPTIONS.map((shift) => (
+											<SelectItem key={shift} value={shift}>
+												{shift}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<FieldError errors={[errors.preferredShift]} />
+							</Field>
+						)}
+					/>
+				</div>
+
+				{/* العنوان */}
+				<div className="flex flex-col gap-1.5">
+					<FieldLabel info="عنوان السكن أو الحي الخاص بالطالب">
+						<Label
+							className="text-sm font-medium"
+							htmlFor={`${idPrefix}-address`}
+						>
+							العنوان
+						</Label>
+					</FieldLabel>
+					<div className="relative">
+						<Input
+							id={`${idPrefix}-address`}
+							placeholder="مثال: سيدي سالم، كفر الشيخ، مصر"
+							className="text-sm pe-9 text-right"
+							disabled={isPending || readOnly}
+							{...register("address")}
+						/>
+						<IconMapPin className="absolute end-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+					</div>
 				</div>
 
 				{/* تفعيل المصروفات */}

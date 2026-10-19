@@ -94,6 +94,8 @@ export default defineConfig(({ mode }) => ({
       "@cornerstonejs/codec-libjpeg-turbo-8bit/decodewasmjs",
       "@cornerstonejs/codec-openjpeg/decodewasmjs",
       "@cornerstonejs/codec-openjph/wasmjs",
+      "@cornerstonejs/core",
+      "@cornerstonejs/tools",
     ],
     // محمّل DICOM يشحن Web Workers ووحدات WASM خاصة به — التحسين المسبق يكسرها
     //
@@ -102,7 +104,7 @@ export default defineConfig(({ mode }) => ({
     // وبلا خطأ. القياس: المصدر النقطي (ne2_shaded) يصل loaded=true، والمتّجه
     // (openmaptiles) يبقى loaded=false إلى الأبد — والفرق بينهما أنّ المتّجه وحده يمرّ
     // بالعامل.
-    exclude: ["@cornerstonejs/dicom-image-loader", "@cornerstonejs/core", "@cornerstonejs/tools", "@cornerstonejs/metadata", "maplibre-gl"],
+    exclude: ["@cornerstonejs/dicom-image-loader", "maplibre-gl"],
   },
   ssr: {
     noExternal: ["@livekit/components-styles"],

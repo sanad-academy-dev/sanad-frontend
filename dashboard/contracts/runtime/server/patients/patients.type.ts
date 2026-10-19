@@ -33,6 +33,10 @@ export const createPatientSchema = z.object({
 	feeType: z.string().optional(),
 	healthConditions: z.string().optional(),
 	previousNursery: z.string().optional(),
+	level: z.string().optional().default("مبتدئ"),
+	learningMethod: z.string().optional().default("حضوري"),
+	preferredShift: z.string().optional().default("صباحي"),
+	address: z.string().optional(),
 	weight: z.coerce
 		.number({ error: "الوزن يجب أن يكون رقمًا" })
 		.min(0, "الوزن يجب أن يكون 0 على الأقل")
@@ -67,6 +71,10 @@ export type CreatePatientInput = {
 	feeType?: string | null;
 	healthConditions?: string | null;
 	previousNursery?: string | null;
+	level?: string | null;
+	learningMethod?: string | null;
+	preferredShift?: string | null;
+	address?: string | null;
 	weight?: number | null;
 	notes?: string | null;
 	active?: boolean;
@@ -102,10 +110,29 @@ export type PatientResponse = {
 	guardianName?: string | null;
 	guardianPhone?: string | null;
 	guardianEmail?: string | null;
+	level?: string | null;
+	learningMethod?: string | null;
+	preferredShift?: string | null;
+	address?: string | null;
 	editsCount: number;
 	createdAt: Date | string;
 	updatedAt: Date | string;
-	owner: { id: string; code: string; name: string; phone: string | null; email: string | null } | null;
+	owner: {
+		id: string;
+		code: string;
+		name: string;
+		phone: string | null;
+		phoneE164?: string | null;
+		email: string | null;
+		gender?: string | null;
+		relationship?: string | null;
+		address?: string | null;
+		city?: string | null;
+		country?: string | null;
+		notes?: string | null;
+		active?: boolean;
+		createdAt?: Date | string;
+	} | null;
 };
 
 export const transferPatientOwnershipSchema = z.object({
@@ -276,3 +303,22 @@ export type PatientHistoryEntry =
 	| { kind: "RADIOLOGY"; id: string; occurredAt: Date; record: PatientHistoryRadiologyOrder }
 	| { kind: "VITALS"; id: string; occurredAt: Date; record: PatientHistoryVitals }
 	| { kind: "CARE_PLAN"; id: string; occurredAt: Date; record: PatientHistoryCarePlan };
+
+export interface PatientSupervisorItem {
+	staffId: string;
+	role?: string;
+	assignedAt: string;
+}
+
+export interface PatientSupervisorResponse {
+	id: string;
+	staffId: string;
+	name: string;
+	role: string;
+	initial: string;
+	avatar?: string | null;
+	phone?: string | null;
+	email?: string | null;
+	assignedAt?: string;
+}
+

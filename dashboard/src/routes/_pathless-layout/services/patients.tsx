@@ -1,8 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { Stats } from "@/components/common/stats";
-import { PatientsTable } from "@/features/services/patients/patients-table";
-import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { usePatientStats } from "@/features/services/patients/hooks/use-patient-stats";
+import { usePatients } from "@/features/services/patients/hooks/use-patients";
+import { PatientsTable } from "@/features/services/patients/patients-table";
 import { getSession } from "@/functions/get-session";
 import { PERMISSIONS } from "@/lib/permissions";
 
@@ -10,8 +10,13 @@ export const Route = createFileRoute("/_pathless-layout/services/patients")({
 	component: RouteComponent,
 	beforeLoad: async () => {
 		const { session } = await getSession();
-		if (session?.session.role === "MEMBER") {
-			const perms: string[] = JSON.parse(session.session.permissions ?? "[]");
+		if (session?.session?.role === "MEMBER") {
+			let perms: string[] = [];
+			try {
+				perms = JSON.parse(session.session.permissions ?? "[]");
+			} catch {
+				perms = [];
+			}
 			const canView =
 				perms.includes(PERMISSIONS.PATIENTS_OWNERS_VIEW_LIMITED) ||
 				perms.includes(PERMISSIONS.PATIENTS_OWNERS_VIEW_FULL);

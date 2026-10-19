@@ -1,3 +1,22 @@
+import type { PatientResponse } from "@sanad/contracts/runtime/server/patients/patients.type";
+import {
+	IconArrowsExchange,
+	IconBan,
+	IconCheck,
+	IconChevronDown,
+	IconChevronLeft,
+	IconDots,
+	IconEdit,
+	IconEye,
+	IconMail,
+	IconPhone,
+	IconPlayerPause,
+	IconPlus,
+	IconTrash,
+	IconUser,
+	IconX,
+} from "@tabler/icons-react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
 	getCoreRowModel,
@@ -6,24 +25,7 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import {
-	IconAlertTriangle,
-	IconArrowsExchange,
-	IconBan,
-	IconCheck,
-	IconChevronDown,
-	IconDots,
-	IconEdit,
-	IconEye,
-	IconMoodSmile,
-	IconPlayerPause,
-	IconPlus,
-	IconTrash,
-	IconUser,
-	IconX,
-} from "@tabler/icons-react";
-import { useMemo, useState } from "react";
-
+import { useCallback, useMemo, useState } from "react";
 import { TableDataView } from "@/components/common/table-data-view";
 import { TableToolbar } from "@/components/common/table-toolbar";
 import { Button } from "@/components/ui/button";
@@ -38,13 +40,11 @@ import {
 import { AddPatientSheet } from "@/features/services/patients/components/add-patient-sheet";
 import { DeletePatientDialog } from "@/features/services/patients/components/delete-patient-dialog";
 import { DisablePatientDialog } from "@/features/services/patients/components/disable-patient-dialog";
-import { PatientProfileSheet } from "@/features/services/patients/components/patient-profile-sheet";
 import { PatientSheet } from "@/features/services/patients/components/patient-sheet";
 import { TransferOwnershipDialog } from "@/features/services/patients/components/transfer-ownership-dialog";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { useUpdatePatient } from "@/features/services/patients/hooks/use-update-patient";
 import { cn } from "@/lib/utils";
-import type { PatientResponse } from "@sanad/contracts/runtime/server/patients/patients.type";
 
 function getGuardianInitials(name?: string | null) {
 	if (!name) return "—";
@@ -64,8 +64,8 @@ function formatDate(dateVal?: string | Date | null) {
 }
 
 export function PatientsTable() {
+	const navigate = useNavigate();
 	const [addSheetOpen, setAddSheetOpen] = useState(false);
-	const [viewingPatient, setViewingPatient] = useState<PatientResponse | null>(null);
 	const [editingPatient, setEditingPatient] = useState<PatientResponse | null>(null);
 	const [disablingPatient, setDisablingPatient] = useState<PatientResponse | null>(null);
 	const [transferringPatient, setTransferringPatient] = useState<PatientResponse | null>(null);
@@ -74,16 +74,19 @@ export function PatientsTable() {
 	const { patients, isLoading } = usePatients();
 	const { updatePatient } = useUpdatePatient();
 
-	const handleStatusChange = async (patient: PatientResponse, newStatus: string) => {
-		try {
-			await updatePatient(patient.id, {
-				status: newStatus,
-				active: newStatus === "ACTIVE",
-			});
-		} catch (e) {
-			console.error(e);
-		}
-	};
+	const handleStatusChange = useCallback(
+		async (patient: PatientResponse, newStatus: string) => {
+			try {
+				await updatePatient(patient.id, {
+					status: newStatus,
+					active: newStatus === "ACTIVE",
+				});
+			} catch (e) {
+				console.error(e);
+			}
+		},
+		[updatePatient],
+	);
 
 	const columns = useMemo<ColumnDef<PatientResponse>[]>(
 		() => [
@@ -101,6 +104,8 @@ export function PatientsTable() {
 					/>
 				),
 				cell: ({ row }) => (
+					// biome-ignore lint/a11y/noStaticElementInteractions: حارس انتشار فقط لإيقاف فتح الصف
+					// biome-ignore lint/a11y/useKeyWithClickEvents: حارس انتشار فقط؛ عنصر التحكم داخله قابل للوصول
 					<div onClick={(e) => e.stopPropagation()}>
 						<Checkbox
 							checked={row.getIsSelected()}
@@ -117,34 +122,44 @@ export function PatientsTable() {
 			{
 				accessorKey: "name",
 				header: "الطالب",
+				size: 260,
+				minSize: 220,
 				cell: ({ row }) => {
 					const p = row.original;
 					const isFemale = p.gender === "FEMALE";
 					const genderText = isFemale ? "أنثى" : "ذكر";
 					const ageText = p.age != null ? `${p.age} سنوات` : "—";
-					const code = p.code || "F-2024000";
+					const code = p.code || "PT-2024000";
 
 					return (
-						<div className="flex items-center gap-3">
+						<div className="flex items-center gap-3 min-w-[200px]">
 							<div
 								className={cn(
 									"flex size-9 shrink-0 items-center justify-center rounded-full border",
 									isFemale
-										? "bg-pink-50 border-pink-200 text-pink-500"
-										: "bg-blue-50 border-blue-200 text-blue-500",
+										? "bg-pink-50 border-pink-200 text-pink-500 dark:bg-pink-950/30 dark:border-pink-900/50"
+										: "bg-blue-50 border-blue-200 text-blue-500 dark:bg-blue-950/30 dark:border-blue-900/50",
 								)}
 							>
 								<IconUser className="size-4.5" />
 							</div>
-							<div className="flex flex-col gap-0.5">
-								<span className="font-bold text-sm text-foreground">{p.name}</span>
-								<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-									<span>{code}</span>
-									<span>-</span>
+							<div className="flex flex-col gap-0.5 min-w-0">
+								<Link
+									to="/services/patients/$patientId"
+									params={{ patientId: p.id }}
+									className="font-bold text-sm text-foreground hover:underline truncate"
+									onClick={(e) => e.stopPropagation()}
+									title={p.name}
+								>
+									{p.name}
+								</Link>
+								{/* <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+									<span className="font-mono text-[11px] text-muted-foreground/80">{code}</span>
+									<span>•</span>
 									<span>{genderText}</span>
-									<span>-</span>
+									<span>•</span>
 									<span>{ageText}</span>
-								</div>
+								</div> */}
 							</div>
 						</div>
 					);
@@ -153,6 +168,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "classroom",
 				header: "الفصل",
+				size: 110,
+				minSize: 90,
 				cell: ({ row }) => {
 					const cls = row.original.classroom || "النجوم";
 					return (
@@ -164,18 +181,56 @@ export function PatientsTable() {
 			},
 			{
 				id: "guardian",
-				header: "ولي الأمر",
+				header: "ولي الأمر / التواصل",
+				size: 260,
+				minSize: 220,
 				cell: ({ row }) => {
 					const p = row.original;
 					const guardianName = p.guardianName || p.owner?.name;
+					const phone = p.guardianPhone || p.owner?.phone;
+					const email = p.guardianEmail || p.owner?.email;
 					const initials = getGuardianInitials(guardianName);
 
+					if (!guardianName && !phone && !email) {
+						return <span className="text-xs text-muted-foreground">—</span>;
+					}
+
 					return (
-						<div
-							className="flex items-center justify-center size-8 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold"
-							title={guardianName || undefined}
-						>
-							{initials}
+						<div className="flex items-center gap-2.5 min-w-[200px]">
+							<div
+								className="flex size-8 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
+								title={guardianName || undefined}
+							>
+								{initials}
+							</div>
+							<div className="flex flex-col gap-0.5 min-w-0">
+								<span
+									className="font-semibold text-sm text-foreground truncate"
+									title={guardianName || undefined}
+								>
+									{guardianName || "ولي أمر غير محدد"}
+								</span>
+								<div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
+									{phone ? (
+										<span className="tabular-nums flex items-center gap-1.5 text-xs">
+											<IconPhone className="size-3 text-muted-foreground shrink-0" />
+											<span dir="ltr" className="text-right font-mono">{phone}</span>
+										</span>
+									) : "-"}
+									{/* {email ? (
+										<span
+											className="truncate flex items-center gap-1.5 text-[11px] text-muted-foreground/90"
+											title={email}
+										>
+											<IconMail className="size-3 text-muted-foreground shrink-0" />
+											<span className="truncate max-w-[170px]">{email}</span>
+										</span>
+									) : null}
+									{!phone && !email && (
+										<span className="text-[11px] text-muted-foreground">لا يوجد وسيلة تواصل</span>
+									)} */}
+								</div>
+							</div>
 						</div>
 					);
 				},
@@ -183,6 +238,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "birthDate",
 				header: "تاريخ الميلاد",
+				size: 120,
+				minSize: 100,
 				cell: ({ row }) => (
 					<span className="text-xs text-foreground font-mono">
 						{formatDate(row.original.birthDate)}
@@ -192,6 +249,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "bloodType",
 				header: "فصيلة الدم",
+				size: 95,
+				minSize: 80,
 				cell: ({ row }) => {
 					const bt = row.original.bloodType || "A+";
 					return (
@@ -204,6 +263,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "developmentStatus",
 				header: "الحالة النمائية",
+				size: 130,
+				minSize: 110,
 				cell: ({ row }) => {
 					const dev = row.original.developmentStatus || "NORMAL";
 					if (dev === "ADVANCED") {
@@ -230,6 +291,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "allergies",
 				header: "الحساسيات",
+				size: 130,
+				minSize: 110,
 				cell: ({ row }) => {
 					const alg = row.original.allergies?.trim();
 					if (!alg || alg === "لا يوجد") {
@@ -245,6 +308,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "feeType",
 				header: "نوع الرسوم",
+				size: 120,
+				minSize: 100,
 				cell: ({ row }) => {
 					const fee = row.original.feeType?.trim();
 					if (!fee) {
@@ -260,6 +325,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "pocketMoneyEnabled",
 				header: "المصروف",
+				size: 105,
+				minSize: 90,
 				cell: ({ row }) => {
 					const enabled = row.original.pocketMoneyEnabled !== false;
 					if (enabled) {
@@ -281,6 +348,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "updatedAt",
 				header: "آخر تحديث",
+				size: 120,
+				minSize: 100,
 				cell: ({ row }) => (
 					<span className="text-xs text-muted-foreground font-mono">
 						{formatDate(row.original.updatedAt || row.original.createdAt)}
@@ -290,6 +359,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "status",
 				header: "الحالة",
+				size: 120,
+				minSize: 100,
 				cell: ({ row }) => {
 					const p = row.original;
 					const currentStatus = p.status || (p.active ? "ACTIVE" : "SUSPENDED");
@@ -297,6 +368,8 @@ export function PatientsTable() {
 						currentStatus === "SUSPENDED" || currentStatus === "PENDING";
 
 					return (
+						// biome-ignore lint/a11y/noStaticElementInteractions: حارس انتشار فقط لإيقاف فتح الصف
+						// biome-ignore lint/a11y/useKeyWithClickEvents: حارس انتشار فقط؛ عنصر التحكم داخله قابل للوصول
 						<div onClick={(e) => e.stopPropagation()}>
 							<DropdownMenu dir="rtl">
 								<DropdownMenuTrigger asChild>
@@ -348,22 +421,36 @@ export function PatientsTable() {
 			{
 				id: "actions",
 				header: "",
+				size: 120,
+				minSize: 110,
 				cell: ({ row }) => (
-					<div onClick={(e) => e.stopPropagation()}>
+					// biome-ignore lint/a11y/noStaticElementInteractions: حارس انتشار فقط لإيقاف فتح الصف
+					// biome-ignore lint/a11y/useKeyWithClickEvents: حارس انتشار فقط؛ عنصر التحكم داخله قابل للوصول
+					<div
+						className="flex items-center "
+						onClick={(e) => e.stopPropagation()}
+					>
+					
+
 						<DropdownMenu dir="rtl">
 							<DropdownMenuTrigger asChild>
 								<Button
 									variant="ghost"
 									size="icon"
-									className="size-8"
+									className="size-7 text-muted-foreground hover:text-foreground"
 								>
-									<IconDots className="size-4" />
+									<IconDots className="size-3.5" />
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="start">
 								<DropdownMenuItem
 									className="gap-2"
-									onSelect={() => setViewingPatient(row.original)}
+									onSelect={() =>
+										navigate({
+											to: "/services/patients/$patientId",
+											params: { patientId: row.original.id },
+										})
+									}
 								>
 									<IconEye className="size-4" />
 									فتح
@@ -403,7 +490,7 @@ export function PatientsTable() {
 				),
 			},
 		],
-		[],
+		[handleStatusChange, navigate],
 	);
 
 	const table = useReactTable({
@@ -413,13 +500,26 @@ export function PatientsTable() {
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
-		globalFilterFn: "includesString",
+		globalFilterFn: (row, _columnId, filterValue) => {
+			const search = String(filterValue).toLowerCase().trim();
+			if (!search) return true;
+			const p = row.original;
+			const guardianName = p.guardianName || p.owner?.name || "";
+			const guardianPhone = p.guardianPhone || p.owner?.phone || "";
+			const guardianEmail = p.guardianEmail || p.owner?.email || "";
+			const studentName = p.name || "";
+			const code = p.code || "";
+			const classroom = p.classroom || "";
+			return (
+				studentName.toLowerCase().includes(search) ||
+				code.toLowerCase().includes(search) ||
+				guardianName.toLowerCase().includes(search) ||
+				guardianPhone.toLowerCase().includes(search) ||
+				guardianEmail.toLowerCase().includes(search) ||
+				classroom.toLowerCase().includes(search)
+			);
+		},
 	});
-
-	const activeViewingPatient = useMemo(() => {
-		if (!viewingPatient) return null;
-		return patients.find((p) => p.id === viewingPatient.id) ?? viewingPatient;
-	}, [patients, viewingPatient]);
 
 	return (
 		<>
@@ -427,58 +527,32 @@ export function PatientsTable() {
 				open={addSheetOpen}
 				onClose={() => setAddSheetOpen(false)}
 			/>
-			<PatientProfileSheet
-				open={!!activeViewingPatient}
-				onClose={() => setViewingPatient(null)}
-				patient={activeViewingPatient}
-				onPatientChange={(updated) => setViewingPatient(updated)}
-			/>
 			<PatientSheet
 				open={!!editingPatient}
 				onClose={() => setEditingPatient(null)}
 				patient={editingPatient}
-				onSuccess={(updated) => {
-					setEditingPatient(null);
-					if (viewingPatient?.id === updated.id) {
-						setViewingPatient(updated);
-					}
-				}}
+				onSuccess={() => setEditingPatient(null)}
 			/>
 			<DisablePatientDialog
 				patient={disablingPatient}
 				onClose={() => setDisablingPatient(null)}
-				onSuccess={(updated) => {
-					setDisablingPatient(null);
-					if (viewingPatient?.id === updated.id) {
-						setViewingPatient(updated);
-					}
-				}}
+				onSuccess={() => setDisablingPatient(null)}
 			/>
 			<TransferOwnershipDialog
 				patient={transferringPatient}
 				onClose={() => setTransferringPatient(null)}
-				onSuccess={(updated) => {
-					setTransferringPatient(null);
-					if (viewingPatient?.id === updated.id) {
-						setViewingPatient(updated);
-					}
-				}}
+				onSuccess={() => setTransferringPatient(null)}
 			/>
 			<DeletePatientDialog
 				patient={deletingPatient}
 				onClose={() => setDeletingPatient(null)}
-				onSuccess={(deletedId) => {
-					setDeletingPatient(null);
-					if (viewingPatient?.id === deletedId) {
-						setViewingPatient(null);
-					}
-				}}
+				onSuccess={() => setDeletingPatient(null)}
 			/>
 
 			<div className="flex min-h-0 flex-1 flex-col">
 				<TableToolbar
 					className="border-t"
-					searchPlaceholder="ابحث باسم الطالب..."
+					searchPlaceholder="ابحث باسم الطالب، ولي الأمر، أو رقم التواصل..."
 					searchValue={(table.getState().globalFilter as string) ?? ""}
 					onSearchChange={(v) => table.setGlobalFilter(v)}
 					actions={
@@ -496,14 +570,20 @@ export function PatientsTable() {
 					table={table}
 					columns={columns}
 					isPending={isLoading}
-					onRowClick={(row) => setViewingPatient(row.original)}
+					tableClassName="w-full min-w-[1600px]"
+					onRowClick={(row) =>
+						navigate({
+							to: "/services/patients/$patientId",
+							params: { patientId: row.original.id },
+						})
+					}
 					emptyState={{
 						title: "لا يوجد طلاب حتى الآن",
-						description:
-							"ملفات الطلاب تساعدك على متابعة بياناتهم، وحضورهم، وفصولهم بشكل منظم",
+						description: "ملفات الطلاب تساعدك على متابعة بياناتهم، وحضورهم، وفصولهم بشكل منظم",
 						action: { label: "إضافة طالب جديد", onClick: () => setAddSheetOpen(true) },
 					}}
 				/>
+				
 			</div>
 		</>
 	);

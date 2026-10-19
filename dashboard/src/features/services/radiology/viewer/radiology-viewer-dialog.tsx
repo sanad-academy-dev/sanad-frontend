@@ -1,8 +1,14 @@
 import { IconExternalLink, IconX } from "@tabler/icons-react";
+import { lazy, Suspense } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { RadiologyStudyViewer } from "@/features/services/radiology/viewer/viewer-page";
+
+const RadiologyStudyViewer = lazy(() =>
+	import("@/features/services/radiology/viewer/viewer-page").then((m) => ({
+		default: m.RadiologyStudyViewer,
+	})),
+);
 
 // عارض الدراسة داخل نافذة منبثقة بحجم ٩٠٪ من الشاشة — يبقى المستخدم في سياق
 // الفحص بدل الانتقال لتبويب آخر، وزر «فتح في تبويب» متاح لمن أراد شاشة كاملة.
@@ -55,11 +61,20 @@ export function RadiologyViewerDialog({
 					</div>
 
 					{/* إعادة التركيب عند تبديل الدراسة تبني محرّك العرض نظيفًا */}
+					
 					{studyId && (
-						<RadiologyStudyViewer
-							key={studyId}
-							studyId={studyId}
-						/>
+						<Suspense
+							fallback={
+								<div className="flex h-full items-center justify-center text-sm text-neutral-400">
+									جارٍ تحميل عارض الأشعة...
+								</div>
+							}
+						>
+							<RadiologyStudyViewer
+								key={studyId}
+								studyId={studyId}
+							/>
+						</Suspense>
 					)}
 				</div>
 			</DialogContent>

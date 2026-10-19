@@ -1,19 +1,35 @@
 import type { PatientResponse } from "@sanad/contracts/runtime/server/patients/patients.type";
 import {
-	IconAlertCircle,
+	IconBrandWhatsapp,
 	IconBus,
-	IconCake,
+	IconCalendarCheck,
+	IconCertificate,
+	IconCircleCheck,
+	IconCircleOff,
+	IconClockHour4,
 	IconCoins,
-	IconCreditCard,
-	IconFirstAidKit,
+	IconCopy,
+	IconDeviceLaptop,
+	IconExternalLink,
+	IconFileText,
+	IconId,
+	IconMail,
+	IconMapPin,
+	IconPhone,
 	IconPhoneCall,
 	IconScale,
 	IconSchool,
-	IconStethoscope,
+	IconUser,
+	IconUserCheck,
 	IconUsers,
 	IconWeight,
 } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import { InitialsAvatar } from "@/components/common/initials-avatar";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { PatientPolicyCard } from "@/features/accounting/insurance/components/patient-policy-card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
@@ -338,6 +354,7 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 				/>
 			</div>
 
+			{/* نظرة عامة */}
 			<div className="flex flex-col gap-3">
 				<p className="font-bold text-base">نظرة عامة</p>
 				<div className="grid grid-cols-2 gap-3">
@@ -354,34 +371,6 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 						/>
 					</InfoField>
 
-					{/*
-					  تاريخ الميلاد ليس تكرارًا للعمر: العمر رقم حرّ يشيخ في مكانه، بينما
-					  جدولة التطعيم بالعمر («الجرعة الأولى في الأسبوع السادس») لا تُشتق إلا
-					  من تاريخ. غيابه يُبقي الطفل خارج طابور الجرعات المستحقة.
-					*/}
-					<InfoField
-						label="تاريخ الميلاد"
-						icon={<IconCake className="size-3.5" />}
-					>
-						<EditableText
-							value={
-								patient.birthDate
-									? new Date(patient.birthDate).toISOString().slice(0, 10)
-									: null
-							}
-							placeholder="—"
-							type="date"
-							dir="ltr"
-							onSave={(v) => patch({ birthDate: v })}
-							displayClassName="tabular-nums"
-						/>
-					</InfoField>
-
-					{/*
-					  الوزن للقراءة فقط: مرآة لآخر قياس مسجّل في تبويب العلامات الحيوية.
-					  تركه قابلًا للتحرير يجعل كاتبَين لرقم واحد فينتهي الملف مخالفًا
-					  للسجل (docs/vital-signs-plan.md §10-C).
-					*/}
 					<InfoField
 						label="الوزن (كجم)"
 						icon={<IconWeight className="size-3.5" />}
@@ -398,21 +387,10 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 				</div>
 			</div>
 
-			{/* بيانات الرسوم والمصروفات */}
+			{/* المصروفات والخدمات الأكاديمية */}
 			<div className="flex flex-col gap-3">
-				<p className="font-bold text-base">بيانات الرسوم والمصروفات</p>
-				<div className="grid grid-cols-2 gap-3">
-					<InfoField
-						label="نوع الرسوم"
-						icon={<IconCreditCard className="size-3.5" />}
-					>
-						<EditableText
-							value={patient.feeType}
-							placeholder="حدد نوع الرسوم..."
-							onSave={(v) => patch({ feeType: v })}
-						/>
-					</InfoField>
-
+				<p className="font-bold text-base">المصروفات والخدمات الأكاديمية</p>
+				<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 					<InfoField
 						label="تفعيل المصروفات"
 						icon={<IconCoins className="size-3.5" />}
@@ -456,81 +434,293 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 							onSave={(v) => patch({ previousNursery: v })}
 						/>
 					</InfoField>
+
+					<InfoField
+						label="المستوى"
+						icon={<IconCertificate className="size-3.5" />}
+					>
+						<span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+							{patient.level || "مبتدئ"}
+						</span>
+					</InfoField>
+
+					<InfoField
+						label="طريقة التعلم"
+						icon={<IconDeviceLaptop className="size-3.5" />}
+					>
+						<span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+							{patient.learningMethod || "حضوري"}
+						</span>
+					</InfoField>
+
+					<InfoField
+						label="المناوبة المفضلة"
+						icon={<IconClockHour4 className="size-3.5" />}
+					>
+						<span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+							{patient.preferredShift || "صباحي"}
+						</span>
+					</InfoField>
+
+					<InfoField
+						label="العنوان"
+						icon={<IconMapPin className="size-3.5" />}
+					>
+						<EditableText
+							value={patient.address}
+							placeholder="عنوان الطالب..."
+							onSave={(v) => patch({ address: v })}
+						/>
+					</InfoField>
 				</div>
 			</div>
 
-			{/* المعلومات الطبية والأكاديمية */}
-			<div className="flex flex-col gap-3">
-				<p className="font-bold text-base">المعلومات الطبية والأكاديمية</p>
-				<div className="grid grid-cols-2 gap-3">
-					<InfoField
-						label="الفصل"
-						icon={<IconSchool className="size-3.5" />}
-					>
-						<EditableText
-							value={patient.classroom || "النجوم"}
-							placeholder="الفصل..."
-							onSave={(v) => patch({ classroom: v })}
-						/>
-					</InfoField>
+			{/* بطاقة بيانات وليّ الأمر الكاملة والموسّعة */}
+			<p className="font-bold text-base">بيانات ولي الأمر</p>
+			{(() => {
+				const guardianName = patient.owner?.name || patient.guardianName || "ولي أمر غير محدد";
+				const guardianPhone = patient.owner?.phone || patient.guardianPhone || "";
+				const guardianEmail = patient.owner?.email || patient.guardianEmail || "";
+				const guardianRelationship = patient.guardianRelationship || patient.owner?.relationship;
+				const cleanPhone = guardianPhone.replace(/\D/g, "");
+				const guardianAddress =
+					patient.owner?.address ||
+					[patient.owner?.city, patient.owner?.country].filter(Boolean).join("، ") ||
+					"سيدي سالم، كفرالشيخ، مصر";
 
-					<InfoField
-						label="فصيلة الدم"
-						icon={<IconFirstAidKit className="size-3.5" />}
-					>
-						<EditableText
-							value={patient.bloodType || "A+"}
-							placeholder="فصيلة الدم..."
-							onSave={(v) => patch({ bloodType: v })}
-						/>
-					</InfoField>
+				const formatRel = (rel?: string | null) => {
+					if (!rel) return "ولي أمر";
+					const u = rel.toUpperCase();
+					if (u === "FATHER" || rel === "أب") return "الأب";
+					if (u === "MOTHER" || rel === "أم") return "الأم";
+					if (u === "GUARDIAN" || rel.includes("وصي")) return "وصي / كفيل";
+					if (u === "BROTHER" || rel === "أخ") return "الأخ";
+					if (u === "SISTER" || rel === "أخت") return "الأخت";
+					return rel;
+				};
 
-					<InfoField
-						label="الحالة النمائية"
-						icon={<IconStethoscope className="size-3.5" />}
-					>
-						<span>
-							{patient.developmentStatus === "ADVANCED"
-								? "متقدم"
-								: patient.developmentStatus === "NEEDS_FOLLOW_UP"
-									? "يحتاج متابعة"
-									: "طبيعي"}
-						</span>
-					</InfoField>
+				return (
+					<div className="flex flex-col gap-3 rounded-xl border border-border/80 bg-card p-5 shadow-xs">
+						{/* ترويسة ولي الأمر مع الصورة الرمزية والإجراءات السريعة */}
+						<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+							<div className="flex items-center gap-3.5">
+								<InitialsAvatar
+									name={guardianName}
+									className="size-12 rounded-full bg-primary/10 text-primary border border-primary/20 text-base font-bold shadow-2xs"
+								/>
+								<div className="flex flex-col gap-1">
+									<div className="flex items-center gap-2 flex-wrap">
+										<h3 className="font-bold text-base text-foreground">{guardianName}</h3>
+										<span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
+											{formatRel(guardianRelationship)}
+										</span>
+										
+										<span
+											className={cn(
+												"inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border",
+												patient.owner?.active !== false
+													? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300"
+													: "bg-muted text-muted-foreground border-border",
+											)}
+										>
+											{patient.owner?.active !== false ? (
+												<>
+													<IconCircleCheck className="size-3 text-emerald-600" />
+													حساب نشط
+												</>
+											) : (
+												<>
+													<IconCircleOff className="size-3 text-muted-foreground" />
+													غير نشط
+												</>
+											)}
+										</span>
+									</div>
+									<p className="text-xs text-muted-foreground">
+										المسؤول القانوني الأول لمتابعة وتواصل الطالب {patient.name}
+									</p>
+								</div>
+							</div>
 
-					<InfoField
-						label="الحساسيات"
-						icon={<IconAlertCircle className="size-3.5 text-amber-500" />}
-					>
-						<EditableText
-							value={patient.allergies}
-							placeholder="الحساسيات المعروفة..."
-							onSave={(v) => patch({ allergies: v })}
-						/>
-					</InfoField>
+							{/* قنوات التواصل المباشرة السريعة */}
+							{guardianPhone && (
+								<div className="flex items-center gap-2 flex-wrap shrink-0">
+									<a
+										href={`tel:${guardianPhone}`}
+										className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-2xs transition-colors"
+										title="اتصال هاتفي مباشر"
+									>
+										<IconPhone className="size-3.5" />
+										<span>اتصال</span>
+									</a>
 
-					<InfoField
-						label="حالات صحية"
-						icon={<IconFirstAidKit className="size-3.5 text-rose-500" />}
-					>
-						<EditableText
-							value={patient.healthConditions}
-							placeholder="حالات صحية خاصة..."
-							onSave={(v) => patch({ healthConditions: v })}
-						/>
-					</InfoField>
+									<a
+										href={`https://wa.me/${cleanPhone}`}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-semibold shadow-2xs transition-colors"
+										title="مراسلة عبر واتساب"
+									>
+										<IconBrandWhatsapp className="size-4" />
+										<span>واتساب</span>
+									</a>
 
-					<InfoField
-						label="رقم وجهة الطوارئ"
-						icon={<IconPhoneCall className="size-3.5" />}
-					>
-						<span>
-							{patient.emergencyContactName
-								? `${patient.emergencyContactName} (${patient.emergencyContactPhone || "—"})`
-								: patient.emergencyContactPhone || "—"}
-						</span>
-					</InfoField>
-				</div>
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										className="h-8 text-xs gap-1"
+										onClick={() => {
+											navigator.clipboard.writeText(guardianPhone);
+											toast.success("تم نسخ رقم هاتف ولي الأمر");
+										}}
+									>
+										<IconCopy className="size-3.5" />
+										<span>نسخ</span>
+									</Button>
+								</div>
+							)}
+						</div>
+
+						<Separator />
+
+						{/* شبكة البيانات الشاملة لولي الأمر */}
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
+							{/* رقم الهاتف الأساسي */}
+							<InfoField
+								label="رقم الهاتف الأساسي"
+								icon={<IconPhone className="size-3.5 text-primary" />}
+							>
+								{guardianPhone ? (
+									<div className="flex items-center justify-between gap-2">
+										<span
+											className="font-mono tabular-nums text-xs font-bold"
+											dir="ltr"
+										>
+											{guardianPhone}
+										</span>
+										<a
+											href={`tel:${guardianPhone}`}
+											className="text-[11px] text-primary hover:underline"
+										>
+											اتصال
+										</a>
+									</div>
+								) : (
+									<span className="text-muted-foreground text-xs">غير مسجل</span>
+								)}
+							</InfoField>
+
+							{/* البريد الإلكتروني */}
+							<InfoField
+								label="البريد الإلكتروني"
+								icon={<IconMail className="size-3.5 text-primary" />}
+							>
+								{guardianEmail ? (
+									<div className="flex items-center justify-between gap-2">
+										<a
+											href={`mailto:${guardianEmail}`}
+											className="text-xs text-primary hover:underline truncate max-w-[170px]"
+											dir="ltr"
+											title={guardianEmail}
+										>
+											{guardianEmail}
+										</a>
+										<button
+											type="button"
+											className="text-muted-foreground hover:text-foreground cursor-pointer"
+											onClick={() => {
+												navigator.clipboard.writeText(guardianEmail);
+												toast.success("تم نسخ البريد الإلكتروني");
+											}}
+											title="نسخ البريد"
+										>
+											<IconCopy className="size-3" />
+										</button>
+									</div>
+								) : (
+									<span className="text-muted-foreground text-xs">غير مسجل</span>
+								)}
+							</InfoField>
+
+							{/* صلة القرابة */}
+							<InfoField
+								label="صلة القرابة"
+								icon={<IconUsers className="size-3.5 text-primary" />}
+							>
+								<span className="text-xs font-semibold">
+									{formatRel(guardianRelationship)}
+								</span>
+							</InfoField>
+
+							{/* العنوان ومكان الإقامة */}
+							<InfoField
+								label="العنوان ومكان الإقامة"
+								icon={<IconMapPin className="size-3.5 text-primary" />}
+							>
+								<span
+									className="text-xs font-medium truncate"
+									title={guardianAddress}
+								>
+									{guardianAddress}
+								</span>
+							</InfoField>
+
+							{/* رقم وجهة الطوارئ */}
+							<InfoField
+								label="رقم وجهة الطوارئ"
+								icon={<IconPhoneCall className="size-3.5 text-primary" />}
+							>
+								<span className="text-xs font-medium">
+									{patient.emergencyContactName && patient.emergencyContactPhone
+										? `${patient.emergencyContactName} (${patient.emergencyContactPhone})`
+										: patient.emergencyContactPhone || patient.emergencyContactName || "—"}
+								</span>
+							</InfoField>
+
+							{/* كود ولي الأمر بالنظام */}
+							<InfoField
+								label="كود الحساب في النظام"
+								icon={<IconId className="size-3.5 text-primary" />}
+							>
+								<span className="text-xs font-mono font-bold">
+									{patient.owner?.code || "—"}
+								</span>
+							</InfoField>
+
+							{/* تاريخ التسجيل */}
+							{patient.owner?.createdAt && (
+								<InfoField
+									label="تاريخ تسجيل الحساب"
+									icon={<IconCalendarCheck className="size-3.5 text-primary" />}
+								>
+									<span className="text-xs font-medium tabular-nums">
+										{new Date(patient.owner.createdAt).toLocaleDateString("ar-EG", {
+											year: "numeric",
+											month: "long",
+											day: "numeric",
+										})}
+									</span>
+								</InfoField>
+							)}
+
+							{/* ملاحظات ولي الأمر */}
+							<InfoField
+								label="ملاحظات ولي الأمر"
+								icon={<IconFileText className="size-3.5 text-primary" />}
+							>
+								<span className="text-xs text-muted-foreground truncate" title={patient.owner?.notes || "لا توجد ملاحظات"}>
+									{patient.owner?.notes || "لا توجد ملاحظات مسجلة"}
+								</span>
+							</InfoField>
+						</div>
+					</div>
+				);
+			})()}
+
+			{/* بطاقة وثيقة التأمين */}
+			<div className="flex flex-col gap-2">
+				<PatientPolicyCard patientId={patient.id} />
 			</div>
 		</TabsContent>
 	);

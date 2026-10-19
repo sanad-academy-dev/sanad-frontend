@@ -34,6 +34,10 @@ export const useCreatePatient = () => {
 				feeType: data.feeType?.trim() || undefined,
 				healthConditions: data.healthConditions?.trim() || undefined,
 				previousNursery: data.previousNursery?.trim() || undefined,
+				level: data.level?.trim() || undefined,
+				learningMethod: data.learningMethod?.trim() || undefined,
+				preferredShift: data.preferredShift?.trim() || undefined,
+				address: data.address?.trim() || undefined,
 				weight:
 					data.weight != null && !Number.isNaN(Number(data.weight))
 						? Number(data.weight)

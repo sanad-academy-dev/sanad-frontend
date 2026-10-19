@@ -19,7 +19,7 @@ export declare const createPatientSchema: z.ZodObject<{
     notes: z.ZodOptional<z.ZodString>;
     active: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
 }, z.core.$strip>;
-export type CreatePatientInput = Pick<Prisma.PatientUncheckedCreateInput, "clinicId" | "name" | "gender" | "ownerId" | "age" | "birthDate" | "weight" | "notes" | "active" | "status" | "nationalId" | "classroom" | "bloodType" | "developmentStatus" | "allergies" | "pocketMoneyEnabled" | "transportation" | "feeType" | "healthConditions" | "previousNursery" | "guardianRelationship" | "emergencyContactPhone" | "emergencyContactName">;
+export type CreatePatientInput = Pick<Prisma.PatientUncheckedCreateInput, "clinicId" | "name" | "gender" | "ownerId" | "age" | "birthDate" | "weight" | "notes" | "active" | "status" | "nationalId" | "classroom" | "bloodType" | "developmentStatus" | "allergies" | "pocketMoneyEnabled" | "transportation" | "feeType" | "healthConditions" | "previousNursery" | "guardianRelationship" | "emergencyContactPhone" | "emergencyContactName" | "level" | "learningMethod" | "preferredShift" | "address">;
 export type UpdatePatientInput = Partial<Omit<CreatePatientInput, "clinicId">> & {
 	guardianName?: string | null;
 	guardianPhone?: string | null;
@@ -50,6 +50,10 @@ export type PatientResponse = Prisma.PatientGetPayload<{
         guardianRelationship: true;
         emergencyContactPhone: true;
         emergencyContactName: true;
+        level: true;
+        learningMethod: true;
+        preferredShift: true;
+        address: true;
         editsCount: true;
         createdAt: true;
         updatedAt: true;
@@ -544,3 +548,22 @@ export type PatientHistoryEntry = {
     occurredAt: Date;
     record: PatientHistoryCarePlan;
 };
+
+export interface PatientSupervisorItem {
+    staffId: string;
+    role?: string;
+    assignedAt: string;
+}
+
+export interface PatientSupervisorResponse {
+    id: string;
+    staffId: string;
+    name: string;
+    role: string;
+    initial: string;
+    avatar?: string | null;
+    phone?: string | null;
+    email?: string | null;
+    assignedAt?: string;
+}
+
