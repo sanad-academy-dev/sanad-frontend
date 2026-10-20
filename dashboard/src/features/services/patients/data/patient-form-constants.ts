@@ -74,6 +74,8 @@ export const INITIAL_PATIENT_FORM_VALUES = {
 	gender: "MALE" as const,
 	classroom: "النجوم",
 	ownerId: "",
+	ownerIds: [] as string[],
+	guardianRelationships: {} as Record<string, string>,
 	guardianName: "",
 	guardianPhone: "",
 	guardianEmail: "",
@@ -104,6 +106,7 @@ export function calculatePatientProgress(values: {
 	classroom?: string | null;
 	guardianName?: string | null;
 	ownerId?: string | null;
+	ownerIds?: string[] | null;
 	guardianPhone?: string | null;
 }) {
 	const checks = [
@@ -111,11 +114,14 @@ export function calculatePatientProgress(values: {
 		Boolean(values.birthDate?.trim()),
 		Boolean(values.gender),
 		Boolean(values.classroom?.trim()),
-		Boolean(values.guardianName?.trim() || values.ownerId),
-		Boolean(values.guardianPhone?.trim()),
+		Boolean(
+			values.guardianName?.trim() ||
+			values.ownerId ||
+			(values.ownerIds && values.ownerIds.length > 0),
+		),
 	];
 	const completed = checks.filter(Boolean).length;
-	const total = 6;
+	const total = 5;
 	const percentage = Math.round((completed / total) * 100);
 	return { completed, total, percentage };
 }
@@ -127,7 +133,9 @@ export function getPatientFilledFields(values: Record<string, unknown>): string[
 		str(values.birthDate) ? "birthDate" : null,
 		str(values.nationalId) ? "nationalId" : null,
 		str(values.classroom) ? "classroom" : null,
-		str(values.ownerId) ? "ownerId" : null,
+		str(values.ownerId) || (Array.isArray(values.ownerIds) && values.ownerIds.length > 0)
+			? "ownerId"
+			: null,
 		str(values.guardianName) ? "guardianName" : null,
 		str(values.guardianPhone) ? "guardianPhone" : null,
 		str(values.guardianEmail) ? "guardianEmail" : null,

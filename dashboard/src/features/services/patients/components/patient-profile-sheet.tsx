@@ -38,6 +38,7 @@ import { PatientSheet } from "@/features/services/patients/components/patient-sh
 import { TransferOwnershipDialog } from "@/features/services/patients/components/transfer-ownership-dialog";
 import { ConsentsTab } from "@/features/services/patients/components/tabs/consents-tab";
 import { DocumentsTab } from "@/features/services/patients/components/tabs/documents-tab";
+import { GuardianTab } from "@/features/services/patients/components/tabs/guardian-tab";
 import { HistoryTab } from "@/features/services/patients/components/tabs/history-tab";
 import { InpatientsTab } from "@/features/services/patients/components/tabs/inpatients-tab";
 import { MedicationsTab } from "@/features/services/patients/components/tabs/medications-tab";
@@ -246,6 +247,12 @@ export function PatientProfileSheet({
 								</TabsTrigger>
 								<TabsTrigger
 									className="flex-none px-2.5 py-2"
+									value="guardian"
+								>
+									بيانات ولي الأمر
+								</TabsTrigger>
+								<TabsTrigger
+									className="flex-none px-2.5 py-2"
 									value="overview"
 								>
 									نظرة عامة
@@ -413,6 +420,13 @@ export function PatientProfileSheet({
 
 							<div className="col-span-7 overflow-y-auto">
 								{activeTab === "overview" && <OverviewTab patientId={patient?.id ?? ""} />}
+								{activeTab === "guardian" && (
+									<GuardianTab
+										patientId={patient?.id ?? ""}
+										onTransferOwnership={() => patient && setTransferTarget(patient)}
+										onEditPatient={() => patient && setEditTarget(patient)}
+									/>
+								)}
 								{activeTab === "history" && (
 									<HistoryTab
 										patientId={patient?.id ?? ""}

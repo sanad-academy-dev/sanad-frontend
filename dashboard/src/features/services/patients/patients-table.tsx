@@ -186,12 +186,22 @@ export function PatientsTable() {
 				minSize: 220,
 				cell: ({ row }) => {
 					const p = row.original;
-					const guardianName = p.guardianName || p.owner?.name;
-					const phone = p.guardianPhone || p.owner?.phone;
-					const email = p.guardianEmail || p.owner?.email;
-					const initials = getGuardianInitials(guardianName);
+					const guardians =
+						p.guardians && p.guardians.length > 0
+							? p.guardians.map((g) => g.owner).filter(Boolean)
+							: p.owner
+								? [p.owner]
+								: [];
 
-					if (!guardianName && !phone && !email) {
+					const primary = guardians[0];
+					const guardianName = primary?.name || p.guardianName || "ولي أمر غير محدد";
+					const phone = primary?.phone || p.guardianPhone;
+					const initials = getGuardianInitials(guardianName);
+					const extraCount = guardians.length > 1 ? guardians.length - 1 : 0;
+					const extraNames =
+						extraCount > 0 ? guardians.slice(1).map((g) => g.name).join("، ") : "";
+
+					if (!primary && !p.guardianName && !phone) {
 						return <span className="text-xs text-muted-foreground">—</span>;
 					}
 
@@ -204,31 +214,33 @@ export function PatientsTable() {
 								{initials}
 							</div>
 							<div className="flex flex-col gap-0.5 min-w-0">
-								<span
-									className="font-semibold text-sm text-foreground truncate"
-									title={guardianName || undefined}
-								>
-									{guardianName || "ولي أمر غير محدد"}
-								</span>
+								<div className="flex items-center gap-1.5 flex-wrap">
+									<span
+										className="font-semibold text-sm text-foreground truncate"
+										title={guardianName || undefined}
+									>
+										{guardianName}
+									</span>
+									{extraCount > 0 && (
+										<span
+											className="inline-flex items-center px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 shrink-0 cursor-help"
+											title={`أولياء أمور إضافيون: ${extraNames}`}
+										>
+											+{extraCount}
+										</span>
+									)}
+								</div>
 								<div className="flex flex-col gap-0.5 text-xs text-muted-foreground">
 									{phone ? (
 										<span className="tabular-nums flex items-center gap-1.5 text-xs">
 											<IconPhone className="size-3 text-muted-foreground shrink-0" />
-											<span dir="ltr" className="text-right font-mono">{phone}</span>
+											<span dir="ltr" className="text-right font-mono">
+												{phone}
+											</span>
 										</span>
-									) : "-"}
-									{/* {email ? (
-										<span
-											className="truncate flex items-center gap-1.5 text-[11px] text-muted-foreground/90"
-											title={email}
-										>
-											<IconMail className="size-3 text-muted-foreground shrink-0" />
-											<span className="truncate max-w-[170px]">{email}</span>
-										</span>
-									) : null}
-									{!phone && !email && (
-										<span className="text-[11px] text-muted-foreground">لا يوجد وسيلة تواصل</span>
-									)} */}
+									) : (
+										"-"
+									)}
 								</div>
 							</div>
 						</div>

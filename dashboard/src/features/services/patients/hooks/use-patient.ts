@@ -16,13 +16,13 @@ export const usePatient = (patientId?: string) => {
 			return res.data as PatientResponse;
 		},
 		enabled: !!patientId,
-		initialData: cached,
-		staleTime: 1000 * 60 * 5,
+		placeholderData: () => cached,
+		staleTime: 1000 * 30,
 	});
 
 	return {
 		patient: data ?? cached ?? null,
-		isLoading: (isLoading || isListLoading) && !cached && !data,
+		isLoading: isLoading && !cached && !data,
 		error,
 		refetch,
 	};

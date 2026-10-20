@@ -86,17 +86,45 @@ export function AddPatientSheet({
 				return found ? found.value : rel;
 			};
 
+			const initialOwnerIds =
+				patient.guardians && patient.guardians.length > 0
+					? (patient.guardians.map((g) => g.owner?.id).filter(Boolean) as string[])
+					: patient.owner?.id
+						? [patient.owner.id]
+						: [];
+
+			const initialRelationships: Record<string, string> = {};
+			if (patient.guardians && patient.guardians.length > 0) {
+				for (const g of patient.guardians) {
+					if (g.owner?.id) {
+						initialRelationships[g.owner.id] = normalizeRelationship(
+							g.relationship || g.owner.relationship || patient.guardianRelationship,
+						);
+					}
+				}
+			} else if (patient.owner?.id) {
+				initialRelationships[patient.owner.id] = normalizeRelationship(
+					patient.guardianRelationship || patient.owner.relationship,
+				);
+			}
+
+			const primaryRel = initialOwnerIds[0]
+				? initialRelationships[initialOwnerIds[0]] ?? "FATHER"
+				: normalizeRelationship(patient.guardianRelationship);
+
 			reset({
 				name: patient.name ?? "",
 				birthDate: toDateInput(patient.birthDate),
 				nationalId: patient.nationalId ?? "",
 				gender: patient.gender ?? "MALE",
 				classroom: patient.classroom ?? "النجوم",
-				ownerId: patient.owner?.id ?? "",
+				ownerId: initialOwnerIds[0] ?? "",
+				ownerIds: initialOwnerIds,
+				guardianRelationships: initialRelationships,
 				guardianName: patient.guardianName || patient.owner?.name || "",
 				guardianPhone: patient.guardianPhone || patient.owner?.phone || "",
 				guardianEmail: patient.guardianEmail || patient.owner?.email || "",
-				guardianRelationship: normalizeRelationship(patient.guardianRelationship),
+				guardianRelationship: primaryRel,
 				emergencyContactName: patient.emergencyContactName ?? "",
 				emergencyContactPhone: patient.emergencyContactPhone ?? "",
 				pocketMoneyEnabled: patient.pocketMoneyEnabled !== false,
@@ -125,9 +153,13 @@ export function AddPatientSheet({
 				setShowAdvanced(true);
 			}
 		} else {
+			const defaultOwnerIds = defaultOwnerId ? [defaultOwnerId] : [];
+			const defaultRels = defaultOwnerId ? { [defaultOwnerId]: "FATHER" } : {};
 			reset({
 				...INITIAL_PATIENT_FORM_VALUES,
 				ownerId: defaultOwnerId ?? "",
+				ownerIds: defaultOwnerIds,
+				guardianRelationships: defaultRels,
 			});
 			setShowAdvanced(false);
 
@@ -186,11 +218,28 @@ export function AddPatientSheet({
 			}
 		}
 
+		const finalOwnerIds =
+			Array.isArray(data.ownerIds) && data.ownerIds.length > 0
+				? data.ownerIds
+				: data.ownerId
+					? [data.ownerId]
+					: [];
+
+		const relMap = data.guardianRelationships || {};
+		const guardianItems = finalOwnerIds.map((oid) => ({
+			ownerId: oid,
+			relationship: relMap[oid] || (oid === finalOwnerIds[0] ? data.guardianRelationship : "FATHER"),
+		}));
+		const primaryRelationship = guardianItems[0]?.relationship || data.guardianRelationship || "FATHER";
+
 		if (isEdit && patient) {
 			const { active: _active, ...updateData } = data;
 			const updated = await updatePatient(patient.id, {
 				...updateData,
-				ownerId: data.ownerId || undefined,
+				ownerId: finalOwnerIds[0] || undefined,
+				ownerIds: finalOwnerIds,
+				guardians: guardianItems,
+				guardianRelationship: primaryRelationship,
 				age,
 			});
 			await onSuccess?.(updated as unknown as PatientResponse);
@@ -199,6 +248,10 @@ export function AddPatientSheet({
 		} else {
 			const created = await createPatient({
 				...data,
+				ownerId: finalOwnerIds[0] || undefined,
+				ownerIds: finalOwnerIds,
+				guardians: guardianItems,
+				guardianRelationship: primaryRelationship,
 				age,
 			});
 			await onSuccess?.(created);
@@ -349,7 +402,13 @@ export function AddPatientSheet({
 				open={ownerDialogOpen}
 				onClose={() => setOwnerDialogOpen(false)}
 				onSuccess={(newOwnerId) => {
-					setValue("ownerId", newOwnerId, { shouldValidate: true });
+					const currentIds = (watch("ownerIds") as string[] | undefined) || [];
+					const nextIds = Array.from(new Set([...currentIds, newOwnerId]));
+					const currentRels = (watch("guardianRelationships") as Record<string, string> | undefined) || {};
+					const nextRels = { ...currentRels, [newOwnerId]: "FATHER" };
+					setValue("ownerIds", nextIds, { shouldValidate: true, shouldDirty: true });
+					setValue("guardianRelationships", nextRels, { shouldValidate: true, shouldDirty: true });
+					setValue("ownerId", nextIds[0], { shouldValidate: true, shouldDirty: true });
 					const found = owners.find((o) => o.id === newOwnerId);
 					if (found) {
 						setValue("guardianName", found.name, { shouldValidate: true });

@@ -1,34 +1,17 @@
 import type { PatientResponse } from "@sanad/contracts/runtime/server/patients/patients.type";
 import {
-	IconBrandWhatsapp,
 	IconBus,
-	IconCalendarCheck,
 	IconCertificate,
-	IconCircleCheck,
-	IconCircleOff,
 	IconClockHour4,
 	IconCoins,
-	IconCopy,
 	IconDeviceLaptop,
-	IconExternalLink,
-	IconFileText,
-	IconId,
-	IconMail,
 	IconMapPin,
-	IconPhone,
-	IconPhoneCall,
 	IconScale,
 	IconSchool,
-	IconUser,
-	IconUserCheck,
 	IconUsers,
 	IconWeight,
 } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
-import { toast } from "sonner";
-import { InitialsAvatar } from "@/components/common/initials-avatar";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { PatientPolicyCard } from "@/features/accounting/insurance/components/patient-policy-card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -39,7 +22,15 @@ import {
 	type PatientAutosaveInput,
 	useAutosavePatient,
 } from "@/features/services/patients/hooks/use-autosave-patient";
-import { usePatients } from "@/features/services/patients/hooks/use-patients";
+import { usePatient } from "@/features/services/patients/hooks/use-patient";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { TRANSPORT_OPTIONS } from "@/features/services/patients/data/patient-form-constants";
 import type { PatientTabProps } from "@/features/services/patients/types/tabs.types";
 import { cn } from "@/lib/utils";
 
@@ -100,7 +91,14 @@ function EditableText({
 }) {
 	const [editing, setEditing] = useState(false);
 	const [draft, setDraft] = useState(value != null ? String(value) : "");
+	const [localValue, setLocalValue] = useState(value);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const isCommittingRef = useRef(false);
+
+	useEffect(() => {
+		setLocalValue(value);
+		if (!editing) setDraft(value != null ? String(value) : "");
+	}, [value, editing]);
 
 	useEffect(() => {
 		if (editing && inputRef.current) {
@@ -109,37 +107,44 @@ function EditableText({
 		}
 	}, [editing]);
 
-	useEffect(() => {
-		if (!editing) setDraft(value != null ? String(value) : "");
-	}, [value, editing]);
-
 	function commit() {
+		if (isCommittingRef.current) return;
+		isCommittingRef.current = true;
 		const next = draft.trim();
-		const current = value != null ? String(value).trim() : "";
-		if (next !== current) onSave(next === "" ? null : next);
+		const current = localValue != null ? String(localValue).trim() : "";
+		if (next !== current) {
+			const finalVal = next === "" ? null : next;
+			setLocalValue(finalVal);
+			onSave(finalVal);
+		}
 		setEditing(false);
+		setTimeout(() => {
+			isCommittingRef.current = false;
+		}, 100);
 	}
 
 	function cancel() {
-		setDraft(value != null ? String(value) : "");
+		setDraft(localValue != null ? String(localValue) : "");
 		setEditing(false);
 	}
 
 	if (!editing) {
+		const display = localValue != null && localValue !== "" ? localValue : null;
 		return (
 			<button
 				type="button"
 				onClick={() => setEditing(true)}
 				dir={dir}
 				className={cn(
-					"text-start w-full rounded px-1 -mx-1 hover:bg-muted/60",
+					"text-start w-full rounded px-1 -mx-1 hover:bg-muted/70 transition-colors cursor-pointer group flex items-center justify-between gap-1",
 					displayClassName,
 				)}
+				title="اضغط للتعديل"
 			>
-				{value != null && value !== "" ? (
-					<span>{value}</span>
+				{display !== null ? (
+					<span>{display}</span>
 				) : (
-					<span className="text-muted-foreground">{placeholder}</span>
+					<span className="text-muted-foreground/70">{placeholder}</span>
 				)}
 			</button>
 		);
@@ -163,7 +168,7 @@ function EditableText({
 					cancel();
 				}
 			}}
-			className={cn("h-8", className)}
+			className={cn("h-8 bg-background ", className)}
 		/>
 	);
 }
@@ -177,7 +182,14 @@ function EditableNotes({
 }) {
 	const [editing, setEditing] = useState(false);
 	const [draft, setDraft] = useState(value ?? "");
+	const [localValue, setLocalValue] = useState(value);
 	const ref = useRef<HTMLTextAreaElement>(null);
+	const isCommittingRef = useRef(false);
+
+	useEffect(() => {
+		setLocalValue(value);
+		if (!editing) setDraft(value ?? "");
+	}, [value, editing]);
 
 	useEffect(() => {
 		if (editing && ref.current) {
@@ -186,19 +198,24 @@ function EditableNotes({
 		}
 	}, [editing]);
 
-	useEffect(() => {
-		if (!editing) setDraft(value ?? "");
-	}, [value, editing]);
-
 	function commit() {
+		if (isCommittingRef.current) return;
+		isCommittingRef.current = true;
 		const next = draft.trim();
-		const current = (value ?? "").trim();
-		if (next !== current) onSave(next === "" ? null : next);
+		const current = (localValue ?? "").trim();
+		if (next !== current) {
+			const finalVal = next === "" ? null : next;
+			setLocalValue(finalVal);
+			onSave(finalVal);
+		}
 		setEditing(false);
+		setTimeout(() => {
+			isCommittingRef.current = false;
+		}, 100);
 	}
 
 	function cancel() {
-		setDraft(value ?? "");
+		setDraft(localValue ?? "");
 		setEditing(false);
 	}
 
@@ -207,10 +224,11 @@ function EditableNotes({
 			<button
 				type="button"
 				onClick={() => setEditing(true)}
-				className="text-start w-full rounded px-1 -mx-1 hover:bg-muted/60 text-sm"
+				className="text-start w-full rounded px-1 -mx-1 hover:bg-muted/70 transition-colors cursor-pointer text-sm"
+				title="اضغط لتعديل الملاحظات"
 			>
-				{value ? (
-					<span className="whitespace-pre-wrap">{value}</span>
+				{localValue ? (
+					<span className="whitespace-pre-wrap">{localValue}</span>
 				) : (
 					<span className="text-muted-foreground">أضف ملاحظات...</span>
 				)}
@@ -231,7 +249,7 @@ function EditableNotes({
 						cancel();
 					}
 				}}
-				className="min-h-[80px] text-sm"
+				className="min-h-[80px] text-sm bg-background"
 			/>
 			<p className="text-xs text-muted-foreground self-start tabular-nums">
 				{draft.length}/500
@@ -275,15 +293,14 @@ function OverviewTabSkeleton() {
 }
 
 export function OverviewTab({ patientId }: PatientTabProps) {
-	const { patients: allPatients, isLoading: isLoadingPatients } = usePatients();
-	const patient: PatientResponse | undefined = allPatients.find((p) => p.id === patientId);
+	const { patient, isLoading } = usePatient(patientId);
 	const { autosave } = useAutosavePatient(patientId);
 
 	function patch(data: PatientAutosaveInput) {
 		autosave(data);
 	}
 
-	if (!patientId || (isLoadingPatients && !patient)) {
+	if (!patientId || (isLoading && !patient)) {
 		return (
 			<TabsContent
 				value="overview"
@@ -375,14 +392,13 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 						label="الوزن (كجم)"
 						icon={<IconWeight className="size-3.5" />}
 					>
-						<div className="flex items-center justify-between gap-2">
-							<span className="tabular-nums">
-								{patient.weight != null ? patient.weight : "—"}
-							</span>
-							<span className="text-[11px] font-normal text-muted-foreground">
-								من العلامات الحيوية
-							</span>
-						</div>
+						<EditableText
+							value={patient.weight}
+							placeholder="—"
+							type="number"
+							onSave={(v) => patch({ weight: v != null && v !== "" ? Number(v) : null })}
+							displayClassName="tabular-nums"
+						/>
 					</InfoField>
 				</div>
 			</div>
@@ -417,11 +433,29 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 						label="وسيلة النقل"
 						icon={<IconBus className="size-3.5" />}
 					>
-						<EditableText
-							value={patient.transportation}
-							placeholder="وسيلة النقل..."
-							onSave={(v) => patch({ transportation: v })}
-						/>
+						<Select
+							value={patient.transportation || ""}
+							onValueChange={(val) => patch({ transportation: val })}
+							dir="rtl"
+						>
+							<SelectTrigger
+								size="sm"
+								className="w-full justify-between text-xs h-7 border-0 bg-transparent hover:bg-muted/70 transition-colors px-1 -mx-1 shadow-none font-medium"
+							>
+								<SelectValue placeholder="اختر وسيلة النقل..." />
+							</SelectTrigger>
+							<SelectContent dir="rtl">
+								{TRANSPORT_OPTIONS.map((opt) => (
+									<SelectItem
+										key={opt}
+										value={opt}
+										className="text-xs"
+									>
+										{opt}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
 					</InfoField>
 
 					<InfoField
@@ -439,27 +473,33 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 						label="المستوى"
 						icon={<IconCertificate className="size-3.5" />}
 					>
-						<span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-							{patient.level || "مبتدئ"}
-						</span>
+						<EditableText
+							value={patient.level}
+							placeholder="مبتدئ"
+							onSave={(v) => patch({ level: v })}
+						/>
 					</InfoField>
 
 					<InfoField
 						label="طريقة التعلم"
 						icon={<IconDeviceLaptop className="size-3.5" />}
 					>
-						<span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-							{patient.learningMethod || "حضوري"}
-						</span>
+						<EditableText
+							value={patient.learningMethod}
+							placeholder="حضوري"
+							onSave={(v) => patch({ learningMethod: v })}
+						/>
 					</InfoField>
 
 					<InfoField
 						label="المناوبة المفضلة"
 						icon={<IconClockHour4 className="size-3.5" />}
 					>
-						<span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-							{patient.preferredShift || "صباحي"}
-						</span>
+						<EditableText
+							value={patient.preferredShift}
+							placeholder="صباحي"
+							onSave={(v) => patch({ preferredShift: v })}
+						/>
 					</InfoField>
 
 					<InfoField
@@ -475,248 +515,6 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 				</div>
 			</div>
 
-			{/* بطاقة بيانات وليّ الأمر الكاملة والموسّعة */}
-			<p className="font-bold text-base">بيانات ولي الأمر</p>
-			{(() => {
-				const guardianName = patient.owner?.name || patient.guardianName || "ولي أمر غير محدد";
-				const guardianPhone = patient.owner?.phone || patient.guardianPhone || "";
-				const guardianEmail = patient.owner?.email || patient.guardianEmail || "";
-				const guardianRelationship = patient.guardianRelationship || patient.owner?.relationship;
-				const cleanPhone = guardianPhone.replace(/\D/g, "");
-				const guardianAddress =
-					patient.owner?.address ||
-					[patient.owner?.city, patient.owner?.country].filter(Boolean).join("، ") ||
-					"سيدي سالم، كفرالشيخ، مصر";
-
-				const formatRel = (rel?: string | null) => {
-					if (!rel) return "ولي أمر";
-					const u = rel.toUpperCase();
-					if (u === "FATHER" || rel === "أب") return "الأب";
-					if (u === "MOTHER" || rel === "أم") return "الأم";
-					if (u === "GUARDIAN" || rel.includes("وصي")) return "وصي / كفيل";
-					if (u === "BROTHER" || rel === "أخ") return "الأخ";
-					if (u === "SISTER" || rel === "أخت") return "الأخت";
-					return rel;
-				};
-
-				return (
-					<div className="flex flex-col gap-3 rounded-xl border border-border/80 bg-card p-5 shadow-xs">
-						{/* ترويسة ولي الأمر مع الصورة الرمزية والإجراءات السريعة */}
-						<div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-							<div className="flex items-center gap-3.5">
-								<InitialsAvatar
-									name={guardianName}
-									className="size-12 rounded-full bg-primary/10 text-primary border border-primary/20 text-base font-bold shadow-2xs"
-								/>
-								<div className="flex flex-col gap-1">
-									<div className="flex items-center gap-2 flex-wrap">
-										<h3 className="font-bold text-base text-foreground">{guardianName}</h3>
-										<span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
-											{formatRel(guardianRelationship)}
-										</span>
-										
-										<span
-											className={cn(
-												"inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium border",
-												patient.owner?.active !== false
-													? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300"
-													: "bg-muted text-muted-foreground border-border",
-											)}
-										>
-											{patient.owner?.active !== false ? (
-												<>
-													<IconCircleCheck className="size-3 text-emerald-600" />
-													حساب نشط
-												</>
-											) : (
-												<>
-													<IconCircleOff className="size-3 text-muted-foreground" />
-													غير نشط
-												</>
-											)}
-										</span>
-									</div>
-									<p className="text-xs text-muted-foreground">
-										المسؤول القانوني الأول لمتابعة وتواصل الطالب {patient.name}
-									</p>
-								</div>
-							</div>
-
-							{/* قنوات التواصل المباشرة السريعة */}
-							{guardianPhone && (
-								<div className="flex items-center gap-2 flex-wrap shrink-0">
-									<a
-										href={`tel:${guardianPhone}`}
-										className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-2xs transition-colors"
-										title="اتصال هاتفي مباشر"
-									>
-										<IconPhone className="size-3.5" />
-										<span>اتصال</span>
-									</a>
-
-									<a
-										href={`https://wa.me/${cleanPhone}`}
-										target="_blank"
-										rel="noopener noreferrer"
-										className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800 text-xs font-semibold shadow-2xs transition-colors"
-										title="مراسلة عبر واتساب"
-									>
-										<IconBrandWhatsapp className="size-4" />
-										<span>واتساب</span>
-									</a>
-
-									<Button
-										type="button"
-										variant="outline"
-										size="sm"
-										className="h-8 text-xs gap-1"
-										onClick={() => {
-											navigator.clipboard.writeText(guardianPhone);
-											toast.success("تم نسخ رقم هاتف ولي الأمر");
-										}}
-									>
-										<IconCopy className="size-3.5" />
-										<span>نسخ</span>
-									</Button>
-								</div>
-							)}
-						</div>
-
-						<Separator />
-
-						{/* شبكة البيانات الشاملة لولي الأمر */}
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-1">
-							{/* رقم الهاتف الأساسي */}
-							<InfoField
-								label="رقم الهاتف الأساسي"
-								icon={<IconPhone className="size-3.5 text-primary" />}
-							>
-								{guardianPhone ? (
-									<div className="flex items-center justify-between gap-2">
-										<span
-											className="font-mono tabular-nums text-xs font-bold"
-											dir="ltr"
-										>
-											{guardianPhone}
-										</span>
-										<a
-											href={`tel:${guardianPhone}`}
-											className="text-[11px] text-primary hover:underline"
-										>
-											اتصال
-										</a>
-									</div>
-								) : (
-									<span className="text-muted-foreground text-xs">غير مسجل</span>
-								)}
-							</InfoField>
-
-							{/* البريد الإلكتروني */}
-							<InfoField
-								label="البريد الإلكتروني"
-								icon={<IconMail className="size-3.5 text-primary" />}
-							>
-								{guardianEmail ? (
-									<div className="flex items-center justify-between gap-2">
-										<a
-											href={`mailto:${guardianEmail}`}
-											className="text-xs text-primary hover:underline truncate max-w-[170px]"
-											dir="ltr"
-											title={guardianEmail}
-										>
-											{guardianEmail}
-										</a>
-										<button
-											type="button"
-											className="text-muted-foreground hover:text-foreground cursor-pointer"
-											onClick={() => {
-												navigator.clipboard.writeText(guardianEmail);
-												toast.success("تم نسخ البريد الإلكتروني");
-											}}
-											title="نسخ البريد"
-										>
-											<IconCopy className="size-3" />
-										</button>
-									</div>
-								) : (
-									<span className="text-muted-foreground text-xs">غير مسجل</span>
-								)}
-							</InfoField>
-
-							{/* صلة القرابة */}
-							<InfoField
-								label="صلة القرابة"
-								icon={<IconUsers className="size-3.5 text-primary" />}
-							>
-								<span className="text-xs font-semibold">
-									{formatRel(guardianRelationship)}
-								</span>
-							</InfoField>
-
-							{/* العنوان ومكان الإقامة */}
-							<InfoField
-								label="العنوان ومكان الإقامة"
-								icon={<IconMapPin className="size-3.5 text-primary" />}
-							>
-								<span
-									className="text-xs font-medium truncate"
-									title={guardianAddress}
-								>
-									{guardianAddress}
-								</span>
-							</InfoField>
-
-							{/* رقم وجهة الطوارئ */}
-							<InfoField
-								label="رقم وجهة الطوارئ"
-								icon={<IconPhoneCall className="size-3.5 text-primary" />}
-							>
-								<span className="text-xs font-medium">
-									{patient.emergencyContactName && patient.emergencyContactPhone
-										? `${patient.emergencyContactName} (${patient.emergencyContactPhone})`
-										: patient.emergencyContactPhone || patient.emergencyContactName || "—"}
-								</span>
-							</InfoField>
-
-							{/* كود ولي الأمر بالنظام */}
-							<InfoField
-								label="كود الحساب في النظام"
-								icon={<IconId className="size-3.5 text-primary" />}
-							>
-								<span className="text-xs font-mono font-bold">
-									{patient.owner?.code || "—"}
-								</span>
-							</InfoField>
-
-							{/* تاريخ التسجيل */}
-							{patient.owner?.createdAt && (
-								<InfoField
-									label="تاريخ تسجيل الحساب"
-									icon={<IconCalendarCheck className="size-3.5 text-primary" />}
-								>
-									<span className="text-xs font-medium tabular-nums">
-										{new Date(patient.owner.createdAt).toLocaleDateString("ar-EG", {
-											year: "numeric",
-											month: "long",
-											day: "numeric",
-										})}
-									</span>
-								</InfoField>
-							)}
-
-							{/* ملاحظات ولي الأمر */}
-							<InfoField
-								label="ملاحظات ولي الأمر"
-								icon={<IconFileText className="size-3.5 text-primary" />}
-							>
-								<span className="text-xs text-muted-foreground truncate" title={patient.owner?.notes || "لا توجد ملاحظات"}>
-									{patient.owner?.notes || "لا توجد ملاحظات مسجلة"}
-								</span>
-							</InfoField>
-						</div>
-					</div>
-				);
-			})()}
 
 			{/* بطاقة وثيقة التأمين */}
 			<div className="flex flex-col gap-2">

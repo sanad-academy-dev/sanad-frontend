@@ -274,7 +274,13 @@ export function AddPatientDialog({
 				open={ownerDialogOpen}
 				onClose={() => setOwnerDialogOpen(false)}
 				onSuccess={(newOwnerId) => {
-					setValue("ownerId", newOwnerId, { shouldValidate: true });
+					const currentIds = (watch("ownerIds") as string[] | undefined) || [];
+					const nextIds = Array.from(new Set([...currentIds, newOwnerId]));
+					const currentRels = (watch("guardianRelationships") as Record<string, string> | undefined) || {};
+					const nextRels = { ...currentRels, [newOwnerId]: "FATHER" };
+					setValue("ownerIds", nextIds, { shouldValidate: true, shouldDirty: true });
+					setValue("guardianRelationships", nextRels, { shouldValidate: true, shouldDirty: true });
+					setValue("ownerId", nextIds[0], { shouldValidate: true, shouldDirty: true });
 					const found = owners.find((o) => o.id === newOwnerId);
 					if (found) {
 						setValue("guardianName", found.name, { shouldValidate: true });

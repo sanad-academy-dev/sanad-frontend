@@ -6,10 +6,20 @@ import type { vitalSignsSelectShape } from "@/server/vital-signs/vital-signs.typ
 
 export type { Gender };
 
+export const guardianItemSchema = z.object({
+	ownerId: z.string(),
+	relationship: z.string().optional(),
+});
+
+export type GuardianItem = z.infer<typeof guardianItemSchema>;
+
 export const createPatientSchema = z.object({
 	name: z.string({ error: "اسم الطفل مطلوب" }).min(1, "اسم الطفل مطلوب"),
 	gender: z.enum(["MALE", "FEMALE", "UNKNOWN"], { error: "الجنس مطلوب" }),
 	ownerId: z.string().optional(),
+	ownerIds: z.array(z.string()).optional(),
+	guardians: z.array(guardianItemSchema).optional(),
+	guardianRelationships: z.record(z.string(), z.string()).optional(),
 	guardianName: z.string().optional(),
 	guardianRelationship: z.string().optional(),
 	guardianPhone: z.string().optional(),
@@ -53,6 +63,9 @@ export type CreatePatientInput = {
 	name: string;
 	gender: Gender;
 	ownerId?: string | null;
+	ownerIds?: string[] | null;
+	guardians?: Array<{ ownerId: string; relationship?: string | null }> | null;
+	guardianRelationships?: Record<string, string> | null;
 	guardianName?: string;
 	guardianPhone?: string;
 	guardianEmail?: string;
@@ -133,6 +146,26 @@ export type PatientResponse = {
 		active?: boolean;
 		createdAt?: Date | string;
 	} | null;
+	guardians?: {
+		id: string;
+		relationship?: string | null;
+		owner: {
+			id: string;
+			code: string;
+			name: string;
+			phone: string | null;
+			phoneE164?: string | null;
+			email: string | null;
+			gender?: string | null;
+			relationship?: string | null;
+			address?: string | null;
+			city?: string | null;
+			country?: string | null;
+			notes?: string | null;
+			active?: boolean;
+			createdAt?: Date | string;
+		};
+	}[] | null;
 };
 
 export const transferPatientOwnershipSchema = z.object({

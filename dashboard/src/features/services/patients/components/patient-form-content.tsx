@@ -1,12 +1,18 @@
 import type { CreatePatientFormInput } from "@sanad/contracts/runtime/server/patients/patients.type";
 import {
 	IconCalendar,
+	IconCheck,
 	IconChevronDown,
 	IconChevronUp,
 	IconMapPin,
 	IconPlus,
+	IconSearch,
 	IconStar,
+	IconUser,
+	IconUsers,
+	IconX,
 } from "@tabler/icons-react";
+import { useMemo, useState } from "react";
 import type {
 	Control,
 	FieldErrors,
@@ -21,6 +27,16 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+	Combobox,
+	ComboboxChip,
+	ComboboxChips,
+	ComboboxChipsInput,
+	ComboboxContent,
+	ComboboxEmpty,
+	ComboboxItem,
+	ComboboxList,
+} from "@/components/ui/combobox";
 import {
 	Select,
 	SelectContent,
@@ -52,7 +68,13 @@ export interface PatientFormContentProps {
 	setValue: UseFormSetValue<CreatePatientFormInput>;
 	isPending?: boolean;
 	readOnly?: boolean;
-	owners?: Array<{ id: string; name: string; phone?: string | null; email?: string | null }>;
+	owners?: Array<{
+		id: string;
+		name: string;
+		phone?: string | null;
+		email?: string | null;
+		code?: string | null;
+	}>;
 	ownersLoading?: boolean;
 	ownerSelectOpen?: boolean;
 	setOwnerSelectOpen?: (open: boolean) => void;
@@ -80,6 +102,21 @@ export function PatientFormContent({
 	idPrefix = "patient-form",
 }: PatientFormContentProps) {
 	const values = watch();
+	const [ownerSearch, setOwnerSearch] = useState("");
+	const [internalOpen, setInternalOpen] = useState(false);
+	const comboOpen = setOwnerSelectOpen ? (ownerSelectOpen ?? false) : internalOpen;
+	const onOpenChange = setOwnerSelectOpen || setInternalOpen;
+
+	const filteredOwners = useMemo(() => {
+		if (!ownerSearch.trim()) return owners;
+		const q = ownerSearch.trim().toLowerCase();
+		return owners.filter(
+			(o) =>
+				o.name.toLowerCase().includes(q) ||
+				(o.phone && o.phone.toLowerCase().includes(q)) ||
+				(o.code && o.code.toLowerCase().includes(q)),
+		);
+	}, [owners, ownerSearch]);
 
 	const handleChipClick = (field: "allergies" | "healthConditions", chip: string) => {
 		const current = watch(field) || "";
@@ -426,188 +463,303 @@ export function PatientFormContent({
 
 				{/* ولي الأمر */}
 				<div className="flex flex-col gap-1.5">
-					<div className="flex items-center justify-between">
-						<FieldLabel
-							required
-							info="اسم ولي الأمر المسؤول عن الطفل للمتابعة والتواصل"
-						>
-							<Label className="text-sm font-medium">ولي الأمر</Label>
-						</FieldLabel>
-						{onAddOwnerClick && !readOnly && (
-							<Button
-								type="button"
-								variant="ghost"
-								size="sm"
-								className="h-6 gap-1 text-xs text-primary px-1.5 hover:bg-primary/10 font-normal"
-								onClick={onAddOwnerClick}
-								disabled={isPending}
-							>
-								<IconPlus className="size-3.5" />
-								إضافة ولي أمر جديد
-							</Button>
-						)}
-					</div>
-
-					<Controller
-						name="ownerId"
-						control={control}
-						render={({ field }) => (
-							<Field data-invalid={!!errors.ownerId || !!errors.guardianName}>
-								<Select
-									open={ownerSelectOpen}
-									onOpenChange={setOwnerSelectOpen}
-									value={field.value ?? ""}
-									onValueChange={(val) => {
-										field.onChange(val);
-										const selectedOwner = owners.find((o) => o.id === val);
-										if (selectedOwner) {
-											setValue("guardianName", selectedOwner.name, { shouldValidate: true });
-											if (selectedOwner.phone) {
-												setValue("guardianPhone", selectedOwner.phone, {
-													shouldValidate: true,
-												});
-											}
-											if (selectedOwner.email) {
-												setValue("guardianEmail", selectedOwner.email, {
-													shouldValidate: true,
-												});
-											}
-										}
-									}}
-									disabled={ownersLoading || isPending || readOnly}
-									dir="rtl"
-								>
-									<SelectTrigger
-										aria-invalid={!!errors.ownerId || !!errors.guardianName}
-										className="w-full text-right text-sm"
-									>
-										<SelectValue placeholder="اختر وليّ الأمر..." />
-									</SelectTrigger>
-									<SelectContent
-										dir="rtl"
-										position="popper"
-									>
-										{onAddOwnerClick && !readOnly && (
-											<div className="flex w-full justify-start p-1.5 border-b">
-												<Button
-													type="button"
-													variant="ghost"
-													size="sm"
-													className="h-7 w-full justify-start gap-1 text-xs font-semibold text-primary"
-													disabled={isPending}
-													onClick={(e) => {
-														e.preventDefault();
-														setOwnerSelectOpen?.(false);
-														onAddOwnerClick();
-													}}
-												>
-													<IconPlus className="size-3.5" />
-													إضافة وليّ أمر جديد
-												</Button>
-											</div>
-										)}
-										{owners.map((owner) => (
-											<SelectItem
-												key={owner.id}
-												value={owner.id}
-												className="text-right"
-											>
-												<div className="flex items-center justify-between w-full gap-2">
-													<span>{owner.name}</span>
-													{owner.phone && (
-														<span className="text-muted-foreground text-xs font-mono">
-															({owner.phone})
-														</span>
-													)}
-												</div>
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FieldError errors={[errors.ownerId, errors.guardianName]} />
-							</Field>
-						)}
-					/>
-				</div>
-
-				{/* صلة القرابة */}
-				<div className="flex flex-col gap-1.5">
-					<FieldLabel>
-						<Label className="text-sm font-medium">صلة القرابة</Label>
-					</FieldLabel>
-					<Controller
-						name="guardianRelationship"
-						control={control}
-						render={({ field }) => (
-							<Select
-								value={field.value || "FATHER"}
-								onValueChange={field.onChange}
-								disabled={isPending || readOnly}
-								dir="rtl"
-							>
-								<SelectTrigger className="w-full text-right text-sm">
-									<SelectValue placeholder="اختر..." />
-								</SelectTrigger>
-								<SelectContent dir="rtl">
-									{RELATIONSHIP_OPTIONS.map((opt) => (
-										<SelectItem
-											key={opt.value}
-											value={opt.value}
-										>
-											{opt.label}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						)}
-					/>
-				</div>
-
-				{/* رقم التواصل */}
-				<div className="flex flex-col gap-1.5">
 					<FieldLabel
 						required
-						info="رقم الجوال الأساسي للتواصل وإرسال الإشعارات"
+						info="يمكنك اختيار ولي أمر واحد أو أكثر لمتابعة الطفل والتواصل معه"
 					>
-						<Label
-							className="text-sm font-medium"
-							htmlFor={`${idPrefix}-guardian-phone`}
-						>
-							رقم التواصل
-						</Label>
+						<Label className="text-sm font-medium">أولياء الأمور</Label>
 					</FieldLabel>
-					<Field data-invalid={!!errors.guardianPhone}>
-						<Input
-							id={`${idPrefix}-guardian-phone`}
-							type="tel"
-							placeholder="05xxxxxxxx"
-							className="text-sm font-mono text-right"
-							disabled={isPending || readOnly}
-							{...register("guardianPhone")}
-						/>
-						<FieldError errors={[errors.guardianPhone]} />
-					</Field>
-				</div>
 
-				{/* البريد الإلكتروني */}
-				<div className="flex flex-col gap-1.5">
-					<FieldLabel info="البريد الإلكتروني لإرسال التقارير والفواتير الدورية">
-						<Label
-							className="text-sm font-medium"
-							htmlFor={`${idPrefix}-guardian-email`}
-						>
-							البريد الإلكتروني
-						</Label>
-					</FieldLabel>
-					<Input
-						id={`${idPrefix}-guardian-email`}
-						type="email"
-						placeholder="parent@email.com"
-						className="text-sm text-right"
-						disabled={isPending || readOnly}
-						{...register("guardianEmail")}
+					<Controller
+						name="ownerIds"
+						control={control}
+						render={({ field }) => {
+							const rawVal = field.value;
+							const currentOwnerId = watch("ownerId");
+							const selectedIds: string[] = Array.isArray(rawVal)
+								? rawVal
+								: typeof rawVal === "string" && rawVal
+									? [rawVal]
+									: currentOwnerId
+										? [currentOwnerId]
+										: [];
+
+							const handleValueChange = (val: string | string[] | null) => {
+								const nextIds: string[] = Array.isArray(val)
+									? val
+									: typeof val === "string" && val
+										? [val]
+										: [];
+
+								const curRels = {
+									...((watch("guardianRelationships") as Record<string, string> | undefined) || {}),
+								};
+
+								nextIds.forEach((id, idx) => {
+									if (!curRels[id]) {
+										curRels[id] = idx === 0 ? (watch("guardianRelationship") || "FATHER") : "MOTHER";
+									}
+								});
+
+								Object.keys(curRels).forEach((id) => {
+									if (!nextIds.includes(id)) {
+										delete curRels[id];
+									}
+								});
+
+								field.onChange(nextIds);
+								setValue("ownerIds", nextIds, { shouldValidate: true, shouldDirty: true });
+								setValue("ownerId", nextIds[0] ?? "", { shouldValidate: true, shouldDirty: true });
+								setValue("guardianRelationships", curRels, { shouldValidate: true, shouldDirty: true });
+
+								const primary = owners.find((o) => o.id === nextIds[0]);
+								if (primary) {
+									setValue("guardianName", primary.name, { shouldValidate: true, shouldDirty: true });
+									if (primary.phone) {
+										setValue("guardianPhone", primary.phone, { shouldValidate: true, shouldDirty: true });
+									}
+									if (primary.email) {
+										setValue("guardianEmail", primary.email, { shouldValidate: true, shouldDirty: true });
+									}
+								} else if (nextIds.length === 0) {
+									setValue("guardianName", "", { shouldValidate: true, shouldDirty: true });
+									setValue("guardianPhone", "", { shouldValidate: true, shouldDirty: true });
+									setValue("guardianEmail", "", { shouldValidate: true, shouldDirty: true });
+								}
+							};
+
+							return (
+								<Field
+									data-invalid={
+										!!errors.ownerIds || !!errors.ownerId || !!errors.guardianName
+									}
+								>
+									<Combobox
+										multiple
+										open={comboOpen}
+										onOpenChange={onOpenChange}
+										value={selectedIds}
+										onValueChange={handleValueChange}
+									>
+										<ComboboxChips
+											aria-invalid={
+												!!errors.ownerIds || !!errors.ownerId || !!errors.guardianName
+											}
+										>
+											{selectedIds.map((id) => {
+												const owner = owners.find((o) => o.id === id);
+												return owner ? (
+													<ComboboxChip
+														key={id}
+														value={id}
+														showRemove={!readOnly}
+													>
+														{owner.name}
+													</ComboboxChip>
+												) : null;
+											})}
+											<ComboboxChipsInput
+												placeholder={selectedIds.length ? "" : "ابحث عن ولي أمر..."}
+												value={ownerSearch}
+												onChange={(e) => setOwnerSearch(e.target.value)}
+												disabled={isPending || readOnly || ownersLoading}
+											/>
+										</ComboboxChips>
+
+										<ComboboxContent dir="rtl">
+											{onAddOwnerClick && !readOnly && (
+												<div className="flex w-full justify-start p-1.5 border-b border-border/40">
+													<Button
+														type="button"
+														variant="ghost"
+														size="sm"
+														className="h-7 w-full gap-1 text-xs"
+														disabled={isPending}
+														onClick={() => {
+															onOpenChange(false);
+															onAddOwnerClick();
+														}}
+													>
+														<IconPlus className="size-3.5" />
+														إضافة ولي أمر جديد
+													</Button>
+												</div>
+											)}
+											<ComboboxList>
+												{filteredOwners.length === 0 ? (
+													<ComboboxEmpty>لا توجد نتائج</ComboboxEmpty>
+												) : (
+													filteredOwners.map((owner) => (
+														<ComboboxItem
+															key={owner.id}
+															value={owner.id}
+														>
+															<span>{owner.name}</span>
+															{(owner.phone || owner.code) && (
+																<span
+																	className="text-muted-foreground text-xs ms-auto font-mono"
+																	dir="ltr"
+																>
+																	{owner.phone || owner.code}
+																</span>
+															)}
+														</ComboboxItem>
+													))
+												)}
+											</ComboboxList>
+										</ComboboxContent>
+									</Combobox>
+
+									<FieldError
+										errors={[
+											errors.ownerIds,
+											errors.ownerId,
+											errors.guardianName,
+										]}
+									/>
+								</Field>
+							);
+						}}
 					/>
 				</div>
+
+				{/* صلة القرابة لكل ولي أمر مختار */}
+				{(() => {
+					const rawVal = watch("ownerIds");
+					const curOwnerId = watch("ownerId");
+					const sIds: string[] = Array.isArray(rawVal)
+						? rawVal
+						: typeof rawVal === "string" && rawVal
+							? [rawVal]
+							: curOwnerId
+								? [curOwnerId]
+								: [];
+					const selOwners = sIds
+						.map((id) => owners.find((o) => o.id === id))
+						.filter(Boolean) as typeof owners;
+					const relMap =
+						(watch("guardianRelationships") as Record<string, string> | undefined) || {};
+
+					if (selOwners.length > 0) {
+						return (
+							<div className="flex flex-col gap-2 rounded-xl border border-border/80 bg-muted/20 p-3">
+								<span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+									<IconUsers className="size-4 text-primary" />
+									صلة القرابة لكل ولي أمر:
+								</span>
+								<div className="flex flex-col gap-2">
+									{selOwners.map((owner, idx) => {
+										const currentRel =
+											relMap[owner.id] ||
+											(idx === 0 ? watch("guardianRelationship") : "FATHER") ||
+											"FATHER";
+										return (
+											<div
+												key={owner.id}
+												className="flex items-center justify-between gap-3 p-2 rounded-lg bg-card border border-border/70 flex-wrap sm:flex-nowrap"
+											>
+												<div className="flex items-center gap-2 min-w-0">
+													<div className="size-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+														{idx + 1}
+													</div>
+													<div className="flex flex-col min-w-0">
+														<span className="text-xs font-semibold text-foreground truncate">
+															{owner.name}
+														</span>
+														{owner.phone && (
+															<span
+																className="text-[11px] text-muted-foreground font-mono"
+																dir="ltr"
+															>
+																{owner.phone}
+															</span>
+														)}
+													</div>
+												</div>
+
+												<div className="flex items-center gap-2 shrink-0">
+													<span className="text-xs text-muted-foreground">
+														صلة القرابة:
+													</span>
+													<Select
+														value={currentRel}
+														onValueChange={(val) => {
+															const updated = {
+																...((watch("guardianRelationships") as Record<string, string> | undefined) || {}),
+																[owner.id]: val,
+															};
+															setValue("guardianRelationships", updated, {
+																shouldValidate: true,
+																shouldDirty: true,
+															});
+															if (idx === 0) {
+																setValue("guardianRelationship", val, {
+																	shouldValidate: true,
+																	shouldDirty: true,
+																});
+															}
+														}}
+														disabled={isPending || readOnly}
+														dir="rtl"
+													>
+														<SelectTrigger className="h-8 w-32 text-xs">
+															<SelectValue placeholder="اختر..." />
+														</SelectTrigger>
+														<SelectContent dir="rtl">
+															{RELATIONSHIP_OPTIONS.map((opt) => (
+																<SelectItem
+																	key={opt.value}
+																	value={opt.value}
+																	className="text-xs"
+																>
+																	{opt.label}
+																</SelectItem>
+															))}
+														</SelectContent>
+													</Select>
+												</div>
+											</div>
+										);
+									})}
+								</div>
+							</div>
+						);
+					}
+
+					return (
+						<div className="flex flex-col gap-1.5">
+							<FieldLabel>
+								<Label className="text-sm font-medium">صلة القرابة</Label>
+							</FieldLabel>
+							<Controller
+								name="guardianRelationship"
+								control={control}
+								render={({ field }) => (
+									<Select
+										value={field.value || "FATHER"}
+										onValueChange={field.onChange}
+										disabled={isPending || readOnly}
+										dir="rtl"
+									>
+										<SelectTrigger className="w-full text-right text-sm">
+											<SelectValue placeholder="اختر..." />
+										</SelectTrigger>
+										<SelectContent dir="rtl">
+											{RELATIONSHIP_OPTIONS.map((opt) => (
+												<SelectItem
+													key={opt.value}
+													value={opt.value}
+												>
+													{opt.label}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								)}
+							/>
+						</div>
+					);
+				})()}
 
 				{/* رقم الطوارئ */}
 				<div className="flex flex-col gap-1.5">

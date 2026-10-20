@@ -7,11 +7,31 @@ import type {
 	UpdatePatientInput,
 } from "@sanad/contracts/runtime/server/patients/patients.type";
 
-// نوع النقل لا نوع الـ DAO: `birthDate` يسافر نصًّا (YYYY-MM-DD) بينما نوع Prisma
-// يقبل `Date | string`. تثبيت النص هنا يمنع تسرّب كائن Date إلى الطلب وإلى الكاش.
 export type PatientAutosaveInput = Omit<UpdatePatientInput, "ownerId" | "birthDate"> & {
 	birthDate?: string | null;
 };
+
+function applyOptimisticUpdate(
+	patient: PatientResponse,
+	input: PatientAutosaveInput,
+): PatientResponse {
+	const {
+		ownerIds: _ownerIds,
+		guardians: _guardians,
+		guardianRelationships: _guardianRelationships,
+		birthDate,
+		...rest
+	} = input;
+
+	return {
+		...patient,
+		...rest,
+		birthDate:
+			birthDate === undefined
+				? patient.birthDate
+				: birthDate || null,
+	};
+}
 
 export const useAutosavePatient = (patientId: string) => {
 	const queryClient = useQueryClient();
@@ -27,37 +47,50 @@ export const useAutosavePatient = (patientId: string) => {
 			return res.data as PatientResponse;
 		},
 		onMutate: async (input) => {
-			await queryClient.cancelQueries({ queryKey: ["patients"] });
-			const previous = queryClient.getQueryData<PatientResponse[]>(["patients"]);
-			if (previous) {
+			await queryClient.cancelQueries({ queryKey: ["patients"], exact: true });
+			await queryClient.cancelQueries({ queryKey: ["patients", patientId], exact: true });
+
+			const previousList = queryClient.getQueryData<PatientResponse[]>(["patients"]);
+			const previousSingle =
+				queryClient.getQueryData<PatientResponse>(["patients", patientId]) ||
+				previousList?.find((row) => row.id === patientId);
+
+			// تحديث كاش الطالب الفردي بشكل متفائل
+			queryClient.setQueryData<PatientResponse>(["patients", patientId], (old) => {
+				const base = old || previousSingle;
+				if (!base) return undefined;
+				return applyOptimisticUpdate(base, input);
+			});
+
+			// تحديث كاش قائمة الطلاب بشكل متفائل
+			if (previousList) {
 				queryClient.setQueryData<PatientResponse[]>(
 					["patients"],
-					previous.map((row) =>
-						row.id === patientId
-							? {
-									...row,
-									...input,
-									// الكاش يحمل Date؛ الإدخال نص — التحويل صريح كي لا يتسرّب
-									// نص إلى حقل تاريخ فينكسر التنسيق عند العرض
-									birthDate:
-										input.birthDate === undefined
-											? row.birthDate
-											: input.birthDate
-												? new Date(input.birthDate)
-												: null,
-								}
-							: row,
+					previousList.map((row) =>
+						row.id === patientId ? applyOptimisticUpdate(row, input) : row,
 					),
 				);
 			}
-			return { previous };
+
+			return { previousList, previousSingle };
+		},
+		onSuccess: (updated) => {
+			if (updated) {
+				queryClient.setQueryData(["patients", patientId], updated);
+				queryClient.setQueryData<PatientResponse[]>(["patients"], (old) =>
+					old ? old.map((p) => (p.id === patientId ? updated : p)) : [updated],
+				);
+			}
+			toast.success("تم حفظ التعديل بنجاح");
 		},
 		onError: (err: Error, _input, ctx) => {
-			if (ctx?.previous) queryClient.setQueryData(["patients"], ctx.previous);
+			if (ctx?.previousList) queryClient.setQueryData(["patients"], ctx.previousList);
+			if (ctx?.previousSingle) queryClient.setQueryData(["patients", patientId], ctx.previousSingle);
 			toast.error(err.message || "فشل الحفظ");
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: ["patients"] });
+			queryClient.invalidateQueries({ queryKey: ["patients"], exact: true });
+			queryClient.invalidateQueries({ queryKey: ["patients", patientId], exact: true });
 		},
 	});
 

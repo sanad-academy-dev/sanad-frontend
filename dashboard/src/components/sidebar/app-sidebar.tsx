@@ -235,6 +235,18 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
             icon: <IconSpeakerphone className="size-[14px]" />,
             isActive: isActive("/announcements"),
           },
+          {
+						title: t("sidebar.items.vaccinations"),
+						url: "/services/vaccinations",
+						icon: <LuSyringe className="size-[14px]" />,
+						isActive: isActive("/services/vaccinations"),
+					},
+					{
+						title: t("sidebar.items.nutrition"),
+						url: "/care/nutrition",
+						icon: <LuCarrot className="size-[14px]" />,
+						isActive: isActive("/care/nutrition"),
+					},
           /* {
 						title: t("sidebar.items.labTests"),
 						url: "/services/lab-tests",
