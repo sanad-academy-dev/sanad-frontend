@@ -33,6 +33,7 @@ import { PatientSidebar } from "@/features/services/patients/components/patient-
 import { DeletePatientDialog } from "@/features/services/patients/components/delete-patient-dialog";
 import { DisablePatientDialog } from "@/features/services/patients/components/disable-patient-dialog";
 import { PatientSheet } from "@/features/services/patients/components/patient-sheet";
+import { AttendanceTab } from "@/features/services/patients/components/tabs/attendance-tab";
 import { ConsentsTab } from "@/features/services/patients/components/tabs/consents-tab";
 import { DocumentsTab } from "@/features/services/patients/components/tabs/documents-tab";
 import { GuardianTab } from "@/features/services/patients/components/tabs/guardian-tab";
@@ -72,6 +73,7 @@ export const Route = createFileRoute("/_pathless-layout/services/patients_/$pati
 
 const PATIENT_TABS = [
 	{ value: "overview", label: "نظرة عامة" },
+	{ value: "attendance", label: "الحضور والانصراف" },
 	{ value: "guardian", label: "بيانات ولي الأمر" },
 	{ value: "history", label: "سجل الطالب" },
 	{ value: "vital-signs", label: "العلامات الحيوية" },
@@ -252,6 +254,7 @@ function PatientDetailPage() {
 						className="h-full"
 					>
 						{activeTab === "overview" && <OverviewTab patientId={patient.id} />}
+						{activeTab === "attendance" && <AttendanceTab patientId={patient.id} />}
 						{activeTab === "guardian" && (
 							<GuardianTab
 								patientId={patient.id}

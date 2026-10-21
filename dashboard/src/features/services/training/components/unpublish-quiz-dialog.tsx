@@ -10,13 +10,13 @@ import {
 import type { QuizListItemResponse } from "@/server/quizzes/quizzes.type";
 
 const UNPUBLISH_COPY: StatusCopy = {
-	title: "إلغاء نشر اختبار",
+	title: "إلغاء نشر تقييم",
 	question: (name) =>
-		`هل أنت متأكد من إلغاء نشر الاختبار "${name}"؟ يمكنك إعادة نشره في أي وقت.`,
+		`هل أنت متأكد من إلغاء نشر التقييم "${name}"؟ يمكنك إعادة نشره في أي وقت.`,
 	consequencesLabel: "النتائج المترتبة:",
 	consequences: [
-		"لن يتمكّن الموظفون من بدء هذا الاختبار مؤقتًا.",
-		"لن يظهر الاختبار ضمن الاختبارات المنشورة.",
+		"لن يتمكّن الموظفون من بدء هذا التقييم مؤقتًا.",
+		"لن يظهر التقييم ضمن التقييمات المنشورة.",
 		"سيحتفظ النظام بجميع الأسئلة والمحاولات والنتائج السابقة دون حذفها.",
 	],
 	confirmLabel: "إلغاء النشر",
@@ -47,7 +47,7 @@ export function UnpublishQuizDialog({
 			rows={
 				quiz && (
 					<>
-						<DetailRow label="اسم الاختبار">
+						<DetailRow label="اسم التقييم">
 							<span className="text-[10px] font-medium leading-[10px] text-[#7A7A7A]">
 								{quiz.title}
 							</span>
@@ -79,7 +79,7 @@ export function UnpublishQuizDialog({
 								{quiz.maxAttempts ?? "بلا حد"}
 							</span>
 						</DetailRow>
-						<DetailRow label="مدة الاختبار">
+						<DetailRow label="مدة التقييم">
 							<span className="text-[12px] leading-[18px] text-[#08090A]">
 								{quiz.timeLimitMinutes ? `${quiz.timeLimitMinutes} دقيقة` : "بلا حد"}
 							</span>

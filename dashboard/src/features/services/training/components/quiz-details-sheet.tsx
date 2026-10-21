@@ -74,11 +74,11 @@ export function QuizDetailsSheet({
 	const instructions = [
 		"أجب على جميع الأسئلة قبل التسليم — الأسئلة غير المُجابة تُحسب صفرًا.",
 		quiz?.timeLimitMinutes
-			? `الوقت المتاح ${quiz.timeLimitMinutes} دقيقة، ويُسلَّم الاختبار تلقائيًا عند انتهائه.`
-			: "لا يوجد وقت محدد لهذا الاختبار — خذ وقتك في الإجابة.",
+			? `الوقت المتاح ${quiz.timeLimitMinutes} دقيقة، ويُسلَّم التقييم تلقائيًا عند انتهائه.`
+			: "لا يوجد وقت محدد لهذا التقييم — خذ وقتك في الإجابة.",
 		quiz?.maxAttempts
 			? `عدد المحاولات المتاحة ${quiz.maxAttempts} — استخدمها بعناية.`
-			: "عدد المحاولات غير محدود لهذا الاختبار.",
+			: "عدد المحاولات غير محدود لهذا التقييم.",
 		`نسبة النجاح ${quiz?.passMark ?? 0}% من الدرجة الكلية (${totalPoints} نقطة).`,
 		quiz?.showAnswers
 			? "ستظهر لك الإجابات الصحيحة في شاشة النتيجة بعد التسليم."
@@ -109,7 +109,7 @@ export function QuizDetailsSheet({
 				    ترتيب DOM في RTL: أوّل عنصر يمينًا، فيبدأ المسار بالصفحة الأمّ ثم ينزل إلى الاختبار. */}
 				<div className="flex shrink-0 items-center justify-between gap-3 border-b px-4 py-2">
 					<nav className="flex min-w-0 items-center gap-1.5">
-						<span className="shrink-0 text-[10px] font-bold text-[#08090A]">الاختبارات</span>
+						<span className="shrink-0 text-[10px] font-bold text-[#08090A]">التقييمات</span>
 						<IconChevronLeft className="size-[9px] shrink-0 text-[#272829]" />
 						<span className="truncate text-[10px] font-bold text-[#08090A]">
 							{quiz?.title ?? "—"}
@@ -132,12 +132,12 @@ export function QuizDetailsSheet({
 				{/* الجسم */}
 				<div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-3 pt-4 pb-3">
 					<SheetTitle className="text-[14px] font-semibold text-[#08090A]">
-						تفاصيل الاختبار
+						تفاصيل التقييم
 					</SheetTitle>
 
 					{isLoading || !quiz ? (
 						<p className="py-16 text-center text-[13px] text-muted-foreground">
-							جارٍ تحميل الاختبار...
+							جارٍ تحميل التقييم...
 						</p>
 					) : (
 						<>
@@ -168,7 +168,7 @@ export function QuizDetailsSheet({
 							{/* بطاقة التفاصيل */}
 							<div className="flex flex-col gap-1 rounded-[4px] border-[0.75px] border-[#E5E5E5] p-3">
 								<DetailRow
-									label="اسم الاختبار"
+									label="اسم التقييم"
 									value={quiz.title}
 									icon={<IconFileText className="size-3.5" />}
 								/>
@@ -198,31 +198,31 @@ export function QuizDetailsSheet({
 									icon={<IconEye className="size-3.5" />}
 								/>
 								<DetailRow
-									label="حالة الاختبار"
+									label="حالة التقييم"
 									value={quiz.status === "PUBLISHED" ? "منشور" : "مسودة"}
 									icon={<IconRosetteDiscountCheck className="size-3.5" />}
 								/>
 							</div>
 
-							{/* وصف الاختبار — الوسم في بداية السطر (يمينًا في RTL) والنص تحته */}
+							{/* وصف التقييم — الوسم في بداية السطر (يمينًا في RTL) والنص تحته */}
 							<div className="flex flex-col items-start gap-2 py-1">
 								<span className="flex items-center gap-1.5 text-[14px] text-[#737373]">
 									<IconFileDescription className="size-3.5" />
-									وصف الاختبار
+									وصف التقييم
 								</span>
 								<p className="w-full text-start text-[14px] font-medium leading-[21px] text-[#08090A]">
-									{quiz.description?.trim() || "لا يوجد وصف لهذا الاختبار."}
+									{quiz.description?.trim() || "لا يوجد وصف لهذا التقييم."}
 								</p>
 							</div>
 
 							{/* الأسئلة — النصّ فقط بلا إجابات حتى لا يُفسد الاختبار */}
 							<SheetTitle className="text-[14px] font-semibold text-[#08090A]">
-								أسئلة الاختبار ({questions.length})
+								أسئلة التقييم ({questions.length})
 							</SheetTitle>
 
 							{questions.length === 0 ? (
 								<p className="text-[11px] text-[#9B9B9D]">
-									لا توجد أسئلة في هذا الاختبار بعد.
+									لا توجد أسئلة في هذا التقييم بعد.
 								</p>
 							) : (
 								<div className="flex flex-col gap-2">
@@ -253,9 +253,9 @@ export function QuizDetailsSheet({
 								</div>
 							)}
 
-							{/* إرشادات وتعليمات الاختبار */}
+							{/* إرشادات وتعليمات التقييم */}
 							<SheetTitle className="text-[14px] font-semibold text-[#08090A]">
-								إرشادات وتعليمات الاختبار
+								إرشادات وتعليمات التقييم
 							</SheetTitle>
 
 							{hasTextQuestions && (
@@ -263,7 +263,7 @@ export function QuizDetailsSheet({
 								<div className="flex items-start gap-1.5 rounded-[4px] bg-[#F59E0B]/[0.12] px-1.5 py-1">
 									<IconAlertTriangle className="mt-[1.5px] size-3 shrink-0 text-[#F59E0B]" />
 									<span className="text-start text-[10px] leading-[14px] text-[#F59E0B]">
-										يحتوي هذا الاختبار على أسئلة نصّية تُصحَّح يدويًا من المدير، لذا قد تظهر نتيجتك
+										يحتوي هذا التقييم على أسئلة نصّية تُصحَّح يدويًا من المدير، لذا قد تظهر نتيجتك
 										النهائية بعد اعتماد التصحيح.
 									</span>
 								</div>
@@ -308,7 +308,7 @@ export function QuizDetailsSheet({
 							(!quiz || questions.length === 0) && "cursor-not-allowed opacity-70",
 						)}
 					>
-						بدء الاختبار
+						بدء التقييم
 						<span className="rounded-[4px] bg-white/20 px-[3px] py-[1.5px] text-[8px] leading-3 text-white">
 							⌘↵
 						</span>

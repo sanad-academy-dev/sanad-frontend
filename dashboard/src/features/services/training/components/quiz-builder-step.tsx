@@ -53,7 +53,7 @@ export function QuizBuilderStep({
 				<div className="flex items-start justify-between gap-7">
 					<div className="flex flex-col gap-2.5">
 						<h2 className="text-[11px] font-bold leading-[10px] text-[#08090A]">
-							باني الاختبار
+							باني التقييم
 						</h2>
 						<p className="text-[10px] leading-[10px] text-[#6B6B67]">
 							أضف الأسئلة وحدّد الإجابات الصحيحة ودرجة كل سؤال — سؤال واحد على الأقل للنشر
@@ -91,7 +91,7 @@ export function QuizBuilderStep({
 			{/* ===== يسار: معاينة الاختبار ===== */}
 			<div className="flex min-h-0 flex-1 flex-col gap-3 self-stretch">
 				<div className="flex items-center py-[5px]">
-					<h2 className="text-[11px] font-bold leading-4 text-[#08090A]">معاينة الاختبار</h2>
+					<h2 className="text-[11px] font-bold leading-4 text-[#08090A]">معاينة التقييم</h2>
 				</div>
 
 				{/* الغلاف — يعرض اللون/الصورة المختارة، ومنتقي الغلاف أسفل اليمين (items-start في RTL) */}
@@ -102,7 +102,7 @@ export function QuizBuilderStep({
 					{cover?.type === "image" && (
 						<img
 							src={cover.url}
-							alt="غلاف الاختبار"
+							alt="غلاف التقييم"
 							className="absolute inset-0 size-full object-cover"
 						/>
 					)}
@@ -110,7 +110,7 @@ export function QuizBuilderStep({
 
 					<div className="relative flex flex-col gap-1">
 						<span className="text-[13px] font-bold text-[#08090A]">
-							{title?.trim() || "اختبار جديد"}
+							{title?.trim() || "تقييم جديد"}
 						</span>
 						<div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-[#08090A]/70">
 							<span>نسبة النجاح: {passMark ?? 0}%</span>
@@ -167,7 +167,7 @@ export function QuizBuilderStep({
 									لا يوجد محتوى للمعاينة حتى الآن
 								</p>
 								<p className="text-center text-[10px] leading-[18px] text-[#6B6B67]">
-									بعد إضافة أول سؤال، ستظهر هنا معاينة مباشرة لطريقة عرض الاختبار للموظفين قبل
+									بعد إضافة أول سؤال، ستظهر هنا معاينة مباشرة لطريقة عرض التقييم للموظفين قبل
 									نشره.
 								</p>
 							</div>

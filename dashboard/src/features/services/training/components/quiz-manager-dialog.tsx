@@ -87,11 +87,11 @@ export function QuizManagerDialog({
 								? "تصحيح الأسئلة النصّية"
 								: view === "result"
 									? "نتيجة الموظف"
-									: "نتائج الاختبار"}
+									: "نتائج التقييم"}
 						</DialogTitle>
 					</div>
 					<DialogDescription className="sr-only">
-						روستر نتائج الاختبار وتصحيح الأسئلة النصّية.
+						روستر نتائج التقييم وتصحيح الأسئلة النصّية.
 					</DialogDescription>
 					<button
 						type="button"
@@ -152,7 +152,7 @@ function RosterView({
 	if (rows.length === 0)
 		return (
 			<p className="py-16 text-center text-[13px] text-muted-foreground">
-				لا يوجد موظفون معيّنون على هذا الاختبار بعد.
+				لا يوجد موظفون معيّنون على هذا التقييم بعد.
 			</p>
 		);
 

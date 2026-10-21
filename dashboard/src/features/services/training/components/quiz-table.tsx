@@ -91,7 +91,7 @@ export function QuizTable({
 		() => [
 			{
 				accessorKey: "title",
-				header: "عنوان الاختبار / المعرّف",
+				header: "عنوان التقييم / المعرّف",
 				// في RTL أول عنصر في ترتيب DOM = أقصى اليمين، فالأفاتار يمين العنوان/المعرّف
 				cell: ({ row }) => (
 					<div className="flex items-center gap-2">
@@ -186,7 +186,7 @@ export function QuizTable({
 						<div className="flex items-center justify-center">
 							<DropdownMenu dir="rtl">
 								<DropdownMenuTrigger
-									aria-label="خيارات الاختبار"
+									aria-label="خيارات التقييم"
 									onClick={(e) => e.stopPropagation()}
 									className="flex size-7 items-center justify-center rounded-[6px] border border-[#E5E5E5] text-[#161616] hover:bg-muted"
 								>
@@ -202,7 +202,7 @@ export function QuizTable({
 											className="h-[29px] rounded-[5px] px-2 text-[12px] font-bold text-[#08090A] focus:bg-[#F2F2F2]"
 										>
 											<IconPlayerPlay className="size-4 text-[#08090A]" />
-											بدء الاختبار
+											بدء التقييم
 										</DropdownMenuItem>
 									)}
 									<DropdownMenuItem

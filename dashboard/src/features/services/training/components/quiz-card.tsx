@@ -149,7 +149,7 @@ export function QuizCard({
 
 					<DropdownMenu dir="rtl">
 						<DropdownMenuTrigger
-							aria-label="خيارات الاختبار"
+							aria-label="خيارات التقييم"
 							className="relative z-20 flex size-7 items-center justify-center rounded-md border text-muted-foreground hover:bg-muted"
 						>
 							<IconDots className="size-4" />
@@ -161,7 +161,7 @@ export function QuizCard({
 							{published && (
 								<DropdownMenuItem onSelect={onPlay}>
 									<IconPlayerPlay className="size-4" />
-									بدء الاختبار
+									بدء التقييم
 								</DropdownMenuItem>
 							)}
 							<DropdownMenuItem onSelect={onEdit}>

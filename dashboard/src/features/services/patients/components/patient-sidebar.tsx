@@ -272,9 +272,14 @@ export function PatientSidebar({ patient, onEdit, onNavigateTab }: PatientSideba
 							<IconClockHour4 className="size-4 shrink-0 text-muted-foreground/70" />
 							<span>المناوبة المفضلة</span>
 						</div>
-						<span className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 dark:bg-primary/20 dark:text-primary dark:border-primary/30">
+						<button
+							type="button"
+							onClick={() => onNavigateTab("attendance")}
+							title="انتقال لتبويب الحضور والمناوبات"
+							className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors cursor-pointer dark:bg-primary/20 dark:text-primary dark:border-primary/30"
+						>
 							{patient.preferredShift || "مسائي"}
-						</span>
+						</button>
 					</div>
 
 					{/* وليّ الأمر */}

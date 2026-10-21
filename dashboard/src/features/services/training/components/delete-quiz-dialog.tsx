@@ -37,7 +37,7 @@ export function DeleteQuizDialog({
 						<div className="flex h-[35px] items-center justify-between border-b border-[#E5E5E5] px-[11px] py-2">
 							<div className="flex min-w-0 items-center gap-1">
 								<DialogTitle className="shrink-0 text-[10px] font-bold leading-[14px] text-[#DC2626]">
-									حذف الاختبار
+									حذف التقييم
 								</DialogTitle>
 								<IconChevronLeft className="size-[9px] shrink-0 text-[#272829]" />
 								<span className="truncate text-[10px] font-bold leading-[14px] text-[#08090A]">
@@ -57,7 +57,7 @@ export function DeleteQuizDialog({
 						{/* الجسم */}
 						<div className="flex flex-col gap-2.5 px-[15px] pt-3 pb-3">
 							<DialogDescription className="text-[12px] leading-[22px] text-[#08090A]">
-								هل أنت متأكد من حذف الاختبار "{quiz.title}"؟ لا يمكن التراجع عن هذا الإجراء.
+								هل أنت متأكد من حذف التقييم "{quiz.title}"؟ لا يمكن التراجع عن هذا الإجراء.
 							</DialogDescription>
 
 							<div className="flex flex-col gap-1.5 rounded-[4px] border-[0.75px] border-[#DC2626] bg-[#FDEBEB] px-[10.25px] py-[9.65px]">
@@ -68,8 +68,8 @@ export function DeleteQuizDialog({
 									</span>
 								</div>
 								{[
-									"سيتم حذف جميع أسئلة الاختبار.",
-									"سيتم حذف كل التعيينات والمحاولات والنتائج المرتبطة بهذا الاختبار.",
+									"سيتم حذف جميع أسئلة التقييم.",
+									"سيتم حذف كل التعيينات والمحاولات والنتائج المرتبطة بهذا التقييم.",
 								].map((line) => (
 									<div
 										key={line}
@@ -89,7 +89,7 @@ export function DeleteQuizDialog({
 								onClick={confirm}
 								className="flex h-[25.5px] items-center justify-center gap-1.5 rounded-[4px] bg-[#DC2626] px-3 text-[11px] font-semibold text-[#F7F7FA] transition-colors hover:bg-[#DC2626]/90"
 							>
-								حذف الاختبار
+								حذف التقييم
 								<span className="rounded-[3px] bg-white/20 px-[3px] py-[1.5px] text-[8px] leading-3 text-white">
 									⌘↵
 								</span>

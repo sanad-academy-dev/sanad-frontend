@@ -23,7 +23,7 @@ export const useQuizzes = () => {
 		queryKey: QUIZZES_KEY,
 		queryFn: async () => {
 			const { data, error } = await api.quizzes.get();
-			if (error) throw new Error("تعذّر تحميل الاختبارات");
+			if (error) throw new Error("تعذّر تحميل التقييمات");
 			return data as QuizListItemResponse[];
 		},
 	});
@@ -35,21 +35,21 @@ export const useQuizStats = () => {
 		queryKey: STATS_KEY,
 		queryFn: async () => {
 			const { data, error } = await api.quizzes.stats.get();
-			if (error) throw new Error("تعذّر تحميل إحصائيات الاختبارات");
+			if (error) throw new Error("تعذّر تحميل إحصائيات التقييمات");
 			return data;
 		},
 	});
 	return { stats: data };
 };
 
-// تفاصيل اختبار (بالأسئلة) — لترطيب لوحة التعديل
+// تفاصيل تقييم (بالأسئلة) — لترطيب لوحة التعديل
 export const useQuiz = (id: string | null) => {
 	const { data, isLoading } = useQuery<QuizResponse>({
 		queryKey: quizKey(id ?? "new"),
 		enabled: !!id,
 		queryFn: async () => {
 			const { data, error } = await api.quizzes({ id: id as string }).get();
-			if (error) throw new Error("تعذّر تحميل الاختبار");
+			if (error) throw new Error("تعذّر تحميل التقييم");
 			return data as QuizResponse;
 		},
 	});
@@ -61,7 +61,7 @@ export const useCreateQuiz = () => {
 	const mutation = useMutation({
 		mutationFn: async (values: CreateQuizFormInput) => {
 			const { data, error } = await api.quizzes.post(values);
-			if (error) throw new Error(errMessage(error, "تعذّر إنشاء الاختبار"));
+			if (error) throw new Error(errMessage(error, "تعذّر إنشاء التقييم"));
 			return data as QuizResponse;
 		},
 		onSuccess: () => {
@@ -72,9 +72,9 @@ export const useCreateQuiz = () => {
 	const createQuiz = (values: CreateQuizFormInput) => {
 		const promise = mutation.mutateAsync(values);
 		toast.promise(promise, {
-			loading: "جارٍ إنشاء الاختبار...",
-			success: "تم إنشاء الاختبار",
-			error: (e: Error) => e.message || "تعذّر إنشاء الاختبار",
+			loading: "جارٍ إنشاء التقييم...",
+			success: "تم إنشاء التقييم",
+			error: (e: Error) => e.message || "تعذّر إنشاء التقييم",
 		});
 		return promise;
 	};
@@ -85,9 +85,9 @@ export const useUpdateQuiz = (id: string | null) => {
 	const qc = useQueryClient();
 	const mutation = useMutation({
 		mutationFn: async (values: UpdateQuizFormInput) => {
-			if (!id) throw new Error("لا يوجد اختبار للتعديل");
+			if (!id) throw new Error("لا يوجد تقييم للتعديل");
 			const { data, error } = await api.quizzes({ id }).put(values);
-			if (error) throw new Error(errMessage(error, "تعذّر تحديث الاختبار"));
+			if (error) throw new Error(errMessage(error, "تعذّر تحديث التقييم"));
 			return data as QuizResponse;
 		},
 		onSuccess: () => {
@@ -106,7 +106,7 @@ export const usePublishQuiz = () => {
 	const mutation = useMutation({
 		mutationFn: async (id: string) => {
 			const { data, error } = await api.quizzes({ id }).publish.post();
-			if (error) throw new Error(errMessage(error, "تعذّر نشر الاختبار"));
+			if (error) throw new Error(errMessage(error, "تعذّر نشر التقييم"));
 			return data as QuizResponse;
 		},
 		onSuccess: () => {
@@ -125,7 +125,7 @@ export const useUnpublishQuiz = () => {
 	const mutation = useMutation({
 		mutationFn: async (id: string) => {
 			const { data, error } = await api.quizzes({ id }).unpublish.post();
-			if (error) throw new Error(errMessage(error, "تعذّر إلغاء نشر الاختبار"));
+			if (error) throw new Error(errMessage(error, "تعذّر إلغاء نشر التقييم"));
 			return data as QuizResponse;
 		},
 		onSuccess: () => {
@@ -137,8 +137,8 @@ export const useUnpublishQuiz = () => {
 		const promise = mutation.mutateAsync(id);
 		toast.promise(promise, {
 			loading: "جارٍ إلغاء النشر...",
-			success: "تم إرجاع الاختبار إلى مسودة",
-			error: (e: Error) => e.message || "تعذّر إلغاء نشر الاختبار",
+			success: "تم إرجاع التقييم إلى مسودة",
+			error: (e: Error) => e.message || "تعذّر إلغاء نشر التقييم",
 		});
 		return promise;
 	};
@@ -151,7 +151,7 @@ export const useDeleteQuiz = () => {
 		mutationFn: async (id: string) => {
 			const { error } = await api.quizzes({ id }).delete();
 			if (error && error.status !== 404)
-				throw new Error(errMessage(error, "تعذّر حذف الاختبار"));
+				throw new Error(errMessage(error, "تعذّر حذف التقييم"));
 		},
 		onSuccess: () => {
 			qc.invalidateQueries({ queryKey: QUIZZES_KEY });
@@ -161,9 +161,9 @@ export const useDeleteQuiz = () => {
 	const deleteQuiz = (id: string) => {
 		const promise = mutation.mutateAsync(id);
 		toast.promise(promise, {
-			loading: "جارٍ حذف الاختبار...",
-			success: "تم حذف الاختبار",
-			error: (e: Error) => e.message || "تعذّر حذف الاختبار",
+			loading: "جارٍ حذف التقييم...",
+			success: "تم حذف التقييم",
+			error: (e: Error) => e.message || "تعذّر حذف التقييم",
 		});
 		return promise;
 	};

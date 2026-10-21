@@ -19,7 +19,7 @@ const TYPE_META: Record<LessonType, { label: string; Icon: typeof IconAlignRight
 	TEXT: { label: "نص", Icon: IconAlignRight },
 	VIDEO: { label: "فيديو", Icon: IconVideoPlus },
 	DOCUMENT: { label: "مستند", Icon: IconFileDiff },
-	QUIZ: { label: "اختبار", Icon: IconFileCheck },
+	QUIZ: { label: "تقييم", Icon: IconFileCheck },
 	SURVEY: { label: "استبيان", Icon: IconCheckbox },
 	AUDIO: { label: "صوت", Icon: IconMicrophone },
 };

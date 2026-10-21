@@ -42,8 +42,8 @@ const OPTIONS: ContentOption[] = [
 	},
 	{
 		key: "quiz",
-		label: "اختبار",
-		description: "إنشاء اختبار لتقييم فهم المتدربين للمادة.",
+		label: "تقييم",
+		description: "إنشاء تقييم لقياس فهم المتدربين للمادة.",
 		Icon: IconFileCheck,
 		tint: "bg-[#F5C33B]/15",
 		fg: "text-[#B45309]",

@@ -233,8 +233,10 @@ function StaffAvatar({ name, isStudent = false }: { name: string; isStudent?: bo
 
 export function AttendanceView({
 	targetType = "students",
+	studentId,
 }: {
 	targetType?: "students" | "staff";
+	studentId?: string;
 }) {
 	const isStudents = targetType === "students";
 	const { staff, isLoading: isStaffLoading } = useStaff();
@@ -259,12 +261,20 @@ export function AttendanceView({
 	// سجلات الحضور للأسبوع المعروض
 	const { records: staffRecords } = useAttendance(weekStart, addDays(weekStart, 6));
 	const { records: studentRecords } = useStudentAttendance(weekStart, addDays(weekStart, 6));
-	const records = isStudents ? studentRecords : staffRecords;
+	const allTargetRecords = isStudents ? studentRecords : staffRecords;
+	const records = useMemo(
+		() => (studentId ? allTargetRecords.filter((r) => r.staffId === studentId) : allTargetRecords),
+		[allTargetRecords, studentId],
+	);
 
 	// تعيينات المناوبات للأسبوع المعروض — لربط الحضور بأيام وساعات العمل المجدولة
 	const { shifts: staffShifts } = useShifts(weekStart, addDays(weekStart, 6));
 	const { shifts: studentShifts } = useStudentShifts(weekStart, addDays(weekStart, 6));
-	const shifts = isStudents ? studentShifts : staffShifts;
+	const allTargetShifts = isStudents ? studentShifts : staffShifts;
+	const shifts = useMemo(
+		() => (studentId ? allTargetShifts.filter((s) => s.staffId === studentId) : allTargetShifts),
+		[allTargetShifts, studentId],
+	);
 
 	// خريطة سريعة: "staffId_yyyy-MM-dd" → تعيين المناوبة
 	const shiftByCell = useMemo(() => {
@@ -371,7 +381,8 @@ export function AttendanceView({
 	const rows = useMemo(() => {
 		const q = search.trim().toLowerCase();
 		if (isStudents) {
-			const list = patients.map((p) => ({
+			const sourcePatients = studentId ? patients.filter((p) => p.id === studentId) : patients;
+			const list = sourcePatients.map((p) => ({
 				id: p.id,
 				name: p.name,
 				code: p.code,
@@ -387,7 +398,7 @@ export function AttendanceView({
 		return list.filter(
 			(s) => s.name.toLowerCase().includes(q) || s.code.toLowerCase().includes(q),
 		);
-	}, [isStudents, patients, staff, search, applyStaffFilters]);
+	}, [isStudents, studentId, patients, staff, search, applyStaffFilters]);
 
 	// ترقيم الصفحات
 	const [pageSize, setPageSize] = useState(15);
@@ -431,7 +442,12 @@ export function AttendanceView({
 					isStudent={isStudents}
 					customStaff={
 						isStudents
-							? patients.map((p) => ({ id: p.id, name: p.name, code: p.code, role: "طالب" }))
+							? (studentId ? patients.filter((p) => p.id === studentId) : patients).map((p) => ({
+									id: p.id,
+									name: p.name,
+									code: p.code,
+									role: "طالب",
+								}))
 							: undefined
 					}
 					onClose={() => setShiftPanelPreset(null)}
@@ -504,7 +520,12 @@ export function AttendanceView({
 				}
 				customItems={
 					isStudents
-						? patients.map((p) => ({ id: p.id, name: p.name, code: p.code, role: "طالب" }))
+						? (studentId ? patients.filter((p) => p.id === studentId) : patients).map((p) => ({
+								id: p.id,
+								name: p.name,
+								code: p.code,
+								role: "طالب",
+							}))
 						: undefined
 				}
 				customRecords={isStudents ? todayStudentRecords : undefined}
@@ -580,169 +601,7 @@ export function AttendanceView({
 				targetLabel={isStudents ? "الطلاب" : "الموظفين"}
 			/>
 
-			{/* شريط الأدوات */}
-			<TableToolbar
-				className="border-t"
-				searchPlaceholder={
-					isStudents
-						? "ابحث عن الطالب بالاسم، المعرف..."
-						: "ابحث عن المدرّب بالاسم،المعرف..."
-				}
-				searchValue={search}
-				onSearchChange={setSearch}
-				// نفس ترتيب صفحة الموظفين: [التصفية] [تصدير] بمقاس xs موحّد
-				buttonSize="xs"
-				showFilter={false}
-				showView={false}
-				showExport={false}
-				leftExtra={
-					<>
-						<FiltersMenu groups={filterGroups} />
-						{/* ترتيب DOM في RTL: بعد التصفية فيظهر على يسارها */}
-						<Button
-							type="button"
-							variant="outline"
-							size="xs"
-							onClick={() =>
-								exportAttendanceWeekCsv({
-									rows,
-									days,
-									recordByCell,
-									isStudents,
-								})
-							}
-							disabled={rows.length === 0}
-							className="gap-1.5 px-2"
-						>
-							<IconDownload className="size-3.5" />
-							تصدير
-						</Button>
-						<span className="h-6 w-px bg-[#E5E5E5]" />
-						{/* التنقّل بين الأسابيع */}
-						<div className="flex items-center gap-1.5">
-							<Button
-								type="button"
-								variant="outline"
-								size="icon"
-								className="size-[18px] rounded-[4px]"
-								onClick={() => setWeekStart((d) => addWeeks(d, -1))}
-							>
-								<IconChevronRight className="size-3" />
-							</Button>
-							<span className="min-w-24 text-center text-[11px] font-semibold tabular-nums">
-								{weekLabel}
-							</span>
-							<Button
-								type="button"
-								variant="outline"
-								size="icon"
-								className="size-[18px] rounded-[4px]"
-								onClick={() => setWeekStart((d) => addWeeks(d, 1))}
-							>
-								<IconChevronLeft className="size-3" />
-							</Button>
-						</div>
-					</>
-				}
-				actions={
-					<>
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => setAlertsOpen(true)}
-							className="h-8 gap-1.5 text-[13px]"
-						>
-							{pendingLeaveCount > 0 && (
-								<span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-[4px] bg-destructive px-1 text-[10px] font-medium text-white">
-									{pendingLeaveCount}
-								</span>
-							)}
-							تنبيهات الأجازات
-							<IconBell className="size-3.5 text-destructive" />
-						</Button>
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => {
-								if (!kioskReady) {
-									showFeatureLockedToast({
-										title: "وضع الكشك غير مفعّل",
-										description:
-											"فعّل «تفعيل وضع الكشك» وعيّن رمز PIN من الإعدادات لاستخدام وضع الكشك.",
-									});
-									return;
-								}
-								setKioskOpen(true);
-							}}
-							className="h-8 gap-1.5 text-[11px]"
-						>
-							<IconDeviceDesktop className="size-3.5" />
-							وضع الكشك
-						</Button>
-						<DropdownMenu dir="rtl">
-							<DropdownMenuTrigger asChild>
-								<Button
-									type="button"
-									size="sm"
-									className="h-[30px] gap-1.5 text-xs"
-								>
-									<IconPlus className="size-2.5" />
-									تسجيل
-									<IconChevronDown className="size-3" />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								align="end"
-								className="min-w-[150px] p-[3px]"
-							>
-								{CELL_ACTIONS.map((action, i) => {
-									const ActionIcon = action.icon;
-									return (
-										<DropdownMenuItem
-											key={action.status}
-											onSelect={
-												action.status === "PRESENT"
-													? () => {
-															setPickerIntent("register");
-															setPickerOpen(true);
-														}
-													: action.status === "LEAVE"
-														? () => {
-																setPickerIntent("leave");
-																setPickerOpen(true);
-															}
-														: action.status === "ABSENT"
-															? () => {
-																	setPickerIntent("absence");
-																	setPickerOpen(true);
-																}
-															: action.status === "LATE"
-																? () => {
-																		setPickerIntent("late");
-																		setPickerOpen(true);
-																	}
-																: undefined
-											}
-											className={cn(
-												"flex h-6 items-center justify-start gap-1.5 rounded-[4px] px-[9px] text-right text-[10px] font-medium text-[#08090A]",
-												i === 0 && "bg-[#9B9B9D]/[0.11]",
-											)}
-										>
-											<ActionIcon
-												className="size-2.5"
-												style={{ color: action.color }}
-											/>
-											{action.label}
-										</DropdownMenuItem>
-									);
-								})}
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</>
-				}
-			/>
+			
 
 			{/* شبكة الحضور الأسبوعية */}
 			<div className="min-h-0 flex-1 overflow-auto bg-white">

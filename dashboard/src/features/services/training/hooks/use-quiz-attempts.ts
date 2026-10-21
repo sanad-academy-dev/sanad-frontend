@@ -24,7 +24,7 @@ export const useQuizPlayer = () => {
 	const start = useMutation({
 		mutationFn: async (quizId: string) => {
 			const { data, error } = await api["quiz-attempts"]["start-by-quiz"].post({ quizId });
-			if (error) throw new AttemptError(msg(error, "تعذّر بدء الاختبار"), error.status ?? 500);
+			if (error) throw new AttemptError(msg(error, "تعذّر بدء التقييم"), error.status ?? 500);
 			return data as PlayerAttemptResponse;
 		},
 		onSuccess: () => qc.invalidateQueries({ queryKey: ["quiz-assignments"] }),
@@ -46,7 +46,7 @@ export const useQuizPlayer = () => {
 				answers,
 			});
 			if (error)
-				throw new AttemptError(msg(error, "تعذّر تسليم الاختبار"), error.status ?? 500);
+				throw new AttemptError(msg(error, "تعذّر تسليم التقييم"), error.status ?? 500);
 			return data as AttemptResultResponse;
 		},
 		onSuccess: () => {
@@ -58,7 +58,7 @@ export const useQuizPlayer = () => {
 	return { start, submit };
 };
 
-// أفضل نتيجة للمتصل على اختبار (لعرض النتيجة عند استنفاد المحاولات)
+// أفضل نتيجة للمتصل على تقييم (لعرض النتيجة عند استنفاد المحاولات)
 export const useMyQuizResult = (quizId: string | null, enabled: boolean) => {
 	const { data, isLoading } = useQuery<AttemptResultResponse | null>({
 		queryKey: ["quiz-attempts", "my-result", quizId],

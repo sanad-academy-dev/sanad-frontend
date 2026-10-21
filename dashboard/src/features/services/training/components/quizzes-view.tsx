@@ -64,9 +64,9 @@ export function QuizzesView() {
 	const handleQuizPublish = async (quiz: QuizListItemResponse) => {
 		try {
 			await publishQuiz(quiz.id);
-			toast.success(`تم نشر الاختبار «${quiz.title}»`);
+			toast.success(`تم نشر التقييم «${quiz.title}»`);
 		} catch {
-			toast.error("تعذّر نشر الاختبار");
+			toast.error("تعذّر نشر التقييم");
 		}
 	};
 
@@ -115,7 +115,7 @@ export function QuizzesView() {
 
 			<TableToolbar
 				className="border-y"
-				searchPlaceholder="ابحث عن اسم الاختبار / الرمز..."
+				searchPlaceholder="ابحث عن اسم التقييم / الرمز..."
 				searchClassName="w-[320px]"
 				searchValue={search}
 				onSearchChange={setSearch}
@@ -138,7 +138,7 @@ export function QuizzesView() {
 						onClick={openQuizCreate}
 					>
 						<IconPlus className="size-3.5" />
-						اختبار جديد
+						تقييم جديد
 					</Button>
 				}
 			/>
@@ -162,7 +162,7 @@ export function QuizzesView() {
 								: "لا توجد تقييمات مطابقة"}
 						</h2>
 						<p className="max-w-[280px] text-[12px] text-muted-foreground">
-							أنشئ اختباراً لتقييم معرفة موظفيك ورصد نتائجهم.
+							أنشئ تقييماً لقياس معرفة موظفيك ورصد نتائجهم.
 						</p>
 						{quizzes.length === 0 && (
 							<Button
@@ -170,7 +170,7 @@ export function QuizzesView() {
 								onClick={openQuizCreate}
 								className="h-9 rounded-lg px-4 text-[12px]"
 							>
-								إنشاء اختبار
+								إنشاء تقييم
 							</Button>
 						)}
 					</div>

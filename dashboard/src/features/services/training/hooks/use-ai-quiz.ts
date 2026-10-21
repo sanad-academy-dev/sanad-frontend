@@ -14,7 +14,7 @@ export const useAiQuiz = () => {
 	const generate = useMutation({
 		mutationFn: async (input: { brief: string; options: AiQuizOptions }) => {
 			const { data, error } = await api.quizzes.ai.generate.post(input);
-			if (error) throw new Error(errMsg(error.value, "تعذّر توليد الاختبار"));
+			if (error) throw new Error(errMsg(error.value, "تعذّر توليد التقييم"));
 			return data as AiQuizPreview;
 		},
 	});

@@ -322,10 +322,10 @@ export function AiCourseSheet({
 									/>
 								</div>
 
-								{/* مبدّل تضمين الاختبارات */}
+								{/* مبدّل تضمين التقييمات */}
 								<ToggleRow
-									label="تضمين اختبارات"
-									desc="إضافة وحدة اختبار في نهاية كل مستوى."
+									label="تضمين تقييمات"
+									desc="إضافة وحدة تقييم في نهاية كل مستوى."
 									checked={opts.includeQuizzes ?? true}
 									onCheckedChange={(v) => setOpt("includeQuizzes", v)}
 								/>

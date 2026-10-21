@@ -79,24 +79,34 @@ export function ShiftsView({
 	initialTarget = "staff",
 	targetType: controlledTarget,
 	onTargetTypeChange,
+	studentId,
 }: {
 	initialTarget?: "staff" | "students";
 	targetType?: "staff" | "students";
 	onTargetTypeChange?: (target: "staff" | "students") => void;
+	studentId?: string;
 } = {}) {
-	const [internalTarget, setInternalTarget] = useState<"staff" | "students">(initialTarget);
+	const [internalTarget, setInternalTarget] = useState<"staff" | "students">(
+		studentId ? "students" : initialTarget,
+	);
 	const targetType = controlledTarget ?? internalTarget;
 	const setTargetType = onTargetTypeChange ?? setInternalTarget;
-	const isStudents = targetType === "students";
+	const isStudents = studentId ? true : targetType === "students";
 
 	const { staff, isLoading: isStaffLoading } = useStaff();
 	const { patients, isLoading: isPatientsLoading } = usePatients();
 	const isLoading = isStudents ? isPatientsLoading : isStaffLoading;
 
-	const studentItems = useMemo(
-		() => patients.map((p) => ({ id: p.id, name: p.name, code: p.code, role: { name: "طالب" }, active: true })),
-		[patients],
-	);
+	const studentItems = useMemo(() => {
+		const sourcePatients = studentId ? patients.filter((p) => p.id === studentId) : patients;
+		return sourcePatients.map((p) => ({
+			id: p.id,
+			name: p.name,
+			code: p.code,
+			role: { name: "طالب" },
+			active: true,
+		}));
+	}, [patients, studentId]);
 	const rawItems = isStudents ? (studentItems as any) : staff;
 	const { filterGroups, applyStaffFilters } = useStaffFilters(rawItems);
 	const [search, setSearch] = useState("");
@@ -114,7 +124,11 @@ export function ShiftsView({
 	// تعيينات المناوبات للأسبوع المعروض (للموظفين أو للطلاب)
 	const { shifts: staffShifts } = useShifts(weekStart, addDays(weekStart, 6));
 	const { shifts: studentShifts } = useStudentShifts(weekStart, addDays(weekStart, 6));
-	const shifts = isStudents ? studentShifts : staffShifts;
+	const allTargetShifts = isStudents ? studentShifts : staffShifts;
+	const shifts = useMemo(
+		() => (studentId ? allTargetShifts.filter((s) => s.staffId === studentId) : allTargetShifts),
+		[allTargetShifts, studentId],
+	);
 
 	const { upsert: upsertStaff, upsertAsync: upsertStaffAsync } = useUpsertShift();
 	const { remove: removeStaff } = useDeleteShift();
@@ -130,7 +144,14 @@ export function ShiftsView({
 	// سجلات الحضور والانصراف للأسبوع المعروض — لربط المناوبات بالحضور الفعلي
 	const { records: staffAttendance } = useAttendance(weekStart, addDays(weekStart, 6));
 	const { records: studentAttendance } = useStudentAttendance(weekStart, addDays(weekStart, 6));
-	const attendance = isStudents ? studentAttendance : staffAttendance;
+	const allAttendance = isStudents ? studentAttendance : staffAttendance;
+	const attendance = useMemo(
+		() =>
+			studentId
+				? allAttendance.filter((a) => (a.staffId || (a as any).studentId) === studentId)
+				: allAttendance,
+		[allAttendance, studentId],
+	);
 
 	// خريطة سجلات الحضور: "staffId_yyyy-MM-dd" → سجل الحضور
 	const attendanceByCell = useMemo(() => {
@@ -231,11 +252,11 @@ export function ShiftsView({
 			dir="rtl"
 		>
 			{/* بطاقات الإحصائيات */}
-			<Stats
+			{/* <Stats
 				className="px-[9px]"
 				stats={stats}
 				variant="inventory"
-			/>
+			/> */}
 
 			{/* <AiShiftsDialog
 				open={aiOpen}
@@ -256,81 +277,7 @@ export function ShiftsView({
 				onClose={() => setPanelPreset(null)}
 			/>
 
-			{/* شريط الأدوات */}
-			<TableToolbar
-				className="border-t"
-				searchPlaceholder={isStudents ? "ابحث عن الطالب بالاسم، المعرف..." : "ابحث عن الموظف بالاسم، المعرف..."}
-				searchValue={search}
-				onSearchChange={setSearch}
-				buttonSize="xs"
-				showFilter={false}
-				showView={false}
-				showExport={false}
-				leftExtra={
-					<>
-						<FiltersMenu groups={filterGroups} />
-						<Button
-							type="button"
-							variant="outline"
-							size="xs"
-							onClick={() => exportStaffCsv(rows)}
-							disabled={rows.length === 0}
-							className="gap-1.5 px-2"
-						>
-							<IconDownload className="size-3.5" />
-							تصدير
-						</Button>
-						<span className="h-6 w-px bg-[#E5E5E5]" />
-						{/* التنقّل بين الأسابيع */}
-						<div className="flex items-center gap-1.5">
-							<Button
-								type="button"
-								variant="outline"
-								size="icon"
-								className="size-[18px] rounded-[4px]"
-								onClick={() => setWeekStart((d) => addWeeks(d, -1))}
-							>
-								<IconChevronRight className="size-3" />
-							</Button>
-							<span className="min-w-24 text-center text-[11px] font-semibold tabular-nums">
-								{weekLabel}
-							</span>
-							<Button
-								type="button"
-								variant="outline"
-								size="icon"
-								className="size-[18px] rounded-[4px]"
-								onClick={() => setWeekStart((d) => addWeeks(d, 1))}
-							>
-								<IconChevronLeft className="size-3" />
-							</Button>
-						</div>
-					</>
-				}
-				actions={
-					<>
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							disabled
-							className="h-[30px] gap-1.5 text-[11px] text-primary"
-						>
-							<IconSparkles className="size-3.5" />
-							جدولة مناوبة بـ AI
-						</Button>
-						<Button
-							type="button"
-							size="sm"
-							onClick={() => setPanelPreset({})}
-							className="h-[30px] gap-1.5 text-xs"
-						>
-							<IconPlus className="size-2.5" />
-							{isStudents ? "جدولة مناوبة طالب" : "جدولة مناوبة"}
-						</Button>
-					</>
-				}
-			/>
+			
 
 			{/* شبكة المناوبات الأسبوعية */}
 			<div className="min-h-0 flex-1 overflow-auto bg-white">

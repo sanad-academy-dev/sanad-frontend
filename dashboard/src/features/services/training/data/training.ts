@@ -41,7 +41,7 @@ export const LESSON_TYPE_OPTIONS: { value: LessonType; label: string }[] = [
 	{ value: "TEXT", label: "نص" },
 	{ value: "VIDEO", label: "فيديو" },
 	{ value: "DOCUMENT", label: "مستند" },
-	{ value: "QUIZ", label: "اختبار" },
+	{ value: "QUIZ", label: "تقييم" },
 	{ value: "SURVEY", label: "استبيان" },
 	{ value: "AUDIO", label: "صوت" },
 ];
@@ -84,8 +84,8 @@ export const CONTENT_TYPE_OPTIONS: {
 	},
 	{
 		value: "QUIZ",
-		label: "اختبار",
-		description: "اختبار يقيس مدى استيعاب المتدرّب للمادة التعليمية بعد دراستها.",
+		label: "تقييم",
+		description: "تقييم يقيس مدى استيعاب المتدرّب للمادة التعليمية بعد دراستها.",
 		Icon: IconFileCheck,
 		tint: "bg-[#8B5CF6]/10",
 		fg: "text-[#8B5CF6]",

@@ -10,7 +10,7 @@ export const LEAVE_TYPES = [
 	{ label: "إجازة وفاة", entitlement: "خمسة أيام" },
 	{ label: "إجازة مولود جديد", entitlement: "ثلاثة أيام" },
 	{ label: "إجازة الوضع", entitlement: "عشرة أسابيع" },
-	{ label: "إجازة الاختبارات", entitlement: "بعدد أيام الاختبارات الفعلية" },
+	{ label: "إجازة التقييمات", entitlement: "بعدد أيام التقييمات الفعلية" },
 	{ label: "إجازة زواج", entitlement: "خمسة أيام" },
 	{ label: "إجازة أداء فريضة الحج", entitlement: "من 10 إلى 15 يوم" },
 	{ label: "إجازة مرضية", entitlement: "بعدد أيام المرض" },

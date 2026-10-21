@@ -62,7 +62,7 @@ export const useQuizAssignmentActions = (quizId: string | null) => {
 			staff: EligibleQuizLearnerResponse;
 			window?: QuizAssignWindow;
 		}) => {
-			if (!quizId) throw new Error("لم يتم إنشاء الاختبار بعد");
+			if (!quizId) throw new Error("لم يتم إنشاء التقييم بعد");
 			const { error } = await api["quiz-assignments"].post({
 				quizId,
 				staffIds: [staff.id],
@@ -113,7 +113,7 @@ export const useQuizAssignmentActions = (quizId: string | null) => {
 
 	const enrollAll = useMutation({
 		mutationFn: async () => {
-			if (!quizId) throw new Error("لم يتم إنشاء الاختبار بعد");
+			if (!quizId) throw new Error("لم يتم إنشاء التقييم بعد");
 			const { error } = await api["quiz-assignments"]["enroll-all"].post({ quizId });
 			if (error) throw new Error("تعذّر تسجيل الجميع");
 		},

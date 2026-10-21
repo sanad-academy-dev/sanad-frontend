@@ -137,7 +137,7 @@ export function QuizPlayerDialog({
 	// biome-ignore lint/correctness/useExhaustiveDependencies: doSubmit مستقر منطقيًا ومحروس ضد التكرار
 	useEffect(() => {
 		if (phase === "playing" && remaining != null && remaining <= 0 && !submittedRef.current) {
-			toast.message("انتهى الوقت — يتم تسليم الاختبار");
+			toast.message("انتهى الوقت — يتم تسليم التقييم");
 			void doSubmit();
 		}
 	}, [phase, remaining]);
@@ -180,10 +180,10 @@ export function QuizPlayerDialog({
 					className="flex shrink-0 items-center justify-between gap-2 border-b border-[#E5E5E5] px-4 py-3"
 				>
 					<DialogTitle className="text-[14px] font-bold text-[#08090A]">
-						{phase === "result" ? "نتيجة الاختبار" : (player?.quiz.title ?? "الاختبار")}
+						{phase === "result" ? "نتيجة التقييم" : (player?.quiz.title ?? "التقييم")}
 					</DialogTitle>
 					<DialogDescription className="sr-only">
-						أداء الاختبار وعرض النتيجة.
+						أداء التقييم وعرض النتيجة.
 					</DialogDescription>
 					<div className="flex items-center gap-2">
 						{phase === "playing" && remaining != null && (
@@ -217,7 +217,7 @@ export function QuizPlayerDialog({
 				>
 					{phase === "loading" && (
 						<p className="py-16 text-center text-[13px] text-muted-foreground">
-							جارٍ تحميل الاختبار...
+							جارٍ تحميل التقييم...
 						</p>
 					)}
 
@@ -336,7 +336,7 @@ export function QuizPlayerDialog({
 								onClick={() => setConfirm(true)}
 								className="h-8 gap-1.5 text-[11px] font-semibold"
 							>
-								تسليم الاختبار
+								تسليم التقييم
 							</Button>
 						)}
 					</div>

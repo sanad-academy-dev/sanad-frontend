@@ -222,7 +222,7 @@ export function LessonForm({
 		hours: "المدة (ساعات)",
 		minutes: "المدة (دقائق)",
 		seconds: "المدة (ثوانٍ)",
-		questions: "أسئلة الاختبار",
+		questions: "أسئلة التقييم",
 	};
 	const changedFields = Object.keys(dirtyFields).map((key) => FIELD_LABELS[key] ?? key);
 
@@ -234,7 +234,7 @@ export function LessonForm({
 	const saveLabel = isEditing
 		? "حفظ تغييرات الدرس"
 		: type === "QUIZ"
-			? "حفظ الاختبار"
+			? "حفظ التقييم"
 			: "حفظ الدرس";
 
 	return (
@@ -280,20 +280,20 @@ export function LessonForm({
 				/>
 			</div>
 
-			{/* بطاقة الاختبار — تحلّ محل بطاقة تفاصيل الدرس لنوع «اختبار» (Figma node 4573-498116) */}
+			{/* بطاقة التقييم — تحلّ محل بطاقة تفاصيل الدرس لنوع «تقييم» */}
 			{type === "QUIZ" ? (
 				<div className="flex flex-col gap-3 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white p-2">
-					{/* عنوان الاختبار — هو نفسه عنوان الدرس المحفوظ */}
+					{/* عنوان التقييم — هو نفسه عنوان الدرس المحفوظ */}
 					<Field
 						className="gap-[5px]"
 						data-invalid={!!errors.title}
 					>
 						<FieldLabel
-							label="عنوان الإختبار"
+							label="عنوان التقييم"
 							required
 						/>
 						<Input
-							placeholder="مثال: اختبار سريع عن الوحدة الأولي"
+							placeholder="مثال: تقييم سريع عن الوحدة الأولى"
 							className="h-[34px] text-[11px]"
 							aria-invalid={!!errors.title}
 							disabled={busy}
@@ -302,7 +302,7 @@ export function LessonForm({
 						<FieldError errors={[errors.title]} />
 					</Field>
 
-					{/* باني الاختبار — الحالة الفارغة حتى يُضاف أول سؤال (Figma node 4573-499041) */}
+					{/* باني التقييم — الحالة الفارغة حتى يُضاف أول سؤال */}
 					{questions.length === 0 ? (
 						<div className="flex h-[161px] flex-col items-center justify-center gap-[11px] rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-[#9B9B9D]/[0.09] px-1.5 py-[4.5px]">
 							<span className="flex size-[29px] items-center justify-center rounded-full border border-[#E5E5E5] bg-[#ECECED]">
@@ -310,7 +310,7 @@ export function LessonForm({
 							</span>
 							<div className="flex flex-col items-center gap-2">
 								<p className="text-[12px] font-semibold leading-[10px] text-[#121217]">
-									باني الاختبار
+									باني التقييم
 								</p>
 								<p className="text-[10px] leading-[10px] text-[#121217]">
 									لا يوجد أي أسئلة حتي الأن، ابدأ بإضافة أول سؤال

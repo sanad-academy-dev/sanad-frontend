@@ -206,7 +206,7 @@ export function AddQuizSheet({
 			await updateQuiz(getValues());
 			await publishQuiz(quizId);
 			close();
-			showSuccessToast("تم نشر الاختبار بنجاح", { iconAtStart: true });
+			showSuccessToast("تم نشر التقييم بنجاح", { iconAtStart: true });
 		} catch (e) {
 			// «غير جاهز» (400) أو أي فشل نشر — نعرضه كخطأ مضمّن على خطوة الأسئلة
 			setPublishError({ step: 2, message: (e as Error).message });
@@ -296,9 +296,9 @@ export function AddQuizSheet({
 				>
 					<FormHeader
 						title={
-							step === 1 ? (editQuizId ? "تعديل الاختبار" : "إنشاء اختبار جديد") : "الاختبارات"
+							step === 1 ? (editQuizId ? "تعديل التقييم" : "إنشاء تقييم جديد") : "التقييمات"
 						}
-						identity={step === 1 ? null : { name: values.title || "اختبار جديد" }}
+						identity={step === 1 ? null : { name: values.title || "تقييم جديد" }}
 						changesCount={changesCount}
 						progress={formProgress}
 						onClose={close}
@@ -351,11 +351,11 @@ export function AddQuizSheet({
 								data-invalid={!!errors.title}
 							>
 								<Label
-									text="عنوان الاختبار"
+									text="عنوان التقييم"
 									required
 								/>
 								<Input
-									placeholder="مثال: اختبار سلامة التعامل مع الأطفال"
+									placeholder="مثال: تقييم سلامة التعامل مع الأطفال"
 									className="h-10 text-[13px]"
 									aria-invalid={!!errors.title}
 									disabled={busy}
@@ -367,7 +367,7 @@ export function AddQuizSheet({
 							<Field className="gap-1.5">
 								<Label text="الوصف" />
 								<Textarea
-									placeholder="وصف موجز لهدف الاختبار..."
+									placeholder="وصف موجز لهدف التقييم..."
 									className="min-h-[72px] text-[13px]"
 									disabled={busy}
 									{...register("description")}
@@ -559,7 +559,7 @@ export function AddQuizSheet({
 								disabled={busy}
 								className="h-[27px] gap-2 rounded-[5px] px-3 text-[11px] font-semibold"
 							>
-								{step === 3 ? "نشر الاختبار" : "التالي"}
+								{step === 3 ? "نشر التقييم" : "التالي"}
 								<Kbd className="text-white">⌘↵</Kbd>
 							</Button>
 						</div>

@@ -157,7 +157,7 @@ export function AiQuizSheet({
 							<span className="flex size-6 items-center justify-center rounded-[6px] bg-primary/10 text-primary">
 								<IconSparkles className="size-3.5" />
 							</span>
-							إنشاء اختبار بالذكاء الاصطناعي
+							إنشاء تقييم بالذكاء الاصطناعي
 						</SheetTitle>
 
 						<button
@@ -180,7 +180,7 @@ export function AiQuizSheet({
 										تم توليد {preview.questions.length} سؤالًا ({totalPoints} درجة)
 									</span>
 									<span className="text-[11px] leading-5 text-[#6B6B67]">
-										راجع الأسئلة ثم اضغط «إضافة الأسئلة» لإضافتها إلى باني الاختبار.
+										راجع الأسئلة ثم اضغط «إضافة الأسئلة» لإضافتها إلى باني التقييم.
 									</span>
 								</div>
 							</div>
@@ -254,18 +254,18 @@ export function AiQuizSheet({
 							{/* الموجز */}
 							<div className="flex flex-col gap-2">
 								<span className="text-[12px] font-semibold text-[#08090A]">
-									ما موضوع الاختبار؟
+									ما موضوع التقييم؟
 								</span>
 								<Textarea
 									autoFocus
 									value={brief}
 									onChange={(e) => setBrief(e.target.value)}
-									placeholder="مثال: اختبار لفريق الاستقبال حول التعامل مع حالات الطوارئ وأولويات الفرز..."
+									placeholder="مثال: تقييم لفريق الاستقبال حول التعامل مع حالات الطوارئ وأولويات الفرز..."
 									className="min-h-[120px] text-[13px]"
 									disabled={isGenerating}
 								/>
 								<p className="text-[11px] leading-5 text-[#9B9B9D]">
-									اكتب موضوع الاختبار، اضبط الإعدادات بالأسفل، ثم اضغط «توليد الأسئلة» لعرض
+									اكتب موضوع التقييم، اضبط الإعدادات بالأسفل، ثم اضغط «توليد الأسئلة» لعرض
 									معاينة قبل الإضافة.
 								</p>
 							</div>

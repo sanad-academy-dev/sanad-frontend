@@ -328,7 +328,7 @@ export function QuizQuestionBuilder(props: QuizProps) {
 				<div className="flex flex-col items-center gap-1 rounded-[6px] border border-dashed border-[#E5E5E5] py-10 text-center">
 					<span className="text-[13px] font-semibold text-[#08090A]">لا توجد أسئلة بعد</span>
 					<span className="text-[11px] text-[#9B9B9D]">
-						أضف سؤالاً واحداً على الأقل لنشر الاختبار.
+						أضف سؤالاً واحداً على الأقل لنشر التقييم.
 					</span>
 				</div>
 			)}

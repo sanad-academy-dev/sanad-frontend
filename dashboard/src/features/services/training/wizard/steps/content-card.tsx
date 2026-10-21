@@ -35,7 +35,7 @@ import { useCourseContent } from "../../hooks/use-course-content";
 const CONTENT_TYPE = {
 	PAGE: { label: "صفحة", Icon: IconFile },
 	LESSON: { label: "درس", Icon: IconBook },
-	QUIZ: { label: "اختبار", Icon: IconFileCheck },
+	QUIZ: { label: "تقييم", Icon: IconFileCheck },
 } as const satisfies Record<CourseContentType, { label: string; Icon: typeof IconFile }>;
 
 function toDurationSeconds(v: LessonFormValues) {
@@ -248,7 +248,7 @@ export function ContentCard({
 				name={unit.title}
 				nameLabel="اسم المحتوى"
 				question={`هل أنت متأكد من حذف "${unit.title}"؟ لا يمكن التراجع عن هذه الخطوة.`}
-				consequences={["سيتم حذف جميع الفصول (الدروس/الاختبارات) المرتبطة بها نهائيًا."]}
+				consequences={["سيتم حذف جميع الفصول (الدروس/التقييمات) المرتبطة بها نهائيًا."]}
 				confirmLabel="حذف"
 				open={confirmingDelete}
 				onOpenChange={setConfirmingDelete}

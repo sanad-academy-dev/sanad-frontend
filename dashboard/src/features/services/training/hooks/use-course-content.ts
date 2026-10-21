@@ -16,9 +16,9 @@ import type {
 	UpdateLessonPayload,
 } from "@/server/training/training.type";
 
-// التصميم يسمّي المحتوى المحفوظ حسب نوعه في رسائل التوست («الدرس» / «الاختبار»)
+// التصميم يسمّي المحتوى المحفوظ حسب نوعه في رسائل التوست («الدرس» / «التقييم»)
 const SAVED_LABELS: Partial<Record<LessonType, string>> = {
-	QUIZ: "الاختبار",
+	QUIZ: "التقييم",
 	SURVEY: "الاستبيان",
 };
 const savedLabel = (type: LessonType) => SAVED_LABELS[type] ?? "الدرس";

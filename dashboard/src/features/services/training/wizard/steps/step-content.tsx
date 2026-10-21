@@ -39,16 +39,16 @@ const LANGUAGE_LABEL = { AR: "العربية", EN: "الإنجليزية" } as c
 const DEFAULT_TITLE: Record<CourseContentType, string> = {
 	PAGE: "صفحة جديدة",
 	LESSON: "درس جديد",
-	QUIZ: "اختبار جديد",
+	QUIZ: "تقييم جديد",
 };
 
-// فصل مبدئي يُنشأ مع البطاقة حسب النوع — الصفحة نصّ، والاختبار اختبار فارغ.
+// فصل مبدئي يُنشأ مع البطاقة حسب النوع — الصفحة نصّ، والتقييم تقييم فارغ.
 // الدرس بلا فصل مبدئي (يختار المستخدم نوع المادة في نموذج الفصل).
 function seedLessons(type: CourseContentType): RestoredLessonInput[] | undefined {
 	if (type === "PAGE") return [{ title: "صفحة جديدة", type: "TEXT", content: "" }];
 	if (type === "QUIZ")
 		return [
-			{ title: "اختبار جديد", type: "QUIZ", content: JSON.stringify({ questions: [] }) },
+			{ title: "تقييم جديد", type: "QUIZ", content: JSON.stringify({ questions: [] }) },
 		];
 	return undefined;
 }
@@ -206,7 +206,7 @@ export function StepContent({
 						<IconSchool className="size-8 text-[#C4C4CC]" />
 						<p className="text-[13px] font-semibold text-[#08090A]">ابدأ ببناء دورتك</p>
 						<p className="max-w-[320px] text-[12px] leading-5 text-[#6B6B67]">
-							أضف مستوى ثم بطاقات محتوى (صفحات، دروس، اختبارات) لتكوين هيكل الدورة.
+							أضف مستوى ثم بطاقات محتوى (صفحات، دروس، تقييمات) لتكوين هيكل الدورة.
 						</p>
 						<Button
 							type="button"
