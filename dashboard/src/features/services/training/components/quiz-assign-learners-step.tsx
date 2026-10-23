@@ -40,7 +40,7 @@ const initials = (name: string) =>
 		.join("")
 		.toUpperCase() || "؟";
 
-function StaffAvatar({
+function StudentAvatar({
 	name,
 	avatar,
 	className,
@@ -120,8 +120,7 @@ function DateField({
 	);
 }
 
-// خطوة «تعيين الموظفين» للاختبار — جدول اختيار + شريط المعيَّنين + تسجيل الجميع + تواريخ اختيارية.
-// مبنيّة على نفس نمط خطوة متدربي الدورة لكنها مربوطة بتعيينات الاختبار (بلا مساس بسلوك خطوة الدورة).
+// خطوة «تعيين الطلاب» للتقييم — جدول اختيار + شريط المعيَّنين + تسجيل الجميع + تواريخ اختيارية.
 export function QuizAssignLearnersStep({ quizId }: { quizId: string }) {
 	const { learners, isLoading } = useEligibleQuizLearners(quizId);
 	const { roster } = useQuizRoster(quizId);
@@ -134,7 +133,7 @@ export function QuizAssignLearnersStep({ quizId }: { quizId: string }) {
 	// due > start فقط عندما يكون كلاهما محدَّدًا
 	const datesInvalid = !!(start && due) && due.getTime() <= start.getTime();
 
-	// staffId → assignmentId (لإلغاء التعيين) — الروستر هو مصدر التحديد
+	// studentId → assignmentId (لإلغاء التعيين) — الروستر هو مصدر التحديد
 	const assignedMap = useMemo(() => new Map(roster.map((a) => [a.staffId, a.id])), [roster]);
 
 	const window = useMemo(
@@ -148,7 +147,7 @@ export function QuizAssignLearnersStep({ quizId }: { quizId: string }) {
 	const filtered = useMemo(() => {
 		const q = search.trim();
 		return learners
-			.filter((l) => (q ? l.name.includes(q) : true))
+			.filter((l) => (q ? l.name.includes(q) || (l.code && l.code.includes(q)) : true))
 			.sort((a, b) => a.name.localeCompare(b.name, "ar"));
 	}, [learners, search]);
 
@@ -166,7 +165,6 @@ export function QuizAssignLearnersStep({ quizId }: { quizId: string }) {
 			{
 				id: "select",
 				// المقاسات نِسَب لا بكسلات: الجدول table-fixed w-full فيوزّع العرض تناسبيًّا.
-				// 36 مقابل 520/220/220 يعطي عمودًا بعرض ~28px (مربّع 16 + حشوة الخليّة).
 				size: 36,
 				header: () => <span className="sr-only">تحديد</span>,
 				cell: ({ row }) => (
@@ -179,39 +177,48 @@ export function QuizAssignLearnersStep({ quizId }: { quizId: string }) {
 			},
 			{
 				accessorKey: "name",
-				header: "الموظف",
+				header: "الطالب",
 				size: 520,
 				cell: ({ row }) => (
 					<div className="flex items-center gap-2">
-						<StaffAvatar
+						<StudentAvatar
 							name={row.original.name}
 							avatar={row.original.avatar}
 						/>
-						<span className="text-sm font-medium text-foreground">{row.original.name}</span>
+						<div className="flex flex-col">
+							<span className="text-sm font-medium text-foreground">{row.original.name}</span>
+							{row.original.code && (
+								<span className="text-[11px] text-muted-foreground">{row.original.code}</span>
+							)}
+						</div>
 					</div>
 				),
 			},
 			{
-				id: "role",
-				header: "القسم",
+				id: "classroom",
+				header: "الفصل",
 				size: 220,
-				cell: ({ row }) =>
-					row.original.role ? (
-						<Badge variant="secondary">{row.original.role.name}</Badge>
+				cell: ({ row }) => {
+					const val = (row.original as any).classroom ?? row.original.role?.name;
+					return val ? (
+						<Badge variant="secondary">{val}</Badge>
 					) : (
 						<span className="text-muted-foreground">—</span>
-					),
+					);
+				},
 			},
 			{
-				id: "branch",
-				header: "الفرع",
+				id: "level",
+				header: "المستوى",
 				size: 220,
-				cell: ({ row }) =>
-					row.original.branch ? (
-						<span className="text-sm text-muted-foreground">{row.original.branch.name}</span>
+				cell: ({ row }) => {
+					const val = (row.original as any).level ?? row.original.branch?.name;
+					return val ? (
+						<span className="text-sm text-muted-foreground">{val}</span>
 					) : (
 						<span className="text-muted-foreground">—</span>
-					),
+					);
+				},
 			},
 		],
 		[assignedMap],
@@ -227,9 +234,9 @@ export function QuizAssignLearnersStep({ quizId }: { quizId: string }) {
 		<div className="flex flex-col gap-3">
 			{/* الترويسة + العدّاد */}
 			<div className="flex flex-col gap-0.5">
-				<h2 className="text-[14px] font-bold text-foreground">تعيين الموظفين</h2>
+				<h2 className="text-[14px] font-bold text-foreground">تعيين الطلاب</h2>
 				<p className="text-[11px] text-muted-foreground">
-					الموظفون المؤهلون: {learners.length}
+					الطلاب المؤهلون: {learners.length}
 				</p>
 			</div>
 
@@ -239,7 +246,7 @@ export function QuizAssignLearnersStep({ quizId }: { quizId: string }) {
 					{roster.length > 0 ? (
 						<AvatarGroup>
 							{roster.slice(0, 5).map((a) => (
-								<StaffAvatar
+								<StudentAvatar
 									key={a.id}
 									name={a.staff.name}
 									avatar={a.staff.avatar}
@@ -254,7 +261,7 @@ export function QuizAssignLearnersStep({ quizId }: { quizId: string }) {
 						</span>
 					)}
 					<span className="text-xs font-medium text-foreground">
-						{roster.length} موظف معيّن
+						{roster.length} طالب معيّن
 					</span>
 				</div>
 				<div className="flex items-center gap-1.5">
@@ -314,12 +321,12 @@ export function QuizAssignLearnersStep({ quizId }: { quizId: string }) {
 				<Input
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
-					placeholder="ابحث عن موظف بالاسم..."
+					placeholder="ابحث عن طالب بالاسم أو الكود..."
 					className="h-9 ps-9 text-xs"
 				/>
 			</div>
 
-			{/* جدول الموظفين القابل للتحديد */}
+			{/* جدول الطلاب القابل للتحديد */}
 			<div className="overflow-hidden rounded-lg border border-border bg-card">
 				<TableDataView
 					table={table}
@@ -328,8 +335,8 @@ export function QuizAssignLearnersStep({ quizId }: { quizId: string }) {
 					pagination={false}
 					onRowClick={(row) => toggle(row.original)}
 					emptyState={{
-						title: "لا يوجد موظفون مطابقون",
-						description: "غيّر البحث أو أضف موظفين للأكاديمية.",
+						title: "لا يوجد طلاب مطابقون",
+						description: "غيّر البحث أو أضف طلابًا إلى النظام.",
 					}}
 				/>
 			</div>

@@ -22,6 +22,7 @@ import {
 import { useMemo, useState } from "react";
 import { TableDataView } from "@/components/common/table-data-view";
 import { TableToolbar } from "@/components/common/table-toolbar";
+import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,8 +47,6 @@ import { useOwners } from "@/features/services/owners/hooks/use-owners";
 import { useUpdateOwner } from "@/features/services/owners/hooks/use-update-owner";
 
 import type { OwnerRelationship, OwnerResponse } from "@/server/owners/owners.type";
-
-const MAX_VISIBLE_PETS = 5;
 
 const STATUSES = [
 	{
@@ -79,33 +78,16 @@ function OwnerAvatar({ name }: { name: string }) {
 }
 
 function PetIcons({ patients }: { patients: OwnerResponse["patients"] }) {
-	const visible = patients.slice(0, MAX_VISIBLE_PETS);
-	const overflow = patients.length - visible.length;
-
-	if (patients.length === 0) {
-		return <span className="text-muted-foreground text-sm">—</span>;
-	}
-
 	return (
-		<div className="flex items-center gap-1.5 flex-wrap">
-			{visible.map((patient) => {
-				return (
-					<div
-						key={patient.id}
-						className="inline-flex items-center gap-1 h-7 px-2 rounded-md bg-primary/10 text-primary text-xs font-medium"
-						title={patient.name}
-					>
-						<IconUser className="size-3.5" />
-						<span className="truncate max-w-[80px]">{patient.name}</span>
-					</div>
-				);
-			})}
-			{overflow > 0 && (
-				<div className="flex items-center justify-center h-7 px-1.5 rounded-md bg-muted text-muted-foreground text-xs font-medium">
-					+{overflow}
-				</div>
-			)}
-		</div>
+		<AvatarCirclesStack
+			items={patients.map((patient) => ({
+				id: patient.id,
+				name: patient.name,
+				title: patient.name,
+			}))}
+			variant="pastel"
+			maxVisible={3}
+		/>
 	);
 }
 

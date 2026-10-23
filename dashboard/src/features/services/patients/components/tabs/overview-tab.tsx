@@ -8,6 +8,8 @@ import {
 	IconMapPin,
 	IconScale,
 	IconSchool,
+	IconShieldCheck,
+	IconUser,
 	IconUsers,
 	IconWeight,
 } from "@tabler/icons-react";
@@ -373,7 +375,10 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 
 			{/* نظرة عامة */}
 			<div className="flex flex-col gap-3">
-				<p className="font-bold text-base">نظرة عامة</p>
+				<div className="flex items-center gap-2 px-1">
+					<IconUser className="size-4 text-blue-600 shrink-0" />
+					<h3 className="text-sm font-bold text-foreground">البيانات الحيوية والأساسية</h3>
+				</div>
 				<div className="grid grid-cols-2 gap-3">
 					<InfoField
 						label="العمر (سنوات)"
@@ -405,7 +410,10 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 
 			{/* المصروفات والخدمات الأكاديمية */}
 			<div className="flex flex-col gap-3">
-				<p className="font-bold text-base">المصروفات والخدمات الأكاديمية</p>
+				<div className="flex items-center gap-2 px-1">
+					<IconSchool className="size-4 text-amber-600 shrink-0" />
+					<h3 className="text-sm font-bold text-foreground">المصروفات والخدمات الأكاديمية</h3>
+				</div>
 				<div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
 					<InfoField
 						label="تفعيل المصروفات"
@@ -517,7 +525,11 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 
 
 			{/* بطاقة وثيقة التأمين */}
-			<div className="flex flex-col gap-2">
+			<div className="flex flex-col gap-3">
+				<div className="flex items-center gap-2 px-1">
+					<IconShieldCheck className="size-4 text-emerald-600 shrink-0" />
+					<h3 className="text-sm font-bold text-foreground">وثيقة التأمين الصحي</h3>
+				</div>
 				<PatientPolicyCard patientId={patient.id} />
 			</div>
 		</TabsContent>

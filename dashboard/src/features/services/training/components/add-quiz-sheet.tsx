@@ -59,7 +59,7 @@ type PublishError = { step: Step; message: string };
 const STEPS: readonly SheetStep[] = [
 	{ step: 1, title: "الإعدادات", icon: IconSettings },
 	{ step: 2, title: "الأسئلة", icon: IconListCheck },
-	{ step: 3, title: "تعيين الموظفين", icon: IconUsers },
+	{ step: 3, title: "تعيين الطلاب", icon: IconUsers },
 ];
 
 // تحويل "" → undefined لحقول رقمية اختيارية (بلا حد) بدل 0 الذي يكسر الحد الأدنى
@@ -522,7 +522,7 @@ export function AddQuizSheet({
 						/>
 					)}
 
-					{/* ===== الخطوة 3: تعيين الموظفين ===== */}
+					{/* ===== الخطوة 3: تعيين الطلاب ===== */}
 					{step === 3 && quizId && (
 						<div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-3 pt-4">
 							<QuizAssignLearnersStep quizId={quizId} />

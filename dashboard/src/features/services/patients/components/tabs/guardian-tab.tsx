@@ -14,6 +14,7 @@ import {
 	IconPhone,
 	IconPhoneCall,
 	IconSchool,
+	IconShieldCheck,
 	IconUserOff,
 	IconUsers,
 } from "@tabler/icons-react";
@@ -422,7 +423,10 @@ export function GuardianTab({
 
 					{/* ── بيانات الاتصال والتواصل ── */}
 					<div className="flex flex-col gap-3">
-						<p className="font-bold text-base">بيانات الاتصال والتواصل</p>
+						<div className="flex items-center gap-2 px-1">
+							<IconPhone className="size-4 text-emerald-600 shrink-0" />
+							<h3 className="text-sm font-bold text-foreground">بيانات الاتصال والتواصل</h3>
+						</div>
 						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
 							{/* الهاتف */}
 							<InfoField
@@ -518,8 +522,11 @@ export function GuardianTab({
 
 					{/* ── جهة الاتصال في حالات الطوارئ ── */}
 					<div className="flex flex-col gap-3">
-						<div className="flex items-center justify-between">
-							<p className="font-bold text-base">جهة الاتصال في حالات الطوارئ</p>
+						<div className="flex items-center justify-between px-1">
+							<div className="flex items-center gap-2">
+								<IconHeartHandshake className="size-4 text-rose-600 shrink-0" />
+								<h3 className="text-sm font-bold text-foreground">جهة الاتصال في حالات الطوارئ</h3>
+							</div>
 							<span className="text-xs text-muted-foreground">
 								للتواصل في الحالات العاجلة عند تعذر الوصول لولي الأمر
 							</span>
@@ -593,13 +600,16 @@ export function GuardianTab({
 
 					{/* ── الطلاب الآخرون لنفس ولي الأمر (الإخوة بالمركز) ── */}
 					<div className="flex flex-col gap-3">
-						<div className="flex items-center gap-2">
-							<p className="font-bold text-base">الطلاب الآخرون لنفس ولي الأمر</p>
-							{siblingPatients.length > 0 && (
-								<span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-									{siblingPatients.length}
-								</span>
-							)}
+						<div className="flex items-center justify-between px-1">
+							<div className="flex items-center gap-2">
+								<IconUsers className="size-4 text-primary shrink-0" />
+								<h3 className="text-sm font-bold text-foreground">الطلاب الآخرون لنفس ولي الأمر</h3>
+								{siblingPatients.length > 0 && (
+									<span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+										{siblingPatients.length}
+									</span>
+								)}
+							</div>
 						</div>
 
 						{siblingPatients.length === 0 ? (
@@ -644,8 +654,11 @@ export function GuardianTab({
 
 					{/* ── ملاحظات ولي الأمر ── */}
 					{patient.owner?.notes && (
-						<div className="flex flex-col gap-2">
-							<p className="font-bold text-base">ملاحظات ولي الأمر</p>
+						<div className="flex flex-col gap-3">
+							<div className="flex items-center gap-2 px-1">
+								<IconFileText className="size-4 text-amber-600 shrink-0" />
+								<h3 className="text-sm font-bold text-foreground">ملاحظات ولي الأمر</h3>
+							</div>
 							<div className="rounded-lg border p-3 text-xs text-foreground bg-card whitespace-pre-wrap leading-relaxed">
 								{patient.owner.notes}
 							</div>
@@ -653,7 +666,11 @@ export function GuardianTab({
 					)}
 
 					{/* ── بطاقة وثيقة التأمين ── */}
-					<div className="flex flex-col gap-2">
+					<div className="flex flex-col gap-3">
+						<div className="flex items-center gap-2 px-1">
+							<IconShieldCheck className="size-4 text-emerald-600 shrink-0" />
+							<h3 className="text-sm font-bold text-foreground">وثيقة التأمين الصحي</h3>
+						</div>
 						<PatientPolicyCard patientId={patient.id} />
 					</div>
 				</>

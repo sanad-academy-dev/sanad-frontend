@@ -21,7 +21,7 @@ export const useEligibleQuizLearners = (quizId: string | null) => {
 			const { data, error } = await api["quiz-assignments"].eligible.get({
 				query: { quizId: quizId as string },
 			});
-			if (error) throw new Error("تعذّر تحميل الموظفين");
+			if (error) throw new Error("تعذّر تحميل الطلاب");
 			return data as EligibleQuizLearnerResponse[];
 		},
 	});
@@ -36,7 +36,7 @@ export const useQuizRoster = (quizId: string | null) => {
 			const { data, error } = await api["quiz-assignments"].get({
 				query: { quizId: quizId as string },
 			});
-			if (error) throw new Error("تعذّر تحميل الموظفين المُعيَّنين");
+			if (error) throw new Error("تعذّر تحميل الطلاب المُعيَّنين");
 			return data as QuizAssignmentResponse[];
 		},
 	});
@@ -69,7 +69,7 @@ export const useQuizAssignmentActions = (quizId: string | null) => {
 				...(window?.startDate ? { startDate: window.startDate } : {}),
 				...(window?.dueDate ? { dueDate: window.dueDate } : {}),
 			});
-			if (error) throw new Error("تعذّر تعيين الموظف");
+			if (error) throw new Error("تعذّر تعيين الطالب");
 		},
 		onMutate: async ({ staff }) => {
 			await qc.cancelQueries({ queryKey: rKey });
@@ -127,7 +127,7 @@ export const useQuizAssignmentActions = (quizId: string | null) => {
 		enrollAll: () =>
 			toast.promise(enrollAll.mutateAsync(), {
 				loading: "جارٍ تسجيل الجميع...",
-				success: "تم تسجيل جميع الموظفين",
+				success: "تم تسجيل جميع الطلاب",
 				error: (e: Error) => e.message,
 			}),
 		isBusy: assign.isPending || unassign.isPending || enrollAll.isPending,

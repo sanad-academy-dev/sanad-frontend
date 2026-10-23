@@ -29,6 +29,11 @@ import { showFeatureLockedToast } from "@/components/common/feature-locked-toast
 import { FiltersMenu } from "@/components/common/filters-menu";
 import { TablePagination } from "@/components/common/table-pagination";
 import { TableToolbar } from "@/components/common/table-toolbar";
+import {
+	ScheduleDateRangeFilter,
+	type ScheduleDateRange,
+	resolveScheduleRange,
+} from "@/components/common/schedule-date-range-filter";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -96,9 +101,13 @@ const STATUS_CELL: Record<string, { label: string; Icon: FC<IconProps> }> = {
 const fmtTime = (iso: string | Date | null) => (iso ? format(new Date(iso), "hh:mm a") : "");
 const fmtTime24 = (iso: string | Date | null) => (iso ? format(new Date(iso), "HH:mm") : "");
 
-// مفتاح اليوم (yyyy-MM-dd) من تاريخ السجل سواء كان نصًا أو كائن Date
-const dayKey = (d: string | Date) =>
-	(typeof d === "string" ? d : d.toISOString()).slice(0, 10);
+// مفتاح اليوم (yyyy-MM-dd) من تاريخ السجل أو المناوبة سواء كان نصًا أو كائن Date
+const dayKey = (d: unknown): string => {
+	if (!d) return "";
+	if (typeof d === "string") return d.slice(0, 10);
+	if (d instanceof Date && !isNaN(d.getTime())) return format(d, "yyyy-MM-dd");
+	return "";
+};
 
 // تصدير كشف الحضور الأسبوعي كملف CSV للطلاب أو الموظفين
 function exportAttendanceWeekCsv({
@@ -234,10 +243,27 @@ function StaffAvatar({ name, isStudent = false }: { name: string; isStudent?: bo
 export function AttendanceView({
 	targetType = "students",
 	studentId,
+	hideNameColumn = false,
+	hideToolbar = false,
+	hideStats = false,
+	hidePagination = false,
+	dateRange: externalDateRange,
+	onDateRangeChange,
+	weekStart: externalWeekStart,
+	onWeekStartChange,
 }: {
 	targetType?: "students" | "staff";
 	studentId?: string;
+	hideNameColumn?: boolean;
+	hideToolbar?: boolean;
+	hideStats?: boolean;
+	hidePagination?: boolean;
+	dateRange?: ScheduleDateRange;
+	onDateRangeChange?: (range: ScheduleDateRange) => void;
+	weekStart?: Date;
+	onWeekStartChange?: (date: Date | ((prev: Date) => Date)) => void;
 }) {
+	const shouldHideName = hideNameColumn || !!studentId;
 	const isStudents = targetType === "students";
 	const { staff, isLoading: isStaffLoading } = useStaff();
 	const { patients, isLoading: isPatientsLoading } = usePatients();
@@ -247,32 +273,50 @@ export function AttendanceView({
 	// وضع الكشك متاح فقط إذا فُعِّل من الإعدادات وله رمز PIN مخزّن
 	const kioskReady = !!clinicInfo?.kioskEnabled && !!clinicInfo?.kioskPin;
 	const [search, setSearch] = useState("");
-	// أسبوع العرض — يبدأ من اليوم الحالي افتراضيًا
-	const [weekStart, setWeekStart] = useState(() =>
-		startOfWeek(new Date(), { weekStartsOn: 0 }),
+
+	// نطاق العرض الموحّد (أسبوع / شهر) — يبدأ من الأسبوع الحالي افتراضياً
+	const [internalDateRange, setInternalDateRange] = useState<ScheduleDateRange>(() => ({
+		mode: "week",
+		date: externalWeekStart ?? new Date(),
+	}));
+	const dateRange = externalDateRange ?? internalDateRange;
+	const setDateRange = (range: ScheduleDateRange) => {
+		if (onDateRangeChange) {
+			onDateRangeChange(range);
+		} else {
+			setInternalDateRange(range);
+		}
+		if (onWeekStartChange) {
+			onWeekStartChange(range.date);
+		}
+	};
+
+	const { start: rangeStart, end: rangeEnd, days, label: weekLabel } = useMemo(
+		() => resolveScheduleRange(dateRange),
+		[dateRange],
 	);
 
-	// أيام الأسبوع السبعة (الأحد → السبت)
-	const days = useMemo(
-		() => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)),
-		[weekStart],
-	);
-
-	// سجلات الحضور للأسبوع المعروض
-	const { records: staffRecords } = useAttendance(weekStart, addDays(weekStart, 6));
-	const { records: studentRecords } = useStudentAttendance(weekStart, addDays(weekStart, 6));
+	// سجلات الحضور للنطاق المعروض (أسبوع أو شهر)
+	const { records: staffRecords } = useAttendance(rangeStart, rangeEnd);
+	const { records: studentRecords } = useStudentAttendance(rangeStart, rangeEnd);
 	const allTargetRecords = isStudents ? studentRecords : staffRecords;
 	const records = useMemo(
-		() => (studentId ? allTargetRecords.filter((r) => r.staffId === studentId) : allTargetRecords),
+		() =>
+			studentId
+				? allTargetRecords.filter((r) => (r.staffId || (r as any).studentId) === studentId)
+				: allTargetRecords,
 		[allTargetRecords, studentId],
 	);
 
-	// تعيينات المناوبات للأسبوع المعروض — لربط الحضور بأيام وساعات العمل المجدولة
-	const { shifts: staffShifts } = useShifts(weekStart, addDays(weekStart, 6));
-	const { shifts: studentShifts } = useStudentShifts(weekStart, addDays(weekStart, 6));
+	// تعيينات المناوبات للنطاق المعروض — لربط الحضور بأيام وساعات العمل المجدولة
+	const { shifts: staffShifts } = useShifts(rangeStart, rangeEnd);
+	const { shifts: studentShifts } = useStudentShifts(rangeStart, rangeEnd);
 	const allTargetShifts = isStudents ? studentShifts : staffShifts;
 	const shifts = useMemo(
-		() => (studentId ? allTargetShifts.filter((s) => s.staffId === studentId) : allTargetShifts),
+		() =>
+			studentId
+				? allTargetShifts.filter((s) => (s.staffId || (s as any).studentId) === studentId)
+				: allTargetShifts,
 		[allTargetShifts, studentId],
 	);
 
@@ -280,9 +324,12 @@ export function AttendanceView({
 	const shiftByCell = useMemo(() => {
 		const map = new Map<string, ShiftAssignmentResponse>();
 		for (const s of shifts) {
-			const dStr =
-				typeof s.date === "string" ? s.date.slice(0, 10) : new Date(s.date).toISOString().slice(0, 10);
-			map.set(`${s.staffId}_${dStr}`, s);
+			if (!s) continue;
+			const id = s.staffId || (s as any).studentId;
+			const dStr = dayKey(s.date);
+			if (id && dStr) {
+				map.set(`${id}_${dStr}`, s);
+			}
 		}
 		return map;
 	}, [shifts]);
@@ -363,7 +410,12 @@ export function AttendanceView({
 	const recordByCell = useMemo(() => {
 		const map = new Map<string, (typeof records)[number]>();
 		for (const r of records) {
-			map.set(`${r.staffId}_${dayKey(r.date)}`, r);
+			if (!r) continue;
+			const id = r.staffId || (r as any).studentId;
+			const dStr = dayKey(r.date);
+			if (id && dStr) {
+				map.set(`${id}_${dStr}`, r);
+			}
 		}
 		return map;
 	}, [records]);
@@ -372,8 +424,11 @@ export function AttendanceView({
 	const dailyTotals = useMemo(() => {
 		const map = new Map<string, number>();
 		for (const r of records) {
+			if (!r) continue;
 			const key = dayKey(r.date);
-			map.set(key, (map.get(key) ?? 0) + r.hours);
+			if (key) {
+				map.set(key, (map.get(key) ?? 0) + (r.hours || 0));
+			}
 		}
 		return map;
 	}, [records]);
@@ -408,12 +463,6 @@ export function AttendanceView({
 	const pagedRows = rows.slice(safePage * pageSize, safePage * pageSize + pageSize);
 	const fromRow = rows.length === 0 ? 0 : safePage * pageSize + 1;
 	const toRow = Math.min((safePage + 1) * pageSize, rows.length);
-
-	const weekLabel = `${format(weekStart, "d", { locale: arSA })} ${format(
-		weekStart,
-		"MMMM yyyy",
-		{ locale: arSA },
-	)}`;
 
 	return (
 		<div
@@ -601,21 +650,169 @@ export function AttendanceView({
 				targetLabel={isStudents ? "الطلاب" : "الموظفين"}
 			/>
 
-			
+			{/* شريط الأدوات */}
+			{!hideToolbar && (
+				<TableToolbar
+					className="border-t"
+					searchPlaceholder={
+						isStudents
+							? "ابحث عن الطالب بالاسم، المعرف..."
+							: "ابحث عن المدرّب بالاسم،المعرف..."
+					}
+					searchValue={search}
+					onSearchChange={setSearch}
+					// نفس ترتيب صفحة الموظفين: [التصفية] [تصدير] بمقاس xs موحّد
+					buttonSize="xs"
+					showFilter={false}
+					showView={false}
+					showExport={false}
+					leftExtra={
+						<>
+							<FiltersMenu groups={filterGroups} />
+							{/* ترتيب DOM في RTL: بعد التصفية فيظهر على يسارها */}
+							<Button
+								type="button"
+								variant="outline"
+								size="xs"
+								onClick={() =>
+									exportAttendanceWeekCsv({
+										rows,
+										days,
+										recordByCell,
+										isStudents,
+									})
+								}
+								disabled={rows.length === 0}
+								className="gap-1.5 px-2"
+							>
+								<IconDownload className="size-3.5" />
+								تصدير
+							</Button>
+							<span className="h-6 w-px bg-[#E5E5E5]" />
+							{/* الفلتر الموحّد للنطاق الزمني (أسبوع / شهر + التقويم) */}
+							<ScheduleDateRangeFilter
+								value={dateRange}
+								onChange={setDateRange}
+							/>
+						</>
+					}
+					actions={
+						<>
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={() => setAlertsOpen(true)}
+								className="h-8 gap-1.5 text-[13px]"
+							>
+								{pendingLeaveCount > 0 && (
+									<span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-[4px] bg-destructive px-1 text-[10px] font-medium text-white">
+										{pendingLeaveCount}
+									</span>
+								)}
+								تنبيهات الأجازات
+								<IconBell className="size-3.5 text-destructive" />
+							</Button>
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={() => {
+									if (!kioskReady) {
+										showFeatureLockedToast({
+											title: "وضع الكشك غير مفعّل",
+											description:
+												"فعّل «تفعيل وضع الكشك» وعيّن رمز PIN من الإعدادات لاستخدام وضع الكشك.",
+										});
+										return;
+									}
+									setKioskOpen(true);
+								}}
+								className="h-8 gap-1.5 text-[11px]"
+							>
+								<IconDeviceDesktop className="size-3.5" />
+								وضع الكشك
+							</Button>
+							<DropdownMenu dir="rtl">
+								<DropdownMenuTrigger asChild>
+									<Button
+										type="button"
+										size="sm"
+										className="h-[30px] gap-1.5 text-xs"
+									>
+										<IconPlus className="size-2.5" />
+										تسجيل
+										<IconChevronDown className="size-3" />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									align="end"
+									className="min-w-[150px] p-[3px]"
+								>
+									{CELL_ACTIONS.map((action, i) => {
+										const ActionIcon = action.icon;
+										return (
+											<DropdownMenuItem
+												key={action.status}
+												onSelect={
+													action.status === "PRESENT"
+														? () => {
+																setPickerIntent("register");
+																setPickerOpen(true);
+															}
+														: action.status === "LEAVE"
+															? () => {
+																	setPickerIntent("leave");
+																	setPickerOpen(true);
+																}
+															: action.status === "ABSENT"
+																? () => {
+																		setPickerIntent("absence");
+																		setPickerOpen(true);
+																	}
+																: action.status === "LATE"
+																	? () => {
+																			setPickerIntent("late");
+																			setPickerOpen(true);
+																		}
+																	: undefined
+												}
+												className={cn(
+													"flex h-6 items-center justify-start gap-1.5 rounded-[4px] px-[9px] text-right text-[10px] font-medium text-[#08090A]",
+													i === 0 && "bg-[#9B9B9D]/[0.11]",
+												)}
+											>
+												<ActionIcon
+													className="size-2.5"
+													style={{ color: action.color }}
+												/>
+												{action.label}
+											</DropdownMenuItem>
+										);
+									})}
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</>
+					}
+				/>
+			)}
+		
 
 			{/* شبكة الحضور الأسبوعية */}
 			<div className="min-h-0 flex-1 overflow-auto bg-white">
 				<table className="w-full border-collapse">
 					<thead className="sticky top-0 z-10 bg-white">
 						<tr>
-							<th className="sticky right-0 z-20 h-[34px] min-w-[180px] border-t border-l border-[#F5F5F6] bg-white px-3">
-								<div className="flex items-center justify-between gap-1">
-									<span className="text-[12px] font-normal text-[#6B6B67]">
-										{isStudents ? "اسم الطالب" : "اسم الموظف"}
-									</span>
-									<IconSortDescending className="size-[15px] text-[#6B6B67]" />
-								</div>
-							</th>
+							{!shouldHideName && (
+								<th className="sticky right-0 z-20 h-[34px] min-w-[180px] border-t border-l border-[#F5F5F6] bg-white px-3">
+									<div className="flex items-center justify-between gap-1">
+										<span className="text-[12px] font-normal text-[#6B6B67]">
+											{isStudents ? "اسم الطالب" : "اسم الموظف"}
+										</span>
+										<IconSortDescending className="size-[15px] text-[#6B6B67]" />
+									</div>
+								</th>
+							)}
 							{days.map((day) => {
 								const today = isToday(day);
 								return (
@@ -654,17 +851,19 @@ export function AttendanceView({
 					<tbody>
 						{pagedRows.map((s) => (
 							<tr key={s.id}>
-								<td className="sticky right-0 z-10 h-[34px] border-t border-l border-[#F5F5F6] bg-white px-3">
-									<div className="flex items-center gap-1.5">
-										<StaffAvatar name={s.name} isStudent={isStudents} />
-										<span
-											dir="rtl"
-											className="truncate text-right text-[12px] text-[#08090A]"
-										>
-											{s.name}
-										</span>
-									</div>
-								</td>
+								{!shouldHideName && (
+									<td className="sticky right-0 z-10 h-[34px] border-t border-l border-[#F5F5F6] bg-white px-3">
+										<div className="flex items-center gap-1.5">
+											<StaffAvatar name={s.name} isStudent={isStudents} />
+											<span
+												dir="rtl"
+												className="truncate text-right text-[12px] text-[#08090A]"
+											>
+												{s.name}
+											</span>
+										</div>
+									</td>
+								)}
 								{days.map((day) => {
 									const dateKey = format(day, "yyyy-MM-dd");
 									const record = recordByCell.get(`${s.id}_${dateKey}`);
@@ -713,7 +912,7 @@ export function AttendanceView({
 									return (
 										<td
 											key={day.toISOString()}
-											className="h-[34px] border-t border-l border-[#F5F5F6] text-center"
+											className="h-[34px] border-t border-l border-[#F5F5F6] p-0 text-center align-middle"
 										>
 											{record && record.status === "PRESENT" && record.checkIn ? (
 												// حاضر (يمين) | فاصل | انصراف أو زر إضافة (يسار) + شارة المناوبة
@@ -820,14 +1019,17 @@ export function AttendanceView({
 															<span className="opacity-80 tabular-nums">({shift.hours || 8}س)</span>
 														</button>
 													) : (
-														// عطلة / لا توجد مناوبة عمل
+														// عطلة / لا توجد مناوبة عمل — نمط خطوط مائلة مطابق للتصميم
 														<button
 															type="button"
-															className="mx-auto flex h-[18px] items-center justify-center gap-1 rounded-[4px] px-1 text-[9px] text-[#A1A1AA] hover:bg-muted/60 hover:text-[#08090A]"
+															className="flex h-[34px] w-full items-center justify-center transition-colors hover:bg-black/[0.03]"
+															style={{
+																backgroundImage:
+																	"repeating-linear-gradient(-25deg, transparent, transparent 5px, rgba(161, 161, 170, 0.35) 5px, rgba(161, 161, 170, 0.35) 6px)",
+															}}
 															title="عطلة / لا توجد مناوبة — انقر للجدولة أو التسجيل"
-														>
-															<span className="opacity-70">— عطلة —</span>
-														</button>
+															aria-label="عطلة / لا توجد مناوبة"
+														/>
 													)}
 												</CellActionsMenu>
 											)}
@@ -839,7 +1041,7 @@ export function AttendanceView({
 						{!isLoading && rows.length === 0 && (
 							<tr>
 								<td
-									colSpan={days.length + 1}
+									colSpan={days.length + (shouldHideName ? 0 : 1)}
 									className="py-12 text-center text-sm text-muted-foreground"
 								>
 									{isStudents ? "لا يوجد طلاب لعرض حضورهم" : "لا يوجد موظفين لعرض حضورهم"}
@@ -849,9 +1051,11 @@ export function AttendanceView({
 					</tbody>
 					<tfoot>
 						<tr>
-							<td className="sticky right-0 z-10 h-[34px] border-t border-l border-[#F5F5F6] bg-white px-3 text-right text-[12px] text-[#6B6B67]">
-								الاجمالي
-							</td>
+							{!shouldHideName && (
+								<td className="sticky right-0 z-10 h-[34px] border-t border-l border-[#F5F5F6] bg-white px-3 text-right text-[12px] text-[#6B6B67]">
+									الاجمالي
+								</td>
+							)}
 							{days.map((day) => {
 								const total = dailyTotals.get(format(day, "yyyy-MM-dd")) ?? 0;
 								return (
@@ -893,16 +1097,18 @@ export function AttendanceView({
 				})}
 			</div>
 
-			<TablePagination
-				page={safePage}
-				pageCount={pageCount}
-				pageSize={pageSize}
-				totalRows={rows.length}
-				fromRow={fromRow}
-				toRow={toRow}
-				onPageChange={setPageIndex}
-				onPageSizeChange={setPageSize}
-			/>
+			{!hidePagination && (!studentId || rows.length > pageSize) && (
+				<TablePagination
+					page={safePage}
+					pageCount={pageCount}
+					pageSize={pageSize}
+					totalRows={rows.length}
+					fromRow={fromRow}
+					toRow={toRow}
+					onPageChange={setPageIndex}
+					onPageSizeChange={setPageSize}
+				/>
+			)}
 		</div>
 	);
 }
