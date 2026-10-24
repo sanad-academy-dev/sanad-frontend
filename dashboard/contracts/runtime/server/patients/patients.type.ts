@@ -142,6 +142,8 @@ export type PatientResponse = {
 		address?: string | null;
 		city?: string | null;
 		country?: string | null;
+		emergencyContactName?: string | null;
+		emergencyContactPhone?: string | null;
 		notes?: string | null;
 		active?: boolean;
 		createdAt?: Date | string;
@@ -161,6 +163,8 @@ export type PatientResponse = {
 			address?: string | null;
 			city?: string | null;
 			country?: string | null;
+			emergencyContactName?: string | null;
+			emergencyContactPhone?: string | null;
 			notes?: string | null;
 			active?: boolean;
 			createdAt?: Date | string;

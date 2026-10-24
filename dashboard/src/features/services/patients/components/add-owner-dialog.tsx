@@ -247,6 +247,54 @@ export function AddOwnerDialog({ open, onClose, onSuccess }: AddOwnerDialogProps
 						</Field>
 					</div>
 
+					<div className="grid grid-cols-2 gap-3">
+						<div className="flex flex-col gap-1.5">
+							<Label
+								className="text-sm font-medium"
+								htmlFor="owner-emergency-name"
+							>
+								اسم جهة الطوارئ
+							</Label>
+							<Field data-invalid={!!errors.emergencyContactName}>
+								<Input
+									id="owner-emergency-name"
+									placeholder="مثال: الجدة - فاطمة"
+									className="text-sm"
+									disabled={isPending}
+									{...register("emergencyContactName")}
+								/>
+								<FieldError errors={[errors.emergencyContactName]} />
+							</Field>
+						</div>
+
+						<div className="flex flex-col gap-1.5">
+							<Label
+								className="text-sm font-medium"
+								htmlFor="owner-emergency-phone"
+							>
+								رقم هاتف الطوارئ
+							</Label>
+							<Field data-invalid={!!errors.emergencyContactPhone}>
+								<Controller
+									name="emergencyContactPhone"
+									control={control}
+									render={({ field }) => (
+										<PhoneInput
+											id="owner-emergency-phone"
+											defaultCountry="SA"
+											placeholder="05XXXXXXXX"
+											aria-invalid={!!errors.emergencyContactPhone}
+											disabled={isPending}
+											value={field.value ?? undefined}
+											onChange={(v) => field.onChange(v ?? "")}
+										/>
+									)}
+								/>
+								<FieldError errors={[errors.emergencyContactPhone]} />
+							</Field>
+						</div>
+					</div>
+
 					<div className="flex flex-col gap-1.5">
 						<Label
 							className="text-sm font-medium"

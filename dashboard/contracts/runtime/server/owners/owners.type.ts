@@ -15,6 +15,8 @@ export const createOwnerSchema = z.object({
 	country: z.string().optional(),
 	city: z.string().optional(),
 	address: z.string().optional(),
+	emergencyContactName: z.string().optional(),
+	emergencyContactPhone: z.string().optional(),
 	notes: z.string().optional(),
 	active: z.boolean(),
 	patientIds: z.array(z.string()).optional(),
@@ -34,6 +36,8 @@ export type CreateOwnerInput = Pick<
 	| "country"
 	| "city"
 	| "address"
+	| "emergencyContactName"
+	| "emergencyContactPhone"
 	| "notes"
 	| "active"
 > & { patientIds?: string[] };
@@ -49,6 +53,8 @@ export type UpdateOwnerInput = Partial<
 		| "country"
 		| "city"
 		| "address"
+		| "emergencyContactName"
+		| "emergencyContactPhone"
 		| "notes"
 		| "active"
 	>
@@ -70,6 +76,8 @@ export type OwnerResponse = Prisma.OwnerGetPayload<{
 		country: true;
 		city: true;
 		address: true;
+		emergencyContactName: true;
+		emergencyContactPhone: true;
 		notes: true;
 		active: true;
 		editsCount: true;

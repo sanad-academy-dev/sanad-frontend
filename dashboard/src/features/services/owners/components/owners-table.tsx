@@ -9,8 +9,8 @@ import {
 	IconPhone,
 	IconPlus,
 	IconTrash,
-	IconUser,
 } from "@tabler/icons-react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
 	type ColumnDef,
 	getCoreRowModel,
@@ -23,7 +23,6 @@ import { useMemo, useState } from "react";
 import { TableDataView } from "@/components/common/table-data-view";
 import { TableToolbar } from "@/components/common/table-toolbar";
 import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -45,6 +44,7 @@ import { OwnerSheet } from "@/features/services/owners/components/owner-sheet";
 import { PortalPasswordDialog } from "@/features/services/owners/components/portal-password-dialog";
 import { useOwners } from "@/features/services/owners/hooks/use-owners";
 import { useUpdateOwner } from "@/features/services/owners/hooks/use-update-owner";
+import { cn } from "@/lib/utils";
 
 import type { OwnerRelationship, OwnerResponse } from "@/server/owners/owners.type";
 
@@ -65,19 +65,23 @@ const STATUSES = [
 
 function OwnerAvatar({ name }: { name: string }) {
 	const initials = name
-		.split(" ")
+		.trim()
+		.split(/\s+/)
 		.slice(0, 2)
 		.map((w) => w[0])
 		.join("")
 		.toUpperCase();
 	return (
-		<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-semibold border border-primary/20">
-			{initials}
+		<div className="flex size-7.5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary border border-primary/20 text-[11px] font-bold">
+			{initials || "؟"}
 		</div>
 	);
 }
 
 function PetIcons({ patients }: { patients: OwnerResponse["patients"] }) {
+	if (!patients || patients.length === 0) {
+		return <span className="text-[11px] text-muted-foreground">—</span>;
+	}
 	return (
 		<AvatarCirclesStack
 			items={patients.map((patient) => ({
@@ -85,7 +89,7 @@ function PetIcons({ patients }: { patients: OwnerResponse["patients"] }) {
 				name: patient.name,
 				title: patient.name,
 			}))}
-			variant="pastel"
+			variant="mauve"
 			maxVisible={3}
 		/>
 	);
@@ -108,7 +112,14 @@ function StatusSelect({
 			dir="rtl"
 			disabled={disabled}
 		>
-			<SelectTrigger className="h-7 text-xs w-28 border-dashed text-right">
+			<SelectTrigger
+				className={cn(
+					"h-6.5 text-[11px] w-24 border-dashed font-medium text-right",
+					active
+						? "border-emerald-200 bg-emerald-50/40 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/20 dark:text-emerald-300"
+						: "border-slate-200 bg-slate-50/40 text-muted-foreground dark:border-slate-800 dark:bg-slate-900/20",
+				)}
+			>
 				<SelectValue />
 			</SelectTrigger>
 			<SelectContent dir="rtl">
@@ -116,13 +127,14 @@ function StatusSelect({
 					<SelectItem
 						key={s.value}
 						value={s.value}
+						className="text-xs"
 					>
 						{s.value === "active" ? (
-							<span className="text-emerald-600">{s.label}</span>
+							<span className="text-emerald-600 dark:text-emerald-400 font-medium">{s.label}</span>
 						) : s.value === "blocked" ? (
-							<span className="text-red-600">{s.label}</span>
+							<span className="text-rose-600 dark:text-rose-400 font-medium">{s.label}</span>
 						) : (
-							s.label
+							<span className="text-muted-foreground">{s.label}</span>
 						)}
 					</SelectItem>
 				))}
@@ -135,37 +147,51 @@ const RELATIONSHIP_CONFIG: Record<
 	NonNullable<OwnerRelationship>,
 	{ label: string; className: string }
 > = {
-	OWNER: { label: "وليّ أمر", className: "bg-blue-100 text-blue-700" },
-	GUARDIAN: { label: "وصي", className: "bg-purple-100 text-purple-700" },
-	DELEGATE: { label: "مفوض", className: "bg-amber-100 text-amber-700" },
-	EMERGENCY: { label: "جهة اتصال للطوارئ", className: "bg-red-100 text-red-700" },
+	OWNER: {
+		label: "وليّ أمر",
+		className: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900",
+	},
+	GUARDIAN: {
+		label: "وصي",
+		className: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-900",
+	},
+	DELEGATE: {
+		label: "مفوض",
+		className: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900",
+	},
+	EMERGENCY: {
+		label: "طوارئ",
+		className: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900",
+	},
 };
 
 function RelationshipBadge({ value }: { value: OwnerRelationship | null }) {
-	if (!value) return <span className="text-muted-foreground text-sm">—</span>;
+	if (!value) return <span className="text-muted-foreground text-[11px]">—</span>;
 	const config = RELATIONSHIP_CONFIG[value];
 	return (
-		<Badge
-			className={config.className}
-			variant="secondary"
+		<span
+			className={cn(
+				"inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border",
+				config?.className ?? "bg-slate-50 text-slate-700 border-slate-200",
+			)}
 		>
-			{config.label}
-		</Badge>
+			{config?.label ?? value}
+		</span>
 	);
 }
 
 function RegistrationBadge() {
 	return (
-		<p className="flex items-center gap-1 text-sm">
-			<IconCircleX className="size-4 text-red-500" />
-			<span className="text-red-500">غير مفعل</span>
-		</p>
+		<span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-medium bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-900">
+			<IconCircleX className="size-3 shrink-0" />
+			<span>غير مفعّل</span>
+		</span>
 	);
 }
 
 export function OwnersTable() {
+	const navigate = useNavigate();
 	const [sheetOpen, setSheetOpen] = useState(false);
-	const [viewingOwner, setViewingOwner] = useState<OwnerResponse | null>(null);
 	const [editingOwner, setEditingOwner] = useState<OwnerResponse | null>(null);
 	const [deletingOwner, setDeletingOwner] = useState<OwnerResponse | null>(null);
 	const [portalOwner, setPortalOwner] = useState<OwnerResponse | null>(null);
@@ -177,13 +203,23 @@ export function OwnersTable() {
 		() => [
 			{
 				accessorKey: "name",
-				header: "العميل / المعرف",
+				header: "ولي الأمر",
+				size: 190,
+				minSize: 170,
 				cell: ({ row }) => (
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-2.5 min-w-[170px]">
 						<OwnerAvatar name={row.original.name} />
-						<div className="flex flex-col">
-							<span className="font-semibold text-sm">{row.original.name}</span>
-							<span className="text-xs text-muted-foreground tabular-nums">
+						<div className="flex flex-col min-w-0">
+							<Link
+								to="/services/owners/$ownerId"
+								params={{ ownerId: row.original.id }}
+								className="font-semibold text-xs text-foreground hover:underline truncate"
+								onClick={(e) => e.stopPropagation()}
+								title={row.original.name}
+							>
+								{row.original.name}
+							</Link>
+							<span className="font-mono text-[10px] text-muted-foreground tabular-nums">
 								{row.original.code}
 							</span>
 						</div>
@@ -192,49 +228,63 @@ export function OwnersTable() {
 			},
 			{
 				accessorKey: "email",
-				header: "الهاتف / البريد الإلكتروني",
+				header: "الهاتف / البريد",
+				size: 180,
+				minSize: 160,
 				cell: ({ row }) => (
 					<div className="flex flex-col gap-0.5">
 						{row.original.phone ? (
-							<span className="text-sm tabular-nums flex items-center gap-1.5">
+							<span className="text-xs font-mono tabular-nums flex items-center gap-1.5 text-foreground">
 								<IconPhone className="size-3 text-muted-foreground shrink-0" />
 								{row.original.phone}
 							</span>
 						) : (
-							<span className="text-muted-foreground text-sm flex items-center gap-1.5">
+							<span className="text-muted-foreground text-xs flex items-center gap-1.5">
 								<IconPhone className="size-3 shrink-0" />—
 							</span>
 						)}
-						<span className="text-xs text-muted-foreground flex items-center gap-1.5 max-w-[160px]">
-							<IconMail className="size-3 shrink-0" />
-							<span className="truncate">{row.original.email}</span>
-						</span>
+						{row.original.email ? (
+							<span className="text-[11px] text-muted-foreground flex items-center gap-1.5 max-w-[160px]">
+								<IconMail className="size-3 shrink-0" />
+								<span className="truncate">{row.original.email}</span>
+							</span>
+						) : null}
 					</div>
 				),
 			},
 			{
 				accessorKey: "patients",
 				header: "الطلاب",
+				size: 110,
+				minSize: 95,
 				cell: ({ row }) => <PetIcons patients={row.original.patients} />,
 			},
 			{
 				accessorKey: "relationship",
-				header: "العلاقة",
+				header: "صلة القرابة",
+				size: 100,
+				minSize: 85,
 				cell: ({ row }) => <RelationshipBadge value={row.original.relationship} />,
 			},
 			{
 				id: "spending",
 				header: "الإنفاق",
-				cell: () => <span className="text-sm tabular-nums text-muted-foreground">٠٠ رس</span>,
+				size: 90,
+				minSize: 80,
+				cell: () => <span className="text-xs font-mono tabular-nums text-muted-foreground">0.00 ر.س</span>,
 			},
 			{
 				id: "appointments",
 				header: "عدد الزيارات",
-				cell: () => <span className="text-sm tabular-nums text-muted-foreground">0</span>,
+				size: 85,
+				minSize: 75,
+				cell: () => <span className="text-xs font-mono tabular-nums text-muted-foreground">0</span>,
 			},
 			{
 				accessorKey: "active",
 				header: "الحالة",
+				size: 105,
+				minSize: 95,
 				cell: ({ row }) => (
 					// biome-ignore lint/a11y/noStaticElementInteractions: حارس انتشار فقط لإيقاف فتح الصف
 					// biome-ignore lint/a11y/useKeyWithClickEvents: حارس انتشار فقط؛ عنصر التحكم داخله قابل للوصول بلوحة المفاتيح
@@ -256,55 +306,61 @@ export function OwnersTable() {
 			{
 				id: "registrationStatus",
 				header: "حالة التسجيل",
+				size: 95,
+				minSize: 85,
 				cell: () => <RegistrationBadge />,
 			},
 			{
 				id: "actions",
 				header: "",
+				size: 40,
+				minSize: 35,
 				cell: ({ row }) => (
 					// biome-ignore lint/a11y/noStaticElementInteractions: حارس انتشار فقط لإيقاف فتح الصف
 					// biome-ignore lint/a11y/useKeyWithClickEvents: حارس انتشار فقط؛ عناصر القائمة قابلة للوصول بلوحة المفاتيح
-					<div onClick={(e) => e.stopPropagation()}>
+					<div
+						className="flex items-center justify-center"
+						onClick={(e) => e.stopPropagation()}
+					>
 						<DropdownMenu dir="rtl">
 							<DropdownMenuTrigger asChild>
 								<Button
 									variant="ghost"
 									size="icon"
-									className="size-8"
+									className="size-6 text-muted-foreground hover:text-foreground"
 								>
-									<IconDots className="size-4" />
+									<IconDots className="size-3.5" />
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="start">
 								<DropdownMenuItem
-									className="gap-2"
-									onSelect={() => setViewingOwner(row.original)}
+									className="gap-2 text-xs"
+									onSelect={() => {
+										navigate({
+											to: "/services/owners/$ownerId",
+											params: { ownerId: row.original.id },
+										});
+									}}
 								>
 									<IconEye className="size-4" />
 									فتح
 								</DropdownMenuItem>
 								<DropdownMenuItem
-									className="gap-2"
+									className="gap-2 text-xs"
 									onSelect={() => setEditingOwner(row.original)}
 								>
 									<IconEdit className="size-4" />
 									تعديل
 								</DropdownMenuItem>
 								<DropdownMenuItem
-									className="gap-2"
+									className="gap-2 text-xs"
 									onSelect={() => setDisablingOwner(row.original)}
 								>
 									<IconBan className="size-4" />
 									تعطيل
 								</DropdownMenuItem>
-								{/*
-								 * [PP1] اعتمادات التطبيق.
-								 *
-								 * موضعها هنا لا في نموذج التعديل: هذا **فعل** يولّد سرًّا لمرّة
-								 * واحدة، لا حقلٌ يُحرَّر ويُحفظ مع بقيّة البيانات.
-								 */}
 								<DropdownMenuItem
-									className="gap-2"
+									className="gap-2 text-xs"
 									onSelect={() => setPortalOwner(row.original)}
 								>
 									<IconDeviceMobile className="size-4" />
@@ -312,7 +368,7 @@ export function OwnersTable() {
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem
-									className="text-destructive gap-2"
+									className="text-destructive gap-2 text-xs"
 									onSelect={() => setDeletingOwner(row.original)}
 								>
 									<IconTrash className="size-4" />
@@ -324,7 +380,7 @@ export function OwnersTable() {
 				),
 			},
 		],
-		[isUpdating, updateOwner],
+		[isUpdating, updateOwner, navigate],
 	);
 
 	const table = useReactTable({
@@ -342,12 +398,6 @@ export function OwnersTable() {
 			<OwnerSheet
 				open={sheetOpen}
 				onClose={() => setSheetOpen(false)}
-			/>
-			<OwnerSheet
-				open={!!viewingOwner}
-				onClose={() => setViewingOwner(null)}
-				owner={viewingOwner}
-				readOnly
 			/>
 			<OwnerSheet
 				open={!!editingOwner}
@@ -372,7 +422,7 @@ export function OwnersTable() {
 			<div className="flex min-h-0 flex-1 flex-col">
 				<TableToolbar
 					className="border-t"
-					searchPlaceholder="ابحث باسم وليّ الأمر..."
+					searchPlaceholder="ابحث باسم وليّ الأمر أو رقم الهاتف..."
 					searchValue={(table.getState().globalFilter as string) ?? ""}
 					onSearchChange={(v) => table.setGlobalFilter(v)}
 					actions={
@@ -380,7 +430,7 @@ export function OwnersTable() {
 							size="sm"
 							onClick={() => setSheetOpen(true)}
 						>
-							<IconPlus />
+							<IconPlus className="size-4" />
 							إضافة وليّ أمر جديد
 						</Button>
 					}
@@ -390,7 +440,13 @@ export function OwnersTable() {
 					table={table}
 					columns={columns}
 					isPending={isLoading}
-					onRowClick={(row) => setViewingOwner(row.original)}
+					tableClassName="w-full min-w-[1000px]"
+					onRowClick={(row) => {
+						navigate({
+							to: "/services/owners/$ownerId",
+							params: { ownerId: row.original.id },
+						});
+					}}
 					emptyState={{
 						title: "لا يوجد أولياء أمور حتى الآن",
 						description: "سجّل أولياء الأمور لتتمكن من ربطهم بالطلاب ومتابعة زياراتهم",

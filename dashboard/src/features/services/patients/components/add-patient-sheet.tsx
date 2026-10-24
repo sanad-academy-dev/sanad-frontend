@@ -125,8 +125,6 @@ export function AddPatientSheet({
 				guardianPhone: patient.guardianPhone || patient.owner?.phone || "",
 				guardianEmail: patient.guardianEmail || patient.owner?.email || "",
 				guardianRelationship: primaryRel,
-				emergencyContactName: patient.emergencyContactName ?? "",
-				emergencyContactPhone: patient.emergencyContactPhone ?? "",
 				pocketMoneyEnabled: patient.pocketMoneyEnabled !== false,
 				transportation: patient.transportation ?? "",
 				feeType: patient.feeType ?? "",

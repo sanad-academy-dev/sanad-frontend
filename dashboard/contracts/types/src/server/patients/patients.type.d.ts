@@ -64,6 +64,8 @@ export type PatientResponse = Prisma.PatientGetPayload<{
                 name: true;
                 phone: true;
                 email: true;
+                emergencyContactName: true;
+                emergencyContactPhone: true;
             };
         };
         animalType: {

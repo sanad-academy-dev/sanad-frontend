@@ -103,6 +103,8 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 					country: owner.country ?? undefined,
 					city: owner.city ?? undefined,
 					address: owner.address ?? undefined,
+					emergencyContactName: owner.emergencyContactName ?? undefined,
+					emergencyContactPhone: owner.emergencyContactPhone ?? undefined,
 					notes: owner.notes ?? undefined,
 					active: owner.active,
 					patientIds: owner.patients.map((p) => p.id),
@@ -122,6 +124,8 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 				country: owner.country ?? undefined,
 				city: owner.city ?? undefined,
 				address: owner.address ?? undefined,
+				emergencyContactName: owner.emergencyContactName ?? undefined,
+				emergencyContactPhone: owner.emergencyContactPhone ?? undefined,
 				notes: owner.notes ?? undefined,
 				active: owner.active,
 				patientIds: owner.patients.map((p) => p.id),
@@ -143,6 +147,8 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 		values.country?.trim() ? "country" : null,
 		values.city?.trim() ? "city" : null,
 		values.address?.trim() ? "address" : null,
+		values.emergencyContactName?.trim() ? "emergencyContactName" : null,
+		values.emergencyContactPhone?.trim() ? "emergencyContactPhone" : null,
 		values.notes?.trim() ? "notes" : null,
 	].filter((f): f is string => f !== null);
 
@@ -587,6 +593,54 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 								/>
 								<FieldError errors={[errors.address]} />
 							</Field>
+						</div>
+
+						<div className="grid grid-cols-2 gap-3">
+							<div className="flex flex-col gap-1.5">
+								<Label
+									className="text-sm font-medium"
+									htmlFor="owner-sheet-emergency-name"
+								>
+									اسم جهة الطوارئ
+								</Label>
+								<Field data-invalid={!!errors.emergencyContactName}>
+									<Input
+										id="owner-sheet-emergency-name"
+										placeholder="مثال: الجدة - فاطمة"
+										className="text-sm"
+										disabled={isPending || readOnly}
+										{...register("emergencyContactName")}
+									/>
+									<FieldError errors={[errors.emergencyContactName]} />
+								</Field>
+							</div>
+
+							<div className="flex flex-col gap-1.5">
+								<Label
+									className="text-sm font-medium"
+									htmlFor="owner-sheet-emergency-phone"
+								>
+									رقم هاتف الطوارئ
+								</Label>
+								<Field data-invalid={!!errors.emergencyContactPhone}>
+									<Controller
+										name="emergencyContactPhone"
+										control={control}
+										render={({ field }) => (
+											<PhoneInput
+												id="owner-sheet-emergency-phone"
+												defaultCountry="SA"
+												placeholder="05XXXXXXXX"
+												aria-invalid={!!errors.emergencyContactPhone}
+												disabled={isPending || readOnly}
+												value={field.value ?? undefined}
+												onChange={(v) => field.onChange(v ?? "")}
+											/>
+										)}
+									/>
+									<FieldError errors={[errors.emergencyContactPhone]} />
+								</Field>
+							</div>
 						</div>
 
 						<div className="flex flex-col gap-1.5">

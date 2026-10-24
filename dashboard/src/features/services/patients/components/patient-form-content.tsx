@@ -760,45 +760,6 @@ export function PatientFormContent({
 						</div>
 					);
 				})()}
-
-				{/* رقم الطوارئ */}
-				<div className="flex flex-col gap-1.5">
-					<FieldLabel info="رقم هاتف بديل يُتصل به في الحالات الطارئة">
-						<Label
-							className="text-sm font-medium"
-							htmlFor={`${idPrefix}-emergency-phone`}
-						>
-							رقم الطوارئ
-						</Label>
-					</FieldLabel>
-					<Input
-						id={`${idPrefix}-emergency-phone`}
-						type="tel"
-						placeholder="05xxxxxxxx"
-						className="text-sm font-mono text-right"
-						disabled={isPending || readOnly}
-						{...register("emergencyContactPhone")}
-					/>
-				</div>
-
-				{/* اسم جهة الطوارئ */}
-				<div className="flex flex-col gap-1.5">
-					<FieldLabel>
-						<Label
-							className="text-sm font-medium"
-							htmlFor={`${idPrefix}-emergency-name`}
-						>
-							اسم جهة الطوارئ
-						</Label>
-					</FieldLabel>
-					<Input
-						id={`${idPrefix}-emergency-name`}
-						placeholder="مثال: الجدة - فاطمة"
-						className="text-sm"
-						disabled={isPending || readOnly}
-						{...register("emergencyContactName")}
-					/>
-				</div>
 			</div>
 
 			{/* ── 3. معلومات طبية ── */}

@@ -27,15 +27,17 @@ export declare const createOwnerSchema: z.ZodObject<{
     country: z.ZodOptional<z.ZodString>;
     city: z.ZodOptional<z.ZodString>;
     address: z.ZodOptional<z.ZodString>;
+    emergencyContactName: z.ZodOptional<z.ZodString>;
+    emergencyContactPhone: z.ZodOptional<z.ZodString>;
     notes: z.ZodOptional<z.ZodString>;
     active: z.ZodBoolean;
     patientIds: z.ZodOptional<z.ZodArray<z.ZodString>>;
 }, z.core.$strip>;
 export type CreateOwnerFormInput = z.infer<typeof createOwnerSchema>;
-export type CreateOwnerInput = Pick<Prisma.OwnerUncheckedCreateInput, "clinicId" | "name" | "phone" | "email" | "gender" | "ownerType" | "relationship" | "country" | "city" | "address" | "notes" | "active"> & {
+export type CreateOwnerInput = Pick<Prisma.OwnerUncheckedCreateInput, "clinicId" | "name" | "phone" | "email" | "gender" | "ownerType" | "relationship" | "country" | "city" | "address" | "emergencyContactName" | "emergencyContactPhone" | "notes" | "active"> & {
     patientIds?: string[];
 };
-export type UpdateOwnerInput = Partial<Pick<Prisma.OwnerUncheckedCreateInput, "name" | "phone" | "gender" | "ownerType" | "relationship" | "country" | "city" | "address" | "notes" | "active">> & {
+export type UpdateOwnerInput = Partial<Pick<Prisma.OwnerUncheckedCreateInput, "name" | "phone" | "gender" | "ownerType" | "relationship" | "country" | "city" | "address" | "emergencyContactName" | "emergencyContactPhone" | "notes" | "active">> & {
     patientIds?: string[];
 };
 export type DisableOwnerInput = {
@@ -57,6 +59,8 @@ export type OwnerResponse = Prisma.OwnerGetPayload<{
         country: true;
         city: true;
         address: true;
+        emergencyContactName: true;
+        emergencyContactPhone: true;
         notes: true;
         active: true;
         editsCount: true;

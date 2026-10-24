@@ -10,5 +10,7 @@ export const OWNER_FIELD_LABELS: Record<string, string> = {
 	country: "الدولة",
 	city: "المدينة",
 	address: "العنوان",
+	emergencyContactName: "اسم جهة الطوارئ",
+	emergencyContactPhone: "رقم هاتف الطوارئ",
 	notes: "ملاحظات",
 };

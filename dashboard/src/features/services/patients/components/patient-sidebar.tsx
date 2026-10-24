@@ -164,13 +164,20 @@ export function PatientSidebar({ patient, onEdit, onNavigateTab }: PatientSideba
 		return "طبيعي";
 	}, [patient.developmentStatus]);
 
-	// جهة ورقم الطوارئ
+	// جهة ورقم الطوارئ (المسجلة لوليّ الأمر أو للطالب كخيار احتياطي)
 	const emergencyContactText = useMemo(() => {
-		if (patient.emergencyContactName && patient.emergencyContactPhone) {
-			return `${patient.emergencyContactName} (${patient.emergencyContactPhone})`;
+		const name = patient.owner?.emergencyContactName || patient.emergencyContactName;
+		const phone = patient.owner?.emergencyContactPhone || patient.emergencyContactPhone;
+		if (name && phone) {
+			return `${name} (${phone})`;
 		}
-		return patient.emergencyContactName || patient.emergencyContactPhone || "—";
-	}, [patient.emergencyContactName, patient.emergencyContactPhone]);
+		return name || phone || "—";
+	}, [
+		patient.owner?.emergencyContactName,
+		patient.owner?.emergencyContactPhone,
+		patient.emergencyContactName,
+		patient.emergencyContactPhone,
+	]);
 
 	return (
 		<aside

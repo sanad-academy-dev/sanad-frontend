@@ -80,8 +80,6 @@ export const INITIAL_PATIENT_FORM_VALUES = {
 	guardianPhone: "",
 	guardianEmail: "",
 	guardianRelationship: "FATHER",
-	emergencyContactName: "",
-	emergencyContactPhone: "",
 	pocketMoneyEnabled: true,
 	transportation: "",
 	feeType: "",
@@ -139,8 +137,6 @@ export function getPatientFilledFields(values: Record<string, unknown>): string[
 		str(values.guardianName) ? "guardianName" : null,
 		str(values.guardianPhone) ? "guardianPhone" : null,
 		str(values.guardianEmail) ? "guardianEmail" : null,
-		str(values.emergencyContactPhone) ? "emergencyContactPhone" : null,
-		str(values.emergencyContactName) ? "emergencyContactName" : null,
 		str(values.address) ? "address" : null,
 		values.allergies && values.allergies !== "لا يوجد" ? "allergies" : null,
 		values.healthConditions && values.healthConditions !== "لا يوجد"

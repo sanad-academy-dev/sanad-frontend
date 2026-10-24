@@ -6,7 +6,7 @@ import type { PatientResponse } from "@sanad/contracts/runtime/server/patients/p
 const EMPTY_PATIENTS: PatientResponse[] = [];
 
 export const usePatients = () => {
-	const { data, isLoading } = useQuery<PatientResponse[]>({
+	const { data, isLoading, refetch } = useQuery<PatientResponse[]>({
 		queryKey: ["patients"],
 		queryFn: async () => {
 			const res = await api.patients.get();
@@ -16,5 +16,5 @@ export const usePatients = () => {
 		staleTime: 1000 * 60 * 5,
 	});
 
-	return { patients: data ?? EMPTY_PATIENTS, isLoading };
+	return { patients: data ?? EMPTY_PATIENTS, isLoading, refetch };
 };
