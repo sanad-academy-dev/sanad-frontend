@@ -105,8 +105,6 @@ function RouteComponent() {
 					clinicName={clinicInfo?.name ?? "الأكاديمية"}
 					search={q}
 					onSearchChange={(value) => setSearch({ q: value })}
-					species={species}
-					onSpeciesChange={(value) => setSearch({ species: value })}
 					onAdminister={openAdminister}
 				/>
 			)}

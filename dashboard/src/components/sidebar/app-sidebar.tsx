@@ -18,6 +18,7 @@ import {
   IconPill,
   IconReportAnalytics,
   IconScissors,
+  IconSchool,
   IconSettings,
   IconSpeakerphone,
   IconStethoscope,
@@ -185,6 +186,12 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                   url: "/services/owners",
                   icon: <IconUsers className="size-[14px]" />,
                   isActive: isActive("/services/owners"),
+                },
+                {
+                  title: t("sidebar.items.classrooms"),
+                  url: "/services/classrooms",
+                  icon: <IconSchool className="size-[14px]" />,
+                  isActive: isActive("/services/classrooms"),
                 },
               ]
             : []),
