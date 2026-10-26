@@ -272,20 +272,20 @@ export function StaffSchedulingPopover({
 				<button
 					type="button"
 					className={cn(
-						"inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium cursor-pointer transition-all border shadow-2xs",
+						"inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium cursor-pointer transition-all border shadow-2xs",
 						isConfigured
-							? "bg-emerald-50 text-emerald-700 border-emerald-200/70 hover:bg-emerald-100/80"
-							: "bg-rose-50 text-rose-700 border-rose-200/70 hover:bg-rose-100/80",
+							? "bg-emerald-50 text-emerald-700 border-emerald-200/70 hover:bg-emerald-100/80 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900"
+							: "bg-rose-50 text-rose-700 border-rose-200/70 hover:bg-rose-100/80 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900",
 					)}
 				>
 					{isConfigured ? (
 						<>
-							<IconCircleCheck className="size-3.5 text-emerald-600" />
+							<IconCircleCheck className="size-3 text-emerald-600 dark:text-emerald-400" />
 							<span>تم الإعداد</span>
 						</>
 					) : (
 						<>
-							<IconCircleX className="size-3.5 text-rose-600" />
+							<IconCircleX className="size-3 text-rose-600 dark:text-rose-400" />
 							<span>يحتاج إعداد</span>
 						</>
 					)}

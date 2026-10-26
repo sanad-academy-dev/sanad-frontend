@@ -27,19 +27,19 @@ import {
   IconUsers,
   IconWorld,
 } from "@tabler/icons-react";
-import { useLocation, useSearch } from "@tanstack/react-router";
+import { Link, useLocation, useSearch } from "@tanstack/react-router";
 import type * as React from "react";
 import { useCallback, useMemo } from "react";
 import {
   LuCarrot,
   LuScissorsLineDashed,
-  LuStethoscope,
   LuSyringe,
   LuTestTubeDiagonal,
   LuTruck,
 } from "react-icons/lu";
 import { NavSections } from "@/components/sidebar/nav-sections";
 import { NavUser } from "@/components/sidebar/nav-user";
+import { SanadLogo } from "@/components/common/sanad-logo";
 import {
   Sidebar,
   SidebarContent,
@@ -432,19 +432,16 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       dir={dir}
       {...props}
     >
-      <SidebarHeader className="">
+      <SidebarHeader className="py-2">
         <SidebarMenu>
           <SidebarMenuItem className="px-1">
-            <div className="flex items-center gap-2">
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                <LuStethoscope className="size-4" />
-              </div>
-              <div className="grid flex-1 text-start text-sm leading-tight">
-                <span className="truncate text-primary font-bold text-lg">
-                  أكاديمية سند
-                </span>
-              </div>
-            </div>
+            <Link
+              to="/"
+              className="flex items-center gap-2 overflow-hidden rounded-md transition-opacity hover:opacity-85"
+            >
+              <SanadLogo className="h-8 w-auto max-w-full group-data-[collapsible=icon]:hidden" />
+              <SanadLogo iconOnly className="hidden size-6 shrink-0 group-data-[collapsible=icon]:block" />
+            </Link>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>

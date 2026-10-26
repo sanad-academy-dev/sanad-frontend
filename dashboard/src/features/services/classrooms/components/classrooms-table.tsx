@@ -25,7 +25,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AssignStaffDialog } from "@/features/services/classrooms/components/assign-staff-dialog";
-import { ClassroomSheet } from "@/features/services/classrooms/components/classroom-sheet";
+import { ClassroomDialog } from "@/features/services/classrooms/components/classroom-dialog";
 import { DeleteClassroomDialog } from "@/features/services/classrooms/components/delete-classroom-dialog";
 import { useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
 import { LEARNING_MODES } from "@/features/services/classrooms/data/constants";
@@ -191,14 +191,30 @@ export function ClassroomsTable({ searchQuery, onAddClassroom }: ClassroomsTable
 			},
 			{
 				accessorKey: "category",
-				header: "الفئة التعليمية",
-				size: 140,
-				minSize: 120,
+				header: "فئة الفصل",
+				size: 110,
+				minSize: 95,
 				cell: ({ row }) => {
 					const val = row.original.category;
 					if (!val) return <span className="text-[11px] text-muted-foreground">—</span>;
+
+					const colorMap: Record<string, string> = {
+						بنين: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900",
+						بنات: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900",
+						مختلط: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-900",
+					};
+
+					const badgeClass =
+						colorMap[val] ||
+						"bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800/60 dark:text-slate-200 dark:border-slate-700";
+
 					return (
-						<span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+						<span
+							className={cn(
+								"inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border",
+								badgeClass,
+							)}
+						>
 							{val}
 						</span>
 					);
@@ -334,7 +350,7 @@ export function ClassroomsTable({ searchQuery, onAddClassroom }: ClassroomsTable
 
 	return (
 		<>
-			<ClassroomSheet
+			<ClassroomDialog
 				open={Boolean(editingClassroom)}
 				onClose={() => setEditingClassroom(null)}
 				classroom={editingClassroom}

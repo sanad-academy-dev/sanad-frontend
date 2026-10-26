@@ -8,14 +8,12 @@ export const AGE_GROUPS = [
 ] as const;
 
 export const CATEGORIES = [
-	"البرمجة والمنطق",
-	"النطق والتخاطب",
-	"تنمية المهارات",
-	"صعوبات التعلم",
-	"الروبوت والذكاء الاصطناعي",
-	"اللغة الإنجليزية",
-	"الفنون والتصميم",
+	"مختلط",
+	"بنين",
+	"بنات",
 ] as const;
+
+export type ClassroomCategory = (typeof CATEGORIES)[number];
 
 export const LEARNING_MODES: Record<
 	LearningMode,

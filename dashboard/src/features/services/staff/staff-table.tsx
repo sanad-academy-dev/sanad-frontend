@@ -74,7 +74,7 @@ function StaffAvatar({ name }: { name: string }) {
 		.join("")
 		.toUpperCase();
 	return (
-		<div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary primarytext-xs font-semibold border border-primary/20">
+		<div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary text-[10px] font-semibold border border-primary/20">
 			{initials}
 		</div>
 	);
@@ -109,18 +109,18 @@ function StaffStatusSelect({
 			disabled={disabled}
 			dir="rtl"
 		>
-			<SelectTrigger className="h-7 text-xs w-28 border-dashed text-right">
+			<SelectTrigger className="h-6.5 text-[11px] w-24 border-dashed text-right font-medium">
 				<SelectValue />
 			</SelectTrigger>
 			<SelectContent dir="rtl">
-				<SelectItem value={StaffStatus.ACTIVE}>
-					<span className="text-emerald-600">{STATUS_CONFIG[StaffStatus.ACTIVE].label}</span>
+				<SelectItem value={StaffStatus.ACTIVE} className="text-xs">
+					<span className="text-emerald-600 font-medium">{STATUS_CONFIG[StaffStatus.ACTIVE].label}</span>
 				</SelectItem>
-				<SelectItem value={StaffStatus.PENDING}>
+				<SelectItem value={StaffStatus.PENDING} className="text-xs">
 					{STATUS_CONFIG[StaffStatus.PENDING].label}
 				</SelectItem>
-				<SelectItem value={StaffStatus.INACTIVE}>
-					<span className="text-red-600">{STATUS_CONFIG[StaffStatus.INACTIVE].label}</span>
+				<SelectItem value={StaffStatus.INACTIVE} className="text-xs">
+					<span className="text-red-600 font-medium">{STATUS_CONFIG[StaffStatus.INACTIVE].label}</span>
 				</SelectItem>
 			</SelectContent>
 		</Select>
@@ -130,17 +130,17 @@ function StaffStatusSelect({
 function RegistrationBadge({ staff }: { staff: StaffResponse }) {
 	if (staff.user) {
 		return (
-			<p className="flex items-center gap-1 text-sm">
-				<IconCircleCheck className="size-4 text-emerald-500" />
-				<span className="text-emerald-500">مفعل</span>
+			<p className="flex items-center gap-1 text-[11px] font-medium text-emerald-600 dark:text-emerald-400">
+				<IconCircleCheck className="size-3.5 text-emerald-500" />
+				<span>مفعل</span>
 			</p>
 		);
 	}
 
 	return (
-		<p className="flex items-center gap-1 text-sm">
-			<IconCircleX className="size-4 text-red-500" />
-			<span className="text-red-500">غير مفعل</span>
+		<p className="flex items-center gap-1 text-[11px] font-medium text-red-600 dark:text-red-400">
+			<IconCircleX className="size-3.5 text-red-500" />
+			<span>غير مفعل</span>
 		</p>
 	);
 }
@@ -176,12 +176,16 @@ export function StaffTable() {
 			{
 				accessorKey: "name",
 				header: "الاسم / المعرف",
+				size: 190,
+				minSize: 170,
 				cell: ({ row }) => (
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-2 min-w-0">
 						<StaffAvatar name={row.original.name} />
-						<div className="flex flex-col">
-							<span className="font-semibold text-sm">{row.original.name}</span>
-							<span className="text-xs text-muted-foreground tabular-nums">
+						<div className="flex flex-col min-w-0">
+							<span className="font-semibold text-xs text-foreground truncate cursor-pointer hover:underline">
+								{row.original.name}
+							</span>
+							<span className="font-mono text-[10px] text-muted-foreground tabular-nums">
 								{row.original.code}
 							</span>
 						</div>
@@ -191,19 +195,21 @@ export function StaffTable() {
 			{
 				accessorKey: "phone",
 				header: "الهاتف / البريد الإلكتروني",
+				size: 170,
+				minSize: 150,
 				cell: ({ row }) => (
-					<div className="flex flex-col gap-0.5">
+					<div className="flex flex-col gap-0.5 min-w-0">
 						{row.original.phone ? (
-							<span className="text-sm tabular-nums flex items-center gap-1.5">
+							<span className="text-xs tabular-nums text-foreground flex items-center gap-1.5 font-mono">
 								<IconPhone className="size-3 text-muted-foreground shrink-0" />
 								{row.original.phone}
 							</span>
 						) : (
-							<span className="text-muted-foreground text-sm flex items-center gap-1.5">
+							<span className="text-muted-foreground text-xs flex items-center gap-1.5">
 								<IconPhone className="size-3 shrink-0" />—
 							</span>
 						)}
-						<span className="text-xs text-muted-foreground flex items-center gap-1.5 max-w-[160px]">
+						<span className="text-[10px] text-muted-foreground flex items-center gap-1.5 max-w-[160px]">
 							<IconMail className="size-3 shrink-0" />
 							<span className="truncate">{row.original.email}</span>
 						</span>
@@ -213,15 +219,19 @@ export function StaffTable() {
 			{
 				accessorKey: "primarySpecialization",
 				header: "التخصص",
+				size: 130,
+				minSize: 110,
 				cell: ({ row }) => {
 					const primary = row.original.primarySpecialization;
 					const secondary = row.original.secondarySpecialization;
-					if (!primary) return <span className="text-muted-foreground text-sm">—</span>;
+					if (!primary) return <span className="text-muted-foreground text-xs">—</span>;
 					return (
-						<div className="flex flex-col gap-0.5">
-							<span className="text-sm">{(primary as { name: string }).name}</span>
+						<div className="flex flex-col gap-0.5 min-w-0">
+							<span className="text-xs text-foreground font-medium truncate">
+								{(primary as { name: string }).name}
+							</span>
 							{secondary && (
-								<span className="text-xs text-muted-foreground">
+								<span className="text-[10px] text-muted-foreground truncate">
 									{(secondary as { name: string }).name}
 								</span>
 							)}
@@ -232,11 +242,19 @@ export function StaffTable() {
 			{
 				accessorKey: "clinic",
 				header: "الأكاديمية",
-				cell: ({ row }) => <span className="text-sm">{row.original.clinic.name}</span>,
+				size: 120,
+				minSize: 100,
+				cell: ({ row }) => (
+					<span className="text-xs text-foreground truncate">
+						{row.original.clinic.name}
+					</span>
+				),
 			},
 			{
 				id: "reservations",
-				header: " أيام العمل",
+				header: "أيام العمل",
+				size: 110,
+				minSize: 95,
 				cell: ({ row }) => (
 					// biome-ignore lint/a11y/noStaticElementInteractions: حارس انتشار فقط لإيقاف فتح الصف
 					// biome-ignore lint/a11y/useKeyWithClickEvents: حارس انتشار فقط؛ عنصر التحكم داخله قابل للوصول بلوحة المفاتيح
@@ -251,20 +269,28 @@ export function StaffTable() {
 			{
 				id: "patients",
 				header: "عدد الطلاب",
-				cell: () => <span className="text-sm tabular-nums text-muted-foreground">0</span>,
+				size: 85,
+				minSize: 75,
+				cell: () => (
+					<span className="text-xs tabular-nums text-muted-foreground font-mono">0</span>
+				),
 			},
 			{
 				id: "rating",
 				header: "التقييم",
+				size: 75,
+				minSize: 65,
 				cell: () => (
-					<span className="flex items-center gap-1 text-sm tabular-nums">
-						<IconStar className="size-3.5 text-amber-400 fill-amber-400" />—
+					<span className="flex items-center gap-1 text-xs tabular-nums text-muted-foreground">
+						<IconStar className="size-3 text-amber-400 fill-amber-400" />—
 					</span>
 				),
 			},
 			{
 				accessorKey: "status",
 				header: "الحالة",
+				size: 110,
+				minSize: 95,
 				cell: ({ row }) => (
 					// biome-ignore lint/a11y/noStaticElementInteractions: حارس انتشار فقط لإيقاف فتح الصف
 					// biome-ignore lint/a11y/useKeyWithClickEvents: حارس انتشار فقط؛ عنصر التحكم داخله قابل للوصول بلوحة المفاتيح
@@ -280,6 +306,8 @@ export function StaffTable() {
 			{
 				id: "registrationStatus",
 				header: "حالة التسجيل",
+				size: 120,
+				minSize: 100,
 				cell: ({ row }) => {
 					const canRemind = !row.original.user && row.original.status !== StaffStatus.INACTIVE;
 					return (
@@ -289,7 +317,7 @@ export function StaffTable() {
 								<Button
 									variant="outline"
 									size="sm"
-									className="h-6 px-2 text-xs"
+									className="h-5 px-1.5 text-[10px]"
 									onClick={(e) => {
 										e.stopPropagation();
 										setInvitingStaff(row.original);
@@ -305,6 +333,7 @@ export function StaffTable() {
 			{
 				id: "actions",
 				header: "",
+				size: 48,
 				cell: ({ row }) => {
 					return (
 						// biome-ignore lint/a11y/noStaticElementInteractions: حارس انتشار فقط لإيقاف فتح الصف
@@ -314,33 +343,33 @@ export function StaffTable() {
 								<DropdownMenuTrigger asChild>
 									<Button
 										variant="ghost"
-										size="icon"
-										className="size-8"
+										size="icon-xs"
+										className="size-7"
 									>
-										<IconDots className="size-4" />
+										<IconDots className="size-3.5" />
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="start">
 									<DropdownMenuItem
-										className="gap-2"
+										className="gap-2 text-xs"
 										onSelect={() => setSelectedStaff(row.original)}
 									>
-										<IconEye className="size-4" />
+										<IconEye className="size-3.5" />
 										فتح
 									</DropdownMenuItem>
 									<DropdownMenuItem
-										className="gap-2"
+										className="gap-2 text-xs"
 										onSelect={() => setDisablingStaff(row.original)}
 									>
-										<IconBan className="size-4" />
+										<IconBan className="size-3.5" />
 										تعطيل
 									</DropdownMenuItem>
 									<DropdownMenuSeparator />
 									<DropdownMenuItem
-										className="text-destructive gap-2"
+										className="text-destructive gap-2 text-xs"
 										onSelect={() => setDeletingStaff(row.original)}
 									>
-										<IconTrash className="size-4" />
+										<IconTrash className="size-3.5" />
 										حذف
 									</DropdownMenuItem>
 								</DropdownMenuContent>
@@ -463,6 +492,7 @@ export function StaffTable() {
 						table={table}
 						columns={columns}
 						isPending={isLoading}
+						headerTextClassName="text-xs font-semibold text-muted-foreground"
 						onRowClick={(row) => setSelectedStaff(row.original)}
 						emptyState={{
 							title: "لا يوجد موظفين حتى الآن",
