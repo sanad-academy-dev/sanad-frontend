@@ -1,14 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { createPortal } from "react-dom";
-import { CheckCircle2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { SectionHeader } from "@/components/ui/header";
+import Container from "@/components/container";
+import PageBreadcrumb from "@/components/page-breadcrumb";
 import { MultiStepForm } from "../../../components/multi-step-form";
 import { Button } from "@/components/ui/button";
+import { ArrowUpLeft, CheckCircle2 } from "lucide-react";
 import { PopupContact } from "./popup-contact";
-import { cn } from "@/lib/utils";
+import { FaqAccordion } from "@/components/faq-accordion";
+import { Separator } from "@/components/separator";
 
 type SupportCard = {
   title: string;
@@ -38,19 +42,19 @@ const CARDS: SupportCard[] = [
     title: "التعاون مع سند",
     subtitle: "هل ترغب في العمل معنا؟",
     text: "إذا كنت مدربًا، أو تمثل مدرسة أو مؤسسة تعليمية، أو لديك فكرة للتعاون مع سند، يسعدنا التواصل معك.",
-    action: "تواصل معنا",
+    action: "تحدث معنا",
     onClickType: "contact-popup",
   },
   {
     title: "الدعم والمساعدة",
     subtitle: "هل تحتاج إلى مساعدة؟",
     text: "نساعدك في أي استفسار يتعلق بالتسجيل، المواعيد، الدفع، البرامج، أو رحلة التعلم.",
-    action: "تواصل مع الدعم",
+    action: "تحدث معنا",
     onClickType: "contact-popup",
   },
 ];
 
-export default function Support({ withBorder = true }: { withBorder?: boolean } = {}) {
+export default function Support() {
   const [multiStepOpen, setMultiStepOpen] = useState(false);
   const [contactPopupOpen, setContactPopupOpen] = useState(false);
 
@@ -78,80 +82,88 @@ export default function Support({ withBorder = true }: { withBorder?: boolean } 
   };
 
   return (
-    <section className="relative w-full overflow-hidden bg-background ">
-      <div className="w-full">
-        <SectionHeader
-          title="كيف يمكننا مساعدتك؟"
-          description="سواء كنت تبحث عن المسار المناسب لطفلك، أو تريد حجز التقييم، أو لديك استفسار عن برامج سند، نحن هنا لمساعدتك."
-          className="text-center items-center"
+    <div
+      className="flex-1 flex flex-col w-full max-w-screen overflow-x-clip bg-background pt-14 selection:bg-primary/20"
+      dir="rtl"
+    >
+      <Container className="flex-1 flex flex-col">
+        {/* Breadcrumb Navigation */}
+        <PageBreadcrumb
+          items={[
+            { label: "حول الأكاديمية" },
+            { label: "تحدث معنا" },
+          ]}
         />
 
-        <div className={cn("w-full rounded-3xl bg-card overflow-hidden shadow-sm", withBorder && "border border-border")} dir="rtl">
-          {/* Top Banner */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between p-8 md:p-12 border-b border-border gap-8">
-            <div className="flex flex-col items-start gap-4 max-w-2xl">
-              <h3 className="text-2xl md:text-4xl font-bold text-foreground tracking-tight">
-                تواصل مع فريق سند
-              </h3>
-              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-                نحن هنا للإجابة عن استفساراتك ومساعدتك في اختيار الخطوة المناسبة في رحلة التعلم.
-              </p>
-              <div className="flex items-center gap-4 mt-4">
-                <Button
-                  onClick={() => setContactPopupOpen(true)}
-                >
-                  تحدث معنا
-                </Button>
-              </div>
-            </div>
-            <div className="flex items-center gap-2.5 text-sm font-semibold text-[#25D366] bg-[#25D366]/10 px-5 py-2.5 rounded-full whitespace-nowrap self-start md:self-auto">
-              <CheckCircle2 className="size-5" />
+        {/* Header */}
+        <SectionHeader
+          title="تحدث معنا"
+          label={
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 sm:px-3 py-0.5 sm:py-1 font-sans text-xs font-bold text-emerald-500 select-none">
+              <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
               <span>متاحون أونلاين</span>
-            </div>
-          </div>
+            </span>
+          }
+          description="نحن هنا للإجابة عن كافة استفساراتك ومساعدتك في اختيار المسار والبرنامج الأنسب لطفلك."
+        />
 
-          {/* Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[1px] bg-border">
-            {CARDS.map((card, i) => (
-              <div key={i} className="flex flex-col items-start p-8 md:p-10 gap-8 group hover:bg-muted/40 transition-colors bg-card">
-                <div className="flex-1 space-y-4">
-                  <h4 className="text-xl md:text-2xl font-bold text-foreground">
-                    {card.title}
-                  </h4>
-                  <div className="space-y-2">
-                    <p className="text-base font-semibold text-foreground/90">
-                      {card.subtitle}
-                    </p>
-                    <p className="text-[15px] text-muted-foreground leading-relaxed">
-                      {card.text}
-                    </p>
-                  </div>
+        {/* Support Channels Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[1px] bg-line">
+          {CARDS.map((card, i) => (
+            <div
+              key={i}
+              className="flex flex-col items-start p-5 sm:p-6 gap-6 group hover:bg-secondary/40 transition-colors bg-card"
+            >
+              <div className="flex-1 space-y-2.5 text-right w-full">
+                <h3 className="text-base sm:text-lg font-bold text-foreground font-heading tracking-normal">
+                  {card.title}
+                </h3>
+                <div className="space-y-1">
+                  <p className="font-sans text-xs sm:text-[12.5px] font-semibold text-foreground/90">
+                    {card.subtitle}
+                  </p>
+                  <p className="font-sans text-xs sm:text-[13px] text-foreground/75 leading-relaxed font-normal">
+                    {card.text}
+                  </p>
                 </div>
-                <Button
-                  variant="secondary"
-                  onClick={() => handleAction(card.onClickType, card.href)}
-                  className="transition-all hover:bg-foreground hover:text-background"
-                >
-                  {card.action}
-                </Button>
               </div>
-            ))}
-          </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleAction(card.onClickType, card.href)}
+                className="w-full h-9 font-sans text-xs font-bold rounded-lg cursor-pointer group transition-all border-line bg-secondary/60 hover:bg-primary hover:text-primary-foreground hover:border-primary shadow-none"
+              >
+                <span>{card.action}</span>
+                <ArrowUpLeft className="size-3.5 mr-1 transition-transform duration-200 group-hover:-translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Button>
+            </div>
+          ))}
         </div>
-      </div>
 
+        {/* Parents FAQ */}
+        <div className="bg-background">
+          <Separator className="border-x-0" />
+          <SectionHeader 
+            title="أسئلة أولياء الأمور" 
+            description="أبرز الأسئلة الشائعة حول برامجنا ومواعيد الحصص وطرق التدريس المعتمدة."
+          />
+          <FaqAccordion idPrefix="contact-faq" />
+        </div>
+      </Container>
+
+      {/* Trial Assessment Modal Portal */}
       {multiStepOpen && typeof document !== "undefined" && createPortal(
         <AnimatePresence>
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-start justify-center bg-black/60 backdrop-blur-sm pt-12 md:pt-[8vh] px-4"
+            className="fixed inset-0 z-[100] flex items-start justify-center bg-black/60 backdrop-blur-sm pt-12 md:pt-[8vh] px-4 overflow-y-auto pb-12"
             onClick={() => setMultiStepOpen(false)}
           >
             <div onClick={(e) => e.stopPropagation()} className="w-full max-w-[800px] mx-auto">
-              <MultiStepForm 
-                onCreate={() => setTimeout(() => setMultiStepOpen(false), 2000)} 
+              <MultiStepForm
+                onCreate={() => setTimeout(() => setMultiStepOpen(false), 2000)}
                 onClose={() => setMultiStepOpen(false)}
               />
             </div>
@@ -160,10 +172,11 @@ export default function Support({ withBorder = true }: { withBorder?: boolean } 
         document.body
       )}
 
+      {/* Direct Contact Modal Portal */}
       {typeof document !== "undefined" && createPortal(
         <PopupContact isOpen={contactPopupOpen} onClose={() => setContactPopupOpen(false)} />,
         document.body
       )}
-    </section>
+    </div>
   );
 }

@@ -1,22 +1,31 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SANAD_BACKEND_URL } from "@/lib/api-config";
+import { getSanadBackendUrl } from "@/lib/api-config";
+import {
+  getSafeUploadName,
+  validateUploadedFile,
+} from "@/lib/upload-validation";
 
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
     const file = formData.get("file");
 
-    if (!file || !(file instanceof Blob)) {
+    if (!file || !(file instanceof File)) {
       return NextResponse.json(
         { message: "لم يتم تحديد أي ملف للرفع" },
         { status: 400 }
       );
     }
 
-    const outgoingFormData = new FormData();
-    outgoingFormData.append("file", file);
+    const validationError = await validateUploadedFile(file);
+    if (validationError) {
+      return NextResponse.json({ message: validationError }, { status: 400 });
+    }
 
-    const response = await fetch(`${SANAD_BACKEND_URL}/public/upload`, {
+    const outgoingFormData = new FormData();
+    outgoingFormData.append("file", file, getSafeUploadName(file));
+
+    const response = await fetch(`${getSanadBackendUrl()}/public/upload`, {
       method: "POST",
       body: outgoingFormData,
     });

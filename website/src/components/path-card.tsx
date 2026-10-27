@@ -1,106 +1,191 @@
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, Bookmark, Calendar, Star } from "lucide-react";
+import {
+  Branches,
+  Elevator,
+  Exploded,
+  Format,
+  Hub,
+  Keyboard,
+  Laptop,
+  Loupe,
+  Patch,
+  Phone,
+  Phosphor,
+  Plot,
+  Plug,
+  Query,
+  Rail,
+  Rebuild,
+  Relay,
+  Riffle,
+  Router,
+  Stack,
+  Terminal,
+  Terrain,
+  Turntable,
+  Vault,
+  type HairlineProps,
+} from "@lucasmarkes/hairline/react";
+import { ArrowUpLeft } from "lucide-react";
 import { JoinButton } from "@/components/join-button";
+import { PATHS } from "@/lib/learning-paths";
+import type { ComponentType } from "react";
 
-// بطاقة دورة بصورة علوية — مشتركة بين "مسارات التعلم" وصفحة الدورات
 export type PathCardData = {
   title: string;
+  category?: string;
   provider: "framer" | "meta";
   image: string;
   reviews: string;
   rating: string;
   level: string;
+  age?: string;
   lectures: string;
   hours: string;
+  seatsBooked?: number;
+  seatsTotal?: number;
+  description?: string;
+  skillsList?: string[];
+  comingSoon?: boolean;
+  animation?: string;
 };
 
-function Dot({ className }: { className?: string }) {
-  return (
-    <span
-      aria-hidden
-      className={`size-[2px] shrink-0 rounded-full ${className ?? "bg-background0"}`}
-    />
-  );
+const ANIMATION_MAP: Record<string, ComponentType<HairlineProps>> = {
+  Branches,
+  Query,
+  Phosphor,
+  Phone,
+  Format,
+  Stack,
+  Keyboard,
+  Terminal,
+  Exploded,
+  Patch,
+  Turntable,
+  Rail,
+  Rebuild,
+  Riffle,
+  Terrain,
+  Plot,
+  Elevator,
+  Hub,
+  Laptop,
+  Loupe,
+  Plug,
+  Relay,
+  Router,
+  Vault,
+};
+
+const pathCategoryAnimations: Record<string, ComponentType<HairlineProps>> = {
+  "البرمجة والمنطق": Keyboard,
+  "الذكاء الاصطناعي": Phosphor,
+  الروبوتيكس: Turntable,
+  "تطوير الألعاب": Riffle,
+  "تحليل البيانات": Plot,
+  "ريادة الأعمال": Hub,
+};
+
+function getPathDetails(category?: string) {
+  const path = PATHS.find((item) => item.title === category);
+
+  return {
+    description:
+      path?.description ??
+      "تعلّم عملي يربط المهارات التقنية ببناء مشاريع حقيقية قابلة للتطبيق.",
+    skills: path?.skillsList ?? ["تطبيق عملي", "مشاريع حقيقية", "حل المشكلات"],
+  };
 }
 
 export default function PathCard({ path }: { path: PathCardData }) {
+  const CourseAnimation =
+    (path.animation && ANIMATION_MAP[path.animation])
+      ? ANIMATION_MAP[path.animation]
+      : (pathCategoryAnimations[path.category ?? ""] ?? Keyboard);
+
+  const fallbackDetails = getPathDetails(path.category);
+  const description = path.description ?? fallbackDetails.description;
+  const skills = path.skillsList ?? fallbackDetails.skills;
+
   return (
-    <article className="group relative flex flex-col justify-between gap-4 rounded border border-border bg-muted/30 p-4 transition-all duration-300 hover:border-primary/30 hover:bg-accent/20 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1">
-      {/* الصورة العلوية */}
-      <div className="relative h-[160px] w-full overflow-hidden rounded bg-muted">
-        <Image
-          src={path.image}
-          alt={path.title}
-          fill
-          sizes="(max-width: 1024px) 100vw, 400px"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+    <article className="group/course relative flex h-[490px] sm:h-[500px] w-full flex-col overflow-hidden rounded-2xl border border-line bg-card transition-all duration-300 hover:border-primary/40 shadow-none">
+      <div className="relative m-2.5 flex aspect-18/10 items-center justify-center overflow-hidden rounded border border-line select-none">
+        <CourseAnimation
+          className="h-full w-full"
+          intensity={0.35}
+          label={`تفاعل كورس ${path.title}`}
         />
-        
-        {/* زر الحفظ */}
-        <button
-          type="button"
-          aria-label="حفظ الدورة"
-          className="absolute right-3 top-3 flex size-8 items-center justify-center rounded-full bg-black/40 primarybackdrop-blur-md transition-all hover:bg-primary hover:text-primary-foreground hover:scale-110"
-        >
-          <Bookmark className="size-4" />
-        </button>
 
-        {/* لوجو المزود */}
-        <div className="absolute bottom-3 left-3 flex h-7 items-center justify-center rounded bg-black/60 px-2.5 backdrop-blur-md border border-white/10">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={`/logos/${path.provider}.svg`}
-            alt={path.provider}
-            width={path.provider === "meta" ? 40 : 45}
-            height={14}
-            className="h-3 w-auto brightness-0 invert"
-          />
-        </div>
-      </div>
-
-      {/* المعلومات */}
-      <div className="flex flex-col gap-2.5 text-right px-1">
-        <h3 className="line-clamp-2 text-xl font-bold text-foreground transition-colors group-hover:text-primary">
-          {path.title}
-        </h3>
-
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 rounded bg-yellow-500/10 px-1.5 py-0.5">
-            <span className="text-sm font-bold text-yellow-500 pt-0.5">
-              {path.rating}
+        {path.comingSoon && (
+          <div className="absolute top-2.5 left-2.5 z-10">
+            <span className="inline-flex shrink-0 items-center rounded-full border border-primary/30 bg-primary/10 dark:bg-primary/20 px-2.5 py-0.5 font-sans text-[11px] font-bold text-primary backdrop-blur-md select-none">
+              قريباً
             </span>
-            <Star className="size-3.5 fill-yellow-500 text-yellow-500" />
           </div>
-          <span className="text-sm text-muted-foreground pt-0.5">
-            ( {path.reviews} )
-          </span>
-        </div>
-
-        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mt-1">
-          <span className="text-foreground/80">{path.level}</span>
-          <Dot className="bg-border" />
-          <span className="text-foreground/80">{path.lectures}</span>
-          <Dot className="bg-border" />
-          <span className="text-foreground/80">{path.hours}</span>
-        </div>
+        )}
       </div>
 
-      {/* الأزرار */}
-      <div className="mt-2 flex items-center gap-3">
-        <JoinButton
-          className="flex flex-1 items-center justify-center gap-2 rounded bg-primary px-4 py-2.5 text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98]"
-        >
-          قيم ابنك
-          <Calendar className="size-4" />
-        </JoinButton>
-        <Link
-          href="/courses/details"
-          className="flex flex-1 items-center justify-center gap-2 rounded border border-border bg-secondary/50 px-4 py-2.5 text-sm font-bold text-foreground transition-all hover:bg-secondary hover:scale-[1.02] active:scale-[0.98]"
-        >
-          التفاصيل
-          <ArrowLeft className="size-4" />
-        </Link>
+      <div dir="rtl" className="grid flex-1 grid-cols-[88px_1fr_1fr] sm:grid-cols-[100px_1fr_1fr] grid-rows-[auto_auto_auto_1fr_auto] bg-card text-right">
+        {/* Row 1: Title */}
+        <div className="col-span-3 flex items-center justify-between border-y-2 border-line px-4 py-2.5">
+          <h3 className="font-heading text-sm sm:text-base font-bold leading-snug text-foreground transition-colors group-hover/course:text-primary tracking-normal">
+            {path.title}
+          </h3>
+        </div>
+
+        {/* Row 2: Category & Description */}
+        <div className="col-span-1 flex items-center justify-center border-b border-l border-line px-2 sm:px-2.5 py-2.5 text-center font-sans text-xs font-semibold text-foreground/80 select-none">
+          {path.category ?? "مسار"}
+        </div>
+        <div className="col-span-2 flex items-center border-b border-line px-3 sm:px-3.5 py-2.5">
+          <p className="line-clamp-2 font-sans text-xs sm:text-[13px] leading-relaxed text-foreground/80 font-normal">
+            {description}
+          </p>
+        </div>
+
+        {/* Row 3: Age / Level / Lectures */}
+        <div className="col-span-1 flex items-center justify-center border-b border-l border-line px-1.5 sm:px-2 py-2 text-center font-sans text-[11px] sm:text-xs text-foreground/85 font-medium">
+          <span className="whitespace-nowrap">{path.age ?? "—"}</span>
+        </div>
+        <div className="col-span-1 flex items-center justify-center border-b border-l border-line px-1.5 sm:px-2 py-2 text-center font-sans text-xs font-semibold text-foreground">
+          <span className="truncate">{path.level}</span>
+        </div>
+        <div className="col-span-1 flex items-center justify-center border-b border-line px-1.5 sm:px-2 py-2 text-center font-sans text-xs font-bold text-primary">
+          <span>{path.lectures}</span>
+        </div>
+
+        {/* Row 4: Skills label & chips */}
+        <div className="col-span-1 flex items-center justify-center border-l border-line px-2 sm:px-2.5 py-2.5 text-center font-sans text-xs font-semibold text-muted-foreground/90 select-none">
+          المهارات
+        </div>
+        <div className="col-span-2 flex content-center flex-wrap items-center gap-1.5 px-2.5 sm:px-3 py-2.5">
+          {skills.map((skill) => (
+            <span
+              key={skill}
+              className="inline-flex items-center rounded-sm border border-line bg-secondary/60 px-2 py-0.5 font-sans text-[11px] sm:text-xs font-medium text-foreground/90 leading-normal select-none transition-colors hover:bg-secondary"
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
+
+        {/* Row 5: Action Buttons */}
+        <div className="col-span-3 flex h-10 items-center border-t border-line mt-auto">
+          <JoinButton className="flex h-10 flex-1 items-center justify-center font-sans text-xs font-bold text-foreground bg-card hover:bg-secondary transition-colors cursor-pointer rounded-none border-0 shadow-none">
+            <span>قيم ابنك</span>
+          </JoinButton>
+          <span
+            aria-hidden="true"
+            className="h-full w-px shrink-0 bg-line"
+          />
+          <Link
+            href="/courses/details"
+            className="group/course-link flex h-10 flex-1 items-center justify-center font-sans text-xs font-bold text-foreground bg-card hover:bg-secondary transition-all"
+          >
+            <span className="px-1.5">التفاصيل</span>
+            <ArrowUpLeft className="size-3.5 transition-transform duration-200 group-hover/course-link:-translate-x-0.5 group-hover/course-link:-translate-y-0.5 text-primary" />
+          </Link>
+        </div>
       </div>
     </article>
   );

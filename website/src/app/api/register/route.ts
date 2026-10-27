@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SANAD_BACKEND_URL } from "@/lib/api-config";
+import { getSanadBackendUrl } from "@/lib/api-config";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const response = await fetch(`${SANAD_BACKEND_URL}/public/register`, {
+    const response = await fetch(`${getSanadBackendUrl()}/public/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

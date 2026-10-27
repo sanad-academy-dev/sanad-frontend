@@ -68,7 +68,6 @@ export function DotGrid({ className }: { className?: string }) {
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
       const cols = Math.floor(width / SPACING);
       const rows = Math.floor(height / SPACING);
       // Centre the lattice so the margins match on every side.
@@ -105,6 +104,7 @@ export function DotGrid({ className }: { className?: string }) {
         ctx.arc(x, y, r, 0, Math.PI * 2);
       }
       ctx.fill();
+
       // Only the few energised dots get a second, brighter pass.
       ctx.fillStyle = lit;
       for (let i = 0; i < count; i++) {
@@ -267,10 +267,7 @@ export function DotGrid({ className }: { className?: string }) {
   return (
     <div
       ref={wrapRef}
-      className={cn(
-        "relative w-full h-full overflow-hidden bg-transparent",
-        className,
-      )}
+      className={cn( "relative w-full h-full overflow-hidden bg-transparent", className, )}
       style={{
         color: "var(--primary)",
       } as React.CSSProperties}

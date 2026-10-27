@@ -6,7 +6,6 @@ import { ArrowLeft, Check, ChevronLeft, ChevronRight, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
-// modal "احجز حصة تجريبية مجانية" — Frame 1984079124 من التصميم
 
 const STEPS = [
   { title: "اختر الموعد", desc: "أختر اليوم والوقت المناسب لك" },
@@ -55,7 +54,6 @@ function Calendar() {
 
   return (
     <div className="flex flex-col gap-2">
-      {/* التنقّل بين الأشهر */}
       <div className="flex items-center justify-between">
         <button
           type="button"
@@ -78,7 +76,6 @@ function Calendar() {
         </button>
       </div>
 
-      {/* أيام الأسبوع */}
       <div dir="rtl" className="grid grid-cols-7">
         {WEEKDAYS.map((d) => (
           <div key={d} className="py-1 text-center text-[10px] text-muted-foreground">
@@ -87,7 +84,6 @@ function Calendar() {
         ))}
       </div>
 
-      {/* الأيام */}
       <div dir="rtl" className="grid grid-cols-7 gap-y-1">
         {cells.map((day, i) => {
           if (day === null) return <div key={`e-${i}`} />;
@@ -106,14 +102,7 @@ function Calendar() {
               onClick={() =>
                 setSelected({ year: view.year, month: view.month, day })
               }
-              className={cn(
-                "mx-auto flex h-9 w-full items-center justify-center rounded text-xs font-medium transition-colors",
-                isSelected
-                  ? "bg-primary text-primary-foreground"
-                  : isFriday
-                    ? "cursor-not-allowed text-muted-foreground"
-                    : "text-foreground hover:bg-secondary",
-              )}
+              className={cn( "mx-auto flex h-9 w-full items-center justify-center rounded text-xs font-medium transition-colors", isSelected ? "bg-primary text-primary-foreground" : isFriday ? "cursor-not-allowed text-muted-foreground" : "text-foreground hover:bg-secondary", )}
             >
               {day}
             </button>
@@ -127,7 +116,6 @@ function Calendar() {
 function Stepper({ active }: { active: number }) {
   return (
     <div className="relative flex justify-between">
-      {/* خط الربط خلف الدوائر */}
       <div className="absolute inset-x-[16.66%] top-[11px] h-0.5 bg-secondary" />
       {STEPS.map((step, i) => {
         const done = i <= active;
@@ -175,9 +163,8 @@ export function TrialModal({ onClose }: { onClose: () => void }) {
         exit={{ opacity: 0, scale: 0.96, y: 8 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
         onClick={(e) => e.stopPropagation()}
-        className="flex max-h-[90vh] w-full max-w-[729px] flex-col gap-8 overflow-y-auto rounded-3xl bg-card p-6 sm:p-12"
+        className="flex max-h-[90vh] w-full max-w-[729px] flex-col gap-8 overflow-y-auto rounded-xl border border-border/80 bg-card/95 backdrop-blur-md p-6 sm:p-12"
       >
-        {/* الرأس */}
         <div className="flex flex-col gap-8">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-xl font-semibold text-foreground">
@@ -196,7 +183,6 @@ export function TrialModal({ onClose }: { onClose: () => void }) {
           <Stepper active={step} />
         </div>
 
-        {/* المحتوى */}
         {step === 0 ? (
           <div className="flex flex-col gap-8">
             <Calendar />

@@ -5,10 +5,9 @@ interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
   innerClassName?: string;
 }
 
-// حاوية موحّدة لكل الأقسام — تملأ عرض الشاشة بشكل مريح وتقلّل الفراغ على الجوانب
 export default function Container({
   className,
-  withBorder = false,
+  withBorder,
   innerClassName,
   children,
   ...props
@@ -16,16 +15,14 @@ export default function Container({
   return (
     <div
       className={cn(
-        "mx-auto w-full max-w-[1340px] px-4 sm:px-8 lg:px-12",
-        !withBorder && "py-16 md:py-24",
-        className,
+        "mx-auto w-full max-w-5xl border-x border-line",
+        withBorder && "border-y",
+        className
       )}
       {...props}
     >
-      {withBorder ? (
-        <div className={cn("w-full border-t border-border py-16 md:py-24 flex flex-col gap-8", innerClassName)}>
-          {children}
-        </div>
+      {innerClassName ? (
+        <div className={innerClassName}>{children}</div>
       ) : (
         children
       )}

@@ -174,6 +174,7 @@ export function ParticleText({
         ctx.globalAlpha = 1;
         return;
       }
+
       // One batched path for the whole word.
       ctx.beginPath();
       for (let i = 0; i < count; i++) {
@@ -402,7 +403,7 @@ export function ParticleText({
     <div
       ref={wrapRef}
       className={cn(
-        "relative h-[240px] w-[min(520px,100%)] overflow-hidden rounded bg-surface font-sans shadow-raised",
+        "relative h-[240px] w-[min(520px,100%)] overflow-hidden rounded bg-surface font-sans",
         className,
       )}
     >
@@ -420,7 +421,7 @@ export function ParticleText({
 
 export default function ParticleTextDemo() {
     return (
-       <main className="bg-card flex-1">
+       <main className="bg-background flex-1">
     <div className="flex justify-center items-center h-screen">
         <ParticleText text="LAB" />
     </div>

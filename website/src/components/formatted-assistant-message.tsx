@@ -10,13 +10,7 @@ interface FormattedAssistantMessageProps {
   onScrollToPricing?: () => void;
 }
 
-/**
- * مكوّن مخصص لتنسيق ردود الذكاء الاصطناعي بشكل أنيق ومريح للعين
- * - يحوّل العناوين والنقاط إلى بنية واضحة
- * - يبرز النصوص المهمة
- * - يحوّل رقم الواتساب إلى زر تفاعلي
- * - يكتشف الإجراءات ذات الصلة ويعرض أزرار سريعة تفاعلية في نهاية الرد
- */
+
 export function FormattedAssistantMessage({
   content,
   onOpenTrial,
@@ -24,7 +18,6 @@ export function FormattedAssistantMessage({
 }: FormattedAssistantMessageProps) {
   const lines = content.split("\n");
 
-  // التحقق مما إذا كان الرد يقترح إجراءات محددة لعرض أزرار الإجراء السريع (Action Pills)
   const suggestsTrial = /تقييم|حجز|تجريب|سجل|ابدأ الآن/i.test(content);
   const suggestsPricing = /سعر|أسعار|اشتراك|تكلفة|باقة|خطة|جنيه/i.test(content);
   const suggestsWhatsapp = /واتساب|تواصل|مساعدة|فريقنا|\+201022805731/i.test(content);
@@ -36,7 +29,7 @@ export function FormattedAssistantMessage({
       return <div key={index} className="h-2" />;
     }
 
-    const isBullet = trimmed.startsWith("* ") || trimmed.startsWith("- ") || trimmed.startsWith("• ");
+    const isBullet = trimmed.startsWith("*") || trimmed.startsWith("-") || trimmed.startsWith("•");
     const bulletContent = isBullet ? trimmed.replace(/^[\*\-•]\s*/, "") : trimmed;
     const parsedElements = parseInlineStyles(bulletContent);
 
@@ -49,7 +42,7 @@ export function FormattedAssistantMessage({
       );
     }
 
-    if (trimmed.startsWith("### ") || trimmed.startsWith("## ")) {
+    if (trimmed.startsWith("###") || trimmed.startsWith("##")) {
       const heading = trimmed.replace(/^#+\s*/, "");
       return (
         <h4 key={index} className="font-bold text-sm text-foreground mt-3 mb-1.5 flex items-center gap-1.5">
@@ -70,13 +63,12 @@ export function FormattedAssistantMessage({
     <div className="space-y-0.5">
       {lines.map((line, idx) => renderLine(line, idx))}
 
-      {/* بطاقات وأزرار الإجراءات السريعة في نهاية الإجابة */}
       {(suggestsTrial || suggestsPricing || suggestsWhatsapp) && (
         <div className="mt-3.5 pt-2.5 border-t border-border/40 flex flex-wrap gap-1.5">
           {suggestsTrial && onOpenTrial && (
             <button
               onClick={onOpenTrial}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-[11px] font-bold transition-all border border-primary/20 cursor-pointer group shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary text-[11px] font-bold transition-all border border-primary/20 cursor-pointer group"
             >
               <CalendarCheck className="size-3.5 text-primary" />
               <span>احجز التقييم المجاني</span>

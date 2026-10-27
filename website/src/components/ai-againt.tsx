@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ChevronsLeft,
@@ -14,7 +15,6 @@ import {
   RefreshCw,
   Sparkles,
   Bot,
-  User,
   Check,
   Loader2,
   Square,
@@ -38,6 +38,7 @@ const SUGGESTIONS = [
 const STORAGE_KEY = "sanad_ai_agent_chat_history";
 
 export default function AiAgent() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -49,8 +50,9 @@ export default function AiAgent() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const messageIdRef = useRef(0);
+  const streamedContentRef = useRef("");
 
-  // تحميل المحادثة السابقة من localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -67,7 +69,6 @@ export default function AiAgent() {
     }
   }, []);
 
-  // حفظ المحادثة في localStorage عند أي تغيير
   useEffect(() => {
     if (!isLoaded) return;
     try {
@@ -100,14 +101,12 @@ export default function AiAgent() {
   // Keyboard shortcut (Ctrl + I / Cmd + I / Escape)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Escape للإغلاق السريع
       if (e.key === "Escape" && isOpen) {
         e.preventDefault();
         setIsOpen(false);
         return;
       }
 
-      // Ctrl + I أو Cmd + I (يدعم الكتابة باللغة العربية والإنجليزية عبر e.code)
       const isCtrlOrCmd = e.ctrlKey || e.metaKey;
       const isKeyI =
         e.code === "KeyI" ||
@@ -139,8 +138,9 @@ export default function AiAgent() {
     setErrorState(null);
     setQuery("");
 
-    const userMsgId = `u-${Date.now()}`;
-    const botMsgId = `b-${Date.now()}`;
+    const requestId = ++messageIdRef.current;
+    const userMsgId = `u-${requestId}`;
+    const botMsgId = `b-${requestId}`;
 
     const newMessages: Message[] = [
       ...messages,
@@ -155,11 +155,15 @@ export default function AiAgent() {
 
     const controller = new AbortController();
     abortControllerRef.current = controller;
+    streamedContentRef.current = "";
 
     try {
       const res = await fetch("/api/agent/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true",
+        },
         signal: controller.signal,
         body: JSON.stringify({
           messages: newMessages.map(({ role, content }) => ({ role, content })),
@@ -176,33 +180,36 @@ export default function AiAgent() {
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
-      let streamedContent = "";
-
       while (true) {
         const { value, done } = await reader.read();
         if (done) break;
 
         const chunk = decoder.decode(value, { stream: true });
-        streamedContent += chunk;
+        streamedContentRef.current = `${streamedContentRef.current}${chunk}`;
 
         setMessages((prev) =>
           prev.map((msg) =>
-            msg.id === botMsgId ? { ...msg, content: streamedContent } : msg
+            msg.id === botMsgId
+              ? { ...msg, content: streamedContentRef.current }
+              : msg
           )
         );
       }
 
-      if (!streamedContent.trim()) {
+      if (!streamedContentRef.current.trim()) {
         throw new Error("لم يتم تلقي إجابة، يرجى المحاولة مرة أخرى.");
       }
-    } catch (err: any) {
-      if (err.name === "AbortError") {
+    } catch (err: unknown) {
+      if (err instanceof DOMException && err.name === "AbortError") {
         console.log("[AiAgent] Streaming stopped by user.");
         return;
       }
       console.error("[AiAgent] Chat error:", err);
-      setErrorState(err.message || "حدث خطأ أثناء الاتصال بالمساعد.");
-      // إزالة رسالة البوت الفارغة في حالة الفشل
+      setErrorState(
+        err instanceof Error
+          ? err.message
+          : "حدث خطأ أثناء الاتصال بالمساعد."
+      );
       setMessages((prev) => prev.filter((m) => m.id !== botMsgId));
     } finally {
       setIsStreaming(false);
@@ -265,10 +272,10 @@ export default function AiAgent() {
               exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
               dir="rtl"
-              className="fixed inset-y-0 left-0 z-[100] flex w-full flex-col border-r border-border bg-card shadow-2xl sm:w-[420px]"
+              className="fixed inset-y-0 left-0 z-[100] flex w-full flex-col border-r border-line bg-card/95 backdrop-blur-md sm:w-[420px]"
             >
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-border/50 px-4 py-3.5 bg-card/60 backdrop-blur-sm">
+              {/* Header - Height h-14 and border-b border-line matches Navbar exactly */}
+              <div className="flex h-14 shrink-0 items-center justify-between border-b border-line px-4 bg-card/60 backdrop-blur-sm">
                 <div className="flex items-center gap-2.5">
                   <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <Sparkles className="size-4.5" />
@@ -356,10 +363,7 @@ export default function AiAgent() {
                     {messages.map((m) => (
                       <div
                         key={m.id}
-                        className={cn(
-                          "group/msg flex gap-2 w-full",
-                          m.role === "user" ? "justify-end" : "justify-start"
-                        )}
+                        className={cn( "group/msg flex gap-2 w-full", m.role === "user" ? "justify-end" : "justify-start" )}
                       >
                         {m.role === "assistant" && (
                           <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary mt-1 border border-primary/20">
@@ -368,18 +372,10 @@ export default function AiAgent() {
                         )}
 
                         <div
-                          className={cn(
-                            "flex flex-col gap-1 max-w-[86%]",
-                            m.role === "user" ? "items-end" : "items-start"
-                          )}
+                          className={cn( "flex flex-col gap-1 max-w-[86%]", m.role === "user" ? "items-end" : "items-start" )}
                         >
                           <div
-                            className={cn(
-                              "rounded-2xl px-4 py-3 text-[13px] leading-relaxed shadow-xs",
-                              m.role === "user"
-                                ? "bg-primary text-primary-foreground rounded-br-xs whitespace-pre-wrap"
-                                : "bg-card border border-border/70 text-foreground rounded-bl-xs"
-                            )}
+                            className={cn( "rounded-xl px-4 py-2.5 text-[13px] leading-relaxed", m.role === "user" ? "bg-primary text-primary-foreground rounded-br-xs whitespace-pre-wrap" : "bg-card/80 border border-border/80 text-foreground rounded-bl-xs backdrop-blur-xs" )}
                           >
                             {m.content ? (
                               m.role === "assistant" ? (
@@ -395,7 +391,7 @@ export default function AiAgent() {
                                     if (el) {
                                       el.scrollIntoView({ behavior: "smooth" });
                                     } else {
-                                      window.location.href = "/#pricing";
+                                      router.push("/pricing");
                                     }
                                   }}
                                 />
@@ -458,7 +454,7 @@ export default function AiAgent() {
 
               {/* Input Area */}
               <div className="p-3 bg-card border-t border-border/50">
-                <div className="relative rounded-xl border border-border bg-background shadow-xs focus-within:ring-1 focus-within:ring-primary transition-all">
+                <div className="relative rounded-xl border border-border bg-background focus-within:ring-1 focus-within:ring-primary transition-all">
                   <textarea
                     ref={textareaRef}
                     value={query}
@@ -479,7 +475,7 @@ export default function AiAgent() {
                       <button
                         onClick={handleStop}
                         title="إيقاف الرد"
-                        className="flex size-7 items-center justify-center rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors shadow-2xs"
+                        className="flex size-7 items-center justify-center rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
                       >
                         <Square className="size-3 fill-current" />
                       </button>
@@ -487,9 +483,7 @@ export default function AiAgent() {
                       <button
                         onClick={() => handleSend()}
                         disabled={!query.trim()}
-                        className={cn(
-                          "flex size-7 items-center justify-center rounded-lg transition-colors",
-                          query.trim()
+                        className={cn( "flex size-7 items-center justify-center rounded-lg transition-colors", query.trim()
                             ? "bg-primary text-primary-foreground hover:bg-primary/90"
                             : "bg-muted text-muted-foreground cursor-not-allowed opacity-50"
                         )}
