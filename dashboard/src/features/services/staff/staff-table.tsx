@@ -109,7 +109,10 @@ function StaffStatusSelect({
 			disabled={disabled}
 			dir="rtl"
 		>
-			<SelectTrigger className="h-6.5 text-[11px] w-24 border-dashed text-right font-medium">
+			<SelectTrigger
+				size="sm"
+				className="!h-5.5 !py-0 px-2 text-[11px] w-20 border-dashed text-right font-medium rounded gap-1 [&_svg]:!size-3"
+			>
 				<SelectValue />
 			</SelectTrigger>
 			<SelectContent dir="rtl">

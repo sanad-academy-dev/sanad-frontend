@@ -15,6 +15,7 @@ import {
 } from "@tanstack/react-table";
 import { TableDataView } from "@/components/common/table-data-view";
 import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
+import { StaffHoverCard } from "@/components/common/hover-cards";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -57,9 +58,15 @@ function TeachersCell({ teachers }: { teachers: ClassroomTeacher[] }) {
 				id: t.id,
 				name: t.name,
 				title: `${t.name}${t.phone ? ` • ${t.phone}` : ""}`,
+				data: t,
 			}))}
 			variant="mauve"
 			maxVisible={3}
+			renderItem={(item, element) => (
+				<StaffHoverCard staff={item.data || { id: String(item.id), name: item.name }}>
+					{element}
+				</StaffHoverCard>
+			)}
 		/>
 	);
 }
@@ -245,7 +252,18 @@ export function ClassroomsTable({ searchQuery, onAddClassroom }: ClassroomsTable
 				header: "المشرف / المعلم",
 				size: 130,
 				minSize: 110,
-				cell: ({ row }) => <TeachersCell teachers={row.original.teachers} />,
+				cell: ({ row }) => (
+					<div
+						className="cursor-pointer hover:opacity-80 transition-opacity inline-flex items-center"
+						onClick={(e) => {
+							e.stopPropagation();
+							setAssigningClassroom(row.original);
+						}}
+						title="تعيين وتعديل الموظفين"
+					>
+						<TeachersCell teachers={row.original.teachers} />
+					</div>
+				),
 			},
 			{
 				accessorKey: "capacity",
@@ -320,7 +338,7 @@ export function ClassroomsTable({ searchQuery, onAddClassroom }: ClassroomsTable
 									onSelect={() => setAssigningClassroom(row.original)}
 								>
 									<IconUserPlus className="size-3.5" />
-									المشرفون والمعلمون
+								    الموظفين
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem

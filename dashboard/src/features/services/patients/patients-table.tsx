@@ -29,6 +29,10 @@ import { useCallback, useMemo, useState } from "react";
 import { TableDataView } from "@/components/common/table-data-view";
 import { TableToolbar } from "@/components/common/table-toolbar";
 import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
+import {
+	StudentHoverCard,
+	GuardianHoverCard,
+} from "@/components/common/hover-cards";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -124,32 +128,34 @@ export function PatientsTable() {
 					const code = p.code || "PT-2024000";
 
 					return (
-						<div className="flex items-center gap-2.5 min-w-[170px]">
-							<div
-								className={cn(
-									"flex size-7.5 shrink-0 items-center justify-center rounded-full border",
-									isFemale
-										? "bg-pink-50 border-pink-200 text-pink-500 dark:bg-pink-950/30 dark:border-pink-900/50"
-										: "bg-blue-50 border-blue-200 text-blue-500 dark:bg-blue-950/30 dark:border-blue-900/50",
-								)}
-							>
-								<IconUser className="size-3.5" />
-							</div>
-							<div className="flex flex-col min-w-0">
-								<Link
-									to="/services/patients/$patientId"
-									params={{ patientId: p.id }}
-									className="font-semibold text-xs text-foreground hover:underline truncate"
-									onClick={(e) => e.stopPropagation()}
-									title={p.name}
+						// <StudentHoverCard student={p}>
+							<div className="flex items-center gap-2.5 min-w-[170px] group cursor-pointer">
+								<div
+									className={cn(
+										"flex size-7.5 shrink-0 items-center justify-center rounded-full border transition-transform group-hover:scale-105",
+										isFemale
+											? "bg-pink-50 border-pink-200 text-pink-500 dark:bg-pink-950/30 dark:border-pink-900/50"
+											: "bg-blue-50 border-blue-200 text-blue-500 dark:bg-blue-950/30 dark:border-blue-900/50",
+									)}
 								>
-									{p.name}
-								</Link>
-								<span className="font-mono text-[10px] text-muted-foreground tabular-nums">
-									{code}
-								</span>
+									<IconUser className="size-3.5" />
+								</div>
+								<div className="flex flex-col min-w-0">
+									<Link
+										to="/services/patients/$patientId"
+										params={{ patientId: p.id }}
+										className="font-semibold text-xs text-foreground hover:underline truncate"
+										onClick={(e) => e.stopPropagation()}
+										title={p.name}
+									>
+										{p.name}
+									</Link>
+									<span className="font-mono text-[10px] text-muted-foreground tabular-nums">
+										{code}
+									</span>
+								</div>
 							</div>
-						</div>
+						// </StudentHoverCard>
 					);
 				},
 			},
@@ -174,7 +180,12 @@ export function PatientsTable() {
 				minSize: 95,
 				cell: ({ row }) => {
 					const p = row.original;
-					const items: { id: string | number; name: string; title: string }[] = [];
+					const items: {
+						id: string | number;
+						name: string;
+						title: string;
+						data: any;
+					}[] = [];
 
 					if (p.guardians && p.guardians.length > 0) {
 						for (const g of p.guardians) {
@@ -185,6 +196,16 @@ export function PatientsTable() {
 									id: g.owner?.id || g.id,
 									name,
 									title: `${name}${phone ? ` • ${phone}` : ""}`,
+									data: {
+										id: g.owner?.id || g.id,
+										name,
+										phone,
+										email: g.owner?.email,
+										relationship: g.relationship || p.guardianRelationship || "ولي أمر",
+										city: g.owner?.city,
+										address: g.owner?.address,
+										active: g.owner?.active,
+									},
 								});
 							}
 						}
@@ -193,12 +214,28 @@ export function PatientsTable() {
 							id: p.owner.id,
 							name: p.owner.name,
 							title: `${p.owner.name}${p.owner.phone ? ` • ${p.owner.phone}` : ""}`,
+							data: {
+								id: p.owner.id,
+								name: p.owner.name,
+								phone: p.owner.phone,
+								email: p.owner.email,
+								relationship: p.guardianRelationship || p.owner.relationship || "ولي أمر",
+								city: p.owner.city,
+								address: p.owner.address,
+								active: p.owner.active,
+							},
 						});
 					} else if (p.guardianName) {
 						items.push({
 							id: "legacy-guardian",
 							name: p.guardianName,
 							title: `${p.guardianName}${p.guardianPhone ? ` • ${p.guardianPhone}` : ""}`,
+							data: {
+								name: p.guardianName,
+								phone: p.guardianPhone,
+								email: p.guardianEmail,
+								relationship: p.guardianRelationship || "ولي أمر",
+							},
 						});
 					}
 
@@ -207,6 +244,15 @@ export function PatientsTable() {
 							items={items}
 							variant="mauve"
 							maxVisible={3}
+							renderItem={(item, element) => (
+								<GuardianHoverCard
+									guardian={item.data || { name: item.name }}
+									align="center"
+									side="top"
+								>
+									{element}
+								</GuardianHoverCard>
+							)}
 						/>
 					);
 				},

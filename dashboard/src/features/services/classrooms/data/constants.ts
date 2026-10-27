@@ -1,10 +1,16 @@
 import type { LearningMode } from "@/server/classrooms/classrooms.type";
 
 export const AGE_GROUPS = [
-	"4-7 سنوات",
-	"8-12 سنة",
-	"13-16 سنة",
-	"17+ سنة",
+	"4-6 سنه",
+	"7-8 سنه",
+	"9-11 سنة",
+	"12-14 سنة",
+	"12-14 سنة",
+	"15-17 سنة",
+	"18-20 سنة",
+	"21-23 سنة",
+	"23-26 سنة",
+	"26+ سنة"
 ] as const;
 
 export const CATEGORIES = [

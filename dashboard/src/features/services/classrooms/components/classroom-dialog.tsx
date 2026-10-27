@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import {
 	IconCopy,
 	IconPlus,
+	IconScan,
+	IconFileDescription,
 	IconUserCheck,
 	IconUserPlus,
 	IconX,
@@ -50,6 +52,7 @@ import {
 	IconTools,
 	IconPuzzle,
 	IconDiamond,
+	IconMaximize,
 } from "@tabler/icons-react";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { Button } from "@/components/ui/button";
@@ -82,12 +85,15 @@ import { Field } from "@/components/ui/field";
 import { FieldLabel } from "@/components/common/field-label";
 import { FormHeader } from "@/components/common/form-header";
 import { FormFooter } from "@/components/common/form-footer";
+import { SanadLogo } from "@/components/common/sanad-logo";
 import { Spinner } from "@/components/ui/spinner";
-import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import { useBranches } from "@/features/settings/branches/hooks/use-branches";
+import { useClassroomClassifications } from "@/features/services/classrooms/hooks/use-classrooms";
 import {
 	useCreateClassroom,
 	useUpdateClassroom,
+	useAddClassroomClassification,
+	useDeleteClassroomClassification,
 } from "@/features/services/classrooms/hooks/use-classroom-mutations";
 import {
 	AGE_GROUPS,
@@ -95,7 +101,12 @@ import {
 	LEARNING_MODES,
 } from "@/features/services/classrooms/data/constants";
 import type { ClassroomResponse, LearningMode } from "@/server/classrooms/classrooms.type";
+import { AssignStaffSheet } from "./assign-staff-dialog";
+import { SaveDraftConfirmDialog } from "./save-draft-confirm-dialog";
+import { ClassroomAgentPanel } from "./classroom-agent-panel";
+import { ClassroomReviewStep } from "./classroom-review-step";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 // قائمة الأيقونات المتاحة للاختيار مع وسوم البحث
 const POPULAR_ICONS = [
@@ -221,7 +232,21 @@ const COLOR_OPTIONS = [
 // قوالب سريعة لملء النموذج
 const CLASSROOM_TEMPLATES = [
 	{
-		title: "المبرمجون الصغار",
+		id: "digital_registration",
+		title: "التسجيل الرقمي",
+		category: "مختلط",
+		ageGroup: "17+ سنة",
+		learningMode: "REMOTE" as LearningMode,
+		capacity: 20,
+		description: "دورة تدريبية متقدمة في استراتيجيات التسجيل الرقمي وإدارة الحملات وتحليل البيانات.",
+		notes: "يشمل شهادة إتمام معتمدة وتطبيق عملي.",
+		icon: "chart",
+		Icon: IconFileDescription,
+		color: "indigo",
+	},
+	{
+		id: "kids_coding",
+		title: "مسار البرمجه للاطفال",
 		category: "مختلط",
 		ageGroup: "8-12 سنة",
 		learningMode: "REMOTE" as LearningMode,
@@ -229,41 +254,48 @@ const CLASSROOM_TEMPLATES = [
 		description: "فصل تدريبي تفاعلي لتعليم أساسيات البرمجة والتفكير المنطقي عبر مشاريع عملية ممتعة.",
 		notes: "يتطلب حاسوب شخصي واتصال بالإنترنت.",
 		icon: "code",
+		Icon: IconCube,
 		color: "blue",
 	},
-	{
-		title: "الروبوت والذكاء الاصطناعي",
-		category: "بنين",
-		ageGroup: "13-16 سنة",
-		learningMode: "IN_PERSON" as LearningMode,
-		capacity: 15,
-		description: "تطبيق عملي لمشاريع الروبوتات وتحديات الذكاء الاصطناعي في مختبر الابتكار.",
-		notes: "الأدوات والمعدات متوفرة داخل المختبر.",
-		icon: "robot",
-		color: "indigo",
-	},
-	{
-		title: "النطق وتنمية المهارات",
-		category: "مختلط",
-		ageGroup: "4-7 سنوات",
-		learningMode: "IN_PERSON" as LearningMode,
-		capacity: 6,
-		description: "جلسات جماعية مصغرة لتطوير مهارات التخاطب والنطق والتفاعل الاجتماعي.",
-		notes: "متابعة فردية لكل طالب مع تقييم دوري.",
-		icon: "brain",
-		color: "rose",
-	},
-	{
-		title: "اللغة الإنجليزية التفاعلية",
-		category: "بنات",
-		ageGroup: "8-12 سنة",
-		learningMode: "HYBRID" as LearningMode,
-		capacity: 12,
-		description: "تطوير مهارات المحادثة والاستماع باللغة الإنجليزية من خلال ألعاب وأنشطة تفاعلية.",
-		notes: "حصص حضورية ومتابعة دورية عن بعد.",
-		icon: "language",
-		color: "emerald",
-	},
+	// {
+	// 	id: "robotics",
+	// 	title: "الروبوت والذكاء الاصطناعي",
+	// 	category: "بنين",
+	// 	ageGroup: "13-16 سنة",
+	// 	learningMode: "IN_PERSON" as LearningMode,
+	// 	capacity: 15,
+	// 	description: "تطبيق عملي لمشاريع الروبوتات وتحديات الذكاء الاصطناعي في مختبر الابتكار.",
+	// 	notes: "الأدوات والمعدات متوفرة داخل المختبر.",
+	// 	icon: "robot",
+	// 	Icon: IconRobot,
+	// 	color: "indigo",
+	// },
+	// {
+	// 	id: "speech",
+	// 	title: "النطق وتنمية المهارات",
+	// 	category: "مختلط",
+	// 	ageGroup: "4-7 سنوات",
+	// 	learningMode: "IN_PERSON" as LearningMode,
+	// 	capacity: 6,
+	// 	description: "جلسات جماعية مصغرة لتطوير مهارات التخاطب والنطق والتفاعل الاجتماعي.",
+	// 	notes: "متابعة فردية لكل طالب مع تقييم دوري.",
+	// 	icon: "brain",
+	// 	Icon: IconBrain,
+	// 	color: "rose",
+	// },
+	// {
+	// 	id: "english",
+	// 	title: "اللغة الإنجليزية التفاعلية",
+	// 	category: "بنات",
+	// 	ageGroup: "8-12 سنة",
+	// 	learningMode: "HYBRID" as LearningMode,
+	// 	capacity: 12,
+	// 	description: "تطوير مهارات المحادثة والاستماع باللغة الإنجليزية من خلال ألعاب وأنشطة تفاعلية.",
+	// 	notes: "حصص حضورية ومتابعة دورية عن بعد.",
+	// 	icon: "language",
+	// 	Icon: IconLanguage,
+	// 	color: "emerald",
+	// },
 ];
 
 // تصنيفات الفصول الافتراضية للدروب داون
@@ -286,8 +318,10 @@ export function ClassroomDialog({
 	classroom,
 }: ClassroomDialogProps) {
 	const isEdit = Boolean(classroom);
-	const { staff, isLoading: isStaffLoading } = useStaff();
 	const { branches } = useBranches();
+	const { classifications: backendClassifications, isLoading: isClassificationsLoading } = useClassroomClassifications();
+	const { mutate: addClassificationMutation, isPending: isAddingClassification } = useAddClassroomClassification();
+	const { mutate: deleteClassificationMutation } = useDeleteClassroomClassification();
 	const { mutate: createClassroom, isPending: isCreating } = useCreateClassroom();
 	const { mutate: updateClassroom, isPending: isUpdating } = useUpdateClassroom();
 	const isPending = isCreating || isUpdating;
@@ -312,18 +346,38 @@ export function ClassroomDialog({
 	const [ageGroup, setAgeGroup] = useState<string>("");
 	const [branch, setBranch] = useState<string>("");
 	const [classification, setClassification] = useState<string>("");
-	const [classificationsList, setClassificationsList] = useState<string[]>(DEFAULT_CLASSIFICATIONS);
+	const [classificationsList, setClassificationsList] = useState<string[]>([]);
 	const [newClassificationInput, setNewClassificationInput] = useState<string>("");
 	const [learningMode, setLearningMode] = useState<LearningMode | "">("");
+
+	// دمج التصنيفات الافتراضية مع تصنيفات الباك إند والإضافات المحلية
+	const mergedClassifications = useMemo(() => {
+		const set = new Set([
+			...DEFAULT_CLASSIFICATIONS,
+			...(backendClassifications || []),
+			...classificationsList,
+		]);
+		return Array.from(set).filter(Boolean);
+	}, [backendClassifications, classificationsList]);
 
 	// خيارات إضافية وتفاعلية
 	const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
 	const [showManagerSection, setShowManagerSection] = useState(false);
+	const [isStaffSheetOpen, setIsStaffSheetOpen] = useState(false);
+	const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>("none");
+	const [templateSearch, setTemplateSearch] = useState("");
+	const [templateMenuOpen, setTemplateMenuOpen] = useState(false);
 	const [showNotice, setShowNotice] = useState(true);
 	const [createAnother, setCreateAnother] = useState(false);
 	const [notifyWhatsApp, setNotifyWhatsApp] = useState(false);
+	const [showDraftConfirm, setShowDraftConfirm] = useState(false);
+	const [hasDraft, setHasDraft] = useState(false);
+	const [isAgentOpen, setIsAgentOpen] = useState(false);
+	const [isReviewStep, setIsReviewStep] = useState(false);
 
 	const resetForm = useCallback(() => {
+		setIsReviewStep(false);
+		setIsAgentOpen(false);
 		setName("");
 		setCode("");
 		setDescription("");
@@ -337,6 +391,9 @@ export function ClassroomDialog({
 		setLearningMode("");
 		setSelectedStaffIds([]);
 		setShowManagerSection(false);
+		setSelectedTemplateId("none");
+		setTemplateSearch("");
+		setTemplateMenuOpen(false);
 		setSelectedIcon("cube");
 		setSelectedIconType("icon");
 		setSelectedColor("blue");
@@ -382,7 +439,13 @@ export function ClassroomDialog({
 
 			setBranch(matchBranch?.[1]?.trim() || "");
 
-			if (matchClass?.[1]) {
+			if (classroom.classification) {
+				const savedClass = classroom.classification.trim();
+				setClassification(savedClass);
+				setClassificationsList((prev) =>
+					prev.includes(savedClass) ? prev : [...prev, savedClass],
+				);
+			} else if (matchClass?.[1]) {
 				const savedClass = matchClass[1].trim();
 				setClassification(savedClass);
 				setClassificationsList((prev) =>
@@ -413,6 +476,7 @@ export function ClassroomDialog({
 
 			setSelectedStaffIds(classroom.teachers?.map((t) => t.id) || []);
 			setShowManagerSection(Boolean(classroom.teachers?.length));
+			setIsReviewStep(false);
 		} else {
 			resetForm();
 		}
@@ -433,6 +497,149 @@ export function ClassroomDialog({
 		if (tpl.color) {
 			setSelectedColor(tpl.color);
 		}
+	};
+
+	const handleSelectTemplate = (tpl: (typeof CLASSROOM_TEMPLATES)[0] | null) => {
+		if (!tpl) {
+			setSelectedTemplateId("none");
+			setName("");
+			setCategory("");
+			setAgeGroup("");
+			setLearningMode("");
+			setCapacity("");
+			setDescription("");
+			setNotes("");
+			setSelectedIcon("cube");
+			setSelectedColor("blue");
+			setTemplateMenuOpen(false);
+			return;
+		}
+
+		setSelectedTemplateId(tpl.id);
+		applyTemplate(tpl);
+		setTemplateMenuOpen(false);
+	};
+
+	const filteredTemplates = useMemo(() => {
+		if (!templateSearch.trim()) return CLASSROOM_TEMPLATES;
+		const q = templateSearch.trim().toLowerCase();
+		return CLASSROOM_TEMPLATES.filter(
+			(t) =>
+				t.title.toLowerCase().includes(q) ||
+				(t.id === "digital_registration" && "التسويق الرقمي".includes(q)),
+		);
+	}, [templateSearch]);
+
+	// فحص وجود مسودة محفوظة عند فتح النموذج لإنشاء فصل جديد
+	useEffect(() => {
+		if (open && !isEdit) {
+			try {
+				const saved = localStorage.getItem("sanad_classroom_draft");
+				if (saved) {
+					const parsed = JSON.parse(saved);
+					if (parsed && typeof parsed === "object") {
+						setHasDraft(true);
+					}
+				} else {
+					setHasDraft(false);
+				}
+			} catch {
+				localStorage.removeItem("sanad_classroom_draft");
+				setHasDraft(false);
+			}
+		}
+	}, [open, isEdit]);
+
+	const isFormDirty = Boolean(
+		name.trim() ||
+		code.trim() ||
+		description.trim() ||
+		category ||
+		capacity ||
+		notes.trim() ||
+		branch ||
+		classification ||
+		learningMode ||
+		selectedStaffIds.length > 0 ||
+		selectedIcon !== "cube" ||
+		selectedColor !== "blue",
+	);
+
+	const handleCloseAttempt = useCallback(() => {
+		if (!isEdit && isFormDirty) {
+			setShowDraftConfirm(true);
+		} else {
+			resetForm();
+			onClose();
+		}
+	}, [isEdit, isFormDirty, resetForm, onClose]);
+
+	const handleSaveDraft = () => {
+		const draftData = {
+			name,
+			code,
+			description,
+			category,
+			capacity,
+			notes,
+			branch,
+			classification,
+			learningMode,
+			selectedStaffIds,
+			selectedIcon,
+			selectedIconType,
+			selectedColor,
+			savedAt: new Date().toISOString(),
+		};
+		localStorage.setItem("sanad_classroom_draft", JSON.stringify(draftData));
+		setHasDraft(true);
+		setShowDraftConfirm(false);
+		toast.success("تم حفظ المسودة بنجاح، يمكنك إكمالها لاحقاً");
+		resetForm();
+		onClose();
+	};
+
+	const handleDiscardDraft = () => {
+		localStorage.removeItem("sanad_classroom_draft");
+		setHasDraft(false);
+		setShowDraftConfirm(false);
+		resetForm();
+		onClose();
+	};
+
+	const handleCancelDraftConfirm = () => {
+		setShowDraftConfirm(false);
+	};
+
+	const handleRestoreDraft = () => {
+		const saved = localStorage.getItem("sanad_classroom_draft");
+		if (!saved) return;
+		try {
+			const d = JSON.parse(saved);
+			if (d.name) setName(d.name);
+			if (d.code) setCode(d.code);
+			if (d.description) setDescription(d.description);
+			if (d.category) setCategory(d.category);
+			if (d.capacity) setCapacity(d.capacity);
+			if (d.notes) setNotes(d.notes);
+			if (d.branch) setBranch(d.branch);
+			if (d.classification) setClassification(d.classification);
+			if (d.learningMode) setLearningMode(d.learningMode);
+			if (Array.isArray(d.selectedStaffIds)) setSelectedStaffIds(d.selectedStaffIds);
+			if (d.selectedIcon) setSelectedIcon(d.selectedIcon);
+			if (d.selectedIconType) setSelectedIconType(d.selectedIconType);
+			if (d.selectedColor) setSelectedColor(d.selectedColor);
+			setHasDraft(false);
+			toast.success("تم استعادة المسودة بنجاح");
+		} catch (e) {
+			console.error("Failed to restore draft", e);
+		}
+	};
+
+	const handleClearDraft = () => {
+		localStorage.removeItem("sanad_classroom_draft");
+		setHasDraft(false);
+		toast.info("تم مسح المسودة المحفوظة");
 	};
 
 	const toggleStaff = (id: string) => {
@@ -483,10 +690,24 @@ export function ClassroomDialog({
 		}
 		setClassification(trimmed);
 		setNewClassificationInput("");
+
+		// حفظ وتخزين التصنيف فورياً في الباك إند وقاعدة البيانات
+		addClassificationMutation(trimmed);
 	};
 
-	const handleSubmit = (e?: React.FormEvent) => {
+	// 1. الانتقال إلى خطوة مراجعة تفاصيل الفصل قبل الإرسال
+	const handleFormSubmitToReview = (e?: React.FormEvent) => {
 		if (e) e.preventDefault();
+		const trimmedName = name.trim();
+		if (!trimmedName) {
+			toast.error("يرجى إدخال اسم الفصل أولاً");
+			return;
+		}
+		setIsReviewStep(true);
+	};
+
+	// 2. تأكيد الإرسال الفعلي بعد مراجعة البيانات
+	const handleFinalSubmit = () => {
 		const trimmedName = name.trim();
 		if (!trimmedName) return;
 
@@ -512,6 +733,7 @@ export function ClassroomDialog({
 			name: trimmedName,
 			code: code.trim() || undefined,
 			category: category || "مختلط",
+			classification: classification || null,
 			ageGroup: ageGroup || "8-12 سنة",
 			learningMode: (learningMode as LearningMode) || "REMOTE",
 			capacity: validCapacity,
@@ -525,6 +747,10 @@ export function ClassroomDialog({
 				{ id: classroom.id, data: payload },
 				{
 					onSuccess: () => {
+						if (notifyWhatsApp) {
+							toast.success("تم إرسال إشعار عبر الواتساب بنجاح");
+						}
+						setIsReviewStep(false);
 						onClose();
 					},
 				},
@@ -532,6 +758,12 @@ export function ClassroomDialog({
 		} else {
 			createClassroom(payload, {
 				onSuccess: () => {
+					localStorage.removeItem("sanad_classroom_draft");
+					setHasDraft(false);
+					if (notifyWhatsApp) {
+						toast.success("تم إرسال إشعار عبر الواتساب بنجاح");
+					}
+					setIsReviewStep(false);
 					if (createAnother) {
 						resetForm();
 					} else {
@@ -542,87 +774,245 @@ export function ClassroomDialog({
 		}
 	};
 
-	useHotkey("Mod+Enter", () => handleSubmit(), {
+	useHotkey("Mod+Enter", () => {
+		if (isReviewStep) {
+			handleFinalSubmit();
+		} else {
+			handleFormSubmitToReview();
+		}
+	}, {
 		enabled: open && !isPending && Boolean(name.trim()),
 	});
 
+	useHotkey("Mod+Alt+T", () => setTemplateMenuOpen((prev) => !prev), {
+		enabled: open,
+	});
+
 	return (
-		<Dialog open={open} onOpenChange={(val) => !val && onClose()}>
+		<>
+			<Dialog
+				open={open}
+				onOpenChange={(val) => {
+					if (!val) handleCloseAttempt();
+				}}
+			>
 			<DialogContent
 				dir="rtl"
 				showCloseButton={false}
-				className="max-w-xl! w-full p-0 gap-0 overflow-hidden"
+				className={cn(
+					"w-full p-0 gap-0 overflow-hidden transition-all duration-300 ease-out",
+					isReviewStep
+						? "max-w-xl!"
+						: isAgentOpen
+						? "max-w-4xl! sm:max-w-5xl! lg:max-w-[1020px]!"
+						: "max-w-xl!"
+				)}
+				onInteractOutside={(e) => {
+					if (!isEdit && isFormDirty) {
+						e.preventDefault();
+						setShowDraftConfirm(true);
+					}
+				}}
+				onEscapeKeyDown={(e) => {
+					if (isReviewStep) {
+						e.preventDefault();
+						setIsReviewStep(false);
+						return;
+					}
+					if (!isEdit && isFormDirty) {
+						e.preventDefault();
+						setShowDraftConfirm(true);
+					}
+				}}
 			>
 				<DialogDescription className="sr-only">
 					{isEdit ? "نموذج تعديل بيانات الفصل الدراسي" : "نموذج إنشاء وإضافة فصل دراسي جديد"}
 				</DialogDescription>
 
-				{/* 1. ترويسة النموذج الموحدة للمنصة (FormHeader) */}
-				<FormHeader
-					variant="dialog"
-					title={isEdit ? "تعديل بيانات الفصل" : "أنشئ فصل جديد"}
-					identity={isEdit && classroom ? { name: classroom.name, code: classroom.code } : null}
-					onClose={onClose}
-					titleActions={
+				{isReviewStep ? (
+					<ClassroomReviewStep
+						isEdit={isEdit}
+						classroom={classroom}
+						name={name}
+						code={code}
+						classification={classification}
+						category={category}
+						learningMode={learningMode}
+						branch={branch}
+						capacity={capacity}
+						notes={notes}
+						description={description}
+						selectedStaffIds={selectedStaffIds}
+						notifyWhatsApp={notifyWhatsApp}
+						onNotifyWhatsAppChange={setNotifyWhatsApp}
+						onBackToForm={() => setIsReviewStep(false)}
+						onSubmit={handleFinalSubmit}
+						isPending={isPending}
+						onClose={handleCloseAttempt}
+					/>
+				) : (
+				<div className="flex flex-col md:flex-row w-full items-stretch overflow-hidden">
+					{/* الجانب الأساسي: نموذج إنشاء/تعديل الفصل (يظهر على اليمين في نمط RTL) */}
+					<div className="flex-1 min-w-[480px] sm:min-w-[520px] flex flex-col">
+						{/* 1. ترويسة النموذج الموحدة للمنصة (FormHeader) */}
+						<FormHeader
+							variant="dialog"
+							title={isEdit ? "تعديل بيانات الفصل" : "أنشئ فصل جديد"}
+							identity={isEdit && classroom ? { name: classroom.name, code: classroom.code } : null}
+							onClose={handleCloseAttempt}
+							actions={
+								<Button
+									type="button"
+									variant="ghost"
+									size="icon-sm"
+									onClick={() => setIsAgentOpen((prev) => !prev)}
+									className="text-muted-foreground hover:text-foreground hidden sm:flex cursor-pointer"
+									title={isAgentOpen ? "إخفاء المساعد الذكي" : "توسيع وعرض المساعد الذكي"}
+								>
+									<IconMaximize className="size-3.5" />
+								</Button>
+							}
+							titleActions={
 						<div className="flex items-center gap-1.5 ms-2">
-							{/* زر أنشئ مع مدير */}
-							<Button
-								type="button"
-								variant={showManagerSection ? "secondary" : "outline"}
-								size="sm"
-								onClick={() => setShowManagerSection((prev) => !prev)}
-								className="h-7 px-2.5 text-xs gap-1.5"
-							>
-								{showManagerSection ? (
-									<IconUserCheck className="size-3.5 text-primary" />
-								) : (
-									<IconUserPlus className="size-3.5" />
-								)}
-								<span>أنشئ مع مدير</span>
-							</Button>
-
 							{/* زر القوالب الجاهزة */}
-							<DropdownMenu dir="rtl" modal={false}>
+							<DropdownMenu dir="rtl" open={templateMenuOpen} onOpenChange={setTemplateMenuOpen} modal={false}>
 								<DropdownMenuTrigger asChild>
 									<Button
 										type="button"
 										variant="outline"
 										size="sm"
-										className="h-7 px-2.5 text-xs gap-1.5"
+										className="h-7 px-3 text-xs gap-1.5 rounded-full border border-border bg-white dark:bg-card hover:bg-muted font-medium cursor-pointer"
 									>
 										<IconCopy className="size-3.5" />
 										<span>قالب</span>
 									</Button>
 								</DropdownMenuTrigger>
-								<DropdownMenuContent align="start" className="w-64! min-w-64">
-									<DropdownMenuLabel className="px-2 py-1.5 text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
-										<IconSparkles className="size-3.5 text-amber-500" />
-										<span>اختر قالباً جاهزاً</span>
-									</DropdownMenuLabel>
-									<DropdownMenuSeparator />
-									{CLASSROOM_TEMPLATES.map((tpl) => (
+								<DropdownMenuContent
+									align="start"
+									className="w-64! min-w-64 p-1.5 rounded-xl border border-border shadow-md bg-popover"
+									onCloseAutoFocus={(e) => e.preventDefault()}
+								>
+									{/* حقل البحث العلوي مع اختصار لوحة المفاتيح */}
+									<div className="flex items-center justify-between gap-1.5 px-2 py-1 mb-1 border-b border-border/60">
+										<input
+											value={templateSearch}
+											onChange={(e) => setTemplateSearch(e.target.value)}
+											placeholder="تطبيق قالب مشروع..."
+											className="w-full text-xs bg-transparent outline-none placeholder:text-muted-foreground/60 text-right"
+											onClick={(e) => e.stopPropagation()}
+											onKeyDown={(e) => e.stopPropagation()}
+										/>
+										
+									</div>
+
+									{/* قائمة الخيارات */}
+									<div className="space-y-0.5">
+										{/* خيار بدون قالب */}
 										<DropdownMenuItem
-											key={tpl.title}
-											onSelect={() => applyTemplate(tpl)}
-											className="cursor-pointer flex flex-col items-start gap-0.5 text-right py-1.5"
+											onClick={() => handleSelectTemplate(null)}
+											className={cn(
+												"w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs cursor-pointer transition-colors text-right",
+												selectedTemplateId === "none" || !selectedTemplateId
+													? "bg-muted font-medium text-foreground"
+													: "text-foreground",
+											)}
 										>
-											<span className="font-medium text-xs text-foreground">
-												{tpl.title}
-											</span>
-											<span className="text-[10px] text-muted-foreground">
-												{tpl.category} • {tpl.ageGroup} • {tpl.capacity} طلاب
-											</span>
+											<div className="flex items-center gap-2">
+												<IconScan className="size-4 text-foreground/80 shrink-0" />
+												<span className="text-xs">بدون قالب</span>
+											</div>
+											{(selectedTemplateId === "none" || !selectedTemplateId) && (
+												<IconCheck className="size-3.5 text-foreground shrink-0" />
+											)}
 										</DropdownMenuItem>
-									))}
+
+										{/* قائمة القوالب */}
+										{filteredTemplates.map((tpl) => {
+											const isSelected = selectedTemplateId === tpl.id;
+											const IconComp = tpl.Icon;
+											return (
+												<DropdownMenuItem
+													key={tpl.id}
+													onClick={() => handleSelectTemplate(tpl)}
+													className={cn(
+														"w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs cursor-pointer transition-colors text-right",
+														isSelected
+															? "bg-muted font-medium text-foreground"
+															: "text-foreground",
+													)}
+												>
+													<div className="flex items-center gap-2">
+														{IconComp ? (
+															<IconComp className="size-4 text-foreground/80 shrink-0" />
+														) : (
+															<span className="size-4 shrink-0" />
+														)}
+														<span className="text-xs">{tpl.title}</span>
+													</div>
+													{isSelected && (
+														<IconCheck className="size-3.5 text-foreground shrink-0" />
+													)}
+												</DropdownMenuItem>
+											);
+										})}
+									</div>
 								</DropdownMenuContent>
 							</DropdownMenu>
+
+							{/* زر أنشئ مع سند */}
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={() => {
+									setIsAgentOpen((prev) => !prev);
+								}}
+								className={cn(
+									"h-7 px-2.5 text-xs gap-1.5 rounded-full border border-border bg-white dark:bg-card hover:bg-muted font-medium cursor-pointer flex items-center shrink-0 transition-all",
+									isAgentOpen && "bg-primary/10 border-primary/40 text-primary font-semibold shadow-2xs",
+								)}
+								title="أنشئ مع سند"
+								aria-label="أنشئ مع سند"
+							>
+								<SanadLogo iconOnly className="h-3.5 w-auto shrink-0" />
+								<span className="whitespace-nowrap">أنشئ مع سند</span>
+							</Button>
 						</div>
 					}
 				/>
 
 				{/* 2. جسم النموذج */}
-				<form onSubmit={handleSubmit} className="flex flex-col">
+				<form onSubmit={handleFormSubmitToReview} className="flex flex-col">
 					<div className="space-y-4 p-5 max-h-[70vh] overflow-y-auto">
+						{/* شريط استعادة المسودة إن وُجدت */}
+						{hasDraft && !isEdit && (
+							<div className="flex items-center justify-between gap-2 rounded-lg border border-primary/25 bg-primary/5 px-3.5 py-2 text-xs text-primary transition-colors">
+								<div className="flex items-center gap-2">
+									<IconSparkles className="size-4 shrink-0 text-primary" />
+									<span>يوجد مسودة غير مكتملة محفوظة مسبقاً.</span>
+								</div>
+								<div className="flex items-center gap-1.5 shrink-0">
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										onClick={handleRestoreDraft}
+										className="h-6.5 text-[11px] px-2.5 font-medium border-primary/30 hover:bg-primary/10 text-primary cursor-pointer"
+									>
+										استعادة المسودة
+									</Button>
+									<Button
+										type="button"
+										variant="ghost"
+										size="sm"
+										onClick={handleClearDraft}
+										className="h-6.5 text-[11px] px-2 text-muted-foreground hover:text-destructive cursor-pointer"
+									>
+										مسح
+									</Button>
+								</div>
+							</div>
+						)}
 						{/* الصف الأول: المعرّف (يمين) + زر الأيقونة المنبثق لاختيار رمز ولون الفصل (وسط) + اسم الفصل (يسار) */}
 						<div className="flex items-end gap-2.5 w-full">
 							{/* 1. حقل المعرّف (في اليمين) */}
@@ -910,63 +1300,6 @@ export function ClassroomDialog({
 							/>
 						</Field>
 
-						{/* قسم تعيين المشرفين والمعلمين (يظهر عند الضغط على أنشئ مع مدير) — كامل العرض */}
-						{showManagerSection && (
-							<div className="w-full rounded-lg border border-primary/25 bg-primary/5 p-3.5 space-y-2">
-								<div className="flex items-center justify-between text-xs font-semibold text-primary">
-									<span>المشرفون والمعلمون المسؤولون</span>
-									<span className="text-[10px] text-muted-foreground font-mono">
-										{selectedStaffIds.length} محدد
-									</span>
-								</div>
-
-								<div className="max-h-36 overflow-y-auto space-y-1 border rounded-md p-1.5 bg-background">
-									{isStaffLoading ? (
-										<p className="text-center text-xs text-muted-foreground py-2">
-											جاري تحميل المعلمين...
-										</p>
-									) : staff.length === 0 ? (
-										<p className="text-center text-xs text-muted-foreground py-2">
-											لا يوجد موظفون متاحون
-										</p>
-									) : (
-										staff.map((s) => {
-											const isSelected = selectedStaffIds.includes(s.id);
-											return (
-												<div
-													key={s.id}
-													onClick={() => toggleStaff(s.id)}
-													className={cn(
-														"flex items-center justify-between p-2 rounded cursor-pointer transition-colors text-xs",
-														isSelected
-															? "bg-primary/10 text-primary font-medium"
-															: "hover:bg-muted/50 text-foreground",
-													)}
-												>
-													<div className="flex items-center gap-2">
-														<div className="size-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-medium">
-															{s.name?.[0] || <IconUser className="size-3.5" />}
-														</div>
-														<span>{s.name}</span>
-													</div>
-													<div
-														className={cn(
-															"size-4 rounded border flex items-center justify-center",
-															isSelected
-																? "bg-primary border-primary text-primary-foreground"
-																: "border-border",
-														)}
-													>
-														{isSelected && <IconCheck className="size-3" />}
-													</div>
-												</div>
-											);
-										})
-									)}
-								</div>
-							</div>
-						)}
-
 						{/* صندوق التنبيه الموحد — كامل العرض */}
 						{showNotice && (
 							<div className="w-full flex items-center justify-between rounded-lg border border-amber-500/30 bg-amber-500/10 px-3.5 py-2.5 text-xs text-amber-900 dark:text-amber-200">
@@ -1116,12 +1449,13 @@ export function ClassroomDialog({
 										onClickCapture={(e) => e.stopPropagation()}
 										onKeyDownCapture={(e) => e.stopPropagation()}
 										onPointerDownCapture={(e) => e.stopPropagation()}
+										onMouseDown={(e) => e.stopPropagation()}
 									>
 										<div className="flex items-center gap-1.5">
 											<Input
 												value={newClassificationInput}
 												onChange={(e) => setNewClassificationInput(e.target.value)}
-												onKeyDownCapture={(e) => {
+												onKeyDown={(e) => {
 													e.stopPropagation();
 													if (e.key === "Enter") {
 														e.preventDefault();
@@ -1135,11 +1469,24 @@ export function ClassroomDialog({
 												type="button"
 												size="sm"
 												variant="secondary"
+												onPointerDown={(e) => {
+													e.preventDefault();
+													e.stopPropagation();
+												}}
+												onMouseDown={(e) => {
+													e.preventDefault();
+													e.stopPropagation();
+													handleAddCustomClassification(e);
+												}}
 												onClick={handleAddCustomClassification}
-												disabled={!newClassificationInput.trim()}
-												className="h-7 px-2 text-xs shrink-0 gap-1"
+												disabled={!newClassificationInput.trim() || isAddingClassification}
+												className="h-7 px-2 text-xs shrink-0 gap-1 cursor-pointer"
 											>
-												<IconPlus className="size-3" />
+												{isAddingClassification ? (
+													<Spinner className="size-3" />
+												) : (
+													<IconPlus className="size-3" />
+												)}
 												<span>إضافة</span>
 											</Button>
 										</div>
@@ -1147,18 +1494,57 @@ export function ClassroomDialog({
 
 									{/* قائمة التصنيفات المتاحة */}
 									<div className="max-h-48 overflow-y-auto space-y-0.5">
-										{classificationsList.map((item) => (
-											<DropdownMenuItem
-												key={item}
-												onClick={() => setClassification(item)}
-												className="cursor-pointer text-xs flex items-center justify-between"
-											>
-												<span>{item}</span>
-												{classification === item && (
-													<IconCheck className="size-3.5 text-primary" />
-												)}
-											</DropdownMenuItem>
-										))}
+										{isClassificationsLoading && mergedClassifications.length === 0 ? (
+											<div className="py-2 text-center text-xs text-muted-foreground">
+												جاري التحميل...
+											</div>
+										) : (
+											mergedClassifications.map((item) => {
+												const isCustom = !DEFAULT_CLASSIFICATIONS.includes(item);
+												return (
+													<div
+														key={item}
+														onClick={() => setClassification(item)}
+														className={cn(
+															"relative flex cursor-pointer select-none items-center justify-between rounded-sm px-2 py-1.5 text-xs outline-none transition-colors hover:bg-accent hover:text-accent-foreground group",
+															classification === item && "bg-accent/60 font-medium",
+														)}
+													>
+														<div className="flex items-center gap-1.5 min-w-0">
+															<span>{item}</span>
+															{classification === item && (
+																<IconCheck className="size-3.5 text-primary shrink-0" />
+															)}
+														</div>
+
+														{isCustom && (
+															<button
+																type="button"
+																title="حذف هذا التصنيف"
+																onPointerDown={(e) => {
+																	e.preventDefault();
+																	e.stopPropagation();
+																}}
+																onMouseDown={(e) => {
+																	e.preventDefault();
+																	e.stopPropagation();
+																}}
+																onClick={(e) => {
+																	e.preventDefault();
+																	e.stopPropagation();
+																	if (classification === item) setClassification("");
+																	setClassificationsList((prev) => prev.filter((c) => c !== item));
+																	deleteClassificationMutation(item);
+																}}
+																className="opacity-50 hover:opacity-100 hover:text-destructive p-0.5 rounded transition-opacity"
+															>
+																<IconX className="size-3.5" />
+															</button>
+														)}
+													</div>
+												);
+											})
+										)}
 									</div>
 
 									{classification && (
@@ -1234,12 +1620,17 @@ export function ClassroomDialog({
 										<IconDots className="size-4" />
 									</Button>
 								</DropdownMenuTrigger>
-								<DropdownMenuContent align="start" className="w-48! min-w-48">
+								<DropdownMenuContent align="start" className="w-44! min-w-44">
 									<DropdownMenuItem
-										onClick={() => setShowManagerSection((prev) => !prev)}
-										className="cursor-pointer text-xs"
+										onClick={() => setIsStaffSheetOpen(true)}
+										className="cursor-pointer text-xs flex items-center justify-between"
 									>
-										تعيين المشرفين والمعلمين
+										<span>تعيين موظف</span>
+										{selectedStaffIds.length > 0 && (
+											<span className="text-[10px] bg-primary/10 text-primary font-medium px-1.5 py-0.5 rounded">
+												{selectedStaffIds.length} محدد
+											</span>
+										)}
 									</DropdownMenuItem>
 									<DropdownMenuItem
 										onClick={() => {
@@ -1247,6 +1638,7 @@ export function ClassroomDialog({
 											setBranch("");
 											setClassification("");
 											setLearningMode("");
+											setSelectedStaffIds([]);
 										}}
 										className="cursor-pointer text-xs text-destructive"
 									>
@@ -1279,7 +1671,7 @@ export function ClassroomDialog({
 							type="button"
 							variant="outline"
 							size="sm"
-							onClick={onClose}
+							onClick={handleCloseAttempt}
 							disabled={isPending}
 						>
 							إلغاء
@@ -1296,7 +1688,70 @@ export function ClassroomDialog({
 						</Button>
 					</FormFooter>
 				</form>
-			</DialogContent>
-		</Dialog>
+			</div>
+
+			{/* الجانب الأيسر (في RTL): لوحة سند للذكاء الاصطناعي (مطابقة تماماً للصورة) */}
+			{isAgentOpen && (
+				<ClassroomAgentPanel
+					onClose={() => setIsAgentOpen(false)}
+					onApplyData={(data) => {
+						if (data.name !== undefined) setName(data.name);
+						if (data.code !== undefined) setCode(data.code);
+						if (data.description !== undefined) setDescription(data.description);
+						if (data.category !== undefined) setCategory(data.category);
+						if (data.capacity !== undefined) setCapacity(data.capacity);
+						if (data.notes !== undefined) setNotes(data.notes);
+						if (data.ageGroup !== undefined) setAgeGroup(data.ageGroup);
+						if (data.branch !== undefined) setBranch(data.branch);
+						if (data.classification !== undefined) setClassification(data.classification);
+						if (data.learningMode !== undefined) setLearningMode(data.learningMode);
+						if (data.selectedIcon !== undefined) setSelectedIcon(data.selectedIcon);
+						if (data.selectedIconType !== undefined) setSelectedIconType(data.selectedIconType);
+						if (data.selectedColor !== undefined) setSelectedColor(data.selectedColor);
+					}}
+					currentValues={{
+						name,
+						code,
+						description,
+						category,
+						capacity,
+						notes,
+						ageGroup,
+						branch,
+						classification,
+						learningMode,
+						selectedIcon,
+						selectedIconType,
+						selectedColor,
+					}}
+				/>
+			)}
+		</div>
+		)}
+	</DialogContent>
+</Dialog>
+
+		{/* سايد شيت تعيين وتعديل الموظفين المطابق للتصميم الموحد */}
+		<AssignStaffSheet
+			open={isStaffSheetOpen}
+			onOpenChange={setIsStaffSheetOpen}
+			classroom={classroom}
+			classroomName={name || classroom?.name}
+			title={isEdit ? "تعيين موظفي الفصل" : "تعيين موظفي الفصل الجديد"}
+			initialSelectedStaffIds={selectedStaffIds}
+			onSaveStaff={(ids) => {
+				setSelectedStaffIds(ids);
+				setIsStaffSheetOpen(false);
+			}}
+		/>
+
+		{/* نافذة التأكيد لحفظ المسودة عند الإغلاق أو النقر خارج الحوار */}
+		<SaveDraftConfirmDialog
+			open={showDraftConfirm}
+			onSave={handleSaveDraft}
+			onDiscard={handleDiscardDraft}
+			onCancel={handleCancelDraftConfirm}
+		/>
+	</>
 	);
 }

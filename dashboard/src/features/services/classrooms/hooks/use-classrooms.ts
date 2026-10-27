@@ -53,3 +53,26 @@ export const useClassroom = (id?: string) => {
 
 	return { classroom: data, isLoading, refetch };
 };
+
+export const useClassroomClassifications = () => {
+	const { data, isLoading, refetch } = useQuery<string[]>({
+		queryKey: ["classrooms", "classifications"],
+		queryFn: async () => {
+			const res = await backendFetch("/api/classrooms/classifications");
+			if (!res.ok) throw new Error("فشل جلب تصنيفات الفصول");
+			return res.json();
+		},
+		staleTime: 1000 * 60 * 5,
+	});
+
+	return {
+		classifications: data ?? [
+			"برمجة",
+			"ذكاء اصطناعي",
+			"روبوتكس",
+			"إدارة أعمال",
+		],
+		isLoading,
+		refetch,
+	};
+};

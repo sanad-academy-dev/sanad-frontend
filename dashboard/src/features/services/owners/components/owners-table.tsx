@@ -23,6 +23,7 @@ import { useMemo, useState } from "react";
 import { TableDataView } from "@/components/common/table-data-view";
 import { TableToolbar } from "@/components/common/table-toolbar";
 import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
+import { GuardianHoverCard, StudentHoverCard } from "@/components/common/hover-cards";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -88,9 +89,20 @@ function PetIcons({ patients }: { patients: OwnerResponse["patients"] }) {
 				id: patient.id,
 				name: patient.name,
 				title: patient.name,
+				data: patient,
 			}))}
 			variant="mauve"
 			maxVisible={3}
+			renderItem={(item, element) => (
+				<StudentHoverCard
+					student={{
+						id: String(item.id),
+						name: item.name,
+					}}
+				>
+					{element}
+				</StudentHoverCard>
+			)}
 		/>
 	);
 }
@@ -113,8 +125,9 @@ function StatusSelect({
 			disabled={disabled}
 		>
 			<SelectTrigger
+				size="sm"
 				className={cn(
-					"h-6.5 text-[11px] w-24 border-dashed font-medium text-right",
+					"!h-5.5 !py-0 px-2 text-[11px] w-20 border-dashed font-medium text-right rounded gap-1 [&_svg]:!size-3",
 					active
 						? "border-emerald-200 bg-emerald-50/40 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/20 dark:text-emerald-300"
 						: "border-slate-200 bg-slate-50/40 text-muted-foreground dark:border-slate-800 dark:bg-slate-900/20",
@@ -207,23 +220,38 @@ export function OwnersTable() {
 				size: 190,
 				minSize: 170,
 				cell: ({ row }) => (
-					<div className="flex items-center gap-2.5 min-w-[170px]">
-						<OwnerAvatar name={row.original.name} />
-						<div className="flex flex-col min-w-0">
-							<Link
-								to="/services/owners/$ownerId"
-								params={{ ownerId: row.original.id }}
-								className="font-semibold text-xs text-foreground hover:underline truncate"
-								onClick={(e) => e.stopPropagation()}
-								title={row.original.name}
-							>
-								{row.original.name}
-							</Link>
-							<span className="font-mono text-[10px] text-muted-foreground tabular-nums">
-								{row.original.code}
-							</span>
+					// <GuardianHoverCard
+					// 	guardian={{
+					// 		id: row.original.id,
+					// 		code: row.original.code,
+					// 		name: row.original.name,
+					// 		phone: row.original.phone,
+					// 		email: row.original.email,
+					// 		relationship: row.original.relationship,
+					// 		address: row.original.address,
+					// 		active: row.original.active,
+					// 		patientsCount: row.original.patients?.length ?? 0,
+					// 		patients: row.original.patients,
+					// 	}}
+					// >
+						<div className="flex items-center gap-2.5 min-w-[170px] group cursor-pointer">
+							<OwnerAvatar name={row.original.name} />
+							<div className="flex flex-col min-w-0">
+								<Link
+									to="/services/owners/$ownerId"
+									params={{ ownerId: row.original.id }}
+									className="font-semibold text-xs text-foreground group-hover:underline truncate"
+									onClick={(e) => e.stopPropagation()}
+									title={row.original.name}
+								>
+									{row.original.name}
+								</Link>
+								<span className="font-mono text-[10px] text-muted-foreground tabular-nums">
+									{row.original.code}
+								</span>
+							</div>
 						</div>
-					</div>
+					// </GuardianHoverCard>
 				),
 			},
 			{

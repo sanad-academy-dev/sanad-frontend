@@ -7,7 +7,10 @@ export interface ClassroomTeacher {
 	name: string;
 	image?: string | null;
 	phone?: string | null;
+	email?: string | null;
 	role?: string | null;
+	branch?: string | null;
+	employmentType?: string | null;
 }
 
 export interface ClassroomStudentInfo {
@@ -23,6 +26,7 @@ export interface ClassroomResponse {
 	name: string;
 	ageGroup?: string | null;
 	category?: string | null;
+	classification?: string | null;
 	learningMode: LearningMode;
 	capacity: number;
 	enrolledCount: number;
@@ -46,6 +50,7 @@ export interface CreateClassroomInput {
 	code?: string;
 	ageGroup?: string | null;
 	category?: string | null;
+	classification?: string | null;
 	learningMode?: LearningMode;
 	capacity?: number;
 	active?: boolean;

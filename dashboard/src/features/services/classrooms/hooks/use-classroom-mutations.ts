@@ -133,3 +133,53 @@ export const useAssignClassroomStudents = () => {
 		},
 	});
 };
+
+export const useAddClassroomClassification = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (name: string) => {
+			const res = await backendFetch("/api/classrooms/classifications", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ name }),
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "فشل إضافة التصنيف");
+			}
+			return res.json();
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["classrooms", "classifications"] });
+			toast.success("تم إضافة التصنيف وحفظه بنجاح");
+		},
+		onError: (error: Error) => {
+			toast.error(error.message);
+		},
+	});
+};
+
+export const useDeleteClassroomClassification = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (name: string) => {
+			const res = await backendFetch(`/api/classrooms/classifications/${encodeURIComponent(name)}`, {
+				method: "DELETE",
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "فشل إزالة التصنيف");
+			}
+			return res.json();
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["classrooms", "classifications"] });
+			toast.success("تم إزالة التصنيف بنجاح");
+		},
+		onError: (error: Error) => {
+			toast.error(error.message);
+		},
+	});
+};

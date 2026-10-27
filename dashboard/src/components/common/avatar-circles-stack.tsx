@@ -4,6 +4,7 @@ export interface AvatarCircleItem {
 	id: string | number;
 	name: string;
 	title?: string;
+	data?: any;
 }
 
 // ألوان الباستيل الناعمة للطلاب مطابقة تماماً للتصميم المرفق (خوخي، وردي، نعناعي، حشيشي، بنفسجي، كهرماني)
@@ -71,6 +72,7 @@ export interface AvatarCirclesStackProps {
 	className?: string;
 	emptyText?: string;
 	onItemClick?: (item: AvatarCircleItem) => void;
+	renderItem?: (item: AvatarCircleItem, element: React.ReactElement) => React.ReactNode;
 }
 
 export function AvatarCirclesStack({
@@ -80,6 +82,7 @@ export function AvatarCirclesStack({
 	className,
 	emptyText = "—",
 	onItemClick,
+	renderItem,
 }: AvatarCirclesStackProps) {
 	if (!items || items.length === 0) {
 		return <span className="text-muted-foreground text-xs select-none">{emptyText}</span>;
@@ -98,12 +101,37 @@ export function AvatarCirclesStack({
 					const initial = getInitialLetter(item.name);
 					const tooltip = item.title || item.name;
 
+					let circleEl: React.ReactElement;
+
 					if (variant === "mauve") {
-						return (
+						circleEl = (
 							<div
 								key={item.id ?? idx}
 								className="flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-background bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#7C3AED]/25 dark:text-[#DDD6FE] text-xs font-semibold shadow-2xs transition-transform hover:scale-110 hover:z-20 cursor-default select-none"
-								title={tooltip}
+								title={renderItem ? undefined : tooltip}
+								onClick={(e) => {
+									if (onItemClick) {
+										e.stopPropagation();
+										onItemClick(item);
+									}
+								}}
+							>
+								{initial}
+							</div>
+						);
+					} else {
+						const color = getPastelColor(idx, item.name);
+						circleEl = (
+							<div
+								key={item.id ?? idx}
+								className={cn(
+									"flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-background text-xs font-semibold shadow-2xs transition-transform hover:scale-110 hover:z-20 cursor-default select-none",
+									color.bg,
+									color.text,
+									color.darkBg,
+									color.darkText,
+								)}
+								title={renderItem ? undefined : tooltip}
 								onClick={(e) => {
 									if (onItemClick) {
 										e.stopPropagation();
@@ -116,28 +144,15 @@ export function AvatarCirclesStack({
 						);
 					}
 
-					const color = getPastelColor(idx, item.name);
-					return (
-						<div
-							key={item.id ?? idx}
-							className={cn(
-								"flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-background text-xs font-semibold shadow-2xs transition-transform hover:scale-110 hover:z-20 cursor-default select-none",
-								color.bg,
-								color.text,
-								color.darkBg,
-								color.darkText,
-							)}
-							title={tooltip}
-							onClick={(e) => {
-								if (onItemClick) {
-									e.stopPropagation();
-									onItemClick(item);
-								}
-							}}
-						>
-							{initial}
-						</div>
-					);
+					if (renderItem) {
+						return (
+							<div key={item.id ?? idx} className="shrink-0">
+								{renderItem(item, circleEl)}
+							</div>
+						);
+					}
+
+					return circleEl;
 				})}
 			</div>
 			{overflow > 0 && (

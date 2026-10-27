@@ -54,12 +54,13 @@ export function SanadLogo({
           }
           .sanad-icon-blocks {
             fill: #9b18e7;
+
           }
         `}</style>
       </defs>
 
       {/* اسم سند (عربي وإنجليزي) */}
-      <g style={{ direction: "ltr" }}>
+      <g style={{ direction: "ltr" }} >
         <text className="sanad-ar-text" x="40" y="825">
           سنـــــد
         </text>
