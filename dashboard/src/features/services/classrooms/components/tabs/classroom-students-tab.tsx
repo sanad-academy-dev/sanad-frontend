@@ -187,6 +187,7 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 
 	const { records: todayAttendance = [] } = useStudentAttendance(todayDate, todayDate);
 	const { shifts: todayShifts = [] } = useStudentShifts(todayDate, todayDate);
+	const { mutate: upsertAttendance } = useUpsertStudentAttendance();
 
 	// دالة مساعدة للتحقق من هوية الطالب وتاريخ السجل بأمان ودقة
 	const isSameDay = useCallback((dateVal: unknown, targetKey: string) => {
