@@ -343,7 +343,11 @@ export function AssignStudentDialog({
 								const isSelected = selectedStudentIds.includes(p.id);
 								const assignedInfo = studentClassroomMap.get(p.id);
 								const hasNoClasses = !assignedInfo;
-								const guardian = p.guardianName || p.owner?.name;
+								const guardian =
+									p.owner?.name ||
+									p.emergencyContactName ||
+									(p as { guardianName?: string | null }).guardianName;
+								const avatar = (p as { avatar?: string | null }).avatar;
 
 								return (
 									<button
@@ -364,9 +368,9 @@ export function AssignStudentDialog({
 												className="pointer-events-none size-4 rounded-[4px] border-[1.5px] border-[#E5E5E5] dark:border-border shrink-0"
 											/>
 											<span className="flex size-[28px] shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white bg-emerald-500 overflow-hidden shadow-2xs">
-												{p.avatar ? (
+												{avatar ? (
 													<img
-														src={p.avatar}
+														src={avatar}
 														alt={p.name}
 														className="size-full object-cover"
 													/>

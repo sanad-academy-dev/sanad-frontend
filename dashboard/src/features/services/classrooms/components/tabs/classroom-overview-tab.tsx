@@ -843,7 +843,7 @@ export function ClassroomOverviewTab({
 							</div>
 
 							{/* متوسط وقت الوصول */}
-							<div className="rounded-[4px] border border-border bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right">
+							{/* <div className="rounded-[4px] border border-border bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right">
 								<span className="text-xs text-muted-foreground font-medium text-right">متوسط وقت الوصول</span>
 								<div className="text-right">
 									<div className="text-xl font-bold font-mono text-foreground text-right">
@@ -853,10 +853,10 @@ export function ClassroomOverviewTab({
 										البداية الرسمية 07:30 ص
 									</div>
 								</div>
-							</div>
+							</div> */}
 
 							{/* الأنشطة المنفذة */}
-							<div className="rounded-[4px] border border-border bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right">
+							{/* <div className="rounded-[4px] border border-border bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right">
 								<span className="text-xs text-muted-foreground font-medium text-right">الأنشطة المنفذة</span>
 								<div className="text-right">
 									<div className="text-xl font-bold font-mono text-foreground text-right">
@@ -866,7 +866,7 @@ export function ClassroomOverviewTab({
 										خلال الشهر الحالي
 									</div>
 								</div>
-							</div>
+							</div> */}
 						</div>
 
 						{/* 4. أكثر الأطفال غياباً هذا الشهر */}

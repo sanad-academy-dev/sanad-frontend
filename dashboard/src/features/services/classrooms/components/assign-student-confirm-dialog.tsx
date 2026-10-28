@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
 	IconArrowsDiagonal,
 	IconArrowsMinimize,
@@ -7,14 +6,10 @@ import {
 	IconSparkles,
 	IconX,
 } from "@tabler/icons-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,7 +22,7 @@ export interface AssignStudentConfirmDialogProps {
 	onOpenChange: (open: boolean) => void;
 	classroom?: ClassroomResponse | null;
 	classroomName?: string;
-	selectedStudents: PatientResponse[];
+	selectedStudents: (PatientResponse & { avatar?: string | null })[];
 	onConfirm: (options: {
 		enableMessage: boolean;
 		subject: string;
@@ -100,7 +95,10 @@ export function AssignStudentConfirmDialog({
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
+		<Dialog
+			open={open}
+			onOpenChange={onOpenChange}
+		>
 			<DialogContent
 				showCloseButton={false}
 				className={cn(
@@ -154,23 +152,26 @@ export function AssignStudentConfirmDialog({
 
 						{/* صندوق الأفاتار كما في الصورة */}
 						<div className="min-h-[58px] p-2.5 rounded-xl border border-border/80 bg-muted/10 flex items-center justify-start gap-2 flex-wrap">
-							{selectedStudents.map((st) => (
-								<div
-									key={st.id}
-									title={`${st.name} ${st.code ? `(#${st.code})` : ""}`}
-									className="size-9 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-2xs border-2 border-background transition-transform hover:scale-110 cursor-pointer overflow-hidden"
-								>
-									{st.avatar ? (
-										<img
-											src={st.avatar}
-											alt={st.name}
-											className="size-full object-cover rounded-full"
-										/>
-									) : (
-										<span>{initialsOf(st.name)}</span>
-									)}
-								</div>
-							))}
+							{selectedStudents.map((st) => {
+								const avatar = (st as { avatar?: string | null }).avatar;
+								return (
+									<div
+										key={st.id}
+										title={`${st.name} ${st.code ? `(#${st.code})` : ""}`}
+										className="size-9 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-2xs border-2 border-background transition-transform hover:scale-110 cursor-pointer overflow-hidden"
+									>
+										{avatar ? (
+											<img
+												src={avatar}
+												alt={st.name}
+												className="size-full object-cover rounded-full"
+											/>
+										) : (
+											<span>{initialsOf(st.name)}</span>
+										)}
+									</div>
+								);
+							})}
 						</div>
 					</div>
 
@@ -201,10 +202,14 @@ export function AssignStudentConfirmDialog({
 						<div className="space-y-4 pt-1 animate-in fade-in-50 duration-200">
 							{/* حقل الموضوع */}
 							<div className="space-y-1.5 text-right">
-								<label className="text-xs font-bold text-foreground">
+								<label
+									htmlFor="assign-message-subject"
+									className="text-xs font-bold text-foreground"
+								>
 									موضوع الرسالة
 								</label>
 								<Input
+									id="assign-message-subject"
 									value={subject}
 									onChange={(e) => setSubject(e.target.value)}
 									placeholder="موضوع الرسالة..."
@@ -215,7 +220,10 @@ export function AssignStudentConfirmDialog({
 							{/* حقل نص الرسالة مع زر الذكاء الاصطناعي */}
 							<div className="space-y-2 text-right">
 								<div className="flex items-center justify-between">
-									<label className="text-xs font-bold text-foreground">
+									<label
+										htmlFor="assign-message-body"
+										className="text-xs font-bold text-foreground"
+									>
 										نص الرسالة لولي الأمر
 									</label>
 									<Button
@@ -232,6 +240,7 @@ export function AssignStudentConfirmDialog({
 								</div>
 
 								<Textarea
+									id="assign-message-body"
 									value={message}
 									onChange={(e) => setMessage(e.target.value)}
 									rows={4}
