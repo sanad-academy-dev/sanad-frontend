@@ -33,6 +33,7 @@ import {
 	IconMoodSmile,
 	IconPhone,
 	IconSend,
+	IconTrash,
 	IconUser,
 	IconUserCircle,
 	IconX,
@@ -462,43 +463,63 @@ function NotificationOutboxCard({
 
 const STATUS_META: Record<string, { label: string; className: string }> = {
 	queue: {
-		label: "طابور الانتظار",
-		className: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800",
+		label: "طابور",
+		className: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800",
 	},
 	QUEUE: {
-		label: "طابور الانتظار",
+		label: "طابور",
+		className: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800",
+	},
+	shortlist: {
+		label: "القائمة المختصرة",
+		className: "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-950/40 dark:text-slate-300 dark:border-slate-800",
+	},
+	SHORTLIST: {
+		label: "القائمة المختصرة",
+		className: "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-950/40 dark:text-slate-300 dark:border-slate-800",
+	},
+	interview: {
+		label: "المقابلة الشخصية",
 		className: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800",
 	},
-	"check-in": {
-		label: "التقييم",
-		className: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800",
+	INTERVIEW: {
+		label: "المقابلة الشخصية",
+		className: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800",
+	},
+	evaluation: {
+		label: "داخل التقييم",
+		className: "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800",
+	},
+	IN_EVALUATION: {
+		label: "داخل التقييم",
+		className: "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800",
 	},
 	EVALUATION: {
-		label: "التقييم",
+		label: "داخل التقييم",
+		className: "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800",
+	},
+	waitlist: {
+		label: "قائمة الانتظار",
 		className: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800",
 	},
-	"in-service": {
-		label: "قيد المراجعة",
-		className: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800",
-	},
-	REVIEW: {
-		label: "قيد المراجعة",
-		className: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800",
-	},
-	"awaiting-payment": {
-		label: "انتظار الرد",
-		className: "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800",
+	WAITLIST: {
+		label: "قائمة الانتظار",
+		className: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800",
 	},
 	AWAITING_REPLY: {
-		label: "انتظار الرد",
-		className: "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800",
+		label: "قائمة الانتظار",
+		className: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800",
+	},
+	REVIEW: {
+		label: "المقابلة الشخصية",
+		className: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800",
 	},
 	done: {
-		label: "تم القبول",
+		label: "مقبول",
 		className: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800",
 	},
 	ACCEPTED: {
-		label: "تم القبول",
+		label: "مقبول",
 		className: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800",
 	},
 	cancelled: {
@@ -523,6 +544,7 @@ export function CampaignRequestSheet({
 	onAccept,
 	onWaitlist,
 	onReject,
+	onDelete,
 }: {
 	campaignId?: string;
 	request: CampaignRequestItem | null;
@@ -533,6 +555,7 @@ export function CampaignRequestSheet({
 	onAccept?: (request: CampaignRequestItem) => void;
 	onWaitlist?: (request: CampaignRequestItem) => void;
 	onReject?: (request: CampaignRequestItem) => void;
+	onDelete?: (request: CampaignRequestItem) => void;
 }) {
 	const { data: session } = useSession();
 	const [hasChronic, setHasChronic] = useState(
@@ -1184,6 +1207,19 @@ export function CampaignRequestSheet({
 										طلب مرفوض
 									</Badge>
 								)}
+
+								<Button
+									type="button"
+									variant="ghost"
+									size="sm"
+									disabled={isUpdating}
+									className="text-destructive/80 hover:bg-destructive/10 hover:text-destructive gap-1.5 h-8 text-xs font-medium"
+									onClick={() => onDelete?.(request)}
+									title="حذف الطلب نهائياً من النظام"
+								>
+									<IconTrash className="size-3.5" />
+									حذف
+								</Button>
 							</div>
 						)}
 					</div>

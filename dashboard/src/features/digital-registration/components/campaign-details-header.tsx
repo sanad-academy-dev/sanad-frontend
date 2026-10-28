@@ -1,26 +1,21 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "@tanstack/react-router";
-import { IconCheck, IconArrowRight, IconArrowLeft } from "@tabler/icons-react";
-import { Badge } from "@/components/ui/badge";
 import { useI18n } from "@/hooks/use-i18n";
 import { cn } from "@/lib/utils";
-import { useCampaignDetails } from "../hooks/use-digital-registration";
 
-export type CampaignView = "requests" | "info" | "stats";
+export type RegistrationView = "requests" | "info" | "activity";
 
-export function CampaignDetailsHeader({ 
-	campaignId,
+export function CampaignDetailsHeader({
 	activeView,
-	onChangeView
-}: { 
-	campaignId: string;
-	activeView: CampaignView;
-	onChangeView: (view: CampaignView) => void;
+	onChangeView,
+	requestsCount = 0,
+}: {
+	activeView: RegistrationView;
+	onChangeView: (view: RegistrationView) => void;
+	requestsCount?: number;
 }) {
 	const { isRtl } = useI18n();
 	const [slot, setSlot] = useState<HTMLElement | null>(null);
-	const { data: campaign } = useCampaignDetails(campaignId);
 
 	useEffect(() => {
 		setSlot(document.getElementById("page-header-slot"));
@@ -28,61 +23,39 @@ export function CampaignDetailsHeader({
 
 	if (!slot) return null;
 
-	const tabs: { value: CampaignView; label: React.ReactNode }[] = [
-		{ 
-			value: "requests", 
+	const tabs: { value: RegistrationView; label: React.ReactNode }[] = [
+		{
+			value: "requests",
 			label: (
 				<span className="flex items-center gap-1.5">
-					الطلبات <span className="bg-muted px-1.5 py-0.5 rounded-full text-[9px] font-bold">{campaign?.requests ?? 0}</span>
+					<span>الطلبات</span>
+					{requestsCount > 0 && (
+						<span className="bg-muted px-1.5 py-0.2 rounded-full text-[9px] font-bold">
+							{requestsCount}
+						</span>
+					)}
 				</span>
-			)
+			),
 		},
-		{ value: "info", label: "معلومات الحملة" },
-		{ value: "stats", label: "الإحصائيات" },
+		{ value: "info", label: "المعلومات" },
+		{ value: "activity", label: "سجل النشاط" },
 	];
-
-	const isCompleted = campaign?.status === "COMPLETED";
-	const isActive = campaign?.status === "ACTIVE";
 
 	return createPortal(
 		<div
-			className="flex items-center gap-[12px]"
+			className="flex items-center gap-2.5"
 			dir={isRtl ? "rtl" : "ltr"}
 		>
-			<Link
-				to="/digital-registration"
-				className="flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-			>
-				{isRtl ? <IconArrowRight size={18} /> : <IconArrowLeft size={18} />}
-			</Link>
-			
-			<span className="h-[18px] w-px bg-[#E5E7EB]" />
-			
-			<div className="flex items-center gap-2">
-				<h1 className="text-sm font-bold text-foreground">
-					{campaign?.name || "حملة التسجيل"}
-				</h1>
-				<Badge 
-					variant="outline" 
-					className={cn(
-						"font-semibold text-[10px] px-1.5 py-0 h-5",
-						isActive && "bg-emerald-50 text-emerald-700 hover:bg-emerald-50 border-emerald-200",
-						isCompleted && "bg-blue-50 text-blue-700 hover:bg-blue-50 border-blue-200",
-						campaign?.status === "DRAFT" && "bg-gray-50 text-gray-700 border-gray-200",
-						campaign?.status === "CLOSED" && "bg-red-50 text-red-700 border-red-200",
-					)}
-				>
-					<IconCheck size={12} className="me-1" />
-					{isActive ? "نشط" : isCompleted ? "مكتمل" : campaign?.status === "DRAFT" ? "مسودة" : "مغلق"}
-				</Badge>
-				<span className="text-xs text-muted-foreground ms-2 border-s ps-2 border-[#E5E7EB]">
-					{campaign?.code || campaignId}
-				</span>
-			</div>
+			{/* عنوان الصفحة: التسجيل الرقمي */}
+			<span className="text-xs sm:text-sm font-bold text-foreground select-none whitespace-nowrap">
+				التسجيل الرقمي
+			</span>
 
-			<span className="h-[18px] w-px bg-[#E5E7EB] mx-1" />
+			{/* فاصل رأسي */}
+			<span className="h-4 w-px bg-border/70" />
 
-			<nav className="flex items-center gap-[3.49px]">
+			{/* ألسنة التنقل (الطلبات، المعلومات، سجل النشاط) */}
+			<nav className="flex items-center gap-1 rounded-md bg-muted/50 p-0.5 border border-border/60 select-none">
 				{tabs.map((tab) => {
 					const isTabActive = activeView === tab.value;
 					return (
@@ -91,10 +64,10 @@ export function CampaignDetailsHeader({
 							type="button"
 							onClick={() => onChangeView(tab.value)}
 							className={cn(
-								"flex h-[25px] items-center justify-center rounded-[4px] px-[14px] text-[11px] font-medium leading-[16px]",
+								"flex h-6.5 items-center justify-center rounded-[4px] px-3 text-[11px] font-semibold transition-all cursor-pointer whitespace-nowrap",
 								isTabActive
-									? "border-[0.75px] border-[#E5E7EB] bg-[#F9FAFB] text-[#1F2937]"
-									: "text-[#6B7280]",
+									? "bg-background text-foreground shadow-2xs border border-border/40 font-bold"
+									: "text-muted-foreground hover:text-foreground hover:bg-background/40",
 							)}
 						>
 							{tab.label}

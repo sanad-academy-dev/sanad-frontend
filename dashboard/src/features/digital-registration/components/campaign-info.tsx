@@ -1,119 +1,106 @@
 import { useState } from "react";
-import { IconCopy, IconCheck, IconExternalLink } from "@tabler/icons-react";
+import { IconCopy, IconCheck, IconExternalLink, IconFileCheck, IconShieldCheck, IconInfoCircle } from "@tabler/icons-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCampaignDetails } from "../hooks/use-digital-registration";
 
-export function CampaignInfo({ campaignId }: { campaignId: string }) {
-	const { data: campaign, isLoading } = useCampaignDetails(campaignId);
+export function CampaignInfo({ campaignId }: { campaignId?: string }) {
+	const { data: campaign, isLoading } = useCampaignDetails(campaignId || "");
 	const [copied, setCopied] = useState(false);
 
-	if (isLoading) {
-		return <div className="p-8 text-center text-sm text-muted-foreground">جاري تحميل بيانات الحملة...</div>;
-	}
-
-	if (!campaign) {
-		return <div className="p-8 text-center text-sm text-destructive">الحملة غير موجودة</div>;
-	}
-
-	const registrationUrl = typeof window !== "undefined"
-		? window.location.port === "3001"
-			? `${window.location.protocol}//${window.location.hostname}:3000/register/${campaign.code}`
-			: `${window.location.origin}/register/${campaign.code}`
-		: `https://sanad.app/register/${campaign.code}`;
+	const registrationUrl =
+		typeof window !== "undefined"
+			? `${window.location.origin}/register`
+			: "https://sanad.app/register";
 
 	const handleCopy = () => {
 		navigator.clipboard.writeText(registrationUrl);
 		setCopied(true);
+		toast.success("تم نسخ رابط التسجيل المباشر بنجاح");
 		setTimeout(() => setCopied(false), 2000);
 	};
 
-	const remaining = Math.max(0, (campaign.maxCapacity || campaign.capacity || 0) - (campaign.accepted || 0));
-
-	const requirements: string[] = [];
-	if (campaign.requireBirthCert) requirements.push("شهادة ميلاد الطفل");
-	if (campaign.requireId) requirements.push("الهوية الوطنية لولي الأمر");
-	if (campaign.requireVaccine) requirements.push("كارت التطعيمات واللقاحات");
-
 	return (
-		<div className="flex w-full flex-col gap-4 p-4 mt-4" dir="rtl">
-			{/* Grid Info */}
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-				<div className="flex flex-col gap-1.5 rounded-md border p-4 bg-card text-start">
-					<span className="text-[11px] text-muted-foreground font-medium">الفئة العمرية</span>
-					<span className="text-sm font-bold text-foreground">{campaign.ageGroup}</span>
-				</div>
-				<div className="flex flex-col gap-1.5 rounded-md border p-4 bg-card text-start">
-					<span className="text-[11px] text-muted-foreground font-medium">الفصل / المسار</span>
-					<span className="text-sm font-bold text-foreground">{campaign.targetClass || "غير محدد"}</span>
-				</div>
-
-				<div className="flex flex-col gap-1.5 rounded-md border p-4 bg-card text-start">
-					<span className="text-[11px] text-muted-foreground font-medium">السعة الإجمالية</span>
-					<span className="text-sm font-bold text-foreground">{campaign.maxCapacity || campaign.capacity} مقعد</span>
-				</div>
-				<div className="flex flex-col gap-1.5 rounded-md border p-4 bg-card text-start">
-					<span className="text-[11px] text-muted-foreground font-medium">المقاعد المتبقية</span>
-					<span className="text-sm font-bold text-emerald-600">{remaining}</span>
-				</div>
-
-				<div className="flex flex-col gap-1.5 rounded-md border p-4 bg-card text-start">
-					<span className="text-[11px] text-muted-foreground font-medium">تاريخ البدء</span>
-					<span className="text-sm font-bold text-foreground">
-						{campaign.startDate ? campaign.startDate.split("T")[0] : "غير محدد"}
-					</span>
-				</div>
-				<div className="flex flex-col gap-1.5 rounded-md border p-4 bg-card text-start">
-					<span className="text-[11px] text-muted-foreground font-medium">تاريخ الانتهاء</span>
-					<span className="text-sm font-bold text-foreground">
-						{campaign.endDate ? campaign.endDate.split("T")[0] : "مستمر"}
-					</span>
-				</div>
-
-				<div className="flex flex-col gap-1.5 rounded-md border p-4 bg-card text-start">
-					<span className="text-[11px] text-muted-foreground font-medium">المنشئ</span>
-					<span className="text-sm font-bold text-foreground">{campaign.createdByName || "المشرف"}</span>
-				</div>
-				<div className="hidden lg:block"></div>
-			</div>
-
-			{/* Registration Link */}
-			<div className="flex flex-col gap-3 rounded-md border p-4 bg-muted/40 text-start">
-				<span className="text-sm font-bold text-foreground">رابط التسجيل الرقمي المباشر</span>
+		<div className="flex w-full flex-col gap-5 p-4 mt-2 max-w-5xl mx-auto" dir="rtl">
+			{/* Public Link Card */}
+			<div className="flex flex-col gap-3 rounded-lg border border-primary/20 bg-primary/5 p-5 text-start shadow-2xs">
 				<div className="flex items-center gap-2">
-					<Input 
-						className="flex-1 text-muted-foreground bg-background border-border" 
-						value={registrationUrl} 
-						readOnly 
+					<IconInfoCircle className="size-5 text-primary" />
+					<h3 className="text-sm font-bold text-foreground">رابط التسجيل الرقمي المباشر لأولياء الأمور</h3>
+				</div>
+				<p className="text-xs text-muted-foreground leading-relaxed">
+					شارك هذا الرابط مع أولياء الأمور للتقديم الذاتي عبر المنظومة الرقمية وتعبئة بيانات الطالب ورفع المرفقات مباشرة دون وسيط.
+				</p>
+				<div className="flex items-center gap-2 pt-1">
+					<Input
+						className="flex-1 text-xs text-muted-foreground bg-background border-border font-mono select-all"
+						value={registrationUrl}
+						readOnly
 						dir="ltr"
 					/>
-					<Button 
-						variant="outline" 
-						size="sm" 
+					<Button
+						variant="outline"
+						size="sm"
 						onClick={handleCopy}
-						className="bg-background hover:bg-muted text-foreground px-4"
+						className="bg-background hover:bg-muted text-foreground px-4 text-xs font-semibold gap-1.5 h-9"
 					>
-						{copied ? <IconCheck className="me-1.5 size-4 text-emerald-600" /> : <IconCopy className="me-1.5 size-4" />}
-						{copied ? "تم النسخ" : "نسخ"}
+						{copied ? <IconCheck className="size-3.5 text-emerald-600" /> : <IconCopy className="size-3.5" />}
+						{copied ? "تم النسخ" : "نسخ الرابط"}
 					</Button>
-					<Button 
-						variant="outline" 
-						size="sm" 
-						onClick={() => window.open(registrationUrl, "_blank")}
-						className="bg-background hover:bg-muted text-foreground px-4"
+					<Button
+						variant="outline"
+						size="sm"
+						asChild
+						className="bg-background hover:bg-muted text-foreground px-3 text-xs h-9"
 					>
-						<IconExternalLink className="me-1.5 size-4" />
-						فتح
+						<a href={registrationUrl} target="_blank" rel="noopener noreferrer" title="فتح الرابط في تبويب جديد">
+							<IconExternalLink className="size-3.5" />
+						</a>
 					</Button>
 				</div>
 			</div>
 
-			{/* Requirements */}
-			<div className="flex flex-col gap-2 rounded-md border p-4 bg-card text-start">
-				<span className="text-sm font-bold text-foreground">المستندات المطلوبة للقبول</span>
-				<span className="text-sm text-muted-foreground font-medium">
-					{requirements.length > 0 ? requirements.join("، ") : "لا توجد مستندات مشروطة"}
-				</span>
+			{/* Info Grid */}
+			<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+				<div className="flex flex-col gap-2 rounded-lg border p-4 bg-card text-start shadow-2xs">
+					<div className="flex items-center gap-2 text-xs font-bold text-foreground">
+						<IconShieldCheck className="size-4 text-emerald-600" />
+						<span>المسار والقبول الأكاديمي</span>
+					</div>
+					<p className="text-xs text-muted-foreground leading-relaxed">
+						{campaign?.targetClass || "جميع المسارات التعليمية والتأهيلية المعتمدة"}
+					</p>
+					<span className="text-[11px] font-semibold text-primary pt-1">
+						الفئة المستهدفة: {campaign?.ageGroup || "من سن سنتين وما فوق"}
+					</span>
+				</div>
+
+				<div className="flex flex-col gap-2 rounded-lg border p-4 bg-card text-start shadow-2xs">
+					<div className="flex items-center gap-2 text-xs font-bold text-foreground">
+						<IconFileCheck className="size-4 text-blue-600" />
+						<span>المستندات المطلوبة</span>
+					</div>
+					<ul className="text-xs text-muted-foreground space-y-1 list-disc list-inside">
+						<li>شهادة ميلاد الطفل</li>
+						<li>الهوية الوطنية أو إقامة ولي الأمر</li>
+						<li>كارت التطعيمات واللقاحات</li>
+						<li>تقارير طبية سابقة (إن وُجدت)</li>
+					</ul>
+				</div>
+
+				<div className="flex flex-col gap-2 rounded-lg border p-4 bg-card text-start shadow-2xs">
+					<div className="flex items-center gap-2 text-xs font-bold text-foreground">
+						<IconInfoCircle className="size-4 text-purple-600" />
+						<span>دورة إجراءات القبول</span>
+					</div>
+					<ol className="text-xs text-muted-foreground space-y-1 list-decimal list-inside">
+						<li>استلام الطلب والفرز الأولي</li>
+						<li>حجز موعد جلسة الفحص والتقييم</li>
+						<li>المراجعة الفنية واعتماد الإدارة</li>
+						<li>ترحيل الطالب إلى النظام الرسمي</li>
+					</ol>
+				</div>
 			</div>
 		</div>
 	);
