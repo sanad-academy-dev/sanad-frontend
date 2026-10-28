@@ -5,28 +5,32 @@ import { Slot } from "radix-ui"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "group/button cursor-pointer inline-flex shrink-0 items-center justify-center rounded-[var(--radius)] border border-transparent bg-clip-padding text-base font-bold whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5",
+  "group/button cursor-pointer inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm",
+        default:
+          "bg-primary text-primary-foreground hover:bg-primary/90",
         outline:
-          "border border-border bg-transparent hover:bg-secondary hover:text-foreground",
+          "border border-border/80 bg-surface/80 backdrop-blur-xs hover:bg-secondary hover:text-foreground text-foreground",
         secondary:
-          "bg-secondary text-foreground hover:bg-secondary/80",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost:
-          "hover:bg-secondary hover:text-foreground",
+          "hover:bg-secondary hover:text-foreground text-foreground",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-12 px-6 gap-2",
-        sm: "h-10 px-4 text-sm gap-1.5 [&_svg:not([class*='size-'])]:size-4",
-        lg: "h-14 px-8 text-lg gap-2.5 [&_svg:not([class*='size-'])]:size-6",
-        icon: "size-12",
-        "icon-sm": "size-10",
-        "icon-lg": "size-14",
+        default:
+          "h-8 rounded-[min(var(--radius-lg),10px)] px-2.5 sm:px-3 text-xs sm:text-sm font-medium gap-2",
+        xs: "h-6 rounded-md px-1.5 text-xs font-medium gap-1 [&>svg:not([class*='size-'])]:size-3.5",
+        sm: "h-7 rounded-md px-2 text-xs font-medium gap-1.5",
+        lg: "h-9 rounded-[min(var(--radius-lg),10px)] px-3.5 text-sm font-medium gap-2",
+        icon: "size-8 rounded-[min(var(--radius-lg),10px)]",
+        "icon-xs": "size-6 rounded-md p-0 [&>svg:not([class*='size-'])]:size-3.5",
+        "icon-sm": "size-8 rounded-[min(var(--radius-lg),10px)]",
+        "icon-lg": "size-9 rounded-[min(var(--radius-lg),10px)]",
       },
     },
     defaultVariants: {

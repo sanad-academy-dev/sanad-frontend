@@ -99,7 +99,9 @@ export default function CampaignRegisterPage({
       try {
         setIsLoadingCampaign(true);
         setLoadError(null);
-        const res = await fetch(`/api/campaigns/${code}`);
+        const res = await fetch(`/api/campaigns/${code}`, {
+          headers: { "ngrok-skip-browser-warning": "true" },
+        });
         const data = await res.json();
         if (!res.ok) {
           throw new Error(data?.message || "تعذر تحميل بيانات الحملة");
@@ -107,9 +109,13 @@ export default function CampaignRegisterPage({
         if (isMounted) {
           setCampaign(data);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (isMounted) {
-          setLoadError(err?.message || "الحملة المطلوبة غير متوفرة حالياً");
+          setLoadError(
+            err instanceof Error
+              ? err.message
+              : "الحملة المطلوبة غير متوفرة حالياً"
+          );
         }
       } finally {
         if (isMounted) {
@@ -166,6 +172,9 @@ export default function CampaignRegisterPage({
 
       const res = await fetch("/api/upload", {
         method: "POST",
+        headers: {
+          "ngrok-skip-browser-warning": "true",
+        },
         body: formData,
       });
 
@@ -176,20 +185,20 @@ export default function CampaignRegisterPage({
 
       const newDoc: UploadedDoc = {
         type,
-        title: `${defaultTitle} - ${studentName.trim() || "المتقدم"} (${file.name})`,
-        fileUrl: data.fileUrl || data.key,
-        fileName: file.name,
-        fileSize: data.fileSize || `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+        title: `${defaultTitle} - ${studentName.trim() || "المتقدم"} (${file.name})`, fileUrl: data.fileUrl || data.key, fileName: file.name, fileSize: data.fileSize ||`${(file.size / (1024 * 1024)).toFixed(1)} MB`,
       };
 
       if (type === "BIRTH_CERTIFICATE") setBirthCertDoc(newDoc);
       else if (type === "VACCINATION_CARD") setVaccineDoc(newDoc);
       else if (type === "GUARDIAN_ID") setGuardianIdDoc(newDoc);
       else if (type === "MEDICAL_REPORT") setMedicalDoc(newDoc);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setUploadErrors((prev) => ({
         ...prev,
-        [type]: err?.message || "تعذر رفع الملف، يرجى المحاولة مرة أخرى.",
+        [type]:
+          err instanceof Error
+            ? err.message
+            : "تعذر رفع الملف، يرجى المحاولة مرة أخرى.",
       }));
     } finally {
       setUploading((prev) => ({ ...prev, [type]: false }));
@@ -273,7 +282,10 @@ export default function CampaignRegisterPage({
 
       const res = await fetch(`/api/campaigns/${code}/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "ngrok-skip-browser-warning": "true",
+        },
         body: JSON.stringify(payload),
       });
 
@@ -284,8 +296,12 @@ export default function CampaignRegisterPage({
 
       setSubmittedDocsCount(attachedDocs.length);
       setSubmittedRequestCode(data.requestCode || "تم التسجيل");
-    } catch (err: any) {
-      setFormError(err?.message || "حدث خطأ أثناء إرسال الطلب، يرجى إعادة المحاولة.");
+    } catch (err: unknown) {
+      setFormError(
+        err instanceof Error
+          ? err.message
+          : "حدث خطأ أثناء إرسال الطلب، يرجى إعادة المحاولة."
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -326,7 +342,7 @@ export default function CampaignRegisterPage({
   if (submittedRequestCode) {
     return (
       <div className="min-h-[75vh] flex flex-col items-center justify-center px-4 py-16">
-        <div className="w-full max-w-xl bg-card border border-border/80 rounded-2xl shadow-xl p-8 sm:p-12 text-center relative overflow-hidden">
+        <div className="w-full max-w-xl bg-card/60 backdrop-blur-xs border border-border/80 rounded-xl p-8 sm:p-12 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 left-0 h-2 bg-gradient-to-r from-primary to-emerald-500" />
 
           <div className="size-20 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto mb-6">
@@ -338,8 +354,8 @@ export default function CampaignRegisterPage({
           </h2>
 
           <p className="text-muted-foreground text-base mb-6 leading-relaxed">
-            شكراً لثقتكم بأكاديمية سند. تم قيد طلب انضمام الطالب{" "}
-            <span className="font-bold text-foreground">{studentName}</span> بنجاح في حملة{" "}
+            شكراً لثقتكم بأكاديمية سند. تم قيد طلب انضمام الطالب{""}
+            <span className="font-bold text-foreground">{studentName}</span> بنجاح في حملة{""}
             <span className="font-semibold text-primary">{campaign.name}</span>.
           </p>
 
@@ -377,7 +393,7 @@ export default function CampaignRegisterPage({
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
       {/* Campaign Header Banner */}
-      <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm mb-8 relative overflow-hidden">
+      <div className="bg-card/60 backdrop-blur-xs border border-border/80 rounded-xl p-6 sm:p-8 mb-8 relative overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
@@ -414,7 +430,7 @@ export default function CampaignRegisterPage({
         )}
 
         {/* Section 1: Student Information */}
-        <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="bg-card/60 backdrop-blur-xs border border-border/80 rounded-xl p-6 sm:p-8 space-y-6">
           <div className="flex items-center gap-3 pb-4 border-b border-border">
             <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
               <GraduationCap className="size-5" />
@@ -447,7 +463,9 @@ export default function CampaignRegisterPage({
               <label className="text-sm font-bold text-foreground">الجنس</label>
               <select
                 value={gender}
-                onChange={(e) => setGender(e.target.value as any)}
+                onChange={(e) =>
+                  setGender(e.target.value as "MALE" | "FEMALE" | "UNKNOWN")
+                }
                 className="w-full h-12 rounded-xl border border-input bg-background px-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
               >
                 <option value="UNKNOWN">غير محدد</option>
@@ -495,7 +513,7 @@ export default function CampaignRegisterPage({
         </div>
 
         {/* Section 2: Guardian Information */}
-        <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="bg-card/60 backdrop-blur-xs border border-border/80 rounded-xl p-6 sm:p-8 space-y-6">
           <div className="flex items-center gap-3 pb-4 border-b border-border">
             <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
               <ShieldCheck className="size-5" />
@@ -571,7 +589,7 @@ export default function CampaignRegisterPage({
         </div>
 
         {/* Section 3: Health & Additional Notes (Optional) */}
-        <div className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div className="bg-card/60 backdrop-blur-xs border border-border/80 rounded-xl p-6 sm:p-8 space-y-6">
           <div className="flex items-center gap-3 pb-4 border-b border-border">
             <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
               <HeartPulse className="size-5" />
@@ -649,7 +667,7 @@ export default function CampaignRegisterPage({
         </div>
 
         {/* Section 4: Document Upload Dropzones (Phase 7) */}
-        <div id="documents-section" className="bg-card border border-border rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+        <div id="documents-section" className="bg-card/60 backdrop-blur-xs border border-border/80 rounded-xl p-6 sm:p-8 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-border">
             <div className="flex items-center gap-3">
               <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
@@ -665,7 +683,7 @@ export default function CampaignRegisterPage({
 
             {/* Document Counter Badge */}
             <div className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-secondary text-secondary-foreground border border-border self-start sm:self-auto">
-              المستندات المرفقة:{" "}
+              المستندات المرفقة:{""}
               <strong className="text-primary font-bold">
                 {[birthCertDoc, vaccineDoc, guardianIdDoc, medicalDoc].filter(Boolean).length}
               </strong>
@@ -736,7 +754,7 @@ export default function CampaignRegisterPage({
           <Button
             type="submit"
             disabled={isSubmitting || Object.values(uploading).some(Boolean)}
-            className="w-full sm:w-auto min-w-[240px] h-14 text-base font-extrabold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all"
+            className="w-full sm:w-auto min-w-[240px] h-14 text-base font-extrabold transition-all"
           >
             {isSubmitting ? (
               <>

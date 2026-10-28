@@ -1,277 +1,323 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Container from './container';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Branches,
+  Hub,
+  Laptop,
+  Query,
+  Terminal,
+  type HairlineProps,
+} from "@lucasmarkes/hairline/react";
+import Container from "./container";
 import { SectionHeader } from "@/components/ui/header";
-import { Compass, Brain, Code2, Layers, Sparkles, TrendingUp, Check } from 'lucide-react';
+import {
+  Compass,
+  Brain,
+  Code2,
+  Award,
+  Sparkles,
+  CheckCircle2,
+  ArrowUpLeft,
+  BookOpen,
+} from "lucide-react";
+import { openTrialAssessmentModal } from "@/components/trial-modal";
+import { cn } from "@/lib/utils";
 
 const stages = [
   {
-    id: "explorer",
-    stageNumber: "01",
-    title: "المستكشف",
-    levelsRange: "01-04",
-    age: "6-9 سنوات",
-    quote: "نبني الأساس قبل كتابة الكود.",
-    basicSkills: ["التفكير المنطقي", "ترتيب الخطوات", "حل المشكلات", "Creative Coding"],
-    outcome: "يحول فكرة بسيطة إلى تجربة تفاعلية.",
+    id: "foundation",
+    title: "المُرتاد",
+    planName: "التأسيس",
+    levels: "المستويات 01–07",
+    age: "6–8 سنوات",
+    prerequisite: "بدون أي شروط مسبقة",
+    courses: [
+      "التفكير المنطقي وحل المشكلات (Unplugged)",
+      "بكتو بلوكس (برمجة من الصفر)",
+      "الألعاب والقصص التفاعلية الأولى",
+    ],
     example: {
-      level: "03",
-      title: "الشروط",
-      challenge: "اجعل الشخصية تتفاعل عندما تلمس الهدف.",
-      newSkill: "ربط الحدث بالنتيجة داخل اللعبة.",
-      whatToBuild: "قصة تفاعلية أو لعبة صغيرة",
+      title: "التسلسل والأحداث التفاعلية",
+      challenge: "برمج حركة الشخصية وتفاعلها الصوتي والحركي عندما تلمس الهدف.",
+      newSkill: "بناء المنطق البرمجي وربط الأحداث بالنتائج داخل بيئة مرئية ممتعة.",
+      whatToBuild: "أول لعبة تفاعلية وقصة رقمية متحركة بنظام المكعبات البرمجية",
     },
     icon: Compass,
   },
   {
-    id: "thinker",
-    stageNumber: "02",
-    title: "المفكر",
-    levelsRange: "05-09",
-    age: "8-12 سنة",
-    quote: "نحوّل المشكلة إلى خطوات قابلة للحل.",
-    basicSkills: ["الخوارزميات", "الشروط", "المتغيرات", "اختبار الحل"],
-    outcome: "يخطط للحل ويختبره ويصحح أخطاءه.",
+    id: "building",
+    title: "المُشيِّد",
+    planName: "البناء",
+    levels: "المستويات 08–14",
+    age: "9–11 سنة",
+    prerequisite: "إتمام التأسيس أو اجتياز تقييم المستوى",
+    courses: [
+      "بكتو بلوكس AI والذكاء الاصطناعي المرئي",
+      "أساسيات تطوير الألعاب (Game Dev)",
+      "مدخل إلى الذكاء الاصطناعي وخوارزميات التعرف",
+    ],
     example: {
-      level: "07",
-      title: "المتغيرات",
-      challenge: "اجعل اللعبة تتذكر نقاط اللاعب.",
-      newSkill: "التعامل مع البيانات داخل البرنامج.",
-      whatToBuild: "لعبة متقدمة أو Python Mini App",
+      title: "المتغيرات وتتبع النقاط والمستويات",
+      challenge: "برمج نظام نقاط ذكي وعقبات تصاعدية تزداد صعوبتها تدريجياً مع تقدم اللاعب.",
+      newSkill: "إدارة البيانات والمتغيرات البرمجية وهيكلة منطق اللعبة المتقدم.",
+      whatToBuild: "لعبة إلكترونية كاملة بنظام نقاط، مستويات، ومؤثرات تفاعلية",
     },
     icon: Brain,
   },
   {
-    id: "coder",
-    stageNumber: "03",
-    title: "المبرمج",
-    levelsRange: "10-14",
-    age: "10-14 سنة",
-    quote: "نكتب كودًا واضحًا يحل مشكلة حقيقية.",
-    basicSkills: ["Python", "البيانات", "الدوال", "Problem Solving"],
-    outcome: "يبني برنامجًا كاملًا ويشرح طريقة عمله.",
+    id: "evolution",
+    title: "المُستنبِط",
+    planName: "التطور ★",
+    levels: "المستويات 15–21",
+    age: "12–14 سنة",
+    prerequisite: "إتمام البناء أو اجتياز تقييم المستوى",
+    courses: [
+      "بايثون للأطفال (كتابة الكود النصي الحقيقي)",
+      "MIT App Inventor (برمجة تطبيقات الهاتف)",
+      "تصميم الألعاب بمحرك Godot ولغة GDScript",
+    ],
     example: {
-      level: "12",
-      title: "الدوال",
-      challenge: "قسّم التطبيق إلى أجزاء يعاد استخدامها.",
-      newSkill: "تنظيم الكود وبناء وظائف واضحة.",
-      whatToBuild: "تطبيق Python أو مشروع ويب",
+      title: "البرمجة النصية بلغة بايثون ومعالجة المشكلات",
+      challenge: "صمم أداة بايثون ذكية تحلل مدخلات المستخدم وتؤتمت حساب أو حل مسألة واقعية.",
+      newSkill: "كتابة دوال نقية وتطوير برمجيات حقيقية بالاعتماد على خوارزميات نظيفة.",
+      whatToBuild: "أدوات برمجية وتطبيقات بايثون تعالج مسائل عملية وتخدم المستخدمين",
     },
     icon: Code2,
   },
   {
-    id: "builder",
-    stageNumber: "04",
-    title: "الباني",
-    levelsRange: "15-19",
-    age: "13-16 سنة",
-    quote: "نحوّل الكود إلى منتج يمكن استخدامه.",
-    basicSkills: ["HTML & CSS", "JavaScript", "واجهات المستخدم", "بناء المنتجات"],
-    outcome: "يصمم ويبني وينشر منتجًا رقميًا.",
+    id: "mastery",
+    title: "السَّنَد",
+    planName: "الإحتراف",
+    levels: "المستويات 22–28",
+    age: "15–17 سنة",
+    prerequisite: "إتمام التطور أو اجتياز تقييم المستوى",
+    courses: [
+      "البايثون المتقدم وأتمتة النظم والبيانات",
+      "تطوير وتصميم مواقع الويب (HTML و CSS)",
+      "لغة جافا والبرمجة كائنية التوجه (Java OOP)",
+      "مشروع التخرج النهائي ونشره (Capstone)",
+    ],
     example: {
-      level: "17",
-      title: "التفاعل",
-      challenge: "اجعل الواجهة تستجيب لاختيارات المستخدم.",
-      newSkill: "بناء تجربة ويب تفاعلية.",
-      whatToBuild: "تطبيق ويب حقيقي",
+      title: "قيادة مشروع برمجي متكامل وإطلاقه",
+      challenge: "قد فريقاً برمجياً مصغراً لتصميم وبناء واختبار ونشر تطبيق رقمي حقيقي على الإنترنت.",
+      newSkill: "إدارة المشروعات التقنية، العمل الجماعي، هندسة البرمجيات، والقيادة.",
+      whatToBuild: "مشروع تقني متكامل ومنشور يضاف لمعرض أعمال الطالب الاحترافي (Portfolio)",
     },
-    icon: Layers,
+    icon: Award,
   },
   {
-    id: "innovator",
-    stageNumber: "05",
-    title: "المبتكر",
-    levelsRange: "20-23",
-    age: "14-18 سنة",
-    quote: "نستخدم التقنية لصناعة حل أذكى.",
-    basicSkills: ["AI", "Automation", "APIs", "التفكير التصميمي"],
-    outcome: "يوظف أدوات حديثة لحل مشكلة محددة.",
+    id: "custom",
+    title: "خاص 1:1",
+    planName: "مسار مخصص",
+    levels: "أي مستوى (01–28)",
+    age: "6–17 سنة",
+    prerequisite: "تقييم فردي معمّق وخطة شخصية",
+    courses: [
+      "خطة فردية مخصصة ومفصلة بالكامل حسب الهدف",
+      "اختيار أي تخصص (ذكاء اصطناعي، ويب، ألعاب، روبوتات)",
+      "تدريب فردي مكثف 1:1 مع مدرب متخصص مفرغ",
+    ],
     example: {
-      level: "22",
-      title: "الأتمتة",
-      challenge: "حوّل مهمة متكررة إلى تدفق يعمل تلقائيًا.",
-      newSkill: "تصميم حلول توفر الوقت والجهد.",
-      whatToBuild: "أداة ذكية أو تدفق عمل مؤتمت",
+      title: "توجيه مكثف ومسار خاص بالكامل",
+      challenge: "التركيز على بناء مشروع فريد في المجال المفضل لطفلك (ألعاب، ويب، ذكاء اصطناعي، مسابقات).",
+      newSkill: "تحقيق أقصى استيعاب وتطبيق عملي من خلال مدرب خاص مفرغ لطفلك طوال الجلسة.",
+      whatToBuild: "مشاريع فريدة ومخصصة بنسبة 100% تحقق تطلعات الأسرة وشغف الطالب الخاص",
     },
     icon: Sparkles,
   },
-  {
-    id: "engineer",
-    stageNumber: "06",
-    title: "المهندس",
-    levelsRange: "24-27",
-    age: "15-18 سنة",
-    quote: "نجمع المهارات في مشروع متكامل.",
-    basicSkills: ["تخطيط المشروع", "هندسة الحل", "الاختبار", "Portfolio"],
-    outcome: "يقدم مشروع تخرج من الفكرة إلى العرض.",
-    example: {
-      level: "27",
-      title: "مشروع التخرج",
-      challenge: "ابنِ واختبر وقدّم حلًا متكاملًا لمشكلة حقيقية.",
-      newSkill: "إدارة مشروع تقني من الفكرة إلى الإطلاق.",
-      whatToBuild: "مشروع متكامل يضاف لمعرض أعماله (Portfolio)",
-    },
-    icon: TrendingUp,
-  },
-];
+] as const;
+
+const stageAnimations = {
+  foundation: Branches,
+  building: Query,
+  evolution: Terminal,
+  mastery: Laptop,
+  custom: Hub,
+} satisfies Record<(typeof stages)[number]["id"], React.ComponentType<HairlineProps>>;
+
+type Stage = (typeof stages)[number];
 
 export default function Levels() {
-  const [activeStage, setActiveStage] = useState(stages[0]);
+  const [activeStage, setActiveStage] = useState<Stage>(stages[0]);
+  const ActiveIcon = activeStage.icon;
+  const ActiveAnimation = stageAnimations[activeStage.id];
 
   return (
-    <section className="w-full bg-background relative overflow-hidden">
-      <Container className="relative z-10" withBorder>
-        {/* Header */}
+    <section
+      className="w-full bg-background relative overflow-hidden scroll-mt-16"
+      id="levels"
+      dir="rtl"
+    >
+      <Container className="relative z-10">
         <SectionHeader
-          title="27 مستوى... مهارة تُبنى >خطوة بخطوة"
-          description="كل مستوى يضيف مهارة جديدة، وكل مرحلة تقرّب طفلك من بناء مشاريع أكثر تقدماً."
-          className="text-center items-center"
+          title="مستويات مسارات التعلم"
+          description="خمس محطات رئيسية ترتقي بطفلك من التفكير المنطقي الأول وصناعة الألعاب حتى قيادة مشاريع البرمجة الحقيقية."
         />
 
-        {/* Timeline */}
-        <div className="relative flex justify-start md:justify-between items-start w-full mb-16 overflow-x-auto pb-6 gap-6 md:gap-0 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {stages.map((stage, index) => {
-            const isActive = activeStage.id === stage.id;
-            const Icon = stage.icon;
-            return (
-              <React.Fragment key={stage.id}>
-                <div 
-                  className="relative z-10 flex flex-col items-center gap-3 cursor-pointer group w-24 shrink-0 snap-center" 
-                  onClick={() => setActiveStage(stage)}
-                >
-                  <div className={`w-14 h-14 rounded-full flex items-center justify-center transition-all duration-500 border-[3px] bg-background ${isActive ? 'border-primary bg-primary text-primary-foreground scale-110 shadow-lg shadow-primary/20' : 'border-border text-muted-foreground group-hover:border-primary/50 group-hover:text-primary/80'}`}>
-                    <Icon className="w-5 h-5 md:w-6 md:h-6" />
-                  </div>
-                  <div className="text-center mt-2 flex flex-col items-center">
-                    <div className={`text-[10px] uppercase tracking-widest mb-1 font-sans transition-colors ${isActive ? 'text-primary font-bold' : 'text-muted-foreground font-semibold'}`}>
-                      المستويات {stage.levelsRange}
-                    </div>
-                    <div className={`text-base font-black transition-colors ${isActive ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'}`}>
-                      {stage.title}
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Arrow Connector */}
-                {index < stages.length - 1 && (
-                  <div className="hidden md:flex flex-1 items-center justify-center mt-7 relative mx-2">
-                    <div className="h-[2px] w-full bg-border transition-colors duration-300"></div>
-                  </div>
-                )}
-              </React.Fragment>
-            );
-          })}
-        </div>
+        <div className="py-6 sm:py-8 px-4 sm:px-6 max-w-5xl mx-auto w-full">
+          {/* Level Tabs */}
+          <div className="flex items-center gap-3 sm:gap-4 pb-3 sm:pb-3.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="size-8 sm:size-8.5 rounded-full border border-line bg-secondary/80 flex items-center justify-center text-primary shrink-0 transition-all duration-200">
+              <ActiveIcon className="size-4 text-primary" />
+            </div>
 
-        {/* Details Card */}
-        <div className="bg-muted/30 rounded-3xl p-4 md:p-6 border border-border shadow-sm relative overflow-hidden">
-          
-          <div 
-            key={activeStage.id} 
-            className="flex flex-col md:flex-row gap-4 md:gap-8 items-stretch animate-in fade-in zoom-in-95 duration-500 fill-mode-forwards"
-          >
-            {/* Right Content */}
-            <div className="flex-1 flex flex-col justify-between py-2 md:py-4 px-2 md:px-4 order-2 md:order-1">
-              <div>
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="w-12 h-12 md:w-14 md:h-14 rounded-[calc(var(--radius)+4px)] border border-border flex items-center justify-center bg-background text-foreground shrink-0 shadow-sm mt-1">
-                    <activeStage.icon className="w-6 h-6 md:w-7 md:h-7" />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <div className="text-muted-foreground font-bold text-sm md:text-base">المرحلة {activeStage.stageNumber}</div>
-                    <h3 className="text-4xl md:text-4xl lg:text-5xl font-black text-foreground">{activeStage.title}</h3>
-                  </div>
-                </div>
-                
-                <div className="flex flex-wrap gap-2 mb-6">
-                  <span className="bg-background px-4 py-2 rounded-full text-sm font-bold text-foreground shadow-sm border border-border">
-                    المستويات {activeStage.levelsRange}
-                  </span>
-                  <span className="bg-background px-4 py-2 rounded-full text-sm font-bold text-foreground shadow-sm border border-border">
-                    {activeStage.age}
-                  </span>
-                </div>
+            <div className="flex items-center gap-2 sm:gap-4 md:gap-6 shrink-0">
+              {stages.map((stage) => {
+                const isActive = activeStage.id === stage.id;
+                return (
+                  <button
+                    key={stage.id}
+                    type="button"
+                    onClick={() => setActiveStage(stage)}
+                    className={cn(
+                      "relative pb-2 pt-1 font-sans text-xs sm:text-sm transition-colors duration-150 cursor-pointer select-none outline-none whitespace-nowrap",
+                      isActive
+                        ? "text-foreground font-bold"
+                        : "text-muted-foreground font-medium hover:text-foreground"
+                    )}
+                  >
+                    <span>{stage.title}</span>
+                    <span className="font-sans text-[11px] sm:text-xs font-normal opacity-75 ms-1.5">
+                      ({stage.planName})
+                    </span>
+                    {isActive && (
+                      <motion.div
+                        layoutId="active-stage-underline"
+                        className="absolute bottom-0 inset-x-0 h-[2px] bg-foreground rounded-full"
+                        transition={{
+                          type: "spring",
+                          bounce: 0.15,
+                          duration: 0.3,
+                        }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-                {/* <div className="relative mb-8">
-                  <div className="absolute right-0 top-0 bottom-0 w-1.5 bg-primary rounded-r-full"></div>
-                  <div className="bg-background pr-6 pl-4 py-3 rounded-r-none shadow-sm border border-l border-y border-border border-r-0 text-lg md:text-xl font-black text-foreground leading-snug">
-                    "{activeStage.quote}"
-                  </div>
-                </div> */}
-
-                <div className="mb-6">
-                  <h4 className="text-sm font-bold text-muted-foreground mb-3">المهارات الأساسية</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {activeStage.basicSkills.map((skill, i) => (
-                      <div key={i} className="bg-background border border-border rounded-full px-3 py-1.5 text-sm font-bold text-foreground flex items-center gap-2 shadow-sm transition-all hover:border-primary/50">
-                        <Check className="w-4 h-4 text-primary" />
-                        {skill}
+          {/* Level Card */}
+          <div className="rounded-xl border border-line bg-background/70 backdrop-blur-xs p-4 sm:p-6 md:p-7 shadow-none">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeStage.id}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-stretch"
+              >
+                {/* Details side */}
+                <div className="w-full lg:w-1/2 rounded-xl bg-secondary/25 backdrop-blur-xs p-4 sm:p-6 border border-line flex flex-col justify-between gap-4">
+                  <div className="flex flex-col gap-3.5">
+                    {/* Header */}
+                    <div className="flex items-center justify-between pb-2.5 border-b border-line/60">
+                      <div className="flex items-center gap-2">
+                        <span className="font-sans text-xs sm:text-sm font-bold text-foreground">
+                          مسار {activeStage.title}
+                        </span>
+                        <span className="font-sans text-xs text-muted-foreground/85 font-medium">
+                          • {activeStage.levels}
+                        </span>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              {/* <div className="flex items-center gap-4 bg-background p-4 shadow-sm border border-border mt-auto">
-                 <div className="bg-primary/10 p-3 rounded-full text-primary shrink-0">
-                  <Target className="w-5 h-5" />
-                </div> 
-                 <div>
-                  <div className="text-xs font-bold text-muted-foreground mb-1">نتيجة المرحلة</div>
-                  <div className="font-black text-foreground text-sm md:text-base">{activeStage.outcome}</div>
-                </div> 
-              </div> */}
-            </div>
-
-            {/* Left Content - Dark Card */}
-            <div className="w-full md:w-[400px] shrink-0 rounded-3xl bg-card p-6 text-card-foreground flex flex-col relative overflow-hidden order-1 md:order-2 shadow-2xl border border-border">
-              {/* <div className="absolute -left-10 -top-10 p-6 opacity-[0.03] rotate-12 pointer-events-none">
-                <activeStage.icon className="w-64 h-64 text-foreground" />
-              </div> */}
-              
-              <div className="relative z-10 flex flex-col h-full">
-                {/* <div className="flex items-center justify-start mb-6">
-                  <div className="text-primary text-xs font-black tracking-widest uppercase bg-primary/10 px-3 py-1.5 rounded-full">
-                    مستوى {activeStage.example.level}
-                  </div>
-                </div> 
-                    */}
-
-                {/* <div className="mb-6">
-                  <div className="text-muted-foreground text-sm font-bold mb-2">مثال من داخل المرحلة</div>
-                  <h4 className="text-2xl font-black text-foreground">{activeStage.example.title}</h4>
-                </div> */}
-
-                <div className="space-y-6 flex-1">
-                  <div>
-                    <div className="text-primary text-sm font-bold mb-2">التحدي العملي</div>
-                    <p className="text-foreground/80 text-sm leading-relaxed font-semibold">{activeStage.example.challenge}</p>
-                  </div>
-                  
-                  <div className="h-px w-full bg-border"></div>
-                  
-                  <div>
-                    <div className="text-primary text-sm font-bold mb-2 flex items-center gap-2">
-                      <Sparkles className="w-4 h-4" />
-                      مهارة جديدة
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-md bg-primary/10 border border-primary/20 font-sans text-xs font-bold text-primary select-none">
+                        {activeStage.age}
+                      </span>
                     </div>
-                    <p className="text-foreground/80 text-sm leading-relaxed font-semibold">{activeStage.example.newSkill}</p>
+
+                    {/* Courses in this level */}
+                    <div className="flex flex-col gap-2 pt-0.5">
+                      <span className="font-sans text-xs font-semibold text-muted-foreground/90 select-none flex items-center gap-1.5">
+                        <BookOpen className="size-3.5 text-primary shrink-0" />
+                        الدورات المقررة في هذا المستوى:
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {activeStage.courses.map((course, idx) => (
+                          <span
+                            key={idx}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-secondary/70 border border-line font-sans text-xs font-medium text-foreground/90 leading-tight select-none transition-colors hover:bg-secondary"
+                          >
+                            <span className="size-1.5 rounded-full bg-primary shrink-0" />
+                            {course}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Practical Challenge */}
+                    <div className="flex flex-col gap-1.5 pt-1">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-sans text-[11px] font-semibold text-primary select-none">
+                          التحدي البرمجي العملي
+                        </span>
+                        <h3 className="font-heading text-sm sm:text-base font-bold text-foreground tracking-normal">
+                          {activeStage.example.title}
+                        </h3>
+                      </div>
+                      <p className="font-sans text-xs sm:text-[13px] text-foreground/80 leading-relaxed font-normal">
+                        {activeStage.example.challenge}
+                      </p>
+                    </div>
+
+                    <div className="h-px w-full border-t border-dashed border-line my-0.5" />
+
+                    {/* Acquired Skill */}
+                    <div className="flex flex-col gap-1.5">
+                      <span className="font-sans text-xs font-semibold text-primary flex items-center gap-1.5 select-none">
+                        <Sparkles className="size-3.5" />
+                        المهارة المكتسبة
+                      </span>
+                      <p className="font-sans text-xs sm:text-[13px] text-foreground/80 leading-relaxed font-normal">
+                        {activeStage.example.newSkill}
+                      </p>
+                    </div>
+
+                    {/* Prerequisite */}
+                    <div className="flex items-center gap-2 pt-1 font-sans text-xs text-muted-foreground/90 font-medium">
+                      <CheckCircle2 className="size-3.5 text-primary shrink-0" />
+                      <span>شرط الدخول: <strong className="font-semibold text-foreground/90">{activeStage.prerequisite}</strong></span>
+                    </div>
+                  </div>
+
+                  {/* Footer */}
+                  <div className="pt-3.5 border-t border-line/60 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-sans text-xs font-semibold text-muted-foreground/80 select-none">
+                        ما الذي سيبنيه طفلك؟
+                      </span>
+                      <span className="font-sans text-xs sm:text-sm font-bold text-foreground">
+                        {activeStage.example.whatToBuild}
+                      </span>
+                    </div>
+
+                    <button
+                      suppressHydrationWarning
+                      type="button"
+                      onClick={() => openTrialAssessmentModal()}
+                      className="group flex h-9 items-center justify-center gap-1.5 rounded-lg bg-primary px-3.5 font-sans text-xs font-bold text-primary-foreground hover:bg-primary/90 transition-all active:scale-[0.98] cursor-pointer shadow-none shrink-0"
+                    >
+                      <span>قيّم طفلك</span>
+                      <ArrowUpLeft className="size-3.5 shrink-0 transition-transform duration-200 group-hover:-translate-x-0.5 group-hover:-translate-y-0.5" />
+                    </button>
                   </div>
                 </div>
 
-                <div className="mt-6 pt-4 bg-muted/50 -mx-6 -mb-6 px-6 pb-6 border-t border-border">
-                  <div className="text-muted-foreground text-xs font-bold mb-2">ما الذي سيبنيه طفلك؟</div>
-                  <div className="text-foreground font-black text-base">{activeStage.example.whatToBuild}</div>
+                {/* Animation side */}
+                <div className="flex min-h-[240px] sm:min-h-[280px] w-full items-center justify-center lg:min-h-0 lg:w-1/2 p-4">
+                  <ActiveAnimation
+                    className="w-full max-w-[380px] sm:max-w-[420px]"
+                    intensity={0.35}
+                    label={`أنيميشن مستوى ${activeStage.title}`}
+                  />
                 </div>
-              </div>
-            </div>
-
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
-
       </Container>
     </section>
   );
 }
-

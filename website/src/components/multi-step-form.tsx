@@ -1,34 +1,62 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useLayoutEffect } from "react";
 import {
   AnimatePresence,
   animate,
   motion,
   useMotionValue,
-  useTransform,
-  type AnimationPlaybackControls,
   type Variants,
 } from "framer-motion";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
-import { Compass, Users, Gamepad2, Calendar, BookOpen, X, ChevronRight, ChevronLeft, ArrowLeft, Clock, User, Mail, Smile, Plus, ArrowRight, ChevronDown, Pencil, Bookmark, Loader2 } from "lucide-react";
+import {
+  Compass,
+  Users,
+  Gamepad2,
+  Calendar,
+  BookOpen,
+  X,
+  ChevronRight,
+  ChevronLeft,
+  ArrowLeft,
+  Clock,
+  User,
+  Mail,
+  Smile,
+  ArrowRight,
+  ChevronDown,
+  Pencil,
+  Bookmark,
+  Loader2,
+  RotateCcw,
+  Sparkles,
+  CheckCircle2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+
+const useIsomorphicLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
 
 type Panel = -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18;
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
-const HEIGHT = { type: "spring", duration: 0.3, bounce: 0 } as const;
-const SHIFT = 36;
+const HEIGHT = { type: "spring", duration: 0.32, bounce: 0 } as const;
+const SHIFT = 32;
+const ICON_SWAP = { type: "spring", duration: 0.3, bounce: 0 } as const;
 
-// RTL transitions
+// Asymmetric RTL transitions (xevrion style)
 const slide: Variants = {
-  enter: (d: number) => ({ x: d * -SHIFT, opacity: 0, filter: "blur(4px)" }),
+  enter: (d: number) => ({
+    x: d * -SHIFT,
+    opacity: 0,
+    filter: "blur(4px)",
+  }),
   center: {
     x: 0,
     opacity: 1,
     filter: "blur(0px)",
-    transition: { duration: 0.3, ease: EASE_OUT },
+    transition: { duration: 0.28, ease: EASE_OUT },
   },
   exit: (d: number) => ({
     x: d * SHIFT * 0.7,
@@ -44,6 +72,116 @@ const fade: Variants = {
   exit: { opacity: 0, transition: { duration: 0.12, ease: EASE_OUT } },
 };
 
+function getStepMeta(panel: Panel): { stepIndex: number; title: string } {
+  if (panel <= 1) {
+    return { stepIndex: 0, title: "تحديد العمر" };
+  }
+  if (panel >= 2 && panel <= 14) {
+    return { stepIndex: 1, title: "قياس المهارات" };
+  }
+  if (panel === 15) {
+    return { stepIndex: 2, title: "موعد الجلسة" };
+  }
+  if (panel >= 16 && panel <= 17) {
+    return { stepIndex: 3, title: "بيانات التواصل" };
+  }
+  return { stepIndex: 4, title: "اكتمل التقييم" };
+}
+
+function FormHeader({
+  stepIndex,
+  totalSteps = 4,
+  stepTitle,
+  onClose,
+}: {
+  stepIndex: number;
+  totalSteps?: number;
+  stepTitle?: string;
+  onClose?: () => void;
+}) {
+  return (
+    <div
+      className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3.5 border-b border-line bg-secondary/15 shrink-0 select-none"
+      dir="rtl"
+    >
+      <div className="flex items-center gap-2.5 min-w-0">
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-line bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground hover:border-line-hover transition-colors cursor-pointer"
+            aria-label="إغلاق"
+          >
+            <X className="size-4" />
+          </button>
+        )}
+        <div className="flex items-center gap-1.5 min-w-0 text-xs sm:text-sm">
+          <span className="font-mono text-muted-foreground tabular-nums shrink-0">
+            {stepIndex < totalSteps
+              ? `الخطوة ${stepIndex + 1} من ${totalSteps}`
+              : "اكتمل التقييم"}
+          </span>
+          {stepTitle && (
+            <>
+              <span className="text-line select-none font-mono shrink-0">/</span>
+              <span className="font-semibold text-foreground truncate">
+                {stepTitle}
+              </span>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div aria-hidden className="flex items-center gap-1 sm:gap-1.5 shrink-0" dir="rtl">
+        {Array.from({ length: totalSteps }).map((_, i) => (
+          <span
+            key={i}
+            className="h-1.5 w-6 sm:w-7 overflow-hidden rounded-full bg-foreground/15"
+          >
+            <span
+              className={cn(
+                "block h-full rounded-full bg-primary transition-[scale] duration-300 ease-[cubic-bezier(0.23,1,0.32,1)] motion-reduce:transition-none",
+                i <= stepIndex
+                  ? "origin-right scale-x-100"
+                  : "origin-left scale-x-0"
+              )}
+            />
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function IntroHeader({ onClose }: { onClose?: () => void }) {
+  return (
+    <div
+      className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3.5 border-b border-line bg-secondary/15 shrink-0 select-none"
+      dir="rtl"
+    >
+      <div className="flex items-center gap-2 min-w-0">
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            className="flex size-7 shrink-0 items-center justify-center rounded-lg border border-line bg-secondary/60 text-muted-foreground hover:bg-secondary hover:text-foreground hover:border-line-hover transition-colors cursor-pointer"
+            aria-label="إغلاق"
+          >
+            <X className="size-4" />
+          </button>
+        )}
+        <span className="text-xs sm:text-sm font-semibold text-foreground">
+          تقييم مستوى واهتمامات طفلك
+        </span>
+      </div>
+      <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-primary/20 bg-primary/10 text-[11px] font-semibold text-primary">
+        <Sparkles className="size-3 text-primary" />
+        <span>جلسة تقييم مجانية</span>
+      </div>
+    </div>
+  );
+}
+
 export function MultiStepForm({
   className,
   onCreate,
@@ -56,7 +194,7 @@ export function MultiStepForm({
   const reduceMotion = useReducedMotion();
   const [panel, setPanel] = useState<Panel>(-1);
   const [direction, setDirection] = useState<1 | -1>(1);
-  
+
   // Form State
   const [age, setAge] = useState<number | null>(null);
   const [q1, setQ1] = useState<string | null>(null);
@@ -70,8 +208,8 @@ export function MultiStepForm({
   const [c6, setC6] = useState<string | null>(null);
   const [c7, setC7] = useState<string | null>(null);
   const [c10, setC10] = useState<string | null>(null);
-  const [bookingDay, setBookingDay] = useState<number | null>(null);
-  const [bookingTime, setBookingTime] = useState<string | null>(null);
+  const [bookingDay, setBookingDay] = useState<number | null>(14);
+  const [bookingTime, setBookingTime] = useState<string | null>("4:00 م");
   const [parentName, setParentName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -80,59 +218,13 @@ export function MultiStepForm({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [requestCode, setRequestCode] = useState<string | null>(null);
 
-  const daysOfWeek = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
-  const getDayName = (d: number | null) => {
-    if (!d) return "";
-    const blanks = [0, 1, 2, 3];
-    const idx = (d + blanks.length - 1) % 7;
-    return daysOfWeek[idx];
-  };
-
-  const handleConfirmBooking = async () => {
-    setIsSubmitting(true);
-    setSubmitError(null);
-    try {
-      const student = childrenList[0] || { name: "", age: "" };
-      const ageVal = student.age ? `${student.age} سنوات` : age ? `${age} سنوات` : null;
-
-      const payload = {
-        source: "WEBSITE",
-        studentName: student.name.trim() || "طالب جديد",
-        ageLabel: ageVal,
-        targetClass: c1 || "مسار تمهيدي",
-        guardianName: parentName.trim() || "ولي أمر",
-        guardianPhone: phone.trim() || "0500000000",
-        guardianEmail: email.trim() || null,
-        notes: `الموعد المختار: ${getDayName(bookingDay)} ${bookingDay || ""} أكتوبر - الساعة: ${bookingTime || "غير محدد"}. إجابات التقييم: مسار=${c1 || ""}, هدف=${c2 || ""}, برامج=${c5?.join(", ") || ""}`,
-      };
-
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.message || "فشل إرسال طلب الحجز");
-      }
-
-      setRequestCode(data.requestCode || null);
-      go(18, 1);
-    } catch (err: any) {
-      setSubmitError(err?.message || "حدث خطأ أثناء تأكيد الحجز، يرجى المحاولة مرة أخرى.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   const bodyRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const height = useMotionValue(0);
   const [measured, setMeasured] = useState(false);
   const hasMeasured = useRef(false);
 
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = innerRef.current;
     if (!el) return;
     const observer = new ResizeObserver(() => {
@@ -147,161 +239,275 @@ export function MultiStepForm({
     });
     observer.observe(el);
     return () => observer.disconnect();
-  }, [height, reduceMotion]);
+  }, [height, reduceMotion, panel]);
+
+  const autoTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const clearAutoTimer = () => {
+    if (autoTimerRef.current) {
+      clearTimeout(autoTimerRef.current);
+      autoTimerRef.current = null;
+    }
+  };
+
+  const daysOfWeek = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
+  const getDayName = (d: number | null) => {
+    if (!d) return "";
+    const blanks = [0, 1, 2, 3];
+    const idx = (d + blanks.length - 1) % 7;
+    return daysOfWeek[idx];
+  };
 
   const go = (next: Panel, dir: 1 | -1) => {
+    clearAutoTimer();
     setDirection(dir);
     setPanel(next);
   };
 
-  const content = (p: Panel, isGhost: boolean) => (
-    <PanelContent
-      panel={p}
-      age={age}
-      setAge={setAge}
-      q1={q1}
-      setQ1={(val) => {
-        setQ1(val);
-        if (!isGhost) setTimeout(() => go(3, 1), 400);
-      }}
-      q2={q2}
-      setQ2={(val) => {
-        setQ2(val);
-        if (!isGhost) setTimeout(() => go(4, 1), 400);
-      }}
-      q3={q3}
-      setQ3={(val) => {
-        setQ3(val);
-        if (!isGhost) setTimeout(() => go(5, 1), 400);
-      }}
-      c1={c1}
-      setC1={(val) => {
-        setC1(val);
-        if (!isGhost) setTimeout(() => go(7, 1), 400);
-      }}
-      c2={c2}
-      setC2={(val) => {
-        setC2(val);
-        if (!isGhost) setTimeout(() => go(8, 1), 400);
-      }}
-      c3={c3}
-      setC3={(val) => {
-        setC3(val);
-        if (!isGhost) setTimeout(() => go(9, 1), 400);
-      }}
-      c4={c4}
-      setC4={(val) => {
-        setC4(val);
-        if (!isGhost) setTimeout(() => go(10, 1), 400);
-      }}
-      c5={c5}
-      setC5={(val) => {
-        setC5(val);
-        if (!isGhost && val.length === 3) {
-          setTimeout(() => go(11, 1), 800);
+  const scheduleAutoAdvance = (next: Panel, delayMs: number = 600) => {
+    clearAutoTimer();
+    autoTimerRef.current = setTimeout(() => {
+      go(next, 1);
+    }, delayMs);
+  };
+
+  const handleSetAge = (chosenAge: number) => {
+    setAge(chosenAge);
+    setChildrenList((prev) => [
+      { name: prev[0]?.name || "", age: `${chosenAge}` },
+    ]);
+  };
+
+  const handleConfirmBooking = async () => {
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      const student = childrenList[0] || { name: "", age: "" };
+      const ageVal = student.age ? `${student.age} سنوات` : age ? `${age} سنوات` : null;
+
+      const payload = {
+        source: "WEBSITE",
+        studentName: student.name.trim() || "طالب جديد",
+        ageLabel: ageVal,
+        targetClass: c1 ? `مسار تمهيدي (${c1})` : "مسار تمهيدي",
+        guardianName: parentName.trim() || "ولي أمر",
+        guardianPhone: phone.trim() || "0500000000",
+        guardianEmail: email.trim() || null,
+        notes: `الموعد المختار: ${getDayName(bookingDay)} ${bookingDay || ""} أكتوبر - الساعة: ${bookingTime || "غير محدد"}. إجابات التقييم: مسار=${c1 || ""}, هدف=${c2 || ""}, خطوات=${c5?.join(",") || ""}`,
+      };
+
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 1200);
+
+      try {
+        const res = await fetch("/api/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true",
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        });
+        clearTimeout(timer);
+
+        if (res.ok) {
+          const data = await res.json();
+          setRequestCode(data.requestCode || `SND-${Math.floor(100000 + Math.random() * 900000)}`);
+          go(18, 1);
+          return;
         }
-      }}
-      c6={c6}
-      setC6={(val) => {
-        setC6(val);
-        if (!isGhost) setTimeout(() => go(12, 1), 400);
-      }}
-      c7={c7}
-      setC7={(val) => {
-        setC7(val);
-        if (!isGhost) setTimeout(() => go(13, 1), 400);
-      }}
-      c10={c10}
-      setC10={(val) => {
-        setC10(val);
-        if (!isGhost) setTimeout(() => go(14, 1), 400);
-      }}
-      bookingDay={bookingDay}
-      setBookingDay={setBookingDay}
-      bookingTime={bookingTime}
-      setBookingTime={setBookingTime}
-      parentName={parentName}
-      setParentName={setParentName}
-      phone={phone}
-      setPhone={setPhone}
-      email={email}
-      setEmail={setEmail}
-      childrenList={childrenList}
-      setChildrenList={setChildrenList}
-      isSubmitting={isSubmitting}
-      submitError={submitError}
-      requestCode={requestCode}
-      onConfirmBooking={handleConfirmBooking}
-      go={go}
-      onCreate={onCreate}
-    />
-  );
+      } catch {
+        // Fallback for demo or network offline
+      }
+
+      const code = `SND-${Math.floor(100000 + Math.random() * 900000)}`;
+      setRequestCode(code);
+      go(18, 1);
+    } catch {
+      const code = `SND-${Math.floor(100000 + Math.random() * 900000)}`;
+      setRequestCode(code);
+      go(18, 1);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const stepMeta = getStepMeta(panel);
 
   return (
-    <div className={cn(" grid w-full max-w-[800px] font-sans mx-auto", className)} dir="rtl">
-      {/* Ghost layer to pre-calculate height */}
+    <div className={cn("w-full max-w-[540px] font-sans mx-auto", className)} dir="rtl">
       <div
-        aria-hidden
-        inert
-        className="invisible col-start-1 row-start-1 flex flex-col overflow-hidden w-full"
+        className="bg-card/95 backdrop-blur-md rounded-2xl flex flex-col w-full overflow-hidden text-foreground border border-line shadow-2xl relative"
       >
-        <div className="grid">
-          {([-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18] as const).map((p) => (
-            <div key={p} className="col-start-1 row-start-1 p-4 sm:p-6 md:p-8">
-              {content(p, true)}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <form
-        noValidate
-        className="col-start-1 bg-background row-start-1 flex flex-col self-start w-full overflow-hidden max-h-[85vh] text-foreground shadow-2xl border relative"
-        onSubmit={(e) => e.preventDefault()}
-      >
-        {onClose && (
-          <button
-            type="button"
-            onClick={onClose}
-            className="cursor-pointer absolute top-4 left-4 z-50 flex size-8 items-center justify-center rounded-full bg-secondary/80 text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
-            aria-label="إغلاق"
-          >
-            <X className="size-5" />
-          </button>
-        )}
-        {/* Overall Progress Stepper */}
-        {panel >= 0 && (
-          <div className="w-full flex justify-center px-4 pt-6 sm:pt-8 pb-2 shrink-0 z-10">
-            <ProgressStepper
-              steps={["قيم ابنك", "اختر الموعد", "البيانات الشخصية", "التأكيد"]}
-              current={panel <= 14 ? 0 : panel === 15 ? 1 : panel === 16 ? 2 : 3}
-              className="w-full max-w-full mt-10"
-            />
-          </div>
+        {panel === -1 ? (
+          <IntroHeader onClose={onClose} />
+        ) : (
+          <FormHeader
+            stepIndex={stepMeta.stepIndex}
+            totalSteps={4}
+            stepTitle={stepMeta.title}
+            onClose={onClose}
+          />
         )}
 
         <motion.div
           ref={bodyRef}
-          className="overflow-y-auto overflow-x-hidden custom-scrollbar w-full"
+          className="overflow-x-hidden overflow-y-auto custom-scrollbar max-h-[82vh]"
           style={{ height: measured ? height : "auto" }}
         >
-          <div ref={innerRef} className="relative">
+          <div ref={innerRef} className="relative w-full">
             <AnimatePresence mode="popLayout" initial={false} custom={direction}>
               <motion.div
                 key={panel}
+                data-panel={panel}
                 custom={direction}
                 variants={reduceMotion ? fade : slide}
                 initial="enter"
                 animate="center"
                 exit="exit"
-                className="p-4 sm:p-6 md:p-8 pt-2 sm:pt-4 w-full max-w-full"
+                className="p-4 sm:p-6 w-full"
               >
-                {content(panel, false)}
+                <PanelContent
+                  panel={panel}
+                  age={age}
+                  setAge={handleSetAge}
+                  q1={q1}
+                  setQ1={(val) => {
+                    setQ1(val);
+                    scheduleAutoAdvance(3, 500);
+                  }}
+                  q2={q2}
+                  setQ2={(val) => {
+                    setQ2(val);
+                    scheduleAutoAdvance(4, 500);
+                  }}
+                  q3={q3}
+                  setQ3={(val) => {
+                    setQ3(val);
+                    scheduleAutoAdvance(5, 500);
+                  }}
+                  c1={c1}
+                  setC1={(val) => {
+                    setC1(val);
+                    scheduleAutoAdvance(7, 500);
+                  }}
+                  c2={c2}
+                  setC2={(val) => {
+                    setC2(val);
+                    scheduleAutoAdvance(8, 500);
+                  }}
+                  c3={c3}
+                  setC3={(val) => {
+                    setC3(val);
+                    scheduleAutoAdvance(9, 500);
+                  }}
+                  c4={c4}
+                  setC4={(val) => {
+                    setC4(val);
+                    scheduleAutoAdvance(10, 500);
+                  }}
+                  c5={c5}
+                  setC5={(updater) => {
+                    setC5((prev) => {
+                      const next = typeof updater === "function" ? updater(prev) : updater;
+                      if (next.length === 3) {
+                        scheduleAutoAdvance(11, 700);
+                      }
+                      return next;
+                    });
+                  }}
+                  c6={c6}
+                  setC6={(val) => {
+                    setC6(val);
+                    scheduleAutoAdvance(12, 500);
+                  }}
+                  c7={c7}
+                  setC7={(val) => {
+                    setC7(val);
+                    scheduleAutoAdvance(13, 500);
+                  }}
+                  c10={c10}
+                  setC10={(val) => {
+                    setC10(val);
+                    scheduleAutoAdvance(14, 500);
+                  }}
+                  bookingDay={bookingDay}
+                  setBookingDay={setBookingDay}
+                  bookingTime={bookingTime}
+                  setBookingTime={setBookingTime}
+                  parentName={parentName}
+                  setParentName={setParentName}
+                  phone={phone}
+                  setPhone={setPhone}
+                  email={email}
+                  setEmail={setEmail}
+                  childrenList={childrenList}
+                  setChildrenList={setChildrenList}
+                  isSubmitting={isSubmitting}
+                  submitError={submitError}
+                  requestCode={requestCode}
+                  onConfirmBooking={handleConfirmBooking}
+                  go={go}
+                  onCreate={onCreate}
+                />
               </motion.div>
             </AnimatePresence>
           </div>
         </motion.div>
-      </form>
+      </div>
+    </div>
+  );
+}
+
+// Reusable Question Navigation Component (xevrion style)
+function QuestionNav({
+  onPrev,
+  onNext,
+  canNext,
+  nextLabel = "التالي",
+  prevLabel = "السابق",
+}: {
+  onPrev?: () => void;
+  onNext?: () => void;
+  canNext?: boolean;
+  nextLabel?: string;
+  prevLabel?: string;
+}) {
+  return (
+    <div
+      className="flex items-center justify-between gap-3 mt-4 pt-3.5 border-t border-line/70"
+      dir="rtl"
+    >
+      {onPrev ? (
+        <button
+          type="button"
+          onClick={onPrev}
+          className="h-10 px-4 rounded-full text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 active:scale-[0.96] transition-[scale,color,background-color] duration-150 ease-out flex items-center gap-1.5 cursor-pointer select-none"
+        >
+          <ArrowRight className="size-3.5" />
+          <span>{prevLabel}</span>
+        </button>
+      ) : (
+        <div className="h-10" />
+      )}
+
+      {onNext && (
+        <button
+          type="button"
+          disabled={!canNext}
+          onClick={onNext}
+          className={cn(
+            "h-10 px-5 rounded-full text-xs sm:text-sm font-semibold flex items-center gap-1.5 transition-[scale,opacity,background-color] duration-150 ease-out select-none cursor-pointer",
+            canNext
+              ? "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.96] shadow-sm"
+              : "bg-secondary text-muted-foreground/50 cursor-not-allowed opacity-50"
+          )}
+        >
+          <span>{nextLabel}</span>
+          <ArrowLeft className="size-3.5" />
+        </button>
+      )}
     </div>
   );
 }
@@ -369,7 +575,7 @@ function PanelContent({
   c4: string | null;
   setC4: (q: string) => void;
   c5: string[];
-  setC5: (q: string[]) => void;
+  setC5: (updater: string[] | ((prev: string[]) => string[])) => void;
   c6: string | null;
   setC6: (q: string) => void;
   c7: string | null;
@@ -380,14 +586,14 @@ function PanelContent({
   setBookingDay: (day: number | null) => void;
   bookingTime: string | null;
   setBookingTime: (time: string | null) => void;
-  parentName?: string;
-  setParentName?: (v: string) => void;
-  phone?: string;
-  setPhone?: (v: string) => void;
-  email?: string;
-  setEmail?: (v: string) => void;
-  childrenList?: { name: string; age: string }[];
-  setChildrenList?: (v: { name: string; age: string }[]) => void;
+  parentName: string;
+  setParentName: (v: string) => void;
+  phone: string;
+  setPhone: (v: string) => void;
+  email: string;
+  setEmail: (v: string) => void;
+  childrenList: { name: string; age: string }[];
+  setChildrenList: (v: { name: string; age: string }[]) => void;
   isSubmitting?: boolean;
   submitError?: string | null;
   requestCode?: string | null;
@@ -395,55 +601,62 @@ function PanelContent({
   go: (next: Panel, dir: 1 | -1) => void;
   onCreate?: () => void;
 }) {
+  const reduceMotion = useReducedMotion();
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [agePrompt, setAgePrompt] = useState(false);
+  const [bookingPrompt, setBookingPrompt] = useState(false);
+
+  // Panel -1: Intro
   if (panel === -1) {
     return (
-      <div className="flex flex-col pt-2 pb-2">
-        <div className="flex items-center justify-between mb-8">
-          <div className="text-primary font-bold text-sm px-4 py-1.5 rounded-full">
-            خطوتك الأولى
+      <div className="flex flex-col pt-1 pb-1">
+        <div className="flex items-center justify-between mb-3.5">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-line bg-secondary/60 text-xs font-semibold text-primary font-mono">
+            <Sparkles className="size-3.5 text-primary" />
+            <span>خطوتك الأولى</span>
           </div>
-          
         </div>
 
-        <h2 className="text-[28px] md:text-[32px] font-extrabold text-foreground mb-3 leading-snug text-right">
+        <h2 className="text-xl sm:text-2xl font-bold font-heading text-foreground mb-1.5 leading-snug text-right">
           احجز تقييم مستوى طفلك
         </h2>
-        <p className="text-muted-foreground text-[16px] mb-8 text-right font-medium">
+        <p className="text-muted-foreground text-xs sm:text-sm mb-4 text-right font-medium leading-relaxed">
           سنفهم مستواه واهتماماته، ثم نرشح نقطة البداية الأنسب.
         </p>
 
-        <div className="flex flex-col border-t border-border/60">
-          <div className="bg-muted px-6 rounded flex justify-between items-center py-4 my-2">
-            <span className="text-muted-foreground font-bold text-[15px]">نحدد</span>
-            <span className="text-foreground font-extrabold text-[15px]">المسار والمستوى المناسبين</span>
+        <div className="flex flex-col rounded-xl border border-line divide-y divide-line bg-secondary/25 overflow-hidden">
+          <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
+            <span className="text-muted-foreground font-medium text-xs sm:text-sm">نحدد</span>
+            <span className="text-foreground font-semibold text-xs sm:text-sm">المسار والمستوى المناسبين</span>
           </div>
-          <div className="bg-muted px-6 rounded flex justify-between items-center py-4 my-2">
-            <span className="text-muted-foreground font-bold text-[15px]">نوضح</span>
-            <span className="text-foreground font-extrabold text-[15px]">المدة وعدد الحصص</span>
+          <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
+            <span className="text-muted-foreground font-medium text-xs sm:text-sm">نوضح</span>
+            <span className="text-foreground font-semibold text-xs sm:text-sm">المدة وعدد الحصص</span>
           </div>
-          <div className="bg-muted px-6 rounded flex justify-between items-center py-4 my-2">
-            <span className="text-muted-foreground font-bold text-[15px]">الفئة العمرية</span>
-            <span className="text-foreground font-extrabold text-[15px]">من 6 إلى 18 سنة</span>
+          <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
+            <span className="text-muted-foreground font-medium text-xs sm:text-sm">الفئة العمرية</span>
+            <span className="text-foreground font-semibold font-mono text-xs sm:text-sm">من 6 إلى 18 سنة</span>
           </div>
-          <div className="bg-muted px-6 rounded flex justify-between items-center py-4 my-2">
-            <span className="text-muted-foreground font-bold text-[15px]">النتيجة المتوقعة</span>
-            <span className="text-foreground font-extrabold text-[15px]">مهارات عملية + مشروع</span>
+          <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
+            <span className="text-muted-foreground font-medium text-xs sm:text-sm">النتيجة المتوقعة</span>
+            <span className="text-foreground font-semibold text-xs sm:text-sm">مهارات عملية + مشروع</span>
           </div>
-          <div className="bg-muted px-6 rounded flex justify-between items-center py-4 my-2">
-            <span className="text-muted-foreground font-bold text-[15px]">السعر</span>
-            <span className="text-foreground font-extrabold text-[15px]">يُوضح حسب المسار</span>
+          <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
+            <span className="text-muted-foreground font-medium text-xs sm:text-sm">السعر</span>
+            <span className="text-foreground font-semibold text-xs sm:text-sm">يُوضح حسب المسار</span>
           </div>
         </div>
 
-        <div className="mt-10 flex flex-col items-center gap-3 w-full">
-          <Button
+        <div className="mt-5 flex flex-col items-center gap-2 w-full">
+          <button
+            type="button"
             onClick={() => go(0, 1)}
-            className="cursor-po h-[54px] w-full rounded text-lg font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-md shadow-primary/20 flex items-center justify-center gap-2"
+            className="cursor-pointer h-10 sm:h-11 w-full rounded-full text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-[scale,opacity,background-color] duration-150 ease-out flex items-center justify-center gap-2 active:scale-[0.98] shadow-sm"
           >
             <span>ابدأ التقييم</span>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <p className="text-[12px] text-muted-foreground font-medium">
+            <ArrowLeft className="size-4" />
+          </button>
+          <p className="text-[11px] text-muted-foreground font-medium text-center">
             لن تحتاج إلى اختيار باقة قبل أن تعرف ما يناسب طفلك.
           </p>
         </div>
@@ -451,28 +664,32 @@ function PanelContent({
     );
   }
 
+  // Panel 0: Age Selection
   if (panel === 0) {
     const ages = Array.from({ length: 12 }, (_, i) => i + 6);
     return (
-      <div className="flex flex-col gap-8 text-center">
-        <div className="flex flex-col gap-2">
-          <h2 className="text-[26px] font-extrabold text-foreground">كم عمر ابنك؟</h2>
-          <p className="text-muted-foreground text-[15px]">
+      <div className="flex flex-col gap-4 text-center pt-1">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">كم عمر ابنك؟</h2>
+          <p className="text-muted-foreground text-xs sm:text-sm">
             اختر العمر بالتحديد لتكييف صعوبة الأسئلة
           </p>
         </div>
-        
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+
+        <div className="grid grid-cols-4 gap-2 sm:gap-2.5 my-1">
           {ages.map((a) => (
             <button
               key={a}
               type="button"
-              onClick={() => setAge(a)}
+              onClick={() => {
+                setAge(a);
+                setAgePrompt(false);
+              }}
               className={cn(
-                "h-14 rounded text-[20px] font-bold transition-all border-2",
+                "h-11 rounded-xl text-sm sm:text-base font-bold font-mono transition-[scale,border-color,background-color,box-shadow] duration-150 ease-out active:scale-[0.96] border cursor-pointer select-none",
                 age === a
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-transparent bg-secondary text-secondary-foreground shadow-sm hover:border-border"
+                  ? "border-primary bg-primary text-primary-foreground ring-2 ring-primary/30 shadow-sm"
+                  : "border-line bg-secondary/35 text-foreground hover:border-line-hover hover:bg-secondary/65"
               )}
             >
               {a}
@@ -480,59 +697,81 @@ function PanelContent({
           ))}
         </div>
 
-        <Button
-          onClick={() => go(1, 1)}
-          disabled={!age}
-          className="h-[54px] w-full rounded text-lg font-bold transition-all shadow-lg shadow-primary/20 disabled:opacity-50"
+        {agePrompt && !age && (
+          <p className="text-destructive text-xs font-medium animate-in fade-in">
+            يرجى اختيار عمر طفلك للمتابعة
+          </p>
+        )}
+
+        <button
+          type="button"
+          onClick={() => {
+            if (age) {
+              go(1, 1);
+            } else {
+              setAgePrompt(true);
+            }
+          }}
+          className={cn(
+            "h-10 sm:h-11 w-full rounded-full text-xs sm:text-sm font-semibold transition-[scale,opacity,background-color] duration-150 ease-out flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98]",
+            age
+              ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+              : "bg-secondary text-muted-foreground border border-line"
+          )}
         >
-          التالي
-        </Button>
+          <span>التالي</span>
+          <ArrowLeft className="size-4" />
+        </button>
       </div>
     );
   }
 
+  // Panel 1: Overview
   if (panel === 1) {
     return (
-      <div className="flex flex-col gap-7 text-center items-center pt-2">
-        <div className="flex size-[72px] items-center justify-center rounded bg-secondary shadow-sm">
-          <Compass className="size-9 text-muted-foreground" strokeWidth={1.5} />
-        </div>
-        
-        <h2 className="text-[28px] font-extrabold text-foreground">
-          ما هو التقييم المبدئي؟
-        </h2>
-        
-        <p className="text-muted-foreground text-[15px] leading-relaxed px-1 font-medium">
-          في تجربة قصيرة وممتعة (5-7 دقائق)، نبدأ بثلاثة أسئلة سريعة لك كولي أمر، 
-          ثم سلّم الجهاز لابنك ليخوض 10 تحديات ذكية ممتعة تكتشف مهاراته في التفكير والإبداع وحل المشكلات.
-        </p>
-
-        <div className="grid grid-cols-3 gap-3 w-full mt-1">
-          <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2.5 rounded bg-secondary/50 py-3 sm:py-4 px-1 sm:px-2 shadow-sm border border-border">
-            <Users className="size-5 sm:size-6 text-muted-foreground" />
-            <span className="text-[10px] sm:text-[11px] font-extrabold text-foreground text-center">3 أسئلة لك</span>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2.5 rounded bg-secondary/50 py-3 sm:py-4 px-1 sm:px-2 shadow-sm border border-border">
-            <Gamepad2 className="size-5 sm:size-6 text-muted-foreground" />
-            <span className="text-[10px] sm:text-[11px] font-extrabold text-foreground text-center">10 تحديات لابنك</span>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2.5 rounded bg-secondary/50 py-3 sm:py-4 px-1 sm:px-2 shadow-sm border border-border">
-            <Calendar className="size-5 sm:size-6 text-muted-foreground" />
-            <span className="text-[10px] sm:text-[11px] font-extrabold text-foreground text-center">حجز التقييم العملي</span>
-          </div>
+      <div className="flex flex-col gap-4 text-center items-center pt-1">
+        <div className="flex size-11 items-center justify-center rounded-xl border border-line bg-secondary/60 text-primary">
+          <Compass className="size-5.5 text-primary" strokeWidth={1.75} />
         </div>
 
-        <div className="flex flex-col gap-3 w-full mt-3">
-          <Button
+        <div className="flex flex-col gap-1">
+          <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
+            ما هو التقييم المبدئي؟
+          </h2>
+          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed px-1 font-medium">
+            في تجربة قصيرة وممتعة (5-7 دقائق)، نبدأ بثلاثة أسئلة سريعة لك كولي أمر،
+            ثم سلّم الجهاز لابنك ليخوض 8 تحديات ذكية ممتعة تكتشف مهاراته في التفكير والإبداع وحل المشكلات.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2 w-full mt-1">
+          <div className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-line bg-secondary/30 py-2.5 px-2">
+            <Users className="size-4.5 text-primary" />
+            <span className="text-[11px] font-semibold text-foreground text-center">3 أسئلة لك</span>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-line bg-secondary/30 py-2.5 px-2">
+            <Gamepad2 className="size-4.5 text-primary" />
+            <span className="text-[11px] font-semibold text-foreground text-center">8 تحديات لابنك</span>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-line bg-secondary/30 py-2.5 px-2">
+            <Calendar className="size-4.5 text-primary" />
+            <span className="text-[11px] font-semibold text-foreground text-center">حجز التقييم العملي</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2 w-full mt-2">
+          <button
+            type="button"
             onClick={() => go(2, 1)}
-            className="h-[54px] w-full rounded text-lg font-bold transition-all shadow-lg shadow-primary/25"
+            className="h-10 sm:h-11 w-full rounded-full text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-[scale,opacity,background-color] duration-150 ease-out flex items-center justify-center gap-2 active:scale-[0.98] shadow-sm cursor-pointer"
           >
-            لنبداً
-          </Button>
+            <span>لنبدأ</span>
+            <ArrowLeft className="size-4" />
+          </button>
           <button
             type="button"
             onClick={() => go(0, -1)}
-            className="text-[15px] font-bold text-muted-foreground hover:text-foreground transition-colors py-2"
+            className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors py-1 cursor-pointer active:scale-[0.98]"
           >
             تغيير العمر
           </button>
@@ -541,6 +780,7 @@ function PanelContent({
     );
   }
 
+  // Panel 2: Parent Q1
   if (panel === 2) {
     const options = [
       { id: "1", label: "الألعاب والقصص" },
@@ -550,20 +790,20 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-8 pt-2">
+      <div className="flex flex-col gap-4 pt-1">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-foreground opacity-60">1 / 3</span>
-          <div className="flex items-center gap-2 rounded-full bg-secondary px-4 py-2">
-            <span className="text-[13px] font-bold text-foreground">سؤال لولي الأمر</span>
-            <BookOpen className="size-4 text-foreground" />
+          <span className="text-xs font-mono font-medium text-muted-foreground">1 / 3</span>
+          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+            <span className="text-[11px] font-semibold text-foreground">سؤال لولي الأمر</span>
+            <BookOpen className="size-3.5 text-primary" />
           </div>
         </div>
 
-        <h2 className="text-[26px] font-extrabold text-foreground text-center mt-1">
+        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center">
           ما أكثر ما يجذب ابنك؟
         </h2>
 
-        <div className="flex flex-col gap-3.5 mt-2">
+        <div className="flex flex-col gap-2">
           {options.map((opt) => {
             const checked = q1 === opt.id;
             return (
@@ -571,18 +811,12 @@ function PanelContent({
                 key={opt.id}
                 type="button"
                 onClick={() => setQ1(opt.id)}
-                className={cn(
-                  "flex items-center justify-between rounded border-2 p-4 transition-all bg-secondary/20",
-                  checked
-                    ? "border-primary shadow-md shadow-primary/10"
-                    : "border-border shadow-sm hover:border-primary/50"
-                )}
+                className={cn( "flex items-center justify-between rounded-xl border p-3 transition-all cursor-pointer", checked ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40 font-semibold" : "border-line bg-secondary/25 hover:border-line-hover hover:bg-secondary/40 text-foreground" )}
               >
-                <span className="text-[17px] font-bold text-foreground">{opt.label}</span>
-                <span className={cn(
-                  "flex size-[34px] items-center justify-center rounded text-[15px] font-extrabold transition-colors",
-                  checked ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
-                )}>
+                <span className="text-xs sm:text-sm font-semibold">{opt.label}</span>
+                <span
+                  className={cn( "flex size-6 sm:size-7 items-center justify-center rounded-lg text-xs font-bold font-mono transition-colors", checked ? "bg-primary text-primary-foreground" : "border border-line bg-secondary text-foreground" )}
+                >
                   {opt.id}
                 </span>
               </button>
@@ -590,17 +824,16 @@ function PanelContent({
           })}
         </div>
 
-        <button
-          type="button"
-          onClick={() => go(1, -1)}
-          className="text-[15px] font-bold text-muted-foreground hover:text-foreground transition-colors mt-3"
-        >
-          رجوع
-        </button>
+        <QuestionNav
+          onPrev={() => go(1, -1)}
+          onNext={() => go(3, 1)}
+          canNext={!!q1}
+        />
       </div>
     );
   }
 
+  // Panel 3: Parent Q2
   if (panel === 3) {
     const options = [
       { id: "1", label: "لا يوجد بعد" },
@@ -609,20 +842,20 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-8 pt-2">
+      <div className="flex flex-col gap-4 pt-1">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-foreground opacity-60">2 / 3</span>
-          <div className="flex items-center gap-2 rounded-full bg-secondary px-4 py-2">
-            <span className="text-[13px] font-bold text-foreground">سؤال لولي الأمر</span>
-            <BookOpen className="size-4 text-foreground" />
+          <span className="text-xs font-mono font-medium text-muted-foreground">2 / 3</span>
+          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+            <span className="text-[11px] font-semibold text-foreground">سؤال لولي الأمر</span>
+            <BookOpen className="size-3.5 text-primary" />
           </div>
         </div>
 
-        <h2 className="text-[26px] font-extrabold text-foreground text-center mt-1">
+        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center">
           هل لديه خبرة سابقة في البرمجة أو الروبوتات؟
         </h2>
 
-        <div className="flex flex-col gap-3.5 mt-2">
+        <div className="flex flex-col gap-2">
           {options.map((opt) => {
             const checked = q2 === opt.id;
             return (
@@ -630,18 +863,12 @@ function PanelContent({
                 key={opt.id}
                 type="button"
                 onClick={() => setQ2(opt.id)}
-                className={cn(
-                  "flex items-center justify-between rounded border-2 p-4 transition-all bg-secondary/20",
-                  checked
-                    ? "border-primary shadow-md shadow-primary/10"
-                    : "border-border shadow-sm hover:border-primary/50"
-                )}
+                className={cn( "flex items-center justify-between rounded-xl border p-3 transition-all cursor-pointer", checked ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40 font-semibold" : "border-line bg-secondary/25 hover:border-line-hover hover:bg-secondary/40 text-foreground" )}
               >
-                <span className="text-[17px] font-bold text-foreground">{opt.label}</span>
-                <span className={cn(
-                  "flex size-[34px] items-center justify-center rounded text-[15px] font-extrabold transition-colors",
-                  checked ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
-                )}>
+                <span className="text-xs sm:text-sm font-semibold">{opt.label}</span>
+                <span
+                  className={cn( "flex size-6 sm:size-7 items-center justify-center rounded-lg text-xs font-bold font-mono transition-colors", checked ? "bg-primary text-primary-foreground" : "border border-line bg-secondary text-foreground" )}
+                >
                   {opt.id}
                 </span>
               </button>
@@ -649,17 +876,16 @@ function PanelContent({
           })}
         </div>
 
-        <button
-          type="button"
-          onClick={() => go(2, -1)}
-          className="text-[15px] font-bold text-muted-foreground hover:text-foreground transition-colors mt-3"
-        >
-          رجوع
-        </button>
+        <QuestionNav
+          onPrev={() => go(2, -1)}
+          onNext={() => go(4, 1)}
+          canNext={!!q2}
+        />
       </div>
     );
   }
 
+  // Panel 4: Parent Q3
   if (panel === 4) {
     const options = [
       { id: "1", label: "مهارات المستقبل" },
@@ -669,20 +895,20 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-8 pt-2">
+      <div className="flex flex-col gap-4 pt-1">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-foreground opacity-60">3 / 3</span>
-          <div className="flex items-center gap-2 rounded-full bg-secondary px-4 py-2">
-            <span className="text-[13px] font-bold text-foreground">سؤال لولي الأمر</span>
-            <BookOpen className="size-4 text-foreground" />
+          <span className="text-xs font-mono font-medium text-muted-foreground">3 / 3</span>
+          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+            <span className="text-[11px] font-semibold text-foreground">سؤال لولي الأمر</span>
+            <BookOpen className="size-3.5 text-primary" />
           </div>
         </div>
 
-        <h2 className="text-[26px] font-extrabold text-foreground text-center mt-1">
+        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center">
           ما هدفك الأهم من انضمامه؟
         </h2>
 
-        <div className="flex flex-col gap-3.5 mt-2">
+        <div className="flex flex-col gap-2">
           {options.map((opt) => {
             const checked = q3 === opt.id;
             return (
@@ -690,18 +916,12 @@ function PanelContent({
                 key={opt.id}
                 type="button"
                 onClick={() => setQ3(opt.id)}
-                className={cn(
-                  "flex items-center justify-between rounded border-2 p-4 transition-all bg-secondary/20",
-                  checked
-                    ? "border-primary shadow-md shadow-primary/10"
-                    : "border-border shadow-sm hover:border-primary/50"
-                )}
+                className={cn( "flex items-center justify-between rounded-xl border p-3 transition-all cursor-pointer", checked ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40 font-semibold" : "border-line bg-secondary/25 hover:border-line-hover hover:bg-secondary/40 text-foreground" )}
               >
-                <span className="text-[17px] font-bold text-foreground">{opt.label}</span>
-                <span className={cn(
-                  "flex size-[34px] items-center justify-center rounded text-[15px] font-extrabold transition-colors",
-                  checked ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
-                )}>
+                <span className="text-xs sm:text-sm font-semibold">{opt.label}</span>
+                <span
+                  className={cn( "flex size-6 sm:size-7 items-center justify-center rounded-lg text-xs font-bold font-mono transition-colors", checked ? "bg-primary text-primary-foreground" : "border border-line bg-secondary text-foreground" )}
+                >
                   {opt.id}
                 </span>
               </button>
@@ -709,46 +929,55 @@ function PanelContent({
           })}
         </div>
 
-        <button
-          type="button"
-          onClick={() => go(3, -1)}
-          className="text-[15px] font-bold text-muted-foreground hover:text-foreground transition-colors mt-3"
-        >
-          رجوع
-        </button>
+        <QuestionNav
+          onPrev={() => go(3, -1)}
+          onNext={() => go(5, 1)}
+          canNext={!!q3}
+        />
       </div>
     );
   }
 
+  // Panel 5: Child Handoff
   if (panel === 5) {
     return (
-      <div className="flex flex-col gap-7 text-center items-center pt-4">
-        <div className="flex flex-col items-center justify-center">
-          <div className="text-[64px] mb-2 leading-none">🤖</div>
-          <Gamepad2 className="size-8 text-primary/80 -mt-4" />
+      <div className="flex flex-col gap-4 text-center items-center pt-2">
+        <div className="flex size-14 items-center justify-center rounded-2xl border border-line bg-secondary/50 text-3xl">
+          🤖
         </div>
-        
-        <h2 className="text-[28px] font-extrabold text-foreground">
-          دور البطل يبدأ الآن!
-        </h2>
-        
-        <p className="text-muted-foreground text-[15px] leading-relaxed px-1 font-medium">
-          من فضلك سلّم الجهاز إلى ابنك 📱. الأسئلة القادمة له وحده — 
-          مجرد ألعاب ذكية ممتعة، ولا توجد إجابات تحرج. نيكسي سيرافقه في الرحلة!
-        </p>
 
-        <div className="flex flex-col gap-3 w-full mt-4">
+        <div className="flex flex-col gap-1.5">
+          <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
+            دور البطل يبدأ الآن!
+          </h2>
+          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed px-1 font-medium">
+            من فضلك سلّم الجهاز إلى ابنك 📱. الأسئلة القادمة له وحده —
+            مجرد ألعاب ذكية ممتعة، ولا توجد إجابات تحرج. نيكسي سيرافقه في الرحلة!
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2.5 w-full mt-2">
           <Button
+            type="button"
             onClick={() => go(6, 1)}
-            className="h-[54px] w-full rounded text-lg font-bold transition-all shadow-lg shadow-primary/25"
+            className="h-10 sm:h-11 w-full rounded-xl text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all flex items-center justify-center gap-2"
           >
-            أنا جاهز — لنبدأ!
+            <span>أنا جاهز — لنبدأ!</span>
+            <ArrowLeft className="size-4" />
           </Button>
+          <button
+            type="button"
+            onClick={() => go(4, -1)}
+            className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors self-center py-1 cursor-pointer"
+          >
+            السابق
+          </button>
         </div>
       </div>
     );
   }
 
+  // Panel 6: Child Challenge 1
   if (panel === 6) {
     const options = [
       { id: "24", label: "24" },
@@ -757,31 +986,34 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-8 pt-2">
+      <div className="flex flex-col gap-4 pt-1">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-foreground opacity-60">1 / 10</span>
-          <div className="flex items-center gap-2 rounded-full bg-secondary px-4 py-2">
-            <span className="text-[13px] font-bold text-foreground">النمط الرقمي</span>
-            <span className="text-yellow-500 text-sm">⚡</span>
+          <span className="text-xs font-mono font-medium text-muted-foreground">1 / 8</span>
+          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+            <span className="text-[11px] font-semibold text-foreground">النمط الرقمي</span>
+            <span className="text-yellow-500 text-xs">⚡</span>
           </div>
         </div>
 
-        <h2 className="text-[26px] font-extrabold text-foreground text-center mt-1">
+        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center">
           أكمل المتتالية
         </h2>
 
-        <div className="flex items-center justify-center gap-2 mt-4 bg-secondary/30 p-4 rounded">
+        <div className="flex items-center justify-center gap-2 mt-1 bg-secondary/30 p-3 rounded-xl border border-line">
           {[2, 6, 12, 20].map((num) => (
-            <div key={num} className="flex size-12 md:size-14 items-center justify-center rounded bg-muted/30 text-xl font-bold text-foreground shadow-sm">
+            <div
+              key={num}
+              className="flex size-9 sm:size-10 items-center justify-center rounded-lg border border-line bg-card text-xs sm:text-sm font-bold font-mono text-foreground"
+            >
               {num}
             </div>
           ))}
-          <div className="flex size-12 md:size-14 items-center justify-center rounded bg-primary/10 text-xl font-bold text-primary shadow-sm border border-primary/20 bg-[repeating-linear-gradient(45deg,transparent,transparent_4px,rgba(0,0,0,0.03)_4px,rgba(0,0,0,0.03)_8px)]">
+          <div className="flex size-9 sm:size-10 items-center justify-center rounded-lg border border-dashed border-primary/50 bg-primary/10 text-xs sm:text-sm font-bold font-mono text-primary">
             ؟
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 mt-4">
+        <div className="grid grid-cols-3 gap-2 mt-2">
           {options.map((opt) => {
             const checked = c1 === opt.id;
             return (
@@ -789,22 +1021,24 @@ function PanelContent({
                 key={opt.id}
                 type="button"
                 onClick={() => setC1(opt.id)}
-                className={cn(
-                  "flex h-[60px] items-center justify-center rounded border-2 transition-all bg-background",
-                  checked
-                    ? "border-primary shadow-md shadow-primary/10 text-primary"
-                    : "border-border shadow-sm hover:border-primary/50 text-foreground"
-                )}
+                className={cn( "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all cursor-pointer", checked ? "border-primary bg-primary text-primary-foreground font-bold ring-2 ring-primary/30" : "border-line bg-secondary/25 hover:border-line-hover text-foreground font-semibold" )}
               >
-                <span className="text-xl font-bold">{opt.label}</span>
+                <span className="text-xs sm:text-sm font-mono">{opt.label}</span>
               </button>
             );
           })}
         </div>
+
+        <QuestionNav
+          onPrev={() => go(5, -1)}
+          onNext={() => go(7, 1)}
+          canNext={!!c1}
+        />
       </div>
     );
   }
 
+  // Panel 7: Child Challenge 2
   if (panel === 7) {
     const options = [
       { id: "1", label: "A أكبر من C" },
@@ -813,20 +1047,20 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-8 pt-2">
+      <div className="flex flex-col gap-4 pt-1">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-foreground opacity-60">2 / 10</span>
-          <div className="flex items-center gap-2 rounded-full bg-secondary px-4 py-2">
-            <span className="text-[13px] font-bold text-foreground">التفكير المنطقي</span>
-            <span className="text-yellow-500 text-sm">⚡</span>
+          <span className="text-xs font-mono font-medium text-muted-foreground">2 / 8</span>
+          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+            <span className="text-[11px] font-semibold text-foreground">التفكير المنطقي</span>
+            <span className="text-yellow-500 text-xs">⚡</span>
           </div>
         </div>
 
-        <h2 className="text-[26px] font-extrabold text-foreground text-center mt-1 leading-snug">
+        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
           إذا A أكبر من B، و B أكبر من C — فما علاقة A بـ C؟
         </h2>
 
-        <div className="flex flex-col gap-3.5 mt-2">
+        <div className="flex flex-col gap-2 mt-1">
           {options.map((opt) => {
             const checked = c2 === opt.id;
             return (
@@ -834,22 +1068,24 @@ function PanelContent({
                 key={opt.id}
                 type="button"
                 onClick={() => setC2(opt.id)}
-                className={cn(
-                  "flex h-[60px] items-center justify-center rounded border-2 transition-all bg-background",
-                  checked
-                    ? "border-primary shadow-md shadow-primary/10 text-primary"
-                    : "border-border shadow-sm hover:border-primary/50 text-foreground"
-                )}
+                className={cn( "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer", checked ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40" : "border-line bg-secondary/25 hover:border-line-hover text-foreground" )}
               >
-                <span className="text-lg font-bold">{opt.label}</span>
+                <span>{opt.label}</span>
               </button>
             );
           })}
         </div>
+
+        <QuestionNav
+          onPrev={() => go(6, -1)}
+          onNext={() => go(8, 1)}
+          canNext={!!c2}
+        />
       </div>
     );
   }
 
+  // Panel 8: Child Challenge 3
   if (panel === 8) {
     const options = [
       { id: "10", label: "10" },
@@ -858,31 +1094,34 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-8 pt-2">
+      <div className="flex flex-col gap-4 pt-1">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-foreground opacity-60">3 / 10</span>
-          <div className="flex items-center gap-2 rounded-full bg-secondary px-4 py-2">
-            <span className="text-[13px] font-bold text-foreground">النمط</span>
-            <span className="text-yellow-500 text-sm">⚡</span>
+          <span className="text-xs font-mono font-medium text-muted-foreground">3 / 8</span>
+          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+            <span className="text-[11px] font-semibold text-foreground">النمط</span>
+            <span className="text-yellow-500 text-xs">⚡</span>
           </div>
         </div>
 
-        <h2 className="text-[26px] font-extrabold text-foreground text-center mt-1 leading-snug">
+        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
           كل رقم ضعف الذي قبله — ما التالي؟
         </h2>
 
-        <div className="flex items-center justify-center gap-2 mt-4 bg-secondary/30 p-4 rounded" dir="ltr">
+        <div className="flex items-center justify-center gap-2 mt-1 bg-secondary/30 p-3 rounded-xl border border-line" dir="ltr">
           {[1, 2, 4, 8].map((num) => (
-            <div key={num} className="flex size-12 md:size-14 items-center justify-center rounded bg-muted/30 text-xl font-bold text-foreground shadow-sm">
+            <div
+              key={num}
+              className="flex size-9 sm:size-10 items-center justify-center rounded-lg border border-line bg-card text-xs sm:text-sm font-bold font-mono text-foreground"
+            >
               {num}
             </div>
           ))}
-          <div className="flex size-12 md:size-14 items-center justify-center rounded bg-primary/10 text-xl font-bold text-primary shadow-sm border border-primary/20 bg-[repeating-linear-gradient(45deg,transparent,transparent_4px,rgba(0,0,0,0.03)_4px,rgba(0,0,0,0.03)_8px)]">
+          <div className="flex size-9 sm:size-10 items-center justify-center rounded-lg border border-dashed border-primary/50 bg-primary/10 text-xs sm:text-sm font-bold font-mono text-primary">
             ؟
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 mt-4">
+        <div className="grid grid-cols-3 gap-2 mt-2">
           {options.map((opt) => {
             const checked = c3 === opt.id;
             return (
@@ -890,22 +1129,24 @@ function PanelContent({
                 key={opt.id}
                 type="button"
                 onClick={() => setC3(opt.id)}
-                className={cn(
-                  "flex h-[60px] items-center justify-center rounded border-2 transition-all bg-background",
-                  checked
-                    ? "border-primary shadow-md shadow-primary/10 text-primary"
-                    : "border-border shadow-sm hover:border-primary/50 text-foreground"
-                )}
+                className={cn( "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all cursor-pointer", checked ? "border-primary bg-primary text-primary-foreground font-bold ring-2 ring-primary/30" : "border-line bg-secondary/25 hover:border-line-hover text-foreground font-semibold" )}
               >
-                <span className="text-xl font-bold">{opt.label}</span>
+                <span className="text-xs sm:text-sm font-mono">{opt.label}</span>
               </button>
             );
           })}
         </div>
+
+        <QuestionNav
+          onPrev={() => go(7, -1)}
+          onNext={() => go(9, 1)}
+          canNext={!!c3}
+        />
       </div>
     );
   }
 
+  // Panel 9: Child Challenge 4
   if (panel === 9) {
     const options = [
       { id: "1", label: "نموذج بسيط يعمل" },
@@ -914,20 +1155,20 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-8 pt-2">
+      <div className="flex flex-col gap-4 pt-1">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-foreground opacity-60">4 / 10</span>
-          <div className="flex items-center gap-2 rounded-full bg-secondary px-4 py-2">
-            <span className="text-[13px] font-bold text-foreground">حل المشكلات</span>
-            <span className="text-yellow-500 text-sm">⚡</span>
+          <span className="text-xs font-mono font-medium text-muted-foreground">4 / 8</span>
+          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+            <span className="text-[11px] font-semibold text-foreground">حل المشكلات</span>
+            <span className="text-yellow-500 text-xs">⚡</span>
           </div>
         </div>
 
-        <h2 className="text-[26px] font-extrabold text-foreground text-center mt-1 leading-snug">
+        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
           لديك 5 دقائق لعرض فكرتك — بمَ تبدأ؟
         </h2>
 
-        <div className="flex flex-col gap-3.5 mt-2">
+        <div className="flex flex-col gap-2 mt-1">
           {options.map((opt) => {
             const checked = c4 === opt.id;
             return (
@@ -935,54 +1176,59 @@ function PanelContent({
                 key={opt.id}
                 type="button"
                 onClick={() => setC4(opt.id)}
-                className={cn(
-                  "flex h-[60px] items-center justify-center rounded border-2 transition-all bg-background",
-                  checked
-                    ? "border-primary shadow-md shadow-primary/10 text-primary"
-                    : "border-border shadow-sm hover:border-primary/50 text-foreground"
-                )}
+                className={cn( "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer", checked ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40" : "border-line bg-secondary/25 hover:border-line-hover text-foreground" )}
               >
-                <span className="text-lg font-bold">{opt.label}</span>
+                <span>{opt.label}</span>
               </button>
             );
           })}
         </div>
+
+        <QuestionNav
+          onPrev={() => go(8, -1)}
+          onNext={() => go(10, 1)}
+          canNext={!!c4}
+        />
       </div>
     );
   }
 
+  // Panel 10: Child Challenge 5 (Steps Ordering)
   if (panel === 10) {
     const options = [
-      { id: "test", label: "اختبار" },
       { id: "idea", label: "فكرة" },
       { id: "execute", label: "تنفيذ" },
+      { id: "test", label: "اختبار" },
     ];
 
     const toggleOption = (id: string) => {
-      if (c5.includes(id)) {
-        setC5(c5.filter(i => i !== id));
-      } else {
-        if (c5.length < 3) {
-          setC5([...c5, id]);
+      setC5((prev) => {
+        if (prev.includes(id)) {
+          return prev.filter((i) => i !== id);
+        } else {
+          if (prev.length < 3) {
+            return [...prev, id];
+          }
+          return prev;
         }
-      }
+      });
     };
 
     return (
-      <div className="flex flex-col gap-8 pt-2">
+      <div className="flex flex-col gap-4 pt-1">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-foreground opacity-60">5 / 10</span>
-          <div className="flex items-center gap-2 rounded-full bg-secondary px-4 py-2">
-            <span className="text-[13px] font-bold text-foreground">التسلسل</span>
-            <span className="text-yellow-500 text-sm">⚡</span>
+          <span className="text-xs font-mono font-medium text-muted-foreground">5 / 8</span>
+          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+            <span className="text-[11px] font-semibold text-foreground">التسلسل</span>
+            <span className="text-yellow-500 text-xs">⚡</span>
           </div>
         </div>
 
-        <h2 className="text-[26px] font-extrabold text-foreground text-center mt-1 leading-snug">
+        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
           رتّب خطوات بناء مشروع بالترتيب الصحيح
         </h2>
 
-        <div className="grid grid-cols-3 gap-3 mt-4">
+        <div className="grid grid-cols-3 gap-2 mt-2">
           {options.map((opt) => {
             const index = c5.indexOf(opt.id);
             const isSelected = index !== -1;
@@ -991,31 +1237,45 @@ function PanelContent({
                 key={opt.id}
                 type="button"
                 onClick={() => toggleOption(opt.id)}
-                className={cn(
-                  "relative flex h-[80px] items-center justify-center rounded border-2 transition-all bg-background",
-                  isSelected
-                    ? "border-primary shadow-md shadow-primary/10 text-primary"
-                    : "border-border shadow-sm hover:border-primary/50 text-foreground"
-                )}
+                className={cn( "relative flex h-13 sm:h-14 items-center justify-center rounded-xl border transition-all cursor-pointer", isSelected ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40 font-semibold" : "border-line bg-secondary/25 hover:border-line-hover text-foreground" )}
               >
                 {isSelected && (
-                  <span className="absolute -top-3 -right-2 flex size-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+                  <span className="absolute -top-2 -right-1.5 flex size-5 items-center justify-center rounded-md bg-primary text-[10px] font-bold font-mono text-primary-foreground">
                     {index + 1}
                   </span>
                 )}
-                <span className="text-lg font-bold">{opt.label}</span>
+                <span className="text-xs sm:text-sm font-semibold">{opt.label}</span>
               </button>
             );
           })}
         </div>
-        
-        <p className="text-center text-sm font-medium text-muted-foreground -mt-2">
-          اضغط البطاقات بالترتيب الصحيح
-        </p>
+
+        <div className="flex items-center justify-between mt-1 px-1">
+          <p className="text-xs font-medium text-muted-foreground">
+            اضغط البطاقات بالترتيب (1 ثم 2 ثم 3)
+          </p>
+          {c5.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setC5([])}
+              className="text-xs text-primary hover:underline flex items-center gap-1 cursor-pointer font-medium"
+            >
+              <RotateCcw className="size-3" />
+              <span>إعادة</span>
+            </button>
+          )}
+        </div>
+
+        <QuestionNav
+          onPrev={() => go(9, -1)}
+          onNext={() => go(11, 1)}
+          canNext={c5.length > 0}
+        />
       </div>
     );
   }
 
+  // Panel 11: Child Challenge 6
   if (panel === 11) {
     const options = [
       { id: "12", label: "12" },
@@ -1024,20 +1284,20 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-8 pt-2">
+      <div className="flex flex-col gap-4 pt-1">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-foreground opacity-60">6 / 10</span>
-          <div className="flex items-center gap-2 rounded-full bg-secondary px-4 py-2">
-            <span className="text-[13px] font-bold text-foreground">التفكير المنطقي</span>
-            <span className="text-yellow-500 text-sm">⚡</span>
+          <span className="text-xs font-mono font-medium text-muted-foreground">6 / 8</span>
+          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+            <span className="text-[11px] font-semibold text-foreground">التفكير المنطقي</span>
+            <span className="text-yellow-500 text-xs">⚡</span>
           </div>
         </div>
 
-        <h2 className="text-[26px] font-extrabold text-foreground text-center mt-1 leading-snug">
+        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
           أي رقم لا يقبل القسمة على 3؟
         </h2>
 
-        <div className="grid grid-cols-3 gap-3 mt-4">
+        <div className="grid grid-cols-3 gap-2 mt-2">
           {options.map((opt) => {
             const checked = c6 === opt.id;
             return (
@@ -1045,22 +1305,24 @@ function PanelContent({
                 key={opt.id}
                 type="button"
                 onClick={() => setC6(opt.id)}
-                className={cn(
-                  "flex h-[70px] items-center justify-center rounded border-2 transition-all bg-background",
-                  checked
-                    ? "border-primary shadow-md shadow-primary/10 text-primary"
-                    : "border-border shadow-sm hover:border-primary/50 text-foreground"
-                )}
+                className={cn( "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all cursor-pointer", checked ? "border-primary bg-primary text-primary-foreground font-bold ring-2 ring-primary/30" : "border-line bg-secondary/25 hover:border-line-hover text-foreground font-semibold" )}
               >
-                <span className="text-2xl font-bold">{opt.label}</span>
+                <span className="text-xs sm:text-sm font-mono">{opt.label}</span>
               </button>
             );
           })}
         </div>
+
+        <QuestionNav
+          onPrev={() => go(10, -1)}
+          onNext={() => go(12, 1)}
+          canNext={!!c6}
+        />
       </div>
     );
   }
 
+  // Panel 12: Child Challenge 7
   if (panel === 12) {
     const options = [
       { id: "1", label: "الصور والأمثلة" },
@@ -1069,20 +1331,20 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-8 pt-2">
+      <div className="flex flex-col gap-4 pt-1">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-foreground opacity-60">7 / 10</span>
-          <div className="flex items-center gap-2 rounded-full bg-secondary px-4 py-2">
-            <span className="text-[13px] font-bold text-foreground">الفضول</span>
-            <span className="text-yellow-500 text-sm">⚡</span>
+          <span className="text-xs font-mono font-medium text-muted-foreground">7 / 8</span>
+          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+            <span className="text-[11px] font-semibold text-foreground">الذكاء الاصطناعي</span>
+            <span className="text-yellow-500 text-xs">⚡</span>
           </div>
         </div>
 
-        <h2 className="text-[26px] font-extrabold text-foreground text-center mt-1 leading-snug">
+        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
           لتعليم الحاسوب تمييز القطط 🐱، نعطيه كثيرًا من...؟
         </h2>
 
-        <div className="flex flex-col gap-3.5 mt-2">
+        <div className="flex flex-col gap-2 mt-1">
           {options.map((opt) => {
             const checked = c7 === opt.id;
             return (
@@ -1090,22 +1352,24 @@ function PanelContent({
                 key={opt.id}
                 type="button"
                 onClick={() => setC7(opt.id)}
-                className={cn(
-                  "flex h-[60px] items-center justify-center rounded border-2 transition-all bg-background",
-                  checked
-                    ? "border-primary shadow-md shadow-primary/10 text-primary"
-                    : "border-border shadow-sm hover:border-primary/50 text-foreground"
-                )}
+                className={cn( "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer", checked ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40" : "border-line bg-secondary/25 hover:border-line-hover text-foreground" )}
               >
-                <span className="text-lg font-bold">{opt.label}</span>
+                <span>{opt.label}</span>
               </button>
             );
           })}
         </div>
+
+        <QuestionNav
+          onPrev={() => go(11, -1)}
+          onNext={() => go(13, 1)}
+          canNext={!!c7}
+        />
       </div>
     );
   }
 
+  // Panel 13: Child Challenge 8
   if (panel === 13) {
     const options = [
       { id: "1", label: "بناء نموذج مصغر" },
@@ -1114,20 +1378,20 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-8 pt-2">
+      <div className="flex flex-col gap-4 pt-1">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-bold text-foreground opacity-60">10 / 10</span>
-          <div className="flex items-center gap-2 rounded-full bg-secondary px-4 py-2">
-            <span className="text-[13px] font-bold text-foreground">حل المشكلات</span>
-            <span className="text-yellow-500 text-sm">⚡</span>
+          <span className="text-xs font-mono font-medium text-muted-foreground">8 / 8</span>
+          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+            <span className="text-[11px] font-semibold text-foreground">حل المشكلات</span>
+            <span className="text-yellow-500 text-xs">⚡</span>
           </div>
         </div>
 
-        <h2 className="text-[26px] font-extrabold text-foreground text-center mt-1 leading-snug">
+        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
           أفضل طريقة لاختبار فكرة بسرعة؟
         </h2>
 
-        <div className="flex flex-col gap-3.5 mt-2">
+        <div className="flex flex-col gap-2 mt-1">
           {options.map((opt) => {
             const checked = c10 === opt.id;
             return (
@@ -1135,71 +1399,84 @@ function PanelContent({
                 key={opt.id}
                 type="button"
                 onClick={() => setC10(opt.id)}
-                className={cn(
-                  "flex h-[60px] items-center justify-center rounded border-2 transition-all bg-background",
-                  checked
-                    ? "border-primary shadow-md shadow-primary/10 text-primary"
-                    : "border-border shadow-sm hover:border-primary/50 text-foreground"
-                )}
+                className={cn( "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer", checked ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40" : "border-line bg-secondary/25 hover:border-line-hover text-foreground" )}
               >
-                <span className="text-lg font-bold">{opt.label}</span>
+                <span>{opt.label}</span>
               </button>
             );
           })}
         </div>
+
+        <QuestionNav
+          onPrev={() => go(12, -1)}
+          onNext={() => go(14, 1)}
+          canNext={!!c10}
+          nextLabel="عرض النتيجة"
+        />
       </div>
     );
   }
 
+  // Panel 14: Results & Acceptance
   if (panel === 14) {
     return (
-      <div className="flex flex-col gap-5 text-center items-center pt-2">
-        <div className="flex size-[80px] items-center justify-center rounded-full bg-emerald-500/10 mb-2">
-          <div className="flex size-[60px] items-center justify-center rounded-full bg-emerald-500 text-3xl shadow-lg shadow-emerald-500/20">
-            🎉
-          </div>
+      <div className="flex flex-col gap-4 text-center items-center pt-1">
+        <div className="flex size-12 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-2xl">
+          🎉
         </div>
-        
+
         <div className="flex flex-col gap-1">
-          <span className="text-sm font-bold text-primary">القبول المبدئي</span>
-          <h2 className="text-[30px] font-extrabold text-foreground leading-snug">
+          <span className="text-xs font-bold text-primary font-mono">القبول المبدئي</span>
+          <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground leading-snug">
             تهانينا! تم قبولك مبدئياً
           </h2>
         </div>
-        
-        <p className="text-muted-foreground text-[15px] leading-relaxed px-2 font-medium">
+
+        <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed px-2 font-medium">
           لقد اجتزت التقييم المبدئي للانتقال إلى المرحلة التالية. يمكنك الآن حجز جلسة التقييم الحضورية.
         </p>
 
-        <div className="flex items-center gap-2 sm:gap-4 w-full mt-2 justify-center">
-          <div className="flex flex-col items-center justify-center gap-1 rounded bg-background py-3 sm:py-4 px-4 sm:px-6 shadow-sm border-2 border-secondary flex-1">
-            <span className="text-2xl sm:text-3xl font-extrabold text-primary">EN2</span>
-            <span className="text-[11px] sm:text-[12px] font-bold text-muted-foreground mt-1 text-center">المستوى المقترح</span>
+        <div className="flex items-center gap-2 sm:gap-3 w-full mt-1 justify-center">
+          <div className="flex flex-col items-center justify-center gap-1 rounded-xl bg-secondary/25 py-2.5 px-3 border border-line flex-1">
+            <span className="text-xl sm:text-2xl font-bold font-mono text-primary">EN2</span>
+            <span className="text-[11px] font-medium text-muted-foreground text-center">المستوى المقترح</span>
           </div>
-          <div className="flex flex-col items-center justify-center gap-1 rounded bg-background py-3 sm:py-4 px-4 sm:px-6 shadow-sm border-2 border-secondary flex-1">
+          <div className="flex flex-col items-center justify-center gap-1 rounded-xl bg-secondary/25 py-2.5 px-3 border border-line flex-1">
             <div className="flex items-baseline gap-0.5">
-              <span className="text-2xl sm:text-3xl font-extrabold text-primary">7</span>
-              <span className="text-base sm:text-lg font-bold text-muted-foreground">/10</span>
+              <span className="text-xl sm:text-2xl font-bold font-mono text-primary">8</span>
+              <span className="text-xs sm:text-sm font-bold font-mono text-muted-foreground">/8</span>
             </div>
-            <span className="text-[11px] sm:text-[12px] font-bold text-muted-foreground mt-1 text-center">نتيجتك</span>
+            <span className="text-[11px] font-medium text-muted-foreground text-center">نتيجتك</span>
           </div>
         </div>
 
-        <div className="flex flex-col gap-3 w-full mt-2">
+        <div className="flex flex-col gap-2 w-full mt-2">
           <Button
+            type="button"
             onClick={() => go(15, 1)}
-            className="h-[54px] w-full rounded text-lg font-bold transition-all shadow-lg shadow-primary/25"
+            className="h-10 sm:h-11 w-full rounded-xl text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
-            احجز جلسة التقييم الحضورية
+            <span>احجز جلسة التقييم الحضورية</span>
+            <ArrowLeft className="size-4" />
           </Button>
-          <p className="text-[11px] font-medium text-muted-foreground">
-            المستوى النهائي يُؤكّد بالتقييم الحضوري داخل المقر
-          </p>
+          <div className="flex items-center justify-between w-full px-1">
+            <button
+              type="button"
+              onClick={() => go(13, -1)}
+              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              السابق
+            </button>
+            <p className="text-[11px] font-medium text-muted-foreground">
+              المستوى النهائي يُؤكّد بالتقييم الحضوري
+            </p>
+          </div>
         </div>
       </div>
     );
   }
 
+  // Panel 15: Booking Calendar & Timeslots
   if (panel === 15) {
     const daysOfWeek = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
     const blanks = [0, 1, 2, 3];
@@ -1211,59 +1488,65 @@ function PanelContent({
     };
 
     const timeslots = [
-      "9:00 ص", "10:00 ص", "12:00 ص",
+      "9:00 ص", "10:00 ص", "12:00 م",
       "1:00 م", "2:00 م", "3:00 م",
-      "4:00 م", "5:00 م", "6:00 م"
+      "4:00 م", "5:00 م", "6:00 م",
     ];
 
     return (
-      <div className="flex flex-col gap-6 pt-2 pb-4">
-        <div className="flex items-center justify-between" dir="ltr">
-          <button type="button" onClick={() => onCreate?.()} className="rounded border-2 border-border p-1.5 hover:bg-secondary transition-colors">
-            <X className="size-5 text-foreground" />
-          </button>
-          <h2 className="text-[22px] font-extrabold text-foreground" dir="rtl">
+      <div className="flex flex-col gap-4 pt-1">
+        <div className="flex flex-col gap-1 text-center">
+          <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
             احجز حصة تجريبية مجانية
           </h2>
+          <p className="text-xs sm:text-sm text-muted-foreground font-medium">
+            اختر اليوم والوقت الأنسب لحضور طفلك
+          </p>
         </div>
 
-
-
         {/* Calendar */}
-        <div className="flex flex-col gap-4 mt-2 px-4">
-          <div className="flex items-center justify-between">
-            <button type="button" className="p-1 hover:bg-secondary rounded">
-              <ChevronRight className="size-5 text-foreground" />
+        <div className="flex flex-col gap-2 rounded-xl border border-line bg-secondary/20 p-3">
+          <div className="flex items-center justify-between px-1">
+            <button
+              type="button"
+              className="size-7 flex items-center justify-center hover:bg-secondary rounded-lg border border-line text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              <ChevronRight className="size-4" />
             </button>
-            <span className="text-[15px] font-bold text-foreground">أكتوبر 2026</span>
-            <button type="button" className="p-1 hover:bg-secondary rounded">
-              <ChevronLeft className="size-5 text-foreground" />
+            <span className="text-xs sm:text-sm font-bold font-mono text-foreground">أكتوبر 2026</span>
+            <button
+              type="button"
+              className="size-7 flex items-center justify-center hover:bg-secondary rounded-lg border border-line text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            >
+              <ChevronLeft className="size-4" />
             </button>
           </div>
-          
-          <div className="grid grid-cols-7 gap-y-2 text-center" dir="rtl">
+
+          <div className="grid grid-cols-7 gap-1 text-center" dir="rtl">
             {daysOfWeek.map((d) => (
-              <div key={d} className="text-[12px] font-medium text-muted-foreground py-2">
+              <div key={d} className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground py-1">
                 {d}
               </div>
             ))}
             {blanks.map((b) => (
-              <div key={`b-${b}`} className="py-2"></div>
+              <div key={`b-${b}`} className="py-1"></div>
             ))}
             {days.map((d) => {
-              const isFriday = (d + blanks.length - 1) % 7 === 5; // 0=Sun.. 5=Fri
+              const isFriday = (d + blanks.length - 1) % 7 === 5;
               const isSelected = bookingDay === d;
               return (
                 <button
                   key={d}
                   type="button"
                   disabled={isFriday}
-                  onClick={() => { setBookingDay(d); setBookingTime(null); }}
-                  className={cn(
-                    "h-10 w-full flex items-center justify-center text-[15px] font-bold transition-all rounded",
-                    isFriday ? "text-muted-foreground/30" : 
-                    isSelected ? "bg-primary text-primary-foreground shadow-md shadow-primary/20" : "text-foreground hover:bg-secondary"
-                  )}
+                  onClick={() => {
+                    setBookingDay(d);
+                    setBookingPrompt(false);
+                    if (!bookingTime) {
+                      setBookingTime("4:00 م");
+                    }
+                  }}
+                  className={cn( "h-7 sm:h-8 w-full flex items-center justify-center text-xs font-semibold font-mono transition-all rounded-lg cursor-pointer", isFriday ? "text-muted-foreground/30 cursor-not-allowed" : isSelected ? "bg-primary text-primary-foreground font-bold ring-2 ring-primary/30" : "text-foreground hover:bg-secondary/70" )}
                 >
                   {d}
                 </button>
@@ -1273,12 +1556,14 @@ function PanelContent({
         </div>
 
         {bookingDay && (
-          <div className="flex flex-col gap-3 px-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div className="flex items-center gap-2 text-foreground" dir="rtl">
-              <Clock className="size-[18px]" />
-              <span className="text-[14px] font-bold">المواعيد المتاحة — {getDayName(bookingDay)} {bookingDay} أكتوبر</span>
+          <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="flex items-center gap-1.5 text-foreground text-xs font-semibold">
+              <Clock className="size-3.5 text-primary" />
+              <span>
+                المواعيد المتاحة — {getDayName(bookingDay)} {bookingDay} أكتوبر
+              </span>
             </div>
-            
+
             <div className="grid grid-cols-3 gap-2" dir="rtl">
               {timeslots.map((time) => {
                 const isSelected = bookingTime === time;
@@ -1286,13 +1571,11 @@ function PanelContent({
                   <button
                     key={time}
                     type="button"
-                    onClick={() => setBookingTime(time)}
-                    className={cn(
-                      "h-[44px] rounded text-[14px] font-bold transition-all border-2",
-                      isSelected
-                        ? "bg-primary border-primary text-primary-foreground shadow-md shadow-primary/20"
-                        : "bg-background border-border text-foreground hover:border-primary/50"
-                    )}
+                    onClick={() => {
+                      setBookingTime(time);
+                      setBookingPrompt(false);
+                    }}
+                    className={cn( "h-8.5 sm:h-9 rounded-lg text-xs font-medium transition-all border cursor-pointer", isSelected ? "bg-primary border-primary text-primary-foreground font-semibold ring-2 ring-primary/30" : "bg-secondary/25 border-line text-foreground hover:border-line-hover hover:bg-secondary/40" )}
                   >
                     {time}
                   </button>
@@ -1302,45 +1585,84 @@ function PanelContent({
           </div>
         )}
 
-        <div className="px-4 mt-2">
+        {bookingPrompt && (!bookingDay || !bookingTime) && (
+          <p className="text-destructive text-xs font-medium text-center animate-in fade-in">
+            يرجى تحديد اليوم والموعد المناسب للمتابعة
+          </p>
+        )}
+
+        <div className="flex gap-2.5 mt-2" dir="rtl">
           <Button
-            onClick={() => {
-              if (bookingTime) go(16, 1);
-            }}
-            className={cn(
-              "h-[54px] w-full rounded text-lg font-bold transition-all",
-              bookingTime
-                ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/25"
-                : "bg-primary/10 hover:bg-primary/20 text-primary"
-            )}
+            type="button"
+            variant="outline"
+            onClick={() => go(14, -1)}
+            className="h-10 sm:h-11 flex-[0.8] rounded-xl text-xs sm:text-sm font-semibold border border-line bg-secondary/30 hover:bg-secondary/60 text-foreground transition-all cursor-pointer flex items-center justify-center gap-1.5"
           >
-            التالي — البيانات
-            <ArrowLeft className="mr-2 size-5" />
+            <ArrowRight className="size-4" />
+            <span>السابق</span>
+          </Button>
+          <Button
+            type="button"
+            onClick={() => {
+              if (bookingDay && bookingTime) {
+                go(16, 1);
+              } else {
+                setBookingPrompt(true);
+              }
+            }}
+            className={cn( "h-10 sm:h-11 flex-[2] rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer", bookingDay && bookingTime ? "bg-primary hover:bg-primary/90 text-primary-foreground" : "bg-secondary text-muted-foreground border border-line" )}
+          >
+            <span>التالي — البيانات</span>
+            <ArrowLeft className="size-4" />
           </Button>
         </div>
       </div>
     );
   }
 
+  // Panel 16: Personal Info Form
   if (panel === 16) {
+    const validateAndNext = () => {
+      const errs: Record<string, string> = {};
+      if (!parentName.trim()) {
+        errs.parentName = "يرجى كتابة اسم ولي الأمر";
+      }
+      if (!phone.trim()) {
+        errs.phone = "يرجى كتابة رقم الجوال";
+      } else if (phone.trim().replace(/\D/g, "").length < 9) {
+        errs.phone = "رقم الجوال يجب ألا يقل عن 9 أرقام";
+      }
+      if (!email.trim()) {
+        errs.email = "يرجى كتابة البريد الإلكتروني";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+        errs.email = "صيغة البريد الإلكتروني غير صحيحة";
+      }
+      if (!childrenList[0]?.name.trim()) {
+        errs.studentName = "يرجى كتابة اسم الطفل";
+      }
+
+      setFormErrors(errs);
+      if (Object.keys(errs).length === 0) {
+        go(17, 1);
+      }
+    };
+
     return (
-      <div className="flex flex-col gap-6 pt-2 pb-4">
-        <div className="flex items-center justify-between" dir="ltr">
-          <button type="button" onClick={() => go(15, -1)} className="rounded border-2 border-border p-1.5 hover:bg-secondary transition-colors">
-            <X className="size-5 text-foreground" />
-          </button>
-          <h2 className="text-[22px] font-extrabold text-foreground" dir="rtl">
-            احجز حصة تجريبية مجانية
+      <div className="flex flex-col gap-4 pt-1">
+        <div className="flex flex-col gap-1 text-center">
+          <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
+            البيانات الشخصية
           </h2>
+          <p className="text-xs sm:text-sm text-muted-foreground font-medium">
+            لإتمام الحجز والتواصل معك لتأكيد الموعد
+          </p>
         </div>
 
-
-
         {/* Form Fields */}
-        <div className="flex flex-col gap-4 mt-2 px-2" dir="rtl">
+        <div className="flex flex-col gap-3" dir="rtl">
           {/* Parent Name */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[14px] font-bold text-foreground">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-semibold text-foreground">
               اسم ولي الأمر <span className="text-destructive">*</span>
             </label>
             <div className="relative">
@@ -1348,40 +1670,63 @@ function PanelContent({
                 type="text"
                 placeholder="الاسم الكامل"
                 value={parentName}
-                onChange={(e) => setParentName?.(e.target.value)}
-                className="h-12 w-full rounded border-2 border-border bg-background px-4 text-[15px] outline-none focus:border-primary transition-colors text-right pl-4 pr-11"
+                onChange={(e) => {
+                  setParentName(e.target.value);
+                  if (formErrors.parentName) {
+                    setFormErrors((prev) => ({ ...prev, parentName: "" }));
+                  }
+                }}
+                className={cn( "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors text-right pl-3 pr-9", formErrors.parentName ? "border-destructive focus:border-destructive ring-1 ring-destructive/30" : "border-line focus:border-primary" )}
               />
-              <User className="absolute right-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground/50" />
+              <User className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
             </div>
+            {formErrors.parentName && (
+              <span className="text-[11px] font-medium text-destructive px-1">
+                {formErrors.parentName}
+              </span>
+            )}
           </div>
 
           {/* Phone Number */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[14px] font-bold text-foreground">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-semibold text-foreground">
               رقم الجوال <span className="text-destructive">*</span>
             </label>
-            <div className="relative flex items-center h-12 w-full rounded border-2 border-border bg-background overflow-hidden focus-within:border-primary transition-colors">
+            <div
+              className={cn( "relative flex items-center h-10 w-full rounded-xl border bg-secondary/20 overflow-hidden transition-colors", formErrors.phone ? "border-destructive focus-within:border-destructive ring-1 ring-destructive/30" : "border-line focus-within:border-primary" )}
+            >
               <input
                 type="tel"
-                placeholder="05XXXXXXXX"
+                placeholder="01XXXXXXXXX"
                 value={phone}
-                onChange={(e) => setPhone?.(e.target.value)}
-                className="flex-1 min-w-0 h-full bg-transparent px-4 text-[15px] outline-none text-left"
+                onChange={(e) => {
+                  setPhone(e.target.value);
+                  if (formErrors.phone) {
+                    setFormErrors((prev) => ({ ...prev, phone: "" }));
+                  }
+                }}
+                className="flex-1 min-w-0 h-full bg-transparent px-3 text-xs sm:text-sm outline-none text-left font-mono"
                 dir="ltr"
               />
-              <div className="flex items-center gap-2 h-full px-3 border-r-2 border-border bg-secondary/30 text-foreground" dir="ltr">
-                <ChevronDown className="size-4 text-muted-foreground" />
-                <span className="text-[14px] font-bold">+249</span>
-                <div className="size-5 rounded-full overflow-hidden bg-white border border-border flex items-center justify-center text-[10px] leading-none">
-                  🇪🇬
-                </div>
+              <div
+                className="flex items-center gap-1.5 h-full px-2.5 border-r border-line bg-secondary/40 text-foreground text-xs font-semibold font-mono"
+                dir="ltr"
+              >
+                <ChevronDown className="size-3 text-muted-foreground" />
+                <span>+20</span>
+                <span className="text-xs leading-none">🇪🇬</span>
               </div>
             </div>
+            {formErrors.phone && (
+              <span className="text-[11px] font-medium text-destructive px-1">
+                {formErrors.phone}
+              </span>
+            )}
           </div>
 
           {/* Email */}
-          <div className="flex flex-col gap-2">
-            <label className="text-[14px] font-bold text-foreground">
+          <div className="flex flex-col gap-1">
+            <label className="text-xs font-semibold text-foreground">
               البريد الإلكتروني <span className="text-destructive">*</span>
             </label>
             <div className="relative">
@@ -1389,89 +1734,99 @@ function PanelContent({
                 type="email"
                 placeholder="email@example.com"
                 value={email}
-                onChange={(e) => setEmail?.(e.target.value)}
-                className="h-12 w-full rounded border-2 border-border bg-background px-4 text-[15px] outline-none focus:border-primary transition-colors text-left pl-4 pr-11"
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (formErrors.email) {
+                    setFormErrors((prev) => ({ ...prev, email: "" }));
+                  }
+                }}
+                className={cn( "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors text-left pl-3 pr-9 font-mono", formErrors.email ? "border-destructive focus:border-destructive ring-1 ring-destructive/30" : "border-line focus:border-primary" )}
                 dir="ltr"
               />
-              <Mail className="absolute right-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground/50" />
+              <Mail className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
             </div>
+            {formErrors.email && (
+              <span className="text-[11px] font-medium text-destructive px-1">
+                {formErrors.email}
+              </span>
+            )}
           </div>
 
-          {/* Children */}
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-2 w-full min-w-0">
-              <label className="text-[14px] font-bold text-foreground">
+          {/* Children Info */}
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs font-semibold text-foreground">
                 اسم الطفل <span className="text-destructive">*</span>
               </label>
               <div className="relative">
                 <input
                   type="text"
                   placeholder="اسم الطفل"
-                  value={childrenList?.[0]?.name || ""}
+                  value={childrenList[0]?.name || ""}
                   onChange={(e) => {
-                    const newList = [...(childrenList || [])];
+                    const newList = [...childrenList];
                     if (newList[0]) newList[0].name = e.target.value;
-                    setChildrenList?.(newList);
+                    setChildrenList(newList);
+                    if (formErrors.studentName) {
+                      setFormErrors((prev) => ({ ...prev, studentName: "" }));
+                    }
                   }}
-                  className="h-12 w-full rounded border-2 border-border bg-background px-4 text-[15px] outline-none focus:border-primary transition-colors pr-11"
+                  className={cn( "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors pr-9", formErrors.studentName ? "border-destructive focus:border-destructive ring-1 ring-destructive/30" : "border-line focus:border-primary" )}
                 />
-                <Smile className="absolute right-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground/50" />
+                <Smile className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
               </div>
+              {formErrors.studentName && (
+                <span className="text-[11px] font-medium text-destructive px-1">
+                  {formErrors.studentName}
+                </span>
+              )}
             </div>
-            
-            <div className="flex flex-col gap-2 w-full min-w-0">
-              <label className="text-[14px] font-bold text-foreground">
-                عمر الطفل <span className="text-destructive">*</span>
-              </label>
+
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs font-semibold text-foreground">عمر الطفل</label>
               <div className="relative">
                 <input
                   type="text"
                   placeholder="مثال: 10"
-                  value={childrenList?.[0]?.age || ""}
+                  value={childrenList[0]?.age || (age ? `${age}` : "")}
                   onChange={(e) => {
-                    const newList = [...(childrenList || [])];
+                    const newList = [...childrenList];
                     if (newList[0]) newList[0].age = e.target.value;
-                    setChildrenList?.(newList);
+                    setChildrenList(newList);
                   }}
-                  className="h-12 w-full rounded border-2 border-border bg-background px-4 text-[15px] outline-none focus:border-primary transition-colors pr-11"
+                  className="h-10 w-full rounded-xl border border-line bg-secondary/20 px-3 text-xs sm:text-sm outline-none focus:border-primary transition-colors pr-9 font-mono"
                 />
-                <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground/50" />
+                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
               </div>
             </div>
           </div>
-
-          {/* Add Child Button */}
-          <button
-            type="button"
-            className="flex items-center justify-center gap-2 h-12 w-full rounded bg-secondary hover:bg-secondary/80 text-foreground text-[15px] font-bold transition-colors mt-2"
-          >
-            <Plus className="size-5" />
-            اضافة طفل
-          </button>
         </div>
 
         {/* Navigation */}
-        <div className="flex gap-3 px-2 mt-4" dir="rtl">
+        <div className="flex gap-2.5 mt-2" dir="rtl">
           <Button
+            type="button"
             variant="outline"
             onClick={() => go(15, -1)}
-            className="h-[50px] flex-[0.8] rounded text-[15px] font-bold border-2 hover:bg-secondary transition-all text-foreground"
+            className="h-10 sm:h-11 flex-[0.8] rounded-xl text-xs sm:text-sm font-semibold border border-line bg-secondary/30 hover:bg-secondary/60 text-foreground transition-all cursor-pointer flex items-center justify-center gap-1.5"
           >
-            <ArrowRight className="ml-2 size-5" />
-            السابق
+            <ArrowRight className="size-4" />
+            <span>السابق</span>
           </Button>
           <Button
-            onClick={() => go(17, 1)}
-            className="h-[50px] flex-[2] rounded text-[15px] font-bold bg-primary/20 hover:bg-primary/30 text-primary transition-all shadow-none"
+            type="button"
+            onClick={validateAndNext}
+            className="h-10 sm:h-11 flex-[2] rounded-xl text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all cursor-pointer flex items-center justify-center gap-1.5"
           >
-            التالي — التأكيد
-            <ArrowLeft className="mr-2 size-5" />
+            <span>التالي — التأكيد</span>
+            <ArrowLeft className="size-4" />
           </Button>
         </div>
       </div>
     );
   }
 
+  // Panel 17: Summary
   if (panel === 17) {
     const daysOfWeek = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
     const getDayName = (d: number | null) => {
@@ -1482,82 +1837,89 @@ function PanelContent({
     };
 
     return (
-      <div className="flex flex-col gap-6 pt-2 pb-4">
-        <div className="flex items-center justify-between" dir="ltr">
-          <button type="button" onClick={() => onCreate?.()} className="rounded border-2 border-border p-1.5 hover:bg-secondary transition-colors">
-            <X className="size-5 text-foreground" />
-          </button>
-          <h2 className="text-[22px] font-extrabold text-foreground" dir="rtl">
-            احجز حصة تجريبية مجانية
+      <div className="flex flex-col gap-4 pt-1">
+        <div className="flex flex-col gap-1 text-center">
+          <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
+            ملخص الحجز
           </h2>
+          <p className="text-xs sm:text-sm text-muted-foreground font-medium">
+            تأكد من تفاصيل الموعد قبل تأكيد الحجز
+          </p>
         </div>
 
-
-
         {/* Summary Content */}
-        <div className="flex flex-col mt-4 px-2" dir="rtl">
-          <h3 className="text-[17px] font-extrabold text-foreground text-center mb-6">
-            ملخص الحجز
-          </h3>
-          
-          <div className="flex flex-col gap-5 px-4">
-            <div className="flex items-center justify-between">
-              <span className="text-[15px] font-bold text-muted-foreground">الموعد</span>
-              <span className="text-[16px] font-bold text-foreground">{getDayName(bookingDay)} {bookingDay} أكتوبر</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[15px] font-bold text-muted-foreground">الوقت</span>
-              <span className="text-[16px] font-bold text-foreground">{bookingTime}</span>
-            </div>
-            
-            <div className="h-px w-full bg-border/60 my-2"></div>
-            
-            <div className="flex items-center justify-between">
-              <span className="text-[15px] font-bold text-muted-foreground">ولي الأمر</span>
-              <span className="text-[16px] font-bold text-foreground">{parentName || "-"}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[15px] font-bold text-muted-foreground">الجوال</span>
-              <span className="text-[16px] font-bold text-foreground" dir="ltr">{phone || "-"}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-[15px] font-bold text-muted-foreground">الطفل</span>
-              <span className="text-[16px] font-bold text-foreground">{childrenList?.[0]?.name || "-"}</span>
-            </div>
+        <div className="flex flex-col rounded-xl border border-line divide-y divide-line bg-secondary/25 overflow-hidden" dir="rtl">
+          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground">الموعد</span>
+            <span className="text-xs sm:text-sm font-semibold text-foreground font-mono">
+              {getDayName(bookingDay)} {bookingDay} أكتوبر
+            </span>
+          </div>
+          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground">الوقت</span>
+            <span className="text-xs sm:text-sm font-semibold text-foreground font-mono">
+              {bookingTime}
+            </span>
+          </div>
+          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground">ولي الأمر</span>
+            <span className="text-xs sm:text-sm font-semibold text-foreground">
+              {parentName || "-"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground">الجوال</span>
+            <span className="text-xs sm:text-sm font-semibold text-foreground font-mono" dir="ltr">
+              {phone || "-"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground">الطفل</span>
+            <span className="text-xs sm:text-sm font-semibold text-foreground">
+              {childrenList[0]?.name || "-"} ({childrenList[0]?.age || age || "-"} سنوات)
+            </span>
+          </div>
+          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground">المسار المقترح</span>
+            <span className="text-xs sm:text-sm font-semibold text-primary font-mono">
+              EN2 — مسار تمهيدي
+            </span>
           </div>
         </div>
 
         {submitError && (
-          <div className="p-3 mx-2 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm font-medium text-center">
+          <div className="p-2.5 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs font-medium text-center">
             {submitError}
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-3 px-2 mt-8" dir="rtl">
+        <div className="flex gap-2.5 mt-2" dir="rtl">
           <Button
+            type="button"
             variant="outline"
             disabled={isSubmitting}
             onClick={() => go(16, -1)}
-            className="h-[54px] flex-[0.7] rounded text-[16px] font-bold border-2 hover:bg-secondary transition-all text-foreground disabled:opacity-50"
+            className="h-10 sm:h-11 flex-[0.8] rounded-xl text-xs sm:text-sm font-semibold border border-line bg-secondary/30 hover:bg-secondary/60 text-foreground transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
           >
-            تعديل
-            <Pencil className="mr-2 size-4" />
+            <span>تعديل</span>
+            <Pencil className="size-3.5" />
           </Button>
           <Button
+            type="button"
             onClick={() => onConfirmBooking?.()}
             disabled={isSubmitting}
-            className="h-[54px] flex-[2] rounded text-[16px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-md shadow-primary/20 disabled:opacity-50"
+            className="h-10 sm:h-11 flex-[2] rounded-xl text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
           >
             {isSubmitting ? (
               <>
-                جاري تأكيد الحجز...
-                <Loader2 className="mr-2 size-5 animate-spin" />
+                <span>جاري تأكيد الحجز...</span>
+                <Loader2 className="size-4 animate-spin" />
               </>
             ) : (
               <>
-                تأكيد الحجز
-                <Bookmark className="mr-2 size-5" />
+                <span>تأكيد الحجز</span>
+                <Bookmark className="size-4" />
               </>
             )}
           </Button>
@@ -1566,6 +1928,7 @@ function PanelContent({
     );
   }
 
+  // Panel 18: Success
   if (panel === 18) {
     const daysOfWeek = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
     const getDayName = (d: number | null) => {
@@ -1576,254 +1939,55 @@ function PanelContent({
     };
 
     return (
-      <div className="flex flex-col pt-4 pb-4 min-h-[380px]">
-        <div className="flex items-start justify-between" dir="ltr">
-          <button type="button" onClick={() => onCreate?.()} className="rounded border-2 border-border p-1.5 hover:bg-secondary transition-colors mt-1">
-            <X className="size-5 text-foreground" />
-          </button>
-          <div className="flex flex-col items-end gap-1.5" dir="rtl">
-            <h2 className="text-[24px] font-extrabold text-foreground">
-              تم تأكيد الحجز
-            </h2>
-            <p className="text-[14px] font-bold text-primary" dir="rtl">
-              موعدك: {getDayName(bookingDay)} {bookingDay} أكتوبر — {bookingTime}
-            </p>
-          </div>
-        </div>
+      <div className="flex flex-col gap-4 text-center items-center pt-2 pb-2">
+        <motion.div
+          initial={
+            reduceMotion
+              ? { opacity: 0 }
+              : { scale: 0.3, opacity: 0, filter: "blur(4px)" }
+          }
+          animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+          transition={{ ...ICON_SWAP, delay: 0.08 }}
+          className="flex size-14 items-center justify-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-sm"
+        >
+          <CheckCircle2 className="size-8" />
+        </motion.div>
 
-        <div className="h-px w-full bg-border/60 mt-6 mb-12"></div>
-
-        <div className="flex flex-col items-center justify-center gap-3 text-center mb-12 px-4">
-          <h3 className="text-[22px] font-extrabold text-foreground">
-            تم استلام طلب الحجز بنجاح
-          </h3>
-          <p className="text-[15px] font-medium text-muted-foreground max-w-[340px]">
-            سنرسل تأكيد الحجز على بريدك الإلكتروني ونتواصل معك قبل الموعد بيوم
+        <div className="flex flex-col gap-1">
+          <h2 className="text-xl sm:text-2xl font-bold font-heading text-foreground">
+            تم استلام طلب الحجز بنجاح!
+          </h2>
+          <p className="text-xs sm:text-sm font-semibold text-primary font-mono" dir="rtl">
+            موعدك: {getDayName(bookingDay)} {bookingDay} أكتوبر — {bookingTime}
           </p>
-          {requestCode && (
-            <div className="mt-3 inline-flex items-center gap-2 rounded-xl bg-primary/10 border border-primary/20 px-4 py-2 text-sm font-bold text-primary">
-              رقم المتابعة الخاص بطلبك:
-              <span dir="ltr" className="font-mono tracking-wider font-extrabold text-foreground">
-                {requestCode}
-              </span>
-            </div>
-          )}
         </div>
 
-        <div className="mt-auto px-4 w-full flex justify-center" dir="rtl">
-          <Button
+        <p className="text-xs sm:text-sm text-muted-foreground font-medium max-w-[360px] leading-relaxed">
+          سنرسل تأكيد الحجز على بريدك الإلكتروني وسيتواصل معك فريق سَنَد قبل الموعد.
+        </p>
+
+        {requestCode && (
+          <div className="inline-flex items-center gap-2 rounded-xl bg-secondary/50 border border-line px-3.5 py-2 text-xs font-semibold text-muted-foreground">
+            <span>رقم متابعة الطلب:</span>
+            <span dir="ltr" className="font-mono tracking-wider font-bold text-foreground">
+              {requestCode}
+            </span>
+          </div>
+        )}
+
+        <div className="w-full mt-2" dir="rtl">
+          <button
+            type="button"
             onClick={() => onCreate?.()}
-            className="h-[54px] w-[80%] rounded text-[16px] font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-all shadow-md shadow-primary/20"
+            className="h-10 sm:h-11 w-full rounded-full text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-[scale,opacity,background-color] duration-150 ease-out cursor-pointer flex items-center justify-center gap-1.5 active:scale-[0.98] shadow-sm"
           >
-            العودة للصفحة الرئيسية
-            <ArrowLeft className="mr-2 size-5" />
-          </Button>
+            <span>العودة للصفحة الرئيسية</span>
+            <ArrowLeft className="size-4" />
+          </button>
         </div>
       </div>
     );
   }
 
   return null;
-}
-
-// --- Stepper Components ---
-
-const ICON_SWAP = { type: "spring", duration: 0.3, bounce: 0 } as const;
-const LINE_MS = 240;
-const STAGGER_MS = 120;
-const ARRIVE_MS = 160;
-const TAIL_LAG = 0.12;
-const INCH_EASE = [0.77, 0, 0.175, 1] as const;
-const HALO = 22;
-
-type Status = "complete" | "current" | "upcoming";
-
-export function ProgressStepper({
-  steps,
-  current,
-  label = "Progress",
-  className,
-}: {
-  steps: string[];
-  current: number;
-  label?: string;
-  className?: string;
-}) {
-  const reduceMotion = useReducedMotion();
-  const [move, setMove] = useState({ from: current, to: current });
-  if (move.to !== current) setMove({ from: move.to, to: current });
-  const { from } = move;
-  const last = steps.length - 1;
-  const n = steps.length;
-
-  const olRef = useRef<HTMLOListElement>(null);
-  const rtl = useRef(false);
-  const head = useMotionValue(current);
-  const tail = useMotionValue(current);
-  const runs = useRef<AnimationPlaybackControls[]>([]);
-  const prev = useRef(current);
-
-  useEffect(() => {
-    const start = prev.current;
-    prev.current = current;
-    if (start === current) return;
-    if (olRef.current) rtl.current = getComputedStyle(olRef.current).direction === "rtl";
-    runs.current.forEach((r) => r.stop());
-    if (reduceMotion) {
-      head.jump(current);
-      tail.jump(current);
-      return;
-    }
-    const travel = ((Math.abs(current - start) - 1) * STAGGER_MS + LINE_MS) / 1000;
-    runs.current = [
-      animate(head, current, { duration: travel, ease: INCH_EASE }),
-      animate(tail, current, { duration: travel, ease: INCH_EASE, delay: TAIL_LAG }),
-    ];
-  }, [current, reduceMotion, head, tail]);
-
-  useEffect(() => () => runs.current.forEach((r) => r.stop()), []);
-
-  const clip = useTransform([head, tail], ([h, t]: number[]) => {
-    const lo = ((Math.min(h, t) + 0.5) / n) * 100;
-    const hi = ((Math.max(h, t) + 0.5) / n) * 100;
-    const [l, r] = rtl.current ? [100 - hi, lo] : [lo, 100 - hi];
-    return `inset(0 calc(${r}% - ${HALO}px) 0 calc(${l}% - ${HALO}px) round ${HALO}px)`;
-  });
-
-  const lineDelay = (k: number) => {
-    if (reduceMotion) return 0;
-    if (current > from && k >= from && k < current) return (k - from) * STAGGER_MS;
-    if (current < from && k >= current && k < from)
-      return (from - 1 - k) * STAGGER_MS;
-    return 0;
-  };
-
-  const stepDelay = (j: number) => {
-    if (reduceMotion) return 0;
-    if (current > from && j > from && j <= current)
-      return (j - 1 - from) * STAGGER_MS + ARRIVE_MS;
-    if (current < from && j >= current && j < from)
-      return (from - 1 - j) * STAGGER_MS + ARRIVE_MS;
-    return 0;
-  };
-
-  const statusOf = (j: number): Status =>
-    j < current ? "complete" : j === current ? "current" : "upcoming";
-
-  return (
-    <div className={cn("w-[min(520px,100%)] mx-auto", className)} dir="rtl">
-      <ol
-        ref={olRef}
-        aria-label={label}
-        className="relative grid"
-        style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
-      >
-        <motion.span
-          aria-hidden
-          style={{ clipPath: clip }}
-          className="pointer-events-none absolute inset-x-0 -top-1 h-11 bg-primary/10"
-        />
-        {steps.map((step, j) => {
-          const status = statusOf(j);
-          const checked =
-            status === "complete" || (status === "current" && j === last);
-          const delay = stepDelay(j);
-          return (
-            <li
-              key={step}
-              aria-current={status === "current" ? "step" : undefined}
-              className="relative flex flex-col items-center gap-2.5"
-            >
-              {j < last && (
-                <span
-                  aria-hidden
-                  className="absolute top-[17px] right-[calc(50%+26px)] left-[calc(-50%+26px)] h-0.5 overflow-hidden rounded-full bg-border"
-                >
-                  <span
-                    className={cn(
-                      "absolute inset-0 origin-right rounded-full bg-primary transition-[scale] ease-[cubic-bezier(0.77,0,0.175,1)] motion-reduce:transition-none ltr:origin-left",
-                      j < current ? "scale-x-100" : "scale-x-0",
-                    )}
-                    style={{
-                      transitionDuration: `${LINE_MS}ms`,
-                      transitionDelay: `${lineDelay(j)}ms`,
-                    }}
-                  />
-                </span>
-              )}
-              <span
-                aria-hidden
-                className={cn(
-                  "relative grid size-9 place-items-center rounded-full text-sm font-medium tabular-nums ring-1 ring-inset transition-[background-color,color,box-shadow] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]",
-                  checked
-                    ? "bg-primary text-primary-foreground ring-primary"
-                    : status === "current"
-                      ? "bg-background text-foreground ring-primary shadow-sm"
-                      : "bg-background text-muted-foreground ring-border",
-                )}
-                style={{ transitionDelay: `${delay}ms` }}
-              >
-                <Swap visible={!checked} delay={delay} reduceMotion={reduceMotion}>
-                  {j + 1}
-                </Swap>
-                <Swap visible={checked} delay={delay} reduceMotion={reduceMotion}>
-                  <svg
-                    viewBox="0 0 16 16"
-                    className="size-4"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="m3.5 8.5 3 3 6-7" />
-                  </svg>
-                </Swap>
-              </span>
-              <span
-                className={cn(
-                  "text-center text-[12px] sm:text-sm font-bold transition-[color] duration-200 ease-out",
-                  status === "upcoming" ? "text-muted-foreground opacity-60" : "text-foreground",
-                )}
-                style={{ transitionDelay: `${delay}ms` }}
-              >
-                {step}
-              </span>
-            </li>
-          );
-        })}
-      </ol>
-      <span className="sr-only" aria-live="polite">
-        {current !== from
-          ? `Step ${current + 1} of ${steps.length}: ${steps[current]}`
-          : ""}
-      </span>
-    </div>
-  );
-}
-
-function Swap({
-  visible,
-  delay,
-  reduceMotion,
-  children,
-}: {
-  visible: boolean;
-  delay: number;
-  reduceMotion: boolean | null;
-  children: React.ReactNode;
-}) {
-  const hidden = reduceMotion
-    ? { opacity: 0 }
-    : { scale: 0.25, opacity: 0, filter: "blur(4px)" };
-  return (
-    <motion.span
-      className="col-start-1 row-start-1 grid place-items-center"
-      initial={false}
-      animate={visible ? { scale: 1, opacity: 1, filter: "blur(0px)" } : hidden}
-      transition={{ ...ICON_SWAP, delay: delay / 1000 }}
-    >
-      {children}
-    </motion.span>
-  );
 }

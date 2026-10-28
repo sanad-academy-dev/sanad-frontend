@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { SANAD_BACKEND_URL } from "@/lib/api-config";
+import { getSanadBackendUrl } from "@/lib/api-config";
 
 export async function GET(
   _req: NextRequest,
@@ -8,7 +8,7 @@ export async function GET(
   try {
     const { code } = await params;
 
-    const response = await fetch(`${SANAD_BACKEND_URL}/public/campaigns/${code}`, {
+    const response = await fetch(`${getSanadBackendUrl()}/public/campaigns/${code}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

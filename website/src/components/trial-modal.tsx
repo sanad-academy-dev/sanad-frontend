@@ -19,8 +19,14 @@ export function TrialModal() {
 
   useEffect(() => {
     setMounted(true);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const handleOpen = () => {
+      console.log("[TRIAL_MODAL] handleOpen called");
+      setOpen(true);
+    };
+    const handleClose = () => {
+      console.log("[TRIAL_MODAL] handleClose called");
+      setOpen(false);
+    };
 
     window.addEventListener(OPEN_TRIAL_MODAL_EVENT, handleOpen);
     window.addEventListener("close-trial-modal", handleClose);
@@ -54,8 +60,13 @@ export function TrialModal() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[100] flex items-start justify-center bg-black/60 backdrop-blur-sm pt-12 md:pt-[8vh] px-4 overflow-y-auto"
-          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 overflow-y-auto"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              console.log("[TRIAL_MODAL] Backdrop clicked directly, closing modal");
+              setOpen(false);
+            }
+          }}
         >
           <motion.div
             key="trial-assessment-card"
@@ -64,11 +75,17 @@ export function TrialModal() {
             exit={{ opacity: 0, scale: 0.96, y: 10 }}
             transition={{ duration: 0.2 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-[800px] mx-auto my-auto"
+            className="w-full max-w-[540px] mx-auto my-auto"
           >
             <MultiStepForm
-              onCreate={() => setTimeout(() => setOpen(false), 2000)}
-              onClose={() => setOpen(false)}
+              onCreate={() => {
+                console.log("[TRIAL_MODAL] onCreate called from MultiStepForm");
+                setOpen(false);
+              }}
+              onClose={() => {
+                console.log("[TRIAL_MODAL] onClose called from MultiStepForm");
+                setOpen(false);
+              }}
             />
           </motion.div>
         </motion.div>

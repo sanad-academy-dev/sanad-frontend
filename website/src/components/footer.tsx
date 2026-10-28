@@ -1,136 +1,241 @@
-import { Mail, MapPin } from "lucide-react";
-import { FaWhatsapp } from "react-icons/fa";
+"use client";
 
 import Image from "next/image";
+import Link from "next/link";
+import { Mail, MapPin, ArrowUpLeft } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
+import { FaFacebookF, FaInstagram, FaLinkedinIn, FaYoutube } from "react-icons/fa6";
 import Container from "./container";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
-// الفوتر — Frame 1984079022 من التصميم
-
-const EXPLORE_LINKS = [
-  "الدورات",
-  "المعسكرات",
-  "الأسعار",
-  "عن الأكاديمية",
+const EXPLORE_ITEMS = [
+  { label: "المسارات التعليمية", href: "/tracks" },
+  { label: "الكورسات والبرامج", href: "/courses" },
+  { label: "باقات الاشتراكات", href: "/pricing" },
+  { label: "معسكرات سَنَد", href: "/#bootcamps" },
+  { label: "فريق العمل", href: "/team" },
 ];
 
-const CONTACTS = [
-  { icon: FaWhatsapp, text: "+201022805731", dir: "ltr" as const, href: "https://wa.me/+201022805731" },
-  { icon: Mail, text: "gamal.htg@gmail.com", dir: "ltr" as const, href: "mailto:gamal.htg@gmail.com" },
-  { icon: MapPin, text: "بجوار فرن الشرطة - أرض النني - سيدي سالم - كفرالشيخ", dir: "rtl" as const },
+const CONTACT_ITEMS = [
+  { 
+    label: "+201022805731", 
+    href: "https://wa.me/+201022805731", 
+    icon: FaWhatsapp,
+    isExternal: true,
+    dir: "ltr" as const,
+    hoverColor: "group-hover:text-[#25D366] group-hover:border-[#25D366] group-hover:bg-[#25D366]/10",
+  },
+  { 
+    label: "gamal.htg@gmail.com", 
+    href: "mailto:gamal.htg@gmail.com", 
+    icon: Mail,
+    isExternal: true,
+    dir: "ltr" as const,
+    hoverColor: "group-hover:text-[#EA4335] group-hover:border-[#EA4335] group-hover:bg-[#EA4335]/10",
+  },
+  { 
+    label: "سيدي سالم - كفر الشيخ", 
+    href: undefined, 
+    icon: MapPin,
+    isExternal: false,
+    dir: "rtl" as const,
+    hoverColor: "group-hover:text-primary group-hover:border-primary group-hover:bg-primary/10",
+  },
 ];
 
-// أيقونات التواصل الاجتماعي (SVG مدمجة — lucide بلا أيقونات ماركات)
-const SOCIALS: { name: string; path: string }[] = [
+const SOCIAL_LINKS = [
   {
-    name: "Instagram",
-    path: "M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z",
+    name: "Facebook",
+    handle: "sanad",
+    icon: FaFacebookF,
+    href: "https://facebook.com",
+    hoverColor: "hover:text-[#1877F2]",
   },
   {
-    name: "YouTube",
-    path: "M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z",
+    name: "Instagram",
+    handle: "sanad",
+    icon: FaInstagram,
+    href: "https://instagram.com",
+    hoverColor: "hover:text-[#E4405F]",
   },
   {
     name: "LinkedIn",
-    path: "M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.225 0z",
+    handle: "sanad",
+    icon: FaLinkedinIn,
+    href: "https://linkedin.com",
+    hoverColor: "hover:text-[#0A66C2]",
   },
   {
-    name: "Facebook",
-    path: "M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z",
+    name: "YouTube",
+    handle: "sanad",
+    icon: FaYoutube,
+    href: "https://youtube.com",
+    hoverColor: "hover:text-[#FF0000]",
   },
 ];
 
 export default function Footer() {
   return (
-    <footer dir="rtl" className="w-full bg-background">
-      <Container withBorder innerClassName="gap-6">
-        <div className="flex flex-col gap-12 lg:flex-row lg:justify-between lg:gap-12">
-          {/* العلامة + الوصف + السوشال */}
-          <div className="flex flex-col items-start gap-6 text-start lg:max-w-[576px]">
-            {/* <h2 className="text-[32px] font-bold text-primary"> */}
-              <Image src="/logos/Logo White.png" alt="Logo" width={100} height={100} />
-            {/* </h2> */}
-            <p className="text-lg leading-relaxed text-muted-foreground">
-              نعلّم الأطفال البرمجة والتقنية بأسلوب عملي وممتع حضورياً في فروعنا من
-              خلال أنشطة تفاعلية ومشاريع تطبيقية ونُبسّط المفاهيم باستخدام أمثلة
-              عملية وتجارب حقيقية.
-            </p>
-            <div className="flex items-center gap-6">
-              {SOCIALS.map((social) => (
-                <a
-                  key={social.name}
-                  href="#"
-                  aria-label={social.name}
-                  className="text-muted-foreground transition-colors hover:text-primary"
-                >
-                  <svg viewBox="0 0 24 24" className="size-6" fill="currentColor">
-                    <path d={social.path} />
-                  </svg>
-                </a>
-              ))}
+    <footer dir="rtl" className="relative w-full bg-background overflow-x-clip border-t border-line">
+      <Container className="relative">
+        <div className="grid grid-cols-1 md:grid-cols-2">
+          <div className="flex flex-col justify-between md:border-b-0 md:border-e border-line">
+            <div className="h-11 sm:h-12 px-5 sm:px-6 flex items-center border-b border-line">
+              <Link href="/" className="inline-flex items-center transition-opacity hover:opacity-80">
+                <Image
+                  src="/logos/Logo White.png"
+                  alt="Sanad Academy Logo"
+                  width={75}
+                  height={26}
+                  unoptimized
+                  className="hidden dark:block h-6 sm:h-6.5 w-auto object-contain"
+                />
+                <Image
+                  src="/logos/Logo Black.png"
+                  alt="Sanad Academy Logo"
+                  width={75}
+                  height={26}
+                  unoptimized
+                  className="block dark:hidden h-6 sm:h-6.5 w-auto object-contain"
+                />
+              </Link>
+            </div>
+
+            <div className="flex-1 p-5 sm:p-6 flex flex-col justify-center">
+              <p className="text-xs sm:text-[13px] text-muted-foreground leading-relaxed max-w-md">
+                نعلّم الأطفال البرمجة والتقنية بأسلوب عملي وممتع حضورياً في فروعنا من خلال أنشطة تفاعلية ومشاريع تطبيقية ونُبسّط المفاهيم باستخدام أمثلة عملية وتجارب حقيقية.
+              </p>
+            </div>
+
+            <div className="h-11 sm:h-12 w-full border-t border-line grid grid-cols-4">
+              <TooltipProvider delayDuration={150}>
+                {SOCIAL_LINKS.map((link, idx) => {
+                  const Icon = link.icon;
+                  return (
+                    <Tooltip key={link.name}>
+                      <TooltipTrigger asChild>
+                        <a
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${link.name} (${link.handle})`}
+                          className={`flex h-full w-full items-center justify-center text-muted-foreground transition-all duration-200 hover:bg-secondary/40 hover:text-foreground ${
+                            idx !== SOCIAL_LINKS.length - 1 ? "border-l border-line" : ""
+                          } ${link.hoverColor}`}
+                        >
+                          <Icon className="size-3.5 sm:size-4 transition-transform duration-200 hover:scale-110 active:scale-95" />
+                        </a>
+                      </TooltipTrigger>
+                      <TooltipContent
+                        side="top"
+                        sideOffset={6}
+                        className="font-heading text-xs font-semibold py-1 px-2.5 bg-popover text-foreground border border-line backdrop-blur-md rounded-md shadow-none"
+                      >
+                        <p>{link.name} ({link.handle})</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                })}
+              </TooltipProvider>
             </div>
           </div>
 
-          {/* استكشف */}
-          <nav className="flex flex-col items-start gap-4 text-start">
-            <h3 className="text-base font-semibold text-foreground">استكشف</h3>
-            {EXPLORE_LINKS.map((link) => (
-              <a
-                key={link}
-                href="#"
-                className="text-base text-muted-foreground transition-colors hover:text-primary"
-              >
-                {link}
-              </a>
-            ))}
-          </nav>
-
-          {/* تواصل معنا */}
-          <div className="flex flex-col items-start gap-4 text-start">
-            <h3 className="text-base font-semibold text-foreground">تواصل معنا</h3>
-            {CONTACTS.map(({ icon: Icon, text, dir, href }) => {
-              const content = (
-                <div className="flex items-center gap-2">
-                  <Icon className="size-4 shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
-                  <span dir={dir} className="text-base text-muted-foreground group-hover:text-primary transition-colors">
-                    {text}
-                  </span>
+          <div className="flex flex-col h-full">
+            <div className="grid grid-cols-2 h-full">
+              <div className="flex flex-col border-e border-line">
+                <div className="h-11 sm:h-12 px-3 sm:px-3.5 lg:px-6 flex items-center border-b border-line text-xs sm:text-sm font-bold text-foreground select-none">
+                  استكشف
                 </div>
-              );
 
-              return href ? (
-                <a
-                  key={text}
-                  href={href}
-                  target={href.startsWith("http") ? "_blank" : undefined}
-                  rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="group"
-                >
-                  {content}
-                </a>
-              ) : (
-                <div key={text} className="group">
-                  {content}
+                <div className="flex flex-col divide-y divide-line">
+                  {EXPLORE_ITEMS.map((item) => (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className="h-11 sm:h-12 px-3 sm:px-3.5 lg:px-6 flex items-center justify-between text-xs sm:text-[13px] text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary/35 group"
+                    >
+                      <span className="transition-transform duration-200 group-hover:-translate-x-1 truncate">
+                        {item.label}
+                      </span>
+                      <ArrowUpLeft className="size-3.5 opacity-0 -translate-x-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0 text-primary shrink-0" />
+                    </Link>
+                  ))}
                 </div>
-              );
-            })}
+              </div>
+
+              <div className="flex flex-col">
+                <div className="h-11 sm:h-12 px-3 sm:px-3.5 lg:px-6 flex items-center border-b border-line text-xs sm:text-sm font-bold text-foreground select-none">
+                  تواصل معنا
+                </div>
+
+                <div className="flex flex-col divide-y divide-line">
+                  {CONTACT_ITEMS.map((item, idx) => {
+                    const Icon = item.icon;
+                    const content = (
+                      <div className="flex items-center gap-2 lg:gap-3 text-[11px] sm:text-xs lg:text-[13px] text-muted-foreground group-hover:text-foreground transition-colors min-w-0">
+                        <div
+                          className={`size-6 sm:size-6.5 lg:size-7.5 rounded-lg border border-line bg-card/60 flex items-center justify-center shrink-0 text-foreground/80 transition-all duration-200 group-hover:scale-105 ${item.hoverColor}`}
+                        >
+                          <Icon className="size-3 sm:size-3.5 lg:size-4 transition-colors" />
+                        </div>
+                        <span dir={item.dir} className="truncate">
+                          {item.label}
+                        </span>
+                      </div>
+                    );
+
+                    return item.href ? (
+                      <a
+                        key={idx}
+                        href={item.href}
+                        target={item.isExternal ? "_blank" : undefined}
+                        rel={item.isExternal ? "noopener noreferrer" : undefined}
+                        className="h-11 sm:h-12 px-3 sm:px-3.5 lg:px-6 flex items-center transition-colors hover:bg-secondary/35 group"
+                      >
+                        {content}
+                      </a>
+                    ) : (
+                      <div
+                        key={idx}
+                        className="h-11 sm:h-12 px-3 sm:px-3.5 lg:px-6 flex items-center select-none"
+                      >
+                        {content}
+                      </div>
+                    );
+                  })}
+
+                  <div className="h-11 sm:h-12 px-3 sm:px-3.5 lg:px-6 flex items-center" aria-hidden="true" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* الشريط السفلي (حقوق النشر وروابط قانونية) */}
-        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
-          <p className="text-sm text-muted-foreground">
-             أكاديمية سند. جميع الحقوق محفوظة © 2026
+        <div className="w-full screen-line-top screen-line-bottom px-4 sm:px-6 py-3 bg-card/25 flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-4 text-xs text-muted-foreground text-center sm:text-right">
+          <p className="text-xs text-muted-foreground">
+            أكاديمية سَنَد. جميع الحقوق محفوظة{""}
+            <span dir="ltr" className="inline-block font-mono">
+              © {new Date().getFullYear()}
+            </span>
           </p>
-          <div className="flex items-center gap-6">
-            <a href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">
+
+          <div className="flex items-center gap-3 sm:gap-4 text-xs">
+            <Link href="#" className="text-muted-foreground transition-colors hover:text-primary">
               سياسة الخصوصية
-            </a>
-            <a href="#" className="text-sm text-muted-foreground transition-colors hover:text-primary">
+            </Link>
+            <span className="text-line select-none">•</span>
+            <Link href="#" className="text-muted-foreground transition-colors hover:text-primary">
               شروط الاستخدام
-            </a>
+            </Link>
           </div>
         </div>
 
+        <div className="h-2.5 sm:h-3 w-full" />
       </Container>
     </footer>
   );

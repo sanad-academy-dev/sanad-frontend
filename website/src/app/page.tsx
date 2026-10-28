@@ -1,89 +1,46 @@
-import Image from "next/image";
-
 import Hero from "@/components/hero";
 import BrandMarquee from "@/components/brand-marquee";
 import CourseCategories from "@/components/course-categories";
 import LearningPaths from "@/components/learning-paths";
 import Pricing from "@/components/pricing";
-import Faq from "@/components/faq";
+import ParentsFaq from "@/components/parents-faq";
 import CtaBanner from "@/components/cta-banner";
 import Levels from "@/components/levels";
 import JourneyChild from "@/components/journey-child";
 import WhySanad from "@/components/why-sanad";
+import { Separator } from "@/components/separator";
 
 export default async function Home() {
-
   return (
-    <main>
-      <section className="relative w-full overflow-hidden">
-        {/* خلفية الـ hero */}
-        <Image
-          src="/hero.png"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(0,0,0,0.6),rgba(28,0,75,0.12))]" />
+    <div className="flex flex-col w-full max-w-screen overflow-x-clip">
+      <Hero />
+      <Separator />
 
-        {/* محتوى الـ hero */}
-        <Hero />
-      </section>
+      <BrandMarquee />
+      <Separator />
 
-      {/* كرت الإحصائيات — يطفو فوق حدّ الـ hero */}
-      {/* <div className="relative z-20 -mt-16 px-4 lg:-mt-[62px]">
-        <StatsCard />
-      </div> */}
+      <WhySanad />
+      <Separator />
 
-      {/* شعارات الشركات */}
-      <div id="partners">
-        <BrandMarquee />
-      </div>
+      <LearningPaths />
+      <Separator />
 
-      {/* الدورات الأكثر طلباً */}
-      {/* <FeaturedCourses courses={courses} /> */}
-
-          {/* لماذا سند */}
-      <div id="about">
-        <WhySanad />
-      </div>
-
-      {/* مسارات التعلم */}
-      <div id="paths">
-        <LearningPaths />
-      </div>
-
-  
-
-      {/* رحلة الطالب */}
       <JourneyChild />
+      <Separator />
 
-      {/*  مستويات مسارات التعلم  */}
-      <div id="levels">
-        <Levels />
-      </div>
+      <Levels />
+      <Separator />
 
-      {/* الفيد باك  */}
-      {/* <TestimonialsSection /> */}
+      <Pricing />
+      <Separator />
 
-      
-      {/* باقات الاشتراك */}
-      <div id="pricing">
-        <Pricing />
-      </div>
+      <ParentsFaq />
+      <Separator />
 
-      {/* أسئلة أولياء الأمور */}
-      <Faq />
+      <CourseCategories />
+      <Separator />
 
-      {/* استكشاف فئات الدورات */}
-      <div id="bootcamps">
-        <CourseCategories  />
-      </div>
-
-      {/* بانر الدعوة للإجراء */}
       <CtaBanner />
-
-    </main>
+    </div>
   );
 }

@@ -32,39 +32,46 @@ export function PopupContact({ isOpen, onClose }: { isOpen: boolean; onClose: ()
           onClick={onClose}
         >
           <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            initial={{ opacity: 0, scale: 0.96, y: 8 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 10 }}
-            className="w-full max-w-5xl bg-[#111] rounded-2xl shadow-xl overflow-hidden border border-border/50 flex flex-col max-h-[90vh]"
+            exit={{ opacity: 0, scale: 0.96, y: 8 }}
+            className="w-full max-w-4xl bg-card rounded-xl overflow-hidden border border-line flex flex-col max-h-[90vh] shadow-none"
             onClick={(e) => e.stopPropagation()}
             dir="rtl"
           >
             {/* Header & Tabs */}
-            <div className="flex items-center justify-between border-b border-border/50 p-4 bg-muted/20">
-              <div className="flex bg-secondary/50 rounded-lg p-1">
+            <div className="flex items-center justify-between border-b border-line p-3 sm:p-4 bg-muted/30">
+              <div className="flex bg-secondary/60 rounded-lg border border-line p-1 gap-1">
                 <button
+                  type="button"
                   className={cn(
-                    "flex items-center gap-2 px-6 py-2 rounded-md text-sm font-bold transition-colors",
-                    activeTab === "message" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                    "flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-md font-sans text-xs sm:text-sm font-bold transition-colors cursor-pointer select-none",
+                    activeTab === "message" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
                   )}
                   onClick={() => setActiveTab("message")}
                 >
-                  <MessageSquare className="w-4 h-4" />
-                  راسلنا
+                  <MessageSquare className="size-4 text-primary" />
+                  <span>راسلنا</span>
                 </button>
                 <button
+                  type="button"
                   className={cn(
-                    "flex items-center gap-2 px-6 py-2 rounded-md text-sm font-bold transition-colors",
-                    activeTab === "book" ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                    "flex items-center gap-1.5 px-4 sm:px-5 py-1.5 rounded-md font-sans text-xs sm:text-sm font-bold transition-colors cursor-pointer select-none",
+                    activeTab === "book" ? "bg-background text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
                   )}
                   onClick={() => setActiveTab("book")}
                 >
-                  <CalendarIcon className="w-4 h-4" />
-                  احجز موعد
+                  <CalendarIcon className="size-4 text-primary" />
+                  <span>احجز موعد</span>
                 </button>
               </div>
-              <button onClick={onClose} className="p-2 bg-secondary/50 rounded-full hover:bg-secondary transition-colors">
-                <X className="w-5 h-5 text-muted-foreground" />
+              <button 
+                type="button"
+                onClick={onClose} 
+                className="p-1.5 bg-secondary/60 rounded-lg border border-line hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                aria-label="إغلاق النافذة"
+              >
+                <X className="size-4" />
               </button>
             </div>
 

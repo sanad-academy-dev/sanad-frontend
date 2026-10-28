@@ -1,12 +1,6 @@
 import { NextRequest } from "next/server";
+import { getSanadBackendUrl } from "@/lib/api-config";
 
-const SANAD_BACKEND_URL =
-  process.env.SANAD_API_URL ??
-  process.env.DASHBOARD_API_URL ??
-  "http://localhost:5180/api";
-
-// Rate limiting بسيط في الذاكرة لتفادي استنزاف الـ API من أي IP
-// الحد: 25 رسالة لكل IP كل 10 دقائق
 const WINDOW_MS = 10 * 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 25;
 
@@ -31,7 +25,6 @@ function checkRateLimit(ip: string): boolean {
 
 export async function POST(req: NextRequest) {
   try {
-    // استخراج عنوان IP الزائر
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
       req.headers.get("x-real-ip") ||
@@ -46,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
 
-    const response = await fetch(`${SANAD_BACKEND_URL}/public/agent/chat`, {
+    const response = await fetch(`${getSanadBackendUrl()}/public/agent/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -65,7 +58,6 @@ export async function POST(req: NextRequest) {
       return new Response("No response stream available", { status: 500 });
     }
 
-    // تمرير الـ Stream مباشرة إلى العميل
     return new Response(response.body, {
       status: 200,
       headers: {
@@ -74,10 +66,11 @@ export async function POST(req: NextRequest) {
         Connection: "keep-alive",
       },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("[website/api/agent] Error proxying chat:", err);
+    const message = err instanceof Error ? err.message : "Unknown proxy error";
     return new Response(
-      err?.message || "Failed to reach Sanad AI backend",
+      message || "Failed to reach Sanad AI backend",
       { status: 500 }
     );
   }

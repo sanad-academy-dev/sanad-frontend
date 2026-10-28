@@ -1,12 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
-import { CheckCircle2 } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 import Container from "./container";
-import { MultiStepForm } from "./multi-step-form";
 import { Button } from "@/components/ui/button";
+import { openTrialAssessmentModal } from "@/components/trial-modal";
 
 const CARDS = [
   {
@@ -40,31 +36,18 @@ const CARDS = [
 ];
 
 export default function Support() {
-  const [multiStepOpen, setMultiStepOpen] = useState(false);
-
-  useEffect(() => {
-    if (multiStepOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [multiStepOpen]);
-
   const handleAction = (type?: string, href?: string) => {
     if (type === "ai-agent") {
       window.dispatchEvent(new Event("open-ai-agent"));
     } else if (type === "trial-modal") {
-      setMultiStepOpen(true);
+      openTrialAssessmentModal();
     } else if (href) {
       window.open(href, "_blank", "noopener,noreferrer");
     }
   };
 
   return (
-    <section className="relative w-full overflow-hidden bg-background ">
+    <section className="relative w-full overflow-hidden bg-background">
       <Container className="py-20 md:py-28" >
         <div className="w-full border-t border-border pt-20 md:pt-28">
         <div className="flex flex-col items-center justify-center text-center space-y-6 mb-16">
@@ -76,9 +59,9 @@ export default function Support() {
           </p>
         </div>
 
-        <div className="w-full rounded-3xl border border-border bg-card overflow-hidden shadow-sm" dir="rtl">
+        <div className="w-full rounded-xl border border-border/80 bg-card/60 backdrop-blur-xs overflow-hidden" dir="rtl">
           {/* Top Banner */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between p-8 md:p-12 border-b border-border gap-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between p-8 md:p-12 border-b border-border/80 gap-8">
             <div className="flex flex-col items-start gap-4 max-w-2xl">
               <h3 className="text-2xl md:text-4xl font-bold text-foreground tracking-tight">
                 تواصل مع فريق سند
@@ -91,14 +74,14 @@ export default function Support() {
                   href="https://wa.me/+201022805731"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center rounded-xl bg-foreground px-8 py-3.5 text-base font-bold text-background transition-colors hover:bg-foreground/90 shadow-sm"
+                  className="inline-flex items-center justify-center rounded-lg bg-foreground px-8 py-3.5 text-base font-bold text-background transition-colors hover:bg-foreground/90"
                 >
                   تحدث معنا
                 </a>
               </div>
             </div>
-            <div className="flex items-center gap-2.5 text-sm font-semibold text-[#25D366] bg-[#25D366]/10 px-5 py-2.5 rounded-full whitespace-nowrap self-start md:self-auto">
-              <CheckCircle2 className="size-5" />
+            <div className="flex items-center gap-2 text-xs font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3.5 py-1.5 rounded-full whitespace-nowrap self-start md:self-auto">
+              <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
               <span>متاحون أونلاين</span>
             </div>
           </div>
@@ -133,26 +116,6 @@ export default function Support() {
         </div>
         </div>
       </Container>
-
-      {multiStepOpen && typeof document !== "undefined" && createPortal(
-        <AnimatePresence>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-start justify-center bg-black/60 backdrop-blur-sm pt-12 md:pt-[8vh] px-4"
-            onClick={() => setMultiStepOpen(false)}
-          >
-            <div onClick={(e) => e.stopPropagation()} className="w-full max-w-[800px] mx-auto">
-              <MultiStepForm 
-                onCreate={() => setTimeout(() => setMultiStepOpen(false), 2000)} 
-                onClose={() => setMultiStepOpen(false)}
-              />
-            </div>
-          </motion.div>
-        </AnimatePresence>,
-        document.body
-      )}
     </section>
   );
 }

@@ -1,567 +1,349 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { ArrowLeft, Gamepad2, Code2, Globe, Cpu, Sparkles } from "lucide-react";
+import { useRef, useState, useEffect, useCallback, type ComponentType } from "react";
+import Link from "next/link";
+import { motion, type Transition } from "framer-motion";
 import {
-  motion,
-  useMotionValue,
-  useMotionValueEvent,
-  useTransform,
-  type MotionValue,
-} from "framer-motion";
-
+  Hub,
+  Keyboard,
+  Phosphor,
+  Plot,
+  Riffle,
+  Turntable,
+  type HairlineProps,
+} from "@lucasmarkes/hairline/react";
+import { ArrowUpLeft } from "lucide-react";
 import Container from "@/components/container";
-import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { cn } from "@/lib/utils";
-import { JoinButton } from "@/components/join-button";
 import { SectionHeader } from "@/components/ui/header";
 
-// --- PageDots Logic ---
-const DOT = 6;
-const PILL = 20;
-const GAP = 6;
-const STEP = DOT + GAP;
+import { PATHS, type LearningPathData } from "@/lib/learning-paths";
+export { PATHS, type LearningPathData };
 
-const clamp01 = (v: number) => Math.min(Math.max(v, 0), 1);
-const smooth = (v: number) => v * v * (3 - 2 * v);
-const lead = (t: number) => smooth(clamp01(t / 0.6));
-const trail = (t: number) => smooth(clamp01((t - 0.4) / 0.6));
+const pathAnimations: Record<
+  LearningPathData["trackNumber"],
+  ComponentType<HairlineProps>
+> = {
+  "01": Keyboard,
+  "02": Phosphor,
+  "03": Turntable,
+  "04": Riffle,
+  "05": Plot,
+  "06": Hub,
+};
 
-function PageDots({
-  count,
-  progress,
-  onSelect,
-  autoplay,
-  className,
-}: {
-  count: number;
-  progress: MotionValue<number>;
-  onSelect: (index: number) => void;
-  autoplay?: {
-    duration: number;
-    running: boolean;
-    onElapsed: (active: number) => void;
-  };
-  className?: string;
+const ICON_STROKE_WIDTH = 2.5;
+
+const PAUSE_ICON = {
+  left: "M5.5 5.5L8.5 5.5L8.5 18.5L5.5 18.5Z",
+  right: "M15.5 5.5L18.5 5.5L18.5 18.5L15.5 18.5Z",
+} as const;
+
+const PLAY_ICON = {
+  left: "M7.5 5.87L13 9.08L13 14.92L7.5 18.13Z",
+  right: "M13 9.08L18.01 12L18.01 12L13 14.92Z",
+} as const;
+
+const ICON_TRANSITION: Transition = {
+  type: "spring",
+  visualDuration: 0.3,
+  bounce: 0,
+};
+
+const AUTOPLAY_DURATION = 4200;
+
+export function LearningPathCard({ 
+  path,
+}: { 
+  path: LearningPathData;
 }) {
-  const [active, setActive] = useState(() => Math.round(progress.get()));
-  useMotionValueEvent(progress, "change", (p) => setActive(Math.round(p)));
-
-  const fillRef = useRef<HTMLSpanElement>(null);
-  const settle = useRef<Animation | undefined>(undefined);
-  const onElapsed = useRef(autoplay?.onElapsed);
-  useEffect(() => {
-    onElapsed.current = autoplay?.onElapsed;
-  });
-  const running = autoplay?.running ?? false;
-  const duration = autoplay?.duration ?? 0;
-
-  useEffect(() => {
-    const fill = fillRef.current;
-    if (!fill || !running) return;
-    settle.current?.cancel();
-    const countdown = fill.animate(
-      [{ transform: "scaleX(0)" }, { transform: "scaleX(1)" }],
-      { duration, easing: "linear" },
-    );
-    countdown.onfinish = () => onElapsed.current?.(active);
-    return () => {
-      countdown.onfinish = null;
-      if (countdown.playState !== "running") return;
-      const from = getComputedStyle(fill).transform;
-      countdown.cancel();
-      settle.current = fill.animate(
-        [{ transform: from }, { transform: "scaleX(1)" }],
-        { duration: 200, easing: "cubic-bezier(0.23, 1, 0.32, 1)" },
-      );
-    };
-  }, [running, active, duration]);
-
-  useEffect(() => () => settle.current?.cancel(), []);
-
-  const pill = (p: number) => {
-    const k = Math.min(Math.max(Math.floor(p), 0), Math.max(count - 2, 0));
-    const t = clamp01(p - k);
-    const left = k * STEP + STEP * trail(t);
-    const right = k * STEP + PILL + STEP * lead(t);
-    return { left, width: right - left };
-  };
-  const pillX = useTransform(progress, (p) => pill(p).left);
-  const pillWidth = useTransform(progress, (p) => pill(p).width);
-
-  if (count <= 1) return null;
+  const PathAnimation = pathAnimations[path.trackNumber];
 
   return (
     <div
-      role="group"
-      aria-label="Pages"
-      className={cn("relative h-8 [contain:layout] dir-ltr", className)}
-      style={{ width: (count - 1) * STEP + PILL, direction: "ltr" }}
+      className={cn(
+        "group/track relative flex h-[490px] sm:h-[500px] w-full flex-col justify-between overflow-hidden rounded-2xl",
+        "border border-line bg-card transition-all duration-300 shadow-none hover:border-primary/40",
+      )}
     >
-      {Array.from({ length: count }, (_, i) => (
-        <Dot
-          key={i}
-          index={i}
-          count={count}
-          progress={progress}
-          current={i === active}
-          onSelect={onSelect}
+      <div className="m-2.5 relative flex aspect-18/10 items-center justify-center overflow-hidden border border-line rounded select-none">
+        <PathAnimation
+          className="h-full w-full"
+          intensity={0.35}
+          label={`تفاعل مسار ${path.title}`}
         />
-      ))}
-      <motion.span
-        aria-hidden
-        className={cn(
-          "pointer-events-none absolute top-1/2 left-0 h-1.5 -translate-y-1/2 overflow-hidden rounded-full",
-          autoplay ? "bg-primary/40" : "bg-primary",
-        )}
-        style={{ x: pillX, width: pillWidth }}
-      >
-        {autoplay && (
-          <span
-            ref={fillRef}
-            className="absolute inset-0 origin-left bg-primary"
-          />
-        )}
-      </motion.span>
-    </div>
-  );
-}
 
-function Dot({
-  index,
-  count,
-  progress,
-  current,
-  onSelect,
-}: {
-  index: number;
-  count: number;
-  progress: MotionValue<number>;
-  current: boolean;
-  onSelect: (index: number) => void;
-}) {
-  const width = useTransform(
-    progress,
-    (p) => DOT + (PILL - DOT) * clamp01(1 - Math.abs(p - index)),
-  );
-  const left = useTransform(
-    progress,
-    (p) => index * STEP + (PILL - DOT) * clamp01(index - p),
-  );
-
-  return (
-    <motion.button
-      type="button"
-      aria-label={`Page ${index + 1} of ${count}`}
-      aria-current={current ? "page" : undefined}
-      onClick={() => onSelect(index)}
-      className="group absolute inset-y-0 -ml-[3px] box-content flex touch-manipulation items-center rounded-full px-[3px] outline-none focus-visible:outline-2 focus-visible:outline-primary"
-      style={{ left, width }}
-    >
-      <span className="h-1.5 w-full rounded-full bg-primary/20 transition-[background-color,scale] duration-150 ease-out group-hover:bg-primary/40 group-active:scale-[0.96]" />
-    </motion.button>
-  );
-}
-
-function SwapIcon({
-  visible,
-  reduceMotion,
-  children,
-}: {
-  visible: boolean;
-  reduceMotion: boolean | null;
-  children: React.ReactNode;
-}) {
-  const hidden = reduceMotion
-    ? { opacity: 0 }
-    : { scale: 0.25, opacity: 0, filter: "blur(4px)" };
-  return (
-    <motion.svg
-      viewBox="0 0 16 16"
-      className="col-start-1 row-start-1 size-4"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      initial={false}
-      animate={visible ? { scale: 1, opacity: 1, filter: "blur(0px)" } : hidden}
-      transition={{ type: "spring", duration: 0.3, bounce: 0 }}
-    >
-      {children}
-    </motion.svg>
-  );
-}
-// --- End PageDots Logic ---
-
-export type LearningPathData = {
-  trackNumber: string;
-  title: string;
-  age: string;
-  level: string;
-  description: string;
-  skills: string;
-  finalProject: string;
-  seatsTotal: number;
-  seatsBooked: number;
-  href: string;
-  icon: React.ElementType;
-};
-
-
-const PATHS: LearningPathData[] = [
-  {
-    trackNumber: "01",
-    title: "البرمجة للأطفال",
-    age: "6–10 سنوات",
-    level: "مبتدئ",
-    description: "مدخل بصري ممتع يبني المنطق والثقة قبل الانتقال لكتابة الكود.",
-    skills: "سكراتش • التفكير المنطقي • البرمجة الإبداعية",
-    finalProject: "لعبة أو قصة تفاعلية",
-    seatsBooked: 5,
-    seatsTotal: 8,
-    href: "#",
-    icon: Gamepad2,
-  },
-  {
-    trackNumber: "02",
-    title: "بايثون",
-    age: "10–14 سنة",
-    level: "مبتدئ إلى متوسط",
-    description: "يتعلم الطفل أساسيات البرمجة ويستخدمها في حل مشكلات حقيقية.",
-    skills: "بايثون • الخوارزميات • حل المشكلات",
-    finalProject: "تطبيق بايثون صغير",
-    seatsBooked: 6,
-    seatsTotal: 8,
-    href: "#",
-    icon: Code2,
-  },
-  {
-    trackNumber: "03",
-    title: "تطوير مواقع الويب",
-    age: "13–18 سنة",
-    level: "متوسط",
-    description: "من تصميم الواجهة إلى بناء تجربة ويب تعمل ويمكن مشاركتها.",
-    skills: "لغة HTML • لغة CSS • جافا سكريبت",
-    finalProject: "موقع ويب متكامل",
-    seatsBooked: 4,
-    seatsTotal: 8,
-    href: "#",
-    icon: Globe,
-  },
-  {
-    trackNumber: "04",
-    title: "الروبوتات",
-    age: "8–16 سنة",
-    level: "حسب التقييم",
-    description: "يربط البرمجة بالحركة والاستشعار وبناء نماذج تتفاعل مع الواقع.",
-    skills: "الروبوتات • التفكير المنطقي • الحوسبة الفيزيائية",
-    finalProject: "نموذج روبوت يعمل",
-    seatsBooked: 8,
-    seatsTotal: 8,
-    href: "#",
-    icon: Cpu,
-  },
-  {
-    trackNumber: "05",
-    title: "الذكاء الاصطناعي والتكنولوجيا المتقدمة",
-    age: "13–18 سنة",
-    level: "متوسط إلى متقدم",
-    description: "يفهم كيف تعمل الأدوات الذكية ويوظفها في حل مشكلة واضحة.",
-    skills: "الذكاء الاصطناعي • الأتمتة • التكنولوجيا الحديثة",
-    finalProject: "تطبيق ذكي أو أتمتة",
-    seatsBooked: 5,
-    seatsTotal: 8,
-    href: "https://ta-01m3wj31wpddvqs87rdfbhmjms-1380-0gg1fm6snphrk9093d7sazppk.makeproxy-m.figma.site/#assessment",
-    icon: Sparkles,
-  },
-];
-
-function LearningPathCard({ path }: { path: LearningPathData }) {
-  const progressPercent = Math.round((path.seatsBooked / path.seatsTotal) * 100);
-  
-  const radius = 22;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (progressPercent / 100) * circumference;
-
-  return (
-    <article className="group flex h-full flex-col justify-between gap-6 rounded-3xl bg-muted/30 p-6 shadow-sm ring-1 ring-border transition-all duration-300 hover:shadow-xl hover:shadow-primary/5 hover:-translate-y-1">
-      <div className="flex flex-col gap-5 text-right">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <span className="text-lg font-bold text-foreground">مسار {path.trackNumber}</span>
-          
-          {/* Circular Progress (replaces icon) */}
-          <div className="relative flex size-14 items-center justify-center">
-            <svg className="size-14 -rotate-90 transform" viewBox="0 0 52 52">
-              <circle
-                cx="26"
-                cy="26"
-                r={radius}
-                stroke="currentColor"
-                strokeWidth="4"
-                fill="none"
-                className="text-primary/10"
-              />
-              <circle
-                cx="26"
-                cy="26"
-                r={radius}
-                stroke="currentColor"
-                strokeWidth="4"
-                fill="none"
-                strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
-                strokeLinecap="round"
-                className="text-primary transition-all duration-1000 ease-out"
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center pt-1">
-              <span className="text-[12px] font-bold leading-none text-foreground">{path.seatsBooked}/{path.seatsTotal}</span>
-              <span className="text-[8px] font-medium leading-none text-muted-foreground mt-0.5">مقعد</span>
-            </div>
+        {path.comingSoon && (
+          <div className="absolute top-3 left-3 z-10">
+            <span className="inline-flex shrink-0 items-center rounded-full border border-primary/30 bg-primary/10 dark:bg-primary/20 px-2.5 py-0.5 font-sans text-[11px] font-bold text-primary backdrop-blur-md select-none">
+              قريباً
+            </span>
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Title & Level */}
-        <div className="flex flex-col gap-2">
-          <h3 className="text-2xl font-bold text-foreground transition-colors group-hover:text-primary">
+      <div dir="rtl" className="grid flex-1 grid-cols-[88px_1fr_1fr] sm:grid-cols-[100px_1fr_1fr] grid-rows-[auto_auto_auto_1fr_auto] text-right bg-card">
+        {/* Row 1: Title */}
+        <div className="col-span-3 border-y-2 border-line px-4 py-2.5 flex items-center justify-between">
+          <h3 className="font-heading text-sm sm:text-base font-bold text-foreground group-hover/track:text-primary transition-colors tracking-normal">
             {path.title}
           </h3>
-          <div className="flex items-center gap-2 text-sm font-bold text-primary">
-            <span>{path.age}</span>
-            <span className="size-1.5 rounded-full bg-primary" />
-            <span>{path.level}</span>
-          </div>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+        </div>
+
+        {/* Row 2: Track ID & Description */}
+        <div className="col-span-1 border-b border-l border-line px-2 sm:px-2.5 py-2.5 font-sans text-xs font-semibold text-foreground/80 flex items-center justify-center text-center gap-1 select-none">
+          <span>مسار</span>
+          <span className="font-mono font-bold text-foreground">{path.trackNumber}</span>
+        </div>
+        <div className="col-span-2 border-b border-line px-3 sm:px-3.5 py-2.5 text-right flex items-center">
+          <p className="font-sans text-xs sm:text-[13px] text-foreground/80 leading-relaxed line-clamp-2 font-normal">
             {path.description}
           </p>
         </div>
 
-        <hr className="border-border/50" />
-
-        {/* Skills */}
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted-foreground">المهارات والتقنيات</span>
-          <span className="text-sm font-bold text-foreground">{path.skills}</span>
+        {/* Row 3: Age / Level / Programs */}
+        <div className="col-span-1 border-b border-l border-line px-1.5 sm:px-2 py-2 font-sans text-[11px] sm:text-xs text-foreground/85 font-medium flex items-center justify-center text-center">
+          <span className="whitespace-nowrap">{path.age}</span>
+        </div>
+        <div className="col-span-1 border-b border-l border-line px-1.5 sm:px-2 py-2 font-sans text-xs text-foreground font-semibold flex items-center justify-center text-center">
+          <span className="truncate">{path.level}</span>
+        </div>
+        <div className="col-span-1 border-b border-line px-1.5 sm:px-2 py-2 font-sans text-xs text-primary font-bold flex items-center justify-center gap-1 text-center">
+          <span className="font-mono font-bold">{path.skillsList.length}</span>
+          <span>برامج</span>
         </div>
 
-        <hr className="border-border/50" />
-
-        {/* Final Project */}
-        <div className="flex flex-col gap-1.5">
-          <span className="text-xs text-muted-foreground">المشروع النهائي للمسار</span>
-          <span className="text-sm font-bold text-foreground">{path.finalProject}</span>
+        {/* Row 4: Courses label & chips */}
+        <div className="col-span-1 border-l border-line px-2 sm:px-2.5 py-2.5 font-sans text-xs font-semibold text-muted-foreground/90 flex items-center justify-center text-center">
+          الدورات
         </div>
-      </div>
+        <div className="col-span-2 px-2.5 sm:px-3 py-2.5 flex flex-wrap gap-1.5 items-center content-center">
+          {path.skillsList.map((course, idx) => (
+            <span
+              key={idx}
+              className="inline-flex items-center rounded-sm border border-line bg-secondary/60 px-2 py-0.5 font-sans text-[11px] sm:text-xs font-medium text-foreground/90 leading-normal select-none transition-colors hover:bg-secondary"
+            >
+              {course}
+            </span>
+          ))}
+        </div>
 
-      {/* Action Button */}
-      <div className="flex pt-2">
-        <JoinButton 
-          variant="ghost" 
-          className="flex w-full items-center justify-between text-base font-bold text-primary transition-opacity hover:opacity-80 p-0 h-auto bg-transparent hover:bg-transparent"
+        {/* Row 5: CTA Link */}
+        <Link
+          href={path.href}
+          className="col-span-3 flex h-10 items-center justify-between border-t border-line px-4 font-sans text-xs sm:text-[13px] font-semibold text-foreground/90 transition-colors hover:bg-muted/70 hover:text-primary group/link mt-auto"
         >
-          <span>التقييم الأولي</span>
-          <ArrowLeft className="size-5" />
-        </JoinButton>
+          <span>استكشف برامج المسار</span>
+          <ArrowUpLeft className="size-4 text-primary transition-transform duration-200 group-hover/link:-translate-x-0.5 group-hover/link:-translate-y-0.5" />
+        </Link>
       </div>
-    </article>
+    </div>
   );
 }
 
-const INTERVAL = 3000;
-const SCROLL_QUIET = 200;
-const subscribeToHydration = () => () => {};
-const getHydratedSnapshot = () => true;
-const getServerHydrationSnapshot = () => false;
-
 export default function LearningPaths() {
-  const courses = PATHS;
-  const systemReduceMotion = useReducedMotion();
-  const hydrated = useSyncExternalStore(
-    subscribeToHydration,
-    getHydratedSnapshot,
-    getServerHydrationSnapshot,
-  );
-  const reduceMotion = hydrated && (systemReduceMotion ?? false);
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const toggleRef = useRef<HTMLButtonElement>(null);
-  const regionRef = useRef<HTMLElement>(null);
-  const progress = useMotionValue(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const isAnimatingRef = useRef(false);
 
-  const [choice, setChoice] = useState<boolean | null>(null);
-  const playing = choice ?? !reduceMotion;
-  const [hovered, setHovered] = useState(false);
-  const [focused, setFocused] = useState(false);
-  const [scrolling, setScrolling] = useState(false);
-  const [visible, setVisible] = useState(true);
-  const running = playing && !hovered && !focused && !scrolling && visible;
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-    let frame = 0;
-    const read = () => {
-      frame = 0;
-      const max = scroller.scrollWidth - scroller.clientWidth;
-      progress.set(
-        max > 0 ? (Math.abs(scroller.scrollLeft) / max) * (courses.length - 1) : 0,
-      );
-    };
+  const updateActiveIndex = useCallback(() => {
+    const container = scrollRef.current;
+    if (!container || isAnimatingRef.current) return;
 
-    let touching = false;
-    let busy = false;
-    let quiet: ReturnType<typeof setTimeout> | undefined;
-    const settleSoon = () => {
-      clearTimeout(quiet);
-      quiet = setTimeout(() => {
-        if (touching) return;
-        busy = false;
-        setScrolling(false);
-      }, SCROLL_QUIET);
-    };
-    const start = () => {
-      busy = true;
-      setScrolling(true);
-    };
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(read);
-      if (busy) settleSoon();
-    };
-    const onWheel = () => {
-      start();
-      settleSoon();
-    };
-    const onTouchStart = () => {
-      touching = true;
-      clearTimeout(quiet);
-      start();
-    };
-    const onTouchEnd = () => {
-      touching = false;
-      settleSoon();
-    };
+    const cRect = container.getBoundingClientRect();
+    const cCenter = cRect.left + cRect.width / 2;
 
-    const passive = { passive: true } as const;
-    scroller.addEventListener("scroll", onScroll, passive);
-    scroller.addEventListener("wheel", onWheel, passive);
-    scroller.addEventListener("touchstart", onTouchStart, passive);
-    scroller.addEventListener("touchend", onTouchEnd, passive);
-    scroller.addEventListener("touchcancel", onTouchEnd, passive);
-    return () => {
-      scroller.removeEventListener("scroll", onScroll);
-      scroller.removeEventListener("wheel", onWheel);
-      scroller.removeEventListener("touchstart", onTouchStart);
-      scroller.removeEventListener("touchend", onTouchEnd);
-      scroller.removeEventListener("touchcancel", onTouchEnd);
-      cancelAnimationFrame(frame);
-      clearTimeout(quiet);
-    };
-  }, [progress, courses.length]);
+    let minDiff = Infinity;
+    let closestIndex = 0;
 
-  useEffect(() => {
-    const onChange = () => setVisible(!document.hidden);
-    onChange();
-    document.addEventListener("visibilitychange", onChange);
-    return () => document.removeEventListener("visibilitychange", onChange);
+    cardRefs.current.forEach((card, idx) => {
+      if (!card) return;
+      const cardRect = card.getBoundingClientRect();
+      const cardCenter = cardRect.left + cardRect.width / 2;
+      const diff = Math.abs(cardCenter - cCenter);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIndex = idx;
+      }
+    });
+
+    setActiveIndex(closestIndex);
   }, []);
 
-  const goTo = (index: number) => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-    const max = scroller.scrollWidth - scroller.clientWidth;
-    // In RTL scrollLeft goes negative
-    scroller.scrollTo({
-      left: -(index / (courses.length - 1)) * max,
-      behavior: reduceMotion ? "auto" : "smooth",
+  const scrollToTrack = useCallback((index: number) => {
+    const container = scrollRef.current;
+    const card = cardRefs.current[index];
+    if (!container || !card) return;
+
+    isAnimatingRef.current = true;
+    container.toggleAttribute("data-animating", true);
+
+    const cRect = container.getBoundingClientRect();
+    const cCenter = cRect.left + cRect.width / 2;
+    const cardRect = card.getBoundingClientRect();
+    const cardCenter = cardRect.left + cardRect.width / 2;
+    const delta = cardCenter - cCenter;
+
+    container.scrollBy({
+      left: delta,
+      behavior: "smooth",
     });
-  };
 
-  const advance = (active: number) => goTo((active + 1) % courses.length);
+    setActiveIndex(index);
 
-  const insideRegion = (node: EventTarget | null) =>
-    node instanceof Node &&
-    !!regionRef.current?.contains(node) &&
-    !toggleRef.current?.contains(node);
+    setTimeout(() => {
+      isAnimatingRef.current = false;
+      container?.toggleAttribute("data-animating", false);
+    }, 450);
+  }, []);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    let timer: NodeJS.Timeout;
+    const handleScroll = () => {
+      clearTimeout(timer);
+      timer = setTimeout(updateActiveIndex, 60);
+    };
+
+    container.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      container.removeEventListener("scroll", handleScroll);
+      clearTimeout(timer);
+    };
+  }, [updateActiveIndex]);
+
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const timer = setTimeout(() => {
+      const next = (activeIndex + 1) % PATHS.length;
+      scrollToTrack(next);
+    }, AUTOPLAY_DURATION);
+
+    return () => clearTimeout(timer);
+  }, [activeIndex, isPlaying, scrollToTrack]);
 
   return (
     <section 
-      className="w-full bg-card"
-      ref={regionRef}
-      onPointerOver={(e) => {
-        if (e.pointerType !== "touch") setHovered(insideRegion(e.target));
-      }}
-      onPointerLeave={() => setHovered(false)}
-      onFocus={(e) => {
-        if (insideRegion(e.target) && (e.target as Element).matches(":focus-visible"))
-          setFocused(true);
-      }}
-      onBlur={(e) => {
-        if (!insideRegion(e.relatedTarget)) setFocused(false);
-      }}
+      className="w-full bg-background relative overflow-hidden scroll-mt-16" 
+      id="paths"
     >
-      <Container withBorder>
-        {/* الرأس */}
-        <div className="flex flex-col items-center justify-center gap-6 text-center">
-          <SectionHeader
-            title="المسار الذي يناسب طفلك الآن"
-            description="العمر يوجّه الاختيار، والتقييم يحدد المستوى ونقطة البداية الفعلية."
-            className="items-center"
-          />
+      <Container className="relative">
+        <SectionHeader
+          title="مسارات التعلم"
+          description="استكشف مساراتنا التعليمية المتكاملة والمصممة لتطوير مهارات التفكير البرمجي والذكاء الاصطناعي للأبناء"
+          action={
+            <Link
+              href="/tracks"
+              className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-line bg-secondary/60 px-3.5 font-sans text-xs font-semibold text-foreground transition-all hover:bg-primary hover:text-primary-foreground hover:border-primary group cursor-pointer shadow-none"
+            >
+              <span>استعراض كافة الكورسات</span>
+              <ArrowUpLeft className="size-3.5 transition-transform duration-200 group-hover:-translate-x-0.5 group-hover:-translate-y-0.5" />
+            </Link>
+          }
+        />
 
-          
+        <div className="relative py-1 sm:py-3">
+          <div
+            ref={scrollRef}
+            dir="rtl"
+            className="flex gap-3 sm:gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar px-4 sm:px-6 py-3 data-animating:snap-none"
+          >
+            {PATHS.map((path, idx) => (
+              <div
+                key={path.trackNumber}
+                ref={(el) => {
+                  cardRefs.current[idx] = el;
+                }}
+                className="shrink-0 snap-center w-[85vw] max-w-[340px] sm:max-w-none sm:w-[355px] md:w-[385px] lg:w-[415px]"
+              >
+                <LearningPathCard 
+                  path={path}
+                />
+              </div>
+            ))}
           </div>
 
-        {/* الكاروسيل */}
-        <div
-          ref={scrollerRef}
-          tabIndex={0}
-          role="region"
-          aria-label="مسارات التعلم"
-          aria-roledescription="carousel"
-          aria-live={running ? "off" : "polite"}
-          className="flex w-full snap-x snap-mandatory gap-6 overflow-x-auto overscroll-x-contain pb-6 outline-none [scrollbar-width:none] focus-visible:outline-2 focus-visible:outline-primary [&::-webkit-scrollbar]:hidden"
-        >
-          {courses.map((path, i) => (
-            <div
-              key={i}
-              role="group"
-              aria-roledescription="slide"
-              aria-label={`${i + 1} of ${courses.length}`}
-              className="mt-3 w-[85vw] sm:w-[350px] md:w-[400px] lg:w-[420px] shrink-0 snap-center snap-always"
+          <div className="flex items-center justify-center gap-3 pt-2 pb-2 select-none" dir="rtl">
+            <div 
+              role="tablist"
+              aria-label="مسارات التعلم"
+              className="flex h-10 items-center rounded-full bg-muted/80 border border-line/60 px-3.5 shadow-xs backdrop-blur-md"
             >
-              <LearningPathCard path={path} />
+              {PATHS.map((path, idx) => {
+                const isCurrent = idx === activeIndex;
+                return (
+                  <button
+                    key={path.trackNumber}
+                    type="button"
+                    role="tab"
+                    aria-selected={isCurrent}
+                    aria-label={`مسار ${path.trackNumber}: ${path.title}`}
+                    onClick={() => scrollToTrack(idx)}
+                    className={cn(
+                      "relative mx-1.5 h-2 overflow-hidden rounded-full transition-all duration-400 ease-[cubic-bezier(0.645,0.045,0.355,1)] cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-ring",
+                      isCurrent 
+                        ? "w-9 sm:w-11 bg-muted-foreground/30" 
+                        : "size-2 bg-muted-foreground/50 hover:bg-foreground"
+                    )}
+                  >
+                    {isCurrent && (
+                      <motion.span
+                        key={`${activeIndex}-${isPlaying}`}
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: isPlaying ? 1 : 0 }}
+                        transition={{
+                          duration: AUTOPLAY_DURATION / 1000,
+                          ease: "linear",
+                        }}
+                        aria-hidden
+                        className="absolute inset-0 origin-right rounded-[inherit] bg-foreground"
+                      />
+                    )}
+                    <span className="sr-only">{path.title}</span>
+                  </button>
+                );
+              })}
             </div>
-          ))}
-        </div>
-        
-        {/* Pagination Controls */}
-        {courses.length > 1 && (
-          <div className="flex items-center justify-center gap-4 dir-ltr pt-2" style={{ direction: "ltr" }}>
+
             <button
               type="button"
-              aria-label="Pause autoplay"
-              aria-pressed={!playing}
-              onClick={() => setChoice(!playing)}
-              className="relative flex size-8 touch-manipulation items-center justify-center rounded-full text-muted-foreground outline-none transition-[scale,color,background-color] duration-150 ease-out hover:bg-muted hover:text-foreground active:scale-[0.96] after:absolute after:-inset-1.5 after:rounded-full"
+              onClick={() => setIsPlaying((prev) => !prev)}
+              aria-label={isPlaying ? "إيقاف التمرير التلقائي" : "تشغيل التمرير التلقائي"}
+              title={isPlaying ? "إيقاف التمرير التلقائي" : "تشغيل التمرير التلقائي"}
+              className={cn(
+                "flex size-10 items-center justify-center rounded-full bg-muted/80 border border-line/60 text-foreground shadow-xs backdrop-blur-md",
+                "transition-[background-color,transform] duration-200 ease-out hover:bg-muted active:scale-95 cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              )}
             >
-              <span className="grid" aria-hidden>
-                <SwapIcon visible={playing} reduceMotion={reduceMotion}>
-                  <path d="M5.75 3.75v8.5M10.25 3.75v8.5" />
-                </SwapIcon>
-                <SwapIcon visible={!playing} reduceMotion={reduceMotion}>
-                  <path d="M5 3.9v8.2a.6.6 0 0 0 .9.5l6.6-4.1a.6.6 0 0 0 0-1L5.9 3.4a.6.6 0 0 0-.9.5Z" />
-                </SwapIcon>
-              </span>
+              <svg
+                aria-hidden
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                stroke="currentColor"
+                strokeWidth={ICON_STROKE_WIDTH}
+                strokeLinejoin="round"
+                className="size-4"
+              >
+                <motion.path
+                  initial={false}
+                  animate={{ d: isPlaying ? PAUSE_ICON.left : PLAY_ICON.left }}
+                  transition={ICON_TRANSITION}
+                />
+                <motion.path
+                  initial={false}
+                  animate={{ d: isPlaying ? PAUSE_ICON.right : PLAY_ICON.right }}
+                  transition={ICON_TRANSITION}
+                />
+              </svg>
             </button>
-            <PageDots
-              count={courses.length}
-              progress={progress}
-              onSelect={goTo}
-              autoplay={{ duration: INTERVAL, running, onElapsed: advance }}
-            />
           </div>
-        )}
+        </div>
       </Container>
     </section>
   );
