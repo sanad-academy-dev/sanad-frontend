@@ -61,8 +61,6 @@ import {
 } from "@/features/services/attendance/hooks/use-student-attendance";
 import { useStudentShifts } from "@/features/services/attendance/hooks/use-student-shifts";
 import { AssignStudentDialog } from "@/features/services/classrooms/components/assign-student-dialog";
-import { ClassroomStatusSelect } from "@/features/services/classrooms/components/classroom-status-select";
-import { useUpdateClassroom } from "@/features/services/classrooms/hooks/use-classroom-mutations";
 import { useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { backendFetch } from "@/lib/backend-fetch";
@@ -117,25 +115,6 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 	// قائمة الفصول ومفردات المرضى/الطلاب لتغذية البيانات بمرونة
 	const { classrooms } = useClassrooms();
 	const { patients } = usePatients();
-	const { mutate: updateClassroom, isPending: isUpdatingClassroom } = useUpdateClassroom();
-
-	const handleStatusChange = useCallback(
-		(newActive: boolean) => {
-			updateClassroom(
-				{
-					id: classroom.id,
-					data: { active: newActive },
-				},
-				{
-					onSuccess: () => {
-						onRefetch();
-						toast.success(`تم تغيير حالة الفصل إلى "${newActive ? "نشط" : "غير نشط"}" بنجاح`);
-					},
-				},
-			);
-		},
-		[classroom.id, updateClassroom, onRefetch],
-	);
 
 	// خريطة لتفاصيل الطالب من ملفه الشامل في النظام (ولي الأمر، الهاتف، العمر، المناوبة المفضلة)
 	const patientsMap = useMemo(() => {
@@ -155,16 +134,12 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 				name: s.name || full?.name || "طالب",
 				code: s.code || full?.code || s.id.slice(0, 5),
 				gender: s.gender || full?.gender || null,
-				avatar: s.avatar || full?.avatar || null,
+				avatar: s.avatar || (full as { avatar?: string | null } | undefined)?.avatar || null,
 				active: s.active !== undefined ? s.active : (full?.active ?? true),
 				age: s.age ?? full?.age ?? null,
 				birthDate: s.birthDate || full?.birthDate || null,
 				guardianName:
-					s.guardianName ||
-					full?.owner?.name ||
-					full?.guardianName ||
-					full?.emergencyContactName ||
-					null,
+					s.guardianName || full?.owner?.name || full?.emergencyContactName || null,
 				guardianPhone:
 					s.guardianPhone ||
 					full?.owner?.phone ||
@@ -187,7 +162,7 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 
 	const { records: todayAttendance = [] } = useStudentAttendance(todayDate, todayDate);
 	const { shifts: todayShifts = [] } = useStudentShifts(todayDate, todayDate);
-	const { mutate: upsertAttendance } = useUpsertStudentAttendance();
+	const { upsert: upsertAttendance } = useUpsertStudentAttendance();
 
 	// دالة مساعدة للتحقق من هوية الطالب وتاريخ السجل بأمان ودقة
 	const isSameDay = useCallback((dateVal: unknown, targetKey: string) => {
@@ -831,6 +806,8 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 					const dotColor = att?.dotColor || "bg-slate-400";
 
 					return (
+						// biome-ignore lint/a11y/noStaticElementInteractions: إيقاف انتشار الحدث لعدم فتح أية نافذة تابعة للصف
+						// biome-ignore lint/a11y/useKeyWithClickEvents: حارس انتشار الحدث
 						<div
 							className="flex items-center gap-1.5"
 							onClick={(e) => e.stopPropagation()}
@@ -849,7 +826,10 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 										<IconChevronDown className="size-2.5 opacity-60" />
 									</button>
 								</DropdownMenuTrigger>
-								<DropdownMenuContent align="start" className="min-w-[130px] p-1">
+								<DropdownMenuContent
+									align="start"
+									className="min-w-[130px] p-1"
+								>
 									<DropdownMenuItem
 										onClick={() =>
 											upsertAttendance({
@@ -1013,13 +993,7 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 				),
 			},
 		],
-		[
-			studentAttendanceMap,
-			studentShiftsMap,
-			classroom.active,
-			isUpdatingClassroom,
-			handleStatusChange,
-		],
+		[studentAttendanceMap, studentShiftsMap, todayKey, upsertAttendance],
 	);
 
 	const table = useReactTable({
