@@ -22,7 +22,7 @@ export interface AssignStudentConfirmDialogProps {
 	onOpenChange: (open: boolean) => void;
 	classroom?: ClassroomResponse | null;
 	classroomName?: string;
-	selectedStudents: (PatientResponse & { avatar?: string | null })[];
+	selectedStudents: PatientResponse[];
 	onConfirm: (options: {
 		enableMessage: boolean;
 		subject: string;
