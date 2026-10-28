@@ -831,36 +831,113 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 					const dotColor = att?.dotColor || "bg-slate-400";
 
 					return (
-						<div className="flex items-center gap-1.5">
-							<span
-								className={cn(
-									"inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-medium border shadow-2xs",
-									colorClasses,
-								)}
-							>
-								<span className={cn("size-1.5 rounded-full shrink-0", dotColor)} />
-								<span>{label}</span>
-							</span>
+						<div
+							className="flex items-center gap-1.5"
+							onClick={(e) => e.stopPropagation()}
+						>
+							<DropdownMenu dir="rtl">
+								<DropdownMenuTrigger asChild>
+									<button
+										type="button"
+										className={cn(
+											"inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-medium border shadow-2xs cursor-pointer hover:opacity-85 transition-opacity",
+											colorClasses,
+										)}
+									>
+										<span className={cn("size-1.5 rounded-full shrink-0", dotColor)} />
+										<span>{label}</span>
+										<IconChevronDown className="size-2.5 opacity-60" />
+									</button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="start" className="min-w-[130px] p-1">
+									<DropdownMenuItem
+										onClick={() =>
+											upsertAttendance({
+												staffId: row.original.id,
+												date: todayKey,
+												status: "PRESENT",
+												hours: 8,
+											})
+										}
+										className="gap-2 text-xs cursor-pointer text-emerald-600 focus:text-emerald-700"
+									>
+										<span className="size-2 rounded-full bg-emerald-500" />
+										حاضر
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() =>
+											upsertAttendance({
+												staffId: row.original.id,
+												date: todayKey,
+												status: "ABSENT",
+												hours: 0,
+											})
+										}
+										className="gap-2 text-xs cursor-pointer text-rose-600 focus:text-rose-700"
+									>
+										<span className="size-2 rounded-full bg-rose-500" />
+										غائب
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() =>
+											upsertAttendance({
+												staffId: row.original.id,
+												date: todayKey,
+												status: "LATE",
+												hours: 0,
+											})
+										}
+										className="gap-2 text-xs cursor-pointer text-amber-600 focus:text-amber-700"
+									>
+										<span className="size-2 rounded-full bg-amber-500" />
+										متأخر
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() =>
+											upsertAttendance({
+												staffId: row.original.id,
+												date: todayKey,
+												status: "LEAVE",
+												hours: 0,
+											})
+										}
+										className="gap-2 text-xs cursor-pointer text-purple-600 focus:text-purple-700"
+									>
+										<span className="size-2 rounded-full bg-purple-500" />
+										إجازة
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
 						</div>
 					);
 				},
 			},
 			{
-				id: "classroomStatus",
-				header: "حالة الفصل",
+				id: "studentStatus",
+				header: "حالة الطالب",
 				size: 110,
 				minSize: 95,
-				cell: () => (
-					// biome-ignore lint/a11y/noStaticElementInteractions: إيقاف انتشار الحدث لعدم فتح أية نافذة تابعة للصف
-					// biome-ignore lint/a11y/useKeyWithClickEvents: حارس انتشار
-					<div onClick={(e) => e.stopPropagation()}>
-						<ClassroomStatusSelect
-							active={Boolean(classroom.active)}
-							onChange={handleStatusChange}
-							disabled={isUpdatingClassroom}
-						/>
-					</div>
-				),
+				cell: ({ row }) => {
+					const isActive = row.original.active !== false;
+					return (
+						<span
+							className={cn(
+								"inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-medium border shadow-2xs",
+								isActive
+									? "bg-emerald-50 text-emerald-700 border-emerald-200/90 dark:bg-emerald-950/30 dark:text-emerald-300 dark:border-emerald-800"
+									: "bg-muted text-muted-foreground border-border",
+							)}
+						>
+							<span
+								className={cn(
+									"size-1.5 rounded-full shrink-0",
+									isActive ? "bg-emerald-500" : "bg-muted-foreground",
+								)}
+							/>
+							<span>{isActive ? "نشط" : "غير نشط"}</span>
+						</span>
+					);
+				},
 			},
 			{
 				id: "actions",
