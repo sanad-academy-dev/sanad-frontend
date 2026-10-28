@@ -1,11 +1,11 @@
-import { IconBriefcase, IconBuildingStore, IconProgressCheck } from "@tabler/icons-react";
+import { IconBriefcase, IconBuildingStore, IconClock, IconProgressCheck } from "@tabler/icons-react";
 import { useCallback, useMemo, useState } from "react";
 
 import type { FilterGroup } from "@/components/common/filters-menu";
 import type { StaffResponse } from "@/server/staff/staff.type";
 import { EmploymentType, StaffStatus } from "@sanad/contracts/runtime/server/staff/staff.type";
 
-type StaffFilterKey = "status" | "role" | "branch" | "employmentType";
+type StaffFilterKey = "status" | "role" | "branch" | "employmentType" | "shift";
 
 const STATUS_OPTIONS = [
 	{ value: StaffStatus.ACTIVE, label: "نشط" },
@@ -18,11 +18,18 @@ const EMPLOYMENT_TYPE_OPTIONS = [
 	{ value: EmploymentType.PART_TIME, label: "دوام جزئي" },
 ];
 
+const SHIFT_OPTIONS = [
+	{ value: "MORNING", label: "صباحي" },
+	{ value: "EVENING", label: "مسائي" },
+	{ value: "BOTH", label: "صباحي ومسائي" },
+];
+
 const EMPTY: Record<StaffFilterKey, string[]> = {
 	status: [],
 	role: [],
 	branch: [],
 	employmentType: [],
+	shift: [],
 };
 
 // خيارات فريدة مشتقّة من الموظفين الحاليين (تتجاهل الفارغ)
@@ -79,6 +86,14 @@ export function useStaffFilters(staff: StaffResponse[]) {
 				selected: filters.employmentType,
 				onToggle: (v) => toggleFilter("employmentType", v),
 			},
+			{
+				key: "shift",
+				label: "المناوبة",
+				Icon: IconClock,
+				options: SHIFT_OPTIONS,
+				selected: filters.shift,
+				onToggle: (v) => toggleFilter("shift", v),
+			},
 		],
 		[staff, filters, toggleFilter],
 	);
@@ -96,6 +111,11 @@ export function useStaffFilters(staff: StaffResponse[]) {
 					(s) =>
 						filters.employmentType.length === 0 ||
 						filters.employmentType.includes(s.employmentType ?? ""),
+				)
+				.filter(
+					(s) =>
+						filters.shift.length === 0 ||
+						filters.shift.includes(s.schedulingSettings?.shift ?? ""),
 				),
 		[filters],
 	);

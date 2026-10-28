@@ -81,7 +81,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { Field } from "@/components/ui/field";
+import { Field, FieldError } from "@/components/ui/field";
 import { FieldLabel } from "@/components/common/field-label";
 import { FormHeader } from "@/components/common/form-header";
 import { FormFooter } from "@/components/common/form-footer";
@@ -375,6 +375,99 @@ export function ClassroomDialog({
 	const [isAgentOpen, setIsAgentOpen] = useState(false);
 	const [isReviewStep, setIsReviewStep] = useState(false);
 
+	// حالات التحقق من صحة المدخلات (Validation)
+	const [errors, setErrors] = useState<{
+		name?: string;
+		category?: string;
+		capacity?: string;
+	}>({});
+	const [touched, setTouched] = useState<{
+		name?: boolean;
+		category?: boolean;
+		capacity?: boolean;
+	}>({});
+
+	// دالة التحقق الشاملة من الحقول المطلوبة (الاسم، الفئة، السعة)
+	const validateForm = useCallback(
+		(customValues?: {
+			name?: string;
+			category?: string;
+			capacity?: number | string;
+		}) => {
+			const checkName = customValues && "name" in customValues ? customValues.name : name;
+			const checkCategory =
+				customValues && "category" in customValues ? customValues.category : category;
+			const checkCapacity =
+				customValues && "capacity" in customValues ? customValues.capacity : capacity;
+
+			const newErrors: {
+				name?: string;
+				category?: string;
+				capacity?: string;
+			} = {};
+
+			// 1. التحقق من اسم الفصل (مطلوب)
+			const trimmedName = (checkName || "").trim();
+			if (!trimmedName) {
+				newErrors.name = "اسم الفصل مطلوب";
+			} else if (trimmedName.length < 2) {
+				newErrors.name = "يجب أن يحتوي اسم الفصل على حرفين على الأقل";
+			} else if (trimmedName.length > 100) {
+				newErrors.name = "اسم الفصل لا يمكن أن يتجاوز 100 حرف";
+			}
+
+			// 2. التحقق من فئة الفصل (مطلوبة)
+			const trimmedCategory = (checkCategory || "").trim();
+			if (!trimmedCategory) {
+				newErrors.category = "يرجى تحديد فئة الفصل (مختلط / بنين / بنات)";
+			} else if (!CATEGORIES.includes(trimmedCategory as any)) {
+				newErrors.category = "فئة الفصل المحددة غير صالحة";
+			}
+
+			// 3. التحقق من السعة القصوى (مطلوبة)
+			if (
+				checkCapacity === "" ||
+				checkCapacity === null ||
+				checkCapacity === undefined
+			) {
+				newErrors.capacity = "السعة القصوى مطلوبة";
+			} else {
+				const num = Number(checkCapacity);
+				if (!Number.isFinite(num) || !Number.isInteger(num)) {
+					newErrors.capacity = "يرجى إدخال عدد صحيح موجب للسعة";
+				} else if (num < 1) {
+					newErrors.capacity = "السعة يجب أن تكون 1 على الأقل";
+				} else if (num > 500) {
+					newErrors.capacity = "السعة لا يمكن أن تتجاوز 500 طالب";
+				}
+			}
+
+			return newErrors;
+		},
+		[name, category, capacity],
+	);
+
+	// التحقق اللحظي من حقل معين
+	const validateField = useCallback(
+		(field: "name" | "category" | "capacity", value: any) => {
+			const tempErrors = validateForm({
+				name: field === "name" ? value : name,
+				category: field === "category" ? value : category,
+				capacity: field === "capacity" ? value : capacity,
+			});
+			setErrors((prev) => {
+				const updated = { ...prev };
+				if (tempErrors[field]) {
+					updated[field] = tempErrors[field];
+				} else {
+					delete updated[field];
+				}
+				return updated;
+			});
+		},
+		[validateForm, name, category, capacity],
+	);
+
 	const resetForm = useCallback(() => {
 		setIsReviewStep(false);
 		setIsAgentOpen(false);
@@ -399,6 +492,8 @@ export function ClassroomDialog({
 		setSelectedColor("blue");
 		setIconSearch("");
 		setIconPickerOpen(false);
+		setErrors({});
+		setTouched({});
 	}, []);
 
 	// مزامنة البيانات عند فتح النموذج
@@ -497,6 +592,8 @@ export function ClassroomDialog({
 		if (tpl.color) {
 			setSelectedColor(tpl.color);
 		}
+		setErrors({});
+		setTouched({});
 	};
 
 	const handleSelectTemplate = (tpl: (typeof CLASSROOM_TEMPLATES)[0] | null) => {
@@ -512,6 +609,8 @@ export function ClassroomDialog({
 			setSelectedIcon("cube");
 			setSelectedColor("blue");
 			setTemplateMenuOpen(false);
+			setErrors({});
+			setTouched({});
 			return;
 		}
 
@@ -695,21 +794,48 @@ export function ClassroomDialog({
 		addClassificationMutation(trimmed);
 	};
 
-	// 1. الانتقال إلى خطوة مراجعة تفاصيل الفصل قبل الإرسال
+	// 1. الانتقال إلى خطوة مراجعة تفاصيل الفصل قبل الإرسال مع التحقق الكامل
 	const handleFormSubmitToReview = (e?: React.FormEvent) => {
 		if (e) e.preventDefault();
-		const trimmedName = name.trim();
-		if (!trimmedName) {
-			toast.error("يرجى إدخال اسم الفصل أولاً");
+
+		setTouched({
+			name: true,
+			category: true,
+			capacity: true,
+		});
+
+		const validationErrors = validateForm();
+		setErrors(validationErrors);
+
+		if (Object.keys(validationErrors).length > 0) {
+			if (validationErrors.name) {
+				toast.error(validationErrors.name);
+				document.getElementById("cls-name")?.focus();
+			} else if (validationErrors.category) {
+				toast.error(validationErrors.category);
+			} else if (validationErrors.capacity) {
+				toast.error(validationErrors.capacity);
+				document.getElementById("cls-capacity")?.focus();
+			}
 			return;
 		}
+
 		setIsReviewStep(true);
 	};
 
 	// 2. تأكيد الإرسال الفعلي بعد مراجعة البيانات
 	const handleFinalSubmit = () => {
+		const validationErrors = validateForm();
+		if (Object.keys(validationErrors).length > 0) {
+			setErrors(validationErrors);
+			setIsReviewStep(false);
+			toast.error("يرجى التأكد من ملء جميع الحقول المطلوبة بشكل صحيح");
+			return;
+		}
+
 		const trimmedName = name.trim();
-		if (!trimmedName) return;
+		const trimmedCategory = category.trim();
+		const validCapacity = Math.floor(Number(capacity));
 
 		const combinedNotes = [
 			description.trim() ? `الوصف: ${description.trim()}` : "",
@@ -723,16 +849,10 @@ export function ClassroomDialog({
 			.filter(Boolean)
 			.join("\n");
 
-		const parsedCapacity = Number(capacity);
-		const validCapacity =
-			Number.isFinite(parsedCapacity) && parsedCapacity >= 1
-				? Math.floor(parsedCapacity)
-				: 10;
-
 		const payload = {
 			name: trimmedName,
 			code: code.trim() || undefined,
-			category: category || "مختلط",
+			category: trimmedCategory,
 			classification: classification || null,
 			ageGroup: ageGroup || "8-12 سنة",
 			learningMode: (learningMode as LearningMode) || "REMOTE",
@@ -781,7 +901,7 @@ export function ClassroomDialog({
 			handleFormSubmitToReview();
 		}
 	}, {
-		enabled: open && !isPending && Boolean(name.trim()),
+		enabled: open && !isPending,
 	});
 
 	useHotkey("Mod+Alt+T", () => setTemplateMenuOpen((prev) => !prev), {
@@ -1212,20 +1332,38 @@ export function ClassroomDialog({
 							</div>
 
 							{/* 3. حقل اسم الفصل (في اليسار مع flex-1 ليأخذ بقية المساحة) */}
-							<Field className="flex-1 min-w-0">
+							<Field className="flex-1 min-w-0" data-invalid={Boolean(touched.name && errors.name)}>
 								<FieldLabel required info="أدخل اسماً واضحاً ومميزاً للفصل الدراسي">
-									<Label htmlFor="cls-name" className="text-xs font-semibold">
+									<Label
+										htmlFor="cls-name"
+										className={cn("text-xs font-semibold", touched.name && errors.name && "text-destructive")}
+									>
 										اسم الفصل
 									</Label>
 								</FieldLabel>
 								<Input
 									id="cls-name"
 									value={name}
-									onChange={(e) => setName(e.target.value)}
+									onChange={(e) => {
+										setName(e.target.value);
+										if (touched.name) validateField("name", e.target.value);
+									}}
+									onBlur={() => {
+										setTouched((prev) => ({ ...prev, name: true }));
+										validateField("name", name);
+									}}
 									placeholder="للمبرمجين الصغار"
-									required
-									className="w-full h-10 text-xs text-right"
+									aria-invalid={Boolean(touched.name && errors.name)}
+									className={cn(
+										"w-full h-10 text-xs text-right transition-colors",
+										touched.name && errors.name && "border-destructive focus-visible:ring-destructive",
+									)}
 								/>
+								{touched.name && errors.name && (
+									<FieldError className="text-[11px] mt-1 text-destructive font-medium">
+										{errors.name}
+									</FieldError>
+								)}
 							</Field>
 						</div>
 
@@ -1247,12 +1385,28 @@ export function ClassroomDialog({
 						</Field>
 
 						{/* حقل فئة الفصل — كامل العرض */}
-						<Field>
+						<Field data-invalid={Boolean(touched.category && errors.category)}>
 							<FieldLabel required info="حدد فئة الفصل: مختلط أو بنين أو بنات">
-								<Label className="text-xs font-semibold">فئة الفصل</Label>
+								<Label className={cn("text-xs font-semibold", touched.category && errors.category && "text-destructive")}>
+									فئة الفصل
+								</Label>
 							</FieldLabel>
-							<Select value={category || undefined} onValueChange={setCategory} dir="rtl">
-								<SelectTrigger className="w-full h-9 text-xs text-right">
+							<Select
+								value={category || undefined}
+								onValueChange={(val) => {
+									setCategory(val);
+									setTouched((prev) => ({ ...prev, category: true }));
+									validateField("category", val);
+								}}
+								dir="rtl"
+							>
+								<SelectTrigger
+									aria-invalid={Boolean(touched.category && errors.category)}
+									className={cn(
+										"w-full h-9 text-xs text-right transition-colors",
+										touched.category && errors.category && "border-destructive focus-visible:ring-destructive",
+									)}
+								>
 									<SelectValue placeholder="حدد فئة الفصل (مختلط / بنين / بنات)" />
 								</SelectTrigger>
 								<SelectContent dir="rtl">
@@ -1263,12 +1417,20 @@ export function ClassroomDialog({
 									))}
 								</SelectContent>
 							</Select>
+							{touched.category && errors.category && (
+								<FieldError className="text-[11px] mt-1 text-destructive font-medium">
+									{errors.category}
+								</FieldError>
+							)}
 						</Field>
 
 						{/* حقل السعة القصوى — كامل العرض */}
-						<Field>
-							<FieldLabel required info="الحد الأقصى لعدد الطلاب المسموح بانضمامهم">
-								<Label htmlFor="cls-capacity" className="text-xs font-semibold">
+						<Field data-invalid={Boolean(touched.capacity && errors.capacity)}>
+							<FieldLabel required info="الحد الأقصى لعدد الطلاب المسموح بانضمامهم (1 على الأقل)">
+								<Label
+									htmlFor="cls-capacity"
+									className={cn("text-xs font-semibold", touched.capacity && errors.capacity && "text-destructive")}
+								>
 									السعة القصوى
 								</Label>
 							</FieldLabel>
@@ -1276,12 +1438,28 @@ export function ClassroomDialog({
 								id="cls-capacity"
 								type="number"
 								min={1}
-								max={200}
+								max={500}
 								value={capacity}
-								onChange={(e) => setCapacity(e.target.value)}
+								onChange={(e) => {
+									setCapacity(e.target.value);
+									if (touched.capacity) validateField("capacity", e.target.value);
+								}}
+								onBlur={() => {
+									setTouched((prev) => ({ ...prev, capacity: true }));
+									validateField("capacity", capacity);
+								}}
 								placeholder="00"
-								className="w-full h-9 text-xs font-mono text-right"
+								aria-invalid={Boolean(touched.capacity && errors.capacity)}
+								className={cn(
+									"w-full h-9 text-xs font-mono text-right transition-colors",
+									touched.capacity && errors.capacity && "border-destructive focus-visible:ring-destructive",
+								)}
 							/>
+							{touched.capacity && errors.capacity && (
+								<FieldError className="text-[11px] mt-1 text-destructive font-medium">
+									{errors.capacity}
+								</FieldError>
+							)}
 						</Field>
 
 						{/* حقل ملاحظات أو أهداف لهذا الفصل — كامل العرض */}
@@ -1680,8 +1858,8 @@ export function ClassroomDialog({
 						<Button
 							type="submit"
 							size="sm"
-							disabled={isPending || !name.trim()}
-							className="gap-1.5"
+							disabled={isPending}
+							className="gap-1.5 cursor-pointer"
 						>
 							{isPending && <Spinner className="size-3.5" />}
 							<span>{isEdit ? "حفظ التعديلات" : "إنشاء الفصل"}</span>
@@ -1695,11 +1873,20 @@ export function ClassroomDialog({
 				<ClassroomAgentPanel
 					onClose={() => setIsAgentOpen(false)}
 					onApplyData={(data) => {
-						if (data.name !== undefined) setName(data.name);
+						if (data.name !== undefined) {
+							setName(data.name);
+							setErrors((prev) => ({ ...prev, name: undefined }));
+						}
 						if (data.code !== undefined) setCode(data.code);
 						if (data.description !== undefined) setDescription(data.description);
-						if (data.category !== undefined) setCategory(data.category);
-						if (data.capacity !== undefined) setCapacity(data.capacity);
+						if (data.category !== undefined) {
+							setCategory(data.category);
+							setErrors((prev) => ({ ...prev, category: undefined }));
+						}
+						if (data.capacity !== undefined) {
+							setCapacity(data.capacity);
+							setErrors((prev) => ({ ...prev, capacity: undefined }));
+						}
 						if (data.notes !== undefined) setNotes(data.notes);
 						if (data.ageGroup !== undefined) setAgeGroup(data.ageGroup);
 						if (data.branch !== undefined) setBranch(data.branch);

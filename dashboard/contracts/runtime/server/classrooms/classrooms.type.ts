@@ -33,6 +33,15 @@ export interface ClassroomStudentInfo {
 	id: string;
 	name: string;
 	code?: string | null;
+	gender?: string | null;
+	avatar?: string | null;
+	active?: boolean;
+	age?: number | null;
+	birthDate?: string | Date | null;
+	guardianName?: string | null;
+	guardianPhone?: string | null;
+	guardianRelationship?: string | null;
+	preferredShift?: string | null;
 }
 
 export interface ClassroomResponse {

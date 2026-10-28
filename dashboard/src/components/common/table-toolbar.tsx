@@ -33,6 +33,10 @@ interface TableToolbarProps {
 	showView?: boolean;
 	/** عناصر تحكّم فريدة تُضاف للمجموعة اليسرى بعد الأزرار القياسية (تبويبات، مُنقّل تواريخ، فلاتر) */
 	leftExtra?: ReactNode;
+	/** قائمة أو عنصر التصفية المخصص — يُعرض بدلاً من زر الفلترة الافتراضي */
+	filterMenu?: ReactNode;
+	/** مُعالج النقر على زر الفلترة الافتراضي */
+	onFilterClick?: () => void;
 	/** المجموعة اليمنى — أزرار أيقونات ثانوية + زر الإضافة الأساسي */
 	actions?: ReactNode;
 	/** مُعالج النقر على زر التصدير */
@@ -49,6 +53,8 @@ export function TableToolbar({
 	buttonSize = "sm",
 	showSearch = true,
 	showFilter = true,
+	filterMenu,
+	onFilterClick,
 	showHelp = true,
 	showExport = true,
 	showView = true,
@@ -84,15 +90,18 @@ export function TableToolbar({
 					</>
 				)}
 
-				{showFilter && (
+				{filterMenu ? (
+					filterMenu
+				) : showFilter ? (
 					<Button
 						size={buttonSize}
 						variant="outline"
+						onClick={onFilterClick}
 					>
 						<IconFilter />
 						فلترة
 					</Button>
-				)}
+				) : null}
 				{showHelp && (
 					<Button
 						size={buttonSize}

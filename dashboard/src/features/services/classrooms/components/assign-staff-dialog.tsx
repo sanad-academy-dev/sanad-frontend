@@ -15,6 +15,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { toast } from "sonner";
+import { AssignStaffConfirmDialog } from "@/features/services/classrooms/components/assign-staff-confirm-dialog";
 import { useAssignClassroomStaff } from "@/features/services/classrooms/hooks/use-classroom-mutations";
 import { useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
@@ -64,6 +66,12 @@ export function AssignStaffDialog({
 	const [search, setSearch] = useState("");
 	const [filter, setFilter] = useState<FilterKey>("all");
 	const [isExpanded, setIsExpanded] = useState(false);
+	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+
+	// كائنات الموظفين المحددين بالكامل لعرض أفاتاراتهم في البوب أب
+	const selectedStaffObjects = useMemo(() => {
+		return staff.filter((s) => selectedStaffIds.includes(s.id));
+	}, [staff, selectedStaffIds]);
 
 	// عند فتح الشيت أو تغيير الفصل، نقوم بمزامنة الموظفين المحددين وإعادة ضبط البحث
 	useEffect(() => {
@@ -77,6 +85,7 @@ export function AssignStaffDialog({
 			}
 			setSearch("");
 			setFilter("all");
+			setConfirmModalOpen(false);
 		}
 	}, [open, classroom, initialSelectedStaffIds]);
 
@@ -147,14 +156,31 @@ export function AssignStaffDialog({
 		);
 	};
 
-	const handleSave = () => {
+	// عند الضغط على "تعيين"، نفتح البوب أب فوق السايد شيت مع بقاء السايد شيت مفتوحاً في الخلفية
+	const handleOpenConfirm = () => {
+		if (selectedStaffIds.length === 0) {
+			toast.error("يرجى اختيار موظف واحد على الأقل للتعيين");
+			return;
+		}
+		setConfirmModalOpen(true);
+	};
+
+	// الحفظ النهائي عند التأكيد من داخل البوب أب
+	const handleFinalSave = (options: {
+		enableMessage: boolean;
+		subject: string;
+		message: string;
+		notifyManager: boolean;
+	}) => {
 		if (onSaveStaff) {
 			onSaveStaff(selectedStaffIds);
+			setConfirmModalOpen(false);
 			onOpenChange(false);
 			return;
 		}
 
 		if (!classroom?.id) {
+			setConfirmModalOpen(false);
 			onOpenChange(false);
 			return;
 		}
@@ -162,7 +188,18 @@ export function AssignStaffDialog({
 		assignStaff(
 			{ id: classroom.id, staffIds: selectedStaffIds },
 			{
-				onSuccess: () => onOpenChange(false),
+				onSuccess: () => {
+					if (options.enableMessage) {
+						toast.success(`تم تعيين ${selectedStaffIds.length} موظف وإرسال رسالة الإشعار بنجاح!`);
+					} else {
+						toast.success(`تم تعيين ${selectedStaffIds.length} موظف بنجاح!`);
+					}
+					setConfirmModalOpen(false);
+					onOpenChange(false);
+				},
+				onError: () => {
+					toast.error("حدث خطأ أثناء حفظ التعيينات");
+				},
 			},
 		);
 	};
@@ -170,7 +207,8 @@ export function AssignStaffDialog({
 	const displayClassName = classroom?.name || classroomName;
 
 	return (
-		<Sheet open={open} onOpenChange={onOpenChange}>
+		<>
+			<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent
 				side="left"
 				showCloseButton={false}
@@ -369,17 +407,29 @@ export function AssignStaffDialog({
 
 					<button
 						type="button"
-						disabled={isPending}
-						onClick={handleSave}
+						disabled={isPending || selectedStaffIds.length === 0}
+						onClick={handleOpenConfirm}
 						className="flex h-[27px] items-center gap-1.5 rounded-[4px] bg-[#4F6AE0] px-3.5 text-[11px] font-semibold text-white hover:bg-[#435bc4] disabled:opacity-50 cursor-pointer transition-colors shadow-xs"
 					>
 						<IconChevronLeft className="size-2.5" />
-						{isPending ? "جاري الحفظ..." : "حفظ التعيينات"}
+						تعيين ({selectedStaffIds.length})
 					</button>
 				</div>
 			</SheetContent>
 		</Sheet>
-	);
+
+		{/* البوب أب التأكيدي يظهر فوق السايد شيت مع بقاء السايد شيت مفتوحاً في الخلفية */}
+		<AssignStaffConfirmDialog
+			open={confirmModalOpen}
+			onOpenChange={setConfirmModalOpen}
+			classroom={classroom}
+			classroomName={displayClassName}
+			selectedStaff={selectedStaffObjects}
+			onConfirm={handleFinalSave}
+			isPending={isPending}
+		/>
+	</>
+);
 }
 
 export const AssignStaffSheet = AssignStaffDialog;

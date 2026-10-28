@@ -72,7 +72,7 @@ export const INITIAL_PATIENT_FORM_VALUES = {
 	birthDate: "",
 	nationalId: "",
 	gender: "MALE" as const,
-	classroom: "النجوم",
+	classroom: "",
 	ownerId: "",
 	ownerIds: [] as string[],
 	guardianRelationships: {} as Record<string, string>,
@@ -114,8 +114,8 @@ export function calculatePatientProgress(values: {
 		Boolean(values.classroom?.trim()),
 		Boolean(
 			values.guardianName?.trim() ||
-			values.ownerId ||
-			(values.ownerIds && values.ownerIds.length > 0),
+				values.ownerId ||
+				(values.ownerIds && values.ownerIds.length > 0),
 		),
 	];
 	const completed = checks.filter(Boolean).length;

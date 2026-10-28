@@ -58,11 +58,43 @@ import { exportStaffCsv } from "@/features/services/staff/utils/export-staff";
 import type { StaffResponse } from "@/server/staff/staff.type";
 import { StaffStatus } from "@sanad/contracts/runtime/server/staff/staff.type";
 
+import { cn } from "@/lib/utils";
+
 // خيارا العرض — الترتيب هو ترتيب DOM في RTL: «جدول» يمينًا و«قائمة» يسارًا
 const VIEW_OPTIONS = [
 	{ value: "list" as const, label: "جدول", Icon: ViewListIcon },
 	{ value: "grid" as const, label: "قائمة", Icon: ViewGridIcon },
 ];
+
+const SHIFT_CONFIG: Record<
+	string,
+	{ label: string; colorClasses: string; dotColor: string }
+> = {
+	MORNING: {
+		label: "صباحي",
+		colorClasses:
+			"bg-amber-50 text-amber-700 border-amber-200/90 dark:bg-amber-950/30 dark:text-amber-300 dark:border-amber-800",
+		dotColor: "bg-amber-500",
+	},
+	EVENING: {
+		label: "مسائي",
+		colorClasses:
+			"bg-indigo-50 text-indigo-700 border-indigo-200/90 dark:bg-indigo-950/30 dark:text-indigo-300 dark:border-indigo-800",
+		dotColor: "bg-indigo-500",
+	},
+	NIGHT: {
+		label: "ليلي",
+		colorClasses:
+			"bg-purple-50 text-purple-700 border-purple-200/90 dark:bg-purple-950/30 dark:text-purple-300 dark:border-purple-800",
+		dotColor: "bg-purple-500",
+	},
+	BOTH: {
+		label: "صباحي ومسائي",
+		colorClasses:
+			"bg-sky-50 text-sky-700 border-sky-200/90 dark:bg-sky-950/30 dark:text-sky-300 dark:border-sky-800",
+		dotColor: "bg-sky-500",
+	},
+};
 
 type StaffView = (typeof VIEW_OPTIONS)[number]["value"];
 
@@ -268,6 +300,35 @@ export function StaffTable() {
 						/>
 					</div>
 				),
+			},
+			{
+				id: "shift",
+				header: "المناوبة",
+				size: 115,
+				minSize: 95,
+				cell: ({ row }) => {
+					const rawShift = row.original.schedulingSettings?.shift;
+					const cfg = rawShift ? SHIFT_CONFIG[rawShift] : null;
+					const label = cfg?.label || "غير محدد";
+					const colorClasses =
+						cfg?.colorClasses ||
+						"bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800/40 dark:text-slate-400 dark:border-slate-700";
+					const dotColor = cfg?.dotColor || "bg-slate-400";
+
+					return (
+						<div className="flex items-center gap-1.5">
+							<span
+								className={cn(
+									"inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[11px] font-medium border shadow-2xs",
+									colorClasses,
+								)}
+							>
+								<span className={cn("size-1.5 rounded-full shrink-0", dotColor)} />
+								<span>{label}</span>
+							</span>
+						</div>
+					);
+				},
 			},
 			{
 				id: "patients",

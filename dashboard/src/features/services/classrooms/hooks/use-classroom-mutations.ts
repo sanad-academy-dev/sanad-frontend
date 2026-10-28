@@ -126,6 +126,7 @@ export const useAssignClassroomStudents = () => {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["classrooms"] });
+			queryClient.invalidateQueries({ queryKey: ["patients"] });
 			toast.success("تم تسجيل الطلاب في الفصل بنجاح");
 		},
 		onError: (error: Error) => {
@@ -165,9 +166,12 @@ export const useDeleteClassroomClassification = () => {
 
 	return useMutation({
 		mutationFn: async (name: string) => {
-			const res = await backendFetch(`/api/classrooms/classifications/${encodeURIComponent(name)}`, {
-				method: "DELETE",
-			});
+			const res = await backendFetch(
+				`/api/classrooms/classifications/${encodeURIComponent(name)}`,
+				{
+					method: "DELETE",
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل إزالة التصنيف");

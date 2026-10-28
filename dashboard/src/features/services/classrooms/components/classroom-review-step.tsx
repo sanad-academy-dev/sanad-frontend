@@ -55,6 +55,7 @@ export function ClassroomReviewStep({
 	category,
 	learningMode,
 	branch,
+	capacity,
 	notes,
 	description,
 	selectedStaffIds,
@@ -70,6 +71,7 @@ export function ClassroomReviewStep({
 	const { branches } = useBranches();
 
 	// 1. تحديد اسم المسؤول (المشرف / المعلم)
+	
 	const managerName = useMemo(() => {
 		if (selectedStaffIds.length > 0 && staff) {
 			const assigned = staff.filter((s) => selectedStaffIds.includes(s.id));
@@ -212,7 +214,19 @@ export function ClassroomReviewStep({
 							<span className="font-semibold text-foreground text-xs">{branchName}</span>
 						</div>
 
-						{/* 6. تاريخ الإنشاء */}
+						{/* 6. فئة الفصل */}
+						<div className="flex items-center justify-between">
+							<span className="text-muted-foreground">فئة الفصل</span>
+							<span className="font-semibold text-foreground text-xs">{category || "مختلط"}</span>
+						</div>
+
+						{/* 7. السعة القصوى */}
+						<div className="flex items-center justify-between">
+							<span className="text-muted-foreground">السعة القصوى</span>
+							<span className="font-semibold text-foreground text-xs">{capacity ? `${capacity} طالب` : "10 طلاب"}</span>
+						</div>
+
+						{/* 8. تاريخ الإنشاء */}
 						<div className="flex items-center justify-between">
 							<span className="text-muted-foreground">تاريخ الإنشاء</span>
 							<span className="font-semibold text-foreground text-xs">{creationDateFormatted}</span>

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
 	IconDots,
 	IconEdit,
@@ -27,7 +28,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { AssignStaffDialog } from "@/features/services/classrooms/components/assign-staff-dialog";
 import { ClassroomDialog } from "@/features/services/classrooms/components/classroom-dialog";
+import { ClassroomStatusSelect } from "@/features/services/classrooms/components/classroom-status-select";
 import { DeleteClassroomDialog } from "@/features/services/classrooms/components/delete-classroom-dialog";
+import { ClassroomsGrid } from "@/features/services/classrooms/components/classrooms-grid";
+import { useUpdateClassroom } from "@/features/services/classrooms/hooks/use-classroom-mutations";
 import { useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
 import { LEARNING_MODES } from "@/features/services/classrooms/data/constants";
 import type { ClassroomResponse, ClassroomTeacher, LearningMode } from "@/server/classrooms/classrooms.type";
@@ -125,14 +129,41 @@ function StatusBadge({ active }: { active: boolean }) {
 interface ClassroomsTableProps {
 	searchQuery?: string;
 	onAddClassroom?: () => void;
+	viewMode?: "table" | "grid";
+	oldestFirst?: boolean;
+	data?: ClassroomResponse[];
+	isLoading?: boolean;
 }
 
-export function ClassroomsTable({ searchQuery, onAddClassroom }: ClassroomsTableProps) {
+export function ClassroomsTable({
+	searchQuery,
+	onAddClassroom,
+	viewMode = "table",
+	oldestFirst = false,
+	data,
+	isLoading: externalLoading,
+}: ClassroomsTableProps) {
+	const navigate = useNavigate();
 	const [editingClassroom, setEditingClassroom] = useState<ClassroomResponse | null>(null);
 	const [assigningClassroom, setAssigningClassroom] = useState<ClassroomResponse | null>(null);
 	const [deletingClassroom, setDeletingClassroom] = useState<ClassroomResponse | null>(null);
+	const [updatingClassroomId, setUpdatingClassroomId] = useState<string | null>(null);
 
-	const { classrooms, isLoading } = useClassrooms(searchQuery);
+	const { mutate: updateClassroom } = useUpdateClassroom();
+	const { classrooms: fetchedClassrooms, isLoading: fetchLoading } = useClassrooms(
+		data ? undefined : searchQuery,
+	);
+	const classrooms = data ?? fetchedClassrooms;
+	const isLoading = externalLoading ?? fetchLoading;
+
+	const sortedClassrooms = useMemo(() => {
+		if (!classrooms) return [];
+		return [...classrooms].sort((a, b) => {
+			const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+			const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+			return oldestFirst ? timeA - timeB : timeB - timeA;
+		});
+	}, [classrooms, oldestFirst]);
 
 	const columns = useMemo<ColumnDef<ClassroomResponse>[]>(
 		() => [
@@ -171,14 +202,18 @@ export function ClassroomsTable({ searchQuery, onAddClassroom }: ClassroomsTable
 				size: 200,
 				minSize: 180,
 				cell: ({ row }) => (
-					<div className="flex flex-col min-w-0">
-						<span className="font-semibold text-xs text-foreground truncate cursor-pointer hover:underline">
+					<Link
+						to="/services/classrooms/$classroomId"
+						params={{ classroomId: row.original.id }}
+						className="flex flex-col min-w-0 group"
+					>
+						<span className="font-semibold text-xs text-foreground truncate group-hover:text-primary hover:underline">
 							{row.original.name}
 						</span>
 						<span className="font-mono text-[10px] text-muted-foreground tabular-nums">
 							#{row.original.code}
 						</span>
-					</div>
+					</Link>
 				),
 			},
 			{
@@ -291,9 +326,27 @@ export function ClassroomsTable({ searchQuery, onAddClassroom }: ClassroomsTable
 			{
 				accessorKey: "active",
 				header: "الحالة",
-				size: 95,
-				minSize: 85,
-				cell: ({ row }) => <StatusBadge active={row.original.active} />,
+				size: 110,
+				minSize: 95,
+				cell: ({ row }) => (
+					// biome-ignore lint/a11y/noStaticElementInteractions: إيقاف انتشار الحدث لعدم فتح صفحة التفاصيل عند تغيير الحالة
+					// biome-ignore lint/a11y/useKeyWithClickEvents: حارس انتشار
+					<div onClick={(e) => e.stopPropagation()}>
+						<ClassroomStatusSelect
+							active={Boolean(row.original.active)}
+							onChange={(newActive) => {
+								setUpdatingClassroomId(row.original.id);
+								updateClassroom(
+									{ id: row.original.id, data: { active: newActive } },
+									{
+										onSettled: () => setUpdatingClassroomId(null),
+									},
+								);
+							}}
+							disabled={updatingClassroomId === row.original.id}
+						/>
+					</div>
+				),
 			},
 			{
 				id: "actions",
@@ -358,7 +411,7 @@ export function ClassroomsTable({ searchQuery, onAddClassroom }: ClassroomsTable
 	);
 
 	const table = useReactTable({
-		data: classrooms,
+		data: sortedClassrooms,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
@@ -385,18 +438,42 @@ export function ClassroomsTable({ searchQuery, onAddClassroom }: ClassroomsTable
 				onClose={() => setDeletingClassroom(null)}
 			/>
 
-			<TableDataView
-				table={table}
-				columns={columns}
-				isPending={isLoading}
-				tableClassName="w-full min-w-[1050px]"
-				onRowClick={(row) => setEditingClassroom(row.original)}
-				emptyState={{
-					title: "لا توجد فصول دراسية حتى الآن",
-					description: "قم بإنشاء الفصول لتنظيم الطلاب ومجموعات التعلم وتعيين المعلمين والمشرفين",
-					action: onAddClassroom ? { label: "إضافة فصل جديد", onClick: onAddClassroom } : undefined,
-				}}
-			/>
+			{viewMode === "grid" ? (
+				<div className="flex-1 min-h-0 overflow-y-auto">
+					<ClassroomsGrid
+						classrooms={sortedClassrooms}
+						isLoading={isLoading}
+						onSelect={(c) =>
+							navigate({
+								to: "/services/classrooms/$classroomId",
+								params: { classroomId: c.id },
+							})
+						}
+						onEdit={setEditingClassroom}
+						onAssignStaff={setAssigningClassroom}
+						onDelete={setDeletingClassroom}
+						onAddClassroom={onAddClassroom}
+					/>
+				</div>
+			) : (
+				<TableDataView
+					table={table}
+					columns={columns}
+					isPending={isLoading}
+					tableClassName="w-full min-w-[1050px]"
+					onRowClick={(row) =>
+						navigate({
+							to: "/services/classrooms/$classroomId",
+							params: { classroomId: row.original.id },
+						})
+					}
+					emptyState={{
+						title: "لا توجد فصول دراسية حتى الآن",
+						description: "قم بإنشاء الفصول لتنظيم الطلاب ومجموعات التعلم وتعيين المعلمين والمشرفين",
+						action: onAddClassroom ? { label: "إضافة فصل جديد", onClick: onAddClassroom } : undefined,
+					}}
+				/>
+			)}
 		</>
 	);
 }

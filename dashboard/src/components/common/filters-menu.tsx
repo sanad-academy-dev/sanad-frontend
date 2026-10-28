@@ -48,10 +48,14 @@ export function FiltersMenu({
 	groups,
 	size = "xs",
 	className,
+	label = "التصفية",
+	onReset,
 }: {
 	groups: FilterGroup[];
 	size?: ComponentProps<typeof Button>["size"];
 	className?: string;
+	label?: string;
+	onReset?: () => void;
 }) {
 	const selectedCount = groups.reduce((n, g) => n + g.selected.length, 0);
 
@@ -66,7 +70,7 @@ export function FiltersMenu({
 					className={cn("gap-1.5 px-2", className)}
 				>
 					<FilterIcon className="size-4 text-muted-foreground" />
-					<span className="text-[12px] font-medium">التصفية</span>
+					<span className="text-[12px] font-medium">{label}</span>
 					{selectedCount > 0 && (
 						<span className="rounded-full bg-primary/10 px-1.5 text-[10px] font-medium text-primary">
 							{selectedCount}
@@ -119,6 +123,19 @@ export function FiltersMenu({
 						</DropdownMenuSubContent>
 					</DropdownMenuSub>
 				))}
+				{selectedCount > 0 && onReset && (
+					<div className="border-t mt-1 pt-1">
+						<DropdownMenuItem
+							onSelect={(e) => {
+								e.preventDefault();
+								onReset();
+							}}
+							className="text-xs text-rose-600 dark:text-rose-400 font-medium justify-center cursor-pointer hover:bg-rose-50 dark:hover:bg-rose-950/30"
+						>
+							إعادة ضبط الفلاتر ({selectedCount})
+						</DropdownMenuItem>
+					</div>
+				)}
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

@@ -4,12 +4,9 @@ import {
 	IconBan,
 	IconCheck,
 	IconChevronDown,
-	IconChevronLeft,
 	IconDots,
 	IconEdit,
 	IconEye,
-	IconMail,
-	IconPhone,
 	IconPlayerPause,
 	IconPlus,
 	IconTrash,
@@ -26,13 +23,10 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import { useCallback, useMemo, useState } from "react";
+import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
+import { GuardianHoverCard, type GuardianHoverData } from "@/components/common/hover-cards";
 import { TableDataView } from "@/components/common/table-data-view";
 import { TableToolbar } from "@/components/common/table-toolbar";
-import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
-import {
-	StudentHoverCard,
-	GuardianHoverCard,
-} from "@/components/common/hover-cards";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -129,32 +123,32 @@ export function PatientsTable() {
 
 					return (
 						// <StudentHoverCard student={p}>
-							<div className="flex items-center gap-2.5 min-w-[170px] group cursor-pointer">
-								<div
-									className={cn(
-										"flex size-7.5 shrink-0 items-center justify-center rounded-full border transition-transform group-hover:scale-105",
-										isFemale
-											? "bg-pink-50 border-pink-200 text-pink-500 dark:bg-pink-950/30 dark:border-pink-900/50"
-											: "bg-blue-50 border-blue-200 text-blue-500 dark:bg-blue-950/30 dark:border-blue-900/50",
-									)}
-								>
-									<IconUser className="size-3.5" />
-								</div>
-								<div className="flex flex-col min-w-0">
-									<Link
-										to="/services/patients/$patientId"
-										params={{ patientId: p.id }}
-										className="font-semibold text-xs text-foreground hover:underline truncate"
-										onClick={(e) => e.stopPropagation()}
-										title={p.name}
-									>
-										{p.name}
-									</Link>
-									<span className="font-mono text-[10px] text-muted-foreground tabular-nums">
-										{code}
-									</span>
-								</div>
+						<div className="flex items-center gap-2.5 min-w-[170px] group cursor-pointer">
+							<div
+								className={cn(
+									"flex size-7.5 shrink-0 items-center justify-center rounded-full border transition-transform group-hover:scale-105",
+									isFemale
+										? "bg-pink-50 border-pink-200 text-pink-500 dark:bg-pink-950/30 dark:border-pink-900/50"
+										: "bg-blue-50 border-blue-200 text-blue-500 dark:bg-blue-950/30 dark:border-blue-900/50",
+								)}
+							>
+								<IconUser className="size-3.5" />
 							</div>
+							<div className="flex flex-col min-w-0">
+								<Link
+									to="/services/patients/$patientId"
+									params={{ patientId: p.id }}
+									className="font-semibold text-xs text-foreground hover:underline truncate"
+									onClick={(e) => e.stopPropagation()}
+									title={p.name}
+								>
+									{p.name}
+								</Link>
+								<span className="font-mono text-[10px] text-muted-foreground tabular-nums">
+									{code}
+								</span>
+							</div>
+						</div>
 						// </StudentHoverCard>
 					);
 				},
@@ -162,13 +156,23 @@ export function PatientsTable() {
 			{
 				accessorKey: "classroom",
 				header: "الفصل",
-				size: 85,
-				minSize: 75,
+				size: 160,
+				minSize: 140,
 				cell: ({ row }) => {
-					const cls = row.original.classroom || "النجوم";
+					const cls = row.original.classroom;
+					if (!cls) {
+						return (
+							<span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-muted/60 text-muted-foreground border border-border/50">
+								بدون فصل
+							</span>
+						);
+					}
 					return (
-						<span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700">
-							{cls}
+						<span
+							className="inline-flex items-center max-w-[150px] truncate px-2.5 py-0.5 rounded text-[11px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-900"
+							title={cls}
+						>
+							<span className="truncate">{cls}</span>
 						</span>
 					);
 				},
@@ -176,15 +180,15 @@ export function PatientsTable() {
 			{
 				id: "guardian",
 				header: "ولي الأمر",
-				size: 110,
-				minSize: 95,
+				size: 140,
+				minSize: 120,
 				cell: ({ row }) => {
 					const p = row.original;
 					const items: {
 						id: string | number;
 						name: string;
 						title: string;
-						data: any;
+						data: GuardianHoverData;
 					}[] = [];
 
 					if (p.guardians && p.guardians.length > 0) {
@@ -260,8 +264,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "birthDate",
 				header: "تاريخ الميلاد",
-				size: 95,
-				minSize: 85,
+				size: 110,
+				minSize: 95,
 				cell: ({ row }) => (
 					<span className="text-xs text-foreground font-mono">
 						{formatDate(row.original.birthDate)}
@@ -271,8 +275,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "bloodType",
 				header: "فصيلة الدم",
-				size: 70,
-				minSize: 60,
+				size: 80,
+				minSize: 70,
 				cell: ({ row }) => {
 					const bt = row.original.bloodType || "A+";
 					return (
@@ -285,8 +289,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "developmentStatus",
 				header: "الحالة النمائية",
-				size: 95,
-				minSize: 85,
+				size: 115,
+				minSize: 100,
 				cell: ({ row }) => {
 					const dev = row.original.developmentStatus || "NORMAL";
 					if (dev === "ADVANCED") {
@@ -313,8 +317,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "allergies",
 				header: "الحساسيات",
-				size: 95,
-				minSize: 80,
+				size: 110,
+				minSize: 95,
 				cell: ({ row }) => {
 					const alg = row.original.allergies?.trim();
 					if (!alg || alg === "لا يوجد") {
@@ -330,8 +334,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "feeType",
 				header: "نوع الرسوم",
-				size: 90,
-				minSize: 80,
+				size: 105,
+				minSize: 90,
 				cell: ({ row }) => {
 					const fee = row.original.feeType?.trim();
 					if (!fee) {
@@ -347,8 +351,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "pocketMoneyEnabled",
 				header: "المصروف",
-				size: 85,
-				minSize: 75,
+				size: 95,
+				minSize: 85,
 				cell: ({ row }) => {
 					const enabled = row.original.pocketMoneyEnabled !== false;
 					if (enabled) {
@@ -370,8 +374,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "updatedAt",
 				header: "آخر تحديث",
-				size: 95,
-				minSize: 85,
+				size: 110,
+				minSize: 95,
 				cell: ({ row }) => (
 					<span className="text-[11px] text-muted-foreground font-mono">
 						{formatDate(row.original.updatedAt || row.original.createdAt)}
@@ -381,8 +385,8 @@ export function PatientsTable() {
 			{
 				accessorKey: "status",
 				header: "الحالة",
-				size: 85,
-				minSize: 75,
+				size: 100,
+				minSize: 90,
 				cell: ({ row }) => {
 					const p = row.original;
 					const currentStatus = p.status || (p.active ? "ACTIVE" : "SUSPENDED");
@@ -590,7 +594,7 @@ export function PatientsTable() {
 					table={table}
 					columns={columns}
 					isPending={isLoading}
-					tableClassName="w-full min-w-[1100px]"
+					tableClassName="w-full min-w-[1300px]"
 					onRowClick={(row) =>
 						navigate({
 							to: "/services/patients/$patientId",
@@ -603,7 +607,6 @@ export function PatientsTable() {
 						action: { label: "إضافة طالب جديد", onClick: () => setAddSheetOpen(true) },
 					}}
 				/>
-				
 			</div>
 		</>
 	);

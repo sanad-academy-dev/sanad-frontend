@@ -245,6 +245,7 @@ export function TableDataView<TData>({
 											<TableCell
 												key={cell.id}
 												className="last:py-0"
+												style={{ width: `${cell.column.getSize()}px` }}
 											>
 												{flexRender(cell.column.columnDef.cell, cell.getContext())}
 											</TableCell>

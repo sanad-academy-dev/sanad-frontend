@@ -17,6 +17,15 @@ export interface ClassroomStudentInfo {
 	id: string;
 	name: string;
 	code?: string | null;
+	gender?: string | null;
+	avatar?: string | null;
+	active?: boolean;
+	age?: number | null;
+	birthDate?: string | Date | null;
+	guardianName?: string | null;
+	guardianPhone?: string | null;
+	guardianRelationship?: string | null;
+	preferredShift?: string | null;
 }
 
 export interface ClassroomResponse {
@@ -49,10 +58,10 @@ export interface CreateClassroomInput {
 	name: string;
 	code?: string;
 	ageGroup?: string | null;
-	category?: string | null;
+	category: string;
 	classification?: string | null;
 	learningMode?: LearningMode;
-	capacity?: number;
+	capacity: number;
 	active?: boolean;
 	notes?: string | null;
 	staffIds?: string[];

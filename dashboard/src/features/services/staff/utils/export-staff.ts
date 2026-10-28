@@ -10,6 +10,7 @@ const HEADERS = [
 	"الدور",
 	"الفرع",
 	"التخصص",
+	"المناوبة",
 	"نوع الدوام",
 	"تاريخ التعيين",
 	"الحالة",
@@ -28,6 +29,13 @@ const EMPLOYMENT_LABEL: Record<string, string> = {
 	PART_TIME: "دوام جزئي",
 };
 
+const SHIFT_LABEL: Record<string, string> = {
+	MORNING: "صباحي",
+	EVENING: "مسائي",
+	NIGHT: "ليلي",
+	BOTH: "صباحي ومسائي",
+};
+
 const iso = (d: Date | string | null | undefined) =>
 	d ? new Date(d).toISOString().slice(0, 10) : "";
 
@@ -41,6 +49,9 @@ function toRow(s: StaffResponse): (string | number | null)[] {
 		s.branch?.name ?? "",
 		s.primarySpecialization?.name ?? "",
 		s.secondarySpecialization?.name ?? "",
+		s.schedulingSettings?.shift
+			? (SHIFT_LABEL[s.schedulingSettings.shift] ?? s.schedulingSettings.shift)
+			: "غير محدد",
 		s.employmentType ? (EMPLOYMENT_LABEL[s.employmentType] ?? s.employmentType) : "",
 		iso(s.hireDate),
 		STATUS_LABEL[s.status] ?? s.status,

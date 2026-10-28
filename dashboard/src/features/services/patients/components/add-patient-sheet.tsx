@@ -109,7 +109,7 @@ export function AddPatientSheet({
 			}
 
 			const primaryRel = initialOwnerIds[0]
-				? initialRelationships[initialOwnerIds[0]] ?? "FATHER"
+				? (initialRelationships[initialOwnerIds[0]] ?? "FATHER")
 				: normalizeRelationship(patient.guardianRelationship);
 
 			reset({
@@ -117,7 +117,7 @@ export function AddPatientSheet({
 				birthDate: toDateInput(patient.birthDate),
 				nationalId: patient.nationalId ?? "",
 				gender: patient.gender ?? "MALE",
-				classroom: patient.classroom ?? "النجوم",
+				classroom: patient.classroom ?? "",
 				ownerId: initialOwnerIds[0] ?? "",
 				ownerIds: initialOwnerIds,
 				guardianRelationships: initialRelationships,
@@ -226,9 +226,11 @@ export function AddPatientSheet({
 		const relMap = data.guardianRelationships || {};
 		const guardianItems = finalOwnerIds.map((oid) => ({
 			ownerId: oid,
-			relationship: relMap[oid] || (oid === finalOwnerIds[0] ? data.guardianRelationship : "FATHER"),
+			relationship:
+				relMap[oid] || (oid === finalOwnerIds[0] ? data.guardianRelationship : "FATHER"),
 		}));
-		const primaryRelationship = guardianItems[0]?.relationship || data.guardianRelationship || "FATHER";
+		const primaryRelationship =
+			guardianItems[0]?.relationship || data.guardianRelationship || "FATHER";
 
 		if (isEdit && patient) {
 			const { active: _active, ...updateData } = data;
@@ -402,10 +404,14 @@ export function AddPatientSheet({
 				onSuccess={(newOwnerId) => {
 					const currentIds = (watch("ownerIds") as string[] | undefined) || [];
 					const nextIds = Array.from(new Set([...currentIds, newOwnerId]));
-					const currentRels = (watch("guardianRelationships") as Record<string, string> | undefined) || {};
+					const currentRels =
+						(watch("guardianRelationships") as Record<string, string> | undefined) || {};
 					const nextRels = { ...currentRels, [newOwnerId]: "FATHER" };
 					setValue("ownerIds", nextIds, { shouldValidate: true, shouldDirty: true });
-					setValue("guardianRelationships", nextRels, { shouldValidate: true, shouldDirty: true });
+					setValue("guardianRelationships", nextRels, {
+						shouldValidate: true,
+						shouldDirty: true,
+					});
 					setValue("ownerId", nextIds[0], { shouldValidate: true, shouldDirty: true });
 					const found = owners.find((o) => o.id === newOwnerId);
 					if (found) {

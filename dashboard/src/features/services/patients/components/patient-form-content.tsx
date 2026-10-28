@@ -1,16 +1,12 @@
 import type { CreatePatientFormInput } from "@sanad/contracts/runtime/server/patients/patients.type";
 import {
 	IconCalendar,
-	IconCheck,
 	IconChevronDown,
 	IconChevronUp,
 	IconMapPin,
 	IconPlus,
-	IconSearch,
-	IconStar,
-	IconUser,
+	IconSchool,
 	IconUsers,
-	IconX,
 } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import type {
@@ -24,9 +20,6 @@ import { Controller } from "react-hook-form";
 
 import { FieldLabel } from "@/components/common/field-label";
 import { Button } from "@/components/ui/button";
-import { Field, FieldError } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
 	Combobox,
 	ComboboxChip,
@@ -37,6 +30,9 @@ import {
 	ComboboxItem,
 	ComboboxList,
 } from "@/components/ui/combobox";
+import { Field, FieldError } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -46,10 +42,10 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
 import {
 	ALLERGY_CHIPS,
 	BLOOD_TYPE_OPTIONS,
-	CLASSROOM_OPTIONS,
 	FEE_TYPE_OPTIONS,
 	HEALTH_CHIPS,
 	LEARNING_METHOD_OPTIONS,
@@ -101,6 +97,7 @@ export function PatientFormContent({
 	setShowAdvanced,
 	idPrefix = "patient-form",
 }: PatientFormContentProps) {
+	const { classrooms } = useClassrooms();
 	const values = watch();
 	const [ownerSearch, setOwnerSearch] = useState("");
 	const [internalOpen, setInternalOpen] = useState(false);
@@ -260,43 +257,49 @@ export function PatientFormContent({
 
 				{/* الفصل */}
 				<div className="flex flex-col gap-1.5">
-					<FieldLabel
-						required
-						info="المجموعة أو الصف الدراسي المسجل به الطفل"
-					>
+					<FieldLabel info="المجموعة أو الصف الدراسي المسجل به الطالب">
 						<Label className="text-sm font-medium">الفصل</Label>
 					</FieldLabel>
 					<Controller
 						name="classroom"
 						control={control}
-						render={({ field }) => (
-							<Field data-invalid={!!errors.classroom}>
-								<Select
-									value={field.value || "النجوم"}
-									onValueChange={field.onChange}
-									disabled={isPending || readOnly}
-									dir="rtl"
-								>
-									<SelectTrigger className="w-full text-right text-sm">
-										<div className="flex items-center gap-2">
-											<IconStar className="size-3.5 text-amber-500 fill-amber-500" />
-											<SelectValue placeholder="اختر الفصل..." />
-										</div>
-									</SelectTrigger>
-									<SelectContent dir="rtl">
-										{CLASSROOM_OPTIONS.map((cls) => (
-											<SelectItem
-												key={cls}
-												value={cls}
-											>
-												{cls}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-								<FieldError errors={[errors.classroom]} />
-							</Field>
-						)}
+						render={({ field }) => {
+							const currentVal = field.value || "__NONE__";
+							return (
+								<Field data-invalid={!!errors.classroom}>
+									<Select
+										value={currentVal}
+										onValueChange={(val) => field.onChange(val === "__NONE__" ? "" : val)}
+										disabled={isPending || readOnly}
+										dir="rtl"
+									>
+										<SelectTrigger className="w-full text-right text-sm">
+											<div className="flex items-center gap-2">
+												<IconSchool className="size-3.5 text-primary" />
+												<SelectValue placeholder="اختر الفصل..." />
+											</div>
+										</SelectTrigger>
+										<SelectContent dir="rtl">
+											<SelectItem value="__NONE__">بدون فصل (غير مسجل)</SelectItem>
+											{classrooms.map((cls) => (
+												<SelectItem
+													key={cls.id}
+													value={cls.name}
+												>
+													<div className="flex items-center justify-between w-full gap-2">
+														<span>{cls.name}</span>
+														<span className="text-[10px] text-muted-foreground font-mono">
+															{cls.enrolledCount}/{cls.capacity} طالب
+														</span>
+													</div>
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+									<FieldError errors={[errors.classroom]} />
+								</Field>
+							);
+						}}
 					/>
 				</div>
 
@@ -321,7 +324,10 @@ export function PatientFormContent({
 									</SelectTrigger>
 									<SelectContent dir="rtl">
 										{LEVEL_OPTIONS.map((lvl) => (
-											<SelectItem key={lvl} value={lvl}>
+											<SelectItem
+												key={lvl}
+												value={lvl}
+											>
 												{lvl}
 											</SelectItem>
 										))}
@@ -354,7 +360,10 @@ export function PatientFormContent({
 									</SelectTrigger>
 									<SelectContent dir="rtl">
 										{LEARNING_METHOD_OPTIONS.map((method) => (
-											<SelectItem key={method} value={method}>
+											<SelectItem
+												key={method}
+												value={method}
+											>
 												{method}
 											</SelectItem>
 										))}
@@ -387,7 +396,10 @@ export function PatientFormContent({
 									</SelectTrigger>
 									<SelectContent dir="rtl">
 										{PREFERRED_SHIFT_OPTIONS.map((shift) => (
-											<SelectItem key={shift} value={shift}>
+											<SelectItem
+												key={shift}
+												value={shift}
+											>
 												{shift}
 											</SelectItem>
 										))}
@@ -492,12 +504,14 @@ export function PatientFormContent({
 										: [];
 
 								const curRels = {
-									...((watch("guardianRelationships") as Record<string, string> | undefined) || {}),
+									...((watch("guardianRelationships") as Record<string, string> | undefined) ||
+										{}),
 								};
 
 								nextIds.forEach((id, idx) => {
 									if (!curRels[id]) {
-										curRels[id] = idx === 0 ? (watch("guardianRelationship") || "FATHER") : "MOTHER";
+										curRels[id] =
+											idx === 0 ? watch("guardianRelationship") || "FATHER" : "MOTHER";
 									}
 								});
 
@@ -509,17 +523,32 @@ export function PatientFormContent({
 
 								field.onChange(nextIds);
 								setValue("ownerIds", nextIds, { shouldValidate: true, shouldDirty: true });
-								setValue("ownerId", nextIds[0] ?? "", { shouldValidate: true, shouldDirty: true });
-								setValue("guardianRelationships", curRels, { shouldValidate: true, shouldDirty: true });
+								setValue("ownerId", nextIds[0] ?? "", {
+									shouldValidate: true,
+									shouldDirty: true,
+								});
+								setValue("guardianRelationships", curRels, {
+									shouldValidate: true,
+									shouldDirty: true,
+								});
 
 								const primary = owners.find((o) => o.id === nextIds[0]);
 								if (primary) {
-									setValue("guardianName", primary.name, { shouldValidate: true, shouldDirty: true });
+									setValue("guardianName", primary.name, {
+										shouldValidate: true,
+										shouldDirty: true,
+									});
 									if (primary.phone) {
-										setValue("guardianPhone", primary.phone, { shouldValidate: true, shouldDirty: true });
+										setValue("guardianPhone", primary.phone, {
+											shouldValidate: true,
+											shouldDirty: true,
+										});
 									}
 									if (primary.email) {
-										setValue("guardianEmail", primary.email, { shouldValidate: true, shouldDirty: true });
+										setValue("guardianEmail", primary.email, {
+											shouldValidate: true,
+											shouldDirty: true,
+										});
 									}
 								} else if (nextIds.length === 0) {
 									setValue("guardianName", "", { shouldValidate: true, shouldDirty: true });
@@ -530,9 +559,7 @@ export function PatientFormContent({
 
 							return (
 								<Field
-									data-invalid={
-										!!errors.ownerIds || !!errors.ownerId || !!errors.guardianName
-									}
+									data-invalid={!!errors.ownerIds || !!errors.ownerId || !!errors.guardianName}
 								>
 									<Combobox
 										multiple
@@ -611,11 +638,7 @@ export function PatientFormContent({
 									</Combobox>
 
 									<FieldError
-										errors={[
-											errors.ownerIds,
-											errors.ownerId,
-											errors.guardianName,
-										]}
+										errors={[errors.ownerIds, errors.ownerId, errors.guardianName]}
 									/>
 								</Field>
 							);
@@ -678,14 +701,14 @@ export function PatientFormContent({
 												</div>
 
 												<div className="flex items-center gap-2 shrink-0">
-													<span className="text-xs text-muted-foreground">
-														صلة القرابة:
-													</span>
+													<span className="text-xs text-muted-foreground">صلة القرابة:</span>
 													<Select
 														value={currentRel}
 														onValueChange={(val) => {
 															const updated = {
-																...((watch("guardianRelationships") as Record<string, string> | undefined) || {}),
+																...((watch("guardianRelationships") as
+																	| Record<string, string>
+																	| undefined) || {}),
 																[owner.id]: val,
 															};
 															setValue("guardianRelationships", updated, {

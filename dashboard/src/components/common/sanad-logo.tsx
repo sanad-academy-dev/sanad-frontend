@@ -1,80 +1,80 @@
 import type * as React from "react";
+import { cn } from "@/lib/utils";
 
-interface SanadLogoProps extends React.ComponentProps<"svg"> {
-  /** عرض الأيقونة فقط (ثلاث كتل بنفسجية) بدون الاسم */
-  iconOnly?: boolean;
+export interface SanadLogoProps extends React.HTMLAttributes<HTMLDivElement> {
+	/** عرض الأيقونة فقط (ثلاث كتل بنفسجية) بدون الاسم */
+	iconOnly?: boolean;
 }
 
-export function SanadLogo({
-  className,
-  iconOnly = false,
-  ...props
-}: SanadLogoProps) {
-  if (iconOnly) {
-    return (
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="2198.31 616.59 867 433.5"
-        className={className}
-        aria-label="شعار سند"
-        {...props}
-      >
-        <g fill="#9b18e7">
-          <polygon points="2776.31 1050.09 3065.31 905.59 3065.31 616.59 2776.31 761.09 2776.31 1050.09" />
-          <polygon points="2487.31 1050.09 2776.31 905.59 2776.31 616.59 2487.31 761.09 2487.31 1050.09" />
-          <polygon points="2198.31 1050.09 2487.31 905.59 2487.31 616.59 2198.31 761.09 2198.31 1050.09" />
-        </g>
-      </svg>
-    );
-  }
+export function SanadLogo({ className, iconOnly = false, style, ...props }: SanadLogoProps) {
+	if (iconOnly) {
+		return (
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 867 433.5"
+				className={cn("shrink-0", className)}
+				aria-label="شعار سند"
+				role="img"
+				style={style}
+				{...(props as React.SVGProps<SVGSVGElement>)}
+			>
+				<g
+					fill="#9b18e7"
+					className="fill-[#9b18e7] dark:fill-[#c084fc]"
+				>
+					<polygon points="578,433.5 867,289 867,0 578,144.5" />
+					<polygon points="289,433.5 578,289 578,0 289,144.5" />
+					<polygon points="0,433.5 289,289 289,0 0,144.5" />
+				</g>
+			</svg>
+		);
+	}
 
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 530 1540 540"
-      className={className}
-      aria-label="شعار سند"
-      role="img"
-      {...props}
-    >
-      <defs>
-        <style>{`
-          .sanad-ar-text {
-            font-family: 'thmanyah sans', 'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif;
-            font-size: 320px;
-            font-weight: 700;
-            fill: #9b18e7;
-          }
-          .sanad-en-text {
-            font-family: 'Clash Display', 'Inter', system-ui, -apple-system, sans-serif;
-            font-size: 200px;
-            font-weight: 800;
-            letter-spacing: 0.04em;
-            fill: #9b18e7;
-          }
-          .sanad-icon-blocks {
-            fill: #9b18e7;
+	return (
+		<div
+			className={cn("inline-flex items-center gap-2 select-none", className)}
+			style={{ direction: "ltr", ...style }}
+			aria-label="شعار سند"
+			role="img"
+			{...props}
+		>
+			{/* اسم سند (عربي وإنجليزي) بخط واضح وأنيق */}
+			<div className="flex flex-col items-start justify-center leading-none">
+				<span
+					className="font-black text-[#9b18e7] dark:text-[#c084fc] select-none"
+					style={{
+						fontFamily: "'IBM Plex Sans Arabic', system-ui, -apple-system, sans-serif",
+						fontSize: "1.2rem",
+						lineHeight: 1,
+						fontWeight: 800,
+					}}
+				>
+					سند
+				</span>
+				<span
+					className="font-black text-[#9b18e7] dark:text-[#c084fc] select-none tracking-[0.24em] mt-0.5"
+					style={{
+						fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+						fontSize: "0.62rem",
+						lineHeight: 1,
+						fontWeight: 800,
+					}}
+				>
+					SANAD
+				</span>
+			</div>
 
-          }
-        `}</style>
-      </defs>
-
-      {/* اسم سند (عربي وإنجليزي) */}
-      <g style={{ direction: "ltr" }} >
-        <text className="sanad-ar-text" x="40" y="825">
-          سنـــــد
-        </text>
-        <text className="sanad-en-text" x="40" y="1035">
-          SANAD
-        </text>
-      </g>
-
-      {/* أيقونة سند بحجم مصغّر متناسق (scale 0.8) لتتناسب تماماً مع حجم النص */}
-      <g transform="translate(-958.65, 163.33) scale(0.8)" className="sanad-icon-blocks">
-        <polygon points="2776.31 1050.09 3065.31 905.59 3065.31 616.59 2776.31 761.09 2776.31 1050.09" />
-        <polygon points="2487.31 1050.09 2776.31 905.59 2776.31 616.59 2487.31 761.09 2487.31 1050.09" />
-        <polygon points="2198.31 1050.09 2487.31 905.59 2487.31 616.59 2198.31 761.09 2198.31 1050.09" />
-      </g>
-    </svg>
-  );
+			{/* أيقونة سند: الكتل الهندسية الثلاث باللون البنفسجي */}
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 867 433.5"
+				className="h-7 w-auto shrink-0 fill-[#9b18e7] dark:fill-[#c084fc]"
+				aria-hidden="true"
+			>
+				<polygon points="578,433.5 867,289 867,0 578,144.5" />
+				<polygon points="289,433.5 578,289 578,0 289,144.5" />
+				<polygon points="0,433.5 289,289 289,0 0,144.5" />
+			</svg>
+		</div>
+	);
 }
