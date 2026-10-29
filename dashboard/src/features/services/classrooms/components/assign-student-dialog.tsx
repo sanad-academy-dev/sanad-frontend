@@ -20,7 +20,10 @@ import { useAssignClassroomStudents } from "@/features/services/classrooms/hooks
 import { useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { cn } from "@/lib/utils";
-import type { ClassroomResponse } from "@/server/classrooms/classrooms.type";
+import type {
+	ClassroomResponse,
+	ClassroomStudentInfo,
+} from "@/server/classrooms/classrooms.type";
 
 export interface AssignStudentDialogProps {
 	classroom?: ClassroomResponse | null;
@@ -67,10 +70,29 @@ export function AssignStudentDialog({
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
-	// كائنات الطلاب المحددين لعرض أفاتاراتهم في البوب أب
+	// كائنات الطلاب المحددين لعرض أفاتاراتهم في البوب أب التأكيدي بدقة
 	const selectedStudentObjects = useMemo(() => {
-		return patients.filter((p) => selectedStudentIds.includes(p.id));
-	}, [patients, selectedStudentIds]);
+		const patientMap = new Map<string, (typeof patients)[number]>();
+		for (const p of patients) {
+			patientMap.set(p.id, p);
+		}
+		const classroomStudentMap = new Map<string, ClassroomStudentInfo>();
+		for (const s of classroom?.students || []) {
+			classroomStudentMap.set(s.id, s);
+		}
+
+		return selectedStudentIds.map((id) => {
+			const p = patientMap.get(id);
+			const cs = classroomStudentMap.get(id);
+			return {
+				id,
+				name: p?.name || cs?.name || "طالب",
+				code: p?.code || cs?.code || id.slice(0, 5),
+				avatar: cs?.avatar || (p as { avatar?: string | null } | undefined)?.avatar || null,
+				gender: p?.gender || cs?.gender || null,
+			};
+		});
+	}, [patients, selectedStudentIds, classroom]);
 
 	// مزامنة الطلاب المحددين عند فتح الشيت
 	useEffect(() => {

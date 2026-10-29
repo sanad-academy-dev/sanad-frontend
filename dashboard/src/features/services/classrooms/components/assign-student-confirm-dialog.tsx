@@ -15,14 +15,22 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import type { ClassroomResponse } from "@/server/classrooms/classrooms.type";
-import type { PatientResponse } from "@/server/patients/patients.type";
+
+export interface AssignStudentItem {
+	id: string;
+	name: string;
+	code?: string | null;
+	avatar?: string | null;
+	gender?: string | null;
+	[key: string]: unknown;
+}
 
 export interface AssignStudentConfirmDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	classroom?: ClassroomResponse | null;
 	classroomName?: string;
-	selectedStudents: PatientResponse[];
+	selectedStudents: AssignStudentItem[];
 	onConfirm: (options: {
 		enableMessage: boolean;
 		subject: string;
