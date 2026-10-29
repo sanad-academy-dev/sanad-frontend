@@ -30,10 +30,20 @@ export interface CampaignRequestItem {
 	id: string;
 	code: string;
 	name: string;
-	column: AppointmentColumnId;
-	status: "QUEUE" | "EVALUATION" | "REVIEW" | "AWAITING_REPLY" | "ACCEPTED" | "REJECTED";
+	column: string;
+	status:
+		| "QUEUE"
+		| "SHORTLIST"
+		| "INTERVIEW"
+		| "IN_EVALUATION"
+		| "WAITLIST"
+		| "ACCEPTED"
+		| "REJECTED"
+		| "EVALUATION"
+		| "REVIEW"
+		| "AWAITING_REPLY";
 	statusLabel: string;
-	statusVariant: "warning" | "info" | "default";
+	statusVariant: "warning" | "info" | "default" | "destructive";
 	patientName: string;
 	patientDetails: string;
 	gender: "MALE" | "FEMALE" | "UNKNOWN";
@@ -62,6 +72,17 @@ export interface CampaignRequestItem {
 	convertedPatientCode?: string | null;
 	convertedOwnerId?: string | null;
 	convertedOwnerCode?: string | null;
+	learningMode?: string | null;
+	preferredShift?: string | null;
+	experienceLevel?: string | null;
+	priority?: string | null;
+	appointmentDate?: string | null;
+	appointmentId?: string | null;
+	roomId?: string | null;
+	roomName?: string | null;
+	notes?: string | null;
+	notifyWhatsapp?: boolean;
+	links?: { id?: string; title?: string; url: string }[];
 	assessmentAppointment?: {
 		id: string;
 		code: string;

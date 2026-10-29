@@ -1,85 +1,84 @@
-import { Card } from "@/components/ui/card";
-import { useCampaignDetails } from "../hooks/use-digital-registration";
+import {
+	IconClock,
+	IconClipboardCheck,
+	IconHourglass,
+	IconCheck,
+	IconX,
+} from "@tabler/icons-react";
+import { cn } from "@/lib/utils";
 
-export function CampaignDetailsStats({ campaignId }: { campaignId: string }) {
-	const { data: campaign, isLoading } = useCampaignDetails(campaignId);
+export interface RegistrationStatsProps {
+	queueCount?: number;
+	evaluationCount?: number;
+	waitingCount?: number;
+	acceptedCount?: number;
+	rejectedCount?: number;
+}
 
-	if (isLoading) {
-		return <div className="p-8 text-center text-sm text-muted-foreground">جاري تحميل إحصائيات الحملة...</div>;
-	}
-
-	if (!campaign) {
-		return <div className="p-8 text-center text-sm text-destructive">الحملة غير موجودة</div>;
-	}
-
-	const max = campaign.maxCapacity || campaign.capacity || 1;
-	const accepted = campaign.accepted || 0;
-	const fillRatio = Math.min(100, Math.round((accepted / max) * 100));
-
-	const sourceStats = campaign.sourceStats || {};
+export function RegistrationStatsBar({
+	queueCount = 0,
+	evaluationCount = 0,
+	waitingCount = 0,
+	acceptedCount = 0,
+	rejectedCount = 0,
+}: RegistrationStatsProps) {
+	const items = [
+		{
+			id: "queue",
+			label: "الطابور",
+			count: queueCount,
+			icon: IconClock,
+			color: "text-blue-600 dark:text-blue-400",
+		},
+		{
+			id: "evaluation",
+			label: "داخل التقييم",
+			count: evaluationCount,
+			icon: IconClipboardCheck,
+			color: "text-amber-600 dark:text-amber-400",
+		},
+		{
+			id: "waiting",
+			label: "بالإنتظار",
+			count: waitingCount,
+			icon: IconHourglass,
+			color: "text-purple-600 dark:text-purple-400",
+		},
+		{
+			id: "accepted",
+			label: "مقبولين",
+			count: acceptedCount,
+			icon: IconCheck,
+			color: "text-emerald-600 dark:text-emerald-400",
+		},
+		{
+			id: "rejected",
+			label: "المرفوضين",
+			count: rejectedCount,
+			icon: IconX,
+			color: "text-rose-600 dark:text-rose-400",
+		},
+	];
 
 	return (
-		<div className="flex w-full flex-col gap-4 p-4 mt-4" dir="rtl">
-			{/* Top Cards */}
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-				<Card className="flex flex-col items-center justify-center p-6 gap-2 rounded-md shadow-none">
-					<span className="text-3xl font-bold text-foreground">{campaign.requests}</span>
-					<span className="text-sm text-muted-foreground">الطلبات الكلية</span>
-				</Card>
-				<Card className="flex flex-col items-center justify-center p-6 gap-2 rounded-md shadow-none">
-					<span className="text-3xl font-bold text-emerald-600">{campaign.accepted}</span>
-					<span className="text-sm text-muted-foreground">مقبول</span>
-				</Card>
-				<Card className="flex flex-col items-center justify-center p-6 gap-2 rounded-md shadow-none">
-					<span className="text-3xl font-bold text-amber-500">{campaign.pending}</span>
-					<span className="text-sm text-muted-foreground">قيد المراجعة</span>
-				</Card>
-				<Card className="flex flex-col items-center justify-center p-6 gap-2 rounded-md shadow-none">
-					<span className="text-3xl font-bold text-red-500">{campaign.rejected || 0}</span>
-					<span className="text-sm text-muted-foreground">مرفوض</span>
-				</Card>
-			</div>
-
-			{/* Middle Progress */}
-			<Card className="flex flex-col p-6 gap-4 rounded-md shadow-none">
-				<div className="flex justify-between items-center w-full">
-					<span className="text-sm font-medium text-muted-foreground">نسبة الامتلاء</span>
-					<span className="text-[15px] font-bold text-emerald-600">{fillRatio}%</span>
-				</div>
-				<div className="h-3 w-full rounded-full bg-muted overflow-hidden flex" dir="ltr">
-					<div
-						className="h-full bg-emerald-600 rounded-e-full transition-all duration-500"
-						style={{ width: `${fillRatio}%` }}
-					/>
-				</div>
-				<div className="flex justify-between items-center w-full text-xs text-muted-foreground">
-					<span>{accepted} مقبول</span>
-					<span>{max} مقعد إجمالي</span>
-				</div>
-			</Card>
-
-			{/* Bottom Sources */}
-			<Card className="flex flex-col p-6 gap-4 rounded-md shadow-none">
-				<span className="text-[15px] font-bold text-foreground self-start mb-2">مصادر التسجيل</span>
-				<div className="flex flex-col gap-3">
-					<div className="flex justify-between items-center">
-						<span className="text-[13px] text-muted-foreground">الموقع الإلكتروني</span>
-						<span className="text-sm font-bold text-foreground">{sourceStats.WEBSITE || 0}</span>
-					</div>
-					<div className="flex justify-between items-center">
-						<span className="text-[13px] text-muted-foreground">رابط مباشر</span>
-						<span className="text-sm font-bold text-foreground">{sourceStats.DIRECT_LINK || 0}</span>
-					</div>
-					<div className="flex justify-between items-center">
-						<span className="text-[13px] text-muted-foreground">إحالة</span>
-						<span className="text-sm font-bold text-foreground">{sourceStats.REFERRAL || 0}</span>
-					</div>
-					<div className="flex justify-between items-center">
-						<span className="text-[13px] text-muted-foreground">تواصل اجتماعي</span>
-						<span className="text-sm font-bold text-foreground">{sourceStats.SOCIAL || 0}</span>
+		<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 px-3 pt-2 pb-1 select-none" dir="rtl">
+			{items.map((item) => (
+				<div
+					key={item.id}
+					className="flex items-center justify-between rounded-lg border border-border/70 bg-card px-3 py-1.5 shadow-2xs hover:border-primary/40 transition-colors"
+				>
+					<span className="text-base font-bold text-foreground tabular-nums">
+						{item.count}
+					</span>
+					<div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium">
+						<span># {item.label}</span>
+						<item.icon className={cn("size-3", item.color)} />
 					</div>
 				</div>
-			</Card>
+			))}
 		</div>
 	);
 }
+
+// Preserve existing detail stats component for compatibility
+export { RegistrationStatsBar as CampaignDetailsStats };

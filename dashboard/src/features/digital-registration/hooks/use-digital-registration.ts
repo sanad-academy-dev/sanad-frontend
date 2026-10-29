@@ -215,6 +215,28 @@ export function useCreateRequest(campaignId: string) {
 			guardianEmail?: string | null;
 			guardianNationalId?: string | null;
 			source?: "WEBSITE" | "DIRECT_LINK" | "REFERRAL" | "SOCIAL" | "OTHER";
+			existingPatientId?: string | null;
+			existingOwnerId?: string | null;
+			learningMode?: string | null;
+			preferredShift?: string | null;
+			experienceLevel?: string | null;
+			priority?: string | null;
+			status?: string | null;
+			columnStatus?: string | null;
+			appointmentDate?: string | null;
+			reviewerId?: string | null;
+			reviewerName?: string | null;
+			roomId?: string | null;
+			roomName?: string | null;
+			notes?: string | null;
+			notifyWhatsapp?: boolean;
+			links?: Array<{ id?: string; title?: string; url: string }>;
+			documents?: Array<{
+				title: string;
+				fileUrl: string;
+				fileSize?: string;
+				type?: string;
+			}>;
 		}) => {
 			const res = await backendFetch(`/api/digital-registration/requests`, {
 				method: "POST",
@@ -224,6 +246,32 @@ export function useCreateRequest(campaignId: string) {
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل تسجيل طلب الطالب");
+			}
+			return res.json();
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
+			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
+			queryClient.invalidateQueries({ queryKey: ["patients"] });
+			queryClient.invalidateQueries({ queryKey: ["owners"] });
+			queryClient.invalidateQueries({ queryKey: ["appointments"] });
+		},
+	});
+}
+
+// ─── حذف طلب تسجيل نهائياً ──────────────────────────────────────────────────
+export function useDeleteRegistrationRequest(campaignId: string) {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async (requestId: string) => {
+			const res = await backendFetch(`/api/digital-registration/requests/${requestId}`, {
+				method: "DELETE",
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "فشل حذف طلب التسجيل");
 			}
 			return res.json();
 		},

@@ -2,13 +2,19 @@ import { type CollisionDetection, pointerWithin, rectIntersection } from "@dnd-k
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
 	IconActivity,
+	IconAlertTriangle,
 	IconCalendar,
 	IconCheck,
 	IconClipboardCheck,
 	IconClock,
+	IconDots,
+	IconEye,
 	IconFileDescription,
 	IconHourglass,
 	IconPlayerPauseFilled,
+	IconPlayerPlayFilled,
+	IconPlus,
+	IconTrash,
 	IconUser,
 	IconX,
 } from "@tabler/icons-react";
@@ -20,14 +26,33 @@ import {
 	KanbanProvider,
 } from "@/components/kanban";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { AppointmentColumnHeader } from "@/features/appointments/components/appointment-column-header";
 import type { AppointmentColumn, AppointmentColumnId } from "@/features/appointments/types/appointment.types";
 import { toast } from "sonner";
 import { CampaignRequestSheet } from "./campaign-request-sheet";
 import type { CampaignRequestItem } from "../types/campaign-request.types";
-import { useCampaignRequests, useUpdateRequestStatus } from "../hooks/use-digital-registration";
+import {
+	useCampaignRequests,
+	useDeleteRegistrationRequest,
+	useUpdateRequestStatus,
+} from "../hooks/use-digital-registration";
 
 const collisionDetection: CollisionDetection = (args) => {
 	const pointerCollisions = pointerWithin(args);
@@ -35,28 +60,36 @@ const collisionDetection: CollisionDetection = (args) => {
 };
 
 const CAMPAIGN_COLUMNS: AppointmentColumn[] = [
-	{ id: "queue" as AppointmentColumnId, name: "طابور الانتظار", count: 0, icon: <IconClock className="size-4" />, accent: "neutral" },
-	{ id: "check-in" as AppointmentColumnId, name: "التقييم", count: 0, icon: <IconClipboardCheck className="size-4" />, accent: "purple" },
-	{ id: "in-service" as AppointmentColumnId, name: "قيد المراجعة", count: 0, icon: <IconActivity className="size-4" />, accent: "amber" },
-	{ id: "awaiting-payment" as AppointmentColumnId, name: "انتظار الرد", count: 0, icon: <IconHourglass className="size-4" />, accent: "blue" },
-	{ id: "done" as AppointmentColumnId, name: "تم القبول", count: 0, icon: <IconCheck className="size-4" />, accent: "emerald" },
-	{ id: "cancelled" as AppointmentColumnId, name: "مرفوض", count: 0, icon: <IconX className="size-4" />, accent: "red" },
+	{ id: "queue" as AppointmentColumnId, name: "طابور", count: 0, icon: <IconClock className="size-4" />, accent: "blue" },
+	{ id: "shortlist" as AppointmentColumnId, name: "القائمة المختصرة", count: 0, icon: <IconClipboardCheck className="size-4" />, accent: "neutral" },
+	{ id: "interview" as AppointmentColumnId, name: "المقابلة الشخصية", count: 0, icon: <IconActivity className="size-4" />, accent: "amber" },
+	{ id: "evaluation" as AppointmentColumnId, name: "داخل التقييم", count: 0, icon: <IconPlayerPlayFilled className="size-4" />, accent: "amber" },
+	{ id: "waitlist" as AppointmentColumnId, name: "قائمة الانتظار", count: 0, icon: <IconHourglass className="size-4" />, accent: "purple" },
+	{ id: "accepted" as AppointmentColumnId, name: "مقبول", count: 0, icon: <IconCheck className="size-4" />, accent: "emerald" },
+	{ id: "rejected" as AppointmentColumnId, name: "مرفوض", count: 0, icon: <IconX className="size-4" />, accent: "red" },
 ];
 
 const COLUMN_STATUS_MAP: Record<
-	AppointmentColumnId,
+	string,
 	{
 		status: CampaignRequestItem["status"];
 		label: string;
-		variant: "warning" | "info" | "default";
+		variant: "warning" | "info" | "default" | "destructive";
 	}
 > = {
-	queue: { status: "QUEUE", label: "طابور الانتظار", variant: "warning" },
-	"check-in": { status: "EVALUATION", label: "التقييم", variant: "info" },
-	"in-service": { status: "REVIEW", label: "قيد المراجعة", variant: "info" },
-	"awaiting-payment": { status: "AWAITING_REPLY", label: "انتظار الرد", variant: "warning" },
-	done: { status: "ACCEPTED", label: "تم القبول", variant: "default" },
-	cancelled: { status: "REJECTED", label: "مرفوض", variant: "default" },
+	queue: { status: "QUEUE", label: "طابور", variant: "warning" },
+	shortlist: { status: "SHORTLIST", label: "القائمة المختصرة", variant: "info" },
+	interview: { status: "INTERVIEW", label: "المقابلة الشخصية", variant: "info" },
+	evaluation: { status: "IN_EVALUATION", label: "داخل التقييم", variant: "info" },
+	waitlist: { status: "WAITLIST", label: "قائمة الانتظار", variant: "warning" },
+	accepted: { status: "ACCEPTED", label: "مقبول", variant: "default" },
+	rejected: { status: "REJECTED", label: "مرفوض", variant: "destructive" },
+	// Backward compatibility with legacy appointment IDs
+	"check-in": { status: "SHORTLIST", label: "القائمة المختصرة", variant: "info" },
+	"in-service": { status: "INTERVIEW", label: "المقابلة الشخصية", variant: "info" },
+	"awaiting-payment": { status: "WAITLIST", label: "قائمة الانتظار", variant: "warning" },
+	done: { status: "ACCEPTED", label: "مقبول", variant: "default" },
+	cancelled: { status: "REJECTED", label: "مرفوض", variant: "destructive" },
 };
 
 const EMPTY_REQUESTS: CampaignRequestItem[] = [];
@@ -65,17 +98,21 @@ export function CampaignRequestsKanban({
 	campaignId,
 	searchQuery,
 	genderFilter,
+	onOpenAddRequest,
 }: {
 	campaignId: string;
 	searchQuery?: string;
 	genderFilter?: string;
+	onOpenAddRequest?: () => void;
 }) {
 	const { data: serverRequests = EMPTY_REQUESTS, isLoading } = useCampaignRequests(campaignId);
 	const updateStatusMutation = useUpdateRequestStatus(campaignId);
+	const deleteRequestMutation = useDeleteRegistrationRequest(campaignId || "");
 
 	const [data, setData] = useState<CampaignRequestItem[]>([]);
 	const lastKnownColumns = useRef<Map<string, AppointmentColumnId>>(new Map());
 	const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+	const [requestToDelete, setRequestToDelete] = useState<CampaignRequestItem | null>(null);
 
 	// Sync local state whenever server query refreshes
 	useEffect(() => {
@@ -137,17 +174,21 @@ export function CampaignRequestsKanban({
 		req: CampaignRequestItem,
 		newStatus: CampaignRequestItem["status"],
 	) => {
-		const statusToColumnMap: Record<CampaignRequestItem["status"], AppointmentColumnId> = {
+		const statusToColumnMap: Record<string, string> = {
 			QUEUE: "queue",
-			EVALUATION: "check-in",
-			REVIEW: "in-service",
-			AWAITING_REPLY: "awaiting-payment",
-			ACCEPTED: "done",
-			REJECTED: "cancelled",
+			SHORTLIST: "shortlist",
+			INTERVIEW: "interview",
+			IN_EVALUATION: "evaluation",
+			EVALUATION: "evaluation",
+			WAITLIST: "waitlist",
+			REVIEW: "shortlist",
+			AWAITING_REPLY: "waitlist",
+			ACCEPTED: "accepted",
+			REJECTED: "rejected",
 		};
 		const newColumn = statusToColumnMap[newStatus] || "queue";
 		const meta = COLUMN_STATUS_MAP[newColumn];
-		const prevCol = lastKnownColumns.current.get(req.id) || (req.column as AppointmentColumnId);
+		const prevCol = lastKnownColumns.current.get(req.id) || req.column;
 
 		lastKnownColumns.current.set(req.id, newColumn);
 
@@ -215,7 +256,7 @@ export function CampaignRequestsKanban({
 				continue;
 			}
 
-			const targetColumn = item.column as AppointmentColumnId;
+			const targetColumn = item.column;
 			const meta = COLUMN_STATUS_MAP[targetColumn] || COLUMN_STATUS_MAP.queue;
 
 			// Synchronously record new column in ref so consecutive drag events don't duplicate
@@ -290,6 +331,17 @@ export function CampaignRequestsKanban({
 					>
 						<AppointmentColumnHeader column={column as AppointmentColumn} />
 
+						{column.id === "queue" && onOpenAddRequest && (
+							<button
+								type="button"
+								onClick={onOpenAddRequest}
+								className="flex h-8 w-full items-center justify-center rounded-md border border-dashed border-border/80 bg-background/60 hover:bg-background text-muted-foreground hover:text-foreground text-xs gap-1 transition-colors mt-1 mb-2 shadow-2xs"
+								title="تسجيل طالب جديد في الطابور"
+							>
+								<IconPlus className="size-3.5" />
+							</button>
+						)}
+
 						<KanbanCards id={column.id}>
 							{(item: CampaignRequestItem) => (
 								<KanbanCard
@@ -310,9 +362,57 @@ export function CampaignRequestsKanban({
 									>
 										{/* Top row: Status Badge and Code */}
 										<div className="flex items-start justify-between gap-2">
-											<span className="text-[13px] font-medium text-muted-foreground">
-												{item.code}
-											</span>
+											<div className="flex items-center gap-1.5">
+												<span className="text-[13px] font-medium text-muted-foreground">
+													{item.code}
+												</span>
+												{/* قائمة الإجراءات السريعة (3 نقط) */}
+												<DropdownMenu dir="rtl">
+													<DropdownMenuTrigger asChild>
+														<button
+															type="button"
+															onClick={(e) => {
+																e.stopPropagation();
+															}}
+															className="size-6 rounded-md hover:bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+															title="خيارات الطلب"
+														>
+															<IconDots size={13} />
+														</button>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent
+														align="start"
+														className="w-40 z-[99]"
+														onClick={(e) => e.stopPropagation()}
+													>
+														<DropdownMenuItem
+															onClick={(e) => {
+																e.stopPropagation();
+																setSelectedRequestId(item.id);
+															}}
+															className="gap-2 text-xs cursor-pointer"
+														>
+															<IconEye size={14} className="text-muted-foreground" />
+															<span>عرض التفاصيل</span>
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															disabled={item.status === "ACCEPTED"}
+															onClick={(e) => {
+																e.stopPropagation();
+																if (item.status === "ACCEPTED") {
+																	toast.error("لا يمكن حذف طالب تم اعتماده وقبوله نهائياً");
+																	return;
+																}
+																setRequestToDelete(item);
+															}}
+															className="gap-2 text-xs text-destructive focus:text-destructive cursor-pointer"
+														>
+															<IconTrash size={14} />
+															<span>حذف الطلب نهائياً</span>
+														</DropdownMenuItem>
+													</DropdownMenuContent>
+												</DropdownMenu>
+											</div>
 											{(() => {
 												const cardMeta = COLUMN_STATUS_MAP[item.column as AppointmentColumnId] || {
 													status: item.status,
@@ -441,7 +541,65 @@ export function CampaignRequestsKanban({
 				onAccept={(req) => handleStatusChange(req, "ACCEPTED")}
 				onWaitlist={(req) => handleStatusChange(req, "QUEUE")}
 				onReject={(req) => handleStatusChange(req, "REJECTED")}
+				onDelete={(req) => {
+					setSelectedRequestId(null);
+					setRequestToDelete(req);
+				}}
 			/>
+
+			{/* نافذة تأكيد حذف طلب التسجيل نهائياً */}
+			<Dialog open={!!requestToDelete} onOpenChange={(open) => !open && setRequestToDelete(null)}>
+				<DialogContent className="max-w-md text-right" dir="rtl">
+					<DialogHeader>
+						<div className="flex items-center gap-2 text-destructive mb-1">
+							<IconAlertTriangle className="size-5" />
+							<DialogTitle className="text-base font-bold">تأكيد حذف طلب التسجيل</DialogTitle>
+						</div>
+						<DialogDescription className="text-xs text-muted-foreground leading-relaxed pt-1">
+							هل أنت متأكد من رغبتك في حذف طلب الطالب{" "}
+							<strong className="text-foreground font-semibold">"{requestToDelete?.patientName}"</strong>{" "}
+							برمز <span className="font-mono text-foreground font-semibold">({requestToDelete?.code})</span>؟
+							<br />
+							<span className="text-rose-600 dark:text-rose-400 mt-1 inline-block">
+								⚠️ هذا الإجراء نهائي وسيتم مسح بيانات التقديم والمستندات المرتبطة به.
+							</span>
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter className="gap-2 sm:gap-0 mt-3 flex-row-reverse justify-start">
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							onClick={() => setRequestToDelete(null)}
+							disabled={deleteRequestMutation.isPending}
+						>
+							إلغاء
+						</Button>
+						<Button
+							type="button"
+							variant="destructive"
+							size="sm"
+							disabled={deleteRequestMutation.isPending}
+							onClick={() => {
+								if (!requestToDelete) return;
+								deleteRequestMutation.mutate(requestToDelete.id, {
+									onSuccess: () => {
+										toast.success("تم حذف طلب التسجيل بنجاح");
+										setRequestToDelete(null);
+									},
+									onError: (err: any) => {
+										toast.error(err.message || "فشل حذف طلب التسجيل");
+									},
+								});
+							}}
+							className="gap-1.5"
+						>
+							<IconTrash className="size-3.5" />
+							{deleteRequestMutation.isPending ? "جاري الحذف..." : "نعم، حذف الطلب"}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
 		</div>
 	);
 }
