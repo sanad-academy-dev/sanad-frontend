@@ -47,9 +47,6 @@ import {
 	IconSparkles,
 	IconStar,
 	IconTools,
-	IconUser,
-	IconUserCheck,
-	IconUserPlus,
 	IconUsers,
 	IconX,
 } from "@tabler/icons-react";
@@ -396,7 +393,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 
 	// خيارات إضافية وتفاعلية
 	const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
-	const [showManagerSection, setShowManagerSection] = useState(false);
+	const [_showManagerSection, setShowManagerSection] = useState(false);
 	const [isStaffSheetOpen, setIsStaffSheetOpen] = useState(false);
 	const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>("none");
 	const [templateSearch, setTemplateSearch] = useState("");
@@ -767,7 +764,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 		toast.info("تم مسح المسودة المحفوظة");
 	};
 
-	const toggleStaff = (id: string) => {
+	const _toggleStaff = (id: string) => {
 		setSelectedStaffIds((prev) =>
 			prev.includes(id) ? prev.filter((sId) => sId !== id) : [...prev, id],
 		);
@@ -1230,262 +1227,288 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 												</div>
 											</div>
 										)}
-										{/* الصف الأول: المعرّف (يمين) + زر الأيقونة المنبثق لاختيار رمز ولون الفصل (وسط) + اسم الفصل (يسار) */}
-										<div className="flex items-start gap-2.5 w-full">
-											{/* 1. حقل المعرّف (في اليمين) */}
-											<Field className="w-36 sm:w-44 shrink-0">
-												<FieldLabel info="المعرّف الكودي الخاص بالفصل (يُولد تلقائياً إن ترك فارغاً)">
-													<Label
-														htmlFor="cls-code"
-														className="text-xs font-semibold flex items-center gap-1.5"
-													>
-														<span>المعرّف</span>
-														<span className="text-[10px] text-muted-foreground font-normal">
-															يُولد تلقائياً
-														</span>
-													</Label>
-												</FieldLabel>
-												<Input
-													id="cls-code"
-													value={code}
-													onChange={(e) => setCode(e.target.value)}
-													placeholder="مثال: PR-02"
-													className="w-full h-10 text-xs font-mono text-center sm:text-right bg-muted/40"
-												/>
-											</Field>
-
-											{/* 2. زر الأيقونة المنبثق لاختيار رمز ولون الفصل (في الوسط بجانب المعرّف) */}
-											<Field className="shrink-0 w-10">
-												<div
-													className="h-5 flex items-center justify-center invisible select-none"
-													aria-hidden="true"
-												>
-													<span className="text-xs font-semibold">رمز</span>
-												</div>
-												<Popover
-													modal={false}
-													open={iconPickerOpen}
-													onOpenChange={setIconPickerOpen}
-												>
-													<PopoverTrigger asChild>
-														<button
-															type="button"
-															className={cn(
-																"size-10 rounded-xl border flex items-center justify-center transition-all cursor-pointer shadow-2xs hover:scale-105 active:scale-95",
-																currentColorConfig.bg,
-															)}
-															title="اختر رمز ولون الفصل"
+										{/* الصف الأول: المعرّف (يمين) + زر الأيقونة (وسط) + اسم الفصل (يسار) — جميع الحقول على نفس السطر أفقياً بدقة مطلقة */}
+										<div className="w-full space-y-2">
+											{/* 1. صف التسميات والعناوين */}
+											<div className="flex items-center gap-2.5 w-full">
+												{/* عنوان المعرّف (في اليمين) */}
+												<div className="w-36 sm:w-44 shrink-0">
+													<FieldLabel info="المعرّف الكودي الخاص بالفصل (يُولد تلقائياً إن ترك فارغاً)">
+														<Label
+															htmlFor="cls-code"
+															className="text-xs font-semibold flex items-center gap-1.5"
 														>
-															{selectedIconType === "emoji" ? (
-																<span className="text-lg leading-none select-none">
-																	{selectedIcon}
-																</span>
-															) : (
-																<ActiveIconComponent className="size-5" />
-															)}
-														</button>
-													</PopoverTrigger>
+															<span>المعرّف</span>
+															<span className="text-[10px] text-muted-foreground font-normal">
+																يُولد تلقائياً
+															</span>
+														</Label>
+													</FieldLabel>
+												</div>
 
-													<PopoverContent
-														className="w-[360px] sm:w-[380px] p-3 shadow-xl rounded-xl border bg-popover"
-														align="start"
-														side="bottom"
-														sideOffset={6}
-														dir="rtl"
-														onOpenAutoFocus={(e) => e.preventDefault()}
-														onCloseAutoFocus={(e) => e.preventDefault()}
+												{/* فراغ توازن للأيقونة (في الوسط) */}
+												<div
+													className="w-10 shrink-0"
+													aria-hidden="true"
+												/>
+
+												{/* عنوان اسم الفصل (في اليسار) */}
+												<div className="flex-1 min-w-0">
+													<FieldLabel
+														required
+														info="أدخل اسماً واضحاً ومميزاً للفصل الدراسي"
 													>
-														{/* تبويبات الأيقونات / الإيموجي */}
-														<div className="flex border-b pb-2 mb-2.5">
+														<Label
+															htmlFor="cls-name"
+															className={cn(
+																"text-xs font-semibold",
+																touched.name && errors.name && "text-destructive",
+															)}
+														>
+															اسم الفصل
+														</Label>
+													</FieldLabel>
+												</div>
+											</div>
+
+											{/* 2. صف الحقول والأيقونة على نفس السطر أفقياً تماماً وبنفس الارتفاع (h-10) */}
+											<div className="flex items-center gap-2.5 w-full">
+												{/* حقل المعرّف */}
+												<div className="w-36 sm:w-44 shrink-0">
+													<Input
+														id="cls-code"
+														value={code}
+														onChange={(e) => setCode(e.target.value)}
+														placeholder="مثال: PR-02"
+														className="w-full h-10 text-xs font-mono text-center sm:text-right bg-muted/40"
+													/>
+												</div>
+
+												{/* زر الأيقونة المنبثق لاختيار رمز ولون الفصل */}
+												<div className="shrink-0 w-10 flex items-center justify-center">
+													<Popover
+														modal={false}
+														open={iconPickerOpen}
+														onOpenChange={setIconPickerOpen}
+													>
+														<PopoverTrigger asChild>
 															<button
 																type="button"
-																onClick={() => setActiveIconTab("icons")}
 																className={cn(
-																	"flex-1 text-center text-xs pb-1.5 transition-colors font-medium border-b-2 -mb-2.5",
-																	activeIconTab === "icons"
-																		? "border-primary text-primary font-semibold"
-																		: "border-transparent text-muted-foreground hover:text-foreground",
+																	"size-10 rounded-xl border flex items-center justify-center transition-all cursor-pointer shadow-2xs hover:scale-105 active:scale-95",
+																	currentColorConfig.bg,
 																)}
+																title="اختر رمز ولون الفصل"
 															>
-																الأيقونات
-															</button>
-															<button
-																type="button"
-																onClick={() => setActiveIconTab("emoji")}
-																className={cn(
-																	"flex-1 text-center text-xs pb-1.5 transition-colors font-medium border-b-2 -mb-2.5",
-																	activeIconTab === "emoji"
-																		? "border-primary text-primary font-semibold"
-																		: "border-transparent text-muted-foreground hover:text-foreground",
+																{selectedIconType === "emoji" ? (
+																	<span className="text-lg leading-none select-none">
+																		{selectedIcon}
+																	</span>
+																) : (
+																	<ActiveIconComponent className="size-5" />
 																)}
-															>
-																الإيموجي
 															</button>
-														</div>
+														</PopoverTrigger>
 
-														{/* شريط اختيار لون الأيقونة */}
-														<div className="flex items-center gap-1.5 py-1 px-0.5 overflow-x-auto no-scrollbar">
-															{/* دائرة تدرج ألوان */}
-															<button
-																type="button"
-																onClick={() => setSelectedColor("blue")}
-																className="size-5.5 rounded-full bg-gradient-to-tr from-pink-500 via-amber-400 to-indigo-500 shrink-0 border border-border/50 shadow-2xs transition-transform hover:scale-110"
-																title="تدرج ألوان"
-															/>
-															<div className="h-4 w-px bg-border shrink-0 mx-0.5" />
-
-															{/* دوائر الألوان المعتمدة */}
-															{COLOR_OPTIONS.map((c) => {
-																const isSelected = selectedColor === c.id;
-																return (
-																	<button
-																		key={c.id}
-																		type="button"
-																		onClick={() => setSelectedColor(c.id)}
-																		style={{ backgroundColor: c.hex }}
-																		className={cn(
-																			"size-5.5 rounded-full shrink-0 flex items-center justify-center transition-transform hover:scale-110 shadow-2xs",
-																			isSelected && "ring-2 ring-primary ring-offset-1",
-																		)}
-																		title={c.label}
-																	>
-																		{isSelected && (
-																			<IconCheck className="size-3 text-white stroke-[3]" />
-																		)}
-																	</button>
-																);
-															})}
-														</div>
-
-														{/* حقل البحث */}
-														<div className="relative my-2">
-															<Input
-																value={iconSearch}
-																onChange={(e) => setIconSearch(e.target.value)}
-																placeholder={
-																	activeIconTab === "icons"
-																		? "ابحث في الأيقونات..."
-																		: "ابحث في الإيموجي..."
-																}
-																className="h-8 text-xs text-right pr-7 pl-7 bg-muted/20"
-															/>
-															<IconSearch className="size-3.5 text-muted-foreground absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
-															{iconSearch && (
+														<PopoverContent
+															className="w-[360px] sm:w-[380px] p-3 shadow-xl rounded-xl border bg-popover"
+															align="start"
+															side="bottom"
+															sideOffset={6}
+															dir="rtl"
+															onOpenAutoFocus={(e) => e.preventDefault()}
+															onCloseAutoFocus={(e) => e.preventDefault()}
+														>
+															{/* تبويبات الأيقونات / الإيموجي */}
+															<div className="flex border-b pb-2 mb-2.5">
 																<button
 																	type="button"
-																	onClick={() => setIconSearch("")}
-																	className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+																	onClick={() => setActiveIconTab("icons")}
+																	className={cn(
+																		"flex-1 text-center text-xs pb-1.5 transition-colors font-medium border-b-2 -mb-2.5",
+																		activeIconTab === "icons"
+																			? "border-primary text-primary font-semibold"
+																			: "border-transparent text-muted-foreground hover:text-foreground",
+																	)}
 																>
-																	<IconX className="size-3" />
+																	الأيقونات
 																</button>
-															)}
-														</div>
+																<button
+																	type="button"
+																	onClick={() => setActiveIconTab("emoji")}
+																	className={cn(
+																		"flex-1 text-center text-xs pb-1.5 transition-colors font-medium border-b-2 -mb-2.5",
+																		activeIconTab === "emoji"
+																			? "border-primary text-primary font-semibold"
+																			: "border-transparent text-muted-foreground hover:text-foreground",
+																	)}
+																>
+																	الإيموجي
+																</button>
+															</div>
 
-														{/* شبكة الأيقونات أو الإيموجي */}
-														<div className="max-h-52 overflow-y-auto p-1.5 border rounded-lg bg-muted/20">
-															{activeIconTab === "icons" ? (
-																<div className="grid grid-cols-8 gap-1.5">
-																	{filteredIcons.map((item) => {
-																		const IconComp = item.icon;
-																		const isSelected =
-																			selectedIcon === item.id && selectedIconType === "icon";
-																		return (
-																			<button
-																				key={item.id}
-																				type="button"
-																				onClick={() => {
-																					setSelectedIcon(item.id);
-																					setSelectedIconType("icon");
-																					setIconPickerOpen(false);
-																				}}
-																				className={cn(
-																					"size-7.5 rounded-md flex items-center justify-center transition-all text-muted-foreground hover:text-foreground hover:bg-background shadow-2xs",
-																					isSelected &&
-																						"bg-primary/10 text-primary border border-primary/30",
-																				)}
-																				title={item.name}
-																			>
-																				<IconComp className="size-4" />
-																			</button>
-																		);
-																	})}
-																</div>
-															) : (
-																<div className="grid grid-cols-8 gap-1.5">
-																	{filteredEmojis.map((emoji) => {
-																		const isSelected =
-																			selectedIcon === emoji && selectedIconType === "emoji";
-																		return (
-																			<button
-																				key={emoji}
-																				type="button"
-																				onClick={() => {
-																					setSelectedIcon(emoji);
-																					setSelectedIconType("emoji");
-																					setIconPickerOpen(false);
-																				}}
-																				className={cn(
-																					"size-7.5 rounded-md flex items-center justify-center text-sm transition-all hover:bg-background hover:scale-110",
-																					isSelected &&
-																						"bg-primary/15 border border-primary/30",
-																				)}
-																			>
-																				{emoji}
-																			</button>
-																		);
-																	})}
-																</div>
-															)}
-														</div>
-													</PopoverContent>
-												</Popover>
-											</Field>
+															{/* شريط اختيار لون الأيقونة */}
+															<div className="flex items-center gap-1.5 py-1 px-0.5 overflow-x-auto no-scrollbar">
+																{/* دائرة تدرج ألوان */}
+																<button
+																	type="button"
+																	onClick={() => setSelectedColor("blue")}
+																	className="size-5.5 rounded-full bg-gradient-to-tr from-pink-500 via-amber-400 to-indigo-500 shrink-0 border border-border/50 shadow-2xs transition-transform hover:scale-110"
+																	title="تدرج ألوان"
+																/>
+																<div className="h-4 w-px bg-border shrink-0 mx-0.5" />
 
-											{/* 3. حقل اسم الفصل (في اليسار مع flex-1 ليأخذ بقية المساحة) */}
-											<Field
-												className="flex-1 min-w-0"
-												data-invalid={Boolean(touched.name && errors.name)}
-											>
-												<FieldLabel
-													required
-													info="أدخل اسماً واضحاً ومميزاً للفصل الدراسي"
-												>
-													<Label
-														htmlFor="cls-name"
+																{/* دوائر الألوان المعتمدة */}
+																{COLOR_OPTIONS.map((c) => {
+																	const isSelected = selectedColor === c.id;
+																	return (
+																		<button
+																			key={c.id}
+																			type="button"
+																			onClick={() => setSelectedColor(c.id)}
+																			style={{ backgroundColor: c.hex }}
+																			className={cn(
+																				"size-5.5 rounded-full shrink-0 flex items-center justify-center transition-transform hover:scale-110 shadow-2xs",
+																				isSelected && "ring-2 ring-primary ring-offset-1",
+																			)}
+																			title={c.label}
+																		>
+																			{isSelected && (
+																				<IconCheck className="size-3 text-white stroke-[3]" />
+																			)}
+																		</button>
+																	);
+																})}
+															</div>
+
+															{/* حقل البحث */}
+															<div className="relative my-2">
+																<Input
+																	value={iconSearch}
+																	onChange={(e) => setIconSearch(e.target.value)}
+																	placeholder={
+																		activeIconTab === "icons"
+																			? "ابحث في الأيقونات..."
+																			: "ابحث في الإيموجي..."
+																	}
+																	className="h-8 text-xs text-right pr-7 pl-7 bg-muted/20"
+																/>
+																<IconSearch className="size-3.5 text-muted-foreground absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+																{iconSearch && (
+																	<button
+																		type="button"
+																		onClick={() => setIconSearch("")}
+																		className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+																	>
+																		<IconX className="size-3" />
+																	</button>
+																)}
+															</div>
+
+															{/* شبكة الأيقونات أو الإيموجي */}
+															<div className="max-h-52 overflow-y-auto p-1.5 border rounded-lg bg-muted/20">
+																{activeIconTab === "icons" ? (
+																	<div className="grid grid-cols-8 gap-1.5">
+																		{filteredIcons.map((item) => {
+																			const IconComp = item.icon;
+																			const isSelected =
+																				selectedIcon === item.id &&
+																				selectedIconType === "icon";
+																			return (
+																				<button
+																					key={item.id}
+																					type="button"
+																					onClick={() => {
+																						setSelectedIcon(item.id);
+																						setSelectedIconType("icon");
+																						setIconPickerOpen(false);
+																					}}
+																					className={cn(
+																						"size-7.5 rounded-md flex items-center justify-center transition-all text-muted-foreground hover:text-foreground hover:bg-background shadow-2xs",
+																						isSelected &&
+																							"bg-primary/10 text-primary border border-primary/30",
+																					)}
+																					title={item.name}
+																				>
+																					<IconComp className="size-4" />
+																				</button>
+																			);
+																		})}
+																	</div>
+																) : (
+																	<div className="grid grid-cols-8 gap-1.5">
+																		{filteredEmojis.map((emoji) => {
+																			const isSelected =
+																				selectedIcon === emoji && selectedIconType === "emoji";
+																			return (
+																				<button
+																					key={emoji}
+																					type="button"
+																					onClick={() => {
+																						setSelectedIcon(emoji);
+																						setSelectedIconType("emoji");
+																						setIconPickerOpen(false);
+																					}}
+																					className={cn(
+																						"size-7.5 rounded-md flex items-center justify-center text-sm transition-all hover:bg-background hover:scale-110",
+																						isSelected &&
+																							"bg-primary/15 border border-primary/30",
+																					)}
+																				>
+																					{emoji}
+																				</button>
+																			);
+																		})}
+																	</div>
+																)}
+															</div>
+														</PopoverContent>
+													</Popover>
+												</div>
+
+												{/* حقل اسم الفصل (في اليسار مع flex-1 ليأخذ بقية المساحة وبنفس ارتفاع h-10) */}
+												<div className="flex-1 min-w-0">
+													<Input
+														id="cls-name"
+														value={name}
+														onChange={(e) => {
+															setName(e.target.value);
+															if (touched.name) validateField("name", e.target.value);
+														}}
+														onBlur={() => {
+															setTouched((prev) => ({ ...prev, name: true }));
+															validateField("name", name);
+														}}
+														placeholder="للمبرمجين الصغار"
+														aria-invalid={Boolean(touched.name && errors.name)}
 														className={cn(
-															"text-xs font-semibold",
-															touched.name && errors.name && "text-destructive",
+															"w-full h-10 text-xs text-right transition-colors",
+															touched.name &&
+																errors.name &&
+																"border-destructive focus-visible:ring-destructive",
 														)}
-													>
-														اسم الفصل
-													</Label>
-												</FieldLabel>
-												<Input
-													id="cls-name"
-													value={name}
-													onChange={(e) => {
-														setName(e.target.value);
-														if (touched.name) validateField("name", e.target.value);
-													}}
-													onBlur={() => {
-														setTouched((prev) => ({ ...prev, name: true }));
-														validateField("name", name);
-													}}
-													placeholder="للمبرمجين الصغار"
-													aria-invalid={Boolean(touched.name && errors.name)}
-													className={cn(
-														"w-full h-10 text-xs text-right transition-colors",
-														touched.name &&
-															errors.name &&
-															"border-destructive focus-visible:ring-destructive",
-													)}
-												/>
-												{touched.name && errors.name && (
-													<FieldError className="text-[11px] mt-1 text-destructive font-medium">
-														{errors.name}
-													</FieldError>
-												)}
-											</Field>
+													/>
+												</div>
+											</div>
+
+											{/* 3. رسالة خطأ اسم الفصل إن وُجدت — أسفل الحقل مباشرة وبدون أي تأثير على محاذاة الحقول */}
+											{touched.name && errors.name && (
+												<div className="flex items-center gap-2.5 w-full">
+													<div
+														className="w-36 sm:w-44 shrink-0"
+														aria-hidden="true"
+													/>
+													<div
+														className="w-10 shrink-0"
+														aria-hidden="true"
+													/>
+													<div className="flex-1 min-w-0">
+														<p className="text-[11px] text-destructive font-medium">
+															{errors.name}
+														</p>
+													</div>
+												</div>
+											)}
 										</div>
 
 										{/* حقل وصف الفصل — كامل العرض */}
@@ -1787,6 +1810,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 													</DropdownMenuLabel>
 
 													{/* حقل تخصيص وإضافة تصنيف جديد */}
+													{/* biome-ignore lint/a11y/noStaticElementInteractions: stops dropdown closing on click */}
 													<div
 														className="p-1 mb-1.5 border-b"
 														onClickCapture={(e) => e.stopPropagation()}
@@ -1847,6 +1871,8 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 															mergedClassifications.map((item) => {
 																const isCustom = !DEFAULT_CLASSIFICATIONS.includes(item);
 																return (
+																	// biome-ignore lint/a11y/noStaticElementInteractions: dropdown option
+																	// biome-ignore lint/a11y/useKeyWithClickEvents: dropdown option
 																	<div
 																		key={item}
 																		onClick={() => setClassification(item)}
@@ -2142,6 +2168,4 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 			/>
 		</>
 	);
-
 }
-
