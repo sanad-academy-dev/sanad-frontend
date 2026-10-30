@@ -49,12 +49,12 @@ function ClassroomsPage() {
 	const statsItems: StatItem[] = useMemo(
 		() => [
 			{
-				title: "اجمالي الفصول",
+				title: "إجمالي الفصول",
 				value: stats.totalClassrooms,
 				tooltip: "إجمالي عدد الفصول الدراسية المسجلة في النظام",
 			},
 			{
-				title: "نشط",
+				title: "الفصول النشطة",
 				value: stats.activeClassrooms,
 				tooltip: "عدد الفصول الدراسية المفعلة والنشطة حالياً",
 			},
@@ -64,9 +64,14 @@ function ClassroomsPage() {
 				tooltip: "إجمالي السعة الاستيعابية لجميع الفصول النشطة",
 			},
 			{
-				title: "مسجلون",
+				title: "الطلاب المسجلون",
 				value: stats.enrolledStudents,
 				tooltip: "إجمالي عدد الطلاب المسجلين حالياً في الفصول",
+			},
+			{
+				title: "المقاعد الشاغرة",
+				value: Math.max(0, stats.totalCapacity - stats.enrolledStudents),
+				tooltip: "عدد المقاعد المتاحة لتسجيل طلاب جدد في جميع الفصول",
 			},
 		],
 		[stats],

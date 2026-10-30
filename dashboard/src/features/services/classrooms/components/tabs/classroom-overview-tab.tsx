@@ -9,9 +9,7 @@ import {
 	IconGenderBigender,
 	IconLayoutGrid,
 	IconSchool,
-	IconTrendingUp,
 	IconUser,
-	IconUserCheck,
 	IconUserExclamation,
 	IconUserPlus,
 	IconUsers,
@@ -27,8 +25,9 @@ import {
 	startOfWeek,
 } from "date-fns";
 import { useCallback, useMemo } from "react";
-import { StatCard } from "@/components/common/stat-card";
+import { Stats } from "@/components/common/stats";
 import { Button } from "@/components/ui/button";
+import type { StatItem } from "@/features/dashboard/types/dashboard.types";
 import { useStudentAttendance } from "@/features/services/attendance/hooks/use-student-attendance";
 import { LEARNING_MODES } from "@/features/services/classrooms/data/constants";
 import { cn } from "@/lib/utils";
@@ -357,38 +356,40 @@ export function ClassroomOverviewTab({
 	// المشرف المسؤول
 	const leadTeacher = classroom.teachers?.[0] || null;
 
+	const overviewStats: StatItem[] = useMemo(
+		() => [
+			{
+				title: "الطلاب المسجلون",
+				value: enrolledCount,
+				tooltip: "إجمالي عدد الطلاب المسجلين حالياً في هذا الفصل",
+			},
+			{
+				title: "نسبة الإشغال",
+				value: occupancy,
+				valueLabel: `${occupancy}%`,
+				tooltip: `نسبة إشغال المقاعد من إجمالي السعة الاستيعابية (${capacityConfig.label})`,
+			},
+			{
+				title: "المقاعد الشاغرة",
+				value: availableSeats,
+				tooltip: "عدد المقاعد المتبقية المتاحة لتسجيل طلاب جدد",
+			},
+			{
+				title: "الكادر التعليمي",
+				value: classroom.teachers?.length || 0,
+				tooltip: "عدد المعلمين والمشرفين المعينين في هذا الفصل",
+			},
+		],
+		[enrolledCount, occupancy, capacityConfig.label, availableSeats, classroom.teachers],
+	);
+
 	return (
 		<div
 			className="flex flex-1 flex-col min-h-0 bg-background text-right"
 			dir="rtl"
 		>
-			{/* شريط الإحصائيات العلوي المعتمد في منصة سند */}
-			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3 px-5 pt-4">
-				<StatCard
-					label="الطلاب المسجلون"
-					icon={<IconUsers className="size-4" />}
-					value={enrolledCount}
-					subtitle="طالب مسجل"
-				/>
-				<StatCard
-					label="نسبة الإشغال"
-					icon={<IconTrendingUp className="size-4" />}
-					value={`${occupancy}%`}
-					subtitle={capacityConfig.label}
-				/>
-				<StatCard
-					label="المقاعد الشاغرة"
-					icon={<IconUserCheck className="size-4" />}
-					value={availableSeats}
-					subtitle="مقعد متاح"
-				/>
-				<StatCard
-					label="الكادر التعليمي"
-					icon={<IconSchool className="size-4" />}
-					value={classroom.teachers?.length || 0}
-					subtitle="معلم ومشرف"
-				/>
-			</div>
+			{/* شريط الإحصائيات المعتمد للمنصة */}
+			<Stats stats={overviewStats} className="px-5 pt-3" />
 
 			{/* محتوى الصفحة الرئيسي */}
 			<div className="flex-1 overflow-y-auto min-h-0 p-5 space-y-4">

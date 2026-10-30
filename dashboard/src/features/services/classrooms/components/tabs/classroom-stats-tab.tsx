@@ -16,11 +16,31 @@ import {
 	IconUsers,
 } from "@tabler/icons-react";
 import { useMemo } from "react";
-import { InfoField, StatCard } from "@/components/common/stat-card";
+import { Stats } from "@/components/common/stats";
 import { useStudentAttendance } from "@/features/services/attendance/hooks/use-student-attendance";
 import { LEARNING_MODES } from "@/features/services/classrooms/data/constants";
+import type { StatItem } from "@/features/dashboard/types/dashboard.types";
 import { cn } from "@/lib/utils";
 import type { ClassroomResponse, LearningMode } from "@/server/classrooms/classrooms.type";
+
+interface InfoFieldProps {
+	label: string;
+	icon?: React.ReactNode;
+	children: React.ReactNode;
+	className?: string;
+}
+
+function InfoField({ label, icon, children, className }: InfoFieldProps) {
+	return (
+		<div className={cn("flex flex-col gap-1.5 rounded-lg border p-3 bg-card", className)}>
+			<div className="flex items-center gap-1.5 text-muted-foreground">
+				{icon && <span className="text-muted-foreground shrink-0">{icon}</span>}
+				<p className="text-xs">{label}</p>
+			</div>
+			<div className="text-sm font-medium text-foreground">{children}</div>
+		</div>
+	);
+}
 
 interface ClassroomStatsTabProps {
 	classroom: ClassroomResponse;
@@ -188,38 +208,40 @@ export function ClassroomStatsTab({ classroom }: ClassroomStatsTabProps) {
 		};
 	}, [classRecords, enrolledCount]);
 
+	const statsItems: StatItem[] = useMemo(
+		() => [
+			{
+				title: "الطلاب المسجلون",
+				value: enrolledCount,
+				tooltip: "إجمالي عدد الطلاب المسجلين حالياً في هذا الفصل",
+			},
+			{
+				title: "نسبة الإشغال",
+				value: occupancy,
+				valueLabel: `${occupancy}%`,
+				tooltip: `نسبة إشغال الفصل بالنسبة للسعة القصوى (${capacityStatus.label})`,
+			},
+			{
+				title: "المقاعد الشاغرة",
+				value: availableSeats,
+				tooltip: "عدد المقاعد المتبقية المتاحة لتسجيل طلاب جدد",
+			},
+			{
+				title: "الكادر التعليمي",
+				value: classroom.teachers?.length || 0,
+				tooltip: "عدد المعلمين والمشرفين المعينين في الفصل",
+			},
+		],
+		[enrolledCount, occupancy, capacityStatus.label, availableSeats, classroom.teachers],
+	);
+
 	return (
 		<div
 			className="flex-1 overflow-y-auto p-5 space-y-5"
 			dir="rtl"
 		>
-			{/* 1. صف البطاقات الإحصائية العلوية الموحدة (StatCard) */}
-			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-				<StatCard
-					label="الطلاب المسجلون"
-					icon={<IconUsers className="size-4" />}
-					value={enrolledCount}
-					subtitle="طالب مسجل"
-				/>
-				<StatCard
-					label="نسبة الإشغال"
-					icon={<IconTrendingUp className="size-4" />}
-					value={`${occupancy}%`}
-					subtitle={capacityStatus.label}
-				/>
-				<StatCard
-					label="المقاعد الشاغرة"
-					icon={<IconUserCheck className="size-4" />}
-					value={availableSeats}
-					subtitle="مقعد متاح"
-				/>
-				<StatCard
-					label="الكادر التعليمي"
-					icon={<IconSchool className="size-4" />}
-					value={classroom.teachers?.length || 0}
-					subtitle="معلم ومشرف"
-				/>
-			</div>
+			{/* 1. صف البطاقات الإحصائية المعتمد للمنصة */}
+			<Stats stats={statsItems} className="py-0" />
 
 			{/* 2. قسم بيانات الطاقة الاستيعابية والتسجيل */}
 			<div className="flex flex-col gap-3">
