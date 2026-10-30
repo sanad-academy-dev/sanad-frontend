@@ -1,19 +1,14 @@
-import { useCallback, useMemo } from "react";
 import {
 	IconBook,
 	IconCalendar,
-	IconCalendarEvent,
 	IconCalendarStats,
-	IconCategory,
+	IconChartBar,
 	IconCheck,
-	IconClock,
 	IconEdit,
 	IconFileDescription,
 	IconGenderBigender,
 	IconLayoutGrid,
 	IconSchool,
-	IconTag,
-	IconTrendingDown,
 	IconTrendingUp,
 	IconUser,
 	IconUserCheck,
@@ -21,25 +16,23 @@ import {
 	IconUserPlus,
 	IconUsers,
 	IconWifi,
-	IconChartBar,
-	IconSparkles,
 } from "@tabler/icons-react";
 import {
-	format,
-	startOfWeek,
-	endOfWeek,
-	startOfMonth,
-	endOfMonth,
 	eachDayOfInterval,
+	endOfMonth,
+	endOfWeek,
+	format,
 	isToday,
+	startOfMonth,
+	startOfWeek,
 } from "date-fns";
+import { useCallback, useMemo } from "react";
+import { StatCard } from "@/components/common/stat-card";
 import { Button } from "@/components/ui/button";
-import { Stats } from "@/components/common/stats";
-import type { StatItem } from "@/features/dashboard/types/dashboard.types";
 import { useStudentAttendance } from "@/features/services/attendance/hooks/use-student-attendance";
 import { LEARNING_MODES } from "@/features/services/classrooms/data/constants";
-import type { ClassroomResponse, LearningMode } from "@/server/classrooms/classrooms.type";
 import { cn } from "@/lib/utils";
+import type { ClassroomResponse, LearningMode } from "@/server/classrooms/classrooms.type";
 
 interface ClassroomOverviewTabProps {
 	classroom: ClassroomResponse;
@@ -57,7 +50,11 @@ function formatArabicDate(dateStr?: string | Date): string {
 	try {
 		const d = new Date(dateStr);
 		if (Number.isNaN(d.getTime())) return "—";
-		return new Intl.DateTimeFormat("ar-EG", { year: "numeric", month: "long", day: "numeric" }).format(d);
+		return new Intl.DateTimeFormat("ar-EG", {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+		}).format(d);
 	} catch {
 		return "—";
 	}
@@ -79,7 +76,8 @@ function getCapacityConfig(pct: number) {
 			label: "مكتمل 100%",
 			barClass: "bg-emerald-500",
 			textClass: "text-emerald-600 dark:text-emerald-400",
-			badgeClass: "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300",
+			badgeClass:
+				"bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300",
 		};
 	}
 	if (pct >= 80) {
@@ -87,7 +85,8 @@ function getCapacityConfig(pct: number) {
 			label: "شبه مكتمل",
 			barClass: "bg-amber-500",
 			textClass: "text-amber-600 dark:text-amber-400",
-			badgeClass: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300",
+			badgeClass:
+				"bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300",
 		};
 	}
 	if (pct >= 60) {
@@ -131,15 +130,6 @@ const AVATAR_PALETTE = [
 	"bg-indigo-100 text-indigo-700 dark:bg-indigo-950/50 dark:text-indigo-300",
 ];
 
-// مواعيد الحصص المعتمدة للفصل
-const SCHEDULE_SESSIONS = [
-	{ id: "1", title: "جلسة تعليمية ومتابعة", day: "الأحد", time: "09:00 ص - 11:00 ص", icon: IconBook },
-	{ id: "2", title: "تطبيق عملي وأنشطة مهارية", day: "الاثنين", time: "09:00 ص - 11:00 ص", icon: IconSparkles },
-	{ id: "3", title: "جلسة تعليمية وتطوير لغوي", day: "الثلاثاء", time: "09:00 ص - 11:00 ص", icon: IconBook },
-	{ id: "4", title: "أنشطة تفاعلية حركية", day: "الأربعاء", time: "09:00 ص - 11:00 ص", icon: IconChartBar },
-	{ id: "5", title: "تقييم أسبوعي ومراجعة إنجاز", day: "الخميس", time: "09:00 ص - 11:00 ص", icon: IconCalendarEvent },
-];
-
 export function ClassroomOverviewTab({
 	classroom,
 	onEdit,
@@ -168,15 +158,21 @@ export function ClassroomOverviewTab({
 	const queryStart = weekStart < monthStart ? weekStart : monthStart;
 	const queryEnd = weekEnd > monthEnd ? weekEnd : monthEnd;
 
-	const { records: rawRecords, isLoading: isAttendanceLoading } = useStudentAttendance(queryStart, queryEnd);
+	const { records: rawRecords, isLoading: isAttendanceLoading } = useStudentAttendance(
+		queryStart,
+		queryEnd,
+	);
 
 	const studentIdsSet = useMemo(() => {
 		return new Set((classroom.students || []).map((s) => s.id));
 	}, [classroom.students]);
 
-	const getRecordStudentId = useCallback((rec: any): string => {
-		return rec.staffId || rec.studentId || rec.patientId || "";
-	}, []);
+	const getRecordStudentId = useCallback(
+		(rec: { staffId?: string; studentId?: string; patientId?: string }): string => {
+			return rec.staffId || rec.studentId || rec.patientId || "";
+		},
+		[],
+	);
 
 	const classroomRecords = useMemo(() => {
 		return (rawRecords || []).filter((r) => studentIdsSet.has(getRecordStudentId(r)));
@@ -211,10 +207,15 @@ export function ClassroomOverviewTab({
 		return workDays.map((day) => {
 			const dayKey = format(day, "yyyy-MM-dd");
 			const dayRecs = weekRecords.filter((r) => String(r.date).slice(0, 10) === dayKey);
-			const present = dayRecs.filter((r) => r.status === "PRESENT" || r.status === "LATE").length;
+			const present = dayRecs.filter(
+				(r) => r.status === "PRESENT" || r.status === "LATE",
+			).length;
 			const absent = dayRecs.filter((r) => r.status === "ABSENT").length;
 			const hasData = dayRecs.length > 0;
-			const pct = hasData && enrolledCount > 0 ? Math.min(100, Math.round((present / enrolledCount) * 100)) : null;
+			const pct =
+				hasData && enrolledCount > 0
+					? Math.min(100, Math.round((present / enrolledCount) * 100))
+					: null;
 
 			return {
 				day,
@@ -232,13 +233,17 @@ export function ClassroomOverviewTab({
 	// ==================== 4. ملخص الأسبوع الفعلي ====================
 	const weekSummary = useMemo(() => {
 		const daysWithData = dailyStats.filter((d) => d.pct !== null);
-		const avgPct = daysWithData.length > 0
-			? Math.round(daysWithData.reduce((acc, d) => acc + (d.pct || 0), 0) / daysWithData.length)
-			: null;
+		const avgPct =
+			daysWithData.length > 0
+				? Math.round(
+						daysWithData.reduce((acc, d) => acc + (d.pct || 0), 0) / daysWithData.length,
+					)
+				: null;
 
-		const bestDay = daysWithData.length > 0
-			? daysWithData.reduce((best, d) => ((d.pct ?? 0) > (best.pct ?? 0) ? d : best))
-			: null;
+		const bestDay =
+			daysWithData.length > 0
+				? daysWithData.reduce((best, d) => ((d.pct ?? 0) > (best.pct ?? 0) ? d : best))
+				: null;
 
 		const totalAbsent = weekRecords.filter((r) => r.status === "ABSENT").length;
 
@@ -247,9 +252,12 @@ export function ClassroomOverviewTab({
 
 	// ==================== 5. الإحصائيات الشهرية الفعلية ====================
 	const monthlyStats = useMemo(() => {
-		const presentMonthCount = monthRecords.filter((r) => r.status === "PRESENT" || r.status === "LATE").length;
+		const presentMonthCount = monthRecords.filter(
+			(r) => r.status === "PRESENT" || r.status === "LATE",
+		).length;
 		const totalMonthRecords = monthRecords.length;
-		const monthlyAvgPct = totalMonthRecords > 0 ? Math.round((presentMonthCount / totalMonthRecords) * 100) : null;
+		const monthlyAvgPct =
+			totalMonthRecords > 0 ? Math.round((presentMonthCount / totalMonthRecords) * 100) : null;
 
 		const checkInRecs = monthRecords.filter((r) => r.checkIn);
 		let avgArrivalStr = "07:30 ص";
@@ -280,7 +288,9 @@ export function ClassroomOverviewTab({
 		}
 
 		const daysInterval = eachDayOfInterval({ start: monthStart, end: today });
-		const passedWorkDays = daysInterval.filter((d) => d.getDay() >= 0 && d.getDay() <= 4).length;
+		const passedWorkDays = daysInterval.filter(
+			(d) => d.getDay() >= 0 && d.getDay() <= 4,
+		).length;
 		const activitiesCount = Math.max(1, passedWorkDays * 2);
 
 		return {
@@ -347,45 +357,41 @@ export function ClassroomOverviewTab({
 	// المشرف المسؤول
 	const leadTeacher = classroom.teachers?.[0] || null;
 
-	// ==================== 7. شريط بطاقات الإحصائيات العلوي الموحد للمنصة ====================
-	const topStats = useMemo<StatItem[]>(() => [
-		{
-			title: "الطلاب المسجلون",
-			value: enrolledCount,
-			tooltip: "إجمالي الطلاب المسجلين حالياً في هذا الفصل",
-			valueLabel: `${enrolledCount} طالب`,
-		},
-		{
-			title: "نسبة الإشغال",
-			value: occupancy,
-			tooltip: "نسبة إشغال مقاعد الفصل مقارنة بالسعة الكاملة",
-			valueLabel: `${occupancy}%`,
-		},
-		{
-			title: "المقاعد الشاغرة",
-			value: availableSeats,
-			tooltip: "عدد المقاعد المتاحة للتسجيل في هذا الفصل",
-			valueLabel: `${availableSeats} مقعد`,
-		},
-		{
-			title: "الكادر التعليمي",
-			value: classroom.teachers?.length || 0,
-			tooltip: "إجمالي المعلمين والمشرفين المعينين لهذا الفصل",
-			valueLabel: `${classroom.teachers?.length || 0} معلمين`,
-		},
-	], [enrolledCount, occupancy, availableSeats, classroom.teachers]);
-
 	return (
-		<div className="flex flex-1 flex-col min-h-0 bg-background text-right" dir="rtl">
+		<div
+			className="flex flex-1 flex-col min-h-0 bg-background text-right"
+			dir="rtl"
+		>
 			{/* شريط الإحصائيات العلوي المعتمد في منصة سند */}
-			<Stats
-				className="px-5 pt-3"
-				stats={topStats}
-			/>
+			<div className="grid grid-cols-2 sm:grid-cols-4 gap-3 px-5 pt-4">
+				<StatCard
+					label="الطلاب المسجلون"
+					icon={<IconUsers className="size-4" />}
+					value={enrolledCount}
+					subtitle="طالب مسجل"
+				/>
+				<StatCard
+					label="نسبة الإشغال"
+					icon={<IconTrendingUp className="size-4" />}
+					value={`${occupancy}%`}
+					subtitle={capacityConfig.label}
+				/>
+				<StatCard
+					label="المقاعد الشاغرة"
+					icon={<IconUserCheck className="size-4" />}
+					value={availableSeats}
+					subtitle="مقعد متاح"
+				/>
+				<StatCard
+					label="الكادر التعليمي"
+					icon={<IconSchool className="size-4" />}
+					value={classroom.teachers?.length || 0}
+					subtitle="معلم ومشرف"
+				/>
+			</div>
 
 			{/* محتوى الصفحة الرئيسي */}
 			<div className="flex-1 overflow-y-auto min-h-0 p-5 space-y-4">
-
 				{/* ┌──── شريط العنوان والإجراءات السريعة ────┐ */}
 				<div className="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-border w-full">
 					{/* يميناً: اسم الفصل والكود والحالة */}
@@ -401,18 +407,26 @@ export function ClassroomOverviewTab({
 										#{classroom.code}
 									</span>
 								)}
-								<span className={cn(
-									"text-[10px] font-medium px-2 py-0.5 rounded-[4px] border flex items-center gap-1.5",
-									classroom.active
-										? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
-										: "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800",
-								)}>
-									<span className={cn("size-1.5 rounded-full", classroom.active ? "bg-emerald-500" : "bg-slate-400")} />
+								<span
+									className={cn(
+										"text-[10px] font-medium px-2 py-0.5 rounded-[4px] border flex items-center gap-1.5",
+										classroom.active
+											? "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800"
+											: "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-900 dark:text-slate-400 dark:border-slate-800",
+									)}
+								>
+									<span
+										className={cn(
+											"size-1.5 rounded-full",
+											classroom.active ? "bg-emerald-500" : "bg-slate-400",
+										)}
+									/>
 									{classroom.active ? "نشط" : "غير نشط"}
 								</span>
 							</div>
 							<p className="text-[11px] text-muted-foreground mt-0.5 text-right">
-								{classroom.category || "عام"} • {classroom.ageGroup || "جميع الأعمار"} • {modeConfig.label}
+								{classroom.category || "عام"} • {classroom.ageGroup || "جميع الأعمار"} •{" "}
+								{modeConfig.label}
 							</p>
 						</div>
 					</div>
@@ -453,13 +467,11 @@ export function ClassroomOverviewTab({
 
 				{/* ┌──── تخطيط العمودين: اليمين = سعة الفصل والتفاصيل | اليسار = الإحصائيات ────┐ */}
 				<div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-start text-right">
-
 					{/* ═════════════════════════════════════════════════════════════════════
 					    العمود الأيمن (Right Column)
 					    نبذة عن الفصل + سعة الفصل + تفاصيل الفصل + الجدول
 					═════════════════════════════════════════════════════════════════════ */}
 					<div className="flex flex-col gap-4 text-right">
-
 						{/* 2. سعة الفصل (Progress) */}
 						<div className="rounded-[4px] border border-border bg-card text-right">
 							<div className="flex items-center justify-between w-full px-4 py-2.5 border-b border-border">
@@ -467,7 +479,12 @@ export function ClassroomOverviewTab({
 									<IconUsers className="size-3.5 text-primary shrink-0" />
 									سعة الفصل
 								</h3>
-								<span className={cn("text-[10px] font-medium px-2 py-0.5 rounded-[4px] border shrink-0", capacityConfig.badgeClass)}>
+								<span
+									className={cn(
+										"text-[10px] font-medium px-2 py-0.5 rounded-[4px] border shrink-0",
+										capacityConfig.badgeClass,
+									)}
+								>
 									{capacityConfig.label}
 								</span>
 							</div>
@@ -475,7 +492,9 @@ export function ClassroomOverviewTab({
 								{/* بيانات السعة الموحدة */}
 								<div className="rounded-[4px] border border-border bg-muted/20 p-3.5 space-y-3 text-right">
 									<div className="flex items-center justify-between text-xs w-full">
-										<span className="font-semibold text-foreground text-right">نسبة الإشغال الحالية</span>
+										<span className="font-semibold text-foreground text-right">
+											نسبة الإشغال الحالية
+										</span>
 										<span className="font-mono text-muted-foreground text-left text-[11px]">
 											{enrolledCount} من {capacity} مقاعد
 										</span>
@@ -483,7 +502,9 @@ export function ClassroomOverviewTab({
 
 									{/* النسبة والعدد */}
 									<div className="flex items-baseline gap-2 text-right">
-										<span className={cn("text-2xl font-bold font-mono", capacityConfig.textClass)}>
+										<span
+											className={cn("text-2xl font-bold font-mono", capacityConfig.textClass)}
+										>
 											{occupancy}%
 										</span>
 										<span className="text-[11px] text-muted-foreground">
@@ -494,7 +515,10 @@ export function ClassroomOverviewTab({
 									{/* شريط السعة المعتمد */}
 									<div className="relative h-2 w-full bg-muted rounded-[2px] overflow-hidden">
 										<div
-											className={cn("h-full rounded-[2px] transition-all duration-500", capacityConfig.barClass)}
+											className={cn(
+												"h-full rounded-[2px] transition-all duration-500",
+												capacityConfig.barClass,
+											)}
 											style={{ width: `${occupancy}%` }}
 										/>
 									</div>
@@ -502,11 +526,12 @@ export function ClassroomOverviewTab({
 									{/* مؤشرات الألوان */}
 									<div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-border">
 										{CAPACITY_SEGMENTS.map((seg) => (
-											<div key={seg.label} className="flex items-center gap-1.5 text-[10px] text-right">
+											<div
+												key={seg.label}
+												className="flex items-center gap-1.5 text-[10px] text-right"
+											>
 												<span className={cn("size-1.5 rounded-full shrink-0", seg.dot)} />
-												<span className="font-medium text-muted-foreground">
-													{seg.label}
-												</span>
+												<span className="font-medium text-muted-foreground">{seg.label}</span>
 											</div>
 										))}
 									</div>
@@ -515,24 +540,37 @@ export function ClassroomOverviewTab({
 								{/* إحصائيات المقاعد الثلاثة بتصميم مطابق لكروت المنصة العلوية */}
 								<div className="grid grid-cols-3 gap-2 pt-0.5">
 									<div className="text-center p-2.5 rounded-[4px] border border-border bg-card">
-										<div className="text-base font-bold font-mono text-primary">{enrolledCount}</div>
+										<div className="text-base font-bold font-mono text-primary">
+											{enrolledCount}
+										</div>
 										<div className="text-[10px] text-muted-foreground mt-0.5">مسجل</div>
 									</div>
 									<div className="text-center p-2.5 rounded-[4px] border border-border bg-card">
-										<div className={cn("text-base font-bold font-mono", availableSeats === 0 ? "text-rose-500" : "text-emerald-600 dark:text-emerald-400")}>
+										<div
+											className={cn(
+												"text-base font-bold font-mono",
+												availableSeats === 0
+													? "text-rose-500"
+													: "text-emerald-600 dark:text-emerald-400",
+											)}
+										>
 											{availableSeats}
 										</div>
 										<div className="text-[10px] text-muted-foreground mt-0.5">شاغر</div>
 									</div>
 									<div className="text-center p-2.5 rounded-[4px] border border-border bg-card">
-										<div className="text-base font-bold font-mono text-foreground">{capacity}</div>
-										<div className="text-[10px] text-muted-foreground mt-0.5">السعة الكلية</div>
+										<div className="text-base font-bold font-mono text-foreground">
+											{capacity}
+										</div>
+										<div className="text-[10px] text-muted-foreground mt-0.5">
+											السعة الكلية
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 
-												{/* 1. نبذة عن الفصل (About) */}
+						{/* 1. نبذة عن الفصل (About) */}
 						<div className="rounded-[4px] border border-border bg-card text-right">
 							<div className="flex items-center justify-between w-full px-4 py-2.5 border-b border-border">
 								<h3 className="text-xs font-bold flex items-center gap-2 text-foreground">
@@ -551,7 +589,8 @@ export function ClassroomOverviewTab({
 							</div>
 							<div className="p-4 text-right">
 								<p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap min-h-[36px] text-right">
-									{description || "لا توجد نبذة أو وصف مسجل لهذا الفصل بعد. يمكنك الضغط على تعديل لإضافة وصف شامل."}
+									{description ||
+										"لا توجد نبذة أو وصف مسجل لهذا الفصل بعد. يمكنك الضغط على تعديل لإضافة وصف شامل."}
 								</p>
 							</div>
 						</div>
@@ -572,8 +611,19 @@ export function ClassroomOverviewTab({
 											<span>الحالة</span>
 										</dt>
 										<dd className="text-xs font-medium flex items-center gap-1.5 text-left">
-											<span className={cn("size-1.5 rounded-full", classroom.active ? "bg-emerald-500" : "bg-slate-400")} />
-											<span className={classroom.active ? "text-emerald-600 dark:text-emerald-400 font-semibold" : "text-slate-500"}>
+											<span
+												className={cn(
+													"size-1.5 rounded-full",
+													classroom.active ? "bg-emerald-500" : "bg-slate-400",
+												)}
+											/>
+											<span
+												className={
+													classroom.active
+														? "text-emerald-600 dark:text-emerald-400 font-semibold"
+														: "text-slate-500"
+												}
+											>
 												{classroom.active ? "نشط" : "غير نشط"}
 											</span>
 										</dd>
@@ -592,7 +642,9 @@ export function ClassroomOverviewTab({
 													</span>
 													<span>{leadTeacher.name}</span>
 													{leadTeacher.role && (
-														<span className="text-[10px] text-muted-foreground">({leadTeacher.role})</span>
+														<span className="text-[10px] text-muted-foreground">
+															({leadTeacher.role})
+														</span>
 													)}
 												</>
 											) : (
@@ -643,7 +695,12 @@ export function ClassroomOverviewTab({
 											<span>نمط التعلم</span>
 										</dt>
 										<dd className="text-left">
-											<span className={cn("text-[10px] px-2 py-0.5 rounded-[4px] font-medium border border-border", modeConfig.className)}>
+											<span
+												className={cn(
+													"text-[10px] px-2 py-0.5 rounded-[4px] font-medium border border-border",
+													modeConfig.className,
+												)}
+											>
 												{modeConfig.label}
 											</span>
 										</dd>
@@ -719,7 +776,6 @@ export function ClassroomOverviewTab({
 								</div>
 							</div>
 						</div> */}
-
 					</div>
 
 					{/* ═════════════════════════════════════════════════════════════════════
@@ -727,7 +783,6 @@ export function ClassroomOverviewTab({
 					    إحصائيات الفصل الفعلية + أكثر الأطفال غياباً (من الباك إند)
 					═════════════════════════════════════════════════════════════════════ */}
 					<div className="flex flex-col gap-4 text-right">
-
 						{/* 1. ملخص الحضور — هذا الأسبوع */}
 						<div className="rounded-[4px] border border-border bg-card text-right">
 							<div className="flex items-center justify-between w-full px-4 py-2.5 border-b border-border">
@@ -743,25 +798,37 @@ export function ClassroomOverviewTab({
 								<div className="grid grid-cols-3 gap-2.5">
 									{/* متوسط الحضور */}
 									<div className="text-center p-3 rounded-[4px] border border-border bg-card">
-										<div className="text-[11px] text-muted-foreground font-medium mb-1">متوسط الحضور</div>
+										<div className="text-[11px] text-muted-foreground font-medium mb-1">
+											متوسط الحضور
+										</div>
 										<div className="text-xl font-bold font-mono text-foreground">
-											{isAttendanceLoading ? "..." : weekSummary.avgPct !== null ? `${weekSummary.avgPct}%` : "—"}
+											{isAttendanceLoading
+												? "..."
+												: weekSummary.avgPct !== null
+													? `${weekSummary.avgPct}%`
+													: "—"}
 										</div>
 									</div>
 
 									{/* أعلى يوم حضور */}
 									<div className="text-center p-3 rounded-[4px] border border-border bg-card">
-										<div className="text-[11px] text-muted-foreground font-medium mb-1">أعلى يوم حضور</div>
+										<div className="text-[11px] text-muted-foreground font-medium mb-1">
+											أعلى يوم حضور
+										</div>
 										<div className="text-xs sm:text-sm font-bold font-mono text-foreground truncate">
-											{isAttendanceLoading ? "..." : weekSummary.bestDay
-												? `${weekSummary.bestDay.label} (${weekSummary.bestDay.pct}%)`
-												: "—"}
+											{isAttendanceLoading
+												? "..."
+												: weekSummary.bestDay
+													? `${weekSummary.bestDay.label} (${weekSummary.bestDay.pct}%)`
+													: "—"}
 										</div>
 									</div>
 
 									{/* حالات غياب الأسبوع */}
 									<div className="text-center p-3 rounded-[4px] border border-border bg-card">
-										<div className="text-[11px] text-muted-foreground font-medium mb-1">حالات غياب</div>
+										<div className="text-[11px] text-muted-foreground font-medium mb-1">
+											حالات غياب
+										</div>
 										<div className="text-xl font-bold font-mono text-foreground">
 											{isAttendanceLoading ? "..." : `${weekSummary.totalAbsent} حالات`}
 										</div>
@@ -783,22 +850,35 @@ export function ClassroomOverviewTab({
 									{dailyStats.map((d) => {
 										const pct = d.pct ?? 0;
 										const isHigh = pct >= 90;
-										const barColor = d.pct === null ? "bg-muted" : isHigh ? "bg-primary" : "bg-muted-foreground/40";
+										const barColor =
+											d.pct === null
+												? "bg-muted"
+												: isHigh
+													? "bg-primary"
+													: "bg-muted-foreground/40";
 
 										return (
-											<div key={d.dayKey} className="flex items-center gap-3 w-full">
+											<div
+												key={d.dayKey}
+												className="flex items-center gap-3 w-full"
+											>
 												{/* 1. اسم اليوم يميناً في RTL */}
-												<span className={cn(
-													"text-xs font-medium w-14 text-right shrink-0",
-													d.isToday ? "text-primary font-bold" : "text-foreground",
-												)}>
+												<span
+													className={cn(
+														"text-xs font-medium w-14 text-right shrink-0",
+														d.isToday ? "text-primary font-bold" : "text-foreground",
+													)}
+												>
 													{d.label}
 												</span>
 
 												{/* 2. شريط التقدم اليومي في المنتصف */}
 												<div className="flex-1 h-2 bg-muted rounded-[2px] overflow-hidden">
 													<div
-														className={cn("h-full rounded-[2px] transition-all duration-500", barColor)}
+														className={cn(
+															"h-full rounded-[2px] transition-all duration-500",
+															barColor,
+														)}
 														style={{ width: `${pct}%` }}
 													/>
 												</div>
@@ -818,10 +898,14 @@ export function ClassroomOverviewTab({
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-right">
 							{/* متوسط الحضور الشهري */}
 							<div className="rounded-[4px] border border-border bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right">
-								<span className="text-xs text-muted-foreground font-medium text-right">متوسط الحضور الشهري</span>
+								<span className="text-xs text-muted-foreground font-medium text-right">
+									متوسط الحضور الشهري
+								</span>
 								<div className="text-right">
 									<div className="text-xl font-bold font-mono text-foreground text-right">
-										{monthlyStats.monthlyAvgPct !== null ? `${monthlyStats.monthlyAvgPct}%` : "89%"}
+										{monthlyStats.monthlyAvgPct !== null
+											? `${monthlyStats.monthlyAvgPct}%`
+											: "89%"}
 									</div>
 									<div className="text-[11px] text-muted-foreground mt-0.5 text-right">
 										معدل الحضور التراكمي
@@ -831,7 +915,9 @@ export function ClassroomOverviewTab({
 
 							{/* نسبة الإشغال */}
 							<div className="rounded-[4px] border border-border bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right">
-								<span className="text-xs text-muted-foreground font-medium text-right">نسبة الإشغال</span>
+								<span className="text-xs text-muted-foreground font-medium text-right">
+									نسبة الإشغال
+								</span>
 								<div className="text-right">
 									<div className="text-xl font-bold font-mono text-foreground text-right">
 										{occupancy}%
@@ -877,7 +963,9 @@ export function ClassroomOverviewTab({
 									أكثر الأطفال غياباً هذا الشهر
 								</h3>
 								<span className="text-[11px] text-muted-foreground font-mono shrink-0">
-									{mostAbsentStudents.length > 0 ? `${mostAbsentStudents.length} طلاب مسجلين` : "سجل الغياب"}
+									{mostAbsentStudents.length > 0
+										? `${mostAbsentStudents.length} طلاب مسجلين`
+										: "سجل الغياب"}
 								</span>
 							</div>
 							<div className="p-4 text-right">
@@ -890,10 +978,12 @@ export function ClassroomOverviewTab({
 											>
 												{/* الاسم والأفاتار يميناً في RTL */}
 												<div className="flex items-center gap-2.5 min-w-0 text-right">
-													<div className={cn(
-														"size-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0",
-														child.avatarColor,
-													)}>
+													<div
+														className={cn(
+															"size-7 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0",
+															child.avatarColor,
+														)}
+													>
 														{child.initials}
 													</div>
 													<div className="min-w-0 text-right">
@@ -910,11 +1000,10 @@ export function ClassroomOverviewTab({
 
 												{/* سبب الغياب وبادج الأيام يساراً */}
 												<div className="flex items-center gap-2 shrink-0 text-left">
-													<span className="text-xs text-muted-foreground">
-														{child.reason}
-													</span>
+													<span className="text-xs text-muted-foreground">{child.reason}</span>
 													<span className="text-[11px] font-medium px-2 py-0.5 rounded-[4px] bg-muted text-foreground border border-border">
-														{child.days} {child.days === 1 ? "يوم" : child.days === 2 ? "يومان" : "أيام"}
+														{child.days}{" "}
+														{child.days === 1 ? "يوم" : child.days === 2 ? "يومان" : "أيام"}
 													</span>
 												</div>
 											</div>
@@ -925,7 +1014,9 @@ export function ClassroomOverviewTab({
 										<div className="size-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
 											<IconCheck className="size-4" />
 										</div>
-										<span className="font-semibold text-foreground">لا توجد حالات غياب مسجلة هذا الشهر</span>
+										<span className="font-semibold text-foreground">
+											لا توجد حالات غياب مسجلة هذا الشهر
+										</span>
 										<span className="text-[11px] text-muted-foreground">
 											{enrolledCount > 0
 												? `سجل الحضور منتظم لجميع طلاب الفصل الـ ${enrolledCount}`
@@ -935,9 +1026,7 @@ export function ClassroomOverviewTab({
 								)}
 							</div>
 						</div>
-
 					</div>
-
 				</div>
 			</div>
 		</div>
