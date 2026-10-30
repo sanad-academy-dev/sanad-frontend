@@ -450,7 +450,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 			const trimmedCategory = (checkCategory || "").trim();
 			if (!trimmedCategory) {
 				newErrors.category = "يرجى تحديد فئة الفصل (مختلط / بنين / بنات)";
-			} else if (!CATEGORIES.includes(trimmedCategory as any)) {
+			} else if (!CATEGORIES.includes(trimmedCategory as (typeof CATEGORIES)[number])) {
 				newErrors.category = "فئة الفصل المحددة غير صالحة";
 			}
 
@@ -475,7 +475,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 
 	// التحقق اللحظي من حقل معين
 	const validateField = useCallback(
-		(field: "name" | "category" | "capacity", value: any) => {
+		(field: "name" | "category" | "capacity", value: unknown) => {
 			const tempErrors = validateForm({
 				name: field === "name" ? value : name,
 				category: field === "category" ? value : category,
@@ -818,9 +818,64 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 		addClassificationMutation(trimmed);
 	};
 
+	// 3 حقول مطلوبة أساسية لإنشاء الفصل: اسم الفصل، فئة الفصل، والسعة القصوى
+	const formProgress = useMemo(() => {
+		const trimmedName = name.trim();
+		const isNameFilled = trimmedName.length >= 2 && trimmedName.length <= 100;
+
+		const trimmedCategory = category.trim();
+		const isCategoryFilled =
+			Boolean(trimmedCategory) &&
+			CATEGORIES.includes(trimmedCategory as (typeof CATEGORIES)[number]);
+
+		const capNum = Number(capacity);
+		const isCapacityFilled =
+			capacity !== "" &&
+			!Number.isNaN(capNum) &&
+			Number.isInteger(capNum) &&
+			capNum >= 1 &&
+			capNum <= 500;
+
+		let filled = 0;
+		if (isNameFilled) filled++;
+		if (isCategoryFilled) filled++;
+		if (isCapacityFilled) filled++;
+
+		const requiredCount = 3;
+		const progress = Math.round((filled / requiredCount) * 100);
+		const isComplete = filled === requiredCount;
+
+		return {
+			filledCount: filled,
+			requiredCount,
+			progress,
+			isComplete,
+		};
+	}, [name, category, capacity]);
+
 	// 1. الانتقال إلى خطوة مراجعة تفاصيل الفصل قبل الإرسال مع التحقق الكامل
 	const handleFormSubmitToReview = (e?: React.FormEvent) => {
 		if (e) e.preventDefault();
+
+		if (!formProgress.isComplete) {
+			setTouched({
+				name: true,
+				category: true,
+				capacity: true,
+			});
+			const validationErrors = validateForm();
+			setErrors(validationErrors);
+			if (validationErrors.name) {
+				toast.error(validationErrors.name);
+				document.getElementById("cls-name")?.focus();
+			} else if (validationErrors.category) {
+				toast.error(validationErrors.category);
+			} else if (validationErrors.capacity) {
+				toast.error(validationErrors.capacity);
+				document.getElementById("cls-capacity")?.focus();
+			}
+			return;
+		}
 
 		setTouched({
 			name: true,
@@ -923,12 +978,12 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 		() => {
 			if (isReviewStep) {
 				handleFinalSubmit();
-			} else {
+			} else if (formProgress.isComplete) {
 				handleFormSubmitToReview();
 			}
 		},
 		{
-			enabled: open && !isPending,
+			enabled: open && !isPending && (isReviewStep || formProgress.isComplete),
 		},
 	);
 
@@ -1009,6 +1064,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 									identity={
 										isEdit && classroom ? { name: classroom.name, code: classroom.code } : null
 									}
+									progress={formProgress}
 									onClose={handleCloseAttempt}
 									actions={
 										<Button
@@ -1058,7 +1114,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 															onKeyDown={(e) => e.stopPropagation()}
 														/>
 													</div>
-													
+
 													{/* قائمة الخيارات */}
 													<div className="space-y-0.5">
 														{/* خيار بدون قالب */}
@@ -1067,12 +1123,10 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 															className={cn(
 																"w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs cursor-pointer transition-colors text-right",
 																selectedTemplateId === "none" || !selectedTemplateId
-																	?
-																	"bg-muted font-medium text-foreground"
+																	? "bg-muted font-medium text-foreground"
 																	: "text-foreground",
 															)}
 														>
-
 															<div className="flex items-center gap-2">
 																<IconScan className="size-4 text-foreground/80 shrink-0" />
 																<span className="text-xs">بدون قالب</span>
@@ -1177,7 +1231,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 											</div>
 										)}
 										{/* الصف الأول: المعرّف (يمين) + زر الأيقونة المنبثق لاختيار رمز ولون الفصل (وسط) + اسم الفصل (يسار) */}
-										<div className="flex items-end gap-2.5 w-full">
+										<div className="flex items-start gap-2.5 w-full">
 											{/* 1. حقل المعرّف (في اليمين) */}
 											<Field className="w-36 sm:w-44 shrink-0">
 												<FieldLabel info="المعرّف الكودي الخاص بالفصل (يُولد تلقائياً إن ترك فارغاً)">
@@ -1201,7 +1255,13 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 											</Field>
 
 											{/* 2. زر الأيقونة المنبثق لاختيار رمز ولون الفصل (في الوسط بجانب المعرّف) */}
-											<div className="shrink-0 mb-0.5">
+											<Field className="shrink-0 w-10">
+												<div
+													className="h-5 flex items-center justify-center invisible select-none"
+													aria-hidden="true"
+												>
+													<span className="text-xs font-semibold">رمز</span>
+												</div>
 												<Popover
 													modal={false}
 													open={iconPickerOpen}
@@ -1379,7 +1439,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 														</div>
 													</PopoverContent>
 												</Popover>
-											</div>
+											</Field>
 
 											{/* 3. حقل اسم الفصل (في اليسار مع flex-1 ليأخذ بقية المساحة) */}
 											<Field
@@ -1986,8 +2046,18 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 											<Button
 												type="submit"
 												size="sm"
-												disabled={isPending}
-												className="gap-1.5 cursor-pointer"
+												disabled={isPending || !formProgress.isComplete}
+												className={cn(
+													"gap-1.5 transition-all",
+													!formProgress.isComplete
+														? "opacity-50 cursor-not-allowed"
+														: "cursor-pointer font-semibold shadow-xs",
+												)}
+												title={
+													!formProgress.isComplete
+														? `يرجى إكمال الحقول المطلوبة (${formProgress.filledCount} من ${formProgress.requiredCount})`
+														: undefined
+												}
 											>
 												{isPending && <Spinner className="size-3.5" />}
 												<span>{isEdit ? "حفظ التعديلات" : "إنشاء الفصل"}</span>
@@ -2072,4 +2142,6 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 			/>
 		</>
 	);
+
 }
+
