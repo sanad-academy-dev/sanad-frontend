@@ -1058,7 +1058,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 															onKeyDown={(e) => e.stopPropagation()}
 														/>
 													</div>
-
+													
 													{/* قائمة الخيارات */}
 													<div className="space-y-0.5">
 														{/* خيار بدون قالب */}
@@ -1067,10 +1067,12 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 															className={cn(
 																"w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs cursor-pointer transition-colors text-right",
 																selectedTemplateId === "none" || !selectedTemplateId
-																	? "bg-muted font-medium text-foreground"
+																	?
+																	"bg-muted font-medium text-foreground"
 																	: "text-foreground",
 															)}
 														>
+
 															<div className="flex items-center gap-2">
 																<IconScan className="size-4 text-foreground/80 shrink-0" />
 																<span className="text-xs">بدون قالب</span>

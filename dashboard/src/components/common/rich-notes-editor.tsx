@@ -8,19 +8,14 @@ import {
 	IconItalic,
 	IconLink,
 	IconList,
+	IconListNumbers,
 	IconQuote,
 	IconStrikethrough,
 	IconTerminal2,
 	IconUnderline,
 } from "@tabler/icons-react";
-import {
-	type ChangeEvent,
-	type KeyboardEvent,
-	type ReactNode,
-	useCallback,
-	useRef,
-	useState,
-} from "react";
+import type { MouseEvent as ReactMouseEvent, ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
 	DropdownMenu,
@@ -31,7 +26,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export interface RichNotesEditorProps {
-	/** قيمة النص الحالي */
+	/** قيمة النص أو محتوى HTML الحالي */
 	value?: string;
 	/** دالة التحديث عند تغيير المحتوى */
 	onChange?: (value: string) => void;
@@ -56,174 +51,233 @@ export interface RichNotesEditorProps {
 }
 
 /**
- * محرر ملاحظات ونصوص غني موحّد للمنصة:
- * - يدعم شريط أدوات عائم (Aa, B, I, S, U, روابط, اقتباس, أكواد, قوائم, نسخ)
- * - يدعم نمط الحدود العلوية فقط (مفيش أي بوردر يمين أو شمال أو تحت)
- * - متوافق مع نصوص Markdown وPlain text
- * - قابل لإعادة الاستخدام في كافة الشاشات والنوافذ المنبثقة
+ * تحويل نصوص الماركداون القديمة أو النصوص العادية إلى HTML متوافق للعرض الفوري
+ */
+function parseInitialContent(val: string): string {
+	if (!val) return "";
+	// إذا كان النص بالفعل بتنسيق HTML
+	if (/<[a-z][\s\S]*>/i.test(val)) {
+		return val;
+	}
+	// تحويل نصوص الماركداون الشائعة إلى عناصر HTML حقيقية
+	let html = val.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+	html = html
+		.replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+		.replace(/(?<!\*)\*(?!\*)(.*?)(?<!\*)\*(?!\*)/g, "<i>$1</i>")
+		.replace(/&lt;u&gt;(.*?)&lt;\/u&gt;/gi, "<u>$1</u>")
+		.replace(/~~(.*?)~~/g, "<s>$1</s>")
+		.replace(
+			/`([^`]+)`/g,
+			'<code class="bg-muted px-1.5 py-0.5 rounded font-mono text-[11px]">$1</code>',
+		)
+		.replace(/\r\n|\n/g, "<br>");
+
+	return html;
+}
+
+/**
+ * محرر نصوص وملاحظات تفاعلي مرئي (WYSIWYG مثل مايكروسوفت وورد تماماً):
+ * - يظهر الخط العريض (Bold) والمائل والمسطر مباشرة أثناء الكتابة
+ * - شريط أدوات عائم يدعم تفعيل وإلغاء الأنماط بنقرة زر أو باختصارات الكيبورد (Ctrl+B, Ctrl+I, Ctrl+U)
+ * - يدعم بوردر علوي فقط وبدون أي بوردر يمين أو شمال أو أسفل
+ * - زر نسخ الملاحظات بنقرة واحدة
  */
 export function RichNotesEditor({
 	value = "",
 	onChange,
-	placeholder = "أضف ملاحظات أو تفاصيل هنا...",
+	placeholder = "أضف ملاحظات أو تفاصيل لهذا الفصل...",
 	className,
 	variant = "border-top-only",
 	minHeight = 90,
 	readOnly = false,
 	disabled = false,
 	id,
-	name,
 	dir = "rtl",
 }: RichNotesEditorProps) {
-	const textareaRef = useRef<HTMLTextAreaElement>(null);
+	const editorRef = useRef<HTMLDivElement>(null);
+	const isTypingRef = useRef(false);
+	const [isEmpty, setIsEmpty] = useState(true);
 	const [copied, setCopied] = useState(false);
 
-	// تطبيق التعديل التنسيقي على التحديد الحالي في textarea
-	const applyFormat = useCallback(
-		(
-			prefix: string,
-			suffix = "",
-			placeholderText = "",
-			mode: "wrap" | "line" | "replace" = "wrap",
-		) => {
-			const textarea = textareaRef.current;
-			if (!textarea || readOnly || disabled) return;
+	// حالات الأزرار النشطة (تضيء عند تواجد المؤشر على نص منسق مثل Word)
+	const [isBold, setIsBold] = useState(false);
+	const [isItalic, setIsItalic] = useState(false);
+	const [isUnderline, setIsUnderline] = useState(false);
+	const [isStrike, setIsStrike] = useState(false);
+	const [isList, setIsList] = useState(false);
+	const [isOrderedList, setIsOrderedList] = useState(false);
+	const [isBlockquote, setIsBlockquote] = useState(false);
+	const [currentHeading, setCurrentHeading] = useState<string>("p");
 
-			const start = textarea.selectionStart;
-			const end = textarea.selectionEnd;
-			const text = textarea.value;
-			const selectedText = text.substring(start, end);
+	// فحص ما إذا كان المحرر فارغاً لإظهار الـ Placeholder
+	const checkIsEmpty = useCallback(() => {
+		if (!editorRef.current) return;
+		const text = editorRef.current.innerText || "";
+		setIsEmpty(text.trim() === "");
+	}, []);
 
-			let newText = text;
-			let newCursorStart = start;
-			let newCursorEnd = end;
+	// تحديث حالات الأزرار النشطة بناءً على موقع المؤشر والتحديد الحالي
+	const updateActiveStates = useCallback(() => {
+		if (typeof document === "undefined" || !editorRef.current) return;
+		try {
+			setIsBold(document.queryCommandState("bold"));
+			setIsItalic(document.queryCommandState("italic"));
+			setIsUnderline(document.queryCommandState("underline"));
+			setIsStrike(document.queryCommandState("strikeThrough"));
+			setIsList(document.queryCommandState("insertUnorderedList"));
+			setIsOrderedList(document.queryCommandState("insertOrderedList"));
 
-			if (mode === "line") {
-				// تنسيق بداية السطر الحالي (مثل العناوين والاقتباس والقوائم)
-				const lastNewline = text.lastIndexOf("\n", start - 1);
-				const lineStart = lastNewline === -1 ? 0 : lastNewline + 1;
-				const nextNewline = text.indexOf("\n", end);
-				const lineEnd = nextNewline === -1 ? text.length : nextNewline;
-				const currentLine = text.substring(lineStart, lineEnd);
-
-				// إزالة أي بادئات سابقة لو كان نفس النمط أو تنظيف
-				const cleanedLine = currentLine.replace(/^(#{1,3}\s*|>\s*|-\s*|\d+\.\s*)/, "");
-				const formattedLine = `${prefix}${cleanedLine}`;
-
-				newText = text.substring(0, lineStart) + formattedLine + text.substring(lineEnd);
-				newCursorStart = lineStart + prefix.length;
-				newCursorEnd = lineStart + formattedLine.length;
-			} else if (mode === "replace") {
-				const replacement = prefix;
-				newText = text.substring(0, start) + replacement + text.substring(end);
-				newCursorStart = start + replacement.length;
-				newCursorEnd = newCursorStart;
-			} else {
-				// وضع الالتفاف wrap: فحص إذا كان النص المحدد ملفوفاً بالفعل لإلغاء التنسيق
-				const hasWrapper =
-					selectedText.startsWith(prefix) && (suffix ? selectedText.endsWith(suffix) : true);
-
-				if (hasWrapper) {
-					// إزالة التنسيق (Unwrap)
-					const unwrapped = selectedText.slice(
-						prefix.length,
-						suffix ? -suffix.length : undefined,
-					);
-					newText = text.substring(0, start) + unwrapped + text.substring(end);
-					newCursorStart = start;
-					newCursorEnd = start + unwrapped.length;
-				} else {
-					// تطبيق التنسيق
-					const contentToWrap = selectedText || placeholderText;
-					const wrapped = `${prefix}${contentToWrap}${suffix}`;
-					newText = text.substring(0, start) + wrapped + text.substring(end);
-					newCursorStart = start + prefix.length;
-					newCursorEnd = newCursorStart + contentToWrap.length;
+			// فحص الكتلة الحالية (H1, H2, H3, Blockquote)
+			const selection = window.getSelection();
+			if (selection && selection.rangeCount > 0) {
+				let node: Node | null = selection.anchorNode;
+				let heading = "p";
+				let inQuote = false;
+				while (node && node !== editorRef.current) {
+					if (node.nodeType === Node.ELEMENT_NODE) {
+						const tag = (node as HTMLElement).tagName.toLowerCase();
+						if (["h1", "h2", "h3"].includes(tag)) heading = tag;
+						if (tag === "blockquote") inQuote = true;
+					}
+					node = node.parentNode;
 				}
+				setCurrentHeading(heading);
+				setIsBlockquote(inQuote);
 			}
+		} catch {
+			// تجاهل أي استثناءات تحديد
+		}
+	}, []);
 
-			onChange?.(newText);
+	// مزامنة القيمة الخارجية الأولية أو عند تغييرها من الخارج بدون تشويش المؤشر
+	useEffect(() => {
+		if (!editorRef.current) return;
+		if (isTypingRef.current) return;
 
-			// إعادة التركيز وتحديد النص التنسيقي
-			requestAnimationFrame(() => {
-				textarea.focus();
-				textarea.setSelectionRange(newCursorStart, newCursorEnd);
-			});
+		const parsed = parseInitialContent(value);
+		if (editorRef.current.innerHTML !== parsed) {
+			editorRef.current.innerHTML = parsed;
+			checkIsEmpty();
+		}
+	}, [value, checkIsEmpty]);
+
+	// متابعة تغيير التحديد في المتصفح لتحديث حالة الأزرار النشطة تلقائياً
+	useEffect(() => {
+		const handleSelectionChange = () => {
+			if (document.activeElement === editorRef.current) {
+				updateActiveStates();
+			}
+		};
+		document.addEventListener("selectionchange", handleSelectionChange);
+		return () => document.removeEventListener("selectionchange", handleSelectionChange);
+	}, [updateActiveStates]);
+
+	// التعامل مع الإدخال وتحديث القيمة
+	const handleInput = useCallback(() => {
+		if (!editorRef.current) return;
+		isTypingRef.current = true;
+		checkIsEmpty();
+		updateActiveStates();
+
+		const content = editorRef.current.innerHTML;
+		const isEffectivelyEmpty =
+			editorRef.current.innerText.trim() === "" &&
+			!content.includes("<img") &&
+			!content.includes("<hr");
+
+		onChange?.(isEffectivelyEmpty ? "" : content);
+
+		setTimeout(() => {
+			isTypingRef.current = false;
+		}, 100);
+	}, [onChange, checkIsEmpty, updateActiveStates]);
+
+	// تنفيذ أمر التنسيق المباشر (WYSIWYG execCommand)
+	const exec = useCallback(
+		(command: string, arg?: string) => {
+			if (readOnly || disabled || !editorRef.current) return;
+			editorRef.current.focus();
+			document.execCommand(command, false, arg);
+			handleInput();
+			updateActiveStates();
 		},
-		[onChange, readOnly, disabled],
+		[readOnly, disabled, handleInput, updateActiveStates],
 	);
 
-	// إزالة كافة التنسيقات من التحديد
+	// إدراج أو تعديل رابط
+	const handleLink = useCallback(() => {
+		if (readOnly || disabled || !editorRef.current) return;
+		const selection = window.getSelection();
+		const currentText = selection?.toString() || "";
+		const url = window.prompt("أدخل رابط URL (مثال: https://example.com):", "https://");
+		if (url) {
+			if (!currentText) {
+				exec(
+					"insertHTML",
+					`<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`,
+				);
+			} else {
+				exec("createLink", url);
+			}
+		}
+	}, [readOnly, disabled, exec]);
+
+	// كود برمجي مضمن
+	const handleInlineCode = useCallback(() => {
+		if (readOnly || disabled || !editorRef.current) return;
+		const selection = window.getSelection();
+		const selected = selection?.toString() || "كود";
+		exec(
+			"insertHTML",
+			`<code class="bg-muted px-1.5 py-0.5 rounded font-mono text-[11px] text-foreground border border-border/40">${selected}</code>`,
+		);
+	}, [readOnly, disabled, exec]);
+
+	// كتلة كود كاملة
+	const handleCodeBlock = useCallback(() => {
+		if (readOnly || disabled || !editorRef.current) return;
+		const selection = window.getSelection();
+		const selected = selection?.toString() || "كود برمجي هنا...";
+		exec(
+			"insertHTML",
+			`<pre class="bg-muted/40 p-2.5 rounded-md font-mono text-xs overflow-x-auto my-1.5 border border-border/60"><code>${selected}</code></pre>`,
+		);
+	}, [readOnly, disabled, exec]);
+
+	// اقتباس
+	const handleQuote = useCallback(() => {
+		if (isBlockquote) {
+			exec("formatBlock", "<p>");
+		} else {
+			exec("formatBlock", "<blockquote>");
+		}
+	}, [isBlockquote, exec]);
+
+	// إزالة كافة التنسيقات
 	const handleClearFormatting = useCallback(() => {
-		const textarea = textareaRef.current;
-		if (!textarea || readOnly || disabled) return;
-
-		const start = textarea.selectionStart;
-		const end = textarea.selectionEnd;
-		const text = textarea.value;
-		const selectedText = text.substring(start, end);
-
-		if (!selectedText) return;
-
-		// تنظيف markdown وعلامات html الأساسية
-		const cleaned = selectedText
-			.replace(/\*\*(.*?)\*\*/g, "$1")
-			.replace(/\*(.*?)\*/g, "$1")
-			.replace(/~~(.*?)~~/g, "$1")
-			.replace(/<u>(.*?)<\/u>/gi, "$1")
-			.replace(/`{1,3}(.*?)`{1,3}/gs, "$1")
-			.replace(/^#{1,6}\s+/gm, "")
-			.replace(/^>\s+/gm, "")
-			.replace(/^-\s+/gm, "")
-			.replace(/\[(.*?)\]\(.*?\)/g, "$1");
-
-		const newText = text.substring(0, start) + cleaned + text.substring(end);
-		onChange?.(newText);
-
-		requestAnimationFrame(() => {
-			textarea.focus();
-			textarea.setSelectionRange(start, start + cleaned.length);
-		});
-	}, [onChange, readOnly, disabled]);
+		exec("removeFormat");
+		exec("formatBlock", "<p>");
+	}, [exec]);
 
 	// نسخ النص للحافظة
 	const handleCopy = useCallback(async () => {
-		if (!value) return;
+		if (!editorRef.current) return;
+		const text = editorRef.current.innerText.trim();
+		if (!text) return;
 		try {
-			await navigator.clipboard.writeText(value);
+			await navigator.clipboard.writeText(text);
 			setCopied(true);
 			toast.success("تم نسخ الملاحظات إلى الحافظة");
 			setTimeout(() => setCopied(false), 2000);
 		} catch {
 			toast.error("تعذر نسخ النص");
 		}
-	}, [value]);
-
-	// اختصارات لوحة المفاتيح الشائعة
-	const handleKeyDown = useCallback(
-		(e: KeyboardEvent<HTMLTextAreaElement>) => {
-			if (e.ctrlKey || e.metaKey) {
-				if (e.key === "b" || e.key === "B") {
-					e.preventDefault();
-					applyFormat("**", "**", "نص عريض");
-				} else if (e.key === "i" || e.key === "I") {
-					e.preventDefault();
-					applyFormat("*", "*", "نص مائل");
-				} else if (e.key === "u" || e.key === "U") {
-					e.preventDefault();
-					applyFormat("<u>", "</u>", "نص مسطر");
-				} else if (e.key === "k" || e.key === "K") {
-					e.preventDefault();
-					applyFormat("[", "](https://)", "رابط");
-				}
-			}
-		},
-		[applyFormat],
-	);
+	}, []);
 
 	// كلاسات الحاوية بناءً على variant
 	const containerStyles = cn(
-		"w-full transition-colors",
+		"relative w-full transition-colors",
 		variant === "border-top-only" &&
 			"border-t border-border border-x-0 border-b-0 rounded-none bg-transparent pt-2.5 pb-4 px-4 sm:px-5",
 		variant === "bordered" && "rounded-lg border border-border bg-card p-3 shadow-2xs",
@@ -236,11 +290,11 @@ export function RichNotesEditor({
 			className={containerStyles}
 			dir={dir}
 		>
-			{/* شريط الأدوات العائم بالأعلى جهة اليمين (مطابق للصورة) */}
+			{/* شريط الأدوات العائم بالأعلى جهة اليمين (مطابق للصورة تماماً) */}
 			{!readOnly && (
-				<div className="flex items-center justify-end mb-2">
-					<div className="flex items-center gap-0.5 rounded-lg border border-border/80 bg-background/95 backdrop-blur-xs px-1.5 py-1 shadow-2xs">
-						{/* 1. قائمة حجم ونمط الخط (Aa) */}
+				<div className="flex items-center justify-end mb-2.5">
+					<div className="flex items-center gap-0.5 rounded-lg border border-border/80 bg-background/95 backdrop-blur-xs px-1.5 py-1 shadow-2xs select-none">
+						{/* 1. قائمة نمط وحجم الخط (Aa ▾) */}
 						<DropdownMenu
 							dir={dir}
 							modal={false}
@@ -249,7 +303,13 @@ export function RichNotesEditor({
 								<button
 									type="button"
 									disabled={disabled}
-									className="h-7 px-1.5 gap-0.5 rounded flex items-center justify-center text-xs font-semibold text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors cursor-pointer outline-none"
+									onMouseDown={(e) => e.preventDefault()}
+									className={cn(
+										"h-7 px-1.5 gap-0.5 rounded flex items-center justify-center text-xs font-semibold transition-colors cursor-pointer outline-none",
+										currentHeading !== "p"
+											? "bg-primary/15 text-primary border border-primary/30 font-bold"
+											: "text-muted-foreground hover:text-foreground hover:bg-muted/80",
+									)}
 									title="أنماط النصوص والعناوين"
 								>
 									<span>Aa</span>
@@ -258,47 +318,53 @@ export function RichNotesEditor({
 							</DropdownMenuTrigger>
 							<DropdownMenuContent
 								align="end"
-								className="w-36 text-xs"
+								className="w-40 text-xs"
 							>
 								<DropdownMenuItem
-									onClick={() => applyFormat("", "", "", "line")}
-									className="cursor-pointer text-xs"
+									onClick={() => exec("formatBlock", "<p>")}
+									className="cursor-pointer text-xs flex items-center justify-between"
 								>
-									نص عادي
+									<span>نص عادي</span>
+									{currentHeading === "p" && <IconCheck className="size-3.5 text-primary" />}
 								</DropdownMenuItem>
 								<DropdownMenuItem
-									onClick={() => applyFormat("# ", "", "", "line")}
-									className="cursor-pointer text-xs font-bold"
+									onClick={() => exec("formatBlock", "<h1>")}
+									className="cursor-pointer text-xs font-bold flex items-center justify-between"
 								>
-									عنوان رئيسي (H1)
+									<span>عنوان رئيسي (H1)</span>
+									{currentHeading === "h1" && <IconCheck className="size-3.5 text-primary" />}
 								</DropdownMenuItem>
 								<DropdownMenuItem
-									onClick={() => applyFormat("## ", "", "", "line")}
-									className="cursor-pointer text-xs font-semibold"
+									onClick={() => exec("formatBlock", "<h2>")}
+									className="cursor-pointer text-xs font-semibold flex items-center justify-between"
 								>
-									عنوان فرعي (H2)
+									<span>عنوان فرعي (H2)</span>
+									{currentHeading === "h2" && <IconCheck className="size-3.5 text-primary" />}
 								</DropdownMenuItem>
 								<DropdownMenuItem
-									onClick={() => applyFormat("### ", "", "", "line")}
-									className="cursor-pointer text-xs font-medium"
+									onClick={() => exec("formatBlock", "<h3>")}
+									className="cursor-pointer text-xs font-medium flex items-center justify-between"
 								>
-									عنوان صغير (H3)
+									<span>عنوان صغير (H3)</span>
+									{currentHeading === "h3" && <IconCheck className="size-3.5 text-primary" />}
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
 
-						{/* 2. عريض Bold */}
+						{/* 2. عريض Bold (تظهر الكلمات عريضة مباشرة مثل الوورد) */}
 						<ToolbarButton
-							onClick={() => applyFormat("**", "**", "نص عريض")}
+							onClick={() => exec("bold")}
+							active={isBold}
 							disabled={disabled}
 							title="عريض (Ctrl+B)"
 						>
-							<IconBold className="size-3.5 stroke-[2.4]" />
+							<IconBold className="size-3.5 stroke-[2.6]" />
 						</ToolbarButton>
 
 						{/* 3. مائل Italic */}
 						<ToolbarButton
-							onClick={() => applyFormat("*", "*", "نص مائل")}
+							onClick={() => exec("italic")}
+							active={isItalic}
 							disabled={disabled}
 							title="مائل (Ctrl+I)"
 						>
@@ -307,7 +373,8 @@ export function RichNotesEditor({
 
 						{/* 4. مشطوب Strikethrough */}
 						<ToolbarButton
-							onClick={() => applyFormat("~~", "~~", "نص مشطوب")}
+							onClick={() => exec("strikeThrough")}
+							active={isStrike}
 							disabled={disabled}
 							title="مشطوب"
 						>
@@ -316,7 +383,8 @@ export function RichNotesEditor({
 
 						{/* 5. مسطر Underline */}
 						<ToolbarButton
-							onClick={() => applyFormat("<u>", "</u>", "نص مسطر")}
+							onClick={() => exec("underline")}
+							active={isUnderline}
 							disabled={disabled}
 							title="مسطر (Ctrl+U)"
 						>
@@ -325,16 +393,17 @@ export function RichNotesEditor({
 
 						{/* 6. رابط Link */}
 						<ToolbarButton
-							onClick={() => applyFormat("[", "](https://)", "رابط")}
+							onClick={handleLink}
 							disabled={disabled}
-							title="إدراج رابط (Ctrl+K)"
+							title="إدراج رابط"
 						>
 							<IconLink className="size-3.5" />
 						</ToolbarButton>
 
 						{/* 7. اقتباس Quote */}
 						<ToolbarButton
-							onClick={() => applyFormat("> ", "", "", "line")}
+							onClick={handleQuote}
+							active={isBlockquote}
 							disabled={disabled}
 							title="اقتباس"
 						>
@@ -352,16 +421,16 @@ export function RichNotesEditor({
 
 						{/* 9. كود برمجي مضمن Inline Code */}
 						<ToolbarButton
-							onClick={() => applyFormat("`", "`", "code")}
+							onClick={handleInlineCode}
 							disabled={disabled}
 							title="كود مضمن"
 						>
 							<IconCode className="size-3.5" />
 						</ToolbarButton>
 
-						{/* 10. كتلة كود Code Block */}
+						{/* 10. كتلة كود كاملة Code Block */}
 						<ToolbarButton
-							onClick={() => applyFormat("```\n", "\n```", "code")}
+							onClick={handleCodeBlock}
 							disabled={disabled}
 							title="كتلة كود برمجية"
 						>
@@ -370,11 +439,22 @@ export function RichNotesEditor({
 
 						{/* 11. قائمة نقطية Bullet List */}
 						<ToolbarButton
-							onClick={() => applyFormat("- ", "", "", "line")}
+							onClick={() => exec("insertUnorderedList")}
+							active={isList}
 							disabled={disabled}
 							title="قائمة نقطية"
 						>
 							<IconList className="size-3.5" />
+						</ToolbarButton>
+
+						{/* قائمة رقمية Numbered List */}
+						<ToolbarButton
+							onClick={() => exec("insertOrderedList")}
+							active={isOrderedList}
+							disabled={disabled}
+							title="قائمة رقمية"
+						>
+							<IconListNumbers className="size-3.5" />
 						</ToolbarButton>
 
 						{/* فاصل رأسي */}
@@ -383,7 +463,7 @@ export function RichNotesEditor({
 						{/* 12. نسخ المحتوى Copy */}
 						<ToolbarButton
 							onClick={handleCopy}
-							disabled={disabled || !value}
+							disabled={disabled || isEmpty}
 							title="نسخ الملاحظات"
 						>
 							{copied ? (
@@ -396,48 +476,88 @@ export function RichNotesEditor({
 				</div>
 			)}
 
-			{/* مساحة كتابة الملاحظات (بدون أي حدود داخلية أو حلقات تركيز مزعجة) */}
-			<textarea
-				ref={textareaRef}
-				id={id}
-				name={name}
-				value={value}
-				onChange={(e: ChangeEvent<HTMLTextAreaElement>) => onChange?.(e.target.value)}
-				onKeyDown={handleKeyDown}
-				placeholder={placeholder}
-				readOnly={readOnly}
-				disabled={disabled}
-				dir={dir}
-				style={{ minHeight: typeof minHeight === "number" ? `${minHeight}px` : minHeight }}
-				className={cn(
-					"w-full bg-transparent border-none outline-none ring-0 focus:ring-0 focus-visible:ring-0 focus:outline-none focus-visible:outline-none shadow-none resize-none",
-					"text-xs sm:text-[13px] leading-relaxed text-foreground placeholder:text-muted-foreground/60 font-sans text-right",
-					"disabled:cursor-not-allowed disabled:opacity-50",
+			{/* مساحة التحرير المرئية الحقيقية (WYSIWYG ContentEditable مثل برنامج Word) */}
+			<div className="relative w-full">
+				{isEmpty && (
+					<div
+						className="absolute top-0 right-0 pointer-events-none select-none text-xs sm:text-[13px] text-muted-foreground/60 leading-relaxed font-sans text-right"
+						dir={dir}
+					>
+						{placeholder}
+					</div>
 				)}
-			/>
+
+				{/* biome-ignore lint/a11y/useSemanticElements: contenteditable element acts as a rich WYSIWYG editor */}
+				<div
+					ref={editorRef}
+					id={id}
+					role="textbox"
+					tabIndex={0}
+					aria-multiline="true"
+					contentEditable={!readOnly && !disabled}
+					suppressContentEditableWarning={true}
+					onInput={handleInput}
+					onKeyUp={updateActiveStates}
+					onMouseUp={updateActiveStates}
+					onFocus={updateActiveStates}
+					dir={dir}
+					style={{
+						minHeight: typeof minHeight === "number" ? `${minHeight}px` : minHeight,
+					}}
+					className={cn(
+						"w-full bg-transparent border-none outline-none ring-0 shadow-none focus:ring-0 focus:outline-none focus-visible:outline-none focus-visible:ring-0",
+						"text-xs sm:text-[13px] leading-relaxed text-foreground font-sans text-right cursor-text",
+						"[&_b]:font-bold [&_strong]:font-bold",
+						"[&_i]:italic [&_em]:italic",
+						"[&_u]:underline [&_u]:underline-offset-2",
+						"[&_s]:line-through [&_strike]:line-through [&_s]:opacity-80",
+						"[&_h1]:text-base [&_h1]:sm:text-lg [&_h1]:font-bold [&_h1]:my-1.5 [&_h1]:leading-snug",
+						"[&_h2]:text-sm [&_h2]:sm:text-base [&_h2]:font-bold [&_h2]:my-1.5 [&_h2]:leading-snug",
+						"[&_h3]:text-xs [&_h3]:sm:text-sm [&_h3]:font-semibold [&_h3]:my-1 [&_h3]:leading-snug",
+						"[&_blockquote]:border-r-2 [&_blockquote]:border-primary/60 [&_blockquote]:pr-3 [&_blockquote]:py-1 [&_blockquote]:my-1.5 [&_blockquote]:italic [&_blockquote]:text-muted-foreground [&_blockquote]:bg-muted/20 [&_blockquote]:rounded-l",
+						"[&_ul]:list-disc [&_ul]:pr-5 [&_ul]:my-1 [&_ul]:space-y-0.5",
+						"[&_ol]:list-decimal [&_ol]:pr-5 [&_ol]:my-1 [&_ol]:space-y-0.5",
+						"[&_code]:bg-muted [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:font-mono [&_code]:text-[11px] [&_code]:text-foreground [&_code]:border [&_code]:border-border/40",
+						"[&_pre]:bg-muted/40 [&_pre]:p-2.5 [&_pre]:rounded-md [&_pre]:font-mono [&_pre]:text-xs [&_pre]:overflow-x-auto [&_pre]:my-1.5 [&_pre]:border [&_pre]:border-border/60",
+						"[&_a]:text-primary [&_a]:underline [&_a]:hover:opacity-80",
+						disabled && "cursor-not-allowed opacity-50",
+					)}
+				/>
+			</div>
 		</div>
 	);
 }
 
-/** زر شريط الأدوات الصغير */
+/** زر شريط الأدوات الصغير المتجاوب مع حالة التفعيل */
 function ToolbarButton({
 	children,
 	onClick,
-	disabled,
+	active = false,
+	disabled = false,
 	title,
 }: {
 	children: ReactNode;
 	onClick: () => void;
+	active?: boolean;
 	disabled?: boolean;
 	title: string;
 }) {
 	return (
 		<button
 			type="button"
+			onMouseDown={(e: ReactMouseEvent) => {
+				// منع فقدان التركيز من محرر النصوص عند النقر على أزرار التنسيق
+				e.preventDefault();
+			}}
 			onClick={onClick}
 			disabled={disabled}
 			title={title}
-			className="size-7 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 active:bg-muted transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed outline-none"
+			className={cn(
+				"size-7 rounded flex items-center justify-center transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed outline-none select-none",
+				active
+					? "bg-primary/15 text-primary border border-primary/30 font-bold shadow-2xs"
+					: "text-muted-foreground hover:text-foreground hover:bg-muted/80 active:bg-muted",
+			)}
 		>
 			{children}
 		</button>
