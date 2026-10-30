@@ -14,7 +14,11 @@ import {
 	IconTerminal2,
 	IconUnderline,
 } from "@tabler/icons-react";
-import type { MouseEvent as ReactMouseEvent, ReactNode } from "react";
+import type {
+	FocusEvent as ReactFocusEvent,
+	MouseEvent as ReactMouseEvent,
+	ReactNode,
+} from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
@@ -48,6 +52,8 @@ export interface RichNotesEditorProps {
 	name?: string;
 	/** محاذاة النص */
 	dir?: "rtl" | "ltr";
+	/** إظهار شريط الأدوات دائماً (افتراضياً: يظهر فقط عند الكتابة والتفاعل) */
+	alwaysShowToolbar?: boolean;
 }
 
 /**
@@ -78,6 +84,7 @@ function parseInitialContent(val: string): string {
 
 /**
  * محرر نصوص وملاحظات تفاعلي مرئي (WYSIWYG مثل مايكروسوفت وورد تماماً):
+ * - يظهر شريط التنسيق بسلاسة عند البدء في الكتابة أو التركيز على الحقل
  * - يظهر الخط العريض (Bold) والمائل والمسطر مباشرة أثناء الكتابة
  * - شريط أدوات عائم يدعم تفعيل وإلغاء الأنماط بنقرة زر أو باختصارات الكيبورد (Ctrl+B, Ctrl+I, Ctrl+U)
  * - يدعم بوردر علوي فقط وبدون أي بوردر يمين أو شمال أو أسفل
@@ -94,9 +101,18 @@ export function RichNotesEditor({
 	disabled = false,
 	id,
 	dir = "rtl",
+	alwaysShowToolbar = false,
 }: RichNotesEditorProps) {
+	const containerRef = useRef<HTMLDivElement>(null);
 	const editorRef = useRef<HTMLDivElement>(null);
 	const isTypingRef = useRef(false);
+	const blurTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+	// حالات التفاعل لإظهار شريط الأدوات عند الكتابة
+	const [isFocused, setIsFocused] = useState(false);
+	const [isHovered, setIsHovered] = useState(false);
+	const [isMenuOpen, setIsMenuOpen] = useState(false);
+
 	const [isEmpty, setIsEmpty] = useState(true);
 	const [copied, setCopied] = useState(false);
 
@@ -172,6 +188,42 @@ export function RichNotesEditor({
 		document.addEventListener("selectionchange", handleSelectionChange);
 		return () => document.removeEventListener("selectionchange", handleSelectionChange);
 	}, [updateActiveStates]);
+
+	// تنظيف المؤقت عند إلغاء التركيب
+	useEffect(() => {
+		return () => {
+			if (blurTimerRef.current) clearTimeout(blurTimerRef.current);
+		};
+	}, []);
+
+	// التعامل مع التركيز Focus
+	const handleFocus = useCallback(() => {
+		if (blurTimerRef.current) {
+			clearTimeout(blurTimerRef.current);
+			blurTimerRef.current = null;
+		}
+		setIsFocused(true);
+		updateActiveStates();
+	}, [updateActiveStates]);
+
+	// التعامل مع فقد التركيز Blur بسلاسة دون اختفاء فجائي
+	const handleBlur = useCallback(
+		(e: ReactFocusEvent) => {
+			if (isMenuOpen) return;
+
+			const related = e.relatedTarget as Node | null;
+			if (containerRef.current && related && containerRef.current.contains(related)) {
+				return;
+			}
+
+			blurTimerRef.current = setTimeout(() => {
+				if (!isMenuOpen && document.activeElement !== editorRef.current) {
+					setIsFocused(false);
+				}
+			}, 150);
+		},
+		[isMenuOpen],
+	);
 
 	// التعامل مع الإدخال وتحديث القيمة
 	const handleInput = useCallback(() => {
@@ -275,6 +327,10 @@ export function RichNotesEditor({
 		}
 	}, []);
 
+	// حالة ظهور شريط التنسيق: عند الكتابة أو التركيز على الحقل أو التحويم
+	const showToolbar =
+		!readOnly && !disabled && (alwaysShowToolbar || isFocused || isMenuOpen || isHovered);
+
 	// كلاسات الحاوية بناءً على variant
 	const containerStyles = cn(
 		"relative w-full transition-colors",
@@ -286,18 +342,34 @@ export function RichNotesEditor({
 	);
 
 	return (
+		// biome-ignore lint/a11y/noStaticElementInteractions: mouse enter/leave toggles toolbar visibility on hover
 		<div
+			ref={containerRef}
 			className={containerStyles}
 			dir={dir}
+			onMouseEnter={() => setIsHovered(true)}
+			onMouseLeave={() => setIsHovered(false)}
 		>
-			{/* شريط الأدوات العائم بالأعلى جهة اليمين (مطابق للصورة تماماً) */}
+			{/* شريط الأدوات العائم بالأعلى جهة اليمين — يظهر بسلاسة عند الكتابة في الحقل */}
 			{!readOnly && (
-				<div className="flex items-center justify-end mb-2.5">
+				<div
+					className={cn(
+						"flex items-center justify-end transition-all duration-200 ease-out",
+						showToolbar
+							? "opacity-100 translate-y-0 max-h-12 mb-2.5 pointer-events-auto"
+							: "opacity-0 -translate-y-1 max-h-0 mb-0 overflow-hidden pointer-events-none",
+					)}
+				>
 					<div className="flex items-center gap-0.5 rounded-lg border border-border/80 bg-background/95 backdrop-blur-xs px-1.5 py-1 shadow-2xs select-none">
 						{/* 1. قائمة نمط وحجم الخط (Aa ▾) */}
 						<DropdownMenu
 							dir={dir}
 							modal={false}
+							open={isMenuOpen}
+							onOpenChange={(open) => {
+								setIsMenuOpen(open);
+								if (open) setIsFocused(true);
+							}}
 						>
 							<DropdownMenuTrigger asChild>
 								<button
@@ -499,7 +571,8 @@ export function RichNotesEditor({
 					onInput={handleInput}
 					onKeyUp={updateActiveStates}
 					onMouseUp={updateActiveStates}
-					onFocus={updateActiveStates}
+					onFocus={handleFocus}
+					onBlur={handleBlur}
 					dir={dir}
 					style={{
 						minHeight: typeof minHeight === "number" ? `${minHeight}px` : minHeight,
