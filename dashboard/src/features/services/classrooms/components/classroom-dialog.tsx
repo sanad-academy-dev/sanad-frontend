@@ -393,7 +393,6 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 
 	// خيارات إضافية وتفاعلية
 	const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
-	const [_showManagerSection, setShowManagerSection] = useState(false);
 	const [isStaffSheetOpen, setIsStaffSheetOpen] = useState(false);
 	const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>("none");
 	const [templateSearch, setTemplateSearch] = useState("");
@@ -472,10 +471,10 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 
 	// التحقق اللحظي من حقل معين
 	const validateField = useCallback(
-		(field: "name" | "category" | "capacity", value: unknown) => {
+		(field: "name" | "category" | "capacity", value: string | number) => {
 			const tempErrors = validateForm({
-				name: field === "name" ? value : name,
-				category: field === "category" ? value : category,
+				name: field === "name" ? String(value) : name,
+				category: field === "category" ? String(value) : category,
 				capacity: field === "capacity" ? value : capacity,
 			});
 			setErrors((prev) => {
@@ -506,7 +505,6 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 		setNewClassificationInput("");
 		setLearningMode("");
 		setSelectedStaffIds([]);
-		setShowManagerSection(false);
 		setSelectedTemplateId("none");
 		setTemplateSearch("");
 		setTemplateMenuOpen(false);
@@ -593,7 +591,6 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 			}
 
 			setSelectedStaffIds(classroom.teachers?.map((t) => t.id) || []);
-			setShowManagerSection(Boolean(classroom.teachers?.length));
 			setIsReviewStep(false);
 		} else {
 			resetForm();
@@ -762,12 +759,6 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 		localStorage.removeItem("sanad_classroom_draft");
 		setHasDraft(false);
 		toast.info("تم مسح المسودة المحفوظة");
-	};
-
-	const _toggleStaff = (id: string) => {
-		setSelectedStaffIds((prev) =>
-			prev.includes(id) ? prev.filter((sId) => sId !== id) : [...prev, id],
-		);
 	};
 
 	// تصفية الأيقونات حسب البحث
