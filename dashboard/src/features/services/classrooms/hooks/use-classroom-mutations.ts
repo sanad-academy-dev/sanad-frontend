@@ -62,9 +62,14 @@ export const useDeleteClassroom = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: async (id: string) => {
+		mutationFn: async (args: string | { id: string; targetClassroomId?: string }) => {
+			const id = typeof args === "string" ? args : args.id;
+			const targetClassroomId = typeof args === "string" ? undefined : args.targetClassroomId;
+
 			const res = await backendFetch(`/api/classrooms/${id}`, {
 				method: "DELETE",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ targetClassroomId }),
 			});
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
@@ -74,6 +79,8 @@ export const useDeleteClassroom = () => {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["classrooms"] });
+			queryClient.invalidateQueries({ queryKey: ["classroom-stats"] });
+			queryClient.invalidateQueries({ queryKey: ["patients"] });
 			toast.success("تم حذف الفصل بنجاح");
 		},
 		onError: (error: Error) => {
