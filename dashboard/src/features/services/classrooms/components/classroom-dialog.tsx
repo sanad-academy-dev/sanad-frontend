@@ -1838,9 +1838,9 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 															<DropdownMenuSeparator className="my-1" />
 															<DropdownMenuItem
 																onClick={() => setBranch("")}
-																className="cursor-pointer text-xs text-destructive py-1.5 px-2.5 justify-center"
+																className="cursor-pointer text-xs text-muted-foreground hover:text-foreground py-1.5 px-2.5 justify-center transition-colors"
 															>
-																إلغاء التحديد
+																بدون فرع
 															</DropdownMenuItem>
 														</>
 													)}
@@ -1984,12 +1984,12 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 
 													{classification && (
 														<>
-															<DropdownMenuSeparator />
+															<DropdownMenuSeparator className="my-1" />
 															<DropdownMenuItem
 																onClick={() => setClassification("")}
-																className="cursor-pointer text-xs text-destructive"
+																className="cursor-pointer text-xs text-muted-foreground hover:text-foreground py-1.5 px-2.5 justify-center transition-colors"
 															>
-																إلغاء التحديد
+																بدون تصنيف
 															</DropdownMenuItem>
 														</>
 													)}
