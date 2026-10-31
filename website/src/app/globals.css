@@ -15,11 +15,11 @@
 
   --color-foreground: var(--foreground);
 
-  --font-sans: var(--font-thmanyah), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-thmanyah-display), ui-sans-serif, system-ui, sans-serif;
 
-  --font-heading: var(--font-thmanyah-display), var(--font-thmanyah), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-thmanyah-display), ui-sans-serif, system-ui, sans-serif;
 
-  --font-serif: var(--font-thmanyah-text), var(--font-thmanyah), serif;
+  --font-serif: var(--font-thmanyah-display), serif;
 
   --color-sidebar-ring: var(--sidebar-ring);
 
@@ -105,7 +105,7 @@
 
 body {
 
-  font-family: var(--font-thmanyah), sans-serif;
+  font-family: var(--font-thmanyah-display), sans-serif;
 
 }
 
@@ -145,9 +145,10 @@ body {
 
   --destructive: oklch(0.577 0.245 27.325);
 
-  --border: oklch(0.92 0.004 286.32);
+  --border: oklch(0.90 0.004 286.32);
 
-  --line: color-mix(in oklab, var(--border) 64%, var(--background));
+  /* Enhanced Light Mode Line Contrast — Crisp, clearly visible architectural CAD lines */
+  --line: var(--border);
 
   --surface: oklch(0.985 0 0);
 
@@ -223,15 +224,16 @@ body {
 
   --destructive: oklch(0.577 0.245 27.325);
 
-  --border: oklch(0.274 0.006 286.033);
+  --border: oklch(0.32 0.006 286.033);
 
-  --line: color-mix(in oklab, var(--border) 64%, var(--background));
+  /* Enhanced Dark Mode Line Contrast — Clearly defines cards and CAD grid lines against dark surfaces */
+  --line: oklch(0.34 0.008 286.033);
 
   --surface: oklch(0.21 0.006 285.885);
 
   --surface-foreground: oklch(0.985 0 0);
 
-  --input: oklch(0.274 0.006 286.033);
+  --input: oklch(0.32 0.006 286.033);
 
   --ring: oklch(0.552 0.016 285.938);
 
@@ -275,7 +277,7 @@ body {
 
     content: "";
 
-    @apply pointer-events-none absolute top-0 left-[-100vw] z-0 h-[2px] w-[200vw] bg-line;
+    @apply pointer-events-none absolute top-0 left-[-100vw] z-0 h-[1.25px] w-[200vw] bg-line;
 
   }
 
@@ -291,7 +293,7 @@ body {
 
     content: "";
 
-    @apply pointer-events-none absolute bottom-0 left-[-100vw] z-0 h-[2px] w-[200vw] bg-line;
+    @apply pointer-events-none absolute bottom-0 left-[-100vw] z-0 h-[1.25px] w-[200vw] bg-line;
 
   }
 
@@ -305,7 +307,35 @@ body {
 
     content: "";
 
-    @apply pointer-events-none absolute bottom-[-0.5rem] left-[-100vw] z-0 h-[2px] w-[200vw] bg-line;
+    @apply pointer-events-none absolute bottom-[-0.5rem] left-[-100vw] z-0 h-[1.25px] w-[200vw] bg-line;
+
+  }
+
+}
+
+@utility screen-dashed-line-top {
+
+  @apply screen-line-top;
+
+  &:before {
+
+    content: "";
+
+    @apply pointer-events-none absolute top-0 left-[-100vw] z-0 h-[1.25px] w-[200vw] bg-inherit bg-[linear-gradient(to_right,var(--line)_4px,transparent_2px)] bg-size-[6px_1.25px] bg-repeat-x;
+
+  }
+
+}
+
+@utility screen-dashed-line-bottom {
+
+  @apply screen-line-bottom;
+
+  &:after {
+
+    content: "";
+
+    @apply pointer-events-none absolute bottom-0 left-[-100vw] z-0 h-[1.25px] w-[200vw] bg-inherit bg-[linear-gradient(to_right,var(--line)_4px,transparent_2px)] bg-size-[6px_1.25px] bg-repeat-x;
 
   }
 
@@ -359,9 +389,9 @@ body {
 
   background-size: 10px 10px;
 
-  border-top: 2px solid var(--line);
+  border-top: 1.25px solid var(--line);
 
-  border-bottom: 2px solid var(--line);
+  border-bottom: 1.25px solid var(--line);
 
 }
 
@@ -369,9 +399,10 @@ body {
 
 
 
-/* CAD Architecture 2px Uniform Grid System — Every coordinate line is exactly 2px */
+/* CAD Architecture 1.25px Precision Grid System — Every coordinate line is exactly 1.25px */
 
-.border-line {
+.border-line,
+[class*="border-line"] {
 
   border-color: var(--line) !important;
 
@@ -379,66 +410,93 @@ body {
 
 
 
-.border-x.border-line {
+.border-x.border-line,
+.border-x[class*="border-line"],
+[class*="border-x"][class*="border-line"] {
 
-  border-inline-width: 2px !important;
-
-}
-
-
-
-.border-b.border-line {
-
-  border-bottom-width: 2px !important;
+  border-inline-width: 1.25px !important;
 
 }
 
 
 
-.border-t.border-line {
+.border-y.border-line,
+.border-y[class*="border-line"],
+[class*="border-y"][class*="border-line"] {
 
-  border-top-width: 2px !important;
-
-}
-
-
-
-.border-e.border-line {
-
-  border-inline-end-width: 2px !important;
+  border-top-width: 1.25px !important;
+  border-bottom-width: 1.25px !important;
 
 }
 
 
 
-.border-s.border-line {
+.border-b.border-line,
+.border-b[class*="border-line"],
+[class*="border-b"][class*="border-line"] {
 
-  border-inline-start-width: 2px !important;
-
-}
-
-
-
-.border.border-line {
-
-  border-width: 2px !important;
+  border-bottom-width: 1.25px !important;
 
 }
 
 
 
-.divide-line > :not(:last-child) {
+.border-t.border-line,
+.border-t[class*="border-line"],
+[class*="border-t"][class*="border-line"] {
+
+  border-top-width: 1.25px !important;
+
+}
+
+
+
+.border-e.border-line,
+.border-e[class*="border-line"],
+[class*="border-e"][class*="border-line"] {
+
+  border-inline-end-width: 1.25px !important;
+
+}
+
+
+
+.border-s.border-line,
+.border-s[class*="border-line"],
+[class*="border-s"][class*="border-line"] {
+
+  border-inline-start-width: 1.25px !important;
+
+}
+
+
+
+.border.border-line,
+.border[class*="border-line"] {
+
+  border-width: 1.25px !important;
+
+}
+
+
+
+.divide-line > :not(:last-child),
+[class*="divide-line"] > :not(:last-child) {
   border-color: var(--line) !important;
 }
 
-.divide-y.divide-line > :not(:last-child) {
+.divide-y.divide-line > :not(:last-child),
+.divide-y[class*="divide-line"] > :not(:last-child),
+[class*="divide-y"][class*="divide-line"] > :not(:last-child) {
   border-color: var(--line) !important;
-  border-bottom-width: 2px !important;
+  border-bottom-width: 1.25px !important;
 }
 
-.divide-x.divide-line > :not(:last-child) {
+.divide-x.divide-line > :not(:last-child),
+.divide-x[class*="divide-line"] > :not(:last-child),
+[class*="divide-x"][class*="divide-line"] > :not(:last-child) {
   border-color: var(--line) !important;
-  border-inline-end-width: 2px !important;
+  border-inline-end-width: 1.25px !important;
 }
 
 /* Responsive and direct border-0 overrides to maintain CAD line precision */
@@ -538,27 +596,23 @@ button *,
   }
 
   html {
-    @apply font-sans;
+    font-family: var(--font-thmanyah-display), ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
-    font-family: var(--font-thmanyah), ui-sans-serif, system-ui, sans-serif;
+    @apply bg-background text-foreground;
+    font-family: var(--font-thmanyah-display), ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
   }
 
-  h1, h2, h3, h4, h5, h6, .font-heading {
-    font-family: var(--font-thmanyah-display), var(--font-thmanyah), ui-sans-serif, system-ui, sans-serif;
+  h1, h2, h3, h4, h5, h6, .font-heading, .font-sans, .font-serif, .font-reading, button, input, textarea, select {
+    font-family: var(--font-thmanyah-display), ui-sans-serif, system-ui, sans-serif;
     letter-spacing: normal;
-  }
-
-  .font-serif, .font-reading {
-    font-family: var(--font-thmanyah-text), var(--font-thmanyah), serif;
   }
 
   .font-mono {

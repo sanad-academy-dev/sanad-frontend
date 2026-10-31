@@ -29,6 +29,7 @@ import {
 import { ArrowUpLeft } from "lucide-react";
 import { JoinButton } from "@/components/join-button";
 import { PATHS } from "@/lib/learning-paths";
+import { cn } from "@/lib/utils";
 import type { ComponentType } from "react";
 
 export type PathCardData = {
@@ -97,7 +98,13 @@ function getPathDetails(category?: string) {
   };
 }
 
-export default function PathCard({ path }: { path: PathCardData }) {
+export default function PathCard({
+  path,
+  className,
+}: {
+  path: PathCardData;
+  className?: string;
+}) {
   const CourseAnimation =
     (path.animation && ANIMATION_MAP[path.animation])
       ? ANIMATION_MAP[path.animation]
@@ -108,7 +115,12 @@ export default function PathCard({ path }: { path: PathCardData }) {
   const skills = path.skillsList ?? fallbackDetails.skills;
 
   return (
-    <article className="group/course relative flex h-[490px] sm:h-[500px] w-full flex-col overflow-hidden rounded-2xl border border-line bg-card transition-all duration-300 hover:border-primary/40 shadow-none">
+    <article
+      className={cn(
+        "group/course relative flex h-[490px] sm:h-[500px] w-full flex-col overflow-hidden bg-card transition-all duration-300 shadow-none",
+        className
+      )}
+    >
       <div className="relative m-2.5 flex aspect-18/10 items-center justify-center overflow-hidden rounded border border-line select-none">
         <CourseAnimation
           className="h-full w-full"
@@ -127,7 +139,7 @@ export default function PathCard({ path }: { path: PathCardData }) {
 
       <div dir="rtl" className="grid flex-1 grid-cols-[88px_1fr_1fr] sm:grid-cols-[100px_1fr_1fr] grid-rows-[auto_auto_auto_1fr_auto] bg-card text-right">
         {/* Row 1: Title */}
-        <div className="col-span-3 flex items-center justify-between border-y-2 border-line px-4 py-2.5">
+        <div className="col-span-3 flex items-center justify-between border-y border-line px-4 py-2.5">
           <h3 className="font-heading text-sm sm:text-base font-bold leading-snug text-foreground transition-colors group-hover/course:text-primary tracking-normal">
             {path.title}
           </h3>
@@ -176,7 +188,7 @@ export default function PathCard({ path }: { path: PathCardData }) {
           </JoinButton>
           <span
             aria-hidden="true"
-            className="h-full w-px shrink-0 bg-line"
+            className="h-full w-[1.25px] shrink-0 bg-line"
           />
           <Link
             href="/courses/details"

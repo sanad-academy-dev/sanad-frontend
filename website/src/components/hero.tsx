@@ -94,12 +94,12 @@ export default function Hero() {
 
           {/* Location & Delivery Mode Badges — Centered */}
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 text-xs font-semibold text-muted-foreground select-none">
-            <div className="flex items-center gap-1.5 rounded-full border border-border/70 bg-surface/70 px-3 py-1 backdrop-blur-xs">
+            <div className="flex items-center gap-1.5 rounded-full border border-line bg-surface/70 px-3 py-1 backdrop-blur-xs">
               <MapPin className="size-3.5 text-primary shrink-0" />
               <span>حضوري في الفروع</span>
             </div>
 
-            <div className="flex items-center gap-1.5 rounded-full border border-border/70 bg-surface/70 px-3 py-1 backdrop-blur-xs">
+            <div className="flex items-center gap-1.5 rounded-full border border-line bg-surface/70 px-3 py-1 backdrop-blur-xs">
               <span className="relative flex size-2 shrink-0">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
                 <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />

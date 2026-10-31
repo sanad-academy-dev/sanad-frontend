@@ -129,7 +129,7 @@ function Stepper({ active }: { active: number }) {
                 <Check className="size-3.5 text-white" strokeWidth={3} />
               </span>
             ) : (
-              <span className="flex size-6 items-center justify-center rounded-full border-[1.5px] border-[#EAECF0] bg-[#F9FAFB]">
+              <span className="flex size-6 items-center justify-center rounded-full border-[1.25px] border-[#EAECF0] bg-[#F9FAFB]">
                 <span className="size-2 rounded-full bg-[#D0D5DD]" />
               </span>
             )}
@@ -163,7 +163,7 @@ export function TrialModal({ onClose }: { onClose: () => void }) {
         exit={{ opacity: 0, scale: 0.96, y: 8 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
         onClick={(e) => e.stopPropagation()}
-        className="flex max-h-[90vh] w-full max-w-[729px] flex-col gap-8 overflow-y-auto rounded-xl border border-border/80 bg-card/95 backdrop-blur-md p-6 sm:p-12"
+        className="flex max-h-[90vh] w-full max-w-[729px] flex-col gap-8 overflow-y-auto rounded-xl border border-line bg-card/95 backdrop-blur-md p-6 sm:p-12"
       >
         <div className="flex flex-col gap-8">
           <div className="flex items-center justify-between gap-4">
@@ -179,7 +179,7 @@ export function TrialModal({ onClose }: { onClose: () => void }) {
               <X className="size-5" />
             </button>
           </div>
-          <div className="h-px w-full bg-secondary" />
+          <div className="h-[1.25px] w-full bg-line" />
           <Stepper active={step} />
         </div>
 
@@ -203,7 +203,7 @@ export function TrialModal({ onClose }: { onClose: () => void }) {
             <button
               type="button"
               onClick={() => setStep((s) => Math.max(0, s - 1))}
-              className="rounded border border-border px-8 py-2.5 text-base font-medium text-primary transition-colors hover:bg-primary/10"
+              className="rounded border border-line px-8 py-2.5 text-base font-medium text-primary transition-colors hover:bg-primary/10"
             >
               رجوع
             </button>
@@ -233,7 +233,7 @@ export default function FreeTrialDialog() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="rounded border border-border py-3 text-center text-base font-medium text-primary transition-colors hover:bg-primary/10"
+        className="rounded border border-line py-3 text-center text-base font-medium text-primary transition-colors hover:bg-primary/10"
       >
         الحصة الأولى تجريبية مجانية
       </button>

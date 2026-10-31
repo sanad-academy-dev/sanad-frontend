@@ -123,7 +123,7 @@ export default function JourneyChild() {
                       onClick={() => handleScroll("next")}
                       disabled={!canScrollLeft}
                       aria-label="المحطة التالية"
-                      className="size-8.5 sm:size-9 rounded-2xl border border-border/50 bg-secondary/80 hover:bg-secondary flex items-center justify-center text-foreground transition-all cursor-pointer disabled:opacity-25 disabled:pointer-events-none shadow-none"
+                      className="size-8.5 sm:size-9 rounded-2xl border border-line bg-secondary/80 hover:bg-secondary flex items-center justify-center text-foreground transition-all cursor-pointer disabled:opacity-25 disabled:pointer-events-none shadow-none"
                     >
                       <ArrowLeft className="size-4 sm:size-4.5" />
                     </button>
@@ -140,7 +140,7 @@ export default function JourneyChild() {
                       onClick={() => handleScroll("prev")}
                       disabled={!canScrollRight}
                       aria-label="المحطة السابقة"
-                      className="size-8.5 sm:size-9 rounded-2xl border border-border/50 bg-secondary/80 hover:bg-secondary flex items-center justify-center text-foreground transition-all cursor-pointer disabled:opacity-25 disabled:pointer-events-none shadow-none"
+                      className="size-8.5 sm:size-9 rounded-2xl border border-line bg-secondary/80 hover:bg-secondary flex items-center justify-center text-foreground transition-all cursor-pointer disabled:opacity-25 disabled:pointer-events-none shadow-none"
                     >
                       <ArrowRight className="size-4 sm:size-4.5" />
                     </button>
@@ -162,7 +162,7 @@ export default function JourneyChild() {
             <div className="relative flex w-max items-start py-2">
               <div
                 aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 top-[3.75rem] h-px border-t border-dashed border-line"
+                className="pointer-events-none absolute inset-x-0 top-[3.75rem] h-0 border-t border-dashed border-line"
               />
 
               {STATIONS.map((station) => (
@@ -184,7 +184,7 @@ export default function JourneyChild() {
 
                   <span
                     aria-hidden="true"
-                    className="absolute z-10 bg-border right-0 top-[3.75rem] h-3 w-px -translate-y-1/2"
+                    className="absolute z-10 bg-line right-0 top-[3.75rem] h-3 w-[1.25px] -translate-y-1/2"
                   />
 
                   <div className="pt-4 text-right">

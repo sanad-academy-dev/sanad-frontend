@@ -64,7 +64,7 @@ export function FormattedAssistantMessage({
       {lines.map((line, idx) => renderLine(line, idx))}
 
       {(suggestsTrial || suggestsPricing || suggestsWhatsapp) && (
-        <div className="mt-3.5 pt-2.5 border-t border-border/40 flex flex-wrap gap-1.5">
+        <div className="mt-3.5 pt-2.5 border-t border-line flex flex-wrap gap-1.5">
           {suggestsTrial && onOpenTrial && (
             <button
               onClick={onOpenTrial}
@@ -79,7 +79,7 @@ export function FormattedAssistantMessage({
           {suggestsPricing && onScrollToPricing && (
             <button
               onClick={onScrollToPricing}
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/60 hover:bg-muted text-foreground text-[11px] font-medium transition-all border border-border/60 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted/60 hover:bg-muted text-foreground text-[11px] font-medium transition-all border border-line cursor-pointer"
             >
               <Tag className="size-3 text-muted-foreground" />
               <span>خطط الأسعار</span>

@@ -16,7 +16,7 @@ export default function Container({
     <div
       className={cn(
         "mx-auto w-full max-w-5xl border-x border-line",
-        withBorder && "border-y",
+        withBorder && "border-y border-line",
         className
       )}
       {...props}

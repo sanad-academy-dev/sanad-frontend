@@ -222,7 +222,7 @@ export default function CourseDetailsPage() {
                 key={i}
                 className="w-[315px] shrink-0 snap-center sm:w-[355px] md:w-[385px] lg:w-[415px]"
               >
-                <PathCard path={course} />
+                <PathCard path={course} className="border border-line rounded-xl" />
               </div>
             ))}
           </div>

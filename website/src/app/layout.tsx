@@ -78,10 +78,10 @@ export default function RootLayout({
     >
       <body
         className={cn(
-          thmanyahSans.variable,
           thmanyahDisplay.variable,
+          thmanyahSans.variable,
           thmanyahText.variable,
-          "bg-background text-foreground antialiased min-h-screen flex flex-col overflow-x-clip"
+          "bg-background text-foreground antialiased min-h-screen flex flex-col overflow-x-clip font-heading"
         )}
         suppressHydrationWarning
       >

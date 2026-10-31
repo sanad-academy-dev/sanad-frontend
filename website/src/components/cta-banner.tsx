@@ -32,7 +32,7 @@ function ComingSoonPopup({ onClose }: { onClose: () => void }) {
         exit={{ opacity: 0, scale: 0.96, y: 8 }}
         transition={{ duration: 0.2, ease: "easeOut" }}
         onClick={(e) => e.stopPropagation()}
-        className="relative flex w-full max-w-sm flex-col gap-4 overflow-hidden rounded-xl bg-card p-5 sm:p-6 text-center border border-border"
+        className="relative flex w-full max-w-sm flex-col gap-4 overflow-hidden rounded-xl bg-card p-5 sm:p-6 text-center border border-line"
         dir="rtl"
       >
         <button

@@ -49,7 +49,7 @@ export default function Support() {
   return (
     <section className="relative w-full overflow-hidden bg-background">
       <Container className="py-20 md:py-28" >
-        <div className="w-full border-t border-border pt-20 md:pt-28">
+        <div className="w-full border-t border-line pt-20 md:pt-28">
         <div className="flex flex-col items-center justify-center text-center space-y-6 mb-16">
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold text-foreground tracking-tight">
             كيف يمكننا مساعدتك؟
@@ -59,9 +59,9 @@ export default function Support() {
           </p>
         </div>
 
-        <div className="w-full rounded-xl border border-border/80 bg-card/60 backdrop-blur-xs overflow-hidden" dir="rtl">
+        <div className="w-full rounded-xl border border-line bg-card/60 backdrop-blur-xs overflow-hidden" dir="rtl">
           {/* Top Banner */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between p-8 md:p-12 border-b border-border/80 gap-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between p-8 md:p-12 border-b border-line gap-8">
             <div className="flex flex-col items-start gap-4 max-w-2xl">
               <h3 className="text-2xl md:text-4xl font-bold text-foreground tracking-tight">
                 تواصل مع فريق سند

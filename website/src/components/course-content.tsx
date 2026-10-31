@@ -124,7 +124,7 @@ export default function CourseContent() {
           >
             {tab}
             {activeTab === tab && (
-              <span className="absolute inset-x-0 -bottom-px h-[2px] bg-primary" />
+              <span className="absolute inset-x-0 -bottom-px h-[1.25px] bg-primary" />
             )}
           </button>
         ))}
