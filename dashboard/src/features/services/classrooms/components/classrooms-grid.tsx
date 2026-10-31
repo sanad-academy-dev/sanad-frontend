@@ -32,6 +32,7 @@ import {
 	IconPlus,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
+import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -527,40 +528,20 @@ function ClassroomCard({
 
 				{/* الجانب الأيسر (في RTL): ستاك أفاتار المعلمين مطابقة للأفاتار في الصورة */}
 				<div
-					className="flex items-center -space-x-2 space-x-reverse shrink-0"
+					className="shrink-0"
 					title="المعلمون والمشرفون على الفصل"
 				>
 					{classroom.teachers && classroom.teachers.length > 0 ? (
-						<>
-							{classroom.teachers.slice(0, 3).map((teacher, idx, arr) => (
-								<div
-									key={teacher.id}
-									style={{ zIndex: arr.length - idx }}
-									title={`${teacher.name}${teacher.role ? ` (${teacher.role})` : ""}`}
-									className="relative size-6.5 rounded-full ring-2 ring-background flex items-center justify-center text-[10px] font-bold bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#7C3AED]/25 dark:text-[#DDD6FE] shadow-2xs transition-transform hover:scale-115 hover:z-30 select-none cursor-default"
-								>
-									{teacher.image ? (
-										<img
-											src={teacher.image}
-											alt={teacher.name}
-											className="size-full object-cover rounded-full"
-										/>
-									) : (
-										<span>{getInitials(teacher.name)}</span>
-									)}
-								</div>
-							))}
-
-							{classroom.teachers.length > 3 && (
-								<div
-									style={{ zIndex: 0 }}
-									className="relative size-6.5 rounded-full ring-2 ring-background bg-muted text-[10px] font-bold text-muted-foreground flex items-center justify-center shadow-2xs select-none"
-									title={`+${classroom.teachers.length - 3} معلمين إضافيين`}
-								>
-									+{classroom.teachers.length - 3}
-								</div>
-							)}
-						</>
+						<AvatarCirclesStack
+							items={classroom.teachers.map((teacher) => ({
+								id: teacher.id,
+								name: teacher.name,
+								title: `${teacher.name}${teacher.role ? ` (${teacher.role})` : ""}`,
+								image: teacher.image,
+							}))}
+							variant="mauve"
+							maxVisible={3}
+						/>
 					) : (
 						<span className="text-[10px] text-muted-foreground/50 font-normal">
 							بلا معلم

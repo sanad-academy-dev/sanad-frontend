@@ -159,15 +159,24 @@ export function AssignStudentConfirmDialog({
 						</div>
 
 						{/* صندوق الأفاتار بستايل راكب فوق بعض مع الأبيض والأرجواني المعتمد */}
-						<div className="min-h-[58px] p-3 rounded-xl border border-border/80 bg-muted/10 flex items-center justify-start -space-x-2.5 space-x-reverse overflow-x-auto py-3">
-							{selectedStudents.map((st, idx, arr) => {
+						<div
+							className="min-h-[58px] p-3 rounded-xl border border-border/80 bg-muted/10 flex items-center justify-start overflow-x-auto py-3 isolate"
+							dir="rtl"
+						>
+							{selectedStudents.map((st, idx) => {
 								const avatar = (st as { avatar?: string | null }).avatar;
 								return (
 									<div
 										key={st.id}
-										style={{ zIndex: arr.length - idx }}
+										style={{
+											zIndex: idx + 1,
+											marginInlineStart: idx === 0 ? 0 : "-12px",
+										}}
 										title={`${st.name} ${st.code ? `(#${st.code})` : ""}`}
-										className="relative size-9 rounded-full ring-2 ring-background bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#7C3AED]/25 dark:text-[#DDD6FE] flex items-center justify-center text-xs font-bold shadow-2xs transition-transform hover:scale-115 hover:z-30 cursor-pointer overflow-hidden shrink-0 select-none"
+										className={cn(
+											"relative size-9 rounded-full ring-2 ring-background bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#7C3AED]/25 dark:text-[#DDD6FE] flex items-center justify-center text-xs font-bold shadow-2xs transition-transform hover:scale-115 hover:z-30 cursor-pointer overflow-hidden shrink-0 select-none",
+											idx > 0 && "-ms-3",
+										)}
 									>
 										{avatar ? (
 											<img
