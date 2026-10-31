@@ -1554,116 +1554,128 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 											/>
 										</Field>
 
-										{/* حقل فئة الفصل — كامل العرض */}
-										<Field data-invalid={Boolean(touched.category && errors.category)}>
-											<FieldLabel
-												required
-												info="حدد فئة الفصل: مختلط أو بنين أو بنات"
-											>
-												<Label
-													className={cn(
-														"text-xs font-semibold",
-														touched.category && errors.category && "text-destructive",
-													)}
+										{/* حقول فئة الفصل والسعة القصوى — جنباً إلى جنب */}
+										<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+											{/* حقل فئة الفصل */}
+											<Field data-invalid={Boolean(touched.category && errors.category)}>
+												<FieldLabel
+													required
+													info="حدد فئة الفصل: مختلط أو بنين أو بنات"
 												>
-													فئة الفصل
-												</Label>
-											</FieldLabel>
-											<Select
-												value={category || undefined}
-												onValueChange={(val) => {
-													setCategory(val);
-													setTouched((prev) => ({ ...prev, category: true }));
-													validateField("category", val);
-												}}
-												dir="rtl"
-											>
-												<SelectTrigger
-													aria-invalid={Boolean(touched.category && errors.category)}
+													<Label
+														className={cn(
+															"text-xs font-semibold",
+															touched.category && errors.category && "text-destructive",
+														)}
+													>
+														فئة الفصل
+													</Label>
+												</FieldLabel>
+												<Select
+													value={category || undefined}
+													onValueChange={(val) => {
+														setCategory(val);
+														setTouched((prev) => ({ ...prev, category: true }));
+														validateField("category", val);
+													}}
+													dir="rtl"
+												>
+													<SelectTrigger
+														aria-invalid={Boolean(touched.category && errors.category)}
+														className={cn(
+															"w-full h-9 text-xs text-right transition-colors",
+															touched.category &&
+																errors.category &&
+																"border-destructive focus-visible:ring-destructive",
+														)}
+													>
+														<SelectValue placeholder="حدد فئة الفصل (مختلط / بنين / بنات)" />
+													</SelectTrigger>
+													<SelectContent dir="rtl">
+														{CATEGORIES.map((cat) => (
+															<SelectItem
+																key={cat}
+																value={cat}
+																className="text-xs"
+															>
+																{cat}
+															</SelectItem>
+														))}
+													</SelectContent>
+												</Select>
+												{touched.category && errors.category && (
+													<FieldError className="text-[11px] mt-1 text-destructive font-medium">
+														{errors.category}
+													</FieldError>
+												)}
+											</Field>
+
+											{/* حقل السعة القصوى */}
+											<Field data-invalid={Boolean(touched.capacity && errors.capacity)}>
+												<FieldLabel
+													required
+													info="الحد الأقصى لعدد الطلاب المسموح بانضمامهم (1 على الأقل)"
+												>
+													<Label
+														htmlFor="cls-capacity"
+														className={cn(
+															"text-xs font-semibold",
+															touched.capacity && errors.capacity && "text-destructive",
+														)}
+													>
+														السعة القصوى
+													</Label>
+												</FieldLabel>
+												<Input
+													id="cls-capacity"
+													type="number"
+													min={1}
+													max={500}
+													value={capacity}
+													onChange={(e) => {
+														setCapacity(e.target.value);
+														if (touched.capacity) validateField("capacity", e.target.value);
+													}}
+													onBlur={() => {
+														setTouched((prev) => ({ ...prev, capacity: true }));
+														validateField("capacity", capacity);
+													}}
+													placeholder="00"
+													aria-invalid={Boolean(touched.capacity && errors.capacity)}
 													className={cn(
-														"w-full h-9 text-xs text-right transition-colors",
-														touched.category &&
-															errors.category &&
+														"w-full h-9 text-xs font-mono text-right transition-colors",
+														touched.capacity &&
+															errors.capacity &&
 															"border-destructive focus-visible:ring-destructive",
 													)}
-												>
-													<SelectValue placeholder="حدد فئة الفصل (مختلط / بنين / بنات)" />
-												</SelectTrigger>
-												<SelectContent dir="rtl">
-													{CATEGORIES.map((cat) => (
-														<SelectItem
-															key={cat}
-															value={cat}
-															className="text-xs"
-														>
-															{cat}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-											{touched.category && errors.category && (
-												<FieldError className="text-[11px] mt-1 text-destructive font-medium">
-													{errors.category}
-												</FieldError>
-											)}
-										</Field>
+												/>
+												{touched.capacity && errors.capacity && (
+													<FieldError className="text-[11px] mt-1 text-destructive font-medium">
+														{errors.capacity}
+													</FieldError>
+												)}
+											</Field>
+										</div>
 
-										{/* حقل السعة القصوى — كامل العرض */}
-										<Field data-invalid={Boolean(touched.capacity && errors.capacity)}>
-											<FieldLabel
-												required
-												info="الحد الأقصى لعدد الطلاب المسموح بانضمامهم (1 على الأقل)"
-											>
+										{/* حقل ملاحظات الفصل — متماشي تماماً مع حدود باقي الفورم */}
+										<Field>
+											<FieldLabel info="ملاحظات وتوجيهات خاصة بالفصل الدراسي">
 												<Label
-													htmlFor="cls-capacity"
-													className={cn(
-														"text-xs font-semibold",
-														touched.capacity && errors.capacity && "text-destructive",
-													)}
+													htmlFor="cls-notes"
+													className="text-xs font-semibold"
 												>
-													السعة القصوى
+													ملاحظات
 												</Label>
 											</FieldLabel>
-											<Input
-												id="cls-capacity"
-												type="number"
-												min={1}
-												max={500}
-												value={capacity}
-												onChange={(e) => {
-													setCapacity(e.target.value);
-													if (touched.capacity) validateField("capacity", e.target.value);
-												}}
-												onBlur={() => {
-													setTouched((prev) => ({ ...prev, capacity: true }));
-													validateField("capacity", capacity);
-												}}
-												placeholder="00"
-												aria-invalid={Boolean(touched.capacity && errors.capacity)}
-												className={cn(
-													"w-full h-9 text-xs font-mono text-right transition-colors",
-													touched.capacity &&
-														errors.capacity &&
-														"border-destructive focus-visible:ring-destructive",
-												)}
-											/>
-											{touched.capacity && errors.capacity && (
-												<FieldError className="text-[11px] mt-1 text-destructive font-medium">
-													{errors.capacity}
-												</FieldError>
-											)}
-										</Field>
-
-										{/* محرر الملاحظات المتقدم والموحّد للمنصة (RichNotesEditor) — بورد فوق ومفيش أي بوردر يمين ولا شمال ولا تحت */}
-										<div className="-mx-5 pt-1">
 											<RichNotesEditor
+												id="cls-notes"
 												value={notes}
 												onChange={setNotes}
 												placeholder="أضف ملاحظات أو أهداف أو تفاصيل لهذا الفصل..."
-												variant="border-top-only"
-												minHeight={90}
+												variant="bordered"
+												minHeight={85}
 											/>
-										</div>
+										</Field>
 									</div>
 
 									{/* 3. شريط التحكم والإجراءات السفلي الثابت في البوب أب (Fixed Bottom Section) */}

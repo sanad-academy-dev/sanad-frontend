@@ -108,9 +108,8 @@ export function RichNotesEditor({
 	const isTypingRef = useRef(false);
 	const blurTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	// حالات التفاعل لإظهار شريط الأدوات عند الكتابة
+	// حالات التفاعل لإظهار شريط الأدوات عند الكتابة والتركيز فقط
 	const [isFocused, setIsFocused] = useState(false);
-	const [isHovered, setIsHovered] = useState(false);
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 
 	const [isEmpty, setIsEmpty] = useState(true);
@@ -327,40 +326,38 @@ export function RichNotesEditor({
 		}
 	}, []);
 
-	// حالة ظهور شريط التنسيق: عند الكتابة أو التركيز على الحقل أو التحويم
+	// حالة ظهور شريط التنسيق: عند الكتابة أو التركيز على الحقل (وليس عند التحويم)
 	const showToolbar =
-		!readOnly && !disabled && (alwaysShowToolbar || isFocused || isMenuOpen || isHovered);
+		!readOnly && !disabled && (alwaysShowToolbar || isFocused || isMenuOpen);
 
 	// كلاسات الحاوية بناءً على variant
 	const containerStyles = cn(
 		"relative w-full transition-colors",
 		variant === "border-top-only" &&
 			"border-t border-border border-x-0 border-b-0 rounded-none bg-transparent pt-2.5 pb-4 px-4 sm:px-5",
-		variant === "bordered" && "rounded-lg border border-border bg-card p-3 shadow-2xs",
+		variant === "bordered" &&
+			"rounded-lg border border-input bg-transparent p-3 shadow-2xs transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring",
 		variant === "ghost" && "border-none bg-transparent p-2",
 		className,
 	);
 
 	return (
-		// biome-ignore lint/a11y/noStaticElementInteractions: mouse enter/leave toggles toolbar visibility on hover
 		<div
 			ref={containerRef}
 			className={containerStyles}
 			dir={dir}
-			onMouseEnter={() => setIsHovered(true)}
-			onMouseLeave={() => setIsHovered(false)}
 		>
-			{/* شريط الأدوات العائم بالأعلى جهة اليمين — يظهر بسلاسة عند الكتابة في الحقل */}
+			{/* شريط الأدوات العائم — يظهر بسلاسة عند الكتابة والتركيز فقط بشكل عائم مطلق (absolute) دون التأثير على مساحة الحقل */}
 			{!readOnly && (
 				<div
 					className={cn(
-						"flex items-center justify-end transition-all duration-200 ease-out",
+						"absolute top-2 end-2 z-20 max-w-[calc(100%-1rem)] transition-all duration-200 ease-out",
 						showToolbar
-							? "opacity-100 translate-y-0 max-h-12 mb-2.5 pointer-events-auto"
-							: "opacity-0 -translate-y-1 max-h-0 mb-0 overflow-hidden pointer-events-none",
+							? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+							: "opacity-0 -translate-y-1 scale-95 pointer-events-none",
 					)}
 				>
-					<div className="flex items-center gap-0.5 rounded-lg border border-border/80 bg-background/95 backdrop-blur-xs px-1.5 py-1 shadow-2xs select-none">
+					<div className="flex items-center gap-0.5 rounded-lg border border-border/80 bg-background/95 backdrop-blur-md px-1.5 py-1 shadow-md select-none overflow-x-auto">
 						{/* 1. قائمة نمط وحجم الخط (Aa ▾) */}
 						<DropdownMenu
 							dir={dir}
