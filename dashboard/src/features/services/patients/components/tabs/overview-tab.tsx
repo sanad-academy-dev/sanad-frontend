@@ -1,4 +1,3 @@
-import type { PatientResponse } from "@sanad/contracts/runtime/server/patients/patients.type";
 import {
 	IconBus,
 	IconCertificate,
@@ -10,10 +9,12 @@ import {
 	IconSchool,
 	IconShieldCheck,
 	IconUser,
-	IconUsers,
 	IconWeight,
 } from "@tabler/icons-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Stats } from "@/components/common/stats";
+import type { StatItem } from "@/features/dashboard/types/dashboard.types";
+import { usePatientHistory } from "@/features/services/patients/hooks/use-patient-history";
 import { PatientPolicyCard } from "@/features/accounting/insurance/components/patient-policy-card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -46,31 +47,6 @@ function getInitials(name?: string | null) {
 			.map((w) => w[0])
 			.join("")
 			.toUpperCase() || "—"
-	);
-}
-
-function StatCard({
-	icon,
-	label,
-	value,
-	subtitle,
-}: {
-	icon: React.ReactNode;
-	label: string;
-	value: string;
-	subtitle?: string;
-}) {
-	return (
-		<div className="flex flex-col gap-2 rounded-lg border p-4">
-			<div className="flex items-center justify-between gap-2">
-				<p className="text-xs text-muted-foreground">{label}</p>
-				<span className="text-muted-foreground">{icon}</span>
-			</div>
-			<div className="flex items-baseline gap-1.5">
-				<p className="font-bold text-2xl tabular-nums">{value}</p>
-				{subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
-			</div>
-		</div>
 	);
 }
 
@@ -284,10 +260,10 @@ function OverviewTabSkeleton() {
 	return (
 		<div className="flex flex-col gap-4 p-4">
 			<Skeleton className="h-24 w-full" />
-			<div className="grid grid-cols-3 gap-3">
-				<Skeleton className="h-20" />
-				<Skeleton className="h-20" />
-				<Skeleton className="h-20" />
+			<div className="grid grid-cols-3 gap-1.5 py-1.5">
+				<Skeleton className="h-12 rounded-[4px]" />
+				<Skeleton className="h-12 rounded-[4px]" />
+				<Skeleton className="h-12 rounded-[4px]" />
 			</div>
 			<Skeleton className="h-64 w-full" />
 		</div>
@@ -297,10 +273,55 @@ function OverviewTabSkeleton() {
 export function OverviewTab({ patientId }: PatientTabProps) {
 	const { patient, isLoading } = usePatient(patientId);
 	const { autosave } = useAutosavePatient(patientId);
+	const { history } = usePatientHistory(patientId);
 
 	function patch(data: PatientAutosaveInput) {
 		autosave(data);
 	}
+
+	const visitsCount = useMemo(() => {
+		return history.filter(
+			(h) =>
+				h.kind === "VISIT" ||
+				(h as unknown as { kind: string }).kind === "APPOINTMENT",
+		).length;
+	}, [history]);
+
+	const displayAge = useMemo(() => {
+		if (patient?.age != null && patient.age > 0) return patient.age;
+		if (patient?.birthDate) {
+			const birth = new Date(patient.birthDate);
+			if (!Number.isNaN(birth.getTime())) {
+				const diff = Date.now() - birth.getTime();
+				const ageDate = new Date(diff);
+				return Math.abs(ageDate.getUTCFullYear() - 1970);
+			}
+		}
+		return null;
+	}, [patient?.age, patient?.birthDate]);
+
+	const statsItems: StatItem[] = useMemo(
+		() => [
+			{
+				title: "الوزن",
+				value: patient?.weight ?? 0,
+				valueLabel: patient?.weight != null ? `${patient.weight} كجم` : "—",
+				tooltip: "الوزن الحالي المسجل للطالب بالكيلوجرام",
+			},
+			{
+				title: "العمر",
+				value: displayAge ?? 0,
+				valueLabel: displayAge != null ? `${displayAge} سنوات` : "—",
+				tooltip: "العمر الحالي للطالب بالسنوات",
+			},
+			{
+				title: "عدد الزيارات",
+				value: visitsCount,
+				tooltip: "إجمالي عدد الزيارات والجلسات المسجلة للطالب",
+			},
+		],
+		[patient?.weight, displayAge, visitsCount],
+	);
 
 	if (!patientId || (isLoading && !patient)) {
 		return (
@@ -353,25 +374,8 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 				</div>
 			</div>
 
-			<div className="grid grid-cols-3 gap-3">
-				<StatCard
-					icon={<IconWeight className="size-4" />}
-					label="الوزن"
-					value={patient.weight != null ? `${patient.weight}` : "—"}
-					subtitle={patient.weight != null ? "كجم" : undefined}
-				/>
-				<StatCard
-					icon={<IconScale className="size-4" />}
-					label="العمر"
-					value={patient.age != null ? `${patient.age}` : "—"}
-					subtitle={patient.age != null ? "سنوات" : undefined}
-				/>
-				<StatCard
-					icon={<IconUsers className="size-4" />}
-					label="عدد الزيارات"
-					value="0"
-				/>
-			</div>
+			{/* إحصائيات الطالب المعتمدة للمنصة */}
+			<Stats stats={statsItems} className="py-0" />
 
 			{/* نظرة عامة */}
 			<div className="flex flex-col gap-3">
