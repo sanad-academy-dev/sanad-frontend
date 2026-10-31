@@ -78,7 +78,7 @@ export interface AvatarCirclesStackProps {
 export function AvatarCirclesStack({
 	items,
 	maxVisible = 3,
-	variant = "pastel",
+	variant = "mauve",
 	className,
 	emptyText = "—",
 	onItemClick,
@@ -100,6 +100,7 @@ export function AvatarCirclesStack({
 				{visible.map((item, idx) => {
 					const initial = getInitialLetter(item.name);
 					const tooltip = item.title || item.name;
+					const zIndex = visible.length - idx;
 
 					let circleEl: React.ReactElement;
 
@@ -107,7 +108,8 @@ export function AvatarCirclesStack({
 						circleEl = (
 							<div
 								key={item.id ?? idx}
-								className="flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-background bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#7C3AED]/25 dark:text-[#DDD6FE] text-xs font-semibold shadow-2xs transition-transform hover:scale-110 hover:z-20 cursor-default select-none"
+								style={{ zIndex }}
+								className="relative flex size-6.5 shrink-0 items-center justify-center rounded-full ring-2 ring-background bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#7C3AED]/25 dark:text-[#DDD6FE] text-[11px] font-bold shadow-2xs transition-transform hover:scale-115 hover:z-30 cursor-default select-none"
 								title={renderItem ? undefined : tooltip}
 								onClick={(e) => {
 									if (onItemClick) {
@@ -124,8 +126,9 @@ export function AvatarCirclesStack({
 						circleEl = (
 							<div
 								key={item.id ?? idx}
+								style={{ zIndex }}
 								className={cn(
-									"flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-background text-xs font-semibold shadow-2xs transition-transform hover:scale-110 hover:z-20 cursor-default select-none",
+									"relative flex size-6.5 shrink-0 items-center justify-center rounded-full ring-2 ring-background text-[11px] font-bold shadow-2xs transition-transform hover:scale-115 hover:z-30 cursor-default select-none",
 									color.bg,
 									color.text,
 									color.darkBg,
@@ -146,7 +149,11 @@ export function AvatarCirclesStack({
 
 					if (renderItem) {
 						return (
-							<div key={item.id ?? idx} className="shrink-0">
+							<div
+								key={item.id ?? idx}
+								className="relative shrink-0 transition-transform hover:scale-115 hover:z-30"
+								style={{ zIndex }}
+							>
 								{renderItem(item, circleEl)}
 							</div>
 						);

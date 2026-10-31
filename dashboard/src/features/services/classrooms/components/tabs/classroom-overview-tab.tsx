@@ -402,7 +402,7 @@ export function ClassroomOverviewTab({
 			dir="rtl"
 		>
 			{/* شريط الإحصائيات المعتمد للمنصة */}
-			<Stats stats={overviewStats} className="px-5 pt-3" />
+			{/* <Stats stats={overviewStats} className="px-5 pt-3" /> */}
 
 			{/* محتوى الصفحة الرئيسي */}
 			<div className="flex-1 overflow-y-auto min-h-0 p-5 space-y-4">
@@ -447,7 +447,7 @@ export function ClassroomOverviewTab({
 
 					{/* يساراً: أزرار الإجراءات */}
 					<div className="flex items-center gap-2 shrink-0">
-						<Button
+						{/* <Button
 							variant="outline"
 							size="sm"
 							onClick={onAssignStaff}
@@ -466,7 +466,7 @@ export function ClassroomOverviewTab({
 								<IconUsers className="size-3.5 text-primary" />
 								تعيين طالب
 							</Button>
-						)}
+						)} */}
 						<Button
 							variant="default"
 							size="sm"
@@ -683,19 +683,25 @@ export function ClassroomOverviewTab({
 										<span>الكادر التعليمي</span>
 									</div>
 									<div className="flex items-center gap-1.5 font-semibold text-foreground text-start">
-										<div className="flex -space-x-1 space-x-reverse overflow-hidden">
-											{(classroom.teachers || []).slice(0, 3).map((t, idx) => (
+										<div className="flex -space-x-2 space-x-reverse">
+											{(classroom.teachers || []).slice(0, 3).map((t, idx, arr) => (
 												<span
 													key={t.id}
-													className={cn(
-														"size-5 rounded-full flex items-center justify-center text-[9px] font-bold ring-1 ring-background",
-														AVATAR_PALETTE[idx % AVATAR_PALETTE.length],
-													)}
+													style={{ zIndex: arr.length - idx }}
+													className="relative size-6.5 rounded-full flex items-center justify-center text-[11px] font-bold ring-2 ring-background bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#7C3AED]/25 dark:text-[#DDD6FE] shadow-2xs transition-transform hover:scale-115 hover:z-30 select-none cursor-default"
 													title={t.name}
 												>
 													{getInitials(t.name)}
 												</span>
 											))}
+											{(classroom.teachers || []).length > 3 && (
+												<span
+													style={{ zIndex: 0 }}
+													className="relative size-6.5 rounded-full flex items-center justify-center text-[10px] font-bold ring-2 ring-background bg-muted text-muted-foreground shadow-2xs select-none"
+												>
+													+{(classroom.teachers || []).length - 3}
+												</span>
+											)}
 										</div>
 										<span className="text-xs text-muted-foreground font-normal">
 											{classroom.teachers?.length || 0} معلمين
@@ -920,8 +926,8 @@ export function ClassroomOverviewTab({
 						</div>
 
 						{/* 3. شبكة الإحصائيات الأربعة بستايل وهوية المنصة المعتمدة */}
-						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-right">
-							{/* متوسط الحضور الشهري */}
+						{/* <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-right">
+						
 							<div className="rounded-lg border border-border/70 bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right shadow-2xs">
 								<span className="text-xs text-muted-foreground font-medium text-right">
 									متوسط الحضور الشهري
@@ -936,10 +942,10 @@ export function ClassroomOverviewTab({
 										معدل الحضور التراكمي
 									</div>
 								</div>
-							</div>
+							</div> */}
 
 							{/* نسبة الإشغال */}
-							<div className="rounded-lg border border-border/70 bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right shadow-2xs">
+							{/* <div className="rounded-lg border border-border/70 bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right shadow-2xs">
 								<span className="text-xs text-muted-foreground font-medium text-right">
 									نسبة الإشغال
 								</span>
@@ -951,7 +957,7 @@ export function ClassroomOverviewTab({
 										{enrolledCount} من {capacity} مقعد
 									</div>
 								</div>
-							</div>
+							</div> */}
 
 							{/* متوسط وقت الوصول */}
 							{/* <div className="rounded-[4px] border border-border bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right">
@@ -977,11 +983,11 @@ export function ClassroomOverviewTab({
 										خلال الشهر الحالي
 									</div>
 								</div>
+						      </div>
 							</div> */}
-						</div>
 
 						{/* 4. أكثر الأطفال غياباً هذا الشهر */}
-						<div className="rounded-xl border border-border/70 bg-card text-right shadow-2xs">
+						{/* <div className="rounded-xl border border-border/70 bg-card text-right shadow-2xs">
 							<div className="flex items-center justify-between w-full px-4 py-2.5 border-b border-border">
 								<h3 className="text-xs font-bold flex items-center gap-2 text-foreground">
 									<IconUserExclamation className="size-3.5 text-primary shrink-0" />
@@ -1001,7 +1007,7 @@ export function ClassroomOverviewTab({
 												key={child.id}
 												className="flex items-center justify-between p-2.5 rounded-[4px] border border-border bg-muted/20 hover:bg-muted/40 transition-colors w-full"
 											>
-												{/* الاسم والأفاتار يميناً في RTL */}
+												 الاسم والأفاتار يميناً في RTL 
 												<div className="flex items-center gap-2.5 min-w-0 text-right">
 													<div
 														className={cn(
@@ -1023,7 +1029,7 @@ export function ClassroomOverviewTab({
 													</div>
 												</div>
 
-												{/* سبب الغياب وبادج الأيام يساراً */}
+												 سبب الغياب وبادج الأيام يساراً 
 												<div className="flex items-center gap-2 shrink-0 text-left">
 													<span className="text-xs text-muted-foreground">{child.reason}</span>
 													<span className="text-[11px] font-medium px-2 py-0.5 rounded-[4px] bg-muted text-foreground border border-border">
@@ -1051,7 +1057,8 @@ export function ClassroomOverviewTab({
 								)}
 							</div>
 						</div>
-					</div>
+					*/}
+					</div> 
 				</div>
 			</div>
 		</div>
