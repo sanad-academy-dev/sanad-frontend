@@ -349,7 +349,7 @@ export default function AiAgent() {
                           <button
                             key={index}
                             onClick={() => handleSend(item.text)}
-                            className="flex items-center gap-3 rounded-xl border border-border/60 bg-muted/30 p-2.5 text-right text-xs font-medium text-muted-foreground hover:bg-muted/70 hover:text-foreground hover:border-border transition-all group"
+                            className="flex items-center gap-3 rounded-xl border border-line bg-muted/30 p-2.5 text-right text-xs font-medium text-muted-foreground hover:bg-muted/70 hover:text-foreground hover:border-line transition-all group"
                           >
                             <Icon className="size-4 shrink-0 text-primary transition-transform group-hover:scale-110" />
                             <span className="flex-1">{item.text}</span>
@@ -375,7 +375,7 @@ export default function AiAgent() {
                           className={cn( "flex flex-col gap-1 max-w-[86%]", m.role === "user" ? "items-end" : "items-start" )}
                         >
                           <div
-                            className={cn( "rounded-xl px-4 py-2.5 text-[13px] leading-relaxed", m.role === "user" ? "bg-primary text-primary-foreground rounded-br-xs whitespace-pre-wrap" : "bg-card/80 border border-border/80 text-foreground rounded-bl-xs backdrop-blur-xs" )}
+                            className={cn( "rounded-xl px-4 py-2.5 text-[13px] leading-relaxed", m.role === "user" ? "bg-primary text-primary-foreground rounded-br-xs whitespace-pre-wrap" : "bg-card/80 border border-line text-foreground rounded-bl-xs backdrop-blur-xs" )}
                           >
                             {m.content ? (
                               m.role === "assistant" ? (
@@ -442,10 +442,10 @@ export default function AiAgent() {
               </div>
 
               {/* Keyboard hint */}
-              <div className="px-4 py-1 text-[11px] text-muted-foreground flex items-center justify-between border-t border-border/30 bg-muted/10">
+              <div className="px-4 py-1 text-[11px] text-muted-foreground flex items-center justify-between border-t border-line bg-muted/10">
                 <span className="flex items-center gap-1">
                   إغلاق/فتح:
-                  <kbd className="rounded border border-border bg-muted px-1 font-mono text-[10px]">
+                  <kbd className="rounded border border-line bg-muted px-1 font-mono text-[10px]">
                     Ctrl + I
                   </kbd>
                 </span>
@@ -453,8 +453,8 @@ export default function AiAgent() {
               </div>
 
               {/* Input Area */}
-              <div className="p-3 bg-card border-t border-border/50">
-                <div className="relative rounded-xl border border-border bg-background focus-within:ring-1 focus-within:ring-primary transition-all">
+              <div className="p-3 bg-card border-t border-line">
+                <div className="relative rounded-xl border border-line bg-background focus-within:ring-1 focus-within:ring-primary transition-all">
                   <textarea
                     ref={textareaRef}
                     value={query}

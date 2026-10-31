@@ -185,7 +185,7 @@ export default function Levels() {
                     {isActive && (
                       <motion.div
                         layoutId="active-stage-underline"
-                        className="absolute bottom-0 inset-x-0 h-[2px] bg-foreground rounded-full"
+                        className="absolute bottom-0 inset-x-0 h-[1.25px] bg-foreground rounded-full"
                         transition={{
                           type: "spring",
                           bounce: 0.15,
@@ -262,7 +262,7 @@ export default function Levels() {
                       </p>
                     </div>
 
-                    <div className="h-px w-full border-t border-dashed border-line my-0.5" />
+                    <div className="h-0 w-full border-t border-dashed border-line my-0.5" />
 
                     {/* Acquired Skill */}
                     <div className="flex flex-col gap-1.5">

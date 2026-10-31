@@ -342,7 +342,7 @@ export default function CampaignRegisterPage({
   if (submittedRequestCode) {
     return (
       <div className="min-h-[75vh] flex flex-col items-center justify-center px-4 py-16">
-        <div className="w-full max-w-xl bg-card/60 backdrop-blur-xs border border-border/80 rounded-xl p-8 sm:p-12 text-center relative overflow-hidden">
+        <div className="w-full max-w-xl bg-card/60 backdrop-blur-xs border border-line rounded-xl p-8 sm:p-12 text-center relative overflow-hidden">
           <div className="absolute top-0 right-0 left-0 h-2 bg-gradient-to-r from-primary to-emerald-500" />
 
           <div className="size-20 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto mb-6">
@@ -359,7 +359,7 @@ export default function CampaignRegisterPage({
             <span className="font-semibold text-primary">{campaign.name}</span>.
           </p>
 
-          <div className="inline-flex flex-col items-center gap-1.5 rounded-xl bg-secondary/80 border border-border p-4 mb-6">
+          <div className="inline-flex flex-col items-center gap-1.5 rounded-xl bg-secondary/80 border border-line p-4 mb-6">
             <span className="text-xs font-semibold text-muted-foreground">رقم متابعة الطلب</span>
             <span className="font-mono text-xl font-black text-primary tracking-wider" dir="ltr">
               {submittedRequestCode}
@@ -393,7 +393,7 @@ export default function CampaignRegisterPage({
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
       {/* Campaign Header Banner */}
-      <div className="bg-card/60 backdrop-blur-xs border border-border/80 rounded-xl p-6 sm:p-8 mb-8 relative overflow-hidden">
+      <div className="bg-card/60 backdrop-blur-xs border border-line rounded-xl p-6 sm:p-8 mb-8 relative overflow-hidden">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-primary/10 text-primary border border-primary/20">
@@ -408,7 +408,7 @@ export default function CampaignRegisterPage({
             </p>
           </div>
 
-          <div className="shrink-0 flex sm:flex-col items-center sm:items-end gap-2 text-xs font-semibold text-muted-foreground bg-secondary/60 rounded-xl p-3 border border-border">
+          <div className="shrink-0 flex sm:flex-col items-center sm:items-end gap-2 text-xs font-semibold text-muted-foreground bg-secondary/60 rounded-xl p-3 border border-line">
             <span>العام الدراسي: <strong className="text-foreground">{campaign.academicYear}</strong></span>
             {campaign.startDate && (
               <span className="flex items-center gap-1">
@@ -430,8 +430,8 @@ export default function CampaignRegisterPage({
         )}
 
         {/* Section 1: Student Information */}
-        <div className="bg-card/60 backdrop-blur-xs border border-border/80 rounded-xl p-6 sm:p-8 space-y-6">
-          <div className="flex items-center gap-3 pb-4 border-b border-border">
+        <div className="bg-card/60 backdrop-blur-xs border border-line rounded-xl p-6 sm:p-8 space-y-6">
+          <div className="flex items-center gap-3 pb-4 border-b border-line">
             <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
               <GraduationCap className="size-5" />
             </div>
@@ -513,8 +513,8 @@ export default function CampaignRegisterPage({
         </div>
 
         {/* Section 2: Guardian Information */}
-        <div className="bg-card/60 backdrop-blur-xs border border-border/80 rounded-xl p-6 sm:p-8 space-y-6">
-          <div className="flex items-center gap-3 pb-4 border-b border-border">
+        <div className="bg-card/60 backdrop-blur-xs border border-line rounded-xl p-6 sm:p-8 space-y-6">
+          <div className="flex items-center gap-3 pb-4 border-b border-line">
             <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
               <ShieldCheck className="size-5" />
             </div>
@@ -589,8 +589,8 @@ export default function CampaignRegisterPage({
         </div>
 
         {/* Section 3: Health & Additional Notes (Optional) */}
-        <div className="bg-card/60 backdrop-blur-xs border border-border/80 rounded-xl p-6 sm:p-8 space-y-6">
-          <div className="flex items-center gap-3 pb-4 border-b border-border">
+        <div className="bg-card/60 backdrop-blur-xs border border-line rounded-xl p-6 sm:p-8 space-y-6">
+          <div className="flex items-center gap-3 pb-4 border-b border-line">
             <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
               <HeartPulse className="size-5" />
             </div>
@@ -667,8 +667,8 @@ export default function CampaignRegisterPage({
         </div>
 
         {/* Section 4: Document Upload Dropzones (Phase 7) */}
-        <div id="documents-section" className="bg-card/60 backdrop-blur-xs border border-border/80 rounded-xl p-6 sm:p-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-border">
+        <div id="documents-section" className="bg-card/60 backdrop-blur-xs border border-line rounded-xl p-6 sm:p-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-line">
             <div className="flex items-center gap-3">
               <div className="size-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
                 <Paperclip className="size-5" />
@@ -682,7 +682,7 @@ export default function CampaignRegisterPage({
             </div>
 
             {/* Document Counter Badge */}
-            <div className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-secondary text-secondary-foreground border border-border self-start sm:self-auto">
+            <div className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-secondary text-secondary-foreground border border-line self-start sm:self-auto">
               المستندات المرفقة:{""}
               <strong className="text-primary font-bold">
                 {[birthCertDoc, vaccineDoc, guardianIdDoc, medicalDoc].filter(Boolean).length}
@@ -860,7 +860,7 @@ function DocumentDropzoneSlot({
             مطلوب
           </span>
         ) : (
-          <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-secondary text-muted-foreground border border-border">
+          <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-secondary text-muted-foreground border border-line">
             اختياري
           </span>
         )}
@@ -918,7 +918,7 @@ function DocumentDropzoneSlot({
           className={`h-32 rounded-xl border-2 border-dashed flex flex-col items-center justify-center text-center p-4 cursor-pointer transition-all ${
             isDragging
               ? "border-primary bg-primary/10 scale-[0.99]"
-              : "border-border hover:border-primary/50 hover:bg-secondary/40 bg-card"
+              : "border-line hover:border-primary/50 hover:bg-secondary/40 bg-card"
           }`}
         >
           <div className="size-9 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-2">

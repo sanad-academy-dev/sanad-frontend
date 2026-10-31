@@ -118,7 +118,7 @@ export function GlowCard({ name, handle, avatar, href, className }: GlowCardProp
       aria-label={`LinkedIn profile for ${name}`}
       data-slot="glow-card"
       className={cn(
-        "@container-size relative h-52 w-full overflow-hidden border border-border bg-card/60 transition-transform duration-200 select-none active:scale-[0.98]",
+        "@container-size relative h-52 w-full overflow-hidden border border-line bg-card/60 transition-transform duration-200 select-none active:scale-[0.98]",
         className
       )}
       style={{
@@ -155,7 +155,7 @@ export function GlowCard({ name, handle, avatar, href, className }: GlowCardProp
 
         <div className="z-10 flex flex-1 flex-col items-center justify-center gap-4">
           <Image
-            className="size-20 rounded-full border border-border/50 object-cover"
+            className="size-20 rounded-full border border-line object-cover"
             src={avatar}
             alt={name}
             width={80}

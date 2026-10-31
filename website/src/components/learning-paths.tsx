@@ -84,7 +84,7 @@ export function LearningPathCard({
 
       <div dir="rtl" className="grid flex-1 grid-cols-[88px_1fr_1fr] sm:grid-cols-[100px_1fr_1fr] grid-rows-[auto_auto_auto_1fr_auto] text-right bg-card">
         {/* Row 1: Title */}
-        <div className="col-span-3 border-y-2 border-line px-4 py-2.5 flex items-center justify-between">
+        <div className="col-span-3 border-y border-line px-4 py-2.5 flex items-center justify-between">
           <h3 className="font-heading text-sm sm:text-base font-bold text-foreground group-hover/track:text-primary transition-colors tracking-normal">
             {path.title}
           </h3>

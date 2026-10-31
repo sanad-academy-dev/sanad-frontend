@@ -128,13 +128,13 @@ export function FaqAccordion({
   };
 
   return (
-    <div className={cn("pt-0 pb-5 px-3 sm:px-5 max-w-5xl mx-auto w-full", className)}>
+    <div className={cn("pt-0 pb-5 max-w-5xl mx-auto w-full", className)}>
       <div
-        className="sm:-mx-5 overflow-x-auto pb-0 screen-line-bottom bg-card/10 scrollbar-none [&::-webkit-scrollbar]:hidden"
+        className="w-full screen-line-bottom bg-card/10 select-none"
         dir="rtl"
       >
-        <div className="flex min-w-max bg-card/10 select-none">
-          {FAQ_CATEGORIES.map((cat) => {
+        <div className="grid grid-cols-4 w-full bg-card/10 select-none">
+          {FAQ_CATEGORIES.map((cat, idx) => {
             const isActive = cat.id === activeCategoryId;
             return (
               <button
@@ -142,19 +142,21 @@ export function FaqAccordion({
                 type="button"
                 onClick={() => setActiveCategoryId(cat.id)}
                 className={cn(
-                  "relative shrink-0 border-l-2 border-line px-5 sm:px-7 py-3.5 sm:py-4 font-sans text-xs sm:text-[13px] transition-colors cursor-pointer outline-none select-none",
+                  "relative flex items-center justify-center py-3 sm:py-4 px-1 sm:px-2 text-center font-sans text-xs sm:text-[13px] transition-colors cursor-pointer outline-none select-none",
+                  idx !== FAQ_CATEGORIES.length - 1 && "border-l border-line",
                   isActive
                     ? "bg-secondary/70 text-foreground font-bold"
                     : "text-muted-foreground font-semibold hover:bg-secondary/35 hover:text-foreground"
                 )}
               >
-                <span className="block">{cat.name}</span>
+                <span className="block truncate">{cat.name}</span>
               </button>
             );
           })}
         </div>
       </div>
-      <div
+      <div className="px-3 sm:px-5">
+        <div
         id={`${idPrefix}-questions`}
         className="mt-3 rounded-2xl border border-line bg-card/40 backdrop-blur-xs overflow-hidden shadow-none"
         dir="rtl"
@@ -226,6 +228,7 @@ export function FaqAccordion({
             })}
           </motion.div>
         </AnimatePresence>
+      </div>
       </div>
     </div>
   );

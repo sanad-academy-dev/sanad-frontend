@@ -144,7 +144,7 @@ export function PricingCalculator({
           <LearningModeSwitch value={mode} onChange={handleModeChange} />
         </div>
 
-        <div className="border-s-2 border-line">
+        <div className="border-s border-line">
           <DurationSwitch value={duration} onChange={setDuration} mode={mode} />
         </div>
       </div>
@@ -153,7 +153,7 @@ export function PricingCalculator({
         <div className="flex-1 flex flex-col justify-start gap-4 sm:gap-5">
           <div className="flex flex-col gap-3">
             {/* Header of selected plan */}
-            <div className="flex flex-wrap items-center justify-between gap-2 pb-1.5 border-b border-border/40">
+            <div className="flex flex-wrap items-center justify-between gap-2 pb-1.5 border-b border-line/60">
               <div className="flex items-center gap-2">
                 <span className="font-heading text-base sm:text-lg font-bold text-foreground">
                   خطة {plan.name}
@@ -165,7 +165,7 @@ export function PricingCalculator({
             </div>
 
             {/* Promise to family */}
-            <div className="p-3 rounded-lg bg-secondary/35 border border-border/40 flex items-start gap-2.5">
+            <div className="p-3 rounded-lg bg-secondary/35 border border-line flex items-start gap-2.5">
               <Sparkles className="size-4 text-primary shrink-0 mt-0.5" />
               <div className="flex flex-col gap-0.5">
                 <span className="font-sans text-[11px] text-primary font-bold">الوعد للأسرة</span>
@@ -175,15 +175,15 @@ export function PricingCalculator({
 
             {/* Plan Metrics */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5 font-sans text-[11.5px] sm:text-xs text-foreground/80">
-              <div className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/30 border border-border/30">
+              <div className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/30 border border-line">
                 <Users className="size-3.5 sm:size-4 text-primary shrink-0" />
                 <span>المجموعة: <strong className="font-mono font-bold text-foreground">{plan.ratio}</strong></span>
               </div>
-              <div className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/30 border border-border/30">
+              <div className="flex items-center gap-2 p-2.5 rounded-lg bg-secondary/30 border border-line">
                 <Award className="size-3.5 sm:size-4 text-primary shrink-0" />
                 <span className="font-medium text-foreground">{plan.age}</span>
               </div>
-              <div className="col-span-2 sm:col-span-1 flex items-center gap-2 p-2.5 rounded-lg bg-secondary/30 border border-border/30">
+              <div className="col-span-2 sm:col-span-1 flex items-center gap-2 p-2.5 rounded-lg bg-secondary/30 border border-line">
                 <CheckCircle2 className="size-3.5 sm:size-4 text-primary shrink-0" />
                 <span className="truncate">الشرط: <strong className="font-medium text-foreground">{plan.prerequisite}</strong></span>
               </div>
@@ -221,7 +221,7 @@ export function PricingCalculator({
                   reduceMotion={reduceMotion}
                 />
               )}
-              <div className="flex items-center justify-between text-xs pt-2 border-t border-border/30 font-sans text-muted-foreground">
+              <div className="flex items-center justify-between text-xs pt-2 border-t border-line/60 font-sans text-muted-foreground">
                 <span>نمط التدريب المعتمد:</span>
                 <span className="font-semibold text-foreground flex items-center gap-1.5">
                   {mode === "online" ? (
@@ -241,7 +241,7 @@ export function PricingCalculator({
           </div>
         </div>
 
-        <div className="w-full lg:w-[350px] xl:w-[370px] shrink-0 flex flex-col justify-between gap-5 rounded-xl bg-secondary/30 backdrop-blur-xs p-5 sm:p-6 border border-border/80">
+        <div className="w-full lg:w-[350px] xl:w-[370px] shrink-0 flex flex-col justify-between gap-5 rounded-xl bg-secondary/30 backdrop-blur-xs p-5 sm:p-6 border border-line">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
@@ -280,7 +280,7 @@ export function PricingCalculator({
               )}
             </div>
 
-            <div className="flex flex-col gap-2.5 border-t border-dashed border-border/70 pt-4">
+            <div className="flex flex-col gap-2.5 border-t border-dashed border-line/70 pt-4">
               <div className="flex items-center justify-between">
                 <p className="font-heading text-xs sm:text-sm font-bold text-foreground text-right">مزايا باقة {plan.name}:</p>
                 <span className="font-sans text-xs font-semibold text-primary">{plan.sessions}</span>
@@ -516,7 +516,7 @@ function LevelSlider({
       <label htmlFor={id} className="sr-only">المستوى</label>
       <div className="relative h-8 flex items-center">
         {/* Slider Track */}
-        <div className="absolute inset-x-0 h-2 overflow-hidden rounded-full bg-secondary/80 border border-border/60">
+        <div className="absolute inset-x-0 h-2 overflow-hidden rounded-full bg-secondary/80 border border-line">
           <motion.div
             className="h-full origin-right bg-primary rounded-full"
             style={{ scaleX }}
@@ -631,12 +631,12 @@ function BillingSwitch({
     <div
       role="radiogroup"
       aria-label="نوع الاشتراك"
-      className="relative grid h-9 grid-cols-2 rounded-lg bg-secondary/80 p-0.5 border border-border/50 text-xs"
+      className="relative grid h-9 grid-cols-2 rounded-lg bg-secondary/80 p-0.5 border border-line text-xs"
     >
       <span
         aria-hidden
         className={cn(
-          "absolute inset-y-0.5 right-0.5 w-[calc(50%-2px)] rounded-md bg-background border border-border/40 transition-transform duration-200 ease-out motion-reduce:transition-none shadow-xs",
+          "absolute inset-y-0.5 right-0.5 w-[calc(50%-2px)] rounded-md bg-background border border-line transition-transform duration-200 ease-out motion-reduce:transition-none shadow-xs",
           value === "family" && "-translate-x-full"
         )}
       />
@@ -700,7 +700,7 @@ function LearningModeSwitch({
             tabIndex={active ? 0 : -1}
             onClick={() => onChange(option.id)}
             className={cn(
-              "relative flex min-h-8 touch-manipulation items-center justify-center border-s-2 border-line px-2 py-3.5 sm:py-4 font-sans text-xs font-bold outline-none transition-colors cursor-pointer select-none first:border-s-0",
+              "relative flex min-h-8 touch-manipulation items-center justify-center border-s border-line px-2 py-3.5 sm:py-4 font-sans text-xs font-bold outline-none transition-colors cursor-pointer select-none first:border-s-0",
               active ? "bg-secondary/70 text-foreground" : "text-muted-foreground hover:bg-secondary/35 hover:text-foreground"
             )}
           >
@@ -744,7 +744,7 @@ function DurationSwitch({
             tabIndex={active ? 0 : -1}
             onClick={() => onChange(option.id)}
             className={cn(
-              "relative flex min-h-8 touch-manipulation items-center justify-center border-s-2 border-line px-1 sm:px-2 py-3.5 sm:py-4 font-sans text-[11px] sm:text-xs font-bold outline-none transition-colors cursor-pointer select-none first:border-s-0 text-center leading-tight",
+              "relative flex min-h-8 touch-manipulation items-center justify-center border-s border-line px-1 sm:px-2 py-3.5 sm:py-4 font-sans text-[11px] sm:text-xs font-bold outline-none transition-colors cursor-pointer select-none first:border-s-0 text-center leading-tight",
               active
                 ? "bg-secondary/70 text-foreground"
                 : "text-muted-foreground hover:bg-secondary/35 hover:text-foreground"

@@ -138,20 +138,26 @@ export default function CoursesView({
           {displayedCourses.length > 0 ? (
             <>
               <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-1/2 z-0 hidden -translate-x-1/2 border-l-2 border-line sm:block" />
-
-                <ul className="relative z-10 grid grid-cols-1 gap-4 sm:grid-cols-2 p-2 sm:p-4">
+                <ul className="relative z-10 grid grid-cols-1 sm:grid-cols-2 sm:gap-x-4">
                   {displayedCourses.map((course, index) => (
                     <li
                       key={`${course.title}-${index}`}
                       className={cn(
-                        "p-1 sm:p-2 max-sm:screen-line-bottom-center",
-                        "sm:nth-[2n+1]:screen-line-bottom-center"
+                        "relative flex flex-col border-b border-line",
+                        index % 2 === 0
+                          ? "sm:border-e sm:border-line"
+                          : "sm:border-s sm:border-line"
                       )}
                     >
                       <PathCard path={course} />
                     </li>
                   ))}
+                  {displayedCourses.length % 2 !== 0 && (
+                    <li
+                      aria-hidden="true"
+                      className="hidden sm:block border-b sm:border-s border-line bg-card/10"
+                    />
+                  )}
                 </ul>
               </div>
 

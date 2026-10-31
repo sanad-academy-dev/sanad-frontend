@@ -1072,7 +1072,7 @@ export default function Navbar({ variant = "overlay" }: { variant?: Variant }) {
                 </TooltipContent>
               </Tooltip>
 
-              <span className={cn("h-3.5 w-px mx-0.5", t.divider)} aria-hidden />
+              <span className={cn("h-3.5 w-[1.5px] mx-0.5", t.divider)} aria-hidden />
 
               <div className="relative">
                 <Tooltip>
@@ -1092,7 +1092,7 @@ export default function Navbar({ variant = "overlay" }: { variant?: Variant }) {
                 </Tooltip>
               </div>
 
-              <span className={cn("h-3.5 w-px mx-0.5", t.divider)} aria-hidden />
+              <span className={cn("h-3.5 w-[1.5px] mx-0.5", t.divider)} aria-hidden />
 
               <button
                 type="button"
@@ -1102,7 +1102,7 @@ export default function Navbar({ variant = "overlay" }: { variant?: Variant }) {
                 تسجيل الدخول
               </button>
 
-              <span className={cn("h-3.5 w-px mx-0.5", t.divider)} aria-hidden />
+              <span className={cn("h-3.5 w-[1.5px] mx-0.5", t.divider)} aria-hidden />
 
               <Tooltip>
                 <TooltipTrigger asChild>
