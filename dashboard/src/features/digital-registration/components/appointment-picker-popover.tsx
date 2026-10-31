@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
 	Popover,
 	PopoverContent,
@@ -10,7 +10,10 @@ import {
 	IconChevronLeft,
 	IconChevronRight,
 	IconSparkles,
+	IconClock,
+	IconCheck,
 } from "@tabler/icons-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { backendFetch } from "@/lib/backend-fetch";
 
@@ -21,6 +24,8 @@ interface AppointmentPickerPopoverProps {
 	reviewerId?: string;
 	enableReminders?: boolean;
 	onEnableRemindersChange?: (val: boolean) => void;
+	enableRecurrence?: boolean;
+	onEnableRecurrenceChange?: (val: boolean) => void;
 	className?: string;
 }
 
@@ -44,18 +49,63 @@ const WEEKDAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sat", "Su"];
 interface TimeSlot {
 	id: string;
 	time: string;
+	startMinute: number;
 	status: "available" | "unavailable" | "conflict";
 	badge?: string;
 }
 
-const DEFAULT_TIME_SLOTS: TimeSlot[] = [
-	{ id: "slot-1", time: "10:00 صباحاً", status: "available" },
-	{ id: "slot-2", time: "10:30 صباحاً", status: "unavailable", badge: "غير متاح" },
-	{ id: "slot-3", time: "11:00 صباحاً", status: "available" },
-	{ id: "slot-4", time: "02:00 مساءً", status: "available" },
-	{ id: "slot-5", time: "02:30 مساءً", status: "unavailable", badge: "غير متاح" },
-	{ id: "slot-6", time: "03:00 مساءً", status: "conflict", badge: "يوجد تعارض" },
+const BASE_SLOT_DEFS: { id: string; time: string; startMinute: number }[] = [
+	{ id: "slot-1", time: "09:00 صباحاً", startMinute: 540 },
+	{ id: "slot-2", time: "09:30 صباحاً", startMinute: 570 },
+	{ id: "slot-3", time: "10:00 صباحاً", startMinute: 600 },
+	{ id: "slot-4", time: "10:30 صباحاً", startMinute: 630 },
+	{ id: "slot-5", time: "11:00 صباحاً", startMinute: 660 },
+	{ id: "slot-6", time: "11:30 صباحاً", startMinute: 690 },
+	{ id: "slot-7", time: "01:00 مساءً", startMinute: 780 },
+	{ id: "slot-8", time: "01:30 مساءً", startMinute: 810 },
+	{ id: "slot-9", time: "02:00 مساءً", startMinute: 840 },
+	{ id: "slot-10", time: "02:30 مساءً", startMinute: 870 },
+	{ id: "slot-11", time: "03:00 مساءً", startMinute: 900 },
+	{ id: "slot-12", time: "03:30 مساءً", startMinute: 930 },
+	{ id: "slot-13", time: "04:00 مساءً", startMinute: 960 },
 ];
+
+/** حساب فترات الإتاحة الذكية فورياً مع حظر الساعات الماضية لليوم فقط (مفيش أيام عطلة - جميع الأيام متاحة) */
+function computeSmartSlots(targetDay: number, targetMonth: number, targetYear: number): TimeSlot[] {
+	const now = new Date();
+	const isToday =
+		targetYear === now.getFullYear() &&
+		targetMonth === now.getMonth() &&
+		targetDay === now.getDate();
+
+	const isPastDay =
+		targetYear < now.getFullYear() ||
+		(targetYear === now.getFullYear() && targetMonth < now.getMonth()) ||
+		(targetYear === now.getFullYear() && targetMonth === now.getMonth() && targetDay < now.getDate());
+
+	const currentMinuteNow = now.getHours() * 60 + now.getMinutes();
+
+	return BASE_SLOT_DEFS.map((s) => {
+		const isPastHour = isToday && s.startMinute <= currentMinuteNow + 20;
+
+		let status: "available" | "unavailable" | "conflict" = "available";
+		let badge: string | undefined = undefined;
+
+		if (isPastDay) {
+			status = "unavailable";
+			badge = "مضى";
+		} else if (isPastHour) {
+			status = "unavailable";
+			badge = "مضى";
+		}
+
+		return {
+			...s,
+			status,
+			badge,
+		};
+	});
+}
 
 export function AppointmentPickerPopover({
 	value,
@@ -64,9 +114,15 @@ export function AppointmentPickerPopover({
 	reviewerId,
 	enableReminders: externalReminders,
 	onEnableRemindersChange,
+	enableRecurrence: externalRecurrence,
+	onEnableRecurrenceChange,
 	className,
 }: AppointmentPickerPopoverProps) {
 	const [open, setOpen] = useState(false);
+
+	// مراجع التمرير وحاوية البوبوفر للتحكم في التمرير بعجلة الماوس بشكل أصلي
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	const popoverContentRef = useRef<HTMLDivElement>(null);
 
 	// تاريخ اليوم الفعلي
 	const today = useMemo(() => new Date(), []);
@@ -83,11 +139,29 @@ export function AppointmentPickerPopover({
 	const [selectedMonth, setSelectedMonth] = useState<number>(currentRealMonth);
 	const [selectedDay, setSelectedDay] = useState<number | null>(currentRealDay);
 
-	// وقت الموعد
-	const [selectedSlot, setSelectedSlot] = useState<string>("10:00 صباحاً");
+	// وقت الموعد المحدد
+	const [selectedSlot, setSelectedSlot] = useState<string>("");
+
+	// وضع اختيار الوقت: فترات محددة أو وقت مخصص بحرية
+	const [timeMode, setTimeMode] = useState<"presets" | "custom">("presets");
+
+	// متحكمات الوقت المخصص
+	const [customHour, setCustomHour] = useState<number>(10);
+	const [customMinute, setCustomMinute] = useState<number>(0);
+	const [customPeriod, setCustomPeriod] = useState<"AM" | "PM">("AM");
 
 	// فترات الإتاحة المحسوبة ديناميكياً
-	const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(DEFAULT_TIME_SLOTS);
+	const [timeSlots, setTimeSlots] = useState<TimeSlot[]>(() =>
+		computeSmartSlots(currentRealDay, currentRealMonth, currentRealYear),
+	);
+
+	// يوم العمل القادم المقترح من AI
+	const [nextWorkingDate, setNextWorkingDate] = useState<{
+		isoDate: string;
+		formattedDate: string;
+		recommendedTime: string;
+		dayNameAr: string;
+	} | null>(null);
 
 	// بيانات اقتراح AI وساعات العمل
 	const [aiRecommendation, setAiRecommendation] = useState<{
@@ -97,20 +171,94 @@ export function AppointmentPickerPopover({
 		workingHoursText: string;
 	}>({
 		isWorkingDay: true,
-		recommendedTime: "10:00 صباحاً",
-		reason: "الوقت الأنسب بناءً على ساعات العمل الرسمية وجدول المراجع",
-		workingHoursText: "08:30 ص - 04:30 م",
+		recommendedTime: "",
+		reason: "اختر موعداً متاحاً أو اعتمد اقتراح AI",
+		workingHoursText: "09:00 ص - 04:30 م",
 	});
 
-	// حالة AI (افتراضياً: شريط التنبيه المدمج، مع إمكانية التبديل لبطاقة الاقتراحات)
+	// حالة AI (شريط مدمج banner أو بطاقة الاقتراحات suggestions)
 	const [aiState, setAiState] = useState<"banner" | "suggestions">("banner");
+
+	// تفعيل التكرار (جدولة زيارات متكررة)
+	const [recurrenceActive, setRecurrenceActive] = useState<boolean>(false);
+
+	// هل اليوم المحدد هو اليوم الفعلي الحالي؟
+	const isTodaySelected =
+		selectedYear === currentRealYear &&
+		selectedMonth === currentRealMonth &&
+		selectedDay === currentRealDay;
+
+	// الوقت الحالي بالدقائق من منتصف الليل وفترة السماح
+	const currentMinuteNow = useMemo(() => {
+		const now = new Date();
+		return now.getHours() * 60 + now.getMinutes();
+	}, [open, selectedDay]);
+
+	// عدد الفترات المتاحة (معرّف قبل useEffect لمنع أخطاء TDZ)
+	const availableSlotsCount = useMemo(() => {
+		return timeSlots.filter((slot) => {
+			const isPastHour = isTodaySelected && slot.startMinute <= currentMinuteNow + 20;
+			return slot.status === "available" && !isPastHour;
+		}).length;
+	}, [timeSlots, isTodaySelected, currentMinuteNow]);
+
+	// تفعيل التمرير بعجلة الماوس بشكل أصلي (سلس بماوس عادي وبنفس منطق النموذج)
+	useEffect(() => {
+		const scrollEl = scrollContainerRef.current;
+		const popoverEl = popoverContentRef.current;
+		if (!open || !scrollEl) return;
+
+		const handleNativeWheel = (e: WheelEvent) => {
+			e.stopPropagation();
+
+			const { scrollTop, scrollHeight, clientHeight } = scrollEl;
+			const maxScroll = scrollHeight - clientHeight;
+			if (maxScroll <= 0) return;
+
+			let delta = e.deltaY;
+			if (e.deltaMode === 1) {
+				delta *= 36;
+			} else if (e.deltaMode === 2) {
+				delta *= clientHeight;
+			}
+
+			const targetScrollTop = Math.max(0, Math.min(maxScroll, scrollTop + delta));
+			if (targetScrollTop !== scrollTop) {
+				e.preventDefault();
+				scrollEl.scrollTop = targetScrollTop;
+			}
+		};
+
+		scrollEl.addEventListener("wheel", handleNativeWheel, { passive: false });
+		popoverEl?.addEventListener("wheel", handleNativeWheel, { passive: false });
+
+		return () => {
+			scrollEl.removeEventListener("wheel", handleNativeWheel);
+			popoverEl?.removeEventListener("wheel", handleNativeWheel);
+		};
+	}, [open, timeMode, aiState]);
+
+	// استعادة الموعد المختار إن وجد
+	useEffect(() => {
+		if (value && value !== "تاريخ الموعد") {
+			const timeMatch = value.match(/(\d+):(\d+)\s*(صباحاً|مساءً|ص|م)?/);
+			if (timeMatch) {
+				const rawH = parseInt(timeMatch[1], 10);
+				const rawM = parseInt(timeMatch[2], 10);
+				const periodStr = timeMatch[3];
+				const isPM = periodStr ? periodStr.includes("م") || periodStr.includes("مساءً") : rawH >= 12;
+				setCustomHour(rawH > 12 ? rawH - 12 : rawH === 0 ? 12 : rawH);
+				setCustomMinute(rawM);
+				setCustomPeriod(isPM ? "PM" : "AM");
+			}
+		}
+	}, [value]);
 
 	// جلب اقتراحات الذكاء الاصطناعي وجدول المراجع عند تغيير التاريخ أو المراجع
 	useEffect(() => {
 		const targetDay = selectedDay || currentRealDay;
-		const dObj = new Date(selectedYear, selectedMonth, targetDay);
-		const dayOfWeek = dObj.getDay(); // 0: Sun, 5: Fri, 6: Sat
-		const isWeekend = dayOfWeek === 5 || dayOfWeek === 6;
+
+		setTimeSlots(computeSmartSlots(targetDay, selectedMonth, selectedYear));
 
 		const yStr = selectedYear;
 		const mStr = String(selectedMonth + 1).padStart(2, "0");
@@ -121,50 +269,89 @@ export function AppointmentPickerPopover({
 		q.set("date", dateParam);
 		if (reviewerId) q.set("staffId", reviewerId);
 
-		backendFetch<any>(`/api/digital-registration/ai-slot-recommendation?${q.toString()}`)
-			.then((res) => {
-				if (res) {
-					if (res.slots && Array.isArray(res.slots)) {
-						setTimeSlots(res.slots);
+		backendFetch(`/api/digital-registration/ai-slot-recommendation?${q.toString()}`)
+			.then(async (res) => {
+				if (res && res.ok) {
+					const data = await res.json();
+					if (data && data.slots && Array.isArray(data.slots)) {
+						const validatedSlots = data.slots.map((s: TimeSlot) => {
+							const isPast = isTodaySelected && s.startMinute <= currentMinuteNow + 20;
+							if (isPast) {
+								return { ...s, status: "unavailable", badge: "مضى" };
+							}
+							return s;
+						});
+						setTimeSlots(validatedSlots);
 					}
 					setAiRecommendation({
-						isWorkingDay: res.isWorkingDay ?? !isWeekend,
-						recommendedTime: res.recommendedTime || "10:00 صباحاً",
+						isWorkingDay: true,
+						recommendedTime: data.recommendedTime || "",
 						reason:
-							res.reason ||
-							(isWeekend
-								? "اليوم المحدد عطلة رسمية (الدوام: الأحد - الخميس)"
-								: "الوقت الأنسب بدون تعارض مع جدول المراجع"),
-						workingHoursText: res.workingHoursText || "08:30 ص - 04:30 م",
+							data.reason ||
+							(isTodaySelected && availableSlotsCount === 0
+								? "انتهت فترات العمل المتاحة لهذا اليوم"
+								: "الوقت الأنسب بدون أي تعارض مع جدول المراجع"),
+						workingHoursText: data.workingHoursText || "09:00 ص - 04:30 م",
 					});
+					if (data.nextWorkingDate) {
+						setNextWorkingDate(data.nextWorkingDate);
+					} else {
+						setNextWorkingDate(null);
+					}
 				}
 			})
 			.catch(() => {
-				// Fallback محلي ذكي في حالة عدم الاتصال
-				if (isWeekend) {
-					setAiRecommendation((prev) => ({
-						...prev,
-						isWorkingDay: false,
-						reason: "اليوم المحدد عطلة رسمية للأكاديمية (الدوام: الأحد - الخميس)",
-					}));
-					setTimeSlots(
-						DEFAULT_TIME_SLOTS.map((s) => ({ ...s, status: "unavailable", badge: "عطلة" })),
-					);
-				} else {
-					setAiRecommendation((prev) => ({
-						...prev,
+				if (isTodaySelected) {
+					setAiRecommendation({
 						isWorkingDay: true,
-						reason:
-							reviewerName && reviewerName !== "المراجع"
-								? `المراجع ${reviewerName} متاح في هذا التاريخ بدون تعارض`
-								: "ساعات العمل الرسمية: 08:30 ص - 04:30 م",
-					}));
-					setTimeSlots(DEFAULT_TIME_SLOTS);
+						recommendedTime: "",
+						reason: "انتهت مواعيد وساعات العمل المتاحة لليوم",
+						workingHoursText: "09:00 ص - 04:30 م",
+					});
+				} else {
+					setAiRecommendation({
+						isWorkingDay: true,
+						recommendedTime: "10:00 صباحاً",
+						reason: "الوقت الأنسب بدون أي تعارض",
+						workingHoursText: "09:00 ص - 04:30 م",
+					});
 				}
 			});
-	}, [selectedDay, selectedMonth, selectedYear, reviewerId, reviewerName, currentRealDay]);
+	}, [selectedYear, selectedMonth, selectedDay, reviewerId, currentRealDay, isTodaySelected, currentMinuteNow, availableSlotsCount]);
 
-	// تفعيل التذكيرات (متزامن مع المفتاح الخارجي في تذييل النموذج)
+	// حماية الموعد المحدد: يمنع بقاء أي ساعة مضت لليوم الحالي
+	useEffect(() => {
+		if (isTodaySelected && selectedSlot) {
+			const matchingSlot = timeSlots.find((s) => s.time === selectedSlot);
+			let slotMin = matchingSlot?.startMinute;
+			if (slotMin === undefined) {
+				const match = selectedSlot.match(/(\d+):(\d+)/);
+				if (match) {
+					let h = parseInt(match[1], 10);
+					const m = parseInt(match[2], 10);
+					const isPM = selectedSlot.includes("مساءً") || selectedSlot.includes("م");
+					if (isPM && h < 12) h += 12;
+					if (!isPM && h === 12) h = 0;
+					slotMin = h * 60 + m;
+				}
+			}
+
+			if (slotMin !== undefined && slotMin <= currentMinuteNow + 20) {
+				const upcomingSlot = timeSlots.find(
+					(s) => s.status === "available" && s.startMinute > currentMinuteNow + 20,
+				);
+				if (upcomingSlot) {
+					setSelectedSlot(upcomingSlot.time);
+					syncValue(selectedDay, selectedMonth, selectedYear, upcomingSlot.time);
+				} else {
+					setSelectedSlot("");
+					syncValue(selectedDay, selectedMonth, selectedYear, null);
+				}
+			}
+		}
+	}, [isTodaySelected, timeSlots, selectedDay, selectedMonth, selectedYear, selectedSlot, currentMinuteNow]);
+
+	// تفعيل التذكيرات
 	const [internalReminders, setInternalReminders] = useState<boolean>(false);
 	const remindersActive = externalReminders !== undefined ? externalReminders : internalReminders;
 	const toggleReminders = (checked: boolean) => {
@@ -172,12 +359,11 @@ export function AppointmentPickerPopover({
 		onEnableRemindersChange?.(checked);
 	};
 
-	// هل نحن في الشهر الحالي أو السابق لمنع الرجوع للوراء لتاريخ قديم؟
+	// فحص حدود الشهر الحالي
 	const isAtCurrentMonth =
 		year < currentRealYear ||
 		(year === currentRealYear && month <= currentRealMonth);
 
-	// منع الرجوع لشهر سابق لتاريخ اليوم
 	const handlePrevMonth = () => {
 		if (isAtCurrentMonth) return;
 		if (month === 0) {
@@ -197,14 +383,12 @@ export function AppointmentPickerPopover({
 		}
 	};
 
-	// توليد شبكة أيام التقويم للشهر المحدد (الأسبوع يبدأ من الإثنين Mo)
+	// توليد شبكة التقويم
 	const calendarDays = useMemo(() => {
 		const daysInCurrentMonth = new Date(year, month + 1, 0).getDate();
 		const daysInPrevMonth = new Date(year, month, 0).getDate();
 
-		// أول يوم في الشهر من الأسبوع (0 = الأحد, 1 = الإثنين)
 		const firstDayOfWeek = new Date(year, month, 1).getDay();
-		// تحويل البداية للإثنين Mo
 		const startOffset = (firstDayOfWeek + 6) % 7;
 
 		const days: Array<{
@@ -215,7 +399,6 @@ export function AppointmentPickerPopover({
 			isSelected: boolean;
 		}> = [];
 
-		// أيام الشهر السابق (غير قابلة للاختيار وتعتبر في الماضي)
 		for (let i = startOffset - 1; i >= 0; i--) {
 			days.push({
 				day: daysInPrevMonth - i,
@@ -226,7 +409,6 @@ export function AppointmentPickerPopover({
 			});
 		}
 
-		// أيام الشهر الحالي مع فحص التواريخ السابقة
 		for (let d = 1; d <= daysInCurrentMonth; d++) {
 			const isPastDay =
 				year < currentRealYear ||
@@ -248,7 +430,6 @@ export function AppointmentPickerPopover({
 			});
 		}
 
-		// إكمال الصفوف لأيام الشهر التالي
 		const totalCells = Math.ceil(days.length / 7) * 7;
 		let nextDayNum = 1;
 		while (days.length < totalCells) {
@@ -264,17 +445,19 @@ export function AppointmentPickerPopover({
 		return days;
 	}, [year, month, currentRealYear, currentRealMonth, currentRealDay, selectedDay, selectedMonth, selectedYear]);
 
-	// تحديث القيمة الخارجية وإرسال النص المعروض بالإضافة للتاريخ المعتمد بصيغة ISO
+	// تحديث القيمة الخارجية والمزامنة مع ISO
 	const syncValue = (dayNum: number | null, mIdx: number, yNum: number, slotTime: string | null) => {
 		if (!dayNum) {
 			onChange("تاريخ الموعد", null);
 			return;
 		}
 		const mName = MONTH_NAMES_AR[mIdx] || "أكتوبر";
-		const timeShort = slotTime ? slotTime.replace(" صباحاً", " ص").replace(" مساءً", " م") : "";
-		const result = `${dayNum} ${mName}${timeShort ? ` - ${timeShort}` : ""}`;
+		const isToday =
+			yNum === currentRealYear && mIdx === currentRealMonth && dayNum === currentRealDay;
 
-		// حساب تاريخ ISO الدقيق للموعد
+		const dayLabel = isToday ? "اليوم" : `${dayNum} ${mName}`;
+		const result = slotTime ? `${dayLabel} - ${slotTime}` : dayLabel;
+
 		let isoString: string | null = null;
 		try {
 			let hours = 10;
@@ -301,23 +484,66 @@ export function AppointmentPickerPopover({
 	};
 
 	const handleSelectDay = (d: number, isPast: boolean, isCurrent: boolean) => {
-		if (isPast || !isCurrent) return; // ممنوع اختيار تواريخ ماضية
+		if (isPast || !isCurrent) return;
 		setSelectedDay(d);
 		setSelectedMonth(month);
 		setSelectedYear(year);
-		syncValue(d, month, year, selectedSlot);
+
+		const isNowToday = year === currentRealYear && month === currentRealMonth && d === currentRealDay;
+		let validSlot = selectedSlot;
+		if (isNowToday) {
+			const matching = timeSlots.find((s) => s.time === selectedSlot);
+			if (matching && matching.startMinute <= currentMinuteNow + 20) {
+				validSlot = "";
+			}
+		}
+
+		syncValue(d, month, year, validSlot || null);
 	};
 
 	const handleSelectSlot = (slot: TimeSlot) => {
-		if (slot.status !== "available") return;
+		const isPastHour = isTodaySelected && slot.startMinute <= currentMinuteNow + 20;
+		if (slot.status !== "available" || isPastHour) return;
+
+		const targetDay = selectedDay || currentRealDay;
+		if (!selectedDay) {
+			setSelectedDay(targetDay);
+		}
+
 		setSelectedSlot(slot.time);
-		syncValue(selectedDay, selectedMonth, selectedYear, slot.time);
+		syncValue(targetDay, selectedMonth, selectedYear, slot.time);
+		setOpen(false);
+	};
+
+	// اعتماد الوقت المخصص
+	const handleApplyCustomTime = () => {
+		const targetDay = selectedDay || currentRealDay;
+		if (!selectedDay) {
+			setSelectedDay(targetDay);
+		}
+
+		const formattedTime = `${String(customHour).padStart(2, "0")}:${String(customMinute).padStart(2, "0")} ${customPeriod === "AM" ? "صباحاً" : "مساءً"}`;
+
+		if (isTodaySelected) {
+			let chosenMinutes = customHour * 60 + customMinute;
+			if (customPeriod === "PM" && customHour < 12) chosenMinutes += 720;
+			if (customPeriod === "AM" && customHour === 12) chosenMinutes = customMinute;
+			if (chosenMinutes <= currentMinuteNow) {
+				toast.warning("ملاحظة: هذا الوقت قد مضى اليوم، يُفضل اختيار وقت قادم أو تغيير اليوم.");
+			}
+		}
+
+		setSelectedSlot(formattedTime);
+		syncValue(targetDay, selectedMonth, selectedYear, formattedTime);
+		toast.success(`تم اختيار الموعد المخصص: ${formattedTime}`);
+		setOpen(false);
 	};
 
 	const handleReset = () => {
 		setSelectedDay(null);
 		setSelectedSlot("");
-		setEnableReminders(false);
+		toggleReminders(false);
+		setRecurrenceActive(false);
 		onChange("تاريخ الموعد", null);
 		setOpen(false);
 	};
@@ -330,9 +556,9 @@ export function AppointmentPickerPopover({
 				<button
 					type="button"
 					className={cn(
-						"h-6.5 px-2 rounded-md border text-[10.5px] font-medium flex items-center gap-1 transition-colors cursor-pointer",
+						"h-6.5 px-2.5 rounded-md border text-[10.5px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer select-none",
 						isCustomSelected
-							? "border-[#4F6BF5]/40 bg-[#4F6BF5]/10 text-[#4F6BF5] font-semibold"
+							? "border-[#5B50E5]/50 bg-[#5B50E5]/10 text-[#5B50E5] font-semibold"
 							: "border-border/80 bg-background hover:bg-muted text-foreground",
 						className,
 					)}
@@ -343,14 +569,53 @@ export function AppointmentPickerPopover({
 			</PopoverTrigger>
 
 			<PopoverContent
+				ref={popoverContentRef}
 				side="top"
 				align="start"
-				sideOffset={8}
+				sideOffset={6}
+				avoidCollisions={true}
+				collisionPadding={8}
 				data-radix-scroll-lock-ignore
-				className="z-[99] w-[305px] p-0 bg-card text-foreground border border-border/80 shadow-2xl rounded-xl select-none overflow-hidden"
+				style={{
+					maxHeight: "min(580px, var(--radix-popover-content-available-height, 580px))",
+				}}
+				className="z-[99] w-[390px] flex flex-col gap-0 p-0 bg-white dark:bg-zinc-950 text-popover-foreground border border-border/80 shadow-2xl rounded-xl select-none overflow-hidden"
 				dir="rtl"
 			>
+				{/* ─── 1. ترويسة الشهر والتنقل الثابتة (Fixed Header - لا تختفي أبداً) ──── */}
+				<div className="shrink-0 px-4 py-2.5 border-b border-border/70 flex items-center justify-between bg-white dark:bg-zinc-950 select-none">
+					<button
+						type="button"
+						disabled={isAtCurrentMonth}
+						onClick={handlePrevMonth}
+						className={cn(
+							"size-7 rounded-md flex items-center justify-center transition-colors",
+							isAtCurrentMonth
+								? "opacity-25 cursor-not-allowed text-muted-foreground"
+								: "hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer",
+						)}
+						title={isAtCurrentMonth ? "لا يمكن العودة لشهر سابق" : "الشهر السابق"}
+					>
+						<IconChevronRight className="size-4" />
+					</button>
+
+					<span className="text-xs font-bold text-foreground">
+						{MONTH_NAMES_AR[month]} {year}
+					</span>
+
+					<button
+						type="button"
+						onClick={handleNextMonth}
+						className="size-7 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+						title="الشهر التالي"
+					>
+						<IconChevronLeft className="size-4" />
+					</button>
+				</div>
+
+				{/* ─── 2. مساحة التمرير السلسة (مطابقة تماماً للنموذج وتعمل بماوس عادي) ──── */}
 				<div
+					ref={scrollContainerRef}
 					data-radix-scroll-lock-ignore
 					style={{ overscrollBehavior: "contain" }}
 					onWheel={(e) => {
@@ -366,276 +631,502 @@ export function AppointmentPickerPopover({
 							el.scrollTop = target;
 						}
 					}}
-					className="max-h-[min(510px,calc(100vh-120px))] overflow-y-auto overscroll-contain p-2 space-y-1 [scrollbar-width:thin] [scrollbar-color:hsl(var(--muted-foreground)/0.3)_transparent]"
+					className="flex-1 min-h-0 overflow-y-auto overscroll-contain sanad-scrollbar pr-3.5 pl-2.5 py-3 space-y-2.5 select-none"
 				>
-				{/* ─── 1. ترويسة التقويم (الشهر والسنة + أسهم التنقل المحمية) ──── */}
-				<div className="flex items-center justify-between pb-1 mb-1 border-b border-border/40">
-					{/* سهم الشهر السابق - معطل إذا كنا في الشهر الحالي لمنع الرجوع للماضي */}
-					<button
-						type="button"
-						disabled={isAtCurrentMonth}
-						onClick={handlePrevMonth}
-						className={cn(
-							"size-6 rounded-md flex items-center justify-center transition-colors",
-							isAtCurrentMonth
-								? "opacity-25 cursor-not-allowed text-muted-foreground"
-								: "hover:bg-muted text-muted-foreground hover:text-foreground cursor-pointer",
-						)}
-						title={isAtCurrentMonth ? "لا يمكن العودة لشهر سابق" : "الشهر السابق"}
-					>
-						<IconChevronRight className="size-3.5" />
-					</button>
-
-					<span className="text-[11.5px] font-bold text-foreground">
-						{MONTH_NAMES_AR[month]} {year}
-					</span>
-
-					{/* سهم الشهر القادم */}
-					<button
-						type="button"
-						onClick={handleNextMonth}
-						className="size-6 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
-						title="الشهر التالي"
-					>
-						<IconChevronLeft className="size-3.5" />
-					</button>
-				</div>
-
-				{/* ─── 2. شبكة أيام الأسبوع والتقويم (Mo -> Su) بدقة متناهية ──── */}
-				<div dir="ltr" className="mb-1">
-					{/* صف أسماء الأيام */}
-					<div className="grid grid-cols-7 text-center text-[9.5px] font-semibold text-muted-foreground/75 mb-0.5">
-						{WEEKDAYS.map((wd) => (
-							<div key={wd} className="py-0.5">
-								{wd}
-							</div>
-						))}
-					</div>
-
-					{/* شبكة الأيام بارتفاع دقيق 24px بدون تسبب بأي scrollbar */}
-					<div className="grid grid-cols-7 gap-y-0.5 gap-x-0.5 text-center">
-						{calendarDays.map((c, idx) => {
-							if (!c.isCurrentMonth) {
-								return (
-									<div
-										key={idx}
-										className="size-6 flex items-center justify-center mx-auto text-muted-foreground/25 text-[10px]"
-									>
-										{c.day}
-									</div>
-								);
-							}
-
-							if (c.isPast) {
-								return (
-									<div
-										key={idx}
-										className="size-6 flex items-center justify-center mx-auto rounded-full text-[10.5px] text-muted-foreground/30 cursor-not-allowed select-none"
-										title="تاريخ سابق غير متاح للحجز"
-									>
-										{c.day}
-									</div>
-								);
-							}
-
-							return (
-								<button
-									key={idx}
-									type="button"
-									onClick={() => handleSelectDay(c.day, c.isPast, c.isCurrentMonth)}
-									className={cn(
-										"size-6 flex items-center justify-center mx-auto rounded-full text-[10.5px] font-medium transition-all cursor-pointer",
-										c.isSelected
-											? "bg-[#5B50E5] text-white font-bold shadow-xs hover:bg-[#4E43D8]"
-											: c.isToday
-												? "border border-[#5B50E5] text-[#5B50E5] font-bold hover:bg-[#5B50E5]/10"
-												: "hover:bg-muted text-foreground",
-									)}
-								>
-									{c.day}
-								</button>
-							);
-						})}
-					</div>
-				</div>
-
-				{/* ─── 3. قسم AI (شريط ساعات العمل التنبيهي أو بطاقة الاقتراحات) ─ */}
-				{aiState === "banner" ? (
-					/* الحالة الأولى: شريط ساعات العمل التنبيهي مطابق للصورة 09e02342 */
-					<div
-						className={cn(
-							"border rounded-md px-2 py-1.5 flex items-center justify-between gap-1 select-none my-1",
-							!aiRecommendation.isWorkingDay
-								? "bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/60"
-								: "bg-[#FFF1F2] dark:bg-rose-950/30 border-[#FFE4E6] dark:border-rose-900/50",
-						)}
-					>
-						{/* اليمين: الأيقونة والنص التحذيري */}
-						<div className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold text-[10.5px]">
-							<IconSparkles className="size-3 text-rose-500 shrink-0" />
-							<span>
-								{!aiRecommendation.isWorkingDay
-									? "اليوم المحدد عطلة رسمية للأكاديمية"
-									: "خصص أيام وساعات عمل منشأتك"}
-							</span>
+					{/* شبكة أيام التقويم (Mo -> Su) */}
+					<div dir="ltr" className="select-none">
+						<div className="grid grid-cols-7 text-center text-[10.5px] font-bold text-muted-foreground/75 mb-1">
+							{WEEKDAYS.map((wd) => (
+								<div key={wd} className="py-0.5">
+									{wd}
+								</div>
+							))}
 						</div>
 
-						{/* الشمال: أزرار التخصيص والتجاهل */}
-						<div className="flex items-center gap-2 text-[10px]">
+						<div className="grid grid-cols-7 gap-1 text-center">
+							{calendarDays.map((c, idx) => {
+								if (!c.isCurrentMonth) {
+									return (
+										<div
+											key={idx}
+											className="size-7.5 flex items-center justify-center mx-auto text-muted-foreground/25 text-[10.5px]"
+										>
+											{c.day}
+										</div>
+									);
+								}
+
+								if (c.isPast) {
+									return (
+										<div
+											key={idx}
+											className="size-7.5 flex items-center justify-center mx-auto rounded-full text-[10.5px] text-muted-foreground/30 cursor-not-allowed select-none"
+											title="تاريخ سابق غير متاح للحجز"
+										>
+											{c.day}
+										</div>
+									);
+								}
+
+								return (
+									<button
+										key={idx}
+										type="button"
+										onClick={() => handleSelectDay(c.day, c.isPast, c.isCurrentMonth)}
+										className={cn(
+											"size-7.5 flex items-center justify-center mx-auto rounded-full text-[11px] font-medium transition-all cursor-pointer",
+											c.isSelected
+												? "bg-[#5B50E5] text-white font-bold shadow-xs hover:bg-[#4E43D8]"
+												: c.isToday
+													? "border border-[#5B50E5] text-[#5B50E5] font-bold hover:bg-[#5B50E5]/10"
+													: "hover:bg-muted text-foreground",
+										)}
+									>
+										{c.day}
+									</button>
+								);
+							})}
+						</div>
+					</div>
+
+					{/* ─── 3. قسم AI (ذكي، أنيق، ومريح المساحة بدون أي تداخل) ─── */}
+					{aiState === "banner" ? (
+						<div
+							className={cn(
+								"border rounded-lg px-3 py-2 flex items-center justify-between gap-2 select-none transition-all",
+								isTodaySelected && availableSlotsCount === 0
+									? "bg-amber-50/80 dark:bg-amber-950/40 border-amber-200/80 dark:border-amber-900/60"
+									: "bg-indigo-50/70 dark:bg-indigo-950/30 border-indigo-200/60 dark:border-indigo-900/40",
+							)}
+						>
+							<div className="flex items-center gap-1.5 font-bold text-[10.5px] truncate flex-1 min-w-0 text-foreground/90">
+								<IconSparkles className="size-3.5 text-[#5B50E5] shrink-0" />
+								<span className="truncate">
+									{isTodaySelected && availableSlotsCount === 0
+										? "انتهت مواعيد اليوم — اضغط لاقتراح موعد"
+										: "حدد موعد الزيارة أو اختر من اقتراحات AI"}
+								</span>
+							</div>
+
 							<button
 								type="button"
 								onClick={() => setAiState("suggestions")}
-								className="text-[#2563EB] dark:text-blue-400 font-bold hover:underline cursor-pointer"
+								className="h-6 px-2.5 text-[10px] text-[#5B50E5] dark:text-indigo-400 font-bold hover:underline cursor-pointer bg-card rounded border border-indigo-200/50 shadow-2xs shrink-0 flex items-center gap-1"
 								title="عرض اقتراحات رفيق AI"
 							>
-								تخصيص
-							</button>
-							<button
-								type="button"
-								onClick={() => setAiState("suggestions")}
-								className="text-[#C2410C] dark:text-orange-400 font-bold hover:underline cursor-pointer"
-								title="تجاهل التنبيه"
-							>
-								تجاهل
+								<span>اقتراح AI</span>
 							</button>
 						</div>
-					</div>
-				) : (
-					/* الحالة الثانية: بطاقة اقتراحات رفيق AI التفاعلية */
-					<div className="bg-[#FFFDF5] dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/40 rounded-lg p-2 my-1 text-right space-y-1.5">
-						<div className="flex items-center justify-between border-b border-amber-200/50 pb-1">
-							<button
-								type="button"
-								onClick={() => setAiState("banner")}
-								className="text-[9px] text-amber-700 dark:text-amber-300 hover:underline cursor-pointer font-medium"
-							>
-								الرجوع للتنبيه
-							</button>
-							<div className="flex items-center gap-1 text-amber-800 dark:text-amber-400 font-bold text-[10.5px]">
-								<IconSparkles className="size-3.5 text-amber-500" />
-								<span>اقتراحات رفيق AI الذكية</span>
-							</div>
-						</div>
-						<div className="text-[9.5px] text-amber-800/90 dark:text-amber-300/90 space-y-1 font-medium leading-tight">
-							<p className="flex items-center gap-1.5">
-								<span
-									className={cn(
-										"size-1.5 rounded-full inline-block shrink-0",
-										aiRecommendation.isWorkingDay ? "bg-emerald-500" : "bg-rose-500",
-									)}
-								/>
-								<span>
-									{reviewerName && reviewerName !== "المراجع"
-										? `المراجع: ${reviewerName} (${aiRecommendation.isWorkingDay ? "متاح" : "عطلة"})`
-										: `الدوام الرسمي: ${aiRecommendation.workingHoursText}`}
-								</span>
-							</p>
-							<p className="flex items-center gap-1.5">
-								<span className="size-1.5 rounded-full bg-amber-500 inline-block shrink-0" />
-								<span>الوقت الأنسب: {aiRecommendation.recommendedTime} ({aiRecommendation.reason})</span>
-							</p>
-						</div>
-
-						{/* زر اعتماد اقتراح AI بضغطة واحدة وتطبيقه فوراً */}
-						<button
-							type="button"
-							onClick={() => {
-								const targetDay = selectedDay || currentRealDay;
-								handleSelectDay(targetDay, false, true);
-								const targetSlot =
-									timeSlots.find((s) => s.time === aiRecommendation.recommendedTime) ||
-									timeSlots.find((s) => s.status === "available") ||
-									timeSlots[0];
-								if (targetSlot) handleSelectSlot(targetSlot);
-							}}
-							className="w-full py-1 px-2 rounded-md bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/50 dark:hover:bg-amber-900/80 text-amber-900 dark:text-amber-200 font-bold text-[10px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer border border-amber-300 dark:border-amber-700"
-						>
-							<IconSparkles className="size-3 text-amber-600 dark:text-amber-400" />
-							<span>
-								تطبيق اقتراح AI الموصى به (
-								{aiRecommendation.recommendedTime.replace(" صباحاً", " ص").replace(" مساءً", " م")}
-								)
-							</span>
-						</button>
-					</div>
-				)}
-
-				{/* ─── 4. قسم وقت الإتاحة ───────────────────────────────────── */}
-				<div className="space-y-1 mb-1.5">
-					<div className="flex items-center justify-between text-[10.5px]">
-						<span className="font-bold text-foreground">وقت الإتاحة</span>
-						<span className="text-[8.5px] text-muted-foreground">
-							جميع الإتاحات حسب منطقتك
-						</span>
-					</div>
-
-					<div className="grid grid-cols-3 gap-1">
-						{timeSlots.map((slot) => {
-							const isSelected = selectedSlot === slot.time;
-							const isAvailable = slot.status === "available";
-
-							return (
+					) : (
+						<div className="bg-[#FFFDF5] dark:bg-amber-950/20 border border-amber-200/80 dark:border-amber-800/40 rounded-lg p-2.5 text-right space-y-1.5 transition-all">
+							<div className="flex items-center justify-between border-b border-amber-200/50 pb-1">
 								<button
-									key={slot.id}
 									type="button"
-									disabled={!isAvailable}
-									onClick={() => handleSelectSlot(slot)}
+									onClick={() => setAiState("banner")}
+									className="text-[9.5px] text-amber-700 dark:text-amber-300 hover:underline cursor-pointer font-medium"
+								>
+									إخفاء التفاصيل
+								</button>
+								<div className="flex items-center gap-1 text-amber-800 dark:text-amber-400 font-bold text-[10.5px]">
+									<IconSparkles className="size-3 text-amber-500" />
+									<span>اقتراح رفيق AI الذكي</span>
+								</div>
+							</div>
+
+							<div className="text-[10px] text-amber-800/90 dark:text-amber-300/90 space-y-0.5 font-medium leading-tight">
+								<p className="flex items-center gap-1.5 truncate">
+									<span
+										className={cn(
+											"size-1.5 rounded-full inline-block shrink-0",
+											!isTodaySelected || availableSlotsCount > 0
+												? "bg-emerald-500"
+												: "bg-amber-500",
+										)}
+									/>
+									<span className="truncate">
+										{reviewerName && reviewerName !== "المراجع"
+											? `المراجع: ${reviewerName}`
+											: `ساعات العمل: ${aiRecommendation.workingHoursText}`}
+									</span>
+								</p>
+
+								<p className="flex items-start gap-1.5">
+									<span className="size-1.5 rounded-full bg-amber-500 inline-block shrink-0 mt-0.5" />
+									<span className="line-clamp-2 leading-tight">{aiRecommendation.reason}</span>
+								</p>
+							</div>
+
+							{/* زر اعتماد اقتراح AI أو الانتقال للغد */}
+							{availableSlotsCount > 0 && aiRecommendation.recommendedTime ? (
+								<button
+									type="button"
+									onClick={() => {
+										const targetDay = selectedDay || currentRealDay;
+										setSelectedDay(targetDay);
+										setSelectedMonth(month);
+										setSelectedYear(year);
+
+										const targetSlot =
+											timeSlots.find(
+												(s) =>
+													s.time === aiRecommendation.recommendedTime &&
+													s.status === "available" &&
+													(!isTodaySelected || s.startMinute > currentMinuteNow + 20),
+											) ||
+											timeSlots.find(
+												(s) =>
+													s.status === "available" &&
+													(!isTodaySelected || s.startMinute > currentMinuteNow + 20),
+											);
+										if (targetSlot) {
+											setSelectedSlot(targetSlot.time);
+											syncValue(targetDay, month, year, targetSlot.time);
+										}
+									}}
+									className="w-full h-7 rounded-md bg-[#5B50E5] hover:bg-[#4E43D8] text-white font-bold text-[10.5px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+								>
+									<IconSparkles className="size-3.5" />
+									<span>
+										تطبيق موعد ({aiRecommendation.recommendedTime.replace(" صباحاً", " ص").replace(" مساءً", " م")})
+									</span>
+								</button>
+							) : nextWorkingDate ? (
+								<button
+									type="button"
+									onClick={() => {
+										const [y, m, d] = nextWorkingDate.isoDate.split("-").map(Number);
+										setYear(y);
+										setMonth(m - 1);
+										setSelectedYear(y);
+										setSelectedMonth(m - 1);
+										setSelectedDay(d);
+										setSelectedSlot(nextWorkingDate.recommendedTime);
+										syncValue(d, m - 1, y, nextWorkingDate.recommendedTime);
+									}}
+									className="w-full h-7 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10.5px] flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+								>
+									<IconSparkles className="size-3.5" />
+									<span>
+										الانتقال ليوم {nextWorkingDate.dayNameAr} {nextWorkingDate.formattedDate} ({nextWorkingDate.recommendedTime.replace(" صباحاً", " ص").replace(" مساءً", " م")})
+									</span>
+								</button>
+							) : (
+								<div className="text-[10px] text-muted-foreground text-center py-0.5">
+									لا توجد فترات متاحة للحجز في هذا اليوم
+								</div>
+							)}
+						</div>
+					)}
+
+					{/* ─── 4. قسم وقت الإتاحة مع خيار الوقت المخصص ─── */}
+					<div className="space-y-2">
+						<div className="flex items-center justify-between">
+							<span className="font-bold text-[11.5px] text-foreground">وقت الإتاحة</span>
+							<div className="flex items-center bg-muted/80 p-0.5 rounded-md border border-border/60">
+								<button
+									type="button"
+									onClick={() => setTimeMode("presets")}
 									className={cn(
-										"h-6 px-1 rounded-md border text-[9px] font-medium flex items-center justify-center gap-0.5 transition-all",
-										isAvailable
-											? isSelected
-												? "border-[#5B50E5] bg-[#5B50E5]/10 text-[#5B50E5] font-bold shadow-2xs"
-												: "border-border/80 bg-background hover:bg-muted text-foreground cursor-pointer"
-											: "border-border/40 bg-muted/20 text-muted-foreground/50 cursor-not-allowed",
+										"h-5.5 px-2.5 rounded text-[10px] font-bold transition-all cursor-pointer",
+										timeMode === "presets"
+											? "bg-background text-foreground shadow-xs"
+											: "text-muted-foreground hover:text-foreground",
 									)}
 								>
-									<span>{slot.time.replace(" صباحاً", " ص").replace(" مساءً", " م")}</span>
-									{slot.badge && (
-										<span
-											className={cn(
-												"px-0.5 py-0.2 rounded text-[7px] font-bold leading-none shrink-0",
-												slot.status === "conflict"
-													? "bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-400"
-													: "bg-muted text-muted-foreground/75",
-											)}
-										>
-											{slot.badge}
-										</span>
-									)}
+									فترات محددة
 								</button>
-							);
-						})}
+								<button
+									type="button"
+									onClick={() => {
+										setTimeMode("custom");
+										setTimeout(() => {
+											scrollContainerRef.current?.scrollTo({ top: scrollContainerRef.current.scrollHeight, behavior: "smooth" });
+										}, 50);
+									}}
+									className={cn(
+										"h-5.5 px-2.5 rounded text-[10px] font-bold transition-all cursor-pointer flex items-center gap-1",
+										timeMode === "custom"
+											? "bg-[#5B50E5] text-white shadow-xs"
+											: "text-muted-foreground hover:text-foreground",
+									)}
+								>
+									<IconClock className="size-3" />
+									<span>وقت مخصص</span>
+								</button>
+							</div>
+						</div>
+
+						{timeMode === "presets" ? (
+							<div className="space-y-1.5">
+								<div className="grid grid-cols-4 gap-1.5">
+									{timeSlots.map((slot) => {
+										const isSelected = selectedSlot === slot.time;
+										const isPastHour = isTodaySelected && slot.startMinute <= currentMinuteNow + 20;
+										const isAvailable = slot.status === "available" && !isPastHour;
+										const badgeText = isPastHour ? "مضى" : slot.badge;
+
+										return (
+											<button
+												key={slot.id}
+												type="button"
+												disabled={!isAvailable}
+												onClick={() => handleSelectSlot(slot)}
+												title={
+													isPastHour
+														? "هذه الساعة انتهت اليوم ولا يمكن حجزها"
+														: slot.status !== "available"
+															? `غير متاح (${badgeText || "محجوز"})`
+															: `حجز الساعة ${slot.time}`
+												}
+												className={cn(
+													"h-6.5 px-1.5 rounded-md border text-[9.5px] font-medium flex items-center justify-between transition-all select-none",
+													isAvailable
+														? isSelected
+															? "border-[#5B50E5] bg-[#5B50E5]/10 text-[#5B50E5] font-bold shadow-xs cursor-pointer ring-1 ring-[#5B50E5]"
+															: "border-border/80 bg-background hover:bg-muted text-foreground cursor-pointer"
+														: "border-border/40 bg-muted/20 text-muted-foreground/40 cursor-not-allowed opacity-55",
+												)}
+											>
+												<span className="font-semibold">{slot.time.replace(" صباحاً", " ص").replace(" مساءً", " م")}</span>
+												{badgeText && (
+													<span
+														className={cn(
+															"px-1 py-0.2 rounded text-[7px] font-bold leading-none shrink-0",
+															badgeText === "مضى"
+																? "bg-zinc-200/90 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400"
+																: "bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-400",
+														)}
+													>
+														{badgeText}
+													</span>
+												)}
+											</button>
+										);
+									})}
+								</div>
+
+								{/* مساعدة سريعة لاختيار وقت مخصص إذا لم يناسبه أي من الفترات أو مضى اليوم */}
+								<div className="flex items-center justify-between pt-1 px-1 text-[10px] text-muted-foreground">
+									<span>لم تجد الوقت المناسب؟</span>
+									<button
+										type="button"
+										onClick={() => {
+											setTimeMode("custom");
+											setTimeout(() => {
+												scrollContainerRef.current?.scrollTo({ top: scrollContainerRef.current.scrollHeight, behavior: "smooth" });
+											}, 50);
+										}}
+										className="text-[#5B50E5] dark:text-indigo-400 font-bold hover:underline cursor-pointer flex items-center gap-1"
+									>
+										<IconClock className="size-3" />
+										<span>تحديد وقت مخصص حر</span>
+									</button>
+								</div>
+							</div>
+						) : (
+							/* لوحة تحديد الوقت المخصص بحرية تامة */
+							<div className="rounded-lg border border-[#5B50E5]/30 bg-[#5B50E5]/5 p-2.5 space-y-2.5 text-right">
+								<div className="flex items-center justify-between border-b border-[#5B50E5]/15 pb-1.5">
+									<span className="text-[10.5px] font-bold text-foreground flex items-center gap-1">
+										<IconClock className="size-3.5 text-[#5B50E5]" />
+										<span>اختر الوقت الذي يناسبك تماماً:</span>
+									</span>
+									<span className="text-[10.5px] text-[#5B50E5] font-bold bg-white dark:bg-card px-2 py-0.5 rounded border border-[#5B50E5]/25 shadow-2xs">
+										{String(customHour).padStart(2, "0")}:{String(customMinute).padStart(2, "0")} {customPeriod === "AM" ? "صباحاً" : "مساءً"}
+									</span>
+								</div>
+
+								{/* أوقات سريعة شائعة للاختيار المباشر بضغطة واحدة */}
+								<div>
+									<div className="text-[9.5px] font-bold text-muted-foreground mb-1">أوقات شائعة سريعة:</div>
+									<div className="grid grid-cols-4 gap-1">
+										{[
+											{ h: 9, m: 0, p: "AM" as const, label: "09:00 ص" },
+											{ h: 10, m: 30, p: "AM" as const, label: "10:30 ص" },
+											{ h: 1, m: 0, p: "PM" as const, label: "01:00 م" },
+											{ h: 3, m: 30, p: "PM" as const, label: "03:30 م" },
+										].map((t, idx) => (
+											<button
+												key={idx}
+												type="button"
+												onClick={() => {
+													setCustomHour(t.h);
+													setCustomMinute(t.m);
+													setCustomPeriod(t.p);
+												}}
+												className="h-5.5 rounded text-[9.5px] font-bold bg-white dark:bg-card border border-border/80 hover:border-[#5B50E5] text-foreground transition-all cursor-pointer"
+											>
+												{t.label}
+											</button>
+										))}
+									</div>
+								</div>
+
+								{/* اختيار الساعة 1 إلى 12 */}
+								<div>
+									<div className="text-[9.5px] font-bold text-muted-foreground mb-1">الساعة:</div>
+									<div className="grid grid-cols-6 gap-1">
+										{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((h) => (
+											<button
+												key={h}
+												type="button"
+												onClick={() => setCustomHour(h)}
+												className={cn(
+													"h-6 rounded text-[10.5px] font-bold transition-all cursor-pointer border",
+													customHour === h
+														? "bg-[#5B50E5] text-white border-[#5B50E5] shadow-xs"
+														: "bg-white dark:bg-card border-border/80 hover:bg-muted text-foreground",
+												)}
+											>
+												{h}
+											</button>
+										))}
+									</div>
+								</div>
+
+								{/* اختيار الدقيقة وفترة اليوم (صباحاً / مساءً) */}
+								<div className="grid grid-cols-2 gap-2">
+									<div>
+										<div className="text-[9.5px] font-bold text-muted-foreground mb-1">الدقيقة:</div>
+										<div className="grid grid-cols-4 gap-1">
+											{[0, 15, 30, 45].map((m) => (
+												<button
+													key={m}
+													type="button"
+													onClick={() => setCustomMinute(m)}
+													className={cn(
+														"h-6 rounded text-[10px] font-bold transition-all cursor-pointer border",
+														customMinute === m
+															? "bg-[#5B50E5] text-white border-[#5B50E5] shadow-xs"
+															: "bg-white dark:bg-card border-border/80 hover:bg-muted text-foreground",
+													)}
+												>
+													{String(m).padStart(2, "0")}
+												</button>
+											))}
+										</div>
+									</div>
+
+									<div>
+										<div className="text-[9.5px] font-bold text-muted-foreground mb-1">الفترة:</div>
+										<div className="grid grid-cols-2 gap-1">
+											<button
+												type="button"
+												onClick={() => setCustomPeriod("AM")}
+												className={cn(
+													"h-6 rounded text-[10px] font-bold transition-all cursor-pointer border",
+													customPeriod === "AM"
+														? "bg-[#5B50E5] text-white border-[#5B50E5] shadow-xs"
+														: "bg-white dark:bg-card border-border/80 hover:bg-muted text-foreground",
+												)}
+											>
+												صباحاً (ص)
+											</button>
+											<button
+												type="button"
+												onClick={() => setCustomPeriod("PM")}
+												className={cn(
+													"h-6 rounded text-[10px] font-bold transition-all cursor-pointer border",
+													customPeriod === "PM"
+														? "bg-[#5B50E5] text-white border-[#5B50E5] shadow-xs"
+														: "bg-white dark:bg-card border-border/80 hover:bg-muted text-foreground",
+												)}
+											>
+												مساءً (م)
+											</button>
+										</div>
+									</div>
+								</div>
+
+								{/* زر اعتماد الوقت المخصص */}
+								<button
+									type="button"
+									onClick={handleApplyCustomTime}
+									className="w-full h-7 rounded-md bg-[#5B50E5] hover:bg-[#4E43D8] text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-xs"
+								>
+									<IconCheck className="size-3.5 stroke-[2.5]" />
+									<span>
+										تأكيد واعتماد الوقت ({String(customHour).padStart(2, "0")}:{String(customMinute).padStart(2, "0")} {customPeriod === "AM" ? "ص" : "م"})
+									</span>
+								</button>
+							</div>
+						)}
+
+						{/* كبسولة الموعد المعتمد */}
+						{selectedSlot && !timeSlots.some((s) => s.time === selectedSlot) && (
+							<div className="flex items-center justify-between p-2 px-3 rounded-lg border border-[#5B50E5]/30 bg-[#5B50E5]/10 text-xs">
+								<div className="flex items-center gap-1.5 font-bold text-[#5B50E5] text-[11px]">
+									<IconSparkles className="size-3.5" />
+									<span>الموعد المعتمد: {selectedSlot}</span>
+								</div>
+								<button
+									type="button"
+									onClick={() => setTimeMode("custom")}
+									className="text-[10.5px] text-[#5B50E5] hover:underline font-bold cursor-pointer"
+								>
+									تعديل
+								</button>
+							</div>
+						)}
 					</div>
 				</div>
 
-				{/* ─── 5. تفعيل التذكيرات ───────────────────────────────────── */}
-				<div className="pt-1.5 mb-1 border-t border-border/40">
-					<div className="flex items-center justify-between">
+				{/* ─── 5. تذييل ثابت محكم تماماً بالأسفل (لا يتداخل إطلاقاً مع المحتوى) ───── */}
+				<div className="shrink-0 px-4 py-3 border-t border-border/70 space-y-2.5 select-none bg-white dark:bg-zinc-950">
+					{/* 1. تفعيل التذكيرات: النص على اليمين والمفتاح على اليسار */}
+					<div className="flex items-center justify-between gap-3">
+						<div className="text-right flex-1 min-w-0">
+							<div className="text-[11px] font-bold text-foreground">
+								تفعيل التذكيرات
+							</div>
+							<div className="text-[9.5px] text-muted-foreground">
+								تذكير للمستخدم عبر الواتساب قبل الموعد بـ 24 ساعة
+							</div>
+						</div>
 						<Switch
 							checked={remindersActive}
 							onCheckedChange={toggleReminders}
-							className="scale-75 origin-left"
+							className="cursor-pointer shrink-0"
 						/>
-						<div className="text-right">
-							<div className="text-[10px] font-bold text-foreground">تفعيل التذكيرات</div>
-							<div className="text-[8.5px] text-muted-foreground">
-								تذكير المستخدم عبر الواتساب قبل الموعد بـ 24 ساعة
+					</div>
+
+					{/* 2. تفعيل التكرار: النص على اليمين والمفتاح على اليسار */}
+					<div className="flex items-center justify-between gap-3">
+						<div className="text-right flex-1 min-w-0">
+							<div className="text-[11px] font-bold text-foreground">
+								تفعيل التكرار
+							</div>
+							<div className="text-[9.5px] text-muted-foreground">
+								طلب جدولة زيارات متكررة للطالب
 							</div>
 						</div>
+						<Switch
+							checked={externalRecurrence !== undefined ? externalRecurrence : recurrenceActive}
+							onCheckedChange={(val) => {
+								setRecurrenceActive(val);
+								onEnableRecurrenceChange?.(val);
+								if (val) {
+									toast.info("تم تفعيل طلب التكرار: سيتم إدراج طلب زيارات متكررة للطالب في خطة المواعيد.");
+								}
+							}}
+							className="cursor-pointer shrink-0"
+						/>
+					</div>
+
+					{/* خط فاصل */}
+					<div className="border-t border-border/40 my-0.5" />
+
+					{/* 3. زر إعادة الضبط في المنتصف تماماً */}
+					<div className="text-center pt-0.5">
+						<button
+							type="button"
+							onClick={handleReset}
+							className="text-[11px] font-bold text-foreground/80 hover:text-foreground transition-colors cursor-pointer hover:underline"
+						>
+							إعادة الضبط
+						</button>
 					</div>
 				</div>
-
-				{/* ─── 6. تذييل Popover: إعادة الضبط ─────────────────────────── */}
-				<div className="pt-1 border-t border-border/40 text-center">
-					<button
-						type="button"
-						onClick={handleReset}
-						className="text-[10px] font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-					>
-						إعادة الضبط
-					</button>
-				</div>
-			</div>
 			</PopoverContent>
 		</Popover>
 	);

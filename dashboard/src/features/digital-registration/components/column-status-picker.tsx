@@ -10,7 +10,9 @@ import {
 	IconCircleCheck,
 	IconCircleX,
 	IconHourglass,
-	IconPlayerPlayFilled,
+	IconClipboardCheck,
+	IconActivity,
+	IconCopy,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 
@@ -22,56 +24,56 @@ export interface ColumnStatusOption {
 	pillIcon: React.ReactNode;
 }
 
-// حالات وأعمدة نظام التسجيل الرقمي بالأكاديمية مع الأيقونات والأرقام المختصرة المطابقة للتصميم
+// حالات وأعمدة نظام التسجيل الرقمي الـ 7 المعتمدة بالأكاديمية
 export const SYSTEM_REGISTRATION_COLUMNS: ColumnStatusOption[] = [
 	{
 		id: "queue",
 		name: "طابور",
-		shortcut: "0",
-		icon: <div className="size-3.5 rounded-full border border-muted-foreground/60 shrink-0" />,
-		pillIcon: <div className="size-2 rounded-full border border-muted-foreground/60" />,
+		shortcut: "1",
+		icon: <IconClock className="size-3.5 text-blue-500 shrink-0" />,
+		pillIcon: <IconClock className="size-2 text-blue-500" />,
 	},
 	{
 		id: "shortlist",
-		name: "القائمة المختصرة",
-		shortcut: "1",
-		icon: <div className="size-3.5 rounded-full border border-muted-foreground/60 shrink-0" />,
-		pillIcon: <div className="size-2 rounded-full border border-muted-foreground/60" />,
+		name: "قائمة مختصرة",
+		shortcut: "2",
+		icon: <IconClipboardCheck className="size-3.5 text-slate-500 shrink-0" />,
+		pillIcon: <IconClipboardCheck className="size-2 text-slate-500" />,
 	},
 	{
 		id: "interview",
 		name: "المقابلة الشخصية",
-		shortcut: "2",
-		icon: <IconClock className="size-3.5 text-blue-500 shrink-0" />,
-		pillIcon: <IconClock className="size-2.5 text-blue-500" />,
-	},
-	{
-		id: "evaluation",
-		name: "داخل التقييم",
 		shortcut: "3",
-		icon: <IconPlayerPlayFilled className="size-3 text-amber-500 shrink-0" />,
-		pillIcon: <IconPlayerPlayFilled className="size-2 text-amber-500" />,
+		icon: <IconActivity className="size-3.5 text-amber-500 shrink-0" />,
+		pillIcon: <IconActivity className="size-2 text-amber-500" />,
 	},
 	{
-		id: "waitlist",
-		name: "قائمة الانتظار",
+		id: "awaiting-payment",
+		name: "بانتظار الدفع",
 		shortcut: "4",
 		icon: <IconHourglass className="size-3.5 text-purple-500 shrink-0" />,
-		pillIcon: <IconHourglass className="size-2.5 text-purple-500" />,
+		pillIcon: <IconHourglass className="size-2 text-purple-500" />,
+	},
+	{
+		id: "accepted",
+		name: "مقبول",
+		shortcut: "5",
+		icon: <IconCircleCheck className="size-3.5 text-emerald-500 shrink-0" />,
+		pillIcon: <IconCircleCheck className="size-2 text-emerald-500" />,
 	},
 	{
 		id: "rejected",
 		name: "مرفوض",
 		shortcut: "6",
 		icon: <IconCircleX className="size-3.5 text-rose-500 shrink-0" />,
-		pillIcon: <IconCircleX className="size-2.5 text-rose-500" />,
+		pillIcon: <IconCircleX className="size-2 text-rose-500" />,
 	},
 	{
-		id: "accepted",
-		name: "مقبول",
+		id: "duplicate",
+		name: "مكرر",
 		shortcut: "7",
-		icon: <IconCircleCheck className="size-3.5 text-blue-500 shrink-0" />,
-		pillIcon: <IconCircleCheck className="size-2.5 text-blue-500" />,
+		icon: <IconCopy className="size-3.5 text-orange-500 shrink-0" />,
+		pillIcon: <IconCopy className="size-2 text-orange-500" />,
 	},
 ];
 

@@ -115,7 +115,7 @@ function RootDocument({ children }: { children: ReactNode }) {
 				<Scripts />
 				<Toaster
 					dir={dir}
-					position={isRtl ? "bottom-left" : "bottom-right"}
+					position="bottom-left"
 				/>
 			</body>
 		</html>

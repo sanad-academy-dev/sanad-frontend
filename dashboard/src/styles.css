@@ -180,6 +180,36 @@
   }
 }
 
+/* شريط تمرير أنيق وموحّد للنوافذ المنبثقة والنماذج والقوائم */
+.sanad-scrollbar {
+  scrollbar-gutter: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(150, 150, 150, 0.45) transparent;
+}
+
+.sanad-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.sanad-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sanad-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(150, 150, 150, 0.45);
+  border-radius: 9999px;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.sanad-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(120, 120, 120, 0.75);
+}
+
+.sanad-scrollbar::-webkit-scrollbar-thumb:active {
+  background-color: #5B50E5;
+}
+
 /* react-phone-number-input overrides */
 .phone-input {
   display: flex;

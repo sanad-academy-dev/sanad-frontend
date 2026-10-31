@@ -1,7 +1,7 @@
 import {
 	IconAlertOctagon,
 	IconAlertTriangle,
-	IconCircleCheck,
+	IconCircleCheckFilled,
 	IconInfoCircle,
 	IconLoader,
 } from "@tabler/icons-react";
@@ -12,8 +12,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
 		<Sonner
 			theme="light"
 			className="toaster group"
+			position="bottom-left"
 			icons={{
-				success: <IconCircleCheck className="size-4 text-emerald-600 dark:text-emerald-400" />,
+				success: <IconCircleCheckFilled className="size-4.5 text-emerald-600 dark:text-emerald-400" />,
 				info: <IconInfoCircle className="size-4 text-blue-600 dark:text-blue-400" />,
 				warning: <IconAlertTriangle className="size-4 text-yellow-600 dark:text-yellow-400" />,
 				error: <IconAlertOctagon className="size-4 text-red-600 dark:text-red-400" />,
@@ -25,8 +26,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
 					"--normal-bg": "var(--popover)",
 					"--normal-text": "var(--popover-foreground)",
 					"--normal-border": "var(--border)",
-					"--border-radius": "4px",
-	} as React.CSSProperties
+					"--border-radius": "8px",
+				} as React.CSSProperties
 			}
 			toastOptions={{
 				style: {
@@ -34,7 +35,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
 				},
 				classNames: {
 					toast: "cn-toast text-right!",
-					success: "text-emerald-700 dark:text-emerald-300",
+					success: "text-foreground",
 					error: "text-red-700 dark:text-red-300",
 					info: "text-blue-700 dark:text-blue-300",
 					warning: "text-yellow-700 dark:text-yellow-300",

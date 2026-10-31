@@ -17,6 +17,7 @@ import {
 	IconCircleCheck,
 	IconClipboardCheck,
 	IconClock,
+	IconCopy,
 	IconDots,
 	IconDownload,
 	IconEdit,
@@ -36,6 +37,7 @@ import {
 	IconTrash,
 	IconUser,
 	IconUserCircle,
+	IconVideo,
 	IconX,
 } from "@tabler/icons-react";
 import { Link } from "@tanstack/react-router";
@@ -498,12 +500,28 @@ const STATUS_META: Record<string, { label: string; className: string }> = {
 		label: "داخل التقييم",
 		className: "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800",
 	},
+	"awaiting-payment": {
+		label: "بانتظار الدفع",
+		className: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800",
+	},
+	AWAITING_PAYMENT: {
+		label: "بانتظار الدفع",
+		className: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800",
+	},
+	duplicate: {
+		label: "مكرر",
+		className: "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-800",
+	},
+	DUPLICATE: {
+		label: "مكرر",
+		className: "bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-950/40 dark:text-orange-300 dark:border-orange-800",
+	},
 	waitlist: {
-		label: "قائمة الانتظار",
+		label: "بانتظار الدفع",
 		className: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800",
 	},
 	WAITLIST: {
-		label: "قائمة الانتظار",
+		label: "بانتظار الدفع",
 		className: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800",
 	},
 	AWAITING_REPLY: {
@@ -706,19 +724,39 @@ export function CampaignRequestSheet({
 
 					{/* المحتوى القابل للتمرير */}
 					<div className="flex-1 space-y-4 overflow-y-auto p-4">
-						{/* العنوان والحالة */}
+						{/* العنوان والحالة وقناة التسجيل */}
 						<div
 							className="flex items-center justify-between gap-2"
 							dir="rtl"
 						>
-							<span
-								className={cn(
-									"rounded-[4px] px-2 py-0.5 text-[11px] font-semibold border",
-									statusMeta.className,
+							<div className="flex items-center gap-1.5 flex-wrap">
+								<span
+									className={cn(
+										"rounded-[4px] px-2 py-0.5 text-[11px] font-semibold border",
+										statusMeta.className,
+									)}
+								>
+									{statusMeta.label}
+								</span>
+
+								{request.source === "DIRECT_LINK" || (request as any).channel === "CALL" ? (
+									<Badge
+										variant="outline"
+										className="gap-1 py-0.5 px-2 text-[10.5px] font-semibold border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
+									>
+										<IconPhone className="size-3 text-emerald-600" />
+										<span>عبر اتصال</span>
+									</Badge>
+								) : (
+									<Badge
+										variant="outline"
+										className="gap-1 py-0.5 px-2 text-[10.5px] font-semibold border-blue-300 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950/40 dark:text-blue-300"
+									>
+										<IconBuilding className="size-3 text-blue-600" />
+										<span>في الأكاديمية</span>
+									</Badge>
 								)}
-							>
-								{statusMeta.label}
-							</span>
+							</div>
 
 							<div className="flex items-center gap-2">
 								<span className="text-sm font-bold text-foreground">
@@ -885,6 +923,65 @@ export function CampaignRequestSheet({
 								</Button>
 							</div>
 						) : null}
+
+						{/* كرت جلسة المقابلة الشخصية الافتراضية (عبر اتصال) */}
+						{(request.source === "DIRECT_LINK" || (request as any).channel === "CALL") && (
+							<div
+								className="flex flex-col gap-2 rounded-md border border-emerald-300 bg-emerald-50/70 dark:bg-emerald-950/30 dark:border-emerald-800 p-3"
+								dir="rtl"
+							>
+								<div className="flex items-center justify-between gap-2">
+									<div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-300">
+										<IconVideo className="size-4 shrink-0 text-emerald-600" />
+										<span>جلسة المقابلة الشخصية (عبر اتصال)</span>
+									</div>
+									<Badge
+										variant="outline"
+										className="text-[10px] bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-900/50 dark:text-emerald-200 font-semibold px-2"
+									>
+										قاعة افتراضية جاهزة
+									</Badge>
+								</div>
+
+								<div className="text-xs text-muted-foreground flex items-center justify-between flex-wrap gap-1">
+									<span>كود القاعة: <strong className="font-mono text-foreground">interview-{request.code.toLowerCase()}</strong></span>
+									{request.appointmentDate && (
+										<span>الموعد: <strong className="text-foreground">{new Date(request.appointmentDate).toLocaleDateString("ar-EG")}</strong></span>
+									)}
+								</div>
+
+								<div className="flex items-center gap-2 pt-1 flex-wrap">
+									<Button
+										asChild
+										size="sm"
+										className="h-7 text-xs bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5 font-semibold shadow-xs"
+									>
+										<Link
+											to="/video-call"
+											search={{ room: `interview-${request.code.toLowerCase()}` }}
+										>
+											<IconVideo className="size-3.5" />
+											دخول المقابلة الآن
+										</Link>
+									</Button>
+
+									<Button
+										type="button"
+										size="sm"
+										variant="outline"
+										className="h-7 text-xs bg-white dark:bg-card border-emerald-300 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-700 dark:text-emerald-300 gap-1.5 font-semibold"
+										onClick={async () => {
+											const guestUrl = `${window.location.origin}/call/${encodeURIComponent(`interview-${request.code.toLowerCase()}`)}`;
+											await navigator.clipboard.writeText(guestUrl);
+											toast.success("تم نسخ رابط المقابلة لولي الأمر بنجاح");
+										}}
+									>
+										<IconCopy className="size-3.5" />
+										نسخ رابط المقابلة لولي الأمر
+									</Button>
+								</div>
+							</div>
+						)}
 
 						{/* بيانات الطفل */}
 						<div className="space-y-1.5">

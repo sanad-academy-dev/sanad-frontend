@@ -35,10 +35,12 @@ export interface CampaignRequestItem {
 		| "QUEUE"
 		| "SHORTLIST"
 		| "INTERVIEW"
+		| "ACCEPTED"
+		| "AWAITING_PAYMENT"
+		| "REJECTED"
+		| "DUPLICATE"
 		| "IN_EVALUATION"
 		| "WAITLIST"
-		| "ACCEPTED"
-		| "REJECTED"
 		| "EVALUATION"
 		| "REVIEW"
 		| "AWAITING_REPLY";
@@ -58,6 +60,9 @@ export interface CampaignRequestItem {
 	guardianPhone: string;
 	guardianEmail?: string | null;
 	guardianNationalId?: string | null;
+	source?: "WEBSITE" | "DIRECT_LINK" | "REFERRAL" | "SOCIAL" | "OTHER";
+	channel?: "CALL" | "ACADEMY";
+	meetingUrl?: string | null;
 	tags: { label: string; variant: "warning" | "destructive" | "default" }[];
 	date: string;
 	documents: {
