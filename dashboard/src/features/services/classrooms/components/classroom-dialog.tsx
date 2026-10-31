@@ -101,6 +101,7 @@ import { AssignStaffSheet } from "./assign-staff-dialog";
 import { ClassroomAgentPanel } from "./classroom-agent-panel";
 import { ClassroomReviewStep } from "./classroom-review-step";
 import { SaveDraftConfirmDialog } from "./save-draft-confirm-dialog";
+import { AddBranchDialog } from "@/features/settings/branches/components/add-branch-dialog";
 
 // قائمة الأيقونات المتاحة للاختيار مع وسوم البحث
 const POPULAR_ICONS = [
@@ -376,10 +377,32 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 	// حالات الدروب داونز السفلية (Drop-downs)
 	const [ageGroup, setAgeGroup] = useState<string>("");
 	const [branch, setBranch] = useState<string>("");
+	const [branchSearch, setBranchSearch] = useState<string>("");
 	const [classification, setClassification] = useState<string>("");
 	const [classificationsList, setClassificationsList] = useState<string[]>([]);
 	const [newClassificationInput, setNewClassificationInput] = useState<string>("");
 	const [learningMode, setLearningMode] = useState<LearningMode | "">("");
+
+	const fallbackBranches = useMemo(
+		() => [
+			{ id: "fb-1", name: "الفرع الرئيسي", branchCode: "BR-MAIN" },
+			{ id: "fb-2", name: "فرع التجمع", branchCode: "BR-TG" },
+			{ id: "fb-3", name: "فرع المعادي", branchCode: "BR-MD" },
+			{ id: "fb-4", name: "عن بعد (أونلاين)", branchCode: "BR-ONLINE" },
+		],
+		[],
+	);
+
+	const filteredBranches = useMemo(() => {
+		const list = branches.length > 0 ? branches : fallbackBranches;
+		if (!branchSearch.trim()) return list;
+		const q = branchSearch.trim().toLowerCase();
+		return list.filter(
+			(b) =>
+				b.name.toLowerCase().includes(q) ||
+				(b.branchCode && b.branchCode.toLowerCase().includes(q)),
+		);
+	}, [branches, fallbackBranches, branchSearch]);
 
 	// دمج التصنيفات الافتراضية مع تصنيفات الباك إند والإضافات المحلية
 	const mergedClassifications = useMemo(() => {
@@ -394,6 +417,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 	// خيارات إضافية وتفاعلية
 	const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
 	const [isStaffSheetOpen, setIsStaffSheetOpen] = useState(false);
+	const [isAddBranchOpen, setIsAddBranchOpen] = useState(false);
 	const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>("none");
 	const [templateSearch, setTemplateSearch] = useState("");
 	const [templateMenuOpen, setTemplateMenuOpen] = useState(false);
@@ -999,12 +1023,20 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 								: "max-w-xl!",
 					)}
 					onInteractOutside={(e) => {
+						if (isStaffSheetOpen || isAddBranchOpen || showDraftConfirm) {
+							e.preventDefault();
+							return;
+						}
 						if (!isEdit && isFormDirty) {
 							e.preventDefault();
 							setShowDraftConfirm(true);
 						}
 					}}
 					onEscapeKeyDown={(e) => {
+						if (isAddBranchOpen) {
+							e.preventDefault();
+							return;
+						}
 						if (isReviewStep) {
 							e.preventDefault();
 							setIsReviewStep(false);
@@ -1726,48 +1758,87 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 												</DropdownMenuTrigger>
 												<DropdownMenuContent
 													align="end"
-													className="w-48! min-w-48"
+													className="w-64! min-w-64 p-1.5 rounded-xl border shadow-lg bg-popover"
 												>
-													<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
-														اختر الفرع
-													</DropdownMenuLabel>
-													<DropdownMenuSeparator />
-													{branches.length > 0
-														? branches.map((b) => (
-																<DropdownMenuItem
-																	key={b.id}
-																	onClick={() => setBranch(b.name)}
-																	className="cursor-pointer text-xs flex items-center justify-between"
-																>
-																	<span>{b.name}</span>
-																	{branch === b.name && (
-																		<IconCheck className="size-3.5 text-primary" />
-																	)}
-																</DropdownMenuItem>
-															))
-														: [
-																"الفرع الرئيسي",
-																"فرع التجمع",
-																"فرع المعادي",
-																"عن بعد (أونلاين)",
-															].map((bName) => (
-																<DropdownMenuItem
-																	key={bName}
-																	onClick={() => setBranch(bName)}
-																	className="cursor-pointer text-xs flex items-center justify-between"
-																>
-																	<span>{bName}</span>
-																	{branch === bName && (
-																		<IconCheck className="size-3.5 text-primary" />
-																	)}
-																</DropdownMenuItem>
-															))}
+													{/* حقل البحث العلوي المطابق للتصميم الموحد */}
+													<div
+														className="p-1 mb-1 border-b border-border/60"
+														onClickCapture={(e) => e.stopPropagation()}
+														onKeyDownCapture={(e) => e.stopPropagation()}
+														onPointerDownCapture={(e) => e.stopPropagation()}
+														onMouseDown={(e) => e.stopPropagation()}
+													>
+														<div className="relative">
+															<Input
+																value={branchSearch}
+																onChange={(e) => setBranchSearch(e.target.value)}
+																placeholder="ابحث عن فرع..."
+																className="h-8 text-xs pr-7 pl-2 bg-muted/20"
+															/>
+															<IconSearch className="size-3.5 text-muted-foreground absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+														</div>
+													</div>
+
+													{/* زر إضافة فرع جديد المطابق للصورة */}
+													<div className="p-1 border-b border-border/60">
+														<button
+															type="button"
+															onClick={() => setIsAddBranchOpen(true)}
+															className="w-full flex items-center justify-center gap-1.5 py-1.5 px-2 text-xs font-semibold text-foreground hover:bg-muted/70 rounded-md transition-colors cursor-pointer"
+														>
+															<IconPlus className="size-3.5" />
+															<span>إضافة فرع جديد</span>
+														</button>
+													</div>
+
+													{/* قائمة الفروع مع الاسم يميناً والمعرّف يساراً كما في التصميم */}
+													<div className="max-h-56 overflow-y-auto py-1 space-y-0.5">
+														{filteredBranches.length === 0 ? (
+															<div className="py-3 text-center text-xs text-muted-foreground">
+																لا توجد فروع مطابقة
+															</div>
+														) : (
+															filteredBranches.map((b) => {
+																const isSelected = branch === b.name;
+																return (
+																	<DropdownMenuItem
+																		key={b.id}
+																		onClick={() => setBranch(b.name)}
+																		className={cn(
+																			"cursor-pointer text-xs flex items-center justify-between py-2 px-2.5 rounded-md transition-colors",
+																			isSelected
+																				? "bg-primary/10 text-primary font-medium"
+																				: "text-foreground",
+																		)}
+																	>
+																		<div className="flex items-center gap-2">
+																			{isSelected && (
+																				<IconCheck className="size-3.5 text-primary shrink-0" />
+																			)}
+																			<span className="font-medium">{b.name}</span>
+																		</div>
+																		{b.branchCode && (
+																			<span
+																				className={cn(
+																					"text-xs font-mono ms-auto",
+																					isSelected ? "text-primary/70" : "text-muted-foreground",
+																				)}
+																			>
+																				{b.branchCode}
+																			</span>
+																		)}
+																	</DropdownMenuItem>
+																);
+															})
+														)}
+													</div>
+
 													{branch && (
 														<>
-															<DropdownMenuSeparator />
+															<DropdownMenuSeparator className="my-1" />
 															<DropdownMenuItem
 																onClick={() => setBranch("")}
-																className="cursor-pointer text-xs text-destructive"
+																className="cursor-pointer text-xs text-destructive py-1.5 px-2.5 justify-center"
 															>
 																إلغاء التحديد
 															</DropdownMenuItem>
@@ -2147,6 +2218,15 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 				onSaveStaff={(ids) => {
 					setSelectedStaffIds(ids);
 					setIsStaffSheetOpen(false);
+				}}
+			/>
+
+			{/* نافذة إضافة فرع جديد من داخل نموذج الفصل */}
+			<AddBranchDialog
+				open={isAddBranchOpen}
+				onOpenChange={setIsAddBranchOpen}
+				onSuccess={(newBranch) => {
+					setBranch(newBranch.name);
 				}}
 			/>
 
