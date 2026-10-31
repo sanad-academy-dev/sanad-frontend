@@ -49,11 +49,24 @@ function formatArabicDate(dateStr?: string | Date): string {
 	try {
 		const d = new Date(dateStr);
 		if (Number.isNaN(d.getTime())) return "—";
-		return new Intl.DateTimeFormat("ar-EG", {
-			year: "numeric",
-			month: "long",
-			day: "numeric",
-		}).format(d);
+		const day = d.getDate();
+		const months = [
+			"يناير",
+			"فبراير",
+			"مارس",
+			"أبريل",
+			"مايو",
+			"يونيو",
+			"يوليو",
+			"أغسطس",
+			"سبتمبر",
+			"أكتوبر",
+			"نوفمبر",
+			"ديسمبر",
+		];
+		const month = months[d.getMonth()];
+		const year = d.getFullYear();
+		return `${day} ${month}، ${year}`;
 	} catch {
 		return "—";
 	}
@@ -474,24 +487,24 @@ export function ClassroomOverviewTab({
 					═════════════════════════════════════════════════════════════════════ */}
 					<div className="flex flex-col gap-4 text-right">
 						{/* 2. سعة الفصل (Progress) */}
-						<div className="rounded-[4px] border border-border bg-card text-right">
-							<div className="flex items-center justify-between w-full px-4 py-2.5 border-b border-border">
-								<h3 className="text-xs font-bold flex items-center gap-2 text-foreground">
-									<IconUsers className="size-3.5 text-primary shrink-0" />
-									سعة الفصل
-								</h3>
+						<div className="rounded-xl border border-border/70 bg-card p-4 shadow-2xs flex flex-col gap-3.5 text-right">
+							<div className="flex items-center justify-between gap-2">
+								<div className="flex items-center gap-2">
+									<IconUsers className="size-4.5 text-foreground/80 shrink-0" />
+									<h3 className="font-bold text-sm text-foreground">سعة الفصل</h3>
+								</div>
 								<span
 									className={cn(
-										"text-[10px] font-medium px-2 py-0.5 rounded-[4px] border shrink-0",
+										"text-xs font-semibold px-2.5 py-0.5 rounded-full border shrink-0",
 										capacityConfig.badgeClass,
 									)}
 								>
 									{capacityConfig.label}
 								</span>
 							</div>
-							<div className="p-4 space-y-3.5 text-right">
+							<div className="space-y-3.5 text-right">
 								{/* بيانات السعة الموحدة */}
-								<div className="rounded-[4px] border border-border bg-muted/20 p-3.5 space-y-3 text-right">
+								<div className="rounded-lg border border-border/70 bg-muted/20 p-3.5 space-y-3 text-right">
 									<div className="flex items-center justify-between text-xs w-full">
 										<span className="font-semibold text-foreground text-right">
 											نسبة الإشغال الحالية
@@ -514,10 +527,10 @@ export function ClassroomOverviewTab({
 									</div>
 
 									{/* شريط السعة المعتمد */}
-									<div className="relative h-2 w-full bg-muted rounded-[2px] overflow-hidden">
+									<div className="relative h-2 w-full bg-muted rounded-full overflow-hidden">
 										<div
 											className={cn(
-												"h-full rounded-[2px] transition-all duration-500",
+												"h-full rounded-full transition-all duration-500",
 												capacityConfig.barClass,
 											)}
 											style={{ width: `${occupancy}%` }}
@@ -540,13 +553,13 @@ export function ClassroomOverviewTab({
 
 								{/* إحصائيات المقاعد الثلاثة بتصميم مطابق لكروت المنصة العلوية */}
 								<div className="grid grid-cols-3 gap-2 pt-0.5">
-									<div className="text-center p-2.5 rounded-[4px] border border-border bg-card">
+									<div className="text-center p-2.5 rounded-lg border border-border/70 bg-card">
 										<div className="text-base font-bold font-mono text-primary">
 											{enrolledCount}
 										</div>
 										<div className="text-[10px] text-muted-foreground mt-0.5">مسجل</div>
 									</div>
-									<div className="text-center p-2.5 rounded-[4px] border border-border bg-card">
+									<div className="text-center p-2.5 rounded-lg border border-border/70 bg-card">
 										<div
 											className={cn(
 												"text-base font-bold font-mono",
@@ -559,7 +572,7 @@ export function ClassroomOverviewTab({
 										</div>
 										<div className="text-[10px] text-muted-foreground mt-0.5">شاغر</div>
 									</div>
-									<div className="text-center p-2.5 rounded-[4px] border border-border bg-card">
+									<div className="text-center p-2.5 rounded-lg border border-border/70 bg-card">
 										<div className="text-base font-bold font-mono text-foreground">
 											{capacity}
 										</div>
@@ -572,171 +585,182 @@ export function ClassroomOverviewTab({
 						</div>
 
 						{/* 1. نبذة عن الفصل (About) */}
-						<div className="rounded-[4px] border border-border bg-card text-right">
-							<div className="flex items-center justify-between w-full px-4 py-2.5 border-b border-border">
-								<h3 className="text-xs font-bold flex items-center gap-2 text-foreground">
-									<IconFileDescription className="size-3.5 text-primary shrink-0" />
-									نبذة عن الفصل
-								</h3>
-								<Button
-									variant="ghost"
-									size="sm"
+						<div className="rounded-xl border border-border/70 bg-card p-4 shadow-2xs flex flex-col gap-3 text-right">
+							<div className="flex items-center justify-between gap-2">
+								<div className="flex items-center gap-2">
+									<IconFileDescription className="size-4.5 text-foreground/80 shrink-0" />
+									<h3 className="font-bold text-sm text-foreground">نبذة عن الفصل</h3>
+								</div>
+								<button
+									type="button"
 									onClick={onEdit}
-									className="h-6 px-2 text-[11px] text-muted-foreground hover:text-foreground gap-1 cursor-pointer shrink-0"
+									className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/80 transition-colors cursor-pointer"
 								>
-									<IconEdit className="size-3" />
-									تعديل
-								</Button>
+									<IconEdit className="size-3.5" />
+									<span>تعديل</span>
+								</button>
 							</div>
-							<div className="p-4 text-right">
-								<p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap min-h-[36px] text-right">
-									{description ||
-										"لا توجد نبذة أو وصف مسجل لهذا الفصل بعد. يمكنك الضغط على تعديل لإضافة وصف شامل."}
-								</p>
-							</div>
+							<p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-wrap min-h-[36px] text-right">
+								{description ||
+									"لا توجد نبذة أو وصف مسجل لهذا الفصل بعد. يمكنك الضغط على تعديل لإضافة وصف شامل."}
+							</p>
 						</div>
 
-						{/* 3. تفاصيل الفصل (Details) */}
-						<div className="rounded-[4px] border border-border bg-card text-right">
-							<div className="flex items-center justify-between w-full px-4 py-2.5 border-b border-border">
-								<h3 className="text-xs font-bold flex items-center gap-2 text-foreground">
-									<IconLayoutGrid className="size-3.5 text-primary shrink-0" />
-									تفاصيل الفصل
-								</h3>
+						{/* 3. تفاصيل الفصل (Details) — مطابق تماماً لتصميم بطاقة تفاصيل الملف الشخصي للطالب */}
+						<div className="rounded-xl border border-border/70 bg-card p-4 shadow-2xs flex flex-col gap-3 text-right">
+							{/* ترويسة البطاقة */}
+							<div className="flex items-center justify-between gap-2">
+								<div className="flex items-center gap-2">
+									<IconLayoutGrid className="size-4.5 text-foreground/80 shrink-0" />
+									<h3 className="font-bold text-sm text-foreground">تفاصيل الفصل</h3>
+								</div>
+								<button
+									type="button"
+									onClick={onEdit}
+									className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/80 transition-colors cursor-pointer"
+								>
+									<IconEdit className="size-3.5" />
+									<span>تعديل</span>
+								</button>
 							</div>
-							<div className="p-4 text-right">
-								<dl className="space-y-2.5 text-right">
-									<div className="flex items-center justify-between gap-2 py-1 border-b border-border">
-										<dt className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-[100px] text-right">
-											<IconCheck className="size-3 text-muted-foreground/70 shrink-0" />
-											<span>الحالة</span>
-										</dt>
-										<dd className="text-xs font-medium flex items-center gap-1.5 text-left">
-											<span
-												className={cn(
-													"size-1.5 rounded-full",
-													classroom.active ? "bg-emerald-500" : "bg-slate-400",
-												)}
-											/>
-											<span
-												className={
-													classroom.active
-														? "text-emerald-600 dark:text-emerald-400 font-semibold"
-														: "text-slate-500"
-												}
-											>
-												{classroom.active ? "نشط" : "غير نشط"}
-											</span>
-										</dd>
-									</div>
 
-									<div className="flex items-center justify-between gap-2 py-1 border-b border-border">
-										<dt className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-[100px] text-right">
-											<IconUser className="size-3 text-muted-foreground/70 shrink-0" />
-											<span>المشرف المسؤول</span>
-										</dt>
-										<dd className="text-xs font-medium text-foreground flex items-center gap-2 text-left">
-											{leadTeacher ? (
-												<>
-													<span className="size-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold">
-														{getInitials(leadTeacher.name)}
-													</span>
-													<span>{leadTeacher.name}</span>
-													{leadTeacher.role && (
-														<span className="text-[10px] text-muted-foreground">
-															({leadTeacher.role})
-														</span>
-													)}
-												</>
-											) : (
-												<span className="text-muted-foreground/70">لم يحدد بعد</span>
+							{/* صفوف البيانات بدون خطوط فاصلة وبنفس أسلوب الملف الشخصي للطالب */}
+							<div className="flex flex-col gap-2.5 text-xs pt-1">
+								{/* الحالة */}
+								<div className="flex items-center justify-between gap-2">
+									<div className="flex items-center gap-2 text-muted-foreground">
+										<IconCheck className="size-4 shrink-0 text-muted-foreground/70" />
+										<span>الحالة</span>
+									</div>
+									<span className="font-semibold text-foreground flex items-center gap-1.5 text-start">
+										<span
+											className={cn(
+												"size-2 rounded-full",
+												classroom.active ? "bg-emerald-500" : "bg-slate-400",
 											)}
-										</dd>
-									</div>
+										/>
+										<span
+											className={
+												classroom.active
+													? "text-emerald-600 dark:text-emerald-400 font-semibold"
+													: "text-slate-500"
+											}
+										>
+											{classroom.active ? "نشط" : "غير نشط"}
+										</span>
+									</span>
+								</div>
 
-									<div className="flex items-center justify-between gap-2 py-1 border-b border-border">
-										<dt className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-[100px] text-right">
-											<IconSchool className="size-3 text-muted-foreground/70 shrink-0" />
-											<span>الكادر التعليمي</span>
-										</dt>
-										<dd className="text-xs font-medium text-foreground flex items-center gap-1.5 text-left">
-											<div className="flex -space-x-1 space-x-reverse overflow-hidden">
-												{(classroom.teachers || []).slice(0, 3).map((t, idx) => (
-													<span
-														key={t.id}
-														className={cn(
-															"size-5 rounded-full flex items-center justify-center text-[9px] font-bold ring-1 ring-background",
-															AVATAR_PALETTE[idx % AVATAR_PALETTE.length],
-														)}
-														title={t.name}
-													>
-														{getInitials(t.name)}
+								{/* المشرف المسؤول */}
+								<div className="flex items-center justify-between gap-2">
+									<div className="flex items-center gap-2 text-muted-foreground">
+										<IconUser className="size-4 shrink-0 text-muted-foreground/70" />
+										<span>المشرف المسؤول</span>
+									</div>
+									<div className="flex items-center gap-2 font-semibold text-foreground text-start">
+										{leadTeacher ? (
+											<>
+												<span className="size-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[10px] font-bold">
+													{getInitials(leadTeacher.name)}
+												</span>
+												<span>{leadTeacher.name}</span>
+												{leadTeacher.role && (
+													<span className="text-[10px] text-muted-foreground font-normal">
+														({leadTeacher.role})
 													</span>
-												))}
-											</div>
-											<span className="text-[11px] text-muted-foreground">
-												{classroom.teachers?.length || 0} معلمين
-											</span>
-										</dd>
-									</div>
-
-									<div className="flex items-center justify-between gap-2 py-1 border-b border-border">
-										<dt className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-[100px] text-right">
-											<IconCalendar className="size-3 text-muted-foreground/70 shrink-0" />
-											<span>تاريخ البدء</span>
-										</dt>
-										<dd className="text-xs font-medium text-foreground text-left">
-											{formatArabicDate(classroom.createdAt)}
-										</dd>
-									</div>
-
-									<div className="flex items-center justify-between gap-2 py-1 border-b border-border">
-										<dt className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-[100px] text-right">
-											<IconWifi className="size-3 text-muted-foreground/70 shrink-0" />
-											<span>نمط التعلم</span>
-										</dt>
-										<dd className="text-left">
-											<span
-												className={cn(
-													"text-[10px] px-2 py-0.5 rounded-[4px] font-medium border border-border",
-													modeConfig.className,
 												)}
-											>
-												{modeConfig.label}
-											</span>
-										</dd>
+											</>
+										) : (
+											<span className="text-muted-foreground/70 font-normal">لم يحدد بعد</span>
+										)}
 									</div>
+								</div>
 
-									<div className="flex items-center justify-between gap-2 py-1 border-b border-border">
-										<dt className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-[100px] text-right">
-											<IconGenderBigender className="size-3 text-muted-foreground/70 shrink-0" />
-											<span>الفئة العمرية</span>
-										</dt>
-										<dd className="text-xs font-medium text-foreground text-left">
-											{classroom.ageGroup || "غير محددة"}
-										</dd>
+								{/* الكادر التعليمي */}
+								<div className="flex items-center justify-between gap-2">
+									<div className="flex items-center gap-2 text-muted-foreground">
+										<IconSchool className="size-4 shrink-0 text-muted-foreground/70" />
+										<span>الكادر التعليمي</span>
 									</div>
+									<div className="flex items-center gap-1.5 font-semibold text-foreground text-start">
+										<div className="flex -space-x-1 space-x-reverse overflow-hidden">
+											{(classroom.teachers || []).slice(0, 3).map((t, idx) => (
+												<span
+													key={t.id}
+													className={cn(
+														"size-5 rounded-full flex items-center justify-center text-[9px] font-bold ring-1 ring-background",
+														AVATAR_PALETTE[idx % AVATAR_PALETTE.length],
+													)}
+													title={t.name}
+												>
+													{getInitials(t.name)}
+												</span>
+											))}
+										</div>
+										<span className="text-xs text-muted-foreground font-normal">
+											{classroom.teachers?.length || 0} معلمين
+										</span>
+									</div>
+								</div>
 
-									<div className="flex items-center justify-between gap-2 py-1 border-b border-border">
-										<dt className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-[100px] text-right">
-											<IconBook className="size-3 text-muted-foreground/70 shrink-0" />
-											<span>تصنيف الفصل</span>
-										</dt>
-										<dd className="text-xs font-medium text-foreground text-left">
-											{classroom.classification || "عام"}
-										</dd>
+								{/* تاريخ البدء */}
+								<div className="flex items-center justify-between gap-2">
+									<div className="flex items-center gap-2 text-muted-foreground">
+										<IconCalendar className="size-4 shrink-0 text-muted-foreground/70" />
+										<span>تاريخ البدء</span>
 									</div>
+									<span className="font-semibold text-foreground tabular-nums text-start">
+										{formatArabicDate(classroom.createdAt)}
+									</span>
+								</div>
 
-									<div className="flex items-center justify-between gap-2 py-1">
-										<dt className="flex items-center gap-1.5 text-xs text-muted-foreground min-w-[100px] text-right">
-											<IconUsers className="size-3 text-muted-foreground/70 shrink-0" />
-											<span>الطلاب المسجلون</span>
-										</dt>
-										<dd className="text-xs font-mono font-bold text-primary text-left">
-											{enrolledCount} طالب
-										</dd>
+								{/* نمط التعلم */}
+								<div className="flex items-center justify-between gap-2">
+									<div className="flex items-center gap-2 text-muted-foreground">
+										<IconWifi className="size-4 shrink-0 text-muted-foreground/70" />
+										<span>نمط التعلم</span>
 									</div>
-								</dl>
+									<span className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 dark:bg-primary/20 dark:text-primary dark:border-primary/30">
+										{modeConfig.label}
+									</span>
+								</div>
+
+								{/* الفئة العمرية */}
+								<div className="flex items-center justify-between gap-2">
+									<div className="flex items-center gap-2 text-muted-foreground">
+										<IconGenderBigender className="size-4 shrink-0 text-muted-foreground/70" />
+										<span>الفئة العمرية</span>
+									</div>
+									<span className="font-semibold text-foreground text-start">
+										{classroom.ageGroup || "غير محددة"}
+									</span>
+								</div>
+
+								{/* تصنيف الفصل */}
+								<div className="flex items-center justify-between gap-2">
+									<div className="flex items-center gap-2 text-muted-foreground">
+										<IconBook className="size-4 shrink-0 text-muted-foreground/70" />
+										<span>تصنيف الفصل</span>
+									</div>
+									<span className="font-semibold text-foreground text-start">
+										{classroom.classification || "عام"}
+									</span>
+								</div>
+
+								{/* الطلاب المسجلون */}
+								<div className="flex items-center justify-between gap-2">
+									<div className="flex items-center gap-2 text-muted-foreground">
+										<IconUsers className="size-4 shrink-0 text-muted-foreground/70" />
+										<span>الطلاب المسجلون</span>
+									</div>
+									<button
+										type="button"
+										onClick={() => onAssignStudent?.()}
+										className="inline-flex items-center px-3 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors cursor-pointer dark:bg-primary/20 dark:text-primary dark:border-primary/30"
+									>
+										{enrolledCount} طالب
+									</button>
+								</div>
 							</div>
 						</div>
 
@@ -785,7 +809,7 @@ export function ClassroomOverviewTab({
 					═════════════════════════════════════════════════════════════════════ */}
 					<div className="flex flex-col gap-4 text-right">
 						{/* 1. ملخص الحضور — هذا الأسبوع */}
-						<div className="rounded-[4px] border border-border bg-card text-right">
+						<div className="rounded-xl border border-border/70 bg-card text-right shadow-2xs">
 							<div className="flex items-center justify-between w-full px-4 py-2.5 border-b border-border">
 								<h3 className="text-xs font-bold flex items-center gap-2 text-foreground">
 									<IconCalendarStats className="size-3.5 text-primary shrink-0" />
@@ -839,7 +863,7 @@ export function ClassroomOverviewTab({
 						</div>
 
 						{/* 2. حضور الأسبوع اليومي */}
-						<div className="rounded-[4px] border border-border bg-card text-right">
+						<div className="rounded-xl border border-border/70 bg-card text-right shadow-2xs">
 							<div className="flex items-center justify-between w-full px-4 py-2.5 border-b border-border">
 								<h3 className="text-xs font-bold flex items-center gap-2 text-foreground">
 									<IconChartBar className="size-3.5 text-primary shrink-0" />
@@ -898,7 +922,7 @@ export function ClassroomOverviewTab({
 						{/* 3. شبكة الإحصائيات الأربعة بستايل وهوية المنصة المعتمدة */}
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-right">
 							{/* متوسط الحضور الشهري */}
-							<div className="rounded-[4px] border border-border bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right">
+							<div className="rounded-lg border border-border/70 bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right shadow-2xs">
 								<span className="text-xs text-muted-foreground font-medium text-right">
 									متوسط الحضور الشهري
 								</span>
@@ -915,7 +939,7 @@ export function ClassroomOverviewTab({
 							</div>
 
 							{/* نسبة الإشغال */}
-							<div className="rounded-[4px] border border-border bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right">
+							<div className="rounded-lg border border-border/70 bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right shadow-2xs">
 								<span className="text-xs text-muted-foreground font-medium text-right">
 									نسبة الإشغال
 								</span>
@@ -957,7 +981,7 @@ export function ClassroomOverviewTab({
 						</div>
 
 						{/* 4. أكثر الأطفال غياباً هذا الشهر */}
-						<div className="rounded-[4px] border border-border bg-card text-right">
+						<div className="rounded-xl border border-border/70 bg-card text-right shadow-2xs">
 							<div className="flex items-center justify-between w-full px-4 py-2.5 border-b border-border">
 								<h3 className="text-xs font-bold flex items-center gap-2 text-foreground">
 									<IconUserExclamation className="size-3.5 text-primary shrink-0" />

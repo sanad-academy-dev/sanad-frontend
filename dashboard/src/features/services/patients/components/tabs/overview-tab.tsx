@@ -311,7 +311,7 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 			{
 				title: "العمر",
 				value: displayAge ?? 0,
-				valueLabel: displayAge != null ? `${displayAge} سنوات` : "—",
+				valueLabel: displayAge != null ? `${displayAge} ` : "—",
 				tooltip: "العمر الحالي للطالب بالسنوات",
 			},
 			{
