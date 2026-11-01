@@ -242,7 +242,9 @@ function ClassroomDetailPage() {
 				classroom={deleteOpen ? classroom : null}
 				onClose={() => {
 					setDeleteOpen(false);
-					refetch();
+				}}
+				onSuccess={() => {
+					setDeleteOpen(false);
 					navigate({ to: "/services/classrooms" });
 				}}
 			/>

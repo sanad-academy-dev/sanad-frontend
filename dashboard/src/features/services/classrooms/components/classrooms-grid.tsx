@@ -32,6 +32,7 @@ import {
 	IconPlus,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
+import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -527,44 +528,20 @@ function ClassroomCard({
 
 				{/* الجانب الأيسر (في RTL): ستاك أفاتار المعلمين مطابقة للأفاتار في الصورة */}
 				<div
-					className="flex items-center -space-x-1.5 space-x-reverse shrink-0"
+					className="shrink-0"
 					title="المعلمون والمشرفون على الفصل"
 				>
 					{classroom.teachers && classroom.teachers.length > 0 ? (
-						<>
-							{classroom.teachers.slice(0, 3).map((teacher, idx) => {
-								const colorClass = AVATAR_COLORS[idx % AVATAR_COLORS.length];
-								return (
-									<div
-										key={teacher.id}
-										title={`${teacher.name}${teacher.role ? ` (${teacher.role})` : ""}`}
-										className={cn(
-											"size-6 rounded-full border-2 border-background flex items-center justify-center text-[9px] font-bold shadow-2xs transition-transform hover:scale-110 hover:z-10",
-											colorClass,
-										)}
-									>
-										{teacher.image ? (
-											<img
-												src={teacher.image}
-												alt={teacher.name}
-												className="size-full object-cover rounded-full"
-											/>
-										) : (
-											<span>{getInitials(teacher.name)}</span>
-										)}
-									</div>
-								);
-							})}
-
-							{classroom.teachers.length > 3 && (
-								<div
-									className="size-6 rounded-full border-2 border-background bg-muted text-[9px] font-bold text-muted-foreground flex items-center justify-center shadow-2xs"
-									title={`+${classroom.teachers.length - 3} معلمين إضافيين`}
-								>
-									+{classroom.teachers.length - 3}
-								</div>
-							)}
-						</>
+						<AvatarCirclesStack
+							items={classroom.teachers.map((teacher) => ({
+								id: teacher.id,
+								name: teacher.name,
+								title: `${teacher.name}${teacher.role ? ` (${teacher.role})` : ""}`,
+								image: teacher.image,
+							}))}
+							variant="mauve"
+							maxVisible={3}
+						/>
 					) : (
 						<span className="text-[10px] text-muted-foreground/50 font-normal">
 							بلا معلم

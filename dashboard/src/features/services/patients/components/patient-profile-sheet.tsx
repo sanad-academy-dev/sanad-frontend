@@ -32,6 +32,7 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PatientPolicyCard } from "@/features/accounting/insurance/components/patient-policy-card";
+import { getStudentAgeGroup } from "@/features/services/classrooms/utils/age-group-utils";
 import { DeletePatientDialog } from "@/features/services/patients/components/delete-patient-dialog";
 import { DisablePatientDialog } from "@/features/services/patients/components/disable-patient-dialog";
 import { PatientSheet } from "@/features/services/patients/components/patient-sheet";
@@ -357,11 +358,13 @@ export function PatientProfileSheet({
 										</span>
 									</div>
 
-									{/* age */}
-									{patient?.age != null && (
+									{/* age group */}
+									{patient && (
 										<div className="flex items-center gap-1.5">
 											<IconCake className="size-4 text-muted-foreground" />
-											<span className="text-sm">{patient.age} سنوات</span>
+											<span className="text-sm font-semibold text-foreground">
+												{getStudentAgeGroup(patient)}
+											</span>
 										</div>
 									)}
 

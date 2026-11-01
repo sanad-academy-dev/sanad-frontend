@@ -34,6 +34,7 @@ export const createPatientSchema = z.object({
 		.string({ error: "تاريخ الميلاد مطلوب" })
 		.min(1, "تاريخ الميلاد مطلوب"),
 	nationalId: z.string().optional(),
+	ageGroup: z.string().optional(),
 	classroom: z.string().optional(),
 	bloodType: z.string().optional(),
 	developmentStatus: z.string().optional().default("NORMAL"),
@@ -75,6 +76,7 @@ export type CreatePatientInput = {
 	age?: number | null;
 	birthDate?: string | Date | null;
 	nationalId?: string | null;
+	ageGroup?: string | null;
 	classroom?: string | null;
 	bloodType?: string | null;
 	developmentStatus?: string | null;
@@ -108,6 +110,7 @@ export type PatientResponse = {
 	active: boolean;
 	status: string;
 	nationalId?: string | null;
+	ageGroup?: string | null;
 	classroom?: string | null;
 	bloodType?: string | null;
 	developmentStatus?: string | null;

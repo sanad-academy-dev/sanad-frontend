@@ -89,28 +89,57 @@ export function AssignStaffDialog({
 		}
 	}, [open, classroom, initialSelectedStaffIds]);
 
-	// خريطة لحساب الفصول ونسبة الطلاب لكل موظف
+	// خريطة لحساب الفصول ونسبة الكادر إلى الطلاب لكل موظف
 	const staffStats = useMemo(() => {
 		const map = new Map<
 			string,
-			{ classroomsCount: number; totalStudents: number }
+			{
+				classroomsCount: number;
+				classrooms: ClassroomResponse[];
+				primaryClassroom?: ClassroomResponse;
+				teachersCount: number;
+				studentsCount: number;
+			}
 		>();
 
-		for (const c of classrooms) {
+		// دمج الفصول لضمان وجود الفصل الحالي حتى لو لم يُجلب بعد في القائمة
+		const allClassrooms = [...classrooms];
+		if (classroom && !allClassrooms.some((c) => c.id === classroom.id)) {
+			allClassrooms.push(classroom);
+		}
+
+		for (const c of allClassrooms) {
 			const studentCount = c.enrolledCount ?? c.students?.length ?? 0;
+			const teacherCount = Math.max(1, c.teachers?.length ?? 1);
+
 			for (const t of c.teachers ?? []) {
 				const current = map.get(t.id) || {
 					classroomsCount: 0,
-					totalStudents: 0,
+					classrooms: [],
+					primaryClassroom: undefined,
+					teachersCount: teacherCount,
+					studentsCount: studentCount,
 				};
 				current.classroomsCount += 1;
-				current.totalStudents += studentCount;
+				current.classrooms.push(c);
+
+				// إذا كان الموظف مسجلاً في هذا الفصل الحالي، نجعله هو الفصل المرجعي
+				if (classroom && c.id === classroom.id) {
+					current.primaryClassroom = c;
+					current.teachersCount = teacherCount;
+					current.studentsCount = studentCount;
+				} else if (!current.primaryClassroom) {
+					current.primaryClassroom = c;
+					current.teachersCount = teacherCount;
+					current.studentsCount = studentCount;
+				}
+
 				map.set(t.id, current);
 			}
 		}
 
 		return map;
-	}, [classrooms]);
+	}, [classrooms, classroom]);
 
 	// تصفية الموظفين بناءً على البحث والفلتر
 	const filteredStaff = useMemo(() => {
@@ -326,13 +355,10 @@ export function AssignStaffDialog({
 							const isSelected = selectedStaffIds.includes(s.id);
 							const stats = staffStats.get(s.id);
 							const hasNoClasses = !stats || stats.classroomsCount === 0;
-							const ratioVal =
-								stats && stats.totalStudents > 0
-									? Math.max(
-											1,
-											Math.round(stats.totalStudents / stats.classroomsCount),
-										)
-									: 0;
+							const teachersCount = stats ? stats.teachersCount : 1;
+							const studentsCount = stats ? stats.studentsCount : 0;
+							// لو عدد الطلاب اكتر من 8 نخليه أحمر، غير كدا موف
+							const isOverloaded = studentsCount > 8;
 
 							const roleName =
 								typeof s.role === "string"
@@ -384,7 +410,24 @@ export function AssignStaffDialog({
 											<span className="shrink-0 rounded-[4px] bg-[#F3E8FF] px-1.5 py-0.5 text-[8.5px] font-semibold text-[#9333EA] dark:bg-purple-950/40 dark:text-purple-300">
 												بدون أي فصول
 											</span>
-										) : null}
+										) : (
+											<span
+												dir="ltr"
+												title={
+													stats?.primaryClassroom
+														? `النسبة في فصل ${stats.primaryClassroom.name}: ${teachersCount} موظف : ${studentsCount} طالب`
+														: `النسبة: ${teachersCount} موظف : ${studentsCount} طالب`
+												}
+												className={cn(
+													"shrink-0 rounded-[4px] px-1.5 py-0.5 text-[9px] font-bold tabular-nums tracking-wide transition-colors",
+													isOverloaded
+														? "bg-[#FEE2E2] text-[#DC2626] dark:bg-red-950/40 dark:text-red-400"
+														: "bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#7C3AED]/25 dark:text-[#DDD6FE]",
+												)}
+											>
+												{teachersCount}:{studentsCount}
+											</span>
+										)}
 									</div>
 								</button>
 							);
@@ -409,7 +452,7 @@ export function AssignStaffDialog({
 						type="button"
 						disabled={isPending || selectedStaffIds.length === 0}
 						onClick={handleOpenConfirm}
-						className="flex h-[27px] items-center gap-1.5 rounded-[4px] bg-[#4F6AE0] px-3.5 text-[11px] font-semibold text-white hover:bg-[#435bc4] disabled:opacity-50 cursor-pointer transition-colors shadow-xs"
+						className="flex h-[27px] items-center gap-1.5 rounded-[4px] bg-primary px-3.5 text-[11px] font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 cursor-pointer transition-colors shadow-xs"
 					>
 						<IconChevronLeft className="size-2.5" />
 						تعيين ({selectedStaffIds.length})

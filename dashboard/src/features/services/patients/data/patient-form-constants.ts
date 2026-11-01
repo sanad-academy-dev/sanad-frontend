@@ -43,6 +43,7 @@ export const PREFERRED_SHIFT_OPTIONS = ["صباحي", "مسائي"] as const;
 export const PATIENT_FIELD_LABELS: Record<string, string> = {
 	name: "اسم الطالب",
 	birthDate: "تاريخ الميلاد",
+	ageGroup: "الفئة العمرية",
 	gender: "الجنس",
 	nationalId: "رقم الهوية / الإقامة",
 	classroom: "الفصل",
@@ -70,6 +71,7 @@ export const PATIENT_FIELD_LABELS: Record<string, string> = {
 export const INITIAL_PATIENT_FORM_VALUES = {
 	name: "",
 	birthDate: "",
+	ageGroup: "",
 	nationalId: "",
 	gender: "MALE" as const,
 	classroom: "",

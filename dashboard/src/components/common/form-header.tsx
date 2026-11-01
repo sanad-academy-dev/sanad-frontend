@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 export function FormHeader({
 	title,
 	variant = "sheet",
+	size = "default",
 	identity,
 	changesCount = 0,
 	progress,
@@ -28,6 +29,8 @@ export function FormHeader({
 	title: string;
 	/** "plain" لنماذج داخل الصفحات — عناوين Radix تتطلب Sheet/Dialog محيطًا */
 	variant?: "sheet" | "dialog" | "plain";
+	/** الحجم: "sm" يضبط الارتفاع إلى h-10 مع تصغير العنوان وحلقة التقدم ليتطابق مع ترويسة المساعد */
+	size?: "default" | "sm";
 	identity?: { name: string; code?: string | null } | null;
 	/** عدد الحقول المعدّلة — تظهر الشارة تلقائيًا عند أي تغيير (إضافة أو تعديل) */
 	changesCount?: number;
@@ -40,20 +43,34 @@ export function FormHeader({
 	className?: string;
 }) {
 	const Title = variant === "dialog" ? DialogTitle : variant === "plain" ? "h2" : SheetTitle;
+	const isSm = size === "sm";
 
 	return (
 		<div
-			className={cn("flex items-center justify-between gap-2 border-b px-4 py-2", className)}
+			className={cn(
+				"flex items-center justify-between gap-2 border-b px-4",
+				isSm ? "h-10 py-0" : "py-2",
+				className,
+			)}
 		>
-			<div className="flex min-w-0 items-center gap-2.5">
-				<Title className="shrink-0 text-base font-semibold">{title}</Title>
+			<div className="flex min-w-0 items-center gap-2">
+				<Title
+					className={cn(
+						"shrink-0 font-semibold",
+						isSm ? "text-sm" : "text-base",
+					)}
+				>
+					{title}
+				</Title>
 
 				{identity && (
 					<div className="flex min-w-0 items-center gap-1.5">
 						{/* فاصل مسار — في RTL يشير لليسار */}
 						<IconChevronLeft className="size-4 shrink-0 text-muted-foreground" />
-						<InitialsAvatar name={identity.name} />
-						<span className="truncate text-sm font-medium">{identity.name}</span>
+						<InitialsAvatar name={identity.name} className={cn(isSm && "size-5 text-[10px]")} />
+						<span className={cn("truncate font-medium", isSm ? "text-xs" : "text-sm")}>
+							{identity.name}
+						</span>
 						{identity.code && (
 							<span className="shrink-0 text-xs text-muted-foreground tabular-nums">
 								{identity.code}
@@ -70,13 +87,18 @@ export function FormHeader({
 					<>
 						<CompletionRing
 							value={progress.progress}
-							size={34}
-							strokeWidth={3}
+							size={isSm ? 26 : 34}
+							strokeWidth={isSm ? 2.5 : 3}
 							trackClassName="stroke-border"
 							colorClassName={progress.isComplete ? "stroke-green-500" : "stroke-primary"}
-							labelClassName="text-[9px]"
+							labelClassName={isSm ? "text-[8px] font-medium" : "text-[9px]"}
 						/>
-						<span className="shrink-0 text-xs text-muted-foreground whitespace-nowrap">
+						<span
+							className={cn(
+								"shrink-0 text-muted-foreground whitespace-nowrap",
+								isSm ? "text-[11px]" : "text-xs",
+							)}
+						>
 							{progress.filledCount} من {progress.requiredCount} حقول مطلوبة
 						</span>
 					</>
@@ -88,11 +110,12 @@ export function FormHeader({
 				{onClose && (
 					<Button
 						variant="ghost"
-						size="icon-sm"
+						size={isSm ? "icon-xs" : "icon-sm"}
 						onClick={onClose}
 						type="button"
+						className={cn(isSm && "size-7")}
 					>
-						<IconX className="size-4" />
+						<IconX className={isSm ? "size-3.5" : "size-4"} />
 					</Button>
 				)}
 			</div>
