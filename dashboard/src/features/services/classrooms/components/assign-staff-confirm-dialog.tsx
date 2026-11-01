@@ -2,7 +2,6 @@ import { useState } from "react";
 import {
 	IconArrowsDiagonal,
 	IconArrowsMinimize,
-	IconInfoCircle,
 	IconMail,
 	IconSend,
 	IconSparkles,
@@ -69,7 +68,7 @@ export function AssignStaffConfirmDialog({
 	isPending = false,
 }: AssignStaffConfirmDialogProps) {
 	const [isExpanded, setIsExpanded] = useState(false);
-	const [enableMessage, setEnableMessage] = useState(true);
+	const [enableMessage, setEnableMessage] = useState(false);
 	const [subject, setSubject] = useState("تعيين موظف جديد");
 	const [message, setMessage] = useState(
 		"مرحبًا، لقد قمنا بإضافتك للفصل الدراسي. نأمل لك وللطلاب تجربة متميزة وموفقة في تحقيق الأهداف التعليمية.",
@@ -184,37 +183,38 @@ export function AssignStaffConfirmDialog({
 						</div>
 					</div>
 
-					{/* صف التبديل (الوضع + إغلاق رسالة / تضمين رسالة) */}
-					<div className="flex items-center justify-between pt-1">
-						<div className="flex items-center gap-1.5">
-							<span className="text-xs font-bold text-foreground">الوضع</span>
-							<IconInfoCircle className="size-3.5 text-muted-foreground/70" />
-							<span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900">
-								مطلوب
-							</span>
-						</div>
-
-						<div className="flex items-center gap-2">
-							<span className="text-xs font-medium text-foreground">
-								{enableMessage ? "إغلاق رسالة" : "تضمين رسالة"}
-							</span>
-							<Switch
-								checked={enableMessage}
-								onCheckedChange={setEnableMessage}
-								aria-label="تفعيل أو إغلاق الرسالة"
-							/>
-						</div>
+					{/* صف التبديل (فتح الرسالة على اليمين) */}
+					<div className="flex items-center gap-2.5 pt-1">
+						<Switch
+							id="enable-staff-message-switch"
+							checked={enableMessage}
+							onCheckedChange={setEnableMessage}
+							aria-label="فتح الرسالة"
+						/>
+						<label
+							htmlFor="enable-staff-message-switch"
+							className="text-xs font-bold text-foreground cursor-pointer select-none"
+						>
+							فتح الرسالة
+						</label>
 					</div>
 
 					{/* الحقلان (الموضوع ونص الرسالة) يظهران عند تفعيل الرسالة كما طلب المستخدم */}
 					{enableMessage && (
 						<div className="space-y-4 pt-1 animate-in fade-in-50 duration-200">
-							{/* حقل الموضوع */}
+							{/* حقل عنوان الرسالة */}
 							<div className="space-y-1.5 text-right">
+								<label
+									htmlFor="assign-staff-message-subject"
+									className="text-xs font-bold text-foreground block"
+								>
+									عنوان الرسالة
+								</label>
 								<Input
+									id="assign-staff-message-subject"
 									value={subject}
 									onChange={(e) => setSubject(e.target.value)}
-									placeholder="موضوع الرسالة..."
+									placeholder="عنوان الرسالة..."
 									className="h-10 rounded-xl border border-border/80 text-xs px-3 font-medium bg-background"
 								/>
 							</div>
@@ -267,22 +267,22 @@ export function AssignStaffConfirmDialog({
 						</label>
 					</div>
 
-					{/* زر التعيين وإرسال الرسالة */}
+					{/* زر التعيين وإرسال الرسالة باستخدام ثيم المنصة الافتراضي */}
 					<Button
 						type="button"
 						size="sm"
 						onClick={handleFormSubmit}
 						disabled={isPending || selectedStaff.length === 0}
-						className="gap-2 px-5 font-semibold text-xs bg-[#4F6AE0] hover:bg-[#435bc4] text-white shadow-sm cursor-pointer"
+						className="gap-2 px-5 font-semibold text-xs shadow-sm cursor-pointer"
 					>
 						{enableMessage ? (
 							<>
-								<IconSparkles className="size-3.5 text-white/90" />
+								<IconSparkles className="size-3.5" />
 								{isPending ? "جاري التعيين والإرسال..." : "تعيين وإرسال رسالة"}
 							</>
 						) : (
 							<>
-								<IconSend className="size-3.5 text-white/90" />
+								<IconSend className="size-3.5" />
 								{isPending ? "جاري التعيين..." : "تأكيد التعيين"}
 							</>
 						)}
