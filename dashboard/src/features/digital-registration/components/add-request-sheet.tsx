@@ -70,7 +70,8 @@ import { AppointmentPickerPopover } from "./appointment-picker-popover";
 import { RoomPickerPopover } from "./room-picker-popover";
 import { ColumnStatusPicker } from "./column-status-picker";
 import { PriorityPickerPopover } from "./priority-picker-popover";
-import { useCreateRequest } from "../hooks/use-digital-registration";
+import { useCreateRequest, useUpdateRequest } from "../hooks/use-digital-registration";
+import type { CampaignRequestItem } from "../types/campaign-request.types";
 import { backendFetch } from "@/lib/backend-fetch";
 import { useOwners } from "@/features/services/patients/hooks/use-owners";
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
@@ -81,6 +82,8 @@ interface AddRequestDialogProps {
 	onClose: () => void;
 	campaignId: string;
 	defaultColumn?: string;
+	initialData?: CampaignRequestItem | null;
+	onSuccess?: (result: any) => void;
 }
 
 // Fallback guardians list when database has no owners yet or running locally
@@ -144,25 +147,26 @@ function statusToEnum(
 /**
  * دالة إشعار حفظ التسجيل بنجاح (مطابقة بنسبة 100% لصورة المستخدم d184a7fb)
  * تظهر في أسفل الشاشة على اليسار مع أيقونة صح خضراء داخل دائرة وزر إغلاق ×
+ * وتستمر لمدة 25 ثانية حتى لا تختفي سريعاً وتبقى واضحة للمستخدم
  */
 export function showRegistrationSuccessToast(message = "تم تسجيل الطلب بنجاح") {
 	toast.custom(
 		(t) => (
 			<div
-				className="flex items-center justify-between gap-4 min-w-[240px] max-w-[340px] px-3.5 py-2.5 bg-background text-foreground border border-border/80 shadow-lg rounded-xl select-none"
+				className="flex items-center justify-between gap-4 min-w-[280px] max-w-[380px] px-4 py-3 bg-background text-foreground border border-border/90 shadow-2xl rounded-xl select-none z-[99999]"
 				dir="rtl"
 			>
-				<div className="flex items-center gap-2">
-					<IconCircleCheckFilled className="size-4.5 text-emerald-600 shrink-0" />
-					<span className="text-[12.5px] font-semibold text-foreground">
+				<div className="flex items-center gap-2.5 min-w-0">
+					<IconCircleCheckFilled className="size-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+					<span className="text-[13px] font-semibold text-foreground truncate">
 						{message}
 					</span>
 				</div>
 				<button
 					type="button"
 					onClick={() => toast.dismiss(t)}
-					className="text-muted-foreground/50 hover:text-foreground p-0.5 rounded transition-colors cursor-pointer"
-					title="إغلاق"
+					className="text-muted-foreground/70 hover:text-foreground p-1 rounded-md hover:bg-muted transition-colors cursor-pointer shrink-0"
+					title="إغلاق الإشعار"
 				>
 					<IconX className="size-3.5" />
 				</button>
@@ -170,7 +174,7 @@ export function showRegistrationSuccessToast(message = "تم تسجيل الطل
 		),
 		{
 			unstyled: true,
-			duration: 4500,
+			duration: 25000,
 			position: "bottom-left",
 		},
 	);
@@ -181,6 +185,8 @@ export function AddRequestDialog({
 	onClose,
 	campaignId,
 	defaultColumn = "طابور",
+	initialData,
+	onSuccess,
 }: AddRequestDialogProps) {
 	// ─── Step State (1: Form, 2: Review) ──────────────────────────────────────────
 	const [step, setStep] = useState<1 | 2>(1);
@@ -458,6 +464,132 @@ export function AddRequestDialog({
 	const [error, setError] = useState<string | null>(null);
 
 	const createMutation = useCreateRequest(campaignId);
+	const updateMutation = useUpdateRequest(campaignId);
+
+	// تعبئة كافة البيانات مسبقاً وبدقة عند فتح الفورم في وضع التعديل (Edit Mode)
+	useEffect(() => {
+		if (initialData && open) {
+			setStep(1);
+			setStudentName(initialData.patientName || initialData.name || "");
+			setGender((initialData.gender as any) || "MALE");
+			setBirthDate(initialData.birthDate ? initialData.birthDate.split("T")[0] : "");
+			setExperienceLevel(initialData.experienceLevel || initialData.ageLabel || "");
+
+			// تطبيع طريقة التعلم لمطابقة خيارات القائمة
+			let lm = initialData.learningMode || "";
+			if (lm.includes("عن بعد") || lm.toLowerCase().includes("online") || lm.includes("أونلاين") || lm.toLowerCase().includes("remote")) {
+				lm = "عن بعد";
+			} else if (lm.includes("أكاديمية") || lm.includes("حضوري") || lm.toLowerCase().includes("academy")) {
+				lm = "في الأكاديمية";
+			}
+			setLearningMode(lm);
+
+			setPreferredShift(initialData.preferredShift || "صباحي");
+			setSuggestedTrack(initialData.targetClass || initialData.proposedTrack || "");
+			setGuardian(initialData.guardianName || "");
+			setGuardianPhone(initialData.guardianPhone || "");
+			setGuardianEmail(initialData.guardianEmail || "");
+			setSelectedOwnerId(initialData.convertedOwnerId || null);
+			setNotes(initialData.notes || "");
+			if (initialData.channel) setChannel(initialData.channel);
+
+			// 1. المراجع (Reviewer)
+			let rName = initialData.assignedStaff?.name || (initialData as any).reviewerName || initialData.assessmentAppointment?.staffName || "";
+			let rId = initialData.assignedStaff?.id || initialData.assignedStaffId || (initialData as any).reviewerId || null;
+			if (!rName && rId && staffList && staffList.length > 0) {
+				const match = staffList.find((s) => s.id === rId || (s as any).userId === rId);
+				if (match) rName = match.name;
+			}
+			setReviewer(rName || "المراجع");
+			setReviewerId(rId);
+
+			// 2. تاريخ الموعد (Appointment Date)
+			const rawDate = initialData.appointmentDate || initialData.assessmentAppointment?.startsAt || null;
+			if (rawDate) {
+				let displayDate = rawDate;
+				if (rawDate.includes("T")) {
+					displayDate = rawDate.split("T")[0];
+				}
+				setAppointmentDate(displayDate);
+				setAppointmentIsoDate(rawDate);
+			} else {
+				setAppointmentDate("تاريخ الموعد");
+				setAppointmentIsoDate(null);
+			}
+
+			// 3. الغرفة (Room)
+			const rRoom = initialData.roomName || (initialData as any).roomId || "الغرفة";
+			setSelectedRoom(rRoom);
+
+			// 4. العمود / الحالة (Column / Status)
+			const colMap: Record<string, string> = {
+				queue: "طابور",
+				QUEUE: "طابور",
+				shortlist: "قائمة مختصرة",
+				SHORTLIST: "قائمة مختصرة",
+				interview: "المقابلة الشخصية",
+				INTERVIEW: "المقابلة الشخصية",
+				accepted: "مقبول",
+				ACCEPTED: "مقبول",
+				"awaiting-payment": "بانتظار الدفع",
+				AWAITING_PAYMENT: "بانتظار الدفع",
+				rejected: "مرفوض",
+				REJECTED: "مرفوض",
+				duplicate: "مكرر",
+				DUPLICATE: "مكرر",
+			};
+			const rawCol = initialData.statusLabel || initialData.column || initialData.status || defaultColumn;
+			setSelectedColumn(colMap[rawCol] || rawCol);
+
+			// 5. الأولوية (Priority)
+			const prioMap: Record<string, string> = {
+				URGENT: "عاجلة",
+				urbent: "عاجلة",
+				HIGH: "مرتفعة",
+				high: "مرتفعة",
+				MEDIUM: "متوسطة",
+				medium: "متوسطة",
+				LOW: "منخفضة",
+				low: "منخفضة",
+				NONE: "بدون أولوية",
+				none: "بدون أولوية",
+			};
+			const rawPrio = initialData.priority || "بدون أولوية";
+			setPriority(prioMap[rawPrio] || rawPrio);
+
+			// 6. إشعار عبر الواتساب
+			setNotifyWhatsapp(Boolean(initialData.notifyWhatsapp));
+
+			// 7. المستندات المرفقة
+			if (initialData.documents?.items && Array.isArray(initialData.documents.items) && initialData.documents.items.length > 0) {
+				setAttachedDocuments(
+					initialData.documents.items.map((doc: any, idx: number) => ({
+						id: doc.id || `doc-${idx}`,
+						name: doc.title || "مستند مرفق",
+						size: doc.fileSize || "1.0 MB",
+						url: doc.fileUrl,
+					}))
+				);
+			} else {
+				setAttachedDocuments([]);
+			}
+
+			// 8. الروابط المرفقة
+			if (initialData.links && Array.isArray(initialData.links) && initialData.links.length > 0) {
+				setAttachedLinks(
+					initialData.links.map((link: any, idx: number) => ({
+						id: link.id || `link-${idx}`,
+						title: link.title || link.url,
+						url: link.url,
+					}))
+				);
+			} else {
+				setAttachedLinks([]);
+			}
+		} else if (!initialData && open) {
+			resetForm();
+		}
+	}, [initialData, open, staffList]);
 
 	// Reset form
 	const resetForm = () => {
@@ -594,8 +726,67 @@ export function AddRequestDialog({
 			}
 		}
 
+		if (initialData) {
+			try {
+				const updated = await updateMutation.mutateAsync({
+					requestId: initialData.id,
+					data: {
+						studentName: studentName.trim(),
+						gender: (gender as "MALE" | "FEMALE" | "UNKNOWN") || "UNKNOWN",
+						birthDate: isoBirthDate,
+						ageLabel: experienceLevel || null,
+						targetClass: suggestedTrack || null,
+						guardianName: guardian.trim(),
+						guardianPhone: validPhone,
+						guardianEmail: guardianEmail.trim() || null,
+						learningMode: learningMode || null,
+						preferredShift: preferredShift || null,
+						experienceLevel: experienceLevel || null,
+						priority: priority || "بدون أولوية",
+						status: statusToEnum(selectedColumn),
+						columnStatus: statusToEnum(selectedColumn),
+						column: selectedColumn,
+						appointmentDate:
+							appointmentIsoDate ||
+							(appointmentDate && appointmentDate !== "تاريخ الموعد"
+								? appointmentDate
+								: null),
+						assignedStaffId: reviewerId || null,
+						reviewerId: reviewerId || null,
+						reviewerName: reviewer !== "المراجع" ? reviewer : null,
+						roomId: null,
+						roomName: selectedRoom !== "الغرفة" ? selectedRoom : null,
+						notifyWhatsapp,
+						links: attachedLinks.length > 0 ? attachedLinks : [],
+						documents: attachedDocuments.length > 0
+							? attachedDocuments.map((d) => ({
+									title: d.name,
+									fileUrl: d.url || "",
+									fileSize: d.size,
+								}))
+							: [],
+						notes: (() => {
+							const parts: string[] = [];
+							if (includeMessage && customMessage.trim()) parts.push(customMessage.trim());
+							if (notes.trim()) parts.push(notes.trim());
+							if (enableRecurrence) parts.push("📌 [ملاحظة: مطلوب جدولة زيارات متكررة للطالب بعد القبول]");
+							return parts.join("\n") || null;
+						})(),
+					},
+				});
+				showRegistrationSuccessToast("تم تحديث بيانات الطلب بنجاح");
+				onSuccess?.(updated);
+				handleClose();
+				return;
+			} catch (err: any) {
+				setError(err.message || "حدث خطأ أثناء تحديث بيانات الطلب");
+				toast.error(err.message || "فشل تحديث الطلب");
+				return;
+			}
+		}
+
 		try {
-			await createMutation.mutateAsync({
+			const created = await createMutation.mutateAsync({
 				campaignId,
 				studentName: studentName.trim(),
 				gender: (gender as "MALE" | "FEMALE" | "UNKNOWN") || "UNKNOWN",
@@ -645,6 +836,7 @@ export function AddRequestDialog({
 			});
 
 			showRegistrationSuccessToast("تم تسجيل الطلب بنجاح");
+			onSuccess?.(created);
 
 			if (createMore) {
 				// Keep dialog open and reset inputs for adding another candidate
@@ -683,18 +875,18 @@ export function AddRequestDialog({
 			if (!open) return;
 			if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
 				e.preventDefault();
-				if (step === 1) {
-					handleNext();
-				} else {
+				if (initialData || step === 2) {
 					handleSubmit();
+				} else {
+					handleNext();
 				}
 			}
 		};
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [open, step, studentName, birthDate, gender, learningMode, suggestedTrack, guardian, guardianPhone, guardianEmail, selectedOwnerId]);
+	}, [open, step, initialData, studentName, birthDate, gender, learningMode, suggestedTrack, guardian, guardianPhone, guardianEmail, selectedOwnerId, appointmentDate, appointmentIsoDate, reviewer, reviewerId, selectedRoom, selectedColumn, priority, notifyWhatsapp, notes, attachedDocuments, attachedLinks]);
 
-	const isSubmitting = createMutation.isPending;
+	const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
 	const isFormFilled =
 		Boolean(studentName.trim()) &&
@@ -722,7 +914,7 @@ export function AddRequestDialog({
 						/* Step 1 Title + Channel Dropdown */
 						<div className="flex items-center gap-2">
 							<span className="text-[13px] font-bold text-foreground">
-								تسجيل طلب جديد في:
+								{initialData ? `تعديل بيانات طلب الطالب - #${initialData.code}` : "تسجيل طلب جديد في:"}
 							</span>
 							<DropdownMenu dir="rtl">
 								<DropdownMenuTrigger asChild>
@@ -1673,24 +1865,44 @@ export function AddRequestDialog({
 								</label>
 							</div>
 
-							{/* في Step 1 أقصى اليسار: زر التالي: مراجعة الطلب  ⌘K */}
+							{/* في Step 1 أقصى اليسار: زر تحديث الطلب (في وضع التعديل) أو زر التالي (في وضع الإضافة) */}
 							<div className="flex items-center gap-2">
-								<Button
-									type="button"
-									size="sm"
-									onClick={handleNext}
-									className={cn(
-										"h-8 px-3.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-xs",
-										isFormFilled
-											? "bg-[#5B50E5] hover:bg-[#4E43D8] text-white"
-											: "bg-[#D0D8F7] hover:bg-[#BFCBFA] text-white/90",
-									)}
-								>
-									<span>التالي: مراجعة الطلب</span>
-									<span className="bg-white/20 text-white text-[9.5px] font-mono px-1 py-0.2 rounded leading-none">
-										⌘K
-									</span>
-								</Button>
+								{initialData ? (
+									<Button
+										type="button"
+										size="sm"
+										onClick={handleSubmit}
+										disabled={isSubmitting}
+										className={cn(
+											"h-8 px-4 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-xs",
+											isSubmitting
+												? "bg-primary/70 text-white cursor-wait"
+												: "bg-[#5B50E5] hover:bg-[#4E43D8] text-white",
+										)}
+									>
+										<span>{isSubmitting ? "جاري الحفظ..." : "تحديث بيانات الطلب"}</span>
+										<span className="bg-white/20 text-white text-[9.5px] font-mono px-1 py-0.2 rounded leading-none">
+											⌘K
+										</span>
+									</Button>
+								) : (
+									<Button
+										type="button"
+										size="sm"
+										onClick={handleNext}
+										className={cn(
+											"h-8 px-3.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-xs",
+											isFormFilled
+												? "bg-[#5B50E5] hover:bg-[#4E43D8] text-white"
+												: "bg-[#D0D8F7] hover:bg-[#BFCBFA] text-white/90",
+										)}
+									>
+										<span>التالي: مراجعة الطلب</span>
+										<span className="bg-white/20 text-white text-[9.5px] font-mono px-1 py-0.2 rounded leading-none">
+											⌘K
+										</span>
+									</Button>
+								)}
 							</div>
 						</>
 					) : (
@@ -1730,7 +1942,7 @@ export function AddRequestDialog({
 									className="h-8 px-4 text-xs font-bold bg-[#5B50E5] hover:bg-[#4E43D8] text-white shadow-xs rounded-lg flex items-center gap-1.5 transition-all cursor-pointer"
 								>
 									<IconCheck className="size-3.5" />
-									<span>{isSubmitting ? "جاري الحفظ..." : "حفظ التسجيل"}</span>
+									<span>{isSubmitting ? "جاري الحفظ..." : (initialData ? "تحديث بيانات الطلب" : "حفظ التسجيل")}</span>
 									<span className="bg-white/20 text-white text-[9px] font-mono px-1 py-0.2 rounded leading-none">
 										⌘K
 									</span>
