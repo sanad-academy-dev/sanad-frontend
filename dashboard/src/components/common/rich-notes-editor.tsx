@@ -334,9 +334,8 @@ export function RichNotesEditor({
 	const containerStyles = cn(
 		"relative w-full transition-colors",
 		variant === "border-top-only" &&
-			"border-t border-border border-x-0 border-b-0 rounded-none bg-transparent pt-2.5 pb-4 px-4 sm:px-5",
-		variant === "bordered" &&
-			"rounded-lg border border-input bg-transparent p-3 shadow-2xs transition-colors focus-within:border-ring focus-within:ring-1 focus-within:ring-ring",
+			"border-t border-border border-x-0 border-b-0 rounded-none bg-transparent pt-0 pb-1 px-0",
+		variant === "bordered" && "rounded-lg border border-border bg-card p-3 shadow-2xs",
 		variant === "ghost" && "border-none bg-transparent p-2",
 		className,
 	);
@@ -347,14 +346,14 @@ export function RichNotesEditor({
 			className={containerStyles}
 			dir={dir}
 		>
-			{/* شريط الأدوات العائم — يظهر بسلاسة عند الكتابة والتركيز فقط بشكل عائم مطلق (absolute) دون التأثير على مساحة الحقل */}
+			{/* شريط الأدوات العائم — يركب تماماً على الخط العلوي (top-0 -translate-y-1/2) بشكل عائم مطلق (absolute) مطابق للتصميم */}
 			{!readOnly && (
 				<div
 					className={cn(
-						"absolute top-2 end-2 z-20 max-w-[calc(100%-1rem)] transition-all duration-200 ease-out",
+						"absolute top-0 -translate-y-1/2 start-0 z-20 max-w-full transition-all duration-200 ease-out",
 						showToolbar
-							? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
-							: "opacity-0 -translate-y-1 scale-95 pointer-events-none",
+							? "opacity-100 scale-100 pointer-events-auto"
+							: "opacity-0 scale-95 pointer-events-none",
 					)}
 				>
 					<div className="flex items-center gap-0.5 rounded-lg border border-border/80 bg-background/95 backdrop-blur-md px-1.5 py-1 shadow-md select-none overflow-x-auto">
@@ -546,10 +545,19 @@ export function RichNotesEditor({
 			)}
 
 			{/* مساحة التحرير المرئية الحقيقية (WYSIWYG ContentEditable مثل برنامج Word) */}
-			<div className="relative w-full">
+			<div
+				data-slot="notes-wrapper"
+				className={cn(
+					"relative w-full",
+					variant === "border-top-only" ? "pt-7" : "pt-8",
+				)}
+			>
 				{isEmpty && (
 					<div
-						className="absolute top-0 right-0 pointer-events-none select-none text-xs sm:text-[13px] text-muted-foreground/60 leading-relaxed font-sans text-right"
+						className={cn(
+							"absolute right-0 pointer-events-none select-none text-xs sm:text-[13px] text-muted-foreground/60 leading-relaxed font-sans text-right",
+							variant === "border-top-only" ? "top-7" : "top-8",
+						)}
 						dir={dir}
 					>
 						{placeholder}

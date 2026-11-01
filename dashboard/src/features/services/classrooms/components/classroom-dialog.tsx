@@ -31,7 +31,8 @@ import {
 	IconHeart,
 	IconLanguage,
 	IconMapPinFilled,
-	IconMaximize,
+	IconArrowsDiagonal,
+	IconArrowsDiagonalMinimize2,
 	IconMoodHappy,
 	IconMoodSmile,
 	IconMusic,
@@ -100,7 +101,7 @@ import type { ClassroomResponse, LearningMode } from "@/server/classrooms/classr
 import { AssignStaffSheet } from "./assign-staff-dialog";
 import { ClassroomAgentPanel } from "./classroom-agent-panel";
 import { ClassroomReviewStep } from "./classroom-review-step";
-import { SaveDraftConfirmDialog } from "./save-draft-confirm-dialog";
+import { DiscardConfirmDialog } from "@/components/common/discard-confirm-dialog";
 import { AddBranchDialog } from "@/features/settings/branches/components/add-branch-dialog";
 
 // قائمة الأيقونات المتاحة للاختيار مع وسوم البحث
@@ -339,6 +340,23 @@ const CLASSROOM_TEMPLATES = [
 
 // تصنيفات الفصول الافتراضية للدروب داون
 const DEFAULT_CLASSIFICATIONS = ["برمجة", "ذكاء اصطناعي", "روبوتكس", "إدارة أعمال"];
+
+// تسميات الحقول لعرضها في نافذة التحذير من البيانات غير المحفوظة
+const CLASSROOM_FIELD_LABELS: Record<string, string> = {
+	name: "اسم الفصل",
+	code: "المعرّف الكودي",
+	description: "الوصف",
+	category: "التصنيف",
+	capacity: "السعة الاستيعابية",
+	notes: "الملاحظات",
+	branch: "الفرع",
+	classification: "نوع الفصل",
+	ageGroup: "الفئة العمرية",
+	learningMode: "نمط التعلم",
+	staff: "الموظفون المعينون",
+	icon: "الأيقونة",
+	color: "اللون",
+};
 
 export interface ClassroomDialogProps {
 	open: boolean;
@@ -693,29 +711,49 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 		}
 	}, [open, isEdit]);
 
-	const isFormDirty = Boolean(
-		name.trim() ||
-			code.trim() ||
-			description.trim() ||
-			category ||
-			capacity ||
-			notes.trim() ||
-			branch ||
-			classification ||
-			learningMode ||
-			selectedStaffIds.length > 0 ||
-			selectedIcon !== "cube" ||
-			selectedColor !== "blue",
-	);
+	// رصد الحقول المدخلة لعرضها في نافذة التحذير من البيانات غير المحفوظة
+	const filledFields = useMemo(() => {
+		const fields: string[] = [];
+		if (name.trim()) fields.push("name");
+		if (code.trim()) fields.push("code");
+		if (description.trim()) fields.push("description");
+		if (category) fields.push("category");
+		if (capacity !== "" && capacity !== undefined && capacity !== null) fields.push("capacity");
+		if (notes.trim()) fields.push("notes");
+		if (branch) fields.push("branch");
+		if (classification) fields.push("classification");
+		if (ageGroup) fields.push("ageGroup");
+		if (learningMode) fields.push("learningMode");
+		if (selectedStaffIds.length > 0) fields.push("staff");
+		if (selectedIcon !== "cube") fields.push("icon");
+		if (selectedColor !== "blue") fields.push("color");
+		return fields;
+	}, [
+		name,
+		code,
+		description,
+		category,
+		capacity,
+		notes,
+		branch,
+		classification,
+		ageGroup,
+		learningMode,
+		selectedStaffIds,
+		selectedIcon,
+		selectedColor,
+	]);
+
+	const isFormDirty = filledFields.length > 0;
 
 	const handleCloseAttempt = useCallback(() => {
-		if (!isEdit && isFormDirty) {
+		if (!isEdit && filledFields.length > 0) {
 			setShowDraftConfirm(true);
 		} else {
 			resetForm();
 			onClose();
 		}
-	}, [isEdit, isFormDirty, resetForm, onClose]);
+	}, [isEdit, filledFields.length, resetForm, onClose]);
 
 	const handleSaveDraft = () => {
 		const draftData = {
@@ -1015,11 +1053,11 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 					dir="rtl"
 					showCloseButton={false}
 					className={cn(
-						"w-full p-0 gap-0 overflow-hidden transition-all duration-300 ease-out",
+						"w-full p-0 gap-0 overflow-hidden transition-[max-width,width] duration-300 ease-in-out",
 						isReviewStep
 							? "max-w-xl!"
 							: isAgentOpen
-								? "max-w-4xl! sm:max-w-5xl! lg:max-w-[1020px]!"
+								? "max-w-5xl! xl:max-w-6xl!"
 								: "max-w-xl!",
 					)}
 					onInteractOutside={(e) => {
@@ -1076,26 +1114,36 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 					) : (
 						<div className="flex flex-col md:flex-row w-full items-stretch overflow-hidden max-h-[88vh]">
 							{/* الجانب الأساسي: نموذج إنشاء/تعديل الفصل (يظهر على اليمين في نمط RTL) */}
-							<div className="flex-1 min-w-[480px] sm:min-w-[520px] flex flex-col min-h-0">
-								{/* 1. ترويسة النموذج الموحدة للمنصة (FormHeader) */}
+							<div
+								className={cn(
+									"flex flex-col min-h-0 bg-background transition-all duration-300",
+									isAgentOpen ? "w-full md:w-1/2 flex-1 min-w-0" : "w-full flex-1 min-w-0",
+								)}
+							>
+								{/* 1. ترويسة النموذج الموحدة للمنصة (FormHeader) بحجم مصغر متناسق مع المساعد */}
 								<FormHeader
 									variant="dialog"
+									size="sm"
 									title={isEdit ? "تعديل بيانات الفصل" : "أنشئ فصل جديد"}
 									identity={
 										isEdit && classroom ? { name: classroom.name, code: classroom.code } : null
 									}
 									progress={formProgress}
-									onClose={handleCloseAttempt}
+									onClose={isAgentOpen ? undefined : handleCloseAttempt}
 									actions={
 										<Button
 											type="button"
 											variant="ghost"
-											size="icon-sm"
+											size="icon-xs"
 											onClick={() => setIsAgentOpen((prev) => !prev)}
-											className="text-muted-foreground hover:text-foreground hidden sm:flex cursor-pointer"
-											title={isAgentOpen ? "إخفاء المساعد الذكي" : "توسيع وعرض المساعد الذكي"}
+											className="size-7 text-muted-foreground hover:text-foreground hidden sm:flex cursor-pointer rounded-md"
+											title={isAgentOpen ? "تصغير وإخفاء المساعد" : "توسيع وعرض المساعد الذكي"}
 										>
-											<IconMaximize className="size-3.5" />
+											{isAgentOpen ? (
+												<IconArrowsDiagonalMinimize2 className="size-3.5" />
+											) : (
+												<IconArrowsDiagonal className="size-3.5" />
+											)}
 										</Button>
 									}
 									titleActions={
@@ -1112,9 +1160,9 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 														type="button"
 														variant="outline"
 														size="sm"
-														className="h-7 px-3 text-xs gap-1.5 rounded-full border border-border bg-white dark:bg-card hover:bg-muted font-medium cursor-pointer"
+														className="h-6 px-2 text-[11px] gap-1 rounded-full border border-border bg-white dark:bg-card hover:bg-muted font-medium cursor-pointer"
 													>
-														<IconCopy className="size-3.5" />
+														<IconCopy className="size-3" />
 														<span>قالب</span>
 													</Button>
 												</DropdownMenuTrigger>
@@ -1198,7 +1246,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 													setIsAgentOpen((prev) => !prev);
 												}}
 												className={cn(
-													"h-7 px-2.5 text-xs gap-1.5 rounded-full border border-border bg-white dark:bg-card hover:bg-muted font-medium cursor-pointer flex items-center shrink-0 transition-all",
+													"h-6 px-2 text-[11px] gap-1 rounded-full border border-border bg-white dark:bg-card hover:bg-muted font-medium cursor-pointer flex items-center shrink-0 transition-all",
 													isAgentOpen &&
 														"bg-primary/10 border-primary/40 text-primary font-semibold shadow-2xs",
 												)}
@@ -1207,7 +1255,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 											>
 												<SanadLogo
 													iconOnly
-													className="h-3.5 w-auto shrink-0"
+													className="h-3 w-auto shrink-0"
 												/>
 												<span className="whitespace-nowrap">أنشئ مع سند</span>
 											</Button>
@@ -1657,25 +1705,17 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 											</Field>
 										</div>
 
-										{/* حقل ملاحظات الفصل — متماشي تماماً مع حدود باقي الفورم */}
-										<Field>
-											<FieldLabel info="ملاحظات وتوجيهات خاصة بالفصل الدراسي">
-												<Label
-													htmlFor="cls-notes"
-													className="text-xs font-semibold"
-												>
-													ملاحظات
-												</Label>
-											</FieldLabel>
+										{/* محرر الملاحظات المتقدم والموحّد للمنصة (RichNotesEditor) — بوردر علوي فقط مع شريط عائم مطابق للصورة تماماً */}
+										<div className="mt-2">
 											<RichNotesEditor
 												id="cls-notes"
 												value={notes}
 												onChange={setNotes}
 												placeholder="أضف ملاحظات أو أهداف أو تفاصيل لهذا الفصل..."
-												variant="bordered"
-												minHeight={85}
+												variant="border-top-only"
+												minHeight={42}
 											/>
-										</Field>
+										</div>
 									</div>
 
 									{/* 3. شريط التحكم والإجراءات السفلي الثابت في البوب أب (Fixed Bottom Section) */}
@@ -2167,10 +2207,11 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 								</form>
 							</div>
 
-							{/* الجانب الأيسر (في RTL): لوحة سند للذكاء الاصطناعي (مطابقة تماماً للصورة) */}
+							{/* الجانب الأيسر (في RTL): لوحة سند للذكاء الاصطناعي */}
 							{isAgentOpen && (
 								<ClassroomAgentPanel
 									onClose={() => setIsAgentOpen(false)}
+									onCloseDialog={handleCloseAttempt}
 									onApplyData={(data) => {
 										if (data.name !== undefined) {
 											setName(data.name);
@@ -2242,12 +2283,14 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 				}}
 			/>
 
-			{/* نافذة التأكيد لحفظ المسودة عند الإغلاق أو النقر خارج الحوار */}
-			<SaveDraftConfirmDialog
+			{/* نافذة التأكيد عند الخروج من النموذج بدون حفظ البيانات المطابقة لنافذة النظام المعتمدة */}
+			<DiscardConfirmDialog
 				open={showDraftConfirm}
-				onSave={handleSaveDraft}
+				filledFields={filledFields}
+				fieldLabels={CLASSROOM_FIELD_LABELS}
+				resumeLabel="متابعة إضافة الفصل"
 				onDiscard={handleDiscardDraft}
-				onCancel={handleCancelDraftConfirm}
+				onResume={handleCancelDraftConfirm}
 			/>
 		</>
 	);

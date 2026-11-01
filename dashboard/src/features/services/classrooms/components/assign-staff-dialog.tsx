@@ -452,7 +452,7 @@ export function AssignStaffDialog({
 						type="button"
 						disabled={isPending || selectedStaffIds.length === 0}
 						onClick={handleOpenConfirm}
-						className="flex h-[27px] items-center gap-1.5 rounded-[4px] bg-[#4F6AE0] px-3.5 text-[11px] font-semibold text-white hover:bg-[#435bc4] disabled:opacity-50 cursor-pointer transition-colors shadow-xs"
+						className="flex h-[27px] items-center gap-1.5 rounded-[4px] bg-primary px-3.5 text-[11px] font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 cursor-pointer transition-colors shadow-xs"
 					>
 						<IconChevronLeft className="size-2.5" />
 						تعيين ({selectedStaffIds.length})

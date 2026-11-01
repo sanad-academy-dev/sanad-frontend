@@ -7,6 +7,8 @@ import {
 	IconDots,
 	IconEdit,
 	IconEye,
+	IconGenderFemale,
+	IconGenderMale,
 	IconPlayerPause,
 	IconPlus,
 	IconTrash,
@@ -43,6 +45,10 @@ import { PatientSheet } from "@/features/services/patients/components/patient-sh
 import { TransferOwnershipDialog } from "@/features/services/patients/components/transfer-ownership-dialog";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { useUpdatePatient } from "@/features/services/patients/hooks/use-update-patient";
+import {
+	calculateAge,
+	getStudentAgeGroup,
+} from "@/features/services/classrooms/utils/age-group-utils";
 import { cn } from "@/lib/utils";
 
 function formatDate(dateVal?: string | Date | null) {
@@ -150,6 +156,40 @@ export function PatientsTable() {
 							</div>
 						</div>
 						// </StudentHoverCard>
+					);
+				},
+			},
+			{
+				accessorKey: "gender",
+				header: "الجنس",
+				size: 90,
+				minSize: 80,
+				cell: ({ row }) => {
+					const isFemale = row.original.gender === "FEMALE";
+					return isFemale ? (
+						<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+							<IconGenderFemale className="size-3 text-rose-500 shrink-0" />
+							أنثى
+						</span>
+					) : (
+						<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+							<IconGenderMale className="size-3 text-blue-500 shrink-0" />
+							ذكر
+						</span>
+					);
+				},
+			},
+			{
+				id: "ageGroup",
+				header: "الفئة العمرية",
+				size: 110,
+				minSize: 95,
+				cell: ({ row }) => {
+					const group = getStudentAgeGroup(row.original);
+					return (
+						<span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 w-fit">
+							{group}
+						</span>
 					);
 				},
 			},
