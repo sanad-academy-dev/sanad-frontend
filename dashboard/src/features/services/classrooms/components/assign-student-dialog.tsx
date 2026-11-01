@@ -19,6 +19,10 @@ import { AssignStudentConfirmDialog } from "@/features/services/classrooms/compo
 import { useAssignClassroomStudents } from "@/features/services/classrooms/hooks/use-classroom-mutations";
 import { useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
+import {
+	getStudentAgeGroup,
+	isStudentMatchingClassroomAge,
+} from "@/features/services/classrooms/utils/age-group-utils";
 import { cn } from "@/lib/utils";
 import type {
 	ClassroomResponse,
@@ -156,13 +160,22 @@ export function AssignStudentDialog({
 			const isAssignedHere = selectedStudentIds.includes(p.id);
 			const hasNoClasses = !assignedInfo;
 
+			// التحقق من توافق الفئة العمرية مع الفصل الدراسي
+			if (classroom?.ageGroup && classroom.ageGroup !== "جميع الأعمار") {
+				const matchesAge = isStudentMatchingClassroomAge(p, classroom.ageGroup);
+				// نسمح للطالب المسجل بالفعل في هذا الفصل بالظهور، بينما الطلاب الآخرين يجب مطابقتهم للفئة العمرية
+				if (!matchesAge && !isAssignedHere) {
+					return false;
+				}
+			}
+
 			if (filter === "assigned") return isAssignedHere;
 			if (filter === "unassigned") return hasNoClasses && !isAssignedHere;
 			if (filter === "other") return !hasNoClasses && !isAssignedHere;
 
 			return true;
 		});
-	}, [patients, search, filter, studentClassroomMap, selectedStudentIds]);
+	}, [patients, search, filter, studentClassroomMap, selectedStudentIds, classroom]);
 
 	const allChecked =
 		filteredStudents.length > 0 &&
@@ -268,6 +281,11 @@ export function AssignStudentDialog({
 									· {displayClassName}
 								</span>
 							)}
+							{classroom?.ageGroup && (
+								<span className="mr-1 text-[9px] font-semibold bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+									{classroom.ageGroup}
+								</span>
+							)}
 						</div>
 						<div className="flex items-center gap-1.5">
 							<button
@@ -358,7 +376,9 @@ export function AssignStudentDialog({
 							</div>
 						) : filteredStudents.length === 0 ? (
 							<div className="py-12 text-center text-xs text-muted-foreground">
-								لا يوجد طلاب مطابقون للبحث
+								{classroom?.ageGroup
+									? `لا يوجد طلاب مطابقون للفئة العمرية لهذا الفصل (${classroom.ageGroup})`
+									: "لا يوجد طلاب مطابقون للبحث"}
 							</div>
 						) : (
 							filteredStudents.map((p) => {
@@ -412,7 +432,8 @@ export function AssignStudentDialog({
 												<span className="truncate text-[9px] text-[#9B9B9D]">
 													{guardian ? `ولي الأمر: ${guardian}` : "بدون ولي أمر مسجل"}
 													{p.gender === "FEMALE" ? " • أنثى" : " • ذكر"}
-													{p.age ? ` • ${p.age} سنوات` : ""}
+													{" • "}
+													<span className="font-semibold text-foreground/90">{getStudentAgeGroup(p)}</span>
 												</span>
 											</div>
 										</div>
@@ -456,7 +477,7 @@ export function AssignStudentDialog({
 							type="button"
 							disabled={isPending || selectedStudentIds.length === 0}
 							onClick={handleOpenConfirm}
-							className="flex h-[27px] items-center gap-1.5 rounded-[4px] bg-[#4F6AE0] px-3.5 text-[11px] font-semibold text-white hover:bg-[#435bc4] disabled:opacity-50 cursor-pointer transition-colors shadow-xs"
+							className="flex h-[27px] items-center gap-1.5 rounded-[4px] bg-primary px-3.5 text-[11px] font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 cursor-pointer transition-colors shadow-xs"
 						>
 							<IconChevronLeft className="size-2.5" />
 							تعيين الطلاب ({selectedStudentIds.length})

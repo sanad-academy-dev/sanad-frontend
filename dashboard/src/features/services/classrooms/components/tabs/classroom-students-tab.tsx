@@ -62,6 +62,10 @@ import {
 import { useStudentShifts } from "@/features/services/attendance/hooks/use-student-shifts";
 import { AssignStudentDialog } from "@/features/services/classrooms/components/assign-student-dialog";
 import { useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
+import {
+	getStudentAgeGroup,
+	isStudentMatchingClassroomAge,
+} from "@/features/services/classrooms/utils/age-group-utils";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { backendFetch } from "@/lib/backend-fetch";
 import { downloadCsv } from "@/lib/csv";
@@ -125,9 +129,9 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 		return map;
 	}, [patients]);
 
-	// دمج بيانات الطلاب مع البيانات الكاملة المسجلة
+	// دمج بيانات الطلاب مع البيانات الكاملة المسجلة وتصفيتهم حسب الفئة العمرية للفصل
 	const students = useMemo<ClassroomStudentInfo[]>(() => {
-		return rawStudents.map((s) => {
+		const mapped = rawStudents.map((s) => {
 			const full = patientsMap.get(s.id);
 			return {
 				id: s.id,
@@ -138,6 +142,7 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 				active: s.active !== undefined ? s.active : (full?.active ?? true),
 				age: s.age ?? full?.age ?? null,
 				birthDate: s.birthDate || full?.birthDate || null,
+				ageGroup: s.ageGroup || (full as { ageGroup?: string | null } | undefined)?.ageGroup || null,
 				guardianName:
 					s.guardianName || full?.owner?.name || full?.emergencyContactName || null,
 				guardianPhone:
@@ -154,7 +159,14 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 				preferredShift: s.preferredShift || full?.preferredShift || null,
 			};
 		});
-	}, [rawStudents, patientsMap]);
+
+		// صفحة الطلاب في تفاصيل الفصل تعرض فقط الطلاب المتوافقين مع الفئة العمرية للفصل
+		if (!classroom.ageGroup || classroom.ageGroup === "جميع الأعمار") {
+			return mapped;
+		}
+
+		return mapped.filter((s) => isStudentMatchingClassroomAge(s, classroom.ageGroup));
+	}, [rawStudents, patientsMap, classroom.ageGroup]);
 
 	// استدعاء سجلات حضور ومناوبات الطلاب لليوم الحالي تحديداً
 	const todayDate = useMemo(() => new Date(), []);
@@ -547,6 +559,7 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 			"ولي الأمر",
 			"رقم الهاتف",
 			"الجنس",
+			"الفئة العمرية",
 			"المناوبة",
 			"حالة الحضور",
 			"الحالة",
@@ -557,6 +570,7 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 			s.guardianName ?? "غير محدد",
 			s.guardianPhone ?? "",
 			s.gender === "FEMALE" ? "أنثى" : "ذكر",
+			getStudentAgeGroup(s),
 			studentShiftsMap.get(s.id)?.label || "عطلة",
 			studentAttendanceMap.get(s.id)?.label || "لم يسجل",
 			s.active !== false ? "نشط" : "غير نشط",
@@ -629,10 +643,14 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 		}
 	};
 
-	// الفصول المتاحة للنقل إليها
+	// الفصول المتاحة للنقل إليها (المطابقة للفئة العمرية للطالب المستهدف)
 	const availableTransferClassrooms = useMemo(() => {
-		return classrooms.filter((c) => c.id !== classroom.id && c.active);
-	}, [classrooms, classroom.id]);
+		return classrooms.filter((c) => {
+			if (c.id === classroom.id || !c.active) return false;
+			if (!transferStudent) return true;
+			return isStudentMatchingClassroomAge(transferStudent, c.ageGroup);
+		});
+	}, [classrooms, classroom.id, transferStudent]);
 
 	// أعمدة جدول الطلاب
 	const columns = useMemo<ColumnDef<ClassroomStudentInfo>[]>(
@@ -731,24 +749,36 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 				},
 			},
 			{
-				id: "demographics",
-				header: "العمر / الجنس",
-				size: 130,
-				minSize: 110,
+				id: "gender",
+				header: "الجنس",
+				size: 90,
+				minSize: 80,
 				cell: ({ row }) => {
 					const isFemale = row.original.gender === "FEMALE";
-					const ageStr = row.original.age ? `${row.original.age} سنوات` : "--";
+					return isFemale ? (
+						<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+							<IconGenderFemale className="size-3 text-rose-500 shrink-0" />
+							أنثى
+						</span>
+					) : (
+						<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+							<IconGenderMale className="size-3 text-blue-500 shrink-0" />
+							ذكر
+						</span>
+					);
+				},
+			},
+			{
+				id: "ageGroup",
+				header: "الفئة العمرية",
+				size: 110,
+				minSize: 95,
+				cell: ({ row }) => {
+					const group = getStudentAgeGroup(row.original);
 					return (
-						<div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-							{isFemale ? (
-								<IconGenderFemale className="size-3.5 text-rose-500 shrink-0" />
-							) : (
-								<IconGenderMale className="size-3.5 text-blue-500 shrink-0" />
-							)}
-							<span className="font-medium">{isFemale ? "أنثى" : "ذكر"}</span>
-							<span>•</span>
-							<span className="font-mono text-[11px]">{ageStr}</span>
-						</div>
+						<span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 w-fit">
+							{group}
+						</span>
 					);
 				},
 			},

@@ -22,7 +22,10 @@ export const useCreatePatient = () => {
 				emergencyContactPhone: data.emergencyContactPhone?.trim() || undefined,
 				emergencyContactName: data.emergencyContactName?.trim() || undefined,
 				age:
-					data.age != null && !Number.isNaN(Number(data.age)) ? Number(data.age) : undefined,
+					data.age != null && !Number.isNaN(Number(data.age)) && Number(data.age) > 0
+						? Number(data.age)
+						: undefined,
+				ageGroup: data.ageGroup?.trim() || undefined,
 				birthDate: data.birthDate,
 				nationalId: data.nationalId?.trim() || undefined,
 				classroom: data.classroom?.trim() || undefined,

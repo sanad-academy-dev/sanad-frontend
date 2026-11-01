@@ -26,6 +26,7 @@ import {
 } from "date-fns";
 import { useCallback, useMemo } from "react";
 import { Stats } from "@/components/common/stats";
+import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
 import { Button } from "@/components/ui/button";
 import type { StatItem } from "@/features/dashboard/types/dashboard.types";
 import { useStudentAttendance } from "@/features/services/attendance/hooks/use-student-attendance";
@@ -682,27 +683,17 @@ export function ClassroomOverviewTab({
 										<IconSchool className="size-4 shrink-0 text-muted-foreground/70" />
 										<span>الكادر التعليمي</span>
 									</div>
-									<div className="flex items-center gap-1.5 font-semibold text-foreground text-start">
-										<div className="flex -space-x-2 space-x-reverse">
-											{(classroom.teachers || []).slice(0, 3).map((t, idx, arr) => (
-												<span
-													key={t.id}
-													style={{ zIndex: arr.length - idx }}
-													className="relative size-6.5 rounded-full flex items-center justify-center text-[11px] font-bold ring-2 ring-background bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#7C3AED]/25 dark:text-[#DDD6FE] shadow-2xs transition-transform hover:scale-115 hover:z-30 select-none cursor-default"
-													title={t.name}
-												>
-													{getInitials(t.name)}
-												</span>
-											))}
-											{(classroom.teachers || []).length > 3 && (
-												<span
-													style={{ zIndex: 0 }}
-													className="relative size-6.5 rounded-full flex items-center justify-center text-[10px] font-bold ring-2 ring-background bg-muted text-muted-foreground shadow-2xs select-none"
-												>
-													+{(classroom.teachers || []).length - 3}
-												</span>
-											)}
-										</div>
+									<div className="flex items-center gap-2 font-semibold text-foreground text-start">
+										<AvatarCirclesStack
+											items={(classroom.teachers || []).map((t) => ({
+												id: t.id,
+												name: t.name,
+												title: `${t.name}${t.role ? ` (${t.role})` : ""}`,
+												image: t.image,
+											}))}
+											variant="mauve"
+											maxVisible={3}
+										/>
 										<span className="text-xs text-muted-foreground font-normal">
 											{classroom.teachers?.length || 0} معلمين
 										</span>

@@ -44,17 +44,25 @@ function Chip({ children, className }: { children: React.ReactNode; className?: 
 export function AssigneeStack({ course }: { course: CourseListItemResponse }) {
 	const extra = course.assignedCount - course.assignees.length;
 	return (
-		<div className="flex items-center">
-			<div className="flex -space-x-2 rtl:space-x-reverse">
-				{course.assignees.map((s) => {
+		<div className="flex items-center isolate" dir="rtl">
+			<div className="flex items-center">
+				{course.assignees.map((s, idx) => {
 					const color = avatarColor(s.name);
 					const url = getFileUrl(s.avatar);
+					const isFirst = idx === 0;
 					return (
 						<span
 							key={s.id}
 							title={s.name}
-							className="flex size-6 items-center justify-center overflow-hidden rounded-full border-2 border-background text-[9px] font-semibold"
-							style={url ? undefined : { backgroundColor: color.bg, color: color.fg }}
+							className={cn(
+								"flex size-6 items-center justify-center overflow-hidden rounded-full border-2 border-background text-[9px] font-semibold",
+								!isFirst && "-ms-2",
+							)}
+							style={{
+								zIndex: idx + 1,
+								marginInlineStart: isFirst ? 0 : "-8px",
+								...(url ? {} : { backgroundColor: color.bg, color: color.fg }),
+							}}
 						>
 							{url ? (
 								<img
@@ -70,7 +78,10 @@ export function AssigneeStack({ course }: { course: CourseListItemResponse }) {
 				})}
 			</div>
 			{extra > 0 && (
-				<span className="z-10 -ms-2 flex size-6 items-center justify-center rounded-full border-2 border-background bg-muted text-[9px] font-semibold text-muted-foreground">
+				<span
+					style={{ zIndex: 0, marginInlineStart: "-8px" }}
+					className="-ms-2 flex size-6 items-center justify-center rounded-full border-2 border-background bg-muted text-[9px] font-semibold text-muted-foreground select-none"
+				>
 					+{extra}
 				</span>
 			)}

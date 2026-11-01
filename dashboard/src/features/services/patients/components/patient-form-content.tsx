@@ -8,7 +8,7 @@ import {
 	IconSchool,
 	IconUsers,
 } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 import type {
 	Control,
 	FieldErrors,
@@ -43,6 +43,12 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
+import { AGE_GROUPS } from "@/features/services/classrooms/data/constants";
+import {
+	calculateAge,
+	filterClassroomsByAgeGroup,
+	getAgeGroupFromAge,
+} from "@/features/services/classrooms/utils/age-group-utils";
 import {
 	ALLERGY_CHIPS,
 	BLOOD_TYPE_OPTIONS,
@@ -99,6 +105,36 @@ export function PatientFormContent({
 }: PatientFormContentProps) {
 	const { classrooms } = useClassrooms();
 	const values = watch();
+	const watchedBirthDate = watch("birthDate");
+	const watchedAgeGroup = watch("ageGroup");
+
+	// اشتقاق الفئة العمرية تلقائياً عند إدخال أو تغيير تاريخ الميلاد أو إذا كانت الفئة العمرية فارغة
+	const prevBirthDateRef = useRef<string | undefined>(undefined);
+	useEffect(() => {
+		if (watchedBirthDate) {
+			const isBirthDateChanged = watchedBirthDate !== prevBirthDateRef.current;
+			if (isBirthDateChanged || !watchedAgeGroup) {
+				prevBirthDateRef.current = watchedBirthDate;
+				const calculatedAge = calculateAge(watchedBirthDate);
+				if (calculatedAge != null) {
+					const detectedGroup = getAgeGroupFromAge(calculatedAge);
+					if (detectedGroup && (!watchedAgeGroup || isBirthDateChanged)) {
+						setValue("ageGroup", detectedGroup, { shouldValidate: true, shouldDirty: true });
+					}
+				}
+			}
+		}
+	}, [watchedBirthDate, watchedAgeGroup, setValue]);
+
+	const effectiveAgeGroup =
+		watchedAgeGroup ||
+		(watchedBirthDate ? getAgeGroupFromAge(calculateAge(watchedBirthDate)) : "");
+
+	// تصفية الفصول المتاحة طبقاً للفئة العمرية
+	const availableClassrooms = useMemo(() => {
+		if (!effectiveAgeGroup) return classrooms;
+		return filterClassroomsByAgeGroup(classrooms, effectiveAgeGroup);
+	}, [classrooms, effectiveAgeGroup]);
 	const [ownerSearch, setOwnerSearch] = useState("");
 	const [internalOpen, setInternalOpen] = useState(false);
 	const comboOpen = setOwnerSelectOpen ? (ownerSelectOpen ?? false) : internalOpen;
@@ -163,33 +199,80 @@ export function PatientFormContent({
 					</Field>
 				</div>
 
-				{/* تاريخ الميلاد */}
-				<div className="flex flex-col gap-1.5">
-					<FieldLabel
-						required
-						info="تاريخ ميلاد الطفل لحساب العمر الدقيق وتحديد الفصل"
-					>
-						<Label
-							className="text-sm font-medium"
-							htmlFor={`${idPrefix}-birth-date`}
+				{/* تاريخ الميلاد والفئة العمرية */}
+				<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+					{/* تاريخ الميلاد */}
+					<div className="flex flex-col gap-1.5">
+						<FieldLabel
+							required
+							info="تاريخ ميلاد الطفل لحساب العمر الدقيق وتحديد الفصل"
 						>
-							تاريخ الميلاد
-						</Label>
-					</FieldLabel>
-					<Field data-invalid={!!errors.birthDate}>
-						<div className="relative">
-							<Input
-								id={`${idPrefix}-birth-date`}
-								type="date"
-								className="text-sm pe-9 text-right"
-								aria-invalid={!!errors.birthDate}
-								disabled={isPending || readOnly}
-								{...register("birthDate")}
-							/>
-							<IconCalendar className="absolute end-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
-						</div>
-						<FieldError errors={[errors.birthDate]} />
-					</Field>
+							<Label
+								className="text-sm font-medium"
+								htmlFor={`${idPrefix}-birth-date`}
+							>
+								تاريخ الميلاد
+							</Label>
+						</FieldLabel>
+						<Field data-invalid={!!errors.birthDate}>
+							<div className="relative">
+								<Input
+									id={`${idPrefix}-birth-date`}
+									type="date"
+									className="text-sm pe-9 text-right"
+									aria-invalid={!!errors.birthDate}
+									disabled={isPending || readOnly}
+									{...register("birthDate")}
+								/>
+								<IconCalendar className="absolute end-2.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+							</div>
+							<FieldError errors={[errors.birthDate]} />
+						</Field>
+					</div>
+
+					{/* الفئة العمرية */}
+					<div className="flex flex-col gap-1.5">
+						<FieldLabel info="الفئة العمرية المناسبة للطفل (يتم تحديدها تلقائياً من تاريخ الميلاد وتستخدم لفلترة الفصول المتاحة)">
+							<Label
+								className="text-sm font-medium"
+								htmlFor={`${idPrefix}-age-group`}
+							>
+								الفئة العمرية
+							</Label>
+						</FieldLabel>
+						<Controller
+							name="ageGroup"
+							control={control}
+							render={({ field }) => (
+								<Field data-invalid={!!errors.ageGroup}>
+									<Select
+										value={field.value || ""}
+										onValueChange={field.onChange}
+										disabled={isPending || readOnly}
+										dir="rtl"
+									>
+										<SelectTrigger
+											id={`${idPrefix}-age-group`}
+											className="w-full text-right text-sm"
+										>
+											<SelectValue placeholder="اختر الفئة العمرية..." />
+										</SelectTrigger>
+										<SelectContent dir="rtl">
+											{AGE_GROUPS.map((group) => (
+												<SelectItem
+													key={group}
+													value={group}
+												>
+													{group}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+									<FieldError errors={[errors.ageGroup]} />
+								</Field>
+							)}
+						/>
+					</div>
 				</div>
 
 				{/* الجنس */}
@@ -257,7 +340,7 @@ export function PatientFormContent({
 
 				{/* الفصل */}
 				<div className="flex flex-col gap-1.5">
-					<FieldLabel info="المجموعة أو الصف الدراسي المسجل به الطالب">
+					<FieldLabel info="المجموعة أو الصف الدراسي المسجل به الطالب (يتم فلترة الفصول تلقائياً حسب الفئة العمرية المحددة)">
 						<Label className="text-sm font-medium">الفصل</Label>
 					</FieldLabel>
 					<Controller
@@ -265,6 +348,16 @@ export function PatientFormContent({
 						control={control}
 						render={({ field }) => {
 							const currentVal = field.value || "__NONE__";
+							const displayedClassrooms = [...availableClassrooms];
+							if (
+								currentVal &&
+								currentVal !== "__NONE__" &&
+								!displayedClassrooms.some((c) => c.name === currentVal)
+							) {
+								const existing = classrooms.find((c) => c.name === currentVal);
+								if (existing) displayedClassrooms.unshift(existing);
+							}
+
 							return (
 								<Field data-invalid={!!errors.classroom}>
 									<Select
@@ -281,21 +374,41 @@ export function PatientFormContent({
 										</SelectTrigger>
 										<SelectContent dir="rtl">
 											<SelectItem value="__NONE__">بدون فصل (غير مسجل)</SelectItem>
-											{classrooms.map((cls) => (
-												<SelectItem
-													key={cls.id}
-													value={cls.name}
-												>
-													<div className="flex items-center justify-between w-full gap-2">
-														<span>{cls.name}</span>
-														<span className="text-[10px] text-muted-foreground font-mono">
-															{cls.enrolledCount}/{cls.capacity} طالب
-														</span>
-													</div>
-												</SelectItem>
-											))}
+											{displayedClassrooms.length === 0 ? (
+												<div className="py-2.5 px-3 text-center text-xs text-muted-foreground">
+													لا توجد فصول متاحة للفئة العمرية (
+													{effectiveAgeGroup || "المحددة"})
+												</div>
+											) : (
+												displayedClassrooms.map((cls) => (
+													<SelectItem
+														key={cls.id}
+														value={cls.name}
+													>
+														<div className="flex items-center justify-between w-full gap-2">
+															<span className="font-medium">{cls.name}</span>
+															<div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-mono">
+																{cls.ageGroup && (
+																	<span className="bg-muted px-1.5 py-0.5 rounded text-[10px] text-primary font-sans font-medium">
+																		{cls.ageGroup}
+																	</span>
+																)}
+																<span>
+																	{cls.enrolledCount}/{cls.capacity} طالب
+																</span>
+															</div>
+														</div>
+													</SelectItem>
+												))
+											)}
 										</SelectContent>
 									</Select>
+									{effectiveAgeGroup && (
+										<p className="text-[11px] text-muted-foreground mt-0.5">
+											معروضة الفصول المتوافقة مع الفئة العمرية:{" "}
+											<span className="font-semibold text-primary">{effectiveAgeGroup}</span>
+										</p>
+									)}
 									<FieldError errors={[errors.classroom]} />
 								</Field>
 							);

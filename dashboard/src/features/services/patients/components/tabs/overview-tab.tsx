@@ -34,6 +34,8 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { TRANSPORT_OPTIONS } from "@/features/services/patients/data/patient-form-constants";
+import { AGE_GROUPS } from "@/features/services/classrooms/data/constants";
+import { getStudentAgeGroup } from "@/features/services/classrooms/utils/age-group-utils";
 import type { PatientTabProps } from "@/features/services/patients/types/tabs.types";
 import { cn } from "@/lib/utils";
 
@@ -287,18 +289,9 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 		).length;
 	}, [history]);
 
-	const displayAge = useMemo(() => {
-		if (patient?.age != null && patient.age > 0) return patient.age;
-		if (patient?.birthDate) {
-			const birth = new Date(patient.birthDate);
-			if (!Number.isNaN(birth.getTime())) {
-				const diff = Date.now() - birth.getTime();
-				const ageDate = new Date(diff);
-				return Math.abs(ageDate.getUTCFullYear() - 1970);
-			}
-		}
-		return null;
-	}, [patient?.age, patient?.birthDate]);
+	const studentAgeGroup = useMemo(() => {
+		return getStudentAgeGroup(patient);
+	}, [patient]);
 
 	const statsItems: StatItem[] = useMemo(
 		() => [
@@ -309,10 +302,10 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 				tooltip: "الوزن الحالي المسجل للطالب بالكيلوجرام",
 			},
 			{
-				title: "العمر",
-				value: displayAge ?? 0,
-				valueLabel: displayAge != null ? `${displayAge} ` : "—",
-				tooltip: "العمر الحالي للطالب بالسنوات",
+				title: "الفئة العمرية",
+				value: 0,
+				valueLabel: studentAgeGroup || "—",
+				tooltip: "الفئة العمرية المعتمدة للطالب والفصول",
 			},
 			{
 				title: "عدد الزيارات",
@@ -320,7 +313,7 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 				tooltip: "إجمالي عدد الزيارات والجلسات المسجلة للطالب",
 			},
 		],
-		[patient?.weight, displayAge, visitsCount],
+		[patient?.weight, studentAgeGroup, visitsCount],
 	);
 
 	if (!patientId || (isLoading && !patient)) {
@@ -385,16 +378,25 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 				</div>
 				<div className="grid grid-cols-2 gap-3">
 					<InfoField
-						label="العمر (سنوات)"
+						label="الفئة العمرية"
 						icon={<IconScale className="size-3.5" />}
 					>
-						<EditableText
-							value={patient.age}
-							placeholder="—"
-							type="number"
-							onSave={(v) => patch({ age: v != null ? Number(v) : undefined })}
-							displayClassName="tabular-nums"
-						/>
+						<Select
+							value={patient.ageGroup || studentAgeGroup || ""}
+							onValueChange={(val) => patch({ ageGroup: val })}
+							dir="rtl"
+						>
+							<SelectTrigger className="h-7 text-xs border border-border/60 bg-background/50 hover:bg-muted/40 px-2 rounded font-semibold text-foreground">
+								<SelectValue placeholder="اختر الفئة العمرية..." />
+							</SelectTrigger>
+							<SelectContent dir="rtl">
+								{AGE_GROUPS.map((group) => (
+									<SelectItem key={group} value={group} className="text-xs">
+										{group}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
 					</InfoField>
 
 					<InfoField
