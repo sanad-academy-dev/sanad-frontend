@@ -29,6 +29,7 @@ function DigitalRegistrationRoute() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [genderFilter, setGenderFilter] = useState("ALL");
 	const [isAddRequestOpen, setIsAddRequestOpen] = useState(false);
+	const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
 	// Fetch campaigns to automatically resolve the active workspace
 	const { data: campaigns = [] } = useCampaigns();
@@ -279,6 +280,8 @@ function DigitalRegistrationRoute() {
 							searchQuery={searchQuery}
 							genderFilter={genderFilter}
 							onOpenAddRequest={() => setIsAddRequestOpen(true)}
+							selectedRequestId={selectedRequestId}
+							onSelectRequest={setSelectedRequestId}
 						/>
 					</div>
 
@@ -287,6 +290,11 @@ function DigitalRegistrationRoute() {
 						open={isAddRequestOpen}
 						onClose={() => setIsAddRequestOpen(false)}
 						campaignId={activeCampaignId}
+						onSuccess={(created) => {
+							if (created?.id) {
+								setSelectedRequestId(created.id);
+							}
+						}}
 					/>
 				</div>
 			)}

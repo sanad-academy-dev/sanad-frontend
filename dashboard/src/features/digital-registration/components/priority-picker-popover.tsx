@@ -83,9 +83,18 @@ export function PriorityPickerPopover({
 
 	// الخيار المختار حالياً
 	const currentOption = useMemo(() => {
+		const val = (value || "").trim().toLowerCase();
+		const mapEnToId = {
+			urgent: "urgent",
+			high: "high",
+			medium: "medium",
+			low: "low",
+			none: "none",
+		};
+		const normalizedId = mapEnToId[val] || val;
 		return (
 			PRIORITY_OPTIONS.find(
-				(p) => p.name === value || p.id === value,
+				(p) => p.name === value || p.id === normalizedId || p.name.toLowerCase() === val,
 			) || PRIORITY_OPTIONS[0]
 		);
 	}, [value]);

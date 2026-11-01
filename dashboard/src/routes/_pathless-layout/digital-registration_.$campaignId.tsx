@@ -22,6 +22,7 @@ function CampaignDetailsRoute() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [genderFilter, setGenderFilter] = useState("ALL");
 	const [isAddRequestOpen, setIsAddRequestOpen] = useState(false);
+	const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
 	const { data: requests = [] } = useCampaignRequests(campaignId);
 	const { data: campaign } = useCampaignDetails(campaignId);
@@ -207,11 +208,19 @@ function CampaignDetailsRoute() {
 						campaignId={campaignId}
 						searchQuery={searchQuery}
 						genderFilter={genderFilter}
+						onOpenAddRequest={() => setIsAddRequestOpen(true)}
+						selectedRequestId={selectedRequestId}
+						onSelectRequest={setSelectedRequestId}
 					/>
 					<AddRequestSheet
 						open={isAddRequestOpen}
 						onClose={() => setIsAddRequestOpen(false)}
 						campaignId={campaignId}
+						onSuccess={(created) => {
+							if (created?.id) {
+								setSelectedRequestId(created.id);
+							}
+						}}
 					/>
 				</>
 			)}

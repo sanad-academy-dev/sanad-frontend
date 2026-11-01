@@ -151,11 +151,15 @@ export function CampaignRequestsKanban({
 	searchQuery,
 	genderFilter,
 	onOpenAddRequest,
+	selectedRequestId: externalSelectedRequestId,
+	onSelectRequest: externalOnSelectRequest,
 }: {
 	campaignId: string;
 	searchQuery?: string;
 	genderFilter?: string;
 	onOpenAddRequest?: () => void;
+	selectedRequestId?: string | null;
+	onSelectRequest?: (id: string | null) => void;
 }) {
 	const { data: serverRequests = EMPTY_REQUESTS, isLoading } = useCampaignRequests(campaignId);
 	const updateStatusMutation = useUpdateRequestStatus(campaignId);
@@ -163,7 +167,9 @@ export function CampaignRequestsKanban({
 
 	const [data, setData] = useState<CampaignRequestItem[]>([]);
 	const lastKnownColumns = useRef<Map<string, AppointmentColumnId>>(new Map());
-	const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+	const [internalSelectedRequestId, setInternalSelectedRequestId] = useState<string | null>(null);
+	const selectedRequestId = externalSelectedRequestId !== undefined ? externalSelectedRequestId : internalSelectedRequestId;
+	const setSelectedRequestId = externalOnSelectRequest || setInternalSelectedRequestId;
 	const [requestToDelete, setRequestToDelete] = useState<CampaignRequestItem | null>(null);
 
 	// Sync local state whenever server query refreshes
@@ -600,24 +606,36 @@ export function CampaignRequestsKanban({
 											{/* خط فاصل ناعم */}
 											<div className="border-t border-zinc-100 dark:border-zinc-800 my-0.5 w-full" />
 
-											{/* 4. شريط التقدم (1/5 مرحلة) مع خط التقدم بالأزرق من اليمين إلى اليسار */}
+											{/* 4. شريط التقدم (1/5 مرحلة أو 3/5 مرحلة) مع تمييز الرفض بالأحمر */}
 											<div className="flex items-center justify-between gap-2 text-zinc-400 dark:text-zinc-500 w-full" dir="rtl">
 												<div className="flex-1 h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
 													<div
-														className="h-full bg-[#3B82F6] rounded-full transition-all duration-300"
-														style={{ width: `${stage.percent}%` }}
+														className={cn(
+															"h-full rounded-full transition-all duration-300",
+															item.column === "rejected" || item.status === "REJECTED"
+																? "bg-rose-500"
+																: "bg-[#3B82F6]",
+														)}
+														style={{ width: item.column === "rejected" || item.status === "REJECTED" ? "60%" : `${stage.percent}%` }}
 													/>
 												</div>
 												<span className="shrink-0 font-medium font-mono text-[9px] text-zinc-400">
-													{stage.current}/{stage.total} مرحلة
+													{item.column === "rejected" || item.status === "REJECTED" ? "3/5 مرحلة" : `${stage.current}/${stage.total} مرحلة`}
 												</span>
 											</div>
 
-											{/* 5. بانر احتمالية الحضور (✨ احتمالية الحضور: 92%) المطابق تماماً للصورة */}
-											<div className="w-full rounded-md bg-[#EFF6FF] dark:bg-blue-950/30 border border-[#DBEAFE]/80 dark:border-blue-900/40 py-1 px-2.5 flex items-center justify-center gap-1.5 text-[10px] font-semibold text-[#3B82F6] dark:text-blue-400 select-none shadow-2xs">
-												<IconSparkles className="size-3 text-[#3B82F6] shrink-0" />
-												<span>احتمالية الحضور: {probability}%</span>
-											</div>
+											{/* 5. بانر حالة الرفض الصريح (مطابق للصورة 11) أو احتمالية الحضور */}
+											{item.column === "rejected" || item.status === "REJECTED" ? (
+												<div className="w-full rounded-md bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 py-1 px-2.5 flex items-center justify-center gap-1.5 text-[10px] font-bold text-rose-600 dark:text-rose-400 select-none shadow-2xs">
+													<IconX className="size-3 text-rose-600 shrink-0" />
+													<span>{item.rejectionReason || "عدم استيفاء أوراق التسجيل المطلوبة"}</span>
+												</div>
+											) : (
+												<div className="w-full rounded-md bg-[#EFF6FF] dark:bg-blue-950/30 border border-[#DBEAFE]/80 dark:border-blue-900/40 py-1 px-2.5 flex items-center justify-center gap-1.5 text-[10px] font-semibold text-[#3B82F6] dark:text-blue-400 select-none shadow-2xs">
+													<IconSparkles className="size-3 text-[#3B82F6] shrink-0" />
+													<span>احتمالية الحضور: {probability}%</span>
+												</div>
+											)}
 
 											{/* زر دخول المقابلة الافتراضية إذا كان الطلب في عمود المقابلة وعبر اتصال */}
 											{(item.column === "interview" || item.status === "INTERVIEW") &&
@@ -640,7 +658,7 @@ export function CampaignRequestsKanban({
 											<div className="flex items-center justify-between gap-1 pt-0.5 w-full" dir="rtl" onClick={(e) => e.stopPropagation()}>
 												{/* المجموعة اليمنى بالصورة: زر التعليقات + زر إضافة ملاحظة */}
 												<div className="flex items-center gap-1 shrink-0">
-													{/* زر 💬 12 (المحادثات / الملاحظات) */}
+													{/* زر 💬 (المحادثات / الملاحظات) */}
 													<button
 														type="button"
 														onClick={() => setSelectedRequestId(item.id)}
@@ -648,7 +666,7 @@ export function CampaignRequestsKanban({
 														title="المحادثات والملاحظات"
 													>
 														<IconMessageCircle className="size-2.5 text-zinc-400" />
-														<span className="font-mono text-[9px]">{item.comments?.length || 12}</span>
+														<span className="font-mono text-[9px]">{item.comments?.length ?? 0}</span>
 													</button>
 
 													{/* زر + إضافة ملاحظة */}
@@ -722,7 +740,7 @@ export function CampaignRequestsKanban({
 																title="تحديد مرحلة الطلب السريعة"
 															>
 																<IconFlag className="size-2.5 text-zinc-500" />
-																<span>تحديد كـ...</span>
+																<span>{item.column === "rejected" || item.status === "REJECTED" ? "تقييم" : "تحديد كـ..."}</span>
 															</button>
 														</DropdownMenuTrigger>
 														<DropdownMenuContent align="end" className="w-44 text-xs z-[99]">
@@ -788,9 +806,8 @@ export function CampaignRequestsKanban({
 				onAccept={(req) => handleStatusChange(req, "ACCEPTED")}
 				onWaitlist={(req) => handleStatusChange(req, "QUEUE")}
 				onReject={(req) => handleStatusChange(req, "REJECTED")}
-				onDelete={(req) => {
+				onDelete={() => {
 					setSelectedRequestId(null);
-					setRequestToDelete(req);
 				}}
 			/>
 

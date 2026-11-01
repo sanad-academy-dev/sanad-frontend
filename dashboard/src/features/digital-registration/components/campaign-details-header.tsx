@@ -4,15 +4,18 @@ import { useI18n } from "@/hooks/use-i18n";
 import { cn } from "@/lib/utils";
 
 export type RegistrationView = "requests" | "info" | "activity";
+export type CampaignView = RegistrationView | "stats";
 
 export function CampaignDetailsHeader({
 	activeView,
 	onChangeView,
 	requestsCount = 0,
+	campaignId,
 }: {
-	activeView: RegistrationView;
-	onChangeView: (view: RegistrationView) => void;
+	activeView: RegistrationView | CampaignView;
+	onChangeView: (view: any) => void;
 	requestsCount?: number;
+	campaignId?: string;
 }) {
 	const { isRtl } = useI18n();
 	const [slot, setSlot] = useState<HTMLElement | null>(null);
