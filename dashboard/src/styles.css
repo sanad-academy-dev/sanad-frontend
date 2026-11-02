@@ -180,6 +180,36 @@
   }
 }
 
+/* شريط تمرير أنيق وموحّد للنوافذ المنبثقة والنماذج والقوائم */
+.sanad-scrollbar {
+  scrollbar-gutter: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(150, 150, 150, 0.45) transparent;
+}
+
+.sanad-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.sanad-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sanad-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(150, 150, 150, 0.45);
+  border-radius: 9999px;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.sanad-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(120, 120, 120, 0.75);
+}
+
+.sanad-scrollbar::-webkit-scrollbar-thumb:active {
+  background-color: #5B50E5;
+}
+
 /* react-phone-number-input overrides */
 .phone-input {
   display: flex;
@@ -244,8 +274,10 @@
   #invoice-print-area *,
   /* نسخة التقرير المنقولة إلى body — القاعدة أعلاه تُخفي كل أبناء body */
   #report-print-root,
-  #report-print-root * {
-    visibility: visible;
+  #report-print-root *,
+  #student-request-print-root,
+  #student-request-print-root * {
+    visibility: visible !important;
   }
   #invoice-print-area {
     position: fixed !important;
@@ -268,24 +300,32 @@
    يبقى بينها وبين الصفحة سلفٌ ذو تحويل أو ارتفاع ثابت أو تمرير داخلي.
    نُخفي أشقّاءها بـ display لا visibility: الأخيرة تُبقي الحيّز فتخرج صفحات
    بيضاء. القاعدة مشروطة بوجود النسخة (:has) حتى لا تمسّ طباعة الفاتورة. */
-#report-print-root {
+#report-print-root,
+#student-request-print-root {
   display: none;
 }
 @media print {
-  body:has(#report-print-root) {
+  body:has(#report-print-root),
+  body:has(#student-request-print-root) {
     overflow: visible !important;
     height: auto !important;
+    background: #fff !important;
   }
-  body:has(#report-print-root) > *:not(#report-print-root) {
+  body:has(#report-print-root) > *:not(#report-print-root),
+  body:has(#student-request-print-root) > *:not(#student-request-print-root) {
     display: none !important;
   }
-  #report-print-root {
+  #report-print-root,
+  #student-request-print-root {
     display: block !important;
     position: static !important;
     width: 100% !important;
+    max-width: 100% !important;
     background: #fff !important;
+    color: #18181b !important;
   }
   @page {
-    margin: 14mm;
+    margin: 12mm 10mm;
+    size: A4 portrait;
   }
 }

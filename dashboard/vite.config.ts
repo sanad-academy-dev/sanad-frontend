@@ -38,6 +38,13 @@ export default defineConfig(({ mode }) => ({
     // الهاتف يصل بعنوان الشبكة (192.168.x.x) عند تشغيل bun run dev:lan. وفيت يرفض المضيفات غير
     // المعروفة، فيسقط الطلب إلى معالج SSR ويعود HTML مكان وحدة JS.
     allowedHosts: true,
+    proxy: {
+      "/api": {
+        target: "http://localhost:5180",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
     watch: {
       /**
        * مجلّدات المخرجات خارج المراقبة — **وإلّا مات خادم التطوير**.

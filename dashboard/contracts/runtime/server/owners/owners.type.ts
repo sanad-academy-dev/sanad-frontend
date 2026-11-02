@@ -20,6 +20,15 @@ export const createOwnerSchema = z.object({
 	notes: z.string().optional(),
 	active: z.boolean(),
 	patientIds: z.array(z.string()).optional(),
+	patientRelationships: z.record(z.string(), z.string()).optional(),
+	patients: z
+		.array(
+			z.object({
+				patientId: z.string(),
+				relationship: z.string().optional(),
+			}),
+		)
+		.optional(),
 });
 
 export type CreateOwnerFormInput = z.infer<typeof createOwnerSchema>;
@@ -40,7 +49,11 @@ export type CreateOwnerInput = Pick<
 	| "emergencyContactPhone"
 	| "notes"
 	| "active"
-> & { patientIds?: string[] };
+> & {
+	patientIds?: string[];
+	patientRelationships?: Record<string, string>;
+	patients?: Array<{ patientId: string; relationship?: string }>;
+};
 
 export type UpdateOwnerInput = Partial<
 	Pick<
@@ -58,37 +71,50 @@ export type UpdateOwnerInput = Partial<
 		| "notes"
 		| "active"
 	>
-> & { patientIds?: string[] };
+> & {
+	patientIds?: string[];
+	patientRelationships?: Record<string, string>;
+	patients?: Array<{ patientId: string; relationship?: string }>;
+};
 
 export type DisableOwnerInput = { newOwnerId?: string };
 export type DeleteOwnerInput = { newOwnerId?: string };
 
-export type OwnerResponse = Prisma.OwnerGetPayload<{
-	select: {
-		id: true;
-		code: true;
-		name: true;
-		phone: true;
-		email: true;
-		gender: true;
-		ownerType: true;
-		relationship: true;
-		country: true;
-		city: true;
-		address: true;
-		emergencyContactName: true;
-		emergencyContactPhone: true;
-		notes: true;
-		active: true;
-		editsCount: true;
-		createdAt: true;
-		updatedAt: true;
-		patients: {
-			select: {
-				id: true;
-				name: true;
-				gender: true;
-			};
+export type OwnerResponse = {
+	id: string;
+	code: string;
+	name: string;
+	phone: string;
+	email: string | null;
+	gender: Gender | null;
+	ownerType: OwnerType;
+	relationship: OwnerRelationship | null;
+	country: string | null;
+	city: string | null;
+	address: string | null;
+	emergencyContactName: string | null;
+	emergencyContactPhone: string | null;
+	notes: string | null;
+	active: boolean;
+	editsCount: number;
+	createdAt: Date;
+	updatedAt: Date;
+	patientRelationships?: Record<string, string>;
+	patients: Array<{
+		id: string;
+		name: string;
+		gender: Gender;
+		code?: string | null;
+		relationship?: string | null;
+	}>;
+	guardianPatients?: Array<{
+		id: string;
+		relationship: string | null;
+		patient: {
+			id: string;
+			name: string;
+			code: string;
+			gender: Gender;
 		};
-	};
-}>;
+	}>;
+};

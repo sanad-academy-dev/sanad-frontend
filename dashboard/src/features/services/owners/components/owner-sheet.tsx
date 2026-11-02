@@ -6,6 +6,7 @@ import {
 	IconPencil,
 	IconPlus,
 	IconUserPlus,
+	IconUsers,
 } from "@tabler/icons-react";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useEffect, useState } from "react";
@@ -46,6 +47,7 @@ import { AddPatientDialog } from "@/features/services/owners/components/add-pati
 import { OWNER_FIELD_LABELS } from "@/features/services/owners/data/constants";
 import { useUpdateOwner } from "@/features/services/owners/hooks/use-update-owner";
 import { DiscardConfirmDialog } from "@/features/services/patients/components/discard-confirm-dialog";
+import { RELATIONSHIP_OPTIONS } from "@/features/services/patients/data/patient-form-constants";
 import { useCreateOwner } from "@/features/services/patients/hooks/use-create-owner";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { useFormProgress } from "@/hooks/use-form-progress";
@@ -54,9 +56,26 @@ import type { OwnerResponse } from "@/server/owners/owners.type";
 
 const ownerSheetCreateSchema = createOwnerSchema.extend({
 	patientIds: z.array(z.string()).min(1, "يرجى اختيار طفل واحد على الأقل"),
+	patientRelationships: z.record(z.string(), z.string()).optional(),
 });
 
 type OwnerSheetFormInput = z.infer<typeof createOwnerSchema>;
+
+function getInitialRelationships(owner?: OwnerResponse | null): Record<string, string> {
+	if (!owner) return {};
+	const map: Record<string, string> = {};
+	if (owner.patientRelationships) {
+		Object.assign(map, owner.patientRelationships);
+	}
+	if (owner.patients) {
+		for (const p of owner.patients) {
+			if (p.id) {
+				map[p.id] = (p as { relationship?: string | null }).relationship || map[p.id] || "FATHER";
+			}
+		}
+	}
+	return map;
+}
 
 interface OwnerSheetProps {
 	open: boolean;
@@ -108,8 +127,9 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 					notes: owner.notes ?? undefined,
 					active: owner.active,
 					patientIds: owner.patients.map((p) => p.id),
+					patientRelationships: getInitialRelationships(owner),
 				}
-			: { active: true, ownerType: "ALL" as const, patientIds: [] },
+			: { active: true, ownerType: "ALL" as const, patientIds: [], patientRelationships: {} },
 	});
 
 	useEffect(() => {
@@ -129,9 +149,10 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 				notes: owner.notes ?? undefined,
 				active: owner.active,
 				patientIds: owner.patients.map((p) => p.id),
+				patientRelationships: getInitialRelationships(owner),
 			});
 		} else if (!open) {
-			reset({ active: true, ownerType: "ALL", patientIds: [] });
+			reset({ active: true, ownerType: "ALL", patientIds: [], patientRelationships: {} });
 			setPatientSearch("");
 		}
 	}, [open, owner, reset]);
@@ -180,7 +201,7 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 		if (filledFields.length > 0) {
 			setConfirmDiscardOpen(true);
 		} else {
-			reset({ active: true, ownerType: "ALL", patientIds: [] });
+			reset({ active: true, ownerType: "ALL", patientIds: [], patientRelationships: {} });
 			setPatientSearch("");
 			onClose();
 		}
@@ -188,7 +209,7 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 
 	const handleConfirmDiscard = () => {
 		setConfirmDiscardOpen(false);
-		reset({ active: true, ownerType: "ALL", patientIds: [] });
+		reset({ active: true, ownerType: "ALL", patientIds: [], patientRelationships: {} });
 		setPatientSearch("");
 		onClose();
 	};
@@ -200,7 +221,7 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 		} else {
 			await createOwner(data);
 		}
-		reset({ active: true, ownerType: "ALL", patientIds: [] });
+		reset({ active: true, ownerType: "ALL", patientIds: [], patientRelationships: {} });
 		setPatientSearch("");
 		// «حفظ ومتابعة الإضافة» — متاح في وضع الإضافة فقط
 		if (!isEdit && continueAdding) return;
@@ -403,7 +424,31 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 											open={patientComboOpen}
 											onOpenChange={setPatientComboOpen}
 											value={field.value ?? []}
-											onValueChange={readOnly ? () => {} : (val) => field.onChange(val ?? [])}
+											onValueChange={
+												readOnly
+													? () => {}
+													: (val) => {
+															const nextIds = val ?? [];
+															field.onChange(nextIds);
+															const curRels = {
+																...((watch("patientRelationships") as
+																	| Record<string, string>
+																	| undefined) || {}),
+															};
+															for (const pId of nextIds) {
+																if (!curRels[pId]) {
+																	const existingRel = owner?.patients?.find(
+																		(p) => p.id === pId,
+																	)?.relationship;
+																	curRels[pId] = existingRel || "FATHER";
+																}
+															}
+															setValue("patientRelationships", curRels, {
+																shouldDirty: true,
+																shouldValidate: true,
+															});
+														}
+											}
 										>
 											<ComboboxChips aria-invalid={!!errors.patientIds}>
 												{(field.value ?? []).map((id) => {
@@ -476,6 +521,109 @@ export function OwnerSheet({ open, onClose, owner, readOnly = false }: OwnerShee
 								)}
 							/>
 						</div>
+
+						{/* صلة القرابة بكل طفل مختار — مطابق لنموذج الطالب */}
+						{(() => {
+							const selectedPatientIds = watch("patientIds") || [];
+							const relMap =
+								(watch("patientRelationships") as Record<string, string> | undefined) || {};
+							const selectedPatientsList = selectedPatientIds
+								.map(
+									(id) =>
+										patients.find((p) => p.id === id) ??
+										owner?.patients?.find((p) => p.id === id),
+								)
+								.filter(Boolean) as Array<{
+								id: string;
+								name: string;
+								code?: string | null;
+								relationship?: string | null;
+							}>;
+
+							if (selectedPatientsList.length === 0) return null;
+
+							return (
+								<div className="flex flex-col gap-2 rounded-xl border border-border/80 bg-muted/20 p-3">
+									<span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+										<IconUsers className="size-4 text-primary" />
+										صلة القرابة بكل طفل:
+									</span>
+									<div className="flex flex-col gap-2">
+										{selectedPatientsList.map((child, idx) => {
+											const currentRel = relMap[child.id] || child.relationship || "FATHER";
+											const currentLabel =
+												RELATIONSHIP_OPTIONS.find((o) => o.value === currentRel)?.label ||
+												currentRel;
+
+											return (
+												<div
+													key={child.id}
+													className="flex items-center justify-between gap-3 p-2 rounded-lg bg-card border border-border/70 flex-wrap sm:flex-nowrap"
+												>
+													<div className="flex items-center gap-2 min-w-0">
+														<div className="size-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+															{idx + 1}
+														</div>
+														<div className="flex flex-col min-w-0">
+															<span className="text-xs font-semibold text-foreground truncate">
+																{child.name}
+															</span>
+															{child.code && (
+																<span className="text-[11px] text-muted-foreground font-mono tabular-nums">
+																	#{child.code}
+																</span>
+															)}
+														</div>
+													</div>
+
+													<div className="flex items-center gap-2 shrink-0">
+														<span className="text-xs text-muted-foreground">صلة القرابة:</span>
+														{readOnly ? (
+															<span className="text-xs font-medium px-2.5 py-1 rounded-md bg-primary/10 text-primary border border-primary/20">
+																{currentLabel}
+															</span>
+														) : (
+															<Select
+																value={currentRel}
+																onValueChange={(val) => {
+																	setValue(
+																		"patientRelationships",
+																		{
+																			...((watch("patientRelationships") as
+																				| Record<string, string>
+																				| undefined) || {}),
+																			[child.id]: val,
+																		},
+																		{ shouldValidate: true, shouldDirty: true },
+																	);
+																}}
+																disabled={isPending}
+																dir="rtl"
+															>
+																<SelectTrigger className="h-8 w-32 text-xs">
+																	<SelectValue placeholder="اختر..." />
+																</SelectTrigger>
+																<SelectContent dir="rtl">
+																	{RELATIONSHIP_OPTIONS.map((opt) => (
+																		<SelectItem
+																			key={opt.value}
+																			value={opt.value}
+																			className="text-xs"
+																		>
+																			{opt.label}
+																		</SelectItem>
+																	))}
+																</SelectContent>
+															</Select>
+														)}
+													</div>
+												</div>
+											);
+										})}
+									</div>
+								</div>
+							);
+						})()}
 
 						<div className="grid grid-cols-2 gap-3">
 							<div className="flex flex-col gap-1.5">

@@ -1,14 +1,20 @@
 import {
+	IconAward,
 	IconBan,
+	IconCheck,
 	IconCircleX,
 	IconDeviceMobile,
 	IconDots,
 	IconEdit,
 	IconEye,
+	IconHeartHandshake,
 	IconMail,
+	IconMapPin,
 	IconPhone,
 	IconPlus,
+	IconSchool,
 	IconTrash,
+	IconUsers,
 } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
@@ -19,9 +25,10 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { TableDataView } from "@/components/common/table-data-view";
 import { TableToolbar } from "@/components/common/table-toolbar";
+import { type FilterGroup, FiltersMenu } from "@/components/common/filters-menu";
 import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
 import { GuardianHoverCard, StudentHoverCard } from "@/components/common/hover-cards";
 import { Button } from "@/components/ui/button";
@@ -79,30 +86,64 @@ function OwnerAvatar({ name }: { name: string }) {
 	);
 }
 
-function PetIcons({ patients }: { patients: OwnerResponse["patients"] }) {
+const PATIENT_RELATIONSHIP_LABELS: Record<string, string> = {
+	FATHER: "أب",
+	MOTHER: "أم",
+	GUARDIAN: "وصي / كفيل",
+	OTHER: "أخرى",
+	OWNER: "وليّ أمر",
+	DELEGATE: "مفوض",
+	EMERGENCY: "طوارئ",
+};
+
+function PetIcons({
+	patients,
+	patientRelationships,
+	ownerName,
+	ownerPhone,
+}: {
+	patients: OwnerResponse["patients"];
+	patientRelationships?: Record<string, string>;
+	ownerName?: string;
+	ownerPhone?: string;
+}) {
 	if (!patients || patients.length === 0) {
 		return <span className="text-[11px] text-muted-foreground">—</span>;
 	}
 	return (
 		<AvatarCirclesStack
-			items={patients.map((patient) => ({
-				id: patient.id,
-				name: patient.name,
-				title: patient.name,
-				data: patient,
-			}))}
+			items={patients.map((patient) => {
+				const rawRel = patient.relationship || patientRelationships?.[patient.id];
+				const relLabel = rawRel ? PATIENT_RELATIONSHIP_LABELS[rawRel] || rawRel : undefined;
+				return {
+					id: patient.id,
+					name: patient.name,
+					title: relLabel ? `${patient.name} (${relLabel})` : patient.name,
+					data: patient,
+				};
+			})}
 			variant="mauve"
 			maxVisible={3}
-			renderItem={(item, element) => (
-				<StudentHoverCard
-					student={{
-						id: String(item.id),
-						name: item.name,
-					}}
-				>
-					{element}
-				</StudentHoverCard>
-			)}
+			renderItem={(item, element) => {
+				const patient = item.data as OwnerResponse["patients"][number];
+				const rawRel = patient?.relationship || patientRelationships?.[patient?.id];
+				const relLabel = rawRel ? PATIENT_RELATIONSHIP_LABELS[rawRel] || rawRel : undefined;
+				return (
+					<StudentHoverCard
+						student={{
+							id: String(item.id),
+							name: item.name,
+							code: patient?.code,
+							gender: patient?.gender,
+							guardianName: ownerName,
+							guardianPhone: ownerPhone,
+							guardianRelationship: relLabel,
+						}}
+					>
+						{element}
+					</StudentHoverCard>
+				);
+			}}
 		/>
 	);
 }
@@ -178,7 +219,30 @@ const RELATIONSHIP_CONFIG: Record<
 	},
 };
 
-function RelationshipBadge({ value }: { value: OwnerRelationship | null }) {
+function RelationshipBadge({
+	value,
+	patients,
+	patientRelationships,
+}: {
+	value: OwnerRelationship | null;
+	patients?: OwnerResponse["patients"];
+	patientRelationships?: Record<string, string>;
+}) {
+	const relLabels = (patients ?? [])
+		.map((p) => p.relationship || patientRelationships?.[p.id])
+		.filter(Boolean)
+		.map((rel) => PATIENT_RELATIONSHIP_LABELS[rel!] || rel!);
+
+	const uniqueRelLabels = Array.from(new Set(relLabels));
+
+	if (uniqueRelLabels.length > 0) {
+		return (
+			<span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium border bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+				{uniqueRelLabels.join("، ")}
+			</span>
+		);
+	}
+
 	if (!value) return <span className="text-muted-foreground text-[11px]">—</span>;
 	const config = RELATIONSHIP_CONFIG[value];
 	return (
@@ -209,6 +273,14 @@ export function OwnersTable() {
 	const [deletingOwner, setDeletingOwner] = useState<OwnerResponse | null>(null);
 	const [portalOwner, setPortalOwner] = useState<OwnerResponse | null>(null);
 	const [disablingOwner, setDisablingOwner] = useState<OwnerResponse | null>(null);
+
+	// فلاتر جدول أولياء الأمور
+	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+	const [selectedRelationships, setSelectedRelationships] = useState<string[]>([]);
+	const [selectedStudentFilters, setSelectedStudentFilters] = useState<string[]>([]);
+	const [selectedTypes, setSelectedTypes] = useState<string[]>([]);
+	const [selectedCities, setSelectedCities] = useState<string[]>([]);
+
 	const { owners, isLoading } = useOwners();
 	const { updateOwner, isPending: isUpdating } = useUpdateOwner();
 
@@ -285,14 +357,27 @@ export function OwnersTable() {
 				header: "الطلاب",
 				size: 110,
 				minSize: 95,
-				cell: ({ row }) => <PetIcons patients={row.original.patients} />,
+				cell: ({ row }) => (
+					<PetIcons
+						patients={row.original.patients}
+						patientRelationships={row.original.patientRelationships}
+						ownerName={row.original.name}
+						ownerPhone={row.original.phone}
+					/>
+				),
 			},
 			{
 				accessorKey: "relationship",
 				header: "صلة القرابة",
 				size: 100,
 				minSize: 85,
-				cell: ({ row }) => <RelationshipBadge value={row.original.relationship} />,
+				cell: ({ row }) => (
+					<RelationshipBadge
+						value={row.original.relationship}
+						patients={row.original.patients}
+						patientRelationships={row.original.patientRelationships}
+					/>
+				),
 			},
 			{
 				id: "spending",
@@ -411,14 +496,155 @@ export function OwnersTable() {
 		[isUpdating, updateOwner, navigate],
 	);
 
+	// تصفية أولياء الأمور حسب الفلاتر المحددة
+	const filteredOwners = useMemo(() => {
+		return owners.filter((owner) => {
+			if (selectedStatuses.length > 0) {
+				const statusKey = owner.active ? "ACTIVE" : "INACTIVE";
+				if (!selectedStatuses.includes(statusKey)) return false;
+			}
+			if (selectedRelationships.length > 0) {
+				if (!owner.relationship || !selectedRelationships.includes(owner.relationship)) return false;
+			}
+			if (selectedStudentFilters.length > 0) {
+				const hasStudents = Boolean(owner.patients && owner.patients.length > 0);
+				const match = selectedStudentFilters.some((sel) => {
+					if (sel === "HAS_STUDENTS") return hasStudents;
+					if (sel === "NO_STUDENTS") return !hasStudents;
+					return true;
+				});
+				if (!match) return false;
+			}
+			if (selectedTypes.length > 0) {
+				if (!owner.ownerType || !selectedTypes.includes(owner.ownerType)) return false;
+			}
+			if (selectedCities.length > 0) {
+				const city = owner.city?.trim() || "";
+				if (!selectedCities.includes(city)) return false;
+			}
+			return true;
+		});
+	}, [
+		owners,
+		selectedStatuses,
+		selectedRelationships,
+		selectedStudentFilters,
+		selectedTypes,
+		selectedCities,
+	]);
+
+	const clearAllFilters = useCallback(() => {
+		setSelectedStatuses([]);
+		setSelectedRelationships([]);
+		setSelectedStudentFilters([]);
+		setSelectedTypes([]);
+		setSelectedCities([]);
+	}, []);
+
+	// تعريف مجموعات التصفية لـ FiltersMenu
+	const filterGroups: FilterGroup[] = useMemo(() => {
+		const uniqueCities = Array.from(
+			new Set(owners.map((o) => o.city?.trim()).filter(Boolean)),
+		).map((c) => ({ value: c as string, label: c as string }));
+
+		const groups: FilterGroup[] = [
+			{
+				key: "status",
+				label: "الحالة",
+				Icon: IconCheck,
+				options: [
+					{ value: "ACTIVE", label: "نشط" },
+					{ value: "INACTIVE", label: "غير نشط" },
+				],
+				selected: selectedStatuses,
+				onToggle: (val) =>
+					setSelectedStatuses((prev) =>
+						prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val],
+					),
+			},
+			{
+				key: "relationship",
+				label: "صلة القرابة",
+				Icon: IconHeartHandshake,
+				options: [
+					{ value: "OWNER", label: "وليّ أمر" },
+					{ value: "GUARDIAN", label: "وصي" },
+					{ value: "DELEGATE", label: "مفوض" },
+					{ value: "EMERGENCY", label: "طوارئ" },
+				],
+				selected: selectedRelationships,
+				onToggle: (val) =>
+					setSelectedRelationships((prev) =>
+						prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val],
+					),
+			},
+			{
+				key: "students",
+				label: "الطلاب المرتبطون",
+				Icon: IconSchool,
+				options: [
+					{ value: "HAS_STUDENTS", label: "لديه طلاب مسجلون" },
+					{ value: "NO_STUDENTS", label: "بدون طلاب مسجلين" },
+				],
+				selected: selectedStudentFilters,
+				onToggle: (val) =>
+					setSelectedStudentFilters((prev) =>
+						prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val],
+					),
+			},
+			
+		];
+
+		if (uniqueCities.length > 0) {
+			groups.push({
+				key: "city",
+				label: "المدينة",
+				Icon: IconMapPin,
+				options: uniqueCities,
+				selected: selectedCities,
+				onToggle: (val) =>
+					setSelectedCities((prev) =>
+						prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val],
+					),
+			});
+		}
+
+		return groups;
+	}, [
+		owners,
+		selectedStatuses,
+		selectedRelationships,
+		selectedStudentFilters,
+		selectedTypes,
+		selectedCities,
+	]);
+
 	const table = useReactTable({
-		data: owners,
+		data: filteredOwners,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
-		globalFilterFn: "includesString",
+		globalFilterFn: (row, _columnId, filterValue) => {
+			const search = String(filterValue).toLowerCase().trim();
+			if (!search) return true;
+			const o = row.original;
+			const name = o.name || "";
+			const code = o.code || "";
+			const phone = o.phone || "";
+			const email = o.email || "";
+			const city = o.city || "";
+			const students = (o.patients || []).map((p) => p.name).join(" ");
+			return (
+				name.toLowerCase().includes(search) ||
+				code.toLowerCase().includes(search) ||
+				phone.toLowerCase().includes(search) ||
+				email.toLowerCase().includes(search) ||
+				city.toLowerCase().includes(search) ||
+				students.toLowerCase().includes(search)
+			);
+		},
 	});
 
 	return (
@@ -450,9 +676,17 @@ export function OwnersTable() {
 			<div className="flex min-h-0 flex-1 flex-col">
 				<TableToolbar
 					className="border-t"
-					searchPlaceholder="ابحث باسم وليّ الأمر أو رقم الهاتف..."
+					searchPlaceholder="ابحث باسم وليّ الأمر، الطالب، الهاتف، أو البريد..."
 					searchValue={(table.getState().globalFilter as string) ?? ""}
 					onSearchChange={(v) => table.setGlobalFilter(v)}
+					filterMenu={
+						<FiltersMenu
+							groups={filterGroups}
+							size="sm"
+							label="فلترة"
+							onReset={clearAllFilters}
+						/>
+					}
 					actions={
 						<Button
 							size="sm"

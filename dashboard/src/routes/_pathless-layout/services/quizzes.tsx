@@ -1,17 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-import { QuizzesHeader } from "@/features/services/training/components/quizzes-header";
-import { QuizzesView } from "@/features/services/training/components/quizzes-view";
-
+// إعادة توجيه مسار التقييمات القديم إلى التبويب الداخلي لوحدة إدارة المحتوى
 export const Route = createFileRoute("/_pathless-layout/services/quizzes")({
-	component: QuizzesRouteComponent,
+	beforeLoad: () => {
+		throw redirect({
+			to: "/services/training",
+			search: { tab: "quizzes" },
+		});
+	},
+	component: () => null,
 });
-
-function QuizzesRouteComponent() {
-	return (
-		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<QuizzesHeader />
-			<QuizzesView />
-		</div>
-	);
-}

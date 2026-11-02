@@ -183,13 +183,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 						title: t("sidebar.items.training"),
 						url: "/services/training",
 						icon: <IconCertificate className="size-[14px]" />,
-						isActive: isActive("/services/training"),
-					},
-					{
-						title: t("sidebar.items.quizzes"),
-						url: "/services/quizzes",
-						icon: <IconChecklist className="size-[14px]" />,
-						isActive: isActive("/services/quizzes"),
+						isActive: pathname.startsWith("/services/training") || pathname.startsWith("/services/quizzes"),
 					},
 					{
 						title: t("sidebar.items.shifts"),

@@ -25,6 +25,7 @@ import {
 import { useCreatePatient } from "@/features/services/patients/hooks/use-create-patient";
 import { useOwners } from "@/features/services/patients/hooks/use-owners";
 import { useUpdatePatient } from "@/features/services/patients/hooks/use-update-patient";
+import { calculateAge, getAgeGroupFromAge } from "@/features/services/classrooms/utils/age-group-utils";
 
 export interface AddPatientSheetProps {
 	open: boolean;
@@ -112,9 +113,16 @@ export function AddPatientSheet({
 				? (initialRelationships[initialOwnerIds[0]] ?? "FATHER")
 				: normalizeRelationship(patient.guardianRelationship);
 
+			const birthDateInput = toDateInput(patient.birthDate);
+			const derivedAgeGroup =
+				(patient as { ageGroup?: string | null }).ageGroup ||
+				(patient.birthDate ? getAgeGroupFromAge(calculateAge(patient.birthDate) ?? -1) : null) ||
+				"";
+
 			reset({
 				name: patient.name ?? "",
-				birthDate: toDateInput(patient.birthDate),
+				birthDate: birthDateInput,
+				ageGroup: derivedAgeGroup,
 				nationalId: patient.nationalId ?? "",
 				gender: patient.gender ?? "MALE",
 				classroom: patient.classroom ?? "",
@@ -212,7 +220,8 @@ export function AddPatientSheet({
 			const b = new Date(data.birthDate);
 			if (!Number.isNaN(b.getTime())) {
 				const now = new Date();
-				age = Math.max(0, now.getFullYear() - b.getFullYear());
+				const calcAge = now.getFullYear() - b.getFullYear();
+				if (calcAge > 0) age = calcAge;
 			}
 		}
 
@@ -232,6 +241,8 @@ export function AddPatientSheet({
 		const primaryRelationship =
 			guardianItems[0]?.relationship || data.guardianRelationship || "FATHER";
 
+		const finalAgeGroup = data.ageGroup || (age != null ? getAgeGroupFromAge(age) : undefined);
+
 		if (isEdit && patient) {
 			const { active: _active, ...updateData } = data;
 			const updated = await updatePatient(patient.id, {
@@ -241,6 +252,7 @@ export function AddPatientSheet({
 				guardians: guardianItems,
 				guardianRelationship: primaryRelationship,
 				age,
+				ageGroup: finalAgeGroup,
 			});
 			await onSuccess?.(updated as unknown as PatientResponse);
 			reset();
@@ -253,6 +265,7 @@ export function AddPatientSheet({
 				guardians: guardianItems,
 				guardianRelationship: primaryRelationship,
 				age,
+				ageGroup: finalAgeGroup,
 			});
 			await onSuccess?.(created);
 			reset();

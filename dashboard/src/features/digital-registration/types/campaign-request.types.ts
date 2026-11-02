@@ -35,10 +35,12 @@ export interface CampaignRequestItem {
 		| "QUEUE"
 		| "SHORTLIST"
 		| "INTERVIEW"
+		| "ACCEPTED"
+		| "AWAITING_PAYMENT"
+		| "REJECTED"
+		| "DUPLICATE"
 		| "IN_EVALUATION"
 		| "WAITLIST"
-		| "ACCEPTED"
-		| "REJECTED"
 		| "EVALUATION"
 		| "REVIEW"
 		| "AWAITING_REPLY";
@@ -58,8 +60,12 @@ export interface CampaignRequestItem {
 	guardianPhone: string;
 	guardianEmail?: string | null;
 	guardianNationalId?: string | null;
+	source?: "WEBSITE" | "DIRECT_LINK" | "REFERRAL" | "SOCIAL" | "OTHER";
+	channel?: "CALL" | "ACADEMY";
+	meetingUrl?: string | null;
 	tags: { label: string; variant: "warning" | "destructive" | "default" }[];
 	date: string;
+	submittedAt?: string | null;
 	documents: {
 		count: number;
 		total: number;
@@ -91,6 +97,29 @@ export interface CampaignRequestItem {
 		durationMinutes: number;
 		staffName?: string | null;
 	} | null;
+	proposedTrack?: string | null;
+	interviewDurationMinutes?: number;
+	attendanceProbability?: number;
+	subscriptionPlanId?: string | null;
+	subscriptionPlanName?: string | null;
+	subscriptionAmount?: number | null;
+	includeMeals?: boolean;
+	enableDailyStipend?: boolean;
+	medications?: Array<{ id?: string; name: string; dose?: string; timing?: string } | string>;
+	allergiesList?: string[];
+	assignedStaffId?: string | null;
+	assignedStaff?: { id: string; name: string; image?: string | null } | null;
+	reviewerId?: string | null;
+	reviewerName?: string | null;
+	referredToStaffId?: string | null;
+	referredToStaff?: { id: string; name: string; image?: string | null } | null;
+	referralReason?: string | null;
+	rejectionReason?: string | null;
+	rejectionNotes?: string | null;
+	deletionReason?: string | null;
+	deletionNotes?: string | null;
+	queueRank?: number;
+	estimatedWait?: string;
 }
 
 export interface RequestNotificationItem {

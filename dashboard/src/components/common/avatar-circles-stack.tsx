@@ -4,6 +4,7 @@ export interface AvatarCircleItem {
 	id: string | number;
 	name: string;
 	title?: string;
+	image?: string | null;
 	data?: any;
 }
 
@@ -78,7 +79,7 @@ export interface AvatarCirclesStackProps {
 export function AvatarCirclesStack({
 	items,
 	maxVisible = 3,
-	variant = "pastel",
+	variant = "mauve",
 	className,
 	emptyText = "—",
 	onItemClick,
@@ -96,57 +97,75 @@ export function AvatarCirclesStack({
 			className={cn("flex items-center gap-1.5 w-fit", className)}
 			dir="rtl"
 		>
-			<div className="flex items-center -space-x-2 space-x-reverse">
+			<div className="flex items-center isolate">
 				{visible.map((item, idx) => {
 					const initial = getInitialLetter(item.name);
 					const tooltip = item.title || item.name;
+					const isFirst = idx === 0;
+					const zIndex = idx + 1;
 
-					let circleEl: React.ReactElement;
+					const color =
+						variant === "mauve" ? null : getPastelColor(idx, item.name);
 
-					if (variant === "mauve") {
-						circleEl = (
-							<div
-								key={item.id ?? idx}
-								className="flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-background bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#7C3AED]/25 dark:text-[#DDD6FE] text-xs font-semibold shadow-2xs transition-transform hover:scale-110 hover:z-20 cursor-default select-none"
-								title={renderItem ? undefined : tooltip}
-								onClick={(e) => {
-									if (onItemClick) {
-										e.stopPropagation();
-										onItemClick(item);
-									}
-								}}
-							>
-								{initial}
-							</div>
-						);
-					} else {
-						const color = getPastelColor(idx, item.name);
-						circleEl = (
-							<div
-								key={item.id ?? idx}
-								className={cn(
-									"flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-background text-xs font-semibold shadow-2xs transition-transform hover:scale-110 hover:z-20 cursor-default select-none",
-									color.bg,
-									color.text,
-									color.darkBg,
-									color.darkText,
-								)}
-								title={renderItem ? undefined : tooltip}
-								onClick={(e) => {
-									if (onItemClick) {
-										e.stopPropagation();
-										onItemClick(item);
-									}
-								}}
-							>
-								{initial}
-							</div>
-						);
-					}
+					const circleEl = (
+						<div
+							key={item.id ?? idx}
+							style={
+								renderItem
+									? undefined
+									: {
+											zIndex,
+											marginInlineStart: isFirst ? 0 : "-9px",
+										}
+							}
+							className={cn(
+								"relative flex size-6.5 shrink-0 items-center justify-center rounded-full ring-2 ring-background text-[11px] font-bold shadow-2xs select-none overflow-hidden",
+								!renderItem && [
+									"transition-transform hover:scale-115 hover:z-30 cursor-default",
+									!isFirst && "-ms-2.5",
+								],
+								variant === "mauve"
+									? "bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#7C3AED]/25 dark:text-[#DDD6FE]"
+									: cn(
+											color?.bg,
+											color?.text,
+											color?.darkBg,
+											color?.darkText,
+										),
+							)}
+							title={renderItem ? undefined : tooltip}
+							onClick={(e) => {
+								if (onItemClick) {
+									e.stopPropagation();
+									onItemClick(item);
+								}
+							}}
+						>
+							{item.image ? (
+								<img
+									src={item.image}
+									alt={item.name}
+									className="size-full rounded-full object-cover"
+								/>
+							) : (
+								initial
+							)}
+						</div>
+					);
 
 					if (renderItem) {
 						return (
-							<div key={item.id ?? idx} className="shrink-0">
+							<div
+								key={item.id ?? idx}
+								className={cn(
+									"relative shrink-0 transition-transform hover:scale-115 hover:z-30",
+									!isFirst && "-ms-2.5",
+								)}
+								style={{
+									zIndex,
+									marginInlineStart: isFirst ? 0 : "-9px",
+								}}
+							>
 								{renderItem(item, circleEl)}
 							</div>
 						);

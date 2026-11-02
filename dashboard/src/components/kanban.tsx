@@ -77,7 +77,7 @@ export const KanbanBoard = ({ id, children, className }: KanbanBoardProps) => {
 	return (
 		<div
 			className={cn(
-				"flex size-full min-h-40 flex-col divide-y overflow-hidden rounded-md bg-secondary text-xs shadow-sm ring-2 transition-all",
+				"flex size-full min-h-[calc(100vh-190px)] flex-col divide-y rounded-md bg-secondary text-xs shadow-sm ring-2 transition-all",
 				isOver ? "ring-primary" : "ring-transparent",
 				className,
 			)}
@@ -167,19 +167,22 @@ export const KanbanCards = <T extends KanbanItemProps = KanbanItemProps>({
 	const items = filteredData.map((item) => item.id);
 
 	return (
-		// منطقة البطاقات هي الجزء المرن في العمود: تأخذ المساحة المتبقية وتمرّر داخليًا
-		// بدل أن تمتد بطول البطاقات فتتجاوز حدود اللوحة
-		<ScrollArea className="min-h-0 flex-1 overflow-hidden">
+		<div className="flex-1 flex flex-col min-h-[220px]">
 			<SortableContext items={items}>
 				<div
-					className={cn("flex flex-grow flex-col gap-2 p-2", className)}
+					className={cn("flex flex-grow flex-col gap-2 p-2 min-h-[220px]", className)}
 					{...props}
 				>
-					{filteredData.map(children)}
+					{filteredData.length > 0 ? (
+						filteredData.map(children)
+					) : (
+						<div className="flex flex-1 flex-col items-center justify-center py-12 text-center text-muted-foreground/40 text-[11px] select-none border border-dashed border-border/40 rounded-lg m-1 min-h-[160px]">
+							<span>لا توجد طلبات في هذه المرحلة</span>
+						</div>
+					)}
 				</div>
 			</SortableContext>
-			<ScrollBar orientation="vertical" />
-		</ScrollArea>
+		</div>
 	);
 };
 

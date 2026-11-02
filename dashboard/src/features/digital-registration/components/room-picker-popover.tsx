@@ -275,7 +275,7 @@ export function RoomPickerPopover({
 									el.scrollTop = target;
 								}
 							}}
-							className="max-h-56 overflow-y-auto overscroll-contain space-y-0.5 p-0.5 select-none [scrollbar-width:thin] [scrollbar-color:hsl(var(--muted-foreground)/0.3)_transparent]"
+							className="max-h-56 overflow-y-auto overscroll-contain space-y-0.5 p-0.5 select-none sanad-scrollbar"
 						>
 							{isLoading ? (
 								<div className="py-5 text-center text-xs text-muted-foreground">

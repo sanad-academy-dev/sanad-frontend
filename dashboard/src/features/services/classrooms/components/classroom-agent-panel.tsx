@@ -3,31 +3,12 @@ import {
 	IconCube,
 	IconPaperclip,
 	IconArrowUp,
-	IconChevronDown,
 	IconX,
 	IconCheck,
-	IconSparkles,
-	IconRefresh,
-	IconLayoutSidebarRightCollapse,
-	IconLayoutSidebar,
-	IconCode,
-	IconRobot,
-	IconBrain,
-	IconSchool,
-	IconFileDescription,
-	IconUsers,
-	IconCalendarPlus,
 	IconArrowBackUp,
+	IconArrowsDiagonalMinimize2,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { SanadLogo } from "@/components/common/sanad-logo";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
@@ -52,6 +33,7 @@ export interface ClassroomAgentFormState {
 
 export interface ClassroomAgentPanelProps {
 	onClose: () => void;
+	onCloseDialog?: () => void;
 	onApplyData: (data: Partial<ClassroomAgentFormState>) => void;
 	currentValues: ClassroomAgentFormState;
 }
@@ -149,48 +131,9 @@ function IsometricCubesPattern() {
 	);
 }
 
-// قائمة المهارات الذكية المتاحة في القائمة السفلية
-const AGENT_SKILLS = [
-	{
-		id: "full-auto",
-		label: "صياغة وتوليد البيانات كاملة",
-		icon: IconSparkles,
-		prompt: "قم بصياغة متكاملة لبيانات فصل جديد بالاسم والكود والوصف والخصائص المناسبة",
-	},
-	{
-		id: "coding-kids",
-		label: "مسار البرمجة للأطفال (8-12 سنة)",
-		icon: IconCode,
-		prompt: "أريد صياغة فصل لتعليم البرمجة للأطفال من سن 8 إلى 12 سنة بنمط عن بعد",
-	},
-	{
-		id: "robotics-teens",
-		label: "الروبوت والذكاء الاصطناعي (13-16 سنة)",
-		icon: IconRobot,
-		prompt: "أريد صياغة فصل روبوتكس وذكاء اصطناعي تفاعلي حضوري في مختبر الابتكار",
-	},
-	{
-		id: "scope-desc",
-		label: "اقتراح وصف وأهداف تعليمية",
-		icon: IconFileDescription,
-		prompt: "اقترح وصفاً شاملاً وأهدافاً تعليمية واضحة للفصل",
-	},
-	{
-		id: "capacity-schedule",
-		label: "تخطيط السعة ونمط التعلم",
-		icon: IconCalendarPlus,
-		prompt: "حدد السعة المثالية ونمط التعلم المناسب للفصل",
-	},
-	{
-		id: "team-staff",
-		label: "توزيع الموظفين والمدربين",
-		icon: IconUsers,
-		prompt: "اقترح أفضل تشكيل لفريق التدريب والمشرفين لهذا الفصل",
-	},
-];
-
 export function ClassroomAgentPanel({
 	onClose,
+	onCloseDialog,
 	onApplyData,
 	currentValues,
 }: ClassroomAgentPanelProps) {
@@ -385,13 +328,13 @@ export function ClassroomAgentPanel({
 	return (
 		<aside
 			aria-label="لوحة سند لصياغة الفصل مع الذكاء الاصطناعي"
-			className="w-full md:w-[380px] lg:w-[410px] shrink-0 border-s border-border bg-white dark:bg-card/95 flex flex-col justify-between overflow-hidden relative transition-all duration-300"
+			className="w-full md:w-1/2 flex-1 min-w-0 border-0 border-none bg-[#F8F9FA] dark:bg-muted/25 flex flex-col justify-between overflow-hidden relative transition-all duration-300 animate-in fade-in-0"
 		>
-			{/* 1. الترويسة العلوية للوحة الذكاء الاصطناعي (أزرار إخفاء وإغلاق كما في الصورة المرفقة) */}
-			<div className="flex items-center justify-between px-3.5 py-2.5 border-b border-border/50 shrink-0 bg-background/50 backdrop-blur-xs">
-				{/* اليمين في RTL: شارة سند الذكي */}
+			{/* 1. الترويسة العلوية للوحة المساعد الذكي بمحاذاة ترويسة النموذج تماماً وبنفس الارتفاع والحجم */}
+			<div className="flex h-10 items-center justify-between gap-2 border-b border-border px-4 shrink-0 bg-transparent">
+				{/* البداية (اليمين في RTL): شارة سند الذكي وزر بدء جلسة جديدة */}
 				<div className="flex items-center gap-1.5">
-					<div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-medium">
+					<div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-semibold">
 						<SanadLogo iconOnly className="size-3" />
 						<span>سند الذكي</span>
 					</div>
@@ -401,48 +344,47 @@ export function ClassroomAgentPanel({
 							variant="ghost"
 							size="icon-xs"
 							onClick={handleResetChat}
-							className="size-7 text-muted-foreground hover:text-foreground rounded-md cursor-pointer"
+							className="size-6 text-muted-foreground hover:text-foreground rounded-md cursor-pointer"
 							title="بدء صياغة جديدة"
 						>
-							<IconArrowBackUp className="size-3.5" />
+							<IconArrowBackUp className="size-3" />
 						</Button>
 					)}
 				</div>
 
-				{/* اليسار في RTL: زر إخفاء وزر الإغلاق X مطابق تماماً للصورة */}
-				<div className="flex items-center gap-1.5">
-					{/* زر إخفاء مع أيقونة سايدبار مطابق تماماً للصورة المرفقة */}
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						onClick={onClose}
-						className="h-7 px-2.5 text-xs gap-1.5 rounded-full border border-border bg-background hover:bg-muted text-muted-foreground hover:text-foreground font-medium cursor-pointer"
-						title="إخفاء لوحة المساعد"
-					>
-						<span>إخفاء</span>
-						<IconLayoutSidebarRightCollapse className="size-3.5" />
-					</Button>
-
-					{/* زر الإغلاق X */}
+				{/* النهاية (اليسار في RTL): أزرار التصغير والإغلاق المتوافقة مع أسلوب المنصة */}
+				<div className="flex items-center gap-0.5">
+					{/* زر تصغير / إخفاء المساعد بأيقونة السهمين المائلين */}
 					<Button
 						type="button"
 						variant="ghost"
 						size="icon-xs"
 						onClick={onClose}
-						className="size-7 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer"
-						title="إغلاق لوحة سند"
+						className="size-7 text-muted-foreground hover:text-foreground cursor-pointer rounded-md"
+						title="تصغير وإخفاء المساعد"
 					>
-						<IconX className="size-4" />
+						<IconArrowsDiagonalMinimize2 className="size-3.5" />
+					</Button>
+
+					{/* زر إغلاق النافذة المنبثقة كاملة */}
+					<Button
+						type="button"
+						variant="ghost"
+						size="icon-xs"
+						onClick={onCloseDialog || onClose}
+						className="size-7 text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer rounded-md"
+						title="إغلاق النافذة"
+					>
+						<IconX className="size-3.5" />
 					</Button>
 				</div>
 			</div>
 
-			{/* 2. المحتوى الداخلي: في حالة عدم وجود رسائل يظهر التصميم المطابق 100% للصورة المرفقة */}
+			{/* 2. المحتوى الداخلي */}
 			<div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col justify-center relative">
 				{messages.length === 0 ? (
 					<div className="flex flex-col items-center justify-center text-center my-auto animate-in fade-in-50 duration-300">
-						{/* شبكة المكعبات الأيزومترية المطابقة للصورة */}
+						{/* شبكة المكعبات الأيزومترية */}
 						<div className="relative flex justify-center mb-1">
 							<IsometricCubesPattern />
 						</div>
@@ -452,49 +394,13 @@ export function ClassroomAgentPanel({
 							<IconCube className="size-5 stroke-[1.8]" />
 						</div>
 
-						{/* العنوان الرئيسي والوصف المطابق للصورة */}
+						{/* العنوان الرئيسي والوصف الموحد لصياغة الفصل */}
 						<h3 className="text-sm font-bold text-foreground mb-1 tracking-tight">
-							صياغة مشروع جديد
+							صياغة فصل دراسي جديد
 						</h3>
-						<p className="text-[11px] text-muted-foreground max-w-[270px] leading-relaxed mb-4">
-							يحدد المشروع نتيجة واضحة وموعداً للإنجاز، ويجمع المهام والمستندات المرتبطة به.
+						<p className="text-[11px] text-muted-foreground max-w-[300px] leading-relaxed">
+							يساعدك سند الذكي في توليد بيانات الفصل، اقتراح السعة المثالية، تحديد نمط التعلم، وصياغة الأهداف التعليمية.
 						</p>
-
-						{/* أزرار الاقتراحات السريعة (Pill Chips) المطابقة تماماً للصورة */}
-						<div className="flex flex-col items-center gap-1.5 w-full max-w-[320px]">
-							<div className="flex items-center justify-center gap-1.5 flex-wrap">
-								<button
-									type="button"
-									onClick={() => handleGenerate("حدّد النطاق والأهداف التعليمية لهذا الفصل")}
-									className="rounded-full border border-border/80 bg-background/90 dark:bg-card/90 px-3 py-1 text-xs text-foreground/80 font-medium hover:border-primary/50 hover:bg-muted hover:text-foreground transition-all cursor-pointer shadow-2xs hover:scale-102 active:scale-98"
-								>
-									حدّد النطاق
-								</button>
-								<button
-									type="button"
-									onClick={() => handleGenerate("ابحث في طلبات العملاء والطلاب الأكثر إقبالاً")}
-									className="rounded-full border border-border/80 bg-background/90 dark:bg-card/90 px-3 py-1 text-xs text-foreground/80 font-medium hover:border-primary/50 hover:bg-muted hover:text-foreground transition-all cursor-pointer shadow-2xs hover:scale-102 active:scale-98"
-								>
-									ابحث في طلبات العملاء
-								</button>
-								<button
-									type="button"
-									onClick={() => handleGenerate("خطط الجدول الزمني ونمط التعلم المناسب")}
-									className="rounded-full border border-border/80 bg-background/90 dark:bg-card/90 px-3 py-1 text-xs text-foreground/80 font-medium hover:border-primary/50 hover:bg-muted hover:text-foreground transition-all cursor-pointer shadow-2xs hover:scale-102 active:scale-98"
-								>
-									خطط الجدول الزمني
-								</button>
-							</div>
-							<div className="flex items-center justify-center">
-								<button
-									type="button"
-									onClick={() => handleGenerate("اختر الفريق التدريسي والمشرفين الملائمين")}
-									className="rounded-full border border-border/80 bg-background/90 dark:bg-card/90 px-3 py-1 text-xs text-foreground/80 font-medium hover:border-primary/50 hover:bg-muted hover:text-foreground transition-all cursor-pointer shadow-2xs hover:scale-102 active:scale-98"
-								>
-									اختر الفريق
-								</button>
-							</div>
-						</div>
 					</div>
 				) : (
 					/* عرض سجل الرسائل التفاعلية عند بدء المحادثة */
@@ -540,6 +446,7 @@ export function ClassroomAgentPanel({
 														<IconCheck className="size-3" /> تم التطبيق
 													</span>
 												) : (
+														
 													<button
 														type="button"
 														onClick={() =>
@@ -551,6 +458,7 @@ export function ClassroomAgentPanel({
 													</button>
 												)}
 											</div>
+
 											<div className="grid grid-cols-2 gap-1.5 text-[10px] bg-background/80 dark:bg-card/80 p-2 rounded-lg border border-border/40">
 												{msg.suggestedData.name && (
 													<div className="col-span-2">
@@ -602,22 +510,22 @@ export function ClassroomAgentPanel({
 				)}
 			</div>
 
-			{/* 3. صندوق الإدخال السفلي المطابق تماماً لتصميم الصورة المرفقة */}
-			<div className="p-3 bg-muted/20 border-t border-border/50 shrink-0">
+			{/* 3. صندوق الإدخال السفلي لصياغة الفصل */}
+			<div className="p-3 bg-transparent border-t border-border/40 shrink-0">
 				{attachedFileName && (
 					<div className="flex items-center justify-between text-[11px] bg-primary/10 text-primary px-2.5 py-1 rounded-lg mb-2">
 						<span className="truncate">ملف مرفق: {attachedFileName}</span>
 						<button
 							type="button"
 							onClick={() => setAttachedFileName(null)}
-							className="text-muted-foreground hover:text-destructive"
+							className="text-muted-foreground hover:text-destructive cursor-pointer"
 						>
 							<IconX className="size-3" />
 						</button>
 					</div>
 				)}
 
-				<div className="rounded-2xl border border-border/80 bg-background p-2.5 shadow-2xs focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/10 transition-all">
+				<div className="rounded-2xl border border-border/80 bg-background dark:bg-card p-2.5 shadow-2xs focus-within:border-primary/40 focus-within:ring-2 focus-within:ring-primary/10 transition-all">
 					{/* حقل النص */}
 					<textarea
 						ref={textareaRef}
@@ -629,50 +537,16 @@ export function ClassroomAgentPanel({
 								handleGenerate();
 							}
 						}}
-						placeholder="ضع مشروعك مع مدير..."
+						placeholder="اطلب من سند صياغة بيانات الفصل الدراسي..."
 						rows={2}
 						className="w-full text-xs bg-transparent border-0 resize-none outline-none focus:ring-0 placeholder:text-muted-foreground/60 leading-relaxed text-right"
 					/>
 
-					{/* شريط الأدوات السفلي داخل الصندوق (المهارات يمين + إرفاق وإرسال يسار) */}
+					{/* شريط الأدوات السفلي داخل الصندوق (إرفاق وإرسال) */}
 					<div className="flex items-center justify-between pt-1 border-t border-border/30 mt-1">
-						{/* قائمة المهارات الذكية المنسدلة */}
-						<DropdownMenu dir="rtl">
-							<DropdownMenuTrigger asChild>
-								<Button
-									type="button"
-									variant="ghost"
-									size="sm"
-									className="h-6 px-2 text-[11px] gap-1 text-muted-foreground hover:text-foreground font-medium rounded-md cursor-pointer"
-								>
-									<IconCube className="size-3 text-muted-foreground" />
-									<span>المهارات</span>
-									<IconChevronDown className="size-3 opacity-60" />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								align="start"
-								className="w-56 p-1 rounded-xl shadow-md border bg-popover"
-							>
-								<DropdownMenuLabel className="px-2 py-1 text-[10px] font-semibold text-muted-foreground">
-									مهارات سند الذكية
-								</DropdownMenuLabel>
-								<DropdownMenuSeparator />
-								{AGENT_SKILLS.map((skill) => {
-									const IconComp = skill.icon;
-									return (
-										<DropdownMenuItem
-											key={skill.id}
-											onClick={() => handleGenerate(skill.prompt)}
-											className="cursor-pointer text-xs flex items-center gap-2 py-1.5"
-										>
-											<IconComp className="size-3.5 text-primary shrink-0" />
-											<span>{skill.label}</span>
-										</DropdownMenuItem>
-									);
-								})}
-							</DropdownMenuContent>
-						</DropdownMenu>
+						<span className="text-[10px] text-muted-foreground/60 select-none">
+							اضغط Enter للإرسال
+						</span>
 
 						{/* أزرار الإرفاق والإرسال */}
 						<div className="flex items-center gap-1.5">

@@ -13,6 +13,7 @@ export interface RegistrationStatsProps {
 	waitingCount?: number;
 	acceptedCount?: number;
 	rejectedCount?: number;
+	campaignId?: string;
 }
 
 export function RegistrationStatsBar({

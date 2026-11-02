@@ -46,28 +46,34 @@ import {
 	IconCalendarPlus,
 	IconCheck,
 	IconChevronDown,
+	IconChevronLeft,
 	IconCircle,
+	IconCircleCheckFilled,
+	IconCopy,
 	IconDots,
 	IconHeadset,
 	IconInfoCircle,
 	IconMapPin,
 	IconPhone,
+	IconMail,
 	IconPlus,
+	IconQrcode,
 	IconUser,
 	IconX,
 	IconArrowRight,
 	IconLinkPlus,
 	IconFileFilled,
 } from "@tabler/icons-react";
+import QRCode from "qrcode";
 import { BirthDatePicker } from "./birth-date-picker";
 import { AppointmentPickerPopover } from "./appointment-picker-popover";
 import { RoomPickerPopover } from "./room-picker-popover";
 import { ColumnStatusPicker } from "./column-status-picker";
 import { PriorityPickerPopover } from "./priority-picker-popover";
-import { useCreateRequest } from "../hooks/use-digital-registration";
+import { useCreateRequest, useUpdateRequest } from "../hooks/use-digital-registration";
+import type { CampaignRequestItem } from "../types/campaign-request.types";
 import { backendFetch } from "@/lib/backend-fetch";
 import { useOwners } from "@/features/services/patients/hooks/use-owners";
-import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import { AddStaffSheet } from "@/features/services/staff/components/add-staff-sheet";
 
@@ -76,60 +82,18 @@ interface AddRequestDialogProps {
 	onClose: () => void;
 	campaignId: string;
 	defaultColumn?: string;
+	initialData?: CampaignRequestItem | null;
+	onSuccess?: (result: any) => void;
 }
-
-// قائمة احتياطية للطلاب المسجلين بالنظام عند العمل محلياً
-const DEFAULT_STUDENTS = [
-	{
-		id: "st-1",
-		name: "يوسف أحمد المنصور",
-		birthDate: "19/02/2008",
-		gender: "MALE",
-		guardian: "محمد السالم",
-		guardianPhone: "0551234567",
-	},
-	{
-		id: "st-2",
-		name: "ريما خالد العتيبي",
-		birthDate: "14/05/2010",
-		gender: "FEMALE",
-		guardian: "خالد العتيبي",
-		guardianPhone: "0564567890",
-	},
-	{
-		id: "st-3",
-		name: "عمر سلطان القحطاني",
-		birthDate: "03/11/2009",
-		gender: "MALE",
-		guardian: "سلطان القحطاني",
-		guardianPhone: "0533344556",
-	},
-	{
-		id: "st-4",
-		name: "سارة فهد الدوسري",
-		birthDate: "22/08/2011",
-		gender: "FEMALE",
-		guardian: "فهد الدوسري",
-		guardianPhone: "0543210987",
-	},
-	{
-		id: "st-5",
-		name: "عبدالرحمن عمر الغامدي",
-		birthDate: "07/01/2008",
-		gender: "MALE",
-		guardian: "عمر الغامدي",
-		guardianPhone: "0511223344",
-	},
-];
 
 // Fallback guardians list when database has no owners yet or running locally
 const DEFAULT_GUARDIANS = [
-	{ id: "g-1", name: "محمد السالم", phone: "0551234567" },
-	{ id: "g-2", name: "عبدالله الشمري", phone: "0509876543" },
-	{ id: "g-3", name: "خالد العتيبي", phone: "0564567890" },
-	{ id: "g-4", name: "فهد الدوسري", phone: "0543210987" },
-	{ id: "g-5", name: "سلطان القحطاني", phone: "0533344556" },
-	{ id: "g-6", name: "عمر الغامدي", phone: "0511223344" },
+	{ id: "g-1", name: "محمد السالم", phone: "0551234567", email: "mohammed.salem@example.com" },
+	{ id: "g-2", name: "عبدالله الشمري", phone: "0509876543", email: "abdullah.shamri@example.com" },
+	{ id: "g-3", name: "خالد العتيبي", phone: "0564567890", email: "khaled.otaibi@example.com" },
+	{ id: "g-4", name: "فهد الدوسري", phone: "0543210987", email: "fahad.dossary@example.com" },
+	{ id: "g-5", name: "سلطان القحطاني", phone: "0533344556", email: "sultan.qahtani@example.com" },
+	{ id: "g-6", name: "عمر الغامدي", phone: "0511223344", email: "omar.ghamdi@example.com" },
 ];
 
 // استخراج الحروف الأولى للاسم العربي للأيقونة الدائرية
@@ -145,37 +109,75 @@ function getArabicInitials(name: string): string {
 // تحويل مسميات الحالات السبع للأكواد المعتمدة في قاعدة البيانات
 function statusToEnum(
 	s?: string,
-): "QUEUE" | "SHORTLIST" | "INTERVIEW" | "IN_EVALUATION" | "WAITLIST" | "ACCEPTED" | "REJECTED" {
+): "QUEUE" | "SHORTLIST" | "INTERVIEW" | "ACCEPTED" | "AWAITING_PAYMENT" | "REJECTED" | "DUPLICATE" {
 	if (!s) return "QUEUE";
 	switch (s) {
 		case "shortlist":
 		case "SHORTLIST":
 		case "القائمة المختصرة":
+		case "قائمة مختصرة":
 			return "SHORTLIST";
 		case "interview":
 		case "INTERVIEW":
 		case "المقابلة الشخصية":
+		case "المقابله الشخصيه":
 			return "INTERVIEW";
-		case "evaluation":
-		case "IN_EVALUATION":
-		case "EVALUATION":
-		case "داخل التقييم":
-			return "IN_EVALUATION";
-		case "waitlist":
-		case "WAITLIST":
-		case "قائمة الانتظار":
-			return "WAITLIST";
 		case "accepted":
 		case "ACCEPTED":
 		case "مقبول":
 			return "ACCEPTED";
+		case "awaiting-payment":
+		case "AWAITING_PAYMENT":
+		case "بانتظار الدفع":
+		case "awaiting_payment":
+			return "AWAITING_PAYMENT";
 		case "rejected":
 		case "REJECTED":
 		case "مرفوض":
 			return "REJECTED";
+		case "duplicate":
+		case "DUPLICATE":
+		case "مكرر":
+			return "DUPLICATE";
 		default:
 			return "QUEUE";
 	}
+}
+
+/**
+ * دالة إشعار حفظ التسجيل بنجاح (مطابقة بنسبة 100% لصورة المستخدم d184a7fb)
+ * تظهر في أسفل الشاشة على اليسار مع أيقونة صح خضراء داخل دائرة وزر إغلاق ×
+ * وتستمر لمدة 25 ثانية حتى لا تختفي سريعاً وتبقى واضحة للمستخدم
+ */
+export function showRegistrationSuccessToast(message = "تم تسجيل الطلب بنجاح") {
+	toast.custom(
+		(t) => (
+			<div
+				className="flex items-center justify-between gap-4 min-w-[280px] max-w-[380px] px-4 py-3 bg-background text-foreground border border-border/90 shadow-2xl rounded-xl select-none z-[99999]"
+				dir="rtl"
+			>
+				<div className="flex items-center gap-2.5 min-w-0">
+					<IconCircleCheckFilled className="size-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+					<span className="text-[13px] font-semibold text-foreground truncate">
+						{message}
+					</span>
+				</div>
+				<button
+					type="button"
+					onClick={() => toast.dismiss(t)}
+					className="text-muted-foreground/70 hover:text-foreground p-1 rounded-md hover:bg-muted transition-colors cursor-pointer shrink-0"
+					title="إغلاق الإشعار"
+				>
+					<IconX className="size-3.5" />
+				</button>
+			</div>
+		),
+		{
+			unstyled: true,
+			duration: 25000,
+			position: "bottom-left",
+		},
+	);
 }
 
 export function AddRequestDialog({
@@ -183,6 +185,8 @@ export function AddRequestDialog({
 	onClose,
 	campaignId,
 	defaultColumn = "طابور",
+	initialData,
+	onSuccess,
 }: AddRequestDialogProps) {
 	// ─── Step State (1: Form, 2: Review) ──────────────────────────────────────────
 	const [step, setStep] = useState<1 | 2>(1);
@@ -202,53 +206,43 @@ export function AddRequestDialog({
 	const [suggestedTrack, setSuggestedTrack] = useState("");
 	const [guardian, setGuardian] = useState("");
 	const [guardianPhone, setGuardianPhone] = useState("");
+	const [guardianEmail, setGuardianEmail] = useState("");
 	const [notes, setNotes] = useState("");
-	const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
 	const [selectedOwnerId, setSelectedOwnerId] = useState<string | null>(null);
 
-	// ─── Student Combobox Filtering from System ─────────────────────────────────
-	const [studentDropdownOpen, setStudentDropdownOpen] = useState(false);
-	const studentContainerRef = useRef<HTMLDivElement>(null);
-	const { patients = [] } = usePatients();
+	// ─── Step 2 Review & Share Controls (مطابق لصورة المستخدم f6725d6d) ─────────
+	const [includeMessage, setIncludeMessage] = useState(false);
+	const [customMessage, setCustomMessage] = useState("");
+	const [isQrOpen, setIsQrOpen] = useState(false);
+	const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
+	const [copiedShareLink, setCopiedShareLink] = useState(false);
 
-	const allStudents = useMemo(() => {
-		if (patients && patients.length > 0) {
-			return patients.map((p) => {
-				let gName = (p as any).guardianName || "";
-				let gPhone = (p as any).guardianPhone || "";
-				if ((p as any).guardians && (p as any).guardians.length > 0) {
-					const g0 = (p as any).guardians[0];
-					gName = g0.owner?.name || gName;
-					gPhone = g0.owner?.phone || gPhone;
-				}
-				let bDate = "";
-				if ((p as any).birthDate) {
-					const d = new Date((p as any).birthDate);
-					if (!isNaN(d.getTime())) {
-						const dd = String(d.getDate()).padStart(2, "0");
-						const mm = String(d.getMonth() + 1).padStart(2, "0");
-						const yy = d.getFullYear();
-						bDate = `${dd}/${mm}/${yy}`;
-					}
-				}
-				return {
-					id: p.id,
-					name: p.name || "بدون اسم",
-					gender: (p as any).gender || "",
-					birthDate: bDate,
-					guardian: gName,
-					guardianPhone: gPhone,
-				};
+	const previewShareLink = useMemo(() => {
+		if (typeof window === "undefined") return "https://sanad-academy.edu/call/interview-applicant";
+		const safeSlug = studentName ? encodeURIComponent(studentName.trim().replace(/\s+/g, "-")) : "applicant";
+		return `${window.location.origin}/call/interview-${safeSlug}`;
+	}, [studentName]);
+
+	const handleCopyShareLink = () => {
+		navigator.clipboard.writeText(previewShareLink);
+		setCopiedShareLink(true);
+		toast.success("تم نسخ رابط المشاركة بنجاح");
+		setTimeout(() => setCopiedShareLink(false), 2000);
+	};
+
+	const handleOpenQr = async () => {
+		try {
+			const dataUrl = await QRCode.toDataURL(previewShareLink, {
+				width: 220,
+				margin: 1.5,
+				color: { dark: "#1E1B4B", light: "#FFFFFF" },
 			});
+			setQrCodeDataUrl(dataUrl);
+			setIsQrOpen(true);
+		} catch (err) {
+			toast.error("فشل توليد رمز QR");
 		}
-		return DEFAULT_STUDENTS;
-	}, [patients]);
-
-	const filteredStudents = useMemo(() => {
-		if (!studentName.trim()) return allStudents;
-		const q = studentName.trim().toLowerCase();
-		return allStudents.filter((s) => s.name.toLowerCase().includes(q));
-	}, [allStudents, studentName]);
+	};
 
 	// ─── Guardian Combobox Filtering ────────────────────────────────────────────
 	const [guardianDropdownOpen, setGuardianDropdownOpen] = useState(false);
@@ -261,6 +255,7 @@ export function AddRequestDialog({
 				id: o.id,
 				name: o.name || "بدون اسم",
 				phone: o.phone || "",
+				email: (o as any).email || "",
 			}));
 		}
 		return DEFAULT_GUARDIANS;
@@ -270,7 +265,10 @@ export function AddRequestDialog({
 		if (!guardian.trim()) return allGuardians;
 		const q = guardian.trim().toLowerCase();
 		return allGuardians.filter(
-			(g) => g.name.toLowerCase().includes(q) || g.phone.includes(q),
+			(g) =>
+				g.name.toLowerCase().includes(q) ||
+				g.phone.includes(q) ||
+				Boolean(g.email && g.email.toLowerCase().includes(q)),
 		);
 	}, [allGuardians, guardian]);
 
@@ -282,12 +280,6 @@ export function AddRequestDialog({
 				!guardianContainerRef.current.contains(e.target as Node)
 			) {
 				setGuardianDropdownOpen(false);
-			}
-			if (
-				studentContainerRef.current &&
-				!studentContainerRef.current.contains(e.target as Node)
-			) {
-				setStudentDropdownOpen(false);
 			}
 		};
 		document.addEventListener("mousedown", handleClickOutside);
@@ -362,6 +354,7 @@ export function AddRequestDialog({
 
 	const [appointmentDate, setAppointmentDate] = useState("تاريخ الموعد");
 	const [appointmentIsoDate, setAppointmentIsoDate] = useState<string | null>(null);
+	const [enableRecurrence, setEnableRecurrence] = useState(false);
 	const [selectedRoom, setSelectedRoom] = useState("الغرفة");
 	const [selectedColumn, setSelectedColumn] = useState(defaultColumn);
 	const [priority, setPriority] = useState<string>("بدون أولوية");
@@ -471,6 +464,132 @@ export function AddRequestDialog({
 	const [error, setError] = useState<string | null>(null);
 
 	const createMutation = useCreateRequest(campaignId);
+	const updateMutation = useUpdateRequest(campaignId);
+
+	// تعبئة كافة البيانات مسبقاً وبدقة عند فتح الفورم في وضع التعديل (Edit Mode)
+	useEffect(() => {
+		if (initialData && open) {
+			setStep(1);
+			setStudentName(initialData.patientName || initialData.name || "");
+			setGender((initialData.gender as any) || "MALE");
+			setBirthDate(initialData.birthDate ? initialData.birthDate.split("T")[0] : "");
+			setExperienceLevel(initialData.experienceLevel || initialData.ageLabel || "");
+
+			// تطبيع طريقة التعلم لمطابقة خيارات القائمة
+			let lm = initialData.learningMode || "";
+			if (lm.includes("عن بعد") || lm.toLowerCase().includes("online") || lm.includes("أونلاين") || lm.toLowerCase().includes("remote")) {
+				lm = "عن بعد";
+			} else if (lm.includes("أكاديمية") || lm.includes("حضوري") || lm.toLowerCase().includes("academy")) {
+				lm = "في الأكاديمية";
+			}
+			setLearningMode(lm);
+
+			setPreferredShift(initialData.preferredShift || "صباحي");
+			setSuggestedTrack(initialData.targetClass || initialData.proposedTrack || "");
+			setGuardian(initialData.guardianName || "");
+			setGuardianPhone(initialData.guardianPhone || "");
+			setGuardianEmail(initialData.guardianEmail || "");
+			setSelectedOwnerId(initialData.convertedOwnerId || null);
+			setNotes(initialData.notes || "");
+			if (initialData.channel) setChannel(initialData.channel);
+
+			// 1. المراجع (Reviewer)
+			let rName = initialData.assignedStaff?.name || (initialData as any).reviewerName || initialData.assessmentAppointment?.staffName || "";
+			let rId = initialData.assignedStaff?.id || initialData.assignedStaffId || (initialData as any).reviewerId || null;
+			if (!rName && rId && staffList && staffList.length > 0) {
+				const match = staffList.find((s) => s.id === rId || (s as any).userId === rId);
+				if (match) rName = match.name;
+			}
+			setReviewer(rName || "المراجع");
+			setReviewerId(rId);
+
+			// 2. تاريخ الموعد (Appointment Date)
+			const rawDate = initialData.appointmentDate || initialData.assessmentAppointment?.startsAt || null;
+			if (rawDate) {
+				let displayDate = rawDate;
+				if (rawDate.includes("T")) {
+					displayDate = rawDate.split("T")[0];
+				}
+				setAppointmentDate(displayDate);
+				setAppointmentIsoDate(rawDate);
+			} else {
+				setAppointmentDate("تاريخ الموعد");
+				setAppointmentIsoDate(null);
+			}
+
+			// 3. الغرفة (Room)
+			const rRoom = initialData.roomName || (initialData as any).roomId || "الغرفة";
+			setSelectedRoom(rRoom);
+
+			// 4. العمود / الحالة (Column / Status)
+			const colMap: Record<string, string> = {
+				queue: "طابور",
+				QUEUE: "طابور",
+				shortlist: "قائمة مختصرة",
+				SHORTLIST: "قائمة مختصرة",
+				interview: "المقابلة الشخصية",
+				INTERVIEW: "المقابلة الشخصية",
+				accepted: "مقبول",
+				ACCEPTED: "مقبول",
+				"awaiting-payment": "بانتظار الدفع",
+				AWAITING_PAYMENT: "بانتظار الدفع",
+				rejected: "مرفوض",
+				REJECTED: "مرفوض",
+				duplicate: "مكرر",
+				DUPLICATE: "مكرر",
+			};
+			const rawCol = initialData.statusLabel || initialData.column || initialData.status || defaultColumn;
+			setSelectedColumn(colMap[rawCol] || rawCol);
+
+			// 5. الأولوية (Priority)
+			const prioMap: Record<string, string> = {
+				URGENT: "عاجلة",
+				urbent: "عاجلة",
+				HIGH: "مرتفعة",
+				high: "مرتفعة",
+				MEDIUM: "متوسطة",
+				medium: "متوسطة",
+				LOW: "منخفضة",
+				low: "منخفضة",
+				NONE: "بدون أولوية",
+				none: "بدون أولوية",
+			};
+			const rawPrio = initialData.priority || "بدون أولوية";
+			setPriority(prioMap[rawPrio] || rawPrio);
+
+			// 6. إشعار عبر الواتساب
+			setNotifyWhatsapp(Boolean(initialData.notifyWhatsapp));
+
+			// 7. المستندات المرفقة
+			if (initialData.documents?.items && Array.isArray(initialData.documents.items) && initialData.documents.items.length > 0) {
+				setAttachedDocuments(
+					initialData.documents.items.map((doc: any, idx: number) => ({
+						id: doc.id || `doc-${idx}`,
+						name: doc.title || "مستند مرفق",
+						size: doc.fileSize || "1.0 MB",
+						url: doc.fileUrl,
+					}))
+				);
+			} else {
+				setAttachedDocuments([]);
+			}
+
+			// 8. الروابط المرفقة
+			if (initialData.links && Array.isArray(initialData.links) && initialData.links.length > 0) {
+				setAttachedLinks(
+					initialData.links.map((link: any, idx: number) => ({
+						id: link.id || `link-${idx}`,
+						title: link.title || link.url,
+						url: link.url,
+					}))
+				);
+			} else {
+				setAttachedLinks([]);
+			}
+		} else if (!initialData && open) {
+			resetForm();
+		}
+	}, [initialData, open, staffList]);
 
 	// Reset form
 	const resetForm = () => {
@@ -485,10 +604,10 @@ export function AddRequestDialog({
 		setSuggestedTrack("");
 		setGuardian("");
 		setGuardianPhone("");
+		setGuardianEmail("");
 		setNotes("");
 		setReviewer("المراجع");
 		setReviewerId(null);
-		setStudentDropdownOpen(false);
 		setGuardianDropdownOpen(false);
 		setSearchStaff("");
 		setIsReviewerOpen(false);
@@ -498,13 +617,17 @@ export function AddRequestDialog({
 		setSelectedRoom("الغرفة");
 		setSelectedColumn(defaultColumn);
 		setPriority("بدون أولوية");
-		setSelectedStudentId(null);
 		setSelectedOwnerId(null);
 		setAttachedDocuments([]);
 		setAttachedLinks([]);
 		setLinkTitle("");
 		setLinkUrl("");
 		setNotifyWhatsapp(false);
+		setIncludeMessage(false);
+		setCustomMessage("");
+		setIsQrOpen(false);
+		setQrCodeDataUrl(null);
+		setCopiedShareLink(false);
 		setError(null);
 	};
 
@@ -513,12 +636,38 @@ export function AddRequestDialog({
 		onClose();
 	};
 
+	// هل ولي الأمر جديد وغير مسجل بالنظام (يظهر فقط إذا كتب المستخدم اسماً غير موجود)
+	const isNewGuardian = Boolean(guardian.trim() && !selectedOwnerId);
+
 	// Validation
 	const validateForm = () => {
 		if (!studentName.trim()) {
-			setError("اختر الطالب مطلوب");
+			setError("اسم الطالب مطلوب");
 			toast.error("يرجى إدخال اسم الطالب");
 			return false;
+		}
+		if (!guardian.trim()) {
+			setError("ولي الأمر مطلوب");
+			toast.error("يرجى اختيار أو إدخال ولي الأمر");
+			return false;
+		}
+		if (isNewGuardian) {
+			if (!guardianPhone.trim()) {
+				setError("رقم هاتف ولي الأمر مطلوب لإنشاء الملف");
+				toast.error("يرجى إدخال رقم هاتف ولي الأمر");
+				return false;
+			}
+			if (!guardianEmail.trim()) {
+				setError("البريد الإلكتروني مطلوب لتوحيد بيانات ولي الأمر");
+				toast.error("يرجى إدخال البريد الإلكتروني لولي الأمر");
+				return false;
+			}
+			const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			if (!emailPattern.test(guardianEmail.trim())) {
+				setError("صيغة البريد الإلكتروني غير صحيحة");
+				toast.error("يرجى إدخال بريد إلكتروني صحيح");
+				return false;
+			}
 		}
 		if (!birthDate.trim()) {
 			setError("تاريخ الميلاد مطلوب");
@@ -538,11 +687,6 @@ export function AddRequestDialog({
 		if (!suggestedTrack) {
 			setError("المجال المقترح مطلوب");
 			toast.error("يرجى اختيار المجال المقترح");
-			return false;
-		}
-		if (!guardian.trim()) {
-			setError("ولي الأمر مطلوب");
-			toast.error("يرجى اختيار أو إدخال ولي الأمر");
 			return false;
 		}
 		return true;
@@ -582,8 +726,67 @@ export function AddRequestDialog({
 			}
 		}
 
+		if (initialData) {
+			try {
+				const updated = await updateMutation.mutateAsync({
+					requestId: initialData.id,
+					data: {
+						studentName: studentName.trim(),
+						gender: (gender as "MALE" | "FEMALE" | "UNKNOWN") || "UNKNOWN",
+						birthDate: isoBirthDate,
+						ageLabel: experienceLevel || null,
+						targetClass: suggestedTrack || null,
+						guardianName: guardian.trim(),
+						guardianPhone: validPhone,
+						guardianEmail: guardianEmail.trim() || null,
+						learningMode: learningMode || null,
+						preferredShift: preferredShift || null,
+						experienceLevel: experienceLevel || null,
+						priority: priority || "بدون أولوية",
+						status: statusToEnum(selectedColumn),
+						columnStatus: statusToEnum(selectedColumn),
+						column: selectedColumn,
+						appointmentDate:
+							appointmentIsoDate ||
+							(appointmentDate && appointmentDate !== "تاريخ الموعد"
+								? appointmentDate
+								: null),
+						assignedStaffId: reviewerId || null,
+						reviewerId: reviewerId || null,
+						reviewerName: reviewer !== "المراجع" ? reviewer : null,
+						roomId: null,
+						roomName: selectedRoom !== "الغرفة" ? selectedRoom : null,
+						notifyWhatsapp,
+						links: attachedLinks.length > 0 ? attachedLinks : [],
+						documents: attachedDocuments.length > 0
+							? attachedDocuments.map((d) => ({
+									title: d.name,
+									fileUrl: d.url || "",
+									fileSize: d.size,
+								}))
+							: [],
+						notes: (() => {
+							const parts: string[] = [];
+							if (includeMessage && customMessage.trim()) parts.push(customMessage.trim());
+							if (notes.trim()) parts.push(notes.trim());
+							if (enableRecurrence) parts.push("📌 [ملاحظة: مطلوب جدولة زيارات متكررة للطالب بعد القبول]");
+							return parts.join("\n") || null;
+						})(),
+					},
+				});
+				showRegistrationSuccessToast("تم تحديث بيانات الطلب بنجاح");
+				onSuccess?.(updated);
+				handleClose();
+				return;
+			} catch (err: any) {
+				setError(err.message || "حدث خطأ أثناء تحديث بيانات الطلب");
+				toast.error(err.message || "فشل تحديث الطلب");
+				return;
+			}
+		}
+
 		try {
-			await createMutation.mutateAsync({
+			const created = await createMutation.mutateAsync({
 				campaignId,
 				studentName: studentName.trim(),
 				gender: (gender as "MALE" | "FEMALE" | "UNKNOWN") || "UNKNOWN",
@@ -592,10 +795,10 @@ export function AddRequestDialog({
 				targetClass: suggestedTrack,
 				guardianName: guardian.trim(),
 				guardianPhone: validPhone,
+				guardianEmail: guardianEmail.trim() || null,
 				source: backendSource,
 
-				// الربط المتكامل مع الطلاب وأولياء الأمور والمواعيد والقاعات
-				existingPatientId: selectedStudentId,
+				// الربط المتكامل مع أولياء الأمور والمواعيد والقاعات
 				existingOwnerId: selectedOwnerId,
 				learningMode: learningMode || null,
 				preferredShift: preferredShift || null,
@@ -611,7 +814,13 @@ export function AddRequestDialog({
 				reviewerId: reviewerId || null,
 				reviewerName: reviewer !== "المراجع" ? reviewer : null,
 				roomName: selectedRoom !== "الغرفة" ? selectedRoom : null,
-				notes: notes.trim() || null,
+				notes: (() => {
+					const parts: string[] = [];
+					if (includeMessage && customMessage.trim()) parts.push(customMessage.trim());
+					if (notes.trim()) parts.push(notes.trim());
+					if (enableRecurrence) parts.push("📌 [ملاحظة: مطلوب جدولة زيارات متكررة للطالب بعد القبول]");
+					return parts.length > 0 ? parts.join("\n") : null;
+				})(),
 				notifyWhatsapp: notifyWhatsapp,
 				links: attachedLinks.map((l) => ({
 					id: l.id,
@@ -626,17 +835,13 @@ export function AddRequestDialog({
 				})),
 			});
 
-			toast.success(
-				notifyWhatsapp
-					? "تم تسجيل المتقدم وإضافته إلى طابور الانتظار وتجهيز إشعار الواتساب"
-					: "تم تسجيل المتقدم وإضافته إلى طابور الانتظار بنجاح",
-			);
+			showRegistrationSuccessToast("تم تسجيل الطلب بنجاح");
+			onSuccess?.(created);
 
 			if (createMore) {
 				// Keep dialog open and reset inputs for adding another candidate
 				setStep(1);
 				setStudentName("");
-				setSelectedStudentId(null);
 				setSelectedOwnerId(null);
 				setBirthDate("");
 				setGender("");
@@ -646,9 +851,11 @@ export function AddRequestDialog({
 				setSuggestedTrack("");
 				setGuardian("");
 				setGuardianPhone("");
+				setGuardianEmail("");
 				setNotes("");
 				setAppointmentDate("تاريخ الموعد");
 				setAppointmentIsoDate(null);
+				setEnableRecurrence(false);
 				setSelectedRoom("الغرفة");
 				setAttachedDocuments([]);
 				setAttachedLinks([]);
@@ -668,26 +875,27 @@ export function AddRequestDialog({
 			if (!open) return;
 			if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
 				e.preventDefault();
-				if (step === 1) {
-					handleNext();
-				} else {
+				if (initialData || step === 2) {
 					handleSubmit();
+				} else {
+					handleNext();
 				}
 			}
 		};
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [open, step, studentName, birthDate, gender, learningMode, suggestedTrack, guardian]);
+	}, [open, step, initialData, studentName, birthDate, gender, learningMode, suggestedTrack, guardian, guardianPhone, guardianEmail, selectedOwnerId, appointmentDate, appointmentIsoDate, reviewer, reviewerId, selectedRoom, selectedColumn, priority, notifyWhatsapp, notes, attachedDocuments, attachedLinks]);
 
-	const isSubmitting = createMutation.isPending;
+	const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
 	const isFormFilled =
 		Boolean(studentName.trim()) &&
+		Boolean(guardian.trim()) &&
+		(!isNewGuardian || (Boolean(guardianPhone.trim()) && Boolean(guardianEmail.trim()))) &&
 		Boolean(birthDate.trim()) &&
 		Boolean(gender) &&
 		Boolean(learningMode) &&
-		Boolean(suggestedTrack) &&
-		Boolean(guardian.trim());
+		Boolean(suggestedTrack);
 
 	return (
 		<>
@@ -695,54 +903,69 @@ export function AddRequestDialog({
 			<DialogContent
 				showCloseButton={false}
 				className={cn(
-					"p-0 gap-0 overflow-hidden rounded-xl bg-card border border-border/80 shadow-2xl transition-all duration-150",
-					isExpanded ? "sm:max-w-4xl max-w-[96vw]" : "sm:max-w-[530px] max-w-[94vw]",
+					"p-0 gap-0 overflow-hidden rounded-xl bg-card border border-border/80 shadow-2xl transition-all duration-150 flex flex-col",
+					isExpanded ? "sm:max-w-4xl max-w-[96vw] max-h-[92vh]" : "sm:max-w-[690px] max-w-[94vw] max-h-[88vh]",
 				)}
 				dir="rtl"
 			>
-				{/* ─── 1. Header Bar: تسجيل طلب جديد في: [عبر اتصال / في الأكاديمية] ── */}
-				<div className="flex items-center justify-between px-4 pt-3 pb-2 bg-card select-none">
-					{/* Title + Channel Dropdown */}
-					<div className="flex items-center gap-2">
-						<span className="text-[13px] font-bold text-foreground">
-							تسجيل طلب جديد في:
-						</span>
-						<DropdownMenu dir="rtl">
-							<DropdownMenuTrigger asChild>
-								<button
-									type="button"
-									className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-border/70 bg-background text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors cursor-pointer shadow-2xs"
-								>
-									{channel === "CALL" ? (
-										<IconPhone className="size-3 text-emerald-600" />
-									) : (
-										<IconBuildingCommunity className="size-3 text-blue-600" />
-									)}
-									<span>{channel === "CALL" ? "عبر اتصال" : "في الأكاديمية"}</span>
-									<IconChevronDown className="size-3 text-muted-foreground ms-0.5" />
-								</button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="start" className="w-44 text-xs z-[99]">
-								<DropdownMenuLabel className="text-[10px] text-muted-foreground">
-									قناة التسجيل المعتمدة
-								</DropdownMenuLabel>
-								<DropdownMenuItem
-									onClick={() => setChannel("CALL")}
-									className="cursor-pointer gap-2 py-1.5"
-								>
-									<IconPhone className="size-3.5 text-emerald-600" />
-									<span className="font-medium">عبر اتصال</span>
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									onClick={() => setChannel("ACADEMY")}
-									className="cursor-pointer gap-2 py-1.5"
-								>
-									<IconBuildingCommunity className="size-3.5 text-blue-600" />
-									<span className="font-medium">في الأكاديمية</span>
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</div>
+				{/* ─── 1. Header Bar (مطابق 100% لصورة المستخدم f6725d6d) ── */}
+				<div className="flex items-center justify-between px-4 pt-3 pb-2 bg-card select-none border-b border-border/40">
+					{step === 1 ? (
+						/* Step 1 Title + Channel Dropdown */
+						<div className="flex items-center gap-2">
+							<span className="text-[13px] font-bold text-foreground">
+								{initialData ? `تعديل بيانات طلب الطالب - #${initialData.code}` : "تسجيل طلب جديد في:"}
+							</span>
+							<DropdownMenu dir="rtl">
+								<DropdownMenuTrigger asChild>
+									<button
+										type="button"
+										className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-border/70 bg-background text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors cursor-pointer shadow-2xs"
+									>
+										{channel === "CALL" ? (
+											<IconPhone className="size-3 text-emerald-600" />
+										) : (
+											<IconBuildingCommunity className="size-3 text-blue-600" />
+										)}
+										<span>{channel === "CALL" ? "عبر اتصال" : "في الأكاديمية"}</span>
+										<IconChevronDown className="size-3 text-muted-foreground ms-0.5" />
+									</button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="start" className="w-44 text-xs z-[99]">
+									<DropdownMenuLabel className="text-[10px] text-muted-foreground">
+										قناة التسجيل المعتمدة
+									</DropdownMenuLabel>
+									<DropdownMenuItem
+										onClick={() => setChannel("CALL")}
+										className="cursor-pointer gap-2 py-1.5"
+									>
+										<IconPhone className="size-3.5 text-emerald-600" />
+										<span className="font-medium">عبر اتصال</span>
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() => setChannel("ACADEMY")}
+										className="cursor-pointer gap-2 py-1.5"
+									>
+										<IconBuildingCommunity className="size-3.5 text-blue-600" />
+										<span className="font-medium">في الأكاديمية</span>
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</div>
+					) : (
+						/* Step 2 Breadcrumb (مطابق لصورة f6725d6d: حجز تسجيل جديد > مراجعه تفاصيل الطلب) */
+						<div className="flex items-center gap-1.5 text-xs text-foreground">
+							<button
+								type="button"
+								onClick={() => setStep(1)}
+								className="text-muted-foreground hover:text-foreground hover:underline cursor-pointer transition-colors"
+							>
+								حجز تسجيل جديد
+							</button>
+							<IconChevronLeft className="size-3.5 text-muted-foreground" />
+							<span className="font-bold text-foreground">مراجعه تفاصيل الطلب</span>
+						</div>
+					)}
 
 					{/* Expand & Close Controls */}
 					<div className="flex items-center gap-0.5">
@@ -769,8 +992,13 @@ export function AddRequestDialog({
 					</div>
 				</div>
 
-				{/* ─── 2. Body Content ──────────────────────────────────────────── */}
-				<div className="px-4 py-2 max-h-[calc(100vh-165px)] overflow-y-auto">
+				{/* ─── 2. Body Content (ارتفاع مرن يستجيب للتكبير بسلاسة لمنع اختفاء المحتوى) ─── */}
+				<div
+					className={cn(
+						"px-4 py-2 overflow-y-auto flex-1 min-h-0 sanad-scrollbar",
+						isExpanded ? "max-h-[calc(92vh-155px)]" : "max-h-[calc(88vh-165px)]",
+					)}
+				>
 					{error && (
 						<div className="mb-2.5 rounded-md bg-destructive/10 border border-destructive/20 p-2 text-[11px] font-semibold text-destructive text-center">
 							{error}
@@ -779,91 +1007,99 @@ export function AddRequestDialog({
 
 					{step === 1 ? (
 						<div className="flex flex-col gap-2.5">
-							{/* Row 1: اختر الطالب | تاريخ الميلاد */}
+							{/* Row 1: اسم الطالب | ولي الأمر */}
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-								{/* اختر الطالب (Searchable Combobox من طلاب النظام مع الفلترة والملء التلقائي) */}
-								<div ref={studentContainerRef} className="relative">
+								{/* اسم الطالب (تسجيل طالب جديد) */}
+								<div>
 									<FieldHeader
-										label="اختر الطالب"
+										label="اسم الطالب"
 										required
-										tooltip="اختر من الطلاب المسجلين بالنظام أو اكتب للفلترة وإضافة طالب جديد"
+										tooltip="اسم الطالب ثلاثي أو رباعي"
+									/>
+									<Input
+										value={studentName}
+										onChange={(e) => setStudentName(e.target.value)}
+										placeholder="مثال: يوسف أحمد"
+										className="h-8 text-[11.5px] text-right px-2.5 rounded-md border-border/80 bg-background"
+										required
+									/>
+								</div>
+
+								{/* ولي الأمر (Searchable Combobox من أولياء الأمور بالنظام أو إضافة ولي أمر جديد) */}
+								<div ref={guardianContainerRef} className="relative">
+									<FieldHeader
+										label="ولي الأمر"
+										required
+										tooltip="اختر من أولياء الأمور المسجلين أو اكتب للفلترة وإضافة ولي أمر جديد"
 									/>
 									<div className="relative">
 										<Input
-											value={studentName}
+											value={guardian}
 											onChange={(e) => {
-												setStudentName(e.target.value);
-												setSelectedStudentId(null);
-												setStudentDropdownOpen(true);
+												setGuardian(e.target.value);
+												setSelectedOwnerId(null);
+												setGuardianDropdownOpen(true);
 											}}
-											onFocus={() => setStudentDropdownOpen(true)}
-											placeholder="مثال: يوسف"
-											className="h-8 text-xs text-right pr-2.5 pl-8 rounded-md border-border/80 bg-background"
+											onFocus={() => setGuardianDropdownOpen(true)}
+											placeholder="اختر أو اكتب ولي الأمر..."
+											className="h-8 text-[11.5px] text-right pr-2.5 pl-8 rounded-md border-border/80 bg-background"
 											required
 										/>
 										<button
 											type="button"
-											onClick={() => setStudentDropdownOpen((prev) => !prev)}
+											onClick={() => setGuardianDropdownOpen((prev) => !prev)}
 											className="absolute inset-y-0 left-2.5 flex items-center text-muted-foreground/60 hover:text-foreground cursor-pointer"
 										>
 											<IconChevronDown className="size-3" />
 										</button>
 									</div>
 
-									{/* القائمة المنسدلة التفاعلية للطلاب مع الفلترة اللحظية */}
-									{studentDropdownOpen && (
+									{/* القائمة المنسدلة التفاعلية لأولياء الأمور مع الفلترة اللحظية */}
+									{guardianDropdownOpen && (
 										<div
 											className="absolute z-[99] mt-1 w-full rounded-lg border border-border/80 bg-popover text-popover-foreground shadow-2xl p-1 max-h-48 overflow-y-auto"
 											dir="rtl"
 										>
 											<div className="px-2 py-1 text-[10px] text-muted-foreground font-semibold border-b border-border/50 flex items-center justify-between">
-												<span>الطلاب المسجلين بالنظام</span>
-												<span className="font-mono text-[9px]">
-													{filteredStudents.length} متاح
-												</span>
+												<span>أولياء الأمور المتاحين بالنظام</span>
+												<span className="font-mono text-[9px]">{filteredGuardians.length} متاح</span>
 											</div>
 
-											{filteredStudents.length > 0 ? (
+											{filteredGuardians.length > 0 ? (
 												<div className="py-1 space-y-0.5">
-													{filteredStudents.map((st) => (
+													{filteredGuardians.map((g) => (
 														<button
-															key={st.id}
+															key={g.id}
 															type="button"
 															onClick={() => {
-																setStudentName(st.name);
-																setSelectedStudentId(st.id.startsWith("s-") ? null : st.id);
-																if (st.birthDate) setBirthDate(st.birthDate);
-																if (st.gender) setGender(st.gender);
-																if (st.guardian) {
-																	setGuardian(st.guardian);
-																	if (st.guardianPhone) setGuardianPhone(st.guardianPhone);
-																}
-																setStudentDropdownOpen(false);
+																setGuardian(g.name);
+																setSelectedOwnerId(g.id);
+																setGuardianPhone(g.phone);
+																setGuardianEmail(g.email || "");
+																setGuardianDropdownOpen(false);
 															}}
 															className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs text-right hover:bg-muted/70 transition-colors cursor-pointer group"
 														>
 															<div className="flex items-center gap-1.5">
 																<IconUser className="size-3 text-muted-foreground group-hover:text-primary transition-colors" />
-																<span className="font-semibold text-foreground">{st.name}</span>
+																<span className="font-semibold text-foreground">{g.name}</span>
 															</div>
-															{st.guardian && (
-																<span className="text-[10px] text-muted-foreground truncate max-w-[120px]">
-																	ولي الأمر: {st.guardian}
-																</span>
-															)}
+															<div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono" dir="ltr">
+																{g.phone && <span>{g.phone}</span>}
+															</div>
 														</button>
 													))}
 												</div>
 											) : (
 												<div className="p-2.5 text-center text-xs text-muted-foreground space-y-1">
-													<p>لا يوجد طالب مسجل بهذا الاسم</p>
-													{studentName.trim() && (
+													<p>لا يوجد ولي أمر مسجل بهذا الاسم</p>
+													{guardian.trim() && (
 														<button
 															type="button"
-															onClick={() => setStudentDropdownOpen(false)}
+															onClick={() => setGuardianDropdownOpen(false)}
 															className="text-primary hover:underline font-semibold text-[11px] cursor-pointer"
 														>
-															استخدام "{studentName}" كاسم طالب جديد
+															استخدام "{guardian}" كولي أمر جديد
 														</button>
 													)}
 												</div>
@@ -871,7 +1107,85 @@ export function AddRequestDialog({
 										</div>
 									)}
 								</div>
+							</div>
 
+							{/* في حال اختيار ولي أمر مسجل: إظهار شارة الربط مع خيار التغيير */}
+							{selectedOwnerId && (
+								<div className="flex items-center justify-between px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-800 dark:text-emerald-300">
+									<div className="flex items-center gap-2">
+										<IconCheck className="size-3 text-emerald-600 shrink-0" />
+										<span className="font-medium">ولي أمر مسجل بالنظام:</span>
+										<span className="font-semibold">{guardian}</span>
+										{guardianPhone && (
+											<span className="font-mono text-[10px] text-muted-foreground" dir="ltr">
+												({guardianPhone})
+											</span>
+										)}
+									</div>
+									<button
+										type="button"
+										onClick={() => {
+											setSelectedOwnerId(null);
+											setGuardian("");
+											setGuardianPhone("");
+											setGuardianEmail("");
+										}}
+										className="text-[10px] text-muted-foreground hover:text-foreground hover:underline cursor-pointer"
+									>
+										تغيير
+									</button>
+								</div>
+							)}
+
+							{/* تظهر حقول ولي الأمر الجديد فقط إذا كتب المستخدم اسم ولي أمر غير موجود بالنظام */}
+							{isNewGuardian && (
+								<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-2.5 rounded-lg border border-primary/20 bg-primary/5 animate-in fade-in duration-200">
+									{/* رقم هاتف ولي الأمر */}
+									<div>
+										<FieldHeader
+											label="رقم هاتف ولي الأمر"
+											required
+											tooltip="رقم هاتف ولي الأمر للتواصل وإرسال الإشعارات (مطلوب لإنشاء الملف)"
+										/>
+										<div className="relative">
+											<Input
+												type="tel"
+												value={guardianPhone}
+												onChange={(e) => setGuardianPhone(e.target.value)}
+												placeholder="05xxxxxxxx"
+												dir="ltr"
+												className="h-8 text-[11.5px] text-left rounded-md border-border/80 bg-background pl-8"
+												required
+											/>
+											<IconPhone className="size-3 text-muted-foreground absolute left-2.5 top-2.5 pointer-events-none" />
+										</div>
+									</div>
+
+									{/* البريد الإلكتروني لولي الأمر */}
+									<div>
+										<FieldHeader
+											label="البريد الإلكتروني لولي الأمر"
+											required
+											tooltip="البريد الإلكتروني لولي الأمر لتوحيد ملفه مع صفحة أولياء الأمور"
+										/>
+										<div className="relative">
+											<Input
+												type="email"
+												value={guardianEmail}
+												onChange={(e) => setGuardianEmail(e.target.value)}
+												placeholder="example@domain.com"
+												dir="ltr"
+												className="h-8 text-[11.5px] text-left rounded-md border-border/80 bg-background pl-8"
+												required
+											/>
+											<IconMail className="size-3 text-muted-foreground absolute left-2.5 top-2.5 pointer-events-none" />
+										</div>
+									</div>
+								</div>
+							)}
+
+							{/* Row 2: تاريخ الميلاد (مُرحّل للأسفل) | الجنس */}
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 								{/* تاريخ الميلاد مع التقويم المخصص */}
 								<div>
 									<FieldHeader
@@ -886,10 +1200,7 @@ export function AddRequestDialog({
 										required
 									/>
 								</div>
-							</div>
 
-							{/* Row 2: الجنس | مستوى */}
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 								{/* الجنس */}
 								<div>
 									<FieldHeader
@@ -901,7 +1212,7 @@ export function AddRequestDialog({
 										value={gender}
 										onValueChange={(val: any) => setGender(val)}
 									>
-										<SelectTrigger className="w-full h-8 text-xs text-right rounded-md border-border/80" dir="rtl">
+										<SelectTrigger className="w-full h-8 text-[11.5px] text-right rounded-md border-border/80" dir="rtl">
 											<SelectValue placeholder="اختر جنس الطالب..." />
 										</SelectTrigger>
 										<SelectContent
@@ -922,7 +1233,10 @@ export function AddRequestDialog({
 										</SelectContent>
 									</Select>
 								</div>
+							</div>
 
+							{/* Row 3: مستوى | طريقة التعلم */}
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 								{/* مستوى: مبتدئ / متوسط / متقدم / غير متأكد */}
 								<div>
 									<FieldHeader
@@ -933,7 +1247,7 @@ export function AddRequestDialog({
 										value={experienceLevel}
 										onValueChange={setExperienceLevel}
 									>
-										<SelectTrigger className="w-full h-8 text-xs text-right rounded-md border-border/80" dir="rtl">
+										<SelectTrigger className="w-full h-8 text-[11.5px] text-right rounded-md border-border/80" dir="rtl">
 											<SelectValue placeholder="حدد مستوي الخبرة" />
 										</SelectTrigger>
 										<SelectContent
@@ -957,10 +1271,7 @@ export function AddRequestDialog({
 										</SelectContent>
 									</Select>
 								</div>
-							</div>
 
-							{/* Row 3: طريقة التعلم | المناوبة المفضلة */}
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 								{/* طريقة التعلم */}
 								<div>
 									<FieldHeader
@@ -972,7 +1283,7 @@ export function AddRequestDialog({
 										value={learningMode}
 										onValueChange={setLearningMode}
 									>
-										<SelectTrigger className="w-full h-8 text-xs text-right rounded-md border-border/80" dir="rtl">
+										<SelectTrigger className="w-full h-8 text-[11.5px] text-right rounded-md border-border/80" dir="rtl">
 											<SelectValue placeholder="اختر الطريقة..." />
 										</SelectTrigger>
 										<SelectContent
@@ -981,19 +1292,19 @@ export function AddRequestDialog({
 											sideOffset={4}
 											className="z-[99] w-[var(--radix-select-trigger-width)] min-w-[160px] bg-popover text-popover-foreground border border-border/80 shadow-xl rounded-lg p-1 text-xs"
 										>
-											<SelectItem value="حضوري" className="text-right text-xs cursor-pointer py-1.5">
-												حضوري
+											<SelectItem value="في الأكاديمية" className="text-right text-xs cursor-pointer py-1.5">
+												في الأكاديمية (حضوري)
 											</SelectItem>
 											<SelectItem value="عن بعد" className="text-right text-xs cursor-pointer py-1.5">
-												عن بعد
-											</SelectItem>
-											<SelectItem value="مدمج" className="text-right text-xs cursor-pointer py-1.5">
-												مدمج
+												عن بعد (أونلاين)
 											</SelectItem>
 										</SelectContent>
 									</Select>
 								</div>
+							</div>
 
+							{/* Row 4: المناوبة المفضلة | المجال المقترح */}
+							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 								{/* المناوبة المفضلة: صباحي / مسائي فقط */}
 								<div>
 									<FieldHeader
@@ -1004,7 +1315,7 @@ export function AddRequestDialog({
 										value={preferredShift}
 										onValueChange={setPreferredShift}
 									>
-										<SelectTrigger className="w-full h-8 text-xs text-right rounded-md border-border/80" dir="rtl">
+										<SelectTrigger className="w-full h-8 text-[11.5px] text-right rounded-md border-border/80" dir="rtl">
 											<SelectValue placeholder="اختر المناوبة" />
 										</SelectTrigger>
 										<SelectContent
@@ -1022,135 +1333,51 @@ export function AddRequestDialog({
 										</SelectContent>
 									</Select>
 								</div>
-							</div>
 
-							{/* Row 4: المجال المقترح (عرض كامل) */}
-							<div>
-								<FieldHeader
-									label="المجال المقترح"
-									required
-									tooltip="المجال أو المسار التقني المقترح للطالب"
-								/>
-								<Select
-									value={suggestedTrack}
-									onValueChange={setSuggestedTrack}
-								>
-									<SelectTrigger className="w-full h-8 text-xs text-right rounded-md border-border/80" dir="rtl">
-										<SelectValue placeholder="اختر" />
-									</SelectTrigger>
-									<SelectContent
-										dir="rtl"
-										position="popper"
-										sideOffset={4}
-										className="z-[99] w-[var(--radix-select-trigger-width)] min-w-[200px] bg-popover text-popover-foreground border border-border/80 shadow-xl rounded-lg p-1 text-xs"
-									>
-										<SelectItem value="البرمجة والمنطق" className="text-right text-xs cursor-pointer py-1.5">
-											البرمجة والمنطق
-										</SelectItem>
-										<SelectItem value="الذكاء الاصطناعي" className="text-right text-xs cursor-pointer py-1.5">
-											الذكاء الاصطناعي
-										</SelectItem>
-										<SelectItem value="الروبوتيكس" className="text-right text-xs cursor-pointer py-1.5">
-											الروبوتيكس
-										</SelectItem>
-										<SelectItem value="تطوير الألعاب" className="text-right text-xs cursor-pointer py-1.5">
-											تطوير الألعاب
-										</SelectItem>
-										<SelectItem value="تحليل البيانات" className="text-right text-xs cursor-pointer py-1.5">
-											تحليل البيانات
-										</SelectItem>
-										<SelectItem value="ريادة الأعمال" className="text-right text-xs cursor-pointer py-1.5">
-											ريادة الأعمال
-										</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-
-							{/* Row 5: ولي الأمر (Searchable Combobox من أولياء الأمور مع الفلترة أثناء الكتابة) */}
-							<div ref={guardianContainerRef} className="relative">
-								<FieldHeader
-									label="ولي الأمر"
-									required
-									tooltip="اختر من أولياء الأمور المسجلين أو اكتب للفلترة وإضافة ولي أمر جديد"
-								/>
-								<div className="relative">
-									<Input
-										value={guardian}
-										onChange={(e) => {
-											setGuardian(e.target.value);
-											setSelectedOwnerId(null);
-											setGuardianDropdownOpen(true);
-										}}
-										onFocus={() => setGuardianDropdownOpen(true)}
-										placeholder="اختر"
-										className="h-8 text-xs text-right pr-2.5 pl-8 rounded-md border-border/80 bg-background"
+								{/* المجال المقترح */}
+								<div>
+									<FieldHeader
+										label="المجال المقترح"
 										required
+										tooltip="المجال أو المسار التقني المقترح للطالب"
 									/>
-									<button
-										type="button"
-										onClick={() => setGuardianDropdownOpen((prev) => !prev)}
-										className="absolute inset-y-0 left-2.5 flex items-center text-muted-foreground/60 hover:text-foreground cursor-pointer"
+									<Select
+										value={suggestedTrack}
+										onValueChange={setSuggestedTrack}
 									>
-										<IconChevronDown className="size-3" />
-									</button>
+										<SelectTrigger className="w-full h-8 text-[11.5px] text-right rounded-md border-border/80" dir="rtl">
+											<SelectValue placeholder="اختر" />
+										</SelectTrigger>
+										<SelectContent
+											dir="rtl"
+											position="popper"
+											sideOffset={4}
+											className="z-[99] w-[var(--radix-select-trigger-width)] min-w-[200px] bg-popover text-popover-foreground border border-border/80 shadow-xl rounded-lg p-1 text-xs"
+										>
+											<SelectItem value="البرمجة والمنطق" className="text-right text-xs cursor-pointer py-1.5">
+												البرمجة والمنطق
+											</SelectItem>
+											<SelectItem value="الذكاء الاصطناعي" className="text-right text-xs cursor-pointer py-1.5">
+												الذكاء الاصطناعي
+											</SelectItem>
+											<SelectItem value="الروبوتيكس" className="text-right text-xs cursor-pointer py-1.5">
+												الروبوتيكس
+											</SelectItem>
+											<SelectItem value="تطوير الألعاب" className="text-right text-xs cursor-pointer py-1.5">
+												تطوير الألعاب
+											</SelectItem>
+											<SelectItem value="تحليل البيانات" className="text-right text-xs cursor-pointer py-1.5">
+												تحليل البيانات
+											</SelectItem>
+											<SelectItem value="ريادة الأعمال" className="text-right text-xs cursor-pointer py-1.5">
+												ريادة الأعمال
+											</SelectItem>
+										</SelectContent>
+									</Select>
 								</div>
-
-								{/* القائمة المنسدلة التفاعلية لأولياء الأمور مع الفلترة اللحظية */}
-								{guardianDropdownOpen && (
-									<div
-										className="absolute z-[99] mt-1 w-full rounded-lg border border-border/80 bg-popover text-popover-foreground shadow-2xl p-1 max-h-48 overflow-y-auto"
-										dir="rtl"
-									>
-										<div className="px-2 py-1 text-[10px] text-muted-foreground font-semibold border-b border-border/50 flex items-center justify-between">
-											<span>أولياء الأمور المتاحين</span>
-											<span className="font-mono text-[9px]">{filteredGuardians.length} متاح</span>
-										</div>
-
-										{filteredGuardians.length > 0 ? (
-											<div className="py-1 space-y-0.5">
-												{filteredGuardians.map((g) => (
-													<button
-														key={g.id}
-														type="button"
-														onClick={() => {
-															setGuardian(g.name);
-															setSelectedOwnerId(g.id.startsWith("g-") ? null : g.id);
-															setGuardianPhone(g.phone);
-															setGuardianDropdownOpen(false);
-														}}
-														className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs text-right hover:bg-muted/70 transition-colors cursor-pointer group"
-													>
-														<div className="flex items-center gap-1.5">
-															<IconUser className="size-3 text-muted-foreground group-hover:text-primary transition-colors" />
-															<span className="font-semibold text-foreground">{g.name}</span>
-														</div>
-														{g.phone && (
-															<span className="text-[10px] text-muted-foreground font-mono" dir="ltr">
-																{g.phone}
-															</span>
-														)}
-													</button>
-												))}
-											</div>
-										) : (
-											<div className="p-2.5 text-center text-xs text-muted-foreground space-y-1">
-												<p>لا يوجد ولي أمر بهذا الاسم</p>
-												{guardian.trim() && (
-													<button
-														type="button"
-														onClick={() => setGuardianDropdownOpen(false)}
-														className="text-primary hover:underline font-semibold text-[11px] cursor-pointer"
-													>
-														استخدام "{guardian}" كاسم ولي أمر جديد
-													</button>
-												)}
-											</div>
-										)}
-									</div>
-								)}
 							</div>
 
-							{/* Row 6: ملاحظات (اختياري) */}
+							{/* Row 5: ملاحظات (اختياري) */}
 							<div>
 								<div className="mb-1 flex items-center justify-between">
 									<span className="text-[11px] font-semibold text-foreground">
@@ -1161,76 +1388,101 @@ export function AddRequestDialog({
 									value={notes}
 									onChange={(e) => setNotes(e.target.value)}
 									placeholder="أضف أي ملاحظات أكاديمية..."
-									className="text-xs text-right h-14 min-h-[56px] resize-none rounded-md border-border/80 placeholder:text-muted-foreground/60 py-1.5"
+									className="text-[11.5px] text-right h-12 min-h-[48px] resize-none rounded-md border-border/80 placeholder:text-muted-foreground/60 py-1.5"
 								/>
 							</div>
 						</div>
 					) : (
-						/* ─── Step 2: Confirmation & Review ────────────────────────── */
-						<div className="flex flex-col gap-3">
-							<div className="rounded-xl border border-border/80 bg-muted/20 p-3.5 space-y-2.5">
-								<div className="flex items-center justify-between border-b border-border/60 pb-2">
-									<span className="text-xs font-bold text-foreground">ملخص مراجعة الطلب</span>
-									<span className="text-[11px] text-primary font-semibold font-mono">
-										{channel === "CALL" ? "عبر اتصال" : "في الأكاديمية"}
+						/* ─── Step 2: Confirmation & Review (مطابق 100% لصورة المستخدم f6725d6d) ── */
+						<div className="flex flex-col gap-3 py-1" dir="rtl">
+							{/* 1. بطاقة ملخص الطلب */}
+							<div className="rounded-xl border border-border/80 bg-card p-4 space-y-3 shadow-2xs">
+								<div className="border-b border-border/60 pb-2 flex items-center justify-between">
+									<h3 className="text-sm font-bold text-foreground">ملخص الطلب</h3>
+									<span className="text-[10px] font-semibold text-primary px-2 py-0.5 rounded-md bg-primary/10">
+										{selectedColumn}
 									</span>
 								</div>
 
-								<div className="grid grid-cols-2 gap-2 text-xs">
-									<div>
-										<span className="text-muted-foreground block text-[10px]">اسم الطالب</span>
-										<span className="font-bold text-foreground">{studentName}</span>
+								{/* قائمة الحقول المنظمة: التسمية على اليمين بالرمادي، والقيمة على اليسار بالأسود/الغامق */}
+								<div className="space-y-2 text-xs divide-y divide-border/30">
+									<div className="flex items-center justify-between pt-1">
+										<span className="text-muted-foreground text-[11px] font-normal">نوع الموعد</span>
+										<span className="font-semibold text-foreground text-[11.5px]">
+											{channel === "CALL" ? "عبر اتصال" : "في الأكاديمية"}
+										</span>
 									</div>
-									<div>
-										<span className="text-muted-foreground block text-[10px]">تاريخ الميلاد</span>
-										<span className="font-mono text-foreground">{birthDate}</span>
+
+									<div className="flex items-center justify-between pt-1.5">
+										<span className="text-muted-foreground text-[11px] font-normal">الطالب</span>
+										<span className="font-semibold text-foreground text-[11.5px]">
+											{studentName} {gender === "MALE" ? "(ذكر)" : gender === "FEMALE" ? "(أنثى)" : ""}
+										</span>
 									</div>
-									<div>
-										<span className="text-muted-foreground block text-[10px]">الجنس</span>
-										<span className="text-foreground">{gender === "MALE" ? "ذكر" : "أنثى"}</span>
-									</div>
-									<div>
-										<span className="text-muted-foreground block text-[10px]">مستوى الخبرة</span>
-										<span className="text-foreground">{experienceLevel || "غير محدد"}</span>
-									</div>
-									<div>
-										<span className="text-muted-foreground block text-[10px]">طريقة التعلم</span>
-										<span className="text-foreground">{learningMode}</span>
-									</div>
-									<div>
-										<span className="text-muted-foreground block text-[10px]">المناوبة</span>
-										<span className="text-foreground">{preferredShift || "غير محدد"}</span>
-									</div>
-									<div className="col-span-2">
-										<span className="text-muted-foreground block text-[10px]">المجال المقترح</span>
-										<span className="font-semibold text-foreground">{suggestedTrack}</span>
-									</div>
-									<div className="col-span-2">
-										<span className="text-muted-foreground block text-[10px]">ولي الأمر</span>
-										<span className="text-foreground">
+
+									<div className="flex items-center justify-between pt-1.5">
+										<span className="text-muted-foreground text-[11px] font-normal">ولي الأمر</span>
+										<span className="font-semibold text-foreground text-[11.5px]">
 											{guardian} {guardianPhone ? `(${guardianPhone})` : ""}
 										</span>
 									</div>
+
+									<div className="flex items-center justify-between pt-1.5">
+										<span className="text-muted-foreground text-[11px] font-normal">المراجع</span>
+										<span className="font-semibold text-foreground text-[11.5px]">
+											{reviewer !== "المراجع" ? reviewer : "فريق القبول والتسجيل"}
+										</span>
+									</div>
+
+									<div className="flex items-center justify-between pt-1.5">
+										<span className="text-muted-foreground text-[11px] font-normal">التاريخ والوقت</span>
+										<span className="font-semibold text-foreground text-[11.5px] font-mono">
+											{appointmentDate && appointmentDate !== "تاريخ الموعد" ? appointmentDate : "قيد الجدولة والفرز"}
+										</span>
+									</div>
+
+									<div className="flex items-center justify-between pt-1.5">
+										<span className="text-muted-foreground text-[11px] font-normal">المدة</span>
+										<span className="font-semibold text-foreground text-[11.5px]">
+											30 دقيقة
+										</span>
+									</div>
+
+									<div className="flex items-center justify-between pt-1.5">
+										<span className="text-muted-foreground text-[11px] font-normal">الغرفة</span>
+										<span className="font-semibold text-foreground text-[11.5px]">
+											{channel === "CALL" ? "جلسة افتراضية" : (selectedRoom !== "الغرفة" ? selectedRoom : "قاعة المقابلات الرئيسية")}
+										</span>
+									</div>
+
+									<div className="flex items-center justify-between pt-1.5">
+										<span className="text-muted-foreground text-[11px] font-normal">الخدمات</span>
+										<span className="font-semibold text-foreground text-[11.5px]">
+											{suggestedTrack} - {learningMode} ({preferredShift || "صباحي"})
+										</span>
+									</div>
+
 									{notes && (
-										<div className="col-span-2">
-											<span className="text-muted-foreground block text-[10px]">ملاحظات</span>
-											<span className="text-muted-foreground text-[11px]">{notes}</span>
+										<div className="flex items-center justify-between pt-1.5">
+											<span className="text-muted-foreground text-[11px] font-normal">ملاحظات</span>
+											<span className="text-foreground text-[11px] max-w-[280px] truncate">{notes}</span>
 										</div>
 									)}
+
 									{(attachedDocuments.length > 0 || attachedLinks.length > 0) && (
-										<div className="col-span-2 pt-1 border-t border-border/40">
-											<span className="text-muted-foreground block text-[10px]">المرفقات والروابط</span>
-											<div className="flex flex-wrap gap-1 mt-1">
+										<div className="flex items-center justify-between pt-1.5">
+											<span className="text-muted-foreground text-[11px] font-normal">المرفقات والروابط</span>
+											<div className="flex flex-wrap gap-1 justify-end max-w-[280px]">
 												{attachedDocuments.map((d) => (
 													<span key={d.id} className="text-[10px] px-1.5 py-0.5 bg-muted rounded inline-flex items-center gap-1">
 														<IconFileFilled className="size-2.5 text-muted-foreground" />
-														<span>{d.name}</span>
+														<span className="truncate max-w-[90px]">{d.name}</span>
 													</span>
 												))}
 												{attachedLinks.map((l) => (
 													<span key={l.id} className="text-[10px] px-1.5 py-0.5 bg-muted rounded inline-flex items-center gap-1 text-[#4F6BF5]">
 														<IconLinkPlus className="size-2.5" />
-														<span>{l.title || l.url}</span>
+														<span className="truncate max-w-[90px]">{l.title || l.url}</span>
 													</span>
 												))}
 											</div>
@@ -1239,23 +1491,70 @@ export function AddRequestDialog({
 								</div>
 							</div>
 
-							<div className="flex flex-wrap items-center gap-1.5 text-xs">
-								<span className="text-muted-foreground text-[10.5px]">التوزيع المبدئي:</span>
-								<span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-semibold text-[10.5px]">
-									{selectedColumn}
-								</span>
-								<span className="px-2 py-0.5 rounded-md bg-muted text-foreground font-semibold text-[10.5px]">
-									{priority}
-								</span>
-								{selectedRoom !== "الغرفة" && (
-									<span className="px-2 py-0.5 rounded-md bg-muted text-foreground text-[10.5px]">
-										الغرفة: {selectedRoom}
-									</span>
-								)}
-								{reviewer !== "المراجع" && (
-									<span className="px-2 py-0.5 rounded-md bg-muted text-foreground text-[10.5px]">
-										المراجع: {reviewer}
-									</span>
+							{/* 2. قسم رابط المشاركة (مطابق تماماً لصورة f6725d6d) */}
+							<div className="space-y-2 pt-1">
+								<Label className="text-xs font-bold text-foreground block">
+									رابط المشاركة
+								</Label>
+								<div className="flex items-center gap-2">
+									<div className="relative flex-1">
+										<Input
+											readOnly
+											value={previewShareLink}
+											placeholder="e.g: www.website.com/username"
+											className="h-8.5 text-xs text-left font-mono bg-muted/40 border-border/80 text-foreground"
+											dir="ltr"
+										/>
+									</div>
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										onClick={handleCopyShareLink}
+										className="h-8.5 px-3 text-xs gap-1.5 font-medium cursor-pointer shrink-0 border-border/80"
+									>
+										{copiedShareLink ? (
+											<IconCheck className="size-3.5 text-emerald-600" />
+										) : (
+											<IconCopy className="size-3.5" />
+										)}
+										<span>{copiedShareLink ? "تم النسخ" : "نسخ"}</span>
+									</Button>
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										onClick={handleOpenQr}
+										className="h-8.5 px-3 text-xs gap-1.5 font-medium cursor-pointer shrink-0 border-border/80"
+									>
+										<IconQrcode className="size-3.5" />
+										<span>رمز QR</span>
+									</Button>
+								</div>
+
+								{/* مفتاح إضافة رسالة */}
+								<div className="flex items-center justify-between pt-1">
+									<label className="flex items-center gap-2 cursor-pointer select-none">
+										<Switch
+											checked={includeMessage}
+											onCheckedChange={setIncludeMessage}
+											size="sm"
+										/>
+										<span className="text-[11.5px] font-semibold text-foreground">
+											إضافة رسالة
+										</span>
+									</label>
+								</div>
+
+								{includeMessage && (
+									<div className="animate-in fade-in duration-150 pt-1">
+										<Textarea
+											value={customMessage}
+											onChange={(e) => setCustomMessage(e.target.value)}
+											placeholder="اكتب رسالة مخصصة لولي الأمر بخصوص تفاصيل المقابلة والطلب..."
+											className="text-xs text-right h-16 min-h-[64px] resize-none rounded-md"
+										/>
+									</div>
 								)}
 							</div>
 						</div>
@@ -1263,7 +1562,7 @@ export function AddRequestDialog({
 				</div>
 
 				{/* ─── المرفقات والروابط المضافة من قائمة الثلاث نقط ───────────── */}
-				{(attachedDocuments.length > 0 || attachedLinks.length > 0) && (
+				{step === 1 && (attachedDocuments.length > 0 || attachedLinks.length > 0) && (
 					<div
 						className="px-4 py-1.5 bg-muted/40 border-t border-border/50 flex flex-wrap items-center gap-1.5 select-none"
 						dir="rtl"
@@ -1325,8 +1624,9 @@ export function AddRequestDialog({
 					</div>
 				)}
 
-				{/* ─── 3. Action Pills Bar (مطابق 100% لصورة المستخدم المرفقة e3a48d0f) ── */}
-				<div className="px-4 py-2 border-t border-border/50 bg-background flex flex-wrap items-center gap-1.5 select-none" dir="rtl">
+				{/* ─── 3. Action Pills Bar (مطابق للتصميم، يظهر فقط في الخطوة 1) ── */}
+				{step === 1 && (
+					<div className="px-4 py-2 border-t border-border/50 bg-background flex flex-wrap items-center gap-1.5 select-none" dir="rtl">
 					{/* 1. [ المراجع 🎧 ] (أقصى اليمين في RTL) - منسدلة اختيار الموظف المعتمدة من النظام */}
 					<Popover open={isReviewerOpen} onOpenChange={setIsReviewerOpen}>
 						<PopoverTrigger asChild>
@@ -1390,7 +1690,7 @@ export function AddRequestDialog({
 										el.scrollTop = target;
 									}
 								}}
-								className="max-h-60 overflow-y-auto overscroll-contain p-1.5 space-y-0.5 [scrollbar-width:thin] [scrollbar-color:hsl(var(--muted-foreground)/0.3)_transparent]"
+								className="max-h-60 overflow-y-auto overscroll-contain p-1.5 space-y-0.5 sanad-scrollbar"
 							>
 								{isStaffLoading ? (
 									<div className="py-6 text-center text-xs text-muted-foreground">
@@ -1475,6 +1775,8 @@ export function AddRequestDialog({
 						reviewerId={reviewerId || undefined}
 						enableReminders={notifyWhatsapp}
 						onEnableRemindersChange={setNotifyWhatsapp}
+						enableRecurrence={enableRecurrence}
+						onEnableRecurrenceChange={setEnableRecurrence}
 					/>
 
 					{/* 3. [ الغرفة 📍 ] - منسدلة اختيار القاعة/الغرفة المعتمدة مع التحقق من شرط تحديد الموعد أولاً وشارة محجوزة */}
@@ -1532,81 +1834,177 @@ export function AddRequestDialog({
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
+				)}
 
-				{/* ─── 4. Footer Bar (مطابق 100% لصورة المستخدم المرفقة e3a48d0f) ── */}
-				<div className="px-4 py-2.5 border-t border-border/70 bg-card flex items-center justify-between gap-2" dir="rtl">
-					{/* أقصى اليمين في RTL: أنشئ المزيد (Checkbox) */}
-					<div className="flex items-center gap-4">
-						<label className="flex items-center gap-1.5 cursor-pointer select-none">
-							<span className="text-[11.5px] text-muted-foreground hover:text-foreground">
-								أنشئ المزيد
-							</span>
-							<Checkbox
-								checked={createMore}
-								onCheckedChange={(checked) => setCreateMore(!!checked)}
-								className="size-3.5 rounded-[3px]"
-							/>
-						</label>
+				{/* ─── 4. Footer Bar (مطابق 100% لصورة المستخدم f6725d6d) ── */}
+				<div className="px-4 py-2 border-t border-border/70 bg-card flex items-center justify-between gap-2" dir="rtl">
+					{step === 1 ? (
+						<>
+							{/* في Step 1 أقصى اليمين: أنشئ المزيد + إشعار عبر الواتساب */}
+							<div className="flex items-center gap-4">
+								<label className="flex items-center gap-1.5 cursor-pointer select-none">
+									<span className="text-[11px] font-medium text-muted-foreground hover:text-foreground">
+										أنشئ المزيد
+									</span>
+									<Checkbox
+										checked={createMore}
+										onCheckedChange={(checked) => setCreateMore(!!checked)}
+										className="size-3.5 rounded-[3px]"
+									/>
+								</label>
 
-						{/* في المنتصف: إشعار عبر الواتساب (Switch) */}
-						<label className="flex items-center gap-1.5 cursor-pointer select-none">
-							<span className="text-[11.5px] text-muted-foreground hover:text-foreground">
-								إشعار عبر الواتساب
-							</span>
-							<Switch
-								size="sm"
-								checked={notifyWhatsapp}
-								onCheckedChange={setNotifyWhatsapp}
-							/>
-						</label>
-					</div>
+								<label className="flex items-center gap-1.5 cursor-pointer select-none">
+									<span className="text-[11px] font-medium text-muted-foreground hover:text-foreground">
+										إشعار عبر الواتساب
+									</span>
+									<Switch
+										size="sm"
+										checked={notifyWhatsapp}
+										onCheckedChange={setNotifyWhatsapp}
+									/>
+								</label>
+							</div>
 
-					{/* أقصى اليسار في RTL: زر التالي: مراجعة الطلب  ⌘K */}
-					<div className="flex items-center gap-2">
-						{step === 2 && (
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								onClick={() => setStep(1)}
-								disabled={isSubmitting}
-								className="h-8 px-2.5 text-xs"
-							>
-								<IconArrowRight className="size-3.5 ms-1" />
-								<span>السابق</span>
-							</Button>
-						)}
-
-						{step === 1 ? (
-							<Button
-								type="button"
-								size="sm"
-								onClick={handleNext}
-								className={cn(
-									"h-8 px-3.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-xs",
-									isFormFilled
-										? "bg-[#5B50E5] hover:bg-[#4E43D8] text-white"
-										: "bg-[#D0D8F7] hover:bg-[#BFCBFA] text-white/90",
+							{/* في Step 1 أقصى اليسار: زر تحديث الطلب (في وضع التعديل) أو زر التالي (في وضع الإضافة) */}
+							<div className="flex items-center gap-2">
+								{initialData ? (
+									<Button
+										type="button"
+										size="sm"
+										onClick={handleSubmit}
+										disabled={isSubmitting}
+										className={cn(
+											"h-8 px-4 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-xs",
+											isSubmitting
+												? "bg-primary/70 text-white cursor-wait"
+												: "bg-[#5B50E5] hover:bg-[#4E43D8] text-white",
+										)}
+									>
+										<span>{isSubmitting ? "جاري الحفظ..." : "تحديث بيانات الطلب"}</span>
+										<span className="bg-white/20 text-white text-[9.5px] font-mono px-1 py-0.2 rounded leading-none">
+											⌘K
+										</span>
+									</Button>
+								) : (
+									<Button
+										type="button"
+										size="sm"
+										onClick={handleNext}
+										className={cn(
+											"h-8 px-3.5 text-xs font-semibold rounded-lg flex items-center gap-1.5 transition-all cursor-pointer shadow-xs",
+											isFormFilled
+												? "bg-[#5B50E5] hover:bg-[#4E43D8] text-white"
+												: "bg-[#D0D8F7] hover:bg-[#BFCBFA] text-white/90",
+										)}
+									>
+										<span>التالي: مراجعة الطلب</span>
+										<span className="bg-white/20 text-white text-[9.5px] font-mono px-1 py-0.2 rounded leading-none">
+											⌘K
+										</span>
+									</Button>
 								)}
-							>
-								<span>التالي: مراجعة الطلب</span>
-								<span className="bg-white/20 text-white text-[9.5px] font-mono px-1 py-0.2 rounded leading-none">
-									⌘K
-								</span>
-							</Button>
-						) : (
-							<Button
-								type="button"
-								size="sm"
-								onClick={handleSubmit}
-								disabled={isSubmitting}
-								className="h-8 px-3.5 text-xs font-bold bg-[#5B50E5] hover:bg-[#4E43D8] text-white shadow-xs rounded-lg flex items-center gap-1.5 transition-all cursor-pointer"
-							>
-								<IconCheck className="size-3.5" />
-								<span>{isSubmitting ? "جاري الحفظ..." : "تأكيد وتسجيل المتقدم"}</span>
-							</Button>
-						)}
-					</div>
+							</div>
+						</>
+					) : (
+						<>
+							{/* في Step 2 أقصى اليمين في RTL: زر تعديل الطلب (مطابق تماماً للصورة f6725d6d) */}
+							<div className="flex items-center gap-2">
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									onClick={() => setStep(1)}
+									disabled={isSubmitting}
+									className="h-8 px-4 text-xs font-medium border-border/80 hover:bg-muted cursor-pointer rounded-lg text-foreground"
+								>
+									<span>تعديل الطلب</span>
+								</Button>
+							</div>
+
+							{/* في Step 2 أقصى اليسار في RTL: إشعار عبر الواتساب + زر حفظ التسجيل (مطابق للصورة f6725d6d) */}
+							<div className="flex items-center gap-3">
+								<label className="flex items-center gap-1.5 cursor-pointer select-none">
+									<span className="text-[11px] font-medium text-muted-foreground hover:text-foreground">
+										إشعار عبر الواتساب
+									</span>
+									<Switch
+										size="sm"
+										checked={notifyWhatsapp}
+										onCheckedChange={setNotifyWhatsapp}
+									/>
+								</label>
+
+								<Button
+									type="button"
+									size="sm"
+									onClick={handleSubmit}
+									disabled={isSubmitting}
+									className="h-8 px-4 text-xs font-bold bg-[#5B50E5] hover:bg-[#4E43D8] text-white shadow-xs rounded-lg flex items-center gap-1.5 transition-all cursor-pointer"
+								>
+									<IconCheck className="size-3.5" />
+									<span>{isSubmitting ? "جاري الحفظ..." : (initialData ? "تحديث بيانات الطلب" : "حفظ التسجيل")}</span>
+									<span className="bg-white/20 text-white text-[9px] font-mono px-1 py-0.2 rounded leading-none">
+										⌘K
+									</span>
+								</Button>
+							</div>
+						</>
+					)}
+				</div>
+			</DialogContent>
+		</Dialog>
+
+		{/* نافذة عرض رمز QR للمشاركة */}
+		<Dialog open={isQrOpen} onOpenChange={setIsQrOpen}>
+			<DialogContent className="sm:max-w-xs p-5 text-center" dir="rtl">
+				<DialogHeader>
+					<DialogTitle className="text-sm font-bold flex items-center justify-center gap-2 text-foreground">
+						<IconQrcode className="size-4 text-[#4F6BF5]" />
+						<span>رمز QR للمشاركة</span>
+					</DialogTitle>
+				</DialogHeader>
+				<div className="py-3 flex flex-col items-center justify-center gap-2">
+					{qrCodeDataUrl ? (
+						<img
+							src={qrCodeDataUrl}
+							alt="QR Code"
+							className="size-44 rounded-lg border border-border/70 p-2 bg-white shadow-xs"
+						/>
+					) : (
+						<div className="size-44 bg-muted animate-pulse rounded-lg flex items-center justify-center">
+							<IconQrcode className="size-8 text-muted-foreground animate-spin" />
+						</div>
+					)}
+					<p className="text-[11px] text-muted-foreground mt-1">
+						امسح الرمز بكاميرا الهاتف لفتح رابط جلسة المقابلة
+					</p>
+				</div>
+				<div className="flex items-center justify-center gap-2 pt-2 border-t border-border/50">
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={() => setIsQrOpen(false)}
+						className="h-7.5 text-xs px-3 cursor-pointer"
+					>
+						إغلاق
+					</Button>
+					{qrCodeDataUrl && (
+						<Button
+							type="button"
+							size="sm"
+							onClick={() => {
+								const a = document.createElement("a");
+								a.href = qrCodeDataUrl;
+								a.download = `QR-${studentName || "candidate"}.png`;
+								a.click();
+								toast.success("تم تنزيل رمز QR بنجاح");
+							}}
+							className="h-7.5 text-xs px-3 bg-[#5B50E5] hover:bg-[#4E43D8] text-white cursor-pointer"
+						>
+							تنزيل الصورة
+						</Button>
+					)}
 				</div>
 			</DialogContent>
 		</Dialog>
@@ -1710,11 +2108,11 @@ function FieldHeader({
 	tooltip?: string;
 }) {
 	return (
-		<div className="flex items-center justify-between mb-1 select-none">
+		<div className="flex items-center justify-between mb-0.5 select-none">
 			<div className="flex items-center gap-1.5">
-				<Label className="text-[11.5px] font-bold text-foreground">{label}</Label>
+				<Label className="text-[11px] font-semibold text-foreground tracking-tight">{label}</Label>
 				{required && (
-					<span className="bg-[#FFF1F2] dark:bg-rose-950/60 text-[#E11D48] dark:text-rose-400 text-[8.5px] font-bold px-1.5 py-0.2 rounded-full leading-tight border border-rose-200/50 dark:border-rose-900/50">
+					<span className="bg-[#FFF1F2] dark:bg-rose-950/60 text-[#E11D48] dark:text-rose-400 text-[8.5px] font-semibold px-1.5 py-0.2 rounded-full leading-tight border border-rose-200/50 dark:border-rose-900/50">
 						مطلوب
 					</span>
 				)}
