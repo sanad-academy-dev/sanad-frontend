@@ -1,8 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+	type CreateLessonFormInput,
+	createLessonSchema,
+	type LessonFormValues,
+	type LessonResponse,
+	type LessonType,
+	MEDIA_LESSON_TYPES,
+	parseQuizContent,
+	REQUIRE_LESSON_MEDIA,
+} from "@sanad/contracts/runtime/server/training/training.type";
 import { IconFileTextSpark, IconInfoCircle, IconPlus } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-
 import { ChangesBadge } from "@/components/common/changes-badge";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
@@ -25,16 +34,6 @@ import {
 } from "@/features/services/training/data/training";
 import { useUploadMedia } from "@/features/services/training/hooks/use-upload-media";
 import { cn } from "@/lib/utils";
-import {
-	type CreateLessonFormInput,
-	createLessonSchema,
-	type LessonFormValues,
-	type LessonResponse,
-	type LessonType,
-	MEDIA_LESSON_TYPES,
-	parseQuizContent,
-	REQUIRE_LESSON_MEDIA,
-} from "@sanad/contracts/runtime/server/training/training.type";
 
 // تسميات الحقول حسب نوع الدرس
 const MEDIA_LABEL: Partial<Record<LessonType, string>> = {
@@ -93,6 +92,7 @@ export function LessonForm({
 	lesson,
 	unitTitle = "",
 	restored,
+	onValuesChange,
 }: {
 	// يستقبل القيم غير المحفوظة عند «تجاهل وخروج» لتمكين «تراجع» من استرجاعها
 	onCancel: (discarded?: CreateLessonFormInput) => void;
@@ -102,6 +102,7 @@ export function LessonForm({
 	lesson?: LessonResponse;
 	unitTitle?: string;
 	restored?: CreateLessonFormInput;
+	onValuesChange?: (values: CreateLessonFormInput) => void;
 }) {
 	const isEditing = !!lesson;
 	const [confirmingDiscard, setConfirmingDiscard] = useState(false);
@@ -147,6 +148,17 @@ export function LessonForm({
 	useEffect(() => {
 		if (restored) reset(restored, { keepDefaultValues: true });
 	}, [restored, reset]);
+
+	// إرسال القيم المحدّثة للمعاينة المباشرة
+	useEffect(() => {
+		if (onValuesChange) {
+			onValuesChange(getValues() as CreateLessonFormInput);
+			const subscription = watch((values) => {
+				onValuesChange(values as CreateLessonFormInput);
+			});
+			return () => subscription.unsubscribe();
+		}
+	}, [watch, getValues, onValuesChange]);
 
 	// عدّاد التعديلات في الشارة، وهو أيضًا شرط تفعيل زر الحفظ
 	const editCount = Object.keys(dirtyFields).length;

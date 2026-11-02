@@ -2,6 +2,7 @@ import type { PatientResponse } from "@sanad/contracts/runtime/server/patients/p
 import {
 	IconArrowsExchange,
 	IconBan,
+	IconCalendarEvent,
 	IconCheck,
 	IconChevronDown,
 	IconDots,
@@ -11,8 +12,10 @@ import {
 	IconGenderMale,
 	IconPlayerPause,
 	IconPlus,
+	IconSchool,
 	IconTrash,
 	IconUser,
+	IconUsers,
 	IconX,
 } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -26,6 +29,7 @@ import {
 } from "@tanstack/react-table";
 import { useCallback, useMemo, useState } from "react";
 import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
+import { type FilterGroup, FiltersMenu } from "@/components/common/filters-menu";
 import { GuardianHoverCard, type GuardianHoverData } from "@/components/common/hover-cards";
 import { TableDataView } from "@/components/common/table-data-view";
 import { TableToolbar } from "@/components/common/table-toolbar";
@@ -45,6 +49,7 @@ import { PatientSheet } from "@/features/services/patients/components/patient-sh
 import { TransferOwnershipDialog } from "@/features/services/patients/components/transfer-ownership-dialog";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { useUpdatePatient } from "@/features/services/patients/hooks/use-update-patient";
+import { AGE_GROUPS } from "@/features/services/classrooms/data/constants";
 import {
 	calculateAge,
 	getStudentAgeGroup,
@@ -68,6 +73,13 @@ export function PatientsTable() {
 	const [disablingPatient, setDisablingPatient] = useState<PatientResponse | null>(null);
 	const [transferringPatient, setTransferringPatient] = useState<PatientResponse | null>(null);
 	const [deletingPatient, setDeletingPatient] = useState<PatientResponse | null>(null);
+
+	// فلاتر جدول الطلاب
+	const [selectedAgeGroups, setSelectedAgeGroups] = useState<string[]>([]);
+	const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
+	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+	const [selectedClassrooms, setSelectedClassrooms] = useState<string[]>([]);
+	const [selectedGuardianStatus, setSelectedGuardianStatus] = useState<string[]>([]);
 
 	const { patients, isLoading } = usePatients();
 	const { updatePatient } = useUpdatePatient();
@@ -557,8 +569,134 @@ export function PatientsTable() {
 		[handleStatusChange, navigate],
 	);
 
+	// تصفية الطلاب حسب الفلاتر المحددة
+	const filteredPatients = useMemo(() => {
+		return patients.filter((p) => {
+			if (selectedGenders.length > 0) {
+				if (!p.gender || !selectedGenders.includes(p.gender)) return false;
+			}
+			if (selectedAgeGroups.length > 0) {
+				const grp = getStudentAgeGroup(p);
+				if (!selectedAgeGroups.includes(grp)) return false;
+			}
+			if (selectedStatuses.length > 0) {
+				const isPendingOrSuspended = p.status === "SUSPENDED" || p.status === "PENDING";
+				const statusKey = isPendingOrSuspended ? "SUSPENDED" : p.active ? "ACTIVE" : "INACTIVE";
+				if (!selectedStatuses.includes(statusKey)) return false;
+			}
+			if (selectedClassrooms.length > 0) {
+				const c = p.classroom?.trim();
+				const match = selectedClassrooms.some((sel) => {
+					if (sel === "NO_CLASSROOM") return !c;
+					return c === sel;
+				});
+				if (!match) return false;
+			}
+			if (selectedGuardianStatus.length > 0) {
+				const hasGuardian = Boolean(
+					p.owner || (p.guardians && p.guardians.length > 0) || p.guardianName,
+				);
+				const match = selectedGuardianStatus.some((sel) => {
+					if (sel === "HAS_GUARDIAN") return hasGuardian;
+					if (sel === "NO_GUARDIAN") return !hasGuardian;
+					return true;
+				});
+				if (!match) return false;
+			}
+			return true;
+		});
+	}, [
+		patients,
+		selectedGenders,
+		selectedAgeGroups,
+		selectedStatuses,
+		selectedClassrooms,
+		selectedGuardianStatus,
+	]);
+
+	const clearAllFilters = useCallback(() => {
+		setSelectedAgeGroups([]);
+		setSelectedGenders([]);
+		setSelectedStatuses([]);
+		setSelectedClassrooms([]);
+		setSelectedGuardianStatus([]);
+	}, []);
+
+	// تعريف مجموعات التصفية لـ FiltersMenu الموحد
+	const filterGroups: FilterGroup[] = useMemo(() => {
+		const uniqueClassrooms = Array.from(
+			new Set(patients.map((p) => p.classroom?.trim()).filter(Boolean)),
+		).map((c) => ({ value: c as string, label: c as string }));
+
+		return [
+			{
+				key: "ageGroup",
+				label: "الفئة العمرية",
+				Icon: IconCalendarEvent,
+				options: AGE_GROUPS.map((g) => ({ value: g, label: g })),
+				selected: selectedAgeGroups,
+				onToggle: (val) =>
+					setSelectedAgeGroups((prev) =>
+						prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val],
+					),
+			},
+			{
+				key: "gender",
+				label: "الجنس",
+				Icon: IconUser,
+				options: [
+					{ value: "MALE", label: "ذكر" },
+					{ value: "FEMALE", label: "أنثى" },
+				],
+				selected: selectedGenders,
+				onToggle: (val) =>
+					setSelectedGenders((prev) =>
+						prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val],
+					),
+			},
+			{
+				key: "status",
+				label: "الحالة",
+				Icon: IconCheck,
+				options: [
+					{ value: "ACTIVE", label: "نشط" },
+					{ value: "SUSPENDED", label: "معلق" },
+					{ value: "INACTIVE", label: "غير نشط / معطل" },
+				],
+				selected: selectedStatuses,
+				onToggle: (val) =>
+					setSelectedStatuses((prev) =>
+						prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val],
+					),
+			},
+			{
+				key: "classroom",
+				label: "الفصل الدراسي",
+				Icon: IconSchool,
+				options: [
+					...uniqueClassrooms,
+					{ value: "NO_CLASSROOM", label: "بدون فصل دراسي" },
+				],
+				selected: selectedClassrooms,
+				onToggle: (val) =>
+					setSelectedClassrooms((prev) =>
+						prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val],
+					),
+				emptyLabel: "لا توجد فصول",
+			},
+			
+		];
+	}, [
+		patients,
+		selectedAgeGroups,
+		selectedGenders,
+		selectedStatuses,
+		selectedClassrooms,
+		selectedGuardianStatus,
+	]);
+
 	const table = useReactTable({
-		data: patients,
+		data: filteredPatients,
 		columns,
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
@@ -619,6 +757,14 @@ export function PatientsTable() {
 					searchPlaceholder="ابحث باسم الطالب، ولي الأمر، أو رقم التواصل..."
 					searchValue={(table.getState().globalFilter as string) ?? ""}
 					onSearchChange={(v) => table.setGlobalFilter(v)}
+					filterMenu={
+						<FiltersMenu
+							groups={filterGroups}
+							size="sm"
+							label="فلترة"
+							onReset={clearAllFilters}
+						/>
+					}
 					actions={
 						<Button
 							size="sm"

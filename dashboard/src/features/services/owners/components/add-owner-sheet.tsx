@@ -3,7 +3,7 @@ import {
 	createOwnerSchema,
 	type OwnerResponse,
 } from "@sanad/contracts/runtime/server/owners/owners.type";
-import { IconPlus } from "@tabler/icons-react";
+import { IconPlus, IconUsers } from "@tabler/icons-react";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { useEffect, useState } from "react";
 import { Controller, type Resolver, useForm } from "react-hook-form";
@@ -39,12 +39,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { AddPatientDialog } from "@/features/services/owners/components/add-patient-dialog";
 import { OWNER_FIELD_LABELS } from "@/features/services/owners/data/constants";
 import { DiscardConfirmDialog } from "@/features/services/patients/components/discard-confirm-dialog";
+import { RELATIONSHIP_OPTIONS } from "@/features/services/patients/data/patient-form-constants";
 import { useCreateOwner } from "@/features/services/patients/hooks/use-create-owner";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { useFormProgress } from "@/hooks/use-form-progress";
 
 const addOwnerSheetSchema = createOwnerSchema.extend({
 	patientIds: z.array(z.string()).min(1, "يرجى اختيار طفل واحد على الأقل"),
+	patientRelationships: z.record(z.string(), z.string()).optional(),
 });
 
 type AddOwnerSheetFormInput = z.infer<typeof addOwnerSheetSchema>;
@@ -77,12 +79,12 @@ export function AddOwnerSheet({
 		formState: { errors },
 	} = useForm<AddOwnerSheetFormInput>({
 		resolver: zodResolver(addOwnerSheetSchema) as Resolver<AddOwnerSheetFormInput>,
-		defaultValues: { active: true, ownerType: "ALL", patientIds: [] },
+		defaultValues: { active: true, ownerType: "ALL", patientIds: [], patientRelationships: {} },
 	});
 
 	useEffect(() => {
 		if (!open) {
-			reset({ active: true, ownerType: "ALL", patientIds: [] });
+			reset({ active: true, ownerType: "ALL", patientIds: [], patientRelationships: {} });
 			setPatientSearch("");
 		}
 	}, [open, reset]);
@@ -271,7 +273,22 @@ export function AddOwnerSheet({
 											open={patientComboOpen}
 											onOpenChange={setPatientComboOpen}
 											value={field.value ?? []}
-											onValueChange={(val) => field.onChange(val ?? [])}
+											onValueChange={(val) => {
+												const nextIds = val ?? [];
+												field.onChange(nextIds);
+												const curRels = {
+													...((watch("patientRelationships") as Record<string, string> | undefined) || {}),
+												};
+												for (const pId of nextIds) {
+													if (!curRels[pId]) {
+														curRels[pId] = "FATHER";
+													}
+												}
+												setValue("patientRelationships", curRels, {
+													shouldDirty: true,
+													shouldValidate: true,
+												});
+											}}
 										>
 											<ComboboxChips aria-invalid={!!errors.patientIds}>
 												{(field.value ?? []).map((id) => {
@@ -338,6 +355,90 @@ export function AddOwnerSheet({
 								)}
 							/>
 						</div>
+
+						{/* صلة القرابة لكل طفل مختار — مطابق تماماً لنموذج الطفل */}
+						{(() => {
+							const selectedPatientIds = watch("patientIds") || [];
+							const relMap =
+								(watch("patientRelationships") as Record<string, string> | undefined) || {};
+							const selectedPatientsList = selectedPatientIds
+								.map((id) => patients.find((p) => p.id === id))
+								.filter(Boolean) as typeof patients;
+
+							if (selectedPatientsList.length === 0) return null;
+
+							return (
+								<div className="flex flex-col gap-2 rounded-xl border border-border/80 bg-muted/20 p-3">
+									<span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+										<IconUsers className="size-4 text-primary" />
+										صلة القرابة بكل طفل:
+									</span>
+									<div className="flex flex-col gap-2">
+										{selectedPatientsList.map((child, idx) => {
+											const currentRel = relMap[child.id] || "FATHER";
+											return (
+												<div
+													key={child.id}
+													className="flex items-center justify-between gap-3 p-2 rounded-lg bg-card border border-border/70 flex-wrap sm:flex-nowrap"
+												>
+													<div className="flex items-center gap-2 min-w-0">
+														<div className="size-7 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs shrink-0">
+															{idx + 1}
+														</div>
+														<div className="flex flex-col min-w-0">
+															<span className="text-xs font-semibold text-foreground truncate">
+																{child.name}
+															</span>
+															{child.code && (
+																<span className="text-[11px] text-muted-foreground font-mono tabular-nums">
+																	#{child.code}
+																</span>
+															)}
+														</div>
+													</div>
+
+													<div className="flex items-center gap-2 shrink-0">
+														<span className="text-xs text-muted-foreground">صلة القرابة:</span>
+														<Select
+															value={currentRel}
+															onValueChange={(val) => {
+																setValue(
+																	"patientRelationships",
+																	{
+																		...((watch("patientRelationships") as
+																			| Record<string, string>
+																			| undefined) || {}),
+																		[child.id]: val,
+																	},
+																	{ shouldValidate: true, shouldDirty: true },
+																);
+															}}
+															disabled={isPending}
+															dir="rtl"
+														>
+															<SelectTrigger className="h-8 w-32 text-xs">
+																<SelectValue placeholder="اختر..." />
+															</SelectTrigger>
+															<SelectContent dir="rtl">
+																{RELATIONSHIP_OPTIONS.map((opt) => (
+																	<SelectItem
+																		key={opt.value}
+																		value={opt.value}
+																		className="text-xs"
+																	>
+																		{opt.label}
+																	</SelectItem>
+																))}
+															</SelectContent>
+														</Select>
+													</div>
+												</div>
+											);
+										})}
+									</div>
+								</div>
+							);
+						})()}
 
 						<div className="grid grid-cols-2 gap-3">
 							<div className="flex flex-col gap-1.5">

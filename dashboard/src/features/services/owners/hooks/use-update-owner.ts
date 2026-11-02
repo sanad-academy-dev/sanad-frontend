@@ -18,6 +18,7 @@ export const useUpdateOwner = () => {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["owners"] });
+			queryClient.invalidateQueries({ queryKey: ["patients"] });
 		},
 	});
 
