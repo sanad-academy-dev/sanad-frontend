@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	IconCalendar,
 	IconCalendarEvent,
@@ -18,28 +18,14 @@ import {
 } from "@/components/ui/popover";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import { useQuickUpdateRequest } from "../../hooks/use-digital-registration";
+import { backendFetch } from "@/lib/backend-fetch";
+import { REGISTRATION_TRACKS } from "../../utils/registration-tracks";
 
 interface RequestBasicInfoGridProps {
 	request: CampaignRequestItem;
 	campaignId?: string;
 	onOpenReschedule: () => void;
 }
-
-const CLASS_OPTIONS = [
-	"النجوم",
-	"براعم النور",
-	"الصف التمهيدي",
-	"الروضة الأولى (KG1)",
-	"الروضة الثانية (KG2)",
-	"عباقرة الغد",
-];
-
-const TRACK_OPTIONS = [
-	"المسار العام المعتمد",
-	"مسار رعاية الموهبة والذكاء",
-	"مسار اللغات واللغويات",
-	"مسار التربية الخاصة والدمج",
-];
 
 export function RequestBasicInfoGrid({
 	request,
@@ -48,17 +34,25 @@ export function RequestBasicInfoGrid({
 }: RequestBasicInfoGridProps) {
 	const [classPopoverOpen, setClassPopoverOpen] = useState(false);
 	const [trackPopoverOpen, setTrackPopoverOpen] = useState(false);
+	const [classrooms, setClassrooms] = useState<Array<{ id: string; name: string; category?: string | null }>>([]);
 	const quickUpdateMutation = useQuickUpdateRequest(campaignId);
 
-	const handleAssignClass = (className: string) => {
+	useEffect(() => {
+		backendFetch("/api/classrooms")
+			.then(async (response) => (response.ok ? response.json() : []))
+			.then((items) => setClassrooms(Array.isArray(items) ? items.filter((item) => item?.name) : []))
+			.catch(() => setClassrooms([]));
+	}, []);
+
+	const handleAssignClass = (classroom: { name: string; category?: string | null }) => {
 		quickUpdateMutation.mutate(
 			{
 				requestId: request.id,
-				data: { targetClass: className },
+				data: { targetClass: classroom.name },
 			},
 			{
 				onSuccess: () => {
-					toast.success(`تم تعيين الفصل: ${className}`);
+				toast.success(`تم تعيين الفصل: ${classroom.name}`);
 					setClassPopoverOpen(false);
 				},
 				onError: (err: any) => {
@@ -115,14 +109,14 @@ export function RequestBasicInfoGrid({
 					</span>
 				</div>
 
-				{/* المدينة */}
+				{/* المدينة لا تُعرض بقيمة ثابتة؛ الطلب لا يحتوي هذا الحقل حالياً. */}
 				<div className="flex items-center justify-between py-0.5 border-b border-zinc-100 dark:border-zinc-800/60">
 					<span className="text-zinc-500 dark:text-zinc-400 flex items-center gap-1 text-[10px]">
 						<IconMapPin className="size-3 text-zinc-400" />
 						<span>المدينة</span>
 					</span>
 					<span className="font-bold text-zinc-900 dark:text-zinc-100 text-[10.5px]">
-						مكة
+						غير محددة
 					</span>
 				</div>
 
@@ -139,9 +133,10 @@ export function RequestBasicInfoGrid({
 						<button
 							type="button"
 							onClick={onOpenReschedule}
-							className="rounded bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 px-1 py-0.2 text-[8.5px] font-bold hover:bg-purple-100 transition-colors"
+							className="rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 px-1.5 py-0.5 text-[9.5px] font-medium transition-colors cursor-pointer shadow-2xs"
+							title="إعادة جدولة موعد المقابلة"
 						>
-							إعادة جدولة
+							إعادة الجدولة
 						</button>
 					</div>
 				</div>
@@ -189,14 +184,16 @@ export function RequestBasicInfoGrid({
 								اختر الفصل المناسب للطالب
 							</p>
 							<div className="space-y-0.5 mt-0.5">
-								{CLASS_OPTIONS.map((cls) => (
+								{classrooms.length === 0 ? (
+									<p className="px-1.5 py-2 text-[10px] text-muted-foreground">لا توجد فصول مضافة في النظام</p>
+								) : classrooms.map((cls) => (
 									<button
-										key={cls}
+										key={cls.id}
 										type="button"
 										onClick={() => handleAssignClass(cls)}
 										className="w-full text-right text-[11px] px-1.5 py-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium transition-colors"
 									>
-										{cls}
+										{cls.name}
 									</button>
 								))}
 							</div>
@@ -236,7 +233,7 @@ export function RequestBasicInfoGrid({
 								اختر المسار الأكاديمي
 							</p>
 							<div className="space-y-0.5 mt-0.5">
-								{TRACK_OPTIONS.map((trk) => (
+								{REGISTRATION_TRACKS.map((trk) => (
 									<button
 										key={trk}
 										type="button"

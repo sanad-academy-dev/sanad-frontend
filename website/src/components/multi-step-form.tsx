@@ -283,51 +283,43 @@ export function MultiStepForm({
     setSubmitError(null);
     try {
       const student = childrenList[0] || { name: "", age: "" };
+		if (!student.name.trim() || !parentName.trim() || !phone.trim()) {
+			setSubmitError("يرجى إدخال اسم الطفل واسم ولي الأمر ورقم الهاتف قبل الإرسال.");
+			return;
+		}
       const ageVal = student.age ? `${student.age} سنوات` : age ? `${age} سنوات` : null;
 
       const payload = {
         source: "WEBSITE",
-        studentName: student.name.trim() || "طالب جديد",
+			studentName: student.name.trim(),
+			gender: "UNKNOWN",
         ageLabel: ageVal,
         targetClass: c1 ? `مسار تمهيدي (${c1})` : "مسار تمهيدي",
-        guardianName: parentName.trim() || "ولي أمر",
-        guardianPhone: phone.trim() || "0500000000",
+			guardianName: parentName.trim(),
+			guardianPhone: phone.trim(),
         guardianEmail: email.trim() || null,
         notes: `الموعد المختار: ${getDayName(bookingDay)} ${bookingDay || ""} أكتوبر - الساعة: ${bookingTime || "غير محدد"}. إجابات التقييم: مسار=${c1 || ""}, هدف=${c2 || ""}, خطوات=${c5?.join(",") || ""}`,
       };
 
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), 1200);
-
-      try {
-        const res = await fetch("/api/register", {
+		const res = await fetch("/api/register", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "ngrok-skip-browser-warning": "true",
           },
           body: JSON.stringify(payload),
-          signal: controller.signal,
-        });
-        clearTimeout(timer);
+		});
 
-        if (res.ok) {
-          const data = await res.json();
-          setRequestCode(data.requestCode || `SND-${Math.floor(100000 + Math.random() * 900000)}`);
-          go(18, 1);
-          return;
-        }
-      } catch {
-        // Fallback for demo or network offline
-      }
+		const data = await res.json().catch(() => ({}));
+		if (!res.ok || !data.requestCode) {
+			setSubmitError(data.message || "تعذر إرسال طلب التسجيل. يرجى المحاولة مرة أخرى.");
+			return;
+		}
 
-      const code = `SND-${Math.floor(100000 + Math.random() * 900000)}`;
-      setRequestCode(code);
-      go(18, 1);
-    } catch {
-      const code = `SND-${Math.floor(100000 + Math.random() * 900000)}`;
-      setRequestCode(code);
-      go(18, 1);
+		setRequestCode(data.requestCode);
+		go(18, 1);
+	} catch {
+		setSubmitError("تعذر الاتصال بخدمة التسجيل. تحقق من اتصالك ثم أعد المحاولة.");
     } finally {
       setIsSubmitting(false);
     }

@@ -35,6 +35,7 @@ import { RescheduleRequestDialog } from "./modals/reschedule-request-dialog";
 import { RejectRequestDialog } from "./modals/reject-request-dialog";
 import { ReferRequestDialog } from "./modals/refer-request-dialog";
 import { DeleteRequestDialog } from "./modals/delete-request-dialog";
+import { RequestStatusTransitionDialog, type RequestTransitionTarget } from "./modals/request-status-transition-dialog";
 import { StudentRequestPrintModal } from "./print/student-request-print-modal";
 
 interface CampaignRequestSheetProps {
@@ -50,7 +51,7 @@ interface CampaignRequestSheetProps {
 	onDelete?: (request: CampaignRequestItem) => void;
 }
 
-export type ActiveActionDrawer = "shortlist" | "waitlist" | "reschedule" | "reject" | "refer" | "delete" | "edit" | null;
+export type ActiveActionDrawer = "shortlist" | "waitlist" | "reschedule" | "reject" | "refer" | "delete" | "edit" | "status" | null;
 
 export function CampaignRequestSheet({
 	request,
@@ -66,6 +67,7 @@ export function CampaignRequestSheet({
 }: CampaignRequestSheetProps) {
 	// Active drawer state - guarantees only ONE action modal/drawer is ever open at a time
 	const [activeDrawer, setActiveDrawer] = useState<ActiveActionDrawer>(null);
+	const [statusTransitionTarget, setStatusTransitionTarget] = useState<RequestTransitionTarget | null>(null);
 	const [isScheduleAssessmentOpen, setIsScheduleAssessmentOpen] = useState(false);
 	const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
 	const lastDrawerClosedAtRef = useRef<number>(0);
@@ -74,8 +76,12 @@ export function CampaignRequestSheet({
 		lastDrawerClosedAtRef.current = Date.now();
 		setActiveDrawer(null);
 	}, []);
+	const openStatusTransition = (target: RequestTransitionTarget) => {
+		setStatusTransitionTarget(target);
+		setActiveDrawer("status");
+	};
 
-	const isAnyDrawerOpen = activeDrawer !== null;
+	const isAnyDrawerOpen = activeDrawer !== null || isScheduleAssessmentOpen || isPrintDialogOpen;
 
 	if (!request) return null;
 
@@ -109,39 +115,44 @@ export function CampaignRequestSheet({
 					overlayClassName="z-40 bg-black/40"
 					showCloseButton={false}
 					onPointerDownOutside={(e) => {
+						const target = e.target as HTMLElement | null;
+						const isNestedOverlay = Boolean(
+							target?.closest('[data-slot="sheet-content"]') ||
+							target?.closest('[role="dialog"]') ||
+							target?.closest('[role="menu"]') ||
+							target?.closest('[data-radix-portal]') ||
+							target?.closest('[data-radix-popper-content-wrapper]'),
+						);
+						// قوائم الإسناد والموعد واللوحات الفرعية تُعرض في Portal؛ لا تعاملها كخروج من التفاصيل.
+						if (isNestedOverlay) {
+							e.preventDefault();
+							return;
+						}
 						const isRecentlyClosed = Date.now() - lastDrawerClosedAtRef.current < 700;
 						if (isAnyDrawerOpen || isRecentlyClosed) {
 							e.preventDefault();
 							if (isAnyDrawerOpen) handleCloseDrawer();
 							return;
 						}
+					}}
+					onFocusOutside={(e) => e.preventDefault()}
+					onInteractOutside={(e) => {
 						const target = e.target as HTMLElement | null;
-						if (
+						const isNestedOverlay = Boolean(
 							target?.closest('[data-slot="sheet-content"]') ||
 							target?.closest('[role="dialog"]') ||
 							target?.closest('[role="menu"]') ||
 							target?.closest('[data-radix-portal]') ||
-							target?.closest('[data-radix-popper-content-wrapper]')
-						) {
+							target?.closest('[data-radix-popper-content-wrapper]'),
+						);
+						if (isNestedOverlay) {
 							e.preventDefault();
+							return;
 						}
-					}}
-					onFocusOutside={(e) => e.preventDefault()}
-					onInteractOutside={(e) => {
 						const isRecentlyClosed = Date.now() - lastDrawerClosedAtRef.current < 700;
 						if (isAnyDrawerOpen || isRecentlyClosed) {
 							e.preventDefault();
 							return;
-						}
-						const target = e.target as HTMLElement | null;
-						if (
-							target?.closest('[data-slot="sheet-content"]') ||
-							target?.closest('[role="dialog"]') ||
-							target?.closest('[role="menu"]') ||
-							target?.closest('[data-radix-portal]') ||
-							target?.closest('[data-radix-popper-content-wrapper]')
-						) {
-							e.preventDefault();
 						}
 					}}
 					className="w-full flex flex-col p-0 sm:w-[60vw]! md:w-[60vw]! lg:w-[60vw]! sm:max-w-none! overflow-hidden bg-background border-zinc-200 dark:border-zinc-800 shadow-2xl transition-all print:w-full print:max-w-none print:shadow-none print:border-none print:overflow-visible z-50"
@@ -152,22 +163,23 @@ export function CampaignRequestSheet({
 						onClose={() => onOpenChange(false)}
 						onOpenShortlist={() => setActiveDrawer("shortlist")}
 						onOpenWaitlist={() => setActiveDrawer("waitlist")}
+						onOpenSchedule={() => setActiveDrawer("reschedule")}
 						onOpenReschedule={() => setActiveDrawer("reschedule")}
 						onOpenReject={() => setActiveDrawer("reject")}
 						onOpenDelete={() => setActiveDrawer("delete")}
-						onAcceptDirect={() => onAccept?.(request)}
+						onAcceptDirect={onAccept ? () => openStatusTransition("ACCEPTED") : undefined}
 						onOpenEdit={() => setActiveDrawer("edit")}
 						onOpenRefer={() => setActiveDrawer("refer")}
 						onOpenPrint={() => setIsPrintDialogOpen(true)}
-						onMoveToQueue={() => handleStatusChange("QUEUE")}
-						onMoveToInterview={() => handleStatusChange("INTERVIEW")}
-						onMoveToAwaitingPayment={() => handleStatusChange("AWAITING_PAYMENT")}
-						onMarkDuplicate={() => handleStatusChange("DUPLICATE")}
+						onMoveToQueue={() => openStatusTransition("QUEUE")}
+						onMoveToInterview={() => openStatusTransition("INTERVIEW")}
+						onMoveToAwaitingPayment={() => openStatusTransition("AWAITING_PAYMENT")}
+						onMarkDuplicate={() => openStatusTransition("DUPLICATE")}
 					/>
 
 					{/* الحاوية الرئيسية للتمرير الموحد للعمودين معاً كصفحة واحدة متكاملة */}
 					<div className="flex-1 overflow-y-auto min-h-0 bg-zinc-50/40 dark:bg-zinc-950/40" dir="rtl">
-						<div className="flex flex-col lg:flex-row min-h-full items-stretch">
+						<div className="flex min-h-full flex-col items-stretch lg:flex-row">
 
 							{/* العمود الرئيسي (الملف الأكاديمي، الطبي، المالي، المسار، والمستندات) - يميناً في RTL */}
 							<div className="flex-1 p-3.5 md:p-4 space-y-3 min-w-0" dir="rtl">
@@ -175,6 +187,7 @@ export function CampaignRequestSheet({
 							<RequestStudentHero
 								request={request}
 								onStatusChange={handleStatusChange}
+								onOpenSchedule={() => setActiveDrawer("reschedule")}
 							/>
 
 							{/* بانر اعتماد القبول والتحويل للسجلات الرسمية إن تم القبول */}
@@ -335,6 +348,7 @@ export function CampaignRequestSheet({
 
 			{/* حزمة نوافذ الإجراءات الست الموحدة (Modals Suite) - تفتح نافذة واحدة فقط وتغلق أي نافذة أخرى تلقائياً */}
 			<ShortlistRequestDialog
+				key={`shortlist-${request.id}`}
 				request={request}
 				open={activeDrawer === "shortlist"}
 				onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("shortlist") : handleCloseDrawer())}
@@ -342,6 +356,7 @@ export function CampaignRequestSheet({
 			/>
 
 			<WaitlistRequestDialog
+				key={`waitlist-${request.id}`}
 				request={request}
 				open={activeDrawer === "waitlist"}
 				onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("waitlist") : handleCloseDrawer())}
@@ -349,6 +364,7 @@ export function CampaignRequestSheet({
 			/>
 
 			<RescheduleRequestDialog
+				key={`reschedule-${request.id}`}
 				request={request}
 				open={activeDrawer === "reschedule"}
 				onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("reschedule") : handleCloseDrawer())}
@@ -356,6 +372,7 @@ export function CampaignRequestSheet({
 			/>
 
 			<RejectRequestDialog
+				key={`reject-${request.id}`}
 				request={request}
 				open={activeDrawer === "reject"}
 				onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("reject") : handleCloseDrawer())}
@@ -363,6 +380,7 @@ export function CampaignRequestSheet({
 			/>
 
 			<ReferRequestDialog
+				key={`refer-${request.id}`}
 				request={request}
 				open={activeDrawer === "refer"}
 				onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("refer") : handleCloseDrawer())}
@@ -370,6 +388,7 @@ export function CampaignRequestSheet({
 			/>
 
 			<DeleteRequestDialog
+				key={`delete-${request.id}`}
 				request={request}
 				open={activeDrawer === "delete"}
 				onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("delete") : handleCloseDrawer())}
@@ -378,6 +397,20 @@ export function CampaignRequestSheet({
 					onOpenChange(false);
 					onDelete?.(request);
 				}}
+			/>
+
+			<RequestStatusTransitionDialog
+				request={request}
+				target={statusTransitionTarget}
+				open={activeDrawer === "status"}
+				onOpenChange={(isOpen) => {
+					if (!isOpen) {
+						setStatusTransitionTarget(null);
+						handleCloseDrawer();
+					}
+				}}
+				campaignId={campaignId}
+				onAccept={onAccept}
 			/>
 
 			{/* نافذة تعديل بيانات الطلب باستخدام فورم التسجيل المعتمدة الشاملة */}

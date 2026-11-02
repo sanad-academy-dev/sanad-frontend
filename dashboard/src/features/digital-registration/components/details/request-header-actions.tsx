@@ -35,6 +35,7 @@ interface RequestHeaderActionsProps {
 	onClose: () => void;
 	onOpenShortlist: () => void;
 	onOpenWaitlist: () => void;
+	onOpenSchedule: () => void;
 	onOpenReschedule: () => void;
 	onOpenReject: () => void;
 	onOpenDelete: () => void;
@@ -53,6 +54,7 @@ export function RequestHeaderActions({
 	onClose,
 	onOpenShortlist,
 	onOpenWaitlist,
+	onOpenSchedule,
 	onOpenReschedule,
 	onOpenReject,
 	onOpenDelete,
@@ -77,7 +79,7 @@ export function RequestHeaderActions({
 	const handleShare = () => {
 		const url = window.location.href;
 		navigator.clipboard.writeText(url);
-		toast.success("تم نسخ رابط الطلب المباشر للمشاركة");
+		toast.success("تم نسخ رابط داخلي؛ يعمل فقط للمستخدمين المصرح لهم");
 	};
 
 	// فتح النوافذ الجانبية بتأخير بسيط لضمان اكتمال إغلاق القائمة المنسدلة بدون أي تعارض في التركيز
@@ -134,13 +136,21 @@ export function RequestHeaderActions({
 							<span>تسجيل بالقائمة المختصرة</span>
 						</DropdownMenuItem>
 
-						{/* 2. المقابلة الشخصية */}
+						{/* 2. إعادة جدولة موعد المقابلة */}
 						<DropdownMenuItem
-							onSelect={() => triggerSafeOpen(onMoveToInterview || onOpenReschedule)}
+							onSelect={() => triggerSafeOpen(onOpenReschedule)}
 							className="gap-2 text-[11px] cursor-pointer"
 						>
-							<IconActivity className="size-3.5 text-amber-600" />
-							<span>تحويل للمقابلة الشخصية</span>
+							<IconCalendarPlus className="size-3.5 text-purple-600" />
+							<span>إعادة جدولة موعد المقابلة</span>
+						</DropdownMenuItem>
+
+						<DropdownMenuItem
+							onSelect={() => triggerSafeOpen(onMoveToInterview)}
+							className="gap-2 text-[11px] cursor-pointer"
+						>
+							<IconActivity className="size-3.5 text-violet-600" />
+							<span>نقل إلى المقابلة الشخصية</span>
 						</DropdownMenuItem>
 
 						{/* 3. قائمة الانتظار */}
@@ -150,15 +160,6 @@ export function RequestHeaderActions({
 						>
 							<IconHourglass className="size-3.5 text-orange-600" />
 							<span>إدراج في قائمة الانتظار</span>
-						</DropdownMenuItem>
-
-						{/* 4. إعادة جدولة موعد المقابلة */}
-						<DropdownMenuItem
-							onSelect={() => triggerSafeOpen(onOpenReschedule)}
-							className="gap-2 text-[11px] cursor-pointer"
-						>
-							<IconCalendarPlus className="size-3.5 text-purple-600" />
-							<span>إعادة جدولة موعد المقابلة</span>
 						</DropdownMenuItem>
 
 						{/* 5. بانتظار الدفع */}
@@ -280,10 +281,10 @@ export function RequestHeaderActions({
 							<IconDots className="size-3.5" />
 						</button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="w-40">
-						<DropdownMenuItem onClick={onOpenReschedule} className="gap-2 text-[11px] cursor-pointer">
+					<DropdownMenuContent align="end" className="w-44">
+						<DropdownMenuItem onClick={() => triggerSafeOpen(onOpenReschedule)} className="gap-2 text-[11px] cursor-pointer">
 							<IconCalendarPlus className="size-3.5 text-zinc-600" />
-							<span>إعادة جدولة</span>
+							<span>إعادة جدولة موعد المقابلة</span>
 						</DropdownMenuItem>
 						<DropdownMenuItem onClick={handlePrint} className="gap-2 text-[11px] cursor-pointer">
 							<IconPrinter className="size-3.5 text-zinc-600" />

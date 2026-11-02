@@ -4,6 +4,8 @@ export interface RegistrationDocumentItem {
 	id: string;
 	title: string;
 	fileUrl: string;
+	/** Stable storage value; fileUrl may be a short-lived protected display route. */
+	storageKey?: string;
 	fileSize?: string | null;
 	type: "BIRTH_CERTIFICATE" | "VACCINATION_CARD" | "GUARDIAN_ID" | "MEDICAL_REPORT" | "OTHER";
 	uploadedAt?: string;
@@ -11,6 +13,7 @@ export interface RegistrationDocumentItem {
 
 export interface RegistrationCommentItem {
 	id: string;
+	authorId?: string;
 	authorName: string;
 	body: string;
 	createdAt: string;
@@ -91,6 +94,7 @@ export interface CampaignRequestItem {
 	links?: { id?: string; title?: string; url: string }[];
 	assessmentAppointment?: {
 		id: string;
+		staffId: string;
 		code: string;
 		startsAt: string;
 		status: string;

@@ -24,9 +24,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useStaffForBooking } from "@/features/appointments/hooks/use-staff-for-booking";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
-import { useReferRequest } from "../../hooks/use-digital-registration";
+import { useReferRequest, useRegistrationReviewers } from "../../hooks/use-digital-registration";
 
 interface ReferRequestDialogProps {
 	request: CampaignRequestItem | null;
@@ -45,7 +44,7 @@ export function ReferRequestDialog({
 	const [referredToStaffId, setReferredToStaffId] = useState<string | null>(null);
 	const [notifyEmail, setNotifyEmail] = useState(false);
 
-	const { staff, isLoading: staffLoading } = useStaffForBooking();
+	const { data: staff = [], isLoading: staffLoading } = useRegistrationReviewers();
 	const referMutation = useReferRequest(campaignId);
 
 	if (!request) return null;
@@ -84,7 +83,7 @@ export function ReferRequestDialog({
 	const selectedStaffMember = staff.find((s) => s.id === referredToStaffId);
 
 	return (
-		<Sheet open={open} onOpenChange={onOpenChange} modal={false}>
+		<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent
 				side="left"
 				showOverlay={false}
@@ -102,7 +101,7 @@ export function ReferRequestDialog({
 					}
 				}}
 				onFocusOutside={(e) => e.preventDefault()}
-				className="w-full sm:w-[28vw]! md:w-[28vw]! lg:w-[28vw]! sm:max-w-none! left-[calc(60vw+0.75rem)]! right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background z-50"
+				className="w-full lg:w-[28vw]! lg:min-w-[20rem]! lg:max-w-[28rem]! lg:left-[calc(60vw+0.75rem)]! lg:right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background z-50 h-[calc(100dvh-1rem)]! max-h-[calc(100dvh-1rem)]! inset-y-2!"
 				dir="rtl"
 			>
 				{/* رأس اللوحة مع زر الرجوع واسم الطالب بدون كود الطلب المكدس */}
@@ -129,7 +128,7 @@ export function ReferRequestDialog({
 				</div>
 
 				{/* محتوى اللوحة */}
-				<div className="p-3.5 space-y-3.5 flex-1 overflow-y-auto">
+				<div className="p-3.5 space-y-3.5 flex-1 min-h-0 overflow-y-auto overscroll-contain sanad-scrollbar">
 					{/* اختيار الأخصائي / المراجع */}
 					<div className="space-y-1.5">
 						<label className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 block">
@@ -188,7 +187,7 @@ export function ReferRequestDialog({
 				</div>
 
 				{/* فوتر اللوحة */}
-				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50 shrink-0">
+				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50 shrink-0 mt-auto">
 					<div className="flex items-center gap-2">
 						<Switch
 							id="notify-email-refer"

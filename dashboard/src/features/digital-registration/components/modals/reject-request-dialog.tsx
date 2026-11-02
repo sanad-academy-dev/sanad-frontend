@@ -74,7 +74,7 @@ export function RejectRequestDialog({
 			reason: activeReason,
 		});
 		setMessageText(generated);
-		toast.success("تم توليد رسالة الاعتذار والرفض الرسمية بالذكاء الاصطناعي ✨");
+		toast.success("تمت إضافة مسودة رسالة قابلة للتعديل");
 	};
 
 	const handleSubmit = () => {
@@ -108,7 +108,7 @@ export function RejectRequestDialog({
 	};
 
 	return (
-		<Sheet open={open} onOpenChange={onOpenChange} modal={false}>
+		<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent
 				side="left"
 				showOverlay={false}
@@ -126,7 +126,7 @@ export function RejectRequestDialog({
 					}
 				}}
 				onFocusOutside={(e) => e.preventDefault()}
-				className="w-full sm:w-[28vw]! md:w-[28vw]! lg:w-[28vw]! sm:max-w-none! left-[calc(60vw+0.75rem)]! right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background z-50"
+				className="w-full lg:w-[28vw]! lg:min-w-[20rem]! lg:max-w-[28rem]! lg:left-[calc(60vw+0.75rem)]! lg:right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background z-50 h-[calc(100dvh-1rem)]! max-h-[calc(100dvh-1rem)]! inset-y-2!"
 				dir="rtl"
 			>
 				{/* رأس اللوحة مع زر الرجوع واسم الطالب بدون كود الطلب المكدس */}
@@ -153,7 +153,7 @@ export function RejectRequestDialog({
 				</div>
 
 				{/* محتوى اللوحة */}
-				<div className="p-3.5 space-y-3.5 flex-1 overflow-y-auto">
+				<div className="p-3.5 space-y-3.5 flex-1 min-h-0 overflow-y-auto overscroll-contain sanad-scrollbar">
 					{/* سبب الرفض */}
 					<div className="space-y-1.5">
 						<label className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 block">
@@ -256,13 +256,13 @@ export function RejectRequestDialog({
 										className="text-[11px] text-primary hover:underline font-bold flex items-center gap-1 transition-colors"
 									>
 										<IconSparkles className="size-3 text-primary" />
-										<span>إنشاء بالذكاء الاصطناعي</span>
+										<span>صياغة تلقائية للرسالة</span>
 									</button>
 								</div>
 								<Textarea
 									value={messageText}
 									onChange={(e) => setMessageText(e.target.value)}
-									placeholder="اكتب نص الاعتذار أو انقر على 'إنشاء بالذكاء الاصطناعي'..."
+									placeholder="اكتب نص الاعتذار أو انقر على «صياغة تلقائية للرسالة»..."
 									className="min-h-24 text-xs leading-relaxed resize-none font-sans"
 								/>
 							</div>
@@ -271,7 +271,7 @@ export function RejectRequestDialog({
 				</div>
 
 				{/* فوتر اللوحة */}
-				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50 shrink-0">
+				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50 shrink-0 mt-auto">
 					<div className="flex items-center gap-2">
 						<Switch
 							id="notify-email-reject"

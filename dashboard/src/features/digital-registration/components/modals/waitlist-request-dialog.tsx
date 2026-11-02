@@ -2,36 +2,20 @@ import { useState } from "react";
 import {
 	IconAlertCircle,
 	IconArrowRight,
-	IconCalendar,
 	IconCheck,
-	IconChevronDown,
 	IconClock,
-	IconFlag,
-	IconHourglass,
-	IconMail,
-	IconPhone,
 	IconSparkles,
-	IconUser,
-	IconX,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	Sheet,
 	SheetContent,
 } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useStaffForBooking } from "@/features/appointments/hooks/use-staff-for-booking";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import { useWaitlistRequest } from "../../hooks/use-digital-registration";
 import { generateWaitlistMessage } from "../../utils/ai-templates";
@@ -42,14 +26,6 @@ interface WaitlistRequestDialogProps {
 	onOpenChange: (open: boolean) => void;
 	campaignId?: string;
 }
-
-const PRIORITY_OPTIONS = [
-	{ id: "بدون أولوية", label: "بدون أولوية", count: 0 },
-	{ id: "عاجلة", label: "عاجلة", count: 1 },
-	{ id: "مرتفعة", label: "مرتفعة", count: 2 },
-	{ id: "متوسطة", label: "متوسطة", count: 3 },
-	{ id: "منخفضة", label: "منخفضة", count: 4 },
-];
 
 export function WaitlistRequestDialog({
 	request,
@@ -62,20 +38,13 @@ export function WaitlistRequestDialog({
 		request ? `إرسال تسجيل في قائمة الانتظار - #${request.code}` : "",
 	);
 	const [messageText, setMessageText] = useState("");
-	const [assignedStaffId, setAssignedStaffId] = useState<string | null>(request?.assignedStaffId || null);
-	const [selectedPriority, setSelectedPriority] = useState<string>("بدون أولوية");
 	const [notifyEmail, setNotifyEmail] = useState(false);
-
-	const [staffPopoverOpen, setStaffPopoverOpen] = useState(false);
-	const [priorityPopoverOpen, setPriorityPopoverOpen] = useState(false);
-
-	const { staff, isLoading: staffLoading } = useStaffForBooking();
 	const waitlistMutation = useWaitlistRequest(campaignId);
 
 	if (!request) return null;
 
-	const queueRank = request.queueRank ?? 3;
-	const estimatedWait = request.estimatedWait || "2-4 أسابيع";
+	const queueRank = request.queueRank ?? null;
+	const estimatedWait = request.estimatedWait ?? null;
 
 	const handleGenerateAI = () => {
 		const generated = generateWaitlistMessage({
@@ -86,7 +55,7 @@ export function WaitlistRequestDialog({
 			estimatedWait,
 		});
 		setMessageText(generated);
-		toast.success("تم إنشاء رسالة قائمة الانتظار بالذكاء الاصطناعي ✨");
+		toast.success("تمت إضافة مسودة رسالة قابلة للتعديل");
 	};
 
 	const handleSubmit = () => {
@@ -94,7 +63,6 @@ export function WaitlistRequestDialog({
 			{
 				requestId: request.id,
 				data: {
-					assignedStaffId,
 					subject: subject.trim(),
 					customMessage: enableMessage ? messageText.trim() : undefined,
 					notifyEmail,
@@ -112,10 +80,8 @@ export function WaitlistRequestDialog({
 		);
 	};
 
-	const selectedStaffMember = staff.find((s) => s.id === assignedStaffId);
-
 	return (
-		<Sheet open={open} onOpenChange={onOpenChange} modal={false}>
+		<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent
 				side="left"
 				showOverlay={false}
@@ -133,7 +99,7 @@ export function WaitlistRequestDialog({
 					}
 				}}
 				onFocusOutside={(e) => e.preventDefault()}
-				className="w-full sm:w-[28vw]! md:w-[28vw]! lg:w-[28vw]! sm:max-w-none! left-[calc(60vw+0.75rem)]! right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background z-50"
+				className="w-full lg:w-[28vw]! lg:min-w-[20rem]! lg:max-w-[28rem]! lg:left-[calc(60vw+0.75rem)]! lg:right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background z-50 h-[calc(100dvh-1rem)]! max-h-[calc(100dvh-1rem)]! inset-y-2!"
 				dir="rtl"
 			>
 				{/* رأس اللوحة مع زر الرجوع والعنوان واسم الطالب بدون كود الطلب المكدس */}
@@ -160,51 +126,23 @@ export function WaitlistRequestDialog({
 				</div>
 
 				{/* محتوى اللوحة القابل للتمرير */}
-				<div className="p-4 space-y-3.5 flex-1 overflow-y-auto">
+				<div className="p-4 space-y-3.5 flex-1 min-h-0 overflow-y-auto overscroll-contain sanad-scrollbar">
 					{/* بانر قائمة الانتظار الأزرق (مطابق للصورة 3) */}
 					<div className="rounded-lg border border-blue-200 dark:border-blue-900/60 bg-blue-50/70 dark:bg-blue-950/30 p-2.5 space-y-1.5 text-xs text-blue-900 dark:text-blue-300">
 						<div className="flex items-center gap-1.5 font-bold">
 							<IconAlertCircle className="size-4 text-blue-600 shrink-0" />
 							<span>
-								لا توجد مقاعد شاغرة حالياً، ترتيب الطالب في قائمة الانتظار #{queueRank}، وسيتم إشعار المراجع وولي الأمر عند توفر مقعد شاغر.
+								{queueRank
+									? `ترتيب الطالب المسجل في قائمة الانتظار هو #${queueRank}، وسيتم إشعار المراجع وولي الأمر عند توفر مقعد شاغر.`
+									: "لا توجد مقاعد شاغرة حالياً. سيُحتسب ترتيب الطالب تلقائياً عند تأكيد إدراجه في قائمة الانتظار."}
 							</span>
 						</div>
-						<div className="flex items-center gap-1 text-[11px] text-blue-700 dark:text-blue-400 pr-5">
-							<IconClock className="size-3" />
-							<span>أوقات التوقع للانتظار: {estimatedWait}</span>
-						</div>
-					</div>
-
-					{/* كارت هوية ولي الأمر */}
-					<div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 p-3 flex items-center justify-between gap-3 shadow-2xs">
-						<div className="flex items-center gap-2.5 min-w-0">
-							<Avatar className="size-9 border border-primary/20 shrink-0">
-								<AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
-									{request.guardianName.slice(0, 2)}
-								</AvatarFallback>
-							</Avatar>
-							<div className="min-w-0">
-								<p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
-									{request.guardianName}
-								</p>
-								<span className="text-[10px] text-muted-foreground block truncate">
-									ولي أمر الطالب • {request.patientName}
-								</span>
+						{estimatedWait && (
+							<div className="flex items-center gap-1 text-[11px] text-blue-700 dark:text-blue-400 pr-5">
+								<IconClock className="size-3" />
+								<span>الوقت المتوقع للانتظار: {estimatedWait}</span>
 							</div>
-						</div>
-
-						<div className="text-left text-[11px] font-mono text-muted-foreground space-y-0.5" dir="ltr">
-							<div className="flex items-center gap-1">
-								<span>{request.guardianPhone}</span>
-								<IconPhone className="size-3 text-zinc-400" />
-							</div>
-							{request.guardianEmail && (
-								<div className="flex items-center gap-1 truncate max-w-[150px]">
-									<span className="truncate">{request.guardianEmail}</span>
-									<IconMail className="size-3 text-zinc-400 shrink-0" />
-								</div>
-							)}
-						</div>
+						)}
 					</div>
 
 					{/* سويتش إضافة / إغلاق رسالة */}
@@ -224,6 +162,9 @@ export function WaitlistRequestDialog({
 
 					{enableMessage && (
 						<div className="space-y-3">
+							<p className="rounded-md bg-muted/60 px-2.5 py-2 text-[10px] text-muted-foreground">
+								سيكون المستلم ولي الأمر: <span className="font-mono" dir="ltr">{request.guardianPhone || "غير محدد"}</span>
+							</p>
 							{/* حقل الموضوع */}
 							<div className="space-y-1">
 								<div className="flex items-center justify-between text-xs font-bold text-zinc-800 dark:text-zinc-200">
@@ -247,7 +188,7 @@ export function WaitlistRequestDialog({
 										className="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:underline"
 									>
 										<IconSparkles className="size-3.5 text-primary" />
-										<span>إنشاء بالذكاء الاصطناعي</span>
+										<span>صياغة تلقائية للرسالة</span>
 									</button>
 								</div>
 								<Textarea
@@ -262,95 +203,9 @@ export function WaitlistRequestDialog({
 				</div>
 
 				{/* شريط الإجراءات والفوتر السفلي */}
-				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col gap-2 shrink-0">
-					{/* صف أدوات التعيين */}
-					<div className="flex items-center gap-1.5 flex-wrap">
-						{/* اختيار الأخصائي المسند إليه */}
-						<Popover open={staffPopoverOpen} onOpenChange={setStaffPopoverOpen}>
-							<PopoverTrigger asChild>
-								<Button
-									variant="outline"
-									size="sm"
-									className="h-7 text-[11px] border-zinc-200 dark:border-zinc-800 gap-1"
-								>
-									<IconUser className="size-3 text-zinc-500" />
-									<span>{selectedStaffMember?.name || "إسناد إلى..."}</span>
-									<IconChevronDown className="size-2.5 opacity-60" />
-								</Button>
-							</PopoverTrigger>
-							<PopoverContent align="start" className="w-52 p-1" dir="rtl">
-								<p className="text-[10px] text-muted-foreground px-2 py-1 font-semibold">المراجع المكلف</p>
-								<div className="max-h-40 overflow-y-auto space-y-0.5">
-									{staffLoading ? (
-										<p className="text-xs p-2 text-center text-muted-foreground">جاري التحميل...</p>
-									) : (
-										staff.map((s) => (
-											<button
-												key={s.id}
-												type="button"
-												onClick={() => {
-													setAssignedStaffId(s.id);
-													setStaffPopoverOpen(false);
-												}}
-												className="w-full text-right text-xs px-2 py-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-1.5"
-											>
-												<Avatar className="size-5">
-													<AvatarFallback className="text-[8px] bg-primary/10 text-primary font-bold">
-														{s.name.slice(0, 2)}
-													</AvatarFallback>
-												</Avatar>
-												<span className="truncate flex-1">{s.name}</span>
-											</button>
-										))
-									)}
-								</div>
-							</PopoverContent>
-						</Popover>
-
-						{/* اختيار الأولوية */}
-						<Popover open={priorityPopoverOpen} onOpenChange={setPriorityPopoverOpen}>
-							<PopoverTrigger asChild>
-								<Button
-									variant="outline"
-									size="sm"
-									className="h-7 text-[11px] border-zinc-200 dark:border-zinc-800 gap-1"
-								>
-									<IconFlag className="size-3 text-zinc-500" />
-									<span>{selectedPriority}</span>
-									<IconChevronDown className="size-2.5 opacity-60" />
-								</Button>
-							</PopoverTrigger>
-							<PopoverContent align="start" className="w-44 p-1" dir="rtl">
-								<p className="text-[10px] text-muted-foreground px-2 py-1 font-semibold">حدد أولوية...</p>
-								{PRIORITY_OPTIONS.map((p) => (
-									<button
-										key={p.id}
-										type="button"
-										onClick={() => {
-											setSelectedPriority(p.label);
-											setPriorityPopoverOpen(false);
-										}}
-										className="w-full flex items-center justify-between text-xs px-2 py-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-									>
-										<span className="font-medium text-foreground">{p.label}</span>
-										<span className="font-mono text-[10px] text-muted-foreground">{p.count}</span>
-									</button>
-								))}
-							</PopoverContent>
-						</Popover>
-
-						<Button
-							variant="outline"
-							size="sm"
-							className="h-7 text-[11px] border-zinc-200 dark:border-zinc-800 gap-1 text-muted-foreground"
-						>
-							<IconCalendar className="size-3" />
-							<span>تاريخ الموعد</span>
-						</Button>
-					</div>
-
+				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col gap-2 shrink-0 mt-auto">
 					{/* صف الإرسال والإلغاء مع إشعار البريد */}
-					<div className="flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800">
+					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-1.5">
 							<Switch
 								id="notify-email-waitlist"

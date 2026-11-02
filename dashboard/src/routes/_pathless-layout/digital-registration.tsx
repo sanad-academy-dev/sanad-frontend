@@ -14,8 +14,8 @@ import { CampaignInfo } from "@/features/digital-registration/components/campaig
 import { RegistrationActivityLog } from "@/features/digital-registration/components/registration-activity-log";
 import { AddRequestSheet } from "@/features/digital-registration/components/add-request-sheet";
 import {
-	useCampaigns,
 	useCampaignRequests,
+	useRegistrationWorkspace,
 } from "@/features/digital-registration/hooks/use-digital-registration";
 import { downloadCsv } from "@/lib/csv";
 import { downloadExcel } from "@/lib/export-excel";
@@ -31,9 +31,9 @@ function DigitalRegistrationRoute() {
 	const [isAddRequestOpen, setIsAddRequestOpen] = useState(false);
 	const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
-	// Fetch campaigns to automatically resolve the active workspace
-	const { data: campaigns = [] } = useCampaigns();
-	const activeCampaignId = campaigns[0]?.id || "default";
+	// One board per clinic. The backend keeps its legacy campaign id internal.
+	const { data: workspace } = useRegistrationWorkspace();
+	const activeCampaignId = workspace?.id || "";
 
 	// Fetch requests for the active registration campaign
 	const { data: requests = [] } = useCampaignRequests(activeCampaignId);
@@ -261,12 +261,12 @@ function DigitalRegistrationRoute() {
 						onExportCsv={handleExportCsv}
 					/>
 
-					{/* Live Indicator Banner matching screenshot */}
+					{/* Polling indicator: this board refreshes periodically, it is not a socket feed. */}
 					<div className="flex items-center justify-between px-4 py-0.5 text-xs text-muted-foreground border-b border-border/40" dir="rtl">
 						<div className="flex items-center gap-1.5 text-muted-foreground">
-							<IconBellRinging className="size-3.5 text-primary animate-pulse" />
-							<span className="font-semibold text-[11px] text-foreground">مباشر</span>
-							<span className="text-[10px] text-muted-foreground">· التحديث اللحظي مفعل لطلبات القبول</span>
+							<IconBellRinging className="size-3.5 text-primary" />
+							<span className="font-semibold text-[11px] text-foreground">محدّث تلقائياً</span>
+							<span className="text-[10px] text-muted-foreground">· يتم تحديث الطلبات كل 30 ثانية</span>
 						</div>
 						<span className="text-[10px] text-muted-foreground font-mono">
 							إجمالي المتقدمين: {requests.length}
@@ -279,7 +279,6 @@ function DigitalRegistrationRoute() {
 							campaignId={activeCampaignId}
 							searchQuery={searchQuery}
 							genderFilter={genderFilter}
-							onOpenAddRequest={() => setIsAddRequestOpen(true)}
 							selectedRequestId={selectedRequestId}
 							onSelectRequest={setSelectedRequestId}
 						/>
@@ -290,11 +289,8 @@ function DigitalRegistrationRoute() {
 						open={isAddRequestOpen}
 						onClose={() => setIsAddRequestOpen(false)}
 						campaignId={activeCampaignId}
-						onSuccess={(created) => {
-							if (created?.id) {
-								setSelectedRequestId(created.id);
-							}
-						}}
+						// الحفظ يحدث قائمة الكانبان فقط؛ فتح التفاصيل قرار صريح من المستخدم.
+						onSuccess={() => setSelectedRequestId(null)}
 					/>
 				</div>
 			)}

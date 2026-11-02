@@ -1,7 +1,4 @@
-/**
- * قوالب رسائل الذكاء الاصطناعي الأكاديمية لمنظومة سند (Sanad LMS)
- * مصممة لتصحيح كافة أخطاء القوالب السابقة وضمان صياغة رسمية وتربوية راقية.
- */
+/** قوالب رسائل جاهزة قابلة للتعديل لمنظومة سند. */
 
 export function generateShortlistMessage({
 	studentName,
@@ -20,17 +17,21 @@ export function generateWaitlistMessage({
 	studentName,
 	guardianName,
 	targetClass,
-	queueRank = 3,
-	estimatedWait = "2-4 أسابيع",
+	queueRank,
+	estimatedWait,
 }: {
 	studentName: string;
 	guardianName: string;
 	targetClass?: string | null;
-	queueRank?: number;
-	estimatedWait?: string;
+	queueRank?: number | null;
+	estimatedWait?: string | null;
 }): string {
 	const className = targetClass || "البرنامج الأكاديمي";
-	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}،\nنود إحاطتكم علماً بأنه نظراً للإقبال الشديد واكتمال المقاعد الشاغرة حالياً في "${className}"، فقد تم إدراج طلبكم في قائمة الانتظار بالترتيب رقم (#${queueRank}).\nالوقت المتوقع لتوفر شواغر هو قرابة (${estimatedWait})، وسيتم إشعاركم فور توفر مقعد شاغر لاستكمال إجراءات القبول.\nشاكرين ومقدرين ثقتكم الغالية في أكاديمية سند.`;
+	const rankText = queueRank ? ` بالترتيب رقم (#${queueRank})` : "";
+	const waitText = estimatedWait
+		? ` الوقت المتوقع لتوفر شواغر هو قرابة (${estimatedWait}).`
+		: " سيتم إشعاركم فور توفر مقعد شاغر.";
+	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}،\nنود إحاطتكم علماً بأنه نظراً للإقبال الشديد واكتمال المقاعد الشاغرة حالياً في "${className}"، فقد تم إدراج طلبكم في قائمة الانتظار${rankText}.\n${waitText}\nشاكرين ومقدرين ثقتكم الغالية في أكاديمية سند.`;
 }
 
 export function generateRescheduleMessage({

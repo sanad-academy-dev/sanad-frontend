@@ -155,7 +155,7 @@ export function AppointmentPickerPopover({
 		computeSmartSlots(currentRealDay, currentRealMonth, currentRealYear),
 	);
 
-	// يوم العمل القادم المقترح من AI
+	// تاريخ بديل يعيده الخادم فقط بعد التحقق الفعلي من توفره.
 	const [nextWorkingDate, setNextWorkingDate] = useState<{
 		isoDate: string;
 		formattedDate: string;
@@ -163,7 +163,7 @@ export function AppointmentPickerPopover({
 		dayNameAr: string;
 	} | null>(null);
 
-	// بيانات اقتراح AI وساعات العمل
+	// بيانات أقرب فترة متاحة وساعات العمل.
 	const [aiRecommendation, setAiRecommendation] = useState<{
 		isWorkingDay: boolean;
 		recommendedTime: string;
@@ -172,11 +172,11 @@ export function AppointmentPickerPopover({
 	}>({
 		isWorkingDay: true,
 		recommendedTime: "",
-		reason: "اختر موعداً متاحاً أو اعتمد اقتراح AI",
+		reason: "اختر موعداً متاحاً من الجدول",
 		workingHoursText: "09:00 ص - 04:30 م",
 	});
 
-	// حالة AI (شريط مدمج banner أو بطاقة الاقتراحات suggestions)
+	// حالة عرض شريط الفترات أو بطاقة الاقتراحات.
 	const [aiState, setAiState] = useState<"banner" | "suggestions">("banner");
 
 	// تفعيل التكرار (جدولة زيارات متكررة)
@@ -254,7 +254,7 @@ export function AppointmentPickerPopover({
 		}
 	}, [value]);
 
-	// جلب اقتراحات الذكاء الاصطناعي وجدول المراجع عند تغيير التاريخ أو المراجع
+	// جلب الفترات المتاحة وجدول المراجع عند تغيير التاريخ أو المراجع.
 	useEffect(() => {
 		const targetDay = selectedDay || currentRealDay;
 
@@ -311,9 +311,9 @@ export function AppointmentPickerPopover({
 				} else {
 					setAiRecommendation({
 						isWorkingDay: true,
-						recommendedTime: "10:00 صباحاً",
-						reason: "الوقت الأنسب بدون أي تعارض",
-						workingHoursText: "09:00 ص - 04:30 م",
+						recommendedTime: "",
+						reason: "تعذر التحقق من الفترات المتاحة؛ اختر موعداً بعد إعادة المحاولة",
+						workingHoursText: "غير متاح حالياً",
 					});
 				}
 			});
@@ -689,7 +689,7 @@ export function AppointmentPickerPopover({
 						</div>
 					</div>
 
-					{/* ─── 3. قسم AI (ذكي، أنيق، ومريح المساحة بدون أي تداخل) ─── */}
+					{/* ─── 3. قسم الفترات المتاحة ─── */}
 					{aiState === "banner" ? (
 						<div
 							className={cn(
@@ -704,7 +704,7 @@ export function AppointmentPickerPopover({
 								<span className="truncate">
 									{isTodaySelected && availableSlotsCount === 0
 										? "انتهت مواعيد اليوم — اضغط لاقتراح موعد"
-										: "حدد موعد الزيارة أو اختر من اقتراحات AI"}
+										: "حدد موعد الزيارة أو اختر من الفترات المتاحة"}
 								</span>
 							</div>
 
@@ -712,9 +712,9 @@ export function AppointmentPickerPopover({
 								type="button"
 								onClick={() => setAiState("suggestions")}
 								className="h-6 px-2.5 text-[10px] text-[#5B50E5] dark:text-indigo-400 font-bold hover:underline cursor-pointer bg-card rounded border border-indigo-200/50 shadow-2xs shrink-0 flex items-center gap-1"
-								title="عرض اقتراحات رفيق AI"
+								title="عرض أقرب الفترات المتاحة"
 							>
-								<span>اقتراح AI</span>
+								<span>فترات متاحة</span>
 							</button>
 						</div>
 					) : (
@@ -729,7 +729,7 @@ export function AppointmentPickerPopover({
 								</button>
 								<div className="flex items-center gap-1 text-amber-800 dark:text-amber-400 font-bold text-[10.5px]">
 									<IconSparkles className="size-3 text-amber-500" />
-									<span>اقتراح رفيق AI الذكي</span>
+									<span>أقرب فترة متاحة</span>
 								</div>
 							</div>
 
@@ -756,7 +756,7 @@ export function AppointmentPickerPopover({
 								</p>
 							</div>
 
-							{/* زر اعتماد اقتراح AI أو الانتقال للغد */}
+							{/* زر اعتماد أقرب فترة متاحة أو الانتقال لتاريخ بديل متحقق منه. */}
 							{availableSlotsCount > 0 && aiRecommendation.recommendedTime ? (
 								<button
 									type="button"

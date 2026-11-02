@@ -1,20 +1,15 @@
 import { useState } from "react";
 import {
 	IconArrowRight,
-	IconCalendar,
 	IconCheck,
 	IconChevronDown,
 	IconClock,
-	IconFlag,
-	IconMail,
-	IconPhone,
 	IconSchool,
 	IconSparkles,
 	IconX,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +23,6 @@ import {
 } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import { useShortlistRequest } from "../../hooks/use-digital-registration";
 import { generateShortlistMessage } from "../../utils/ai-templates";
@@ -49,14 +43,6 @@ const CLASS_OPTIONS = [
 	"عباقرة الغد",
 ];
 
-const PRIORITY_OPTIONS = [
-	{ id: "بدون أولوية", label: "بدون أولوية", count: 0 },
-	{ id: "عاجلة", label: "عاجلة", count: 1 },
-	{ id: "مرتفعة", label: "مرتفعة", count: 2 },
-	{ id: "متوسطة", label: "متوسطة", count: 3 },
-	{ id: "منخفضة", label: "منخفضة", count: 4 },
-];
-
 export function ShortlistRequestDialog({
 	request,
 	open,
@@ -64,16 +50,11 @@ export function ShortlistRequestDialog({
 	campaignId = "",
 }: ShortlistRequestDialogProps) {
 	const [enableMessage, setEnableMessage] = useState(true);
-	const [subject, setSubject] = useState(
-		request ? `تسجيل طلب بالقائمة المختصرة - #${request.code}` : "",
-	);
 	const [messageText, setMessageText] = useState("");
 	const [selectedClass, setSelectedClass] = useState<string | null>(request?.targetClass || null);
-	const [selectedPriority, setSelectedPriority] = useState<string>("بدون أولوية");
 	const [notifyEmail, setNotifyEmail] = useState(false);
 
 	const [classPopoverOpen, setClassPopoverOpen] = useState(false);
-	const [priorityPopoverOpen, setPriorityPopoverOpen] = useState(false);
 
 	const shortlistMutation = useShortlistRequest(campaignId);
 
@@ -86,7 +67,7 @@ export function ShortlistRequestDialog({
 			targetClass: selectedClass || request.targetClass,
 		});
 		setMessageText(generated);
-		toast.success("تم توليد رسالة القبول بالقائمة المختصرة بالذكاء الاصطناعي ✨");
+		toast.success("تمت إضافة مسودة رسالة قابلة للتعديل");
 	};
 
 	const handleSubmit = () => {
@@ -95,7 +76,6 @@ export function ShortlistRequestDialog({
 				requestId: request.id,
 				data: {
 					targetClass: selectedClass,
-					priority: selectedPriority,
 					customMessage: enableMessage ? messageText.trim() : undefined,
 					notifyEmail,
 				},
@@ -113,7 +93,7 @@ export function ShortlistRequestDialog({
 	};
 
 	return (
-		<Sheet open={open} onOpenChange={onOpenChange} modal={false}>
+		<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent
 				side="left"
 				showOverlay={false}
@@ -131,7 +111,7 @@ export function ShortlistRequestDialog({
 					}
 				}}
 				onFocusOutside={(e) => e.preventDefault()}
-				className="w-full sm:w-[28vw]! md:w-[28vw]! lg:w-[28vw]! sm:max-w-none! left-[calc(60vw+0.75rem)]! right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background z-50"
+				className="w-full lg:w-[28vw]! lg:min-w-[20rem]! lg:max-w-[28rem]! lg:left-[calc(60vw+0.75rem)]! lg:right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background z-50 h-[calc(100dvh-1rem)]! max-h-[calc(100dvh-1rem)]! inset-y-2!"
 				dir="rtl"
 			>
 				{/* رأس اللوحة مع زر الرجوع والعنوان واسم الطالب بدون كود الطلب المكدس */}
@@ -158,39 +138,7 @@ export function ShortlistRequestDialog({
 				</div>
 
 				{/* محتوى اللوحة القابل للتمرير */}
-				<div className="p-4 space-y-4 flex-1 overflow-y-auto">
-					{/* كارت هوية ولي الأمر */}
-					<div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 p-3 flex items-center justify-between gap-3 shadow-2xs">
-						<div className="flex items-center gap-2.5 min-w-0">
-							<Avatar className="size-9 border border-primary/20 shrink-0">
-								<AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
-									{request.guardianName.slice(0, 2)}
-								</AvatarFallback>
-							</Avatar>
-							<div className="min-w-0">
-								<p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
-									{request.guardianName}
-								</p>
-								<span className="text-[10px] text-muted-foreground block truncate">
-									ولي أمر الطالب • {request.patientName}
-								</span>
-							</div>
-						</div>
-
-						<div className="text-left text-[11px] font-mono text-muted-foreground space-y-0.5" dir="ltr">
-							<div className="flex items-center gap-1">
-								<span>{request.guardianPhone}</span>
-								<IconPhone className="size-3 text-zinc-400" />
-							</div>
-							{request.guardianEmail && (
-								<div className="flex items-center gap-1 truncate max-w-[150px]">
-									<span className="truncate">{request.guardianEmail}</span>
-									<IconMail className="size-3 text-zinc-400 shrink-0" />
-								</div>
-							)}
-						</div>
-					</div>
-
+				<div className="p-4 space-y-4 flex-1 min-h-0 overflow-y-auto overscroll-contain sanad-scrollbar">
 					{/* سويتش إضافة / إغلاق رسالة */}
 					<div className="flex items-center justify-between pt-1">
 						<label
@@ -208,19 +156,9 @@ export function ShortlistRequestDialog({
 
 					{enableMessage && (
 						<div className="space-y-3">
-							{/* حقل الموضوع */}
-							<div className="space-y-1">
-								<div className="flex items-center justify-between text-xs font-bold text-zinc-800 dark:text-zinc-200">
-									<span>الموضوع</span>
-									<span className="text-[10px] text-rose-500 font-normal">مطلوب</span>
-								</div>
-								<Input
-									value={subject}
-									onChange={(e) => setSubject(e.target.value)}
-									className="h-8 text-xs font-sans"
-								/>
-							</div>
-
+							<p className="rounded-md bg-muted/60 px-2.5 py-2 text-[10px] text-muted-foreground">
+								ستُسجل الرسالة ضمن الطلب لإرسالها إلى ولي الأمر: <span className="font-mono" dir="ltr">{request.guardianPhone || "غير محدد"}</span>
+							</p>
 							{/* مربع نص الرسالة */}
 							<div className="space-y-1">
 								<div className="flex items-center justify-between text-xs">
@@ -231,7 +169,7 @@ export function ShortlistRequestDialog({
 										className="inline-flex items-center gap-1 text-[11px] font-bold text-primary hover:underline"
 									>
 										<IconSparkles className="size-3.5 text-primary" />
-										<span>إنشاء بالذكاء الاصطناعي</span>
+										<span>صياغة تلقائية للرسالة</span>
 									</button>
 								</div>
 								<Textarea
@@ -282,87 +220,47 @@ export function ShortlistRequestDialog({
 
 						<Badge variant="outline" className="h-7 text-[11px] border-zinc-200 dark:border-zinc-800 gap-1 text-muted-foreground">
 							<IconClock className="size-3" />
-							<span>قيد الانتظار</span>
+							<span>سيُنقل للقائمة المختصرة</span>
 						</Badge>
 
-						{/* اختيار الأولوية مع قائمة الأرقام */}
-						<Popover open={priorityPopoverOpen} onOpenChange={setPriorityPopoverOpen}>
-							<PopoverTrigger asChild>
-								<Button
-									variant="outline"
-									size="sm"
-									className="h-7 text-[11px] border-zinc-200 dark:border-zinc-800 gap-1"
-								>
-									<IconFlag className="size-3 text-zinc-500" />
-									<span>{selectedPriority}</span>
-									<IconChevronDown className="size-2.5 opacity-60" />
-								</Button>
-							</PopoverTrigger>
-							<PopoverContent align="start" className="w-44 p-1" dir="rtl">
-								<p className="text-[10px] text-muted-foreground px-2 py-1 font-semibold">حدد أولوية...</p>
-								{PRIORITY_OPTIONS.map((p) => (
-									<button
-										key={p.id}
-										type="button"
-										onClick={() => {
-											setSelectedPriority(p.label);
-											setPriorityPopoverOpen(false);
-										}}
-										className="w-full flex items-center justify-between text-xs px-2 py-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-									>
-										<span className="font-medium text-foreground">{p.label}</span>
-										<span className="font-mono text-[10px] text-muted-foreground">{p.count}</span>
-									</button>
-								))}
-							</PopoverContent>
-						</Popover>
+					</div>
+				</div>
 
+				{/* صف الإرسال والإلغاء مع إشعار البريد (فوتر مثبت) */}
+				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50 shrink-0 mt-auto">
+					<div className="flex items-center gap-1.5">
+						<Switch
+							id="notify-email-shortlist"
+							checked={notifyEmail}
+							onCheckedChange={setNotifyEmail}
+						/>
+						<label
+							htmlFor="notify-email-shortlist"
+							className="text-[11px] text-muted-foreground cursor-pointer font-medium"
+						>
+							إشعار عبر البريد
+						</label>
+					</div>
+
+					<div className="flex items-center gap-2">
 						<Button
 							variant="outline"
 							size="sm"
-							className="h-7 text-[11px] border-zinc-200 dark:border-zinc-800 gap-1 text-muted-foreground"
+							onClick={() => onOpenChange(false)}
+							disabled={shortlistMutation.isPending}
+							className="h-8 text-xs cursor-pointer"
 						>
-							<IconCalendar className="size-3" />
-							<span>تاريخ الموعد</span>
+							إلغاء
 						</Button>
-					</div>
-
-					{/* صف الإرسال والإلغاء مع إشعار البريد */}
-					<div className="flex items-center justify-between pt-1 border-t border-zinc-100 dark:border-zinc-800">
-						<div className="flex items-center gap-1.5">
-							<Switch
-								id="notify-email-shortlist"
-								checked={notifyEmail}
-								onCheckedChange={setNotifyEmail}
-							/>
-							<label
-								htmlFor="notify-email-shortlist"
-								className="text-[11px] text-muted-foreground cursor-pointer font-medium"
-							>
-								إشعار عبر البريد
-							</label>
-						</div>
-
-						<div className="flex items-center gap-2">
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={() => onOpenChange(false)}
-								disabled={shortlistMutation.isPending}
-								className="h-7 text-xs"
-							>
-								إلغاء
-							</Button>
-							<Button
-								size="sm"
-								onClick={handleSubmit}
-								disabled={shortlistMutation.isPending}
-								className="h-7 text-xs font-semibold px-3 gap-1 bg-primary text-primary-foreground"
-							>
-								<IconCheck className="size-3" />
-								<span>{shortlistMutation.isPending ? "جاري الإرسال..." : "إرسال قبول الطلب"}</span>
-							</Button>
-						</div>
+						<Button
+							size="sm"
+							onClick={handleSubmit}
+							disabled={shortlistMutation.isPending}
+							className="h-8 text-xs font-semibold px-3 gap-1 bg-primary text-primary-foreground cursor-pointer"
+						>
+							<IconCheck className="size-3" />
+							<span>{shortlistMutation.isPending ? "جاري الإرسال..." : "إرسال قبول الطلب"}</span>
+						</Button>
 					</div>
 				</div>
 			</SheetContent>

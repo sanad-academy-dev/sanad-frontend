@@ -199,7 +199,6 @@ function CampaignDetailsRoute() {
 						onSearchChange={setSearchQuery}
 						genderFilter={genderFilter}
 						onGenderFilterChange={setGenderFilter}
-						onOpenAddRequest={() => setIsAddRequestOpen(true)}
 						onExport={handleExportExcel}
 						onExportCsv={handleExportCsv}
 					/>
@@ -208,7 +207,6 @@ function CampaignDetailsRoute() {
 						campaignId={campaignId}
 						searchQuery={searchQuery}
 						genderFilter={genderFilter}
-						onOpenAddRequest={() => setIsAddRequestOpen(true)}
 						selectedRequestId={selectedRequestId}
 						onSelectRequest={setSelectedRequestId}
 					/>

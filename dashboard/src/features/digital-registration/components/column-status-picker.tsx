@@ -81,12 +81,14 @@ interface ColumnStatusPickerProps {
 	value: string;
 	onChange: (columnName: string) => void;
 	className?: string;
+	allowedIds?: string[];
 }
 
 export function ColumnStatusPicker({
 	value,
 	onChange,
 	className,
+	allowedIds,
 }: ColumnStatusPickerProps) {
 	const [open, setOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -103,17 +105,20 @@ export function ColumnStatusPicker({
 	// تصفية الحالات بالبحث
 	const filteredColumns = useMemo(() => {
 		const q = searchQuery.trim().toLowerCase();
-		if (!q) return SYSTEM_REGISTRATION_COLUMNS;
-		return SYSTEM_REGISTRATION_COLUMNS.filter((c) =>
+		const allowed = allowedIds
+			? SYSTEM_REGISTRATION_COLUMNS.filter((c) => allowedIds.includes(c.id))
+			: SYSTEM_REGISTRATION_COLUMNS;
+		if (!q) return allowed;
+		return allowed.filter((c) =>
 			c.name.toLowerCase().includes(q),
 		);
-	}, [searchQuery]);
+	}, [searchQuery, allowedIds]);
 
 	// دعم الاختصار عبر لوحة المفاتيح عند فتح القائمة (0-7)
 	useEffect(() => {
 		if (!open) return;
 		const handleKeyDown = (e: KeyboardEvent) => {
-			const target = SYSTEM_REGISTRATION_COLUMNS.find(
+			const target = filteredColumns.find(
 				(c) => c.shortcut === e.key,
 			);
 			if (target) {

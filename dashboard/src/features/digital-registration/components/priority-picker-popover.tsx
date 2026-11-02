@@ -71,12 +71,14 @@ interface PriorityPickerPopoverProps {
 	value: string;
 	onChange: (priorityName: string) => void;
 	className?: string;
+	iconOnly?: boolean;
 }
 
 export function PriorityPickerPopover({
 	value,
 	onChange,
 	className,
+	iconOnly = false,
 }: PriorityPickerPopoverProps) {
 	const [open, setOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -134,14 +136,17 @@ export function PriorityPickerPopover({
 					type="button"
 					className={cn(
 						"h-6.5 px-2 rounded-md border text-[10.5px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer select-none",
+						iconOnly && "size-6 px-0 justify-center",
 						currentOption.id !== "none"
 							? "border-border/90 bg-muted/70 text-foreground font-semibold"
 							: "border-border/80 bg-background hover:bg-muted text-foreground",
 						className,
 					)}
+					title={`الأولوية: ${currentOption.name}`}
+					aria-label={`الأولوية: ${currentOption.name}`}
 				>
 					{currentOption.pillIcon}
-					<span>{currentOption.name}</span>
+					{!iconOnly && <span>{currentOption.name}</span>}
 				</button>
 			</PopoverTrigger>
 

@@ -13,11 +13,12 @@ import {
 	IconAlertCircle,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
-import { useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
+import { useBranches } from "@/features/settings/branches/hooks/use-branches";
+import { useRooms } from "@/features/settings/branches/hooks/use-rooms";
 
 interface RoomPickerPopoverProps {
 	value: string;
-	onChange: (roomName: string) => void;
+	onChange: (roomName: string, roomId?: string, branchId?: string) => void;
 	appointmentDate: string;
 	onOpenAppointmentPicker?: () => void;
 	className?: string;
@@ -28,22 +29,6 @@ export interface RoomItem {
 	name: string;
 	isBooked: boolean;
 }
-
-// قائمة القاعات والمعامل التقنية بالأكاديمية (شاملة مطابقة للتصميم والاحتياج)
-export const DEFAULT_ACADEMY_ROOMS: RoomItem[] = [
-	{ id: "room-1", name: "غرفة فحص", isBooked: true },
-	{ id: "room-2", name: "غرفة الطوارئ", isBooked: false },
-	{ id: "room-3", name: "معمل البرمجة والذكاء الاصطناعي", isBooked: false },
-	{ id: "room-4", name: "قاعة الروبوتيكس والابتكار", isBooked: false },
-	{ id: "room-5", name: "مختبر تحليل البيانات", isBooked: false },
-	{ id: "room-6", name: "قاعة التقييم والقبول الأكاديمي", isBooked: false },
-	{ id: "room-7", name: "غرفة المقابلات والاستشارات", isBooked: false },
-	{ id: "room-8", name: "قاعة ريادة الأعمال وتطوير الألعاب", isBooked: false },
-	{ id: "room-9", name: "غرفة الأنشطة والمشاريع", isBooked: false },
-	{ id: "room-10", name: "قاعة المحاضرات الكبرى", isBooked: false },
-	{ id: "room-11", name: "معمل الأمن السيبراني والشبكات", isBooked: false },
-	{ id: "room-12", name: "قاعة ورش العمل التفاعلية", isBooked: false },
-];
 
 export function RoomPickerPopover({
 	value,
@@ -58,32 +43,19 @@ export function RoomPickerPopover({
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const popoverContentRef = useRef<HTMLDivElement>(null);
 
-	// ربط القاعات مع فصول وقاعات النظام المعتمدة
-	const { classrooms = [], isLoading } = useClassrooms();
+	const { branches, isLoading: isLoadingBranches } = useBranches();
+	const activeBranchId = branches[0]?.id;
+	const { rooms, isLoading: isLoadingRooms } = useRooms(activeBranchId);
+	const isLoading = isLoadingBranches || isLoadingRooms;
 
 	// التحقق من شرط التسلسل: هل تم اختيار موعد أولاً؟
 	const isAppointmentSelected =
 		Boolean(appointmentDate) && appointmentDate !== "تاريخ الموعد";
 
-	// دمج قاعات النظام مع القائمة المعتمدة لضمان وجود خيارات كافية وقابلة للتمرير دائماً
+	// الغرف تأتي من إعدادات الفروع فقط؛ لا نعرض أسماء تجريبية يمكن أن تفشل عند الحفظ.
 	const roomsList: RoomItem[] = useMemo(() => {
-		if (classrooms && classrooms.length > 0) {
-			const sysRooms: RoomItem[] = classrooms.map((c, idx) => ({
-				id: c.id,
-				name: c.name || `قاعة ${c.roomNumber || idx + 1}`,
-				isBooked: idx === 0,
-			}));
-			const names = new Set(sysRooms.map((r) => r.name));
-			const merged = [...sysRooms];
-			for (const r of DEFAULT_ACADEMY_ROOMS) {
-				if (!names.has(r.name)) {
-					merged.push(r);
-				}
-			}
-			return merged;
-		}
-		return DEFAULT_ACADEMY_ROOMS;
-	}, [classrooms]);
+		return rooms.map((room) => ({ id: room.id, name: room.name, isBooked: false }));
+	}, [rooms]);
 
 	// تصفية القاعات بالبحث
 	const filteredRooms = useMemo(() => {
@@ -141,13 +113,13 @@ export function RoomPickerPopover({
 			return;
 		}
 
-		onChange(room.name);
+		onChange(room.name, room.id, activeBranchId);
 		setWarningRoom(null);
 		setOpen(false);
 	};
 
 	const handleReset = () => {
-		onChange("الغرفة");
+		onChange("الغرفة", undefined, undefined);
 		setWarningRoom(null);
 		setOpen(false);
 	};

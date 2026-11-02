@@ -13,6 +13,7 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { useSession } from "@/lib/auth/client";
 import type { CampaignRequestItem, RegistrationCommentItem } from "../../types/campaign-request.types";
 import {
 	useAddRequestComment,
@@ -62,6 +63,7 @@ export function RequestActivityComments({
 		request.comments || [],
 	);
 	const commentsContainerRef = useRef<HTMLDivElement>(null);
+	const { data: session } = useSession();
 
 	const addCommentMutation = useAddRequestComment(campaignId, request.id);
 	const deleteCommentMutation = useDeleteRequestComment(campaignId, request.id);
@@ -81,7 +83,7 @@ export function RequestActivityComments({
 		const tempId = `temp-${Date.now()}`;
 		const optimisticComment: RegistrationCommentItem = {
 			id: tempId,
-			authorName: "د. أحمد جمال",
+			authorName: "أنت",
 			body: trimmed,
 			createdAt: new Date().toISOString(),
 		};
@@ -185,7 +187,7 @@ export function RequestActivityComments({
 											</span>
 											<span className="text-zinc-300 dark:text-zinc-700">•</span>
 											<span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
-												طلب زيارة
+											طلب تسجيل
 											</span>
 											<span className="text-zinc-300 dark:text-zinc-700">•</span>
 											<span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-normal">
@@ -194,7 +196,8 @@ export function RequestActivityComments({
 										</div>
 									</div>
 
-									{/* زر حذف التعليق المباشر عند تمرير المؤشر */}
+									{/* لا يظهر الحذف إلا لصاحب التعليق. */}
+									{c.authorId === session?.user?.id && (
 									<button
 										type="button"
 										onClick={() => handleDeleteComment(c.id)}
@@ -203,6 +206,7 @@ export function RequestActivityComments({
 									>
 										<IconTrash className="size-3.5" />
 									</button>
+									)}
 								</div>
 
 								{/* نص التعليق المعروض بوضوح تام */}
@@ -238,6 +242,8 @@ export function RequestActivityComments({
 					<div className="flex items-center gap-1 text-zinc-400">
 						<button
 							type="button"
+							disabled
+							aria-label="رفع الوسائط غير متاح حالياً"
 							className="size-6 flex items-center justify-center rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
 							title="رفع وسائط"
 						>
@@ -245,6 +251,8 @@ export function RequestActivityComments({
 						</button>
 						<button
 							type="button"
+							disabled
+							aria-label="الرموز التعبيرية غير متاحة حالياً"
 							className="size-6 flex items-center justify-center rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
 							title="رموز تعبيرية"
 						>
@@ -252,6 +260,8 @@ export function RequestActivityComments({
 						</button>
 						<button
 							type="button"
+							disabled
+							aria-label="الإشارة غير متاحة حالياً"
 							className="size-6 flex items-center justify-center rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
 							title="إشارة @"
 						>
@@ -259,6 +269,8 @@ export function RequestActivityComments({
 						</button>
 						<button
 							type="button"
+							disabled
+							aria-label="إرفاق ملف غير متاح حالياً"
 							className="size-6 flex items-center justify-center rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
 							title="إرفاق ملف"
 						>

@@ -70,11 +70,11 @@ import { AppointmentPickerPopover } from "./appointment-picker-popover";
 import { RoomPickerPopover } from "./room-picker-popover";
 import { ColumnStatusPicker } from "./column-status-picker";
 import { PriorityPickerPopover } from "./priority-picker-popover";
-import { useCreateRequest, useUpdateRequest } from "../hooks/use-digital-registration";
+import { REGISTRATION_TRACKS } from "../utils/registration-tracks";
+import { useCreateRequest, useRegistrationReviewers, useScheduleAssessmentAppointment, useUpdateRequest } from "../hooks/use-digital-registration";
 import type { CampaignRequestItem } from "../types/campaign-request.types";
 import { backendFetch } from "@/lib/backend-fetch";
 import { useOwners } from "@/features/services/patients/hooks/use-owners";
-import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import { AddStaffSheet } from "@/features/services/staff/components/add-staff-sheet";
 
 interface AddRequestDialogProps {
@@ -86,16 +86,6 @@ interface AddRequestDialogProps {
 	onSuccess?: (result: any) => void;
 }
 
-// Fallback guardians list when database has no owners yet or running locally
-const DEFAULT_GUARDIANS = [
-	{ id: "g-1", name: "محمد السالم", phone: "0551234567", email: "mohammed.salem@example.com" },
-	{ id: "g-2", name: "عبدالله الشمري", phone: "0509876543", email: "abdullah.shamri@example.com" },
-	{ id: "g-3", name: "خالد العتيبي", phone: "0564567890", email: "khaled.otaibi@example.com" },
-	{ id: "g-4", name: "فهد الدوسري", phone: "0543210987", email: "fahad.dossary@example.com" },
-	{ id: "g-5", name: "سلطان القحطاني", phone: "0533344556", email: "sultan.qahtani@example.com" },
-	{ id: "g-6", name: "عمر الغامدي", phone: "0511223344", email: "omar.ghamdi@example.com" },
-];
-
 // استخراج الحروف الأولى للاسم العربي للأيقونة الدائرية
 function getArabicInitials(name: string): string {
 	if (!name) return "م";
@@ -104,6 +94,16 @@ function getArabicInitials(name: string): string {
 	if (parts.length === 0) return "م";
 	if (parts.length === 1) return parts[0].slice(0, 2);
 	return (parts[0][0] || "") + (parts[1][0] || "");
+}
+
+function parseStrictBirthDate(value: string): Date | null {
+	const match = value.trim().match(/^(?:(\d{4})-(\d{2})-(\d{2})|(\d{2})\/(\d{2})\/(\d{4}))$/);
+	if (!match) return null;
+	const year = Number(match[1] || match[6]);
+	const month = Number(match[2] || match[5]);
+	const day = Number(match[3] || match[4]);
+	const date = new Date(Date.UTC(year, month - 1, day));
+	return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day ? date : null;
 }
 
 // تحويل مسميات الحالات السبع للأكواد المعتمدة في قاعدة البيانات
@@ -258,7 +258,7 @@ export function AddRequestDialog({
 				email: (o as any).email || "",
 			}));
 		}
-		return DEFAULT_GUARDIANS;
+		return [];
 	}, [owners]);
 
 	const filteredGuardians = useMemo(() => {
@@ -293,24 +293,19 @@ export function AddRequestDialog({
 	const [searchStaff, setSearchStaff] = useState("");
 	const [isAddStaffOpen, setIsAddStaffOpen] = useState(false);
 
-	const { staff: systemStaff, isLoading: isStaffLoading } = useStaff();
+	const { data: systemStaff = [], isLoading: isStaffLoading } = useRegistrationReviewers();
 
-	// موظفو النظام مع توفير عينة تحاكي موظفي الأكاديمية عند عدم وجود موظفين مسجلين بعد
+	// كل أعضاء النظام التابعين للأكاديمية، بمن فيهم المدير، متاحون كمراجعين.
 	const staffList = useMemo(() => {
-		if (systemStaff && systemStaff.length > 0) {
-			return systemStaff.map((s, idx) => ({
+		if (systemStaff.length > 0) {
+			return systemStaff.map((s) => ({
 				id: s.id,
+				userId: s.id,
 				name: s.name,
-				isBusy: (s as any).status === "BUSY" || idx === 0,
+				isBusy: false,
 			}));
 		}
-		return [
-			{ id: "staff-1", name: "أحمد محمد علي", isBusy: true },
-			{ id: "staff-2", name: "سارة خالد المنصور", isBusy: false },
-			{ id: "staff-3", name: "عبدالله عمر الشريف", isBusy: false },
-			{ id: "staff-4", name: "مريم إبراهيم العتيبي", isBusy: true },
-			{ id: "staff-5", name: "فيصل فهد القحطاني", isBusy: false },
-		];
+		return [];
 	}, [systemStaff]);
 
 	const filteredStaff = useMemo(() => {
@@ -356,12 +351,14 @@ export function AddRequestDialog({
 	const [appointmentIsoDate, setAppointmentIsoDate] = useState<string | null>(null);
 	const [enableRecurrence, setEnableRecurrence] = useState(false);
 	const [selectedRoom, setSelectedRoom] = useState("الغرفة");
+	const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+	const [selectedRoomBranchId, setSelectedRoomBranchId] = useState<string | null>(null);
 	const [selectedColumn, setSelectedColumn] = useState(defaultColumn);
 	const [priority, setPriority] = useState<string>("بدون أولوية");
 
 	// ─── Attachments (المستندات والروابط المرفقة من قائمة الثلاث نقط - الصورة 030c9405) ──
 	const [attachedDocuments, setAttachedDocuments] = useState<
-		Array<{ id: string; name: string; size: string; url?: string; key?: string }>
+		Array<{ id: string; name: string; size: string; url?: string; key?: string; type?: string }>
 	>([]);
 	const [attachedLinks, setAttachedLinks] = useState<
 		Array<{ id: string; title: string; url: string }>
@@ -397,6 +394,7 @@ export function AddRequestDialog({
 	const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const files = Array.from(e.target.files || []);
 		if (files.length === 0) return;
+		let uploaded = 0;
 
 		for (const file of files) {
 			try {
@@ -410,7 +408,8 @@ export function AddRequestDialog({
 
 				if (res.ok) {
 					const uploadData = await res.json();
-					const fileUrl = uploadData.key?.startsWith("http")
+					if (!uploadData.key) throw new Error("لم يُرجع الخادم رابط المستند");
+					const fileUrl = uploadData.key.startsWith("/") || uploadData.key.startsWith("http")
 						? uploadData.key
 						: `/api/uploads/serve?key=${encodeURIComponent(uploadData.key)}`;
 
@@ -422,37 +421,21 @@ export function AddRequestDialog({
 							size: `${(file.size / 1024).toFixed(1)} KB`,
 							url: fileUrl,
 							key: uploadData.key,
+							type: "OTHER",
 						},
 					]);
+					uploaded += 1;
 				} else {
-					setAttachedDocuments((prev) => [
-						...prev,
-						{
-							id: Math.random().toString(36).substring(2, 9),
-							name: file.name,
-							size: `${(file.size / 1024).toFixed(1)} KB`,
-							url: `/uploads/${file.name}`,
-						},
-					]);
+					throw new Error((await res.json().catch(() => null))?.message || "فشل رفع المستند");
 				}
-			} catch {
-				setAttachedDocuments((prev) => [
-					...prev,
-					{
-						id: Math.random().toString(36).substring(2, 9),
-						name: file.name,
-						size: `${(file.size / 1024).toFixed(1)} KB`,
-						url: `/uploads/${file.name}`,
-					},
-				]);
+			} catch (error) {
+				toast.error(`تعذر رفع ${file.name}: ${error instanceof Error ? error.message : "خطأ غير متوقع"}`);
 			}
 		}
 
-		toast.success(
-			files.length > 1
-				? `تم إرفاق ورفع ${files.length} مستندات بنجاح`
-				: `تم إرفاق ورفع المستند: ${files[0].name}`,
-		);
+		if (uploaded > 0) {
+			toast.success(uploaded > 1 ? `تم رفع ${uploaded} مستندات بنجاح` : `تم رفع المستند: ${files[0].name}`);
+		}
 
 		if (fileInputRef.current) fileInputRef.current.value = "";
 	};
@@ -465,6 +448,7 @@ export function AddRequestDialog({
 
 	const createMutation = useCreateRequest(campaignId);
 	const updateMutation = useUpdateRequest(campaignId);
+	const scheduleMutation = useScheduleAssessmentAppointment(campaignId);
 
 	// تعبئة كافة البيانات مسبقاً وبدقة عند فتح الفورم في وضع التعديل (Edit Mode)
 	useEffect(() => {
@@ -485,7 +469,7 @@ export function AddRequestDialog({
 			setLearningMode(lm);
 
 			setPreferredShift(initialData.preferredShift || "صباحي");
-			setSuggestedTrack(initialData.targetClass || initialData.proposedTrack || "");
+			setSuggestedTrack(initialData.proposedTrack || "");
 			setGuardian(initialData.guardianName || "");
 			setGuardianPhone(initialData.guardianPhone || "");
 			setGuardianEmail(initialData.guardianEmail || "");
@@ -518,8 +502,10 @@ export function AddRequestDialog({
 			}
 
 			// 3. الغرفة (Room)
-			const rRoom = initialData.roomName || (initialData as any).roomId || "الغرفة";
+			const rRoom = initialData.roomName || "الغرفة";
 			setSelectedRoom(rRoom);
+			setSelectedRoomId((initialData as any).roomId || null);
+			setSelectedRoomBranchId(null);
 
 			// 4. العمود / الحالة (Column / Status)
 			const colMap: Record<string, string> = {
@@ -568,6 +554,8 @@ export function AddRequestDialog({
 						name: doc.title || "مستند مرفق",
 						size: doc.fileSize || "1.0 MB",
 						url: doc.fileUrl,
+						key: doc.storageKey || doc.fileUrl,
+						type: doc.type || "OTHER",
 					}))
 				);
 			} else {
@@ -651,19 +639,14 @@ export function AddRequestDialog({
 			toast.error("يرجى اختيار أو إدخال ولي الأمر");
 			return false;
 		}
+		if (!guardianPhone.trim()) {
+			setError("رقم هاتف ولي الأمر مطلوب");
+			toast.error("يرجى إدخال رقم هاتف ولي الأمر");
+			return false;
+		}
 		if (isNewGuardian) {
-			if (!guardianPhone.trim()) {
-				setError("رقم هاتف ولي الأمر مطلوب لإنشاء الملف");
-				toast.error("يرجى إدخال رقم هاتف ولي الأمر");
-				return false;
-			}
-			if (!guardianEmail.trim()) {
-				setError("البريد الإلكتروني مطلوب لتوحيد بيانات ولي الأمر");
-				toast.error("يرجى إدخال البريد الإلكتروني لولي الأمر");
-				return false;
-			}
 			const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-			if (!emailPattern.test(guardianEmail.trim())) {
+			if (guardianEmail.trim() && !emailPattern.test(guardianEmail.trim())) {
 				setError("صيغة البريد الإلكتروني غير صحيحة");
 				toast.error("يرجى إدخال بريد إلكتروني صحيح");
 				return false;
@@ -672,6 +655,11 @@ export function AddRequestDialog({
 		if (!birthDate.trim()) {
 			setError("تاريخ الميلاد مطلوب");
 			toast.error("يرجى إدخال تاريخ الميلاد");
+			return false;
+		}
+		if (!parseStrictBirthDate(birthDate)) {
+			setError("تاريخ الميلاد غير صالح");
+			toast.error("يرجى إدخال تاريخ ميلاد صحيح");
 			return false;
 		}
 		if (!gender) {
@@ -703,28 +691,11 @@ export function AddRequestDialog({
 		if (!validateForm()) return;
 
 		const backendSource = channel === "CALL" ? "DIRECT_LINK" : "OTHER";
-		const validPhone = guardianPhone.trim() || "0500000000";
+		const validPhone = guardianPhone.trim();
 
-		let isoBirthDate: string | null = null;
-		if (birthDate.trim()) {
-			if (birthDate.includes("/")) {
-				const parts = birthDate.split("/");
-				if (parts.length === 3) {
-					const d = parseInt(parts[0], 10);
-					const m = parseInt(parts[1], 10) - 1;
-					const y = parseInt(parts[2], 10);
-					const dateObj = new Date(y, m, d);
-					if (!isNaN(dateObj.getTime())) {
-						isoBirthDate = dateObj.toISOString();
-					}
-				}
-			} else {
-				const dateObj = new Date(birthDate);
-				if (!isNaN(dateObj.getTime())) {
-					isoBirthDate = dateObj.toISOString();
-				}
-			}
-		}
+		const parsedBirthDate = parseStrictBirthDate(birthDate);
+		if (!parsedBirthDate) return;
+		const isoBirthDate = parsedBirthDate.toISOString();
 
 		if (initialData) {
 			try {
@@ -735,7 +706,7 @@ export function AddRequestDialog({
 						gender: (gender as "MALE" | "FEMALE" | "UNKNOWN") || "UNKNOWN",
 						birthDate: isoBirthDate,
 						ageLabel: experienceLevel || null,
-						targetClass: suggestedTrack || null,
+						proposedTrack: suggestedTrack || null,
 						guardianName: guardian.trim(),
 						guardianPhone: validPhone,
 						guardianEmail: guardianEmail.trim() || null,
@@ -743,26 +714,24 @@ export function AddRequestDialog({
 						preferredShift: preferredShift || null,
 						experienceLevel: experienceLevel || null,
 						priority: priority || "بدون أولوية",
-						status: statusToEnum(selectedColumn),
-						columnStatus: statusToEnum(selectedColumn),
+						status: selectedColumn ? statusToEnum(selectedColumn) : undefined,
 						column: selectedColumn,
-						appointmentDate:
-							appointmentIsoDate ||
-							(appointmentDate && appointmentDate !== "تاريخ الموعد"
-								? appointmentDate
-								: null),
+						appointmentDate: appointmentIsoDate || (appointmentDate !== "تاريخ الموعد" ? appointmentDate : null),
+						appointmentIsoDate: appointmentIsoDate || null,
 						assignedStaffId: reviewerId || null,
 						reviewerId: reviewerId || null,
 						reviewerName: reviewer !== "المراجع" ? reviewer : null,
-						roomId: null,
+						roomId: selectedRoomId,
 						roomName: selectedRoom !== "الغرفة" ? selectedRoom : null,
 						notifyWhatsapp,
 						links: attachedLinks.length > 0 ? attachedLinks : [],
 						documents: attachedDocuments.length > 0
 							? attachedDocuments.map((d) => ({
+									id: d.id,
 									title: d.name,
-									fileUrl: d.url || "",
+									fileUrl: d.key || d.url || "",
 									fileSize: d.size,
+									type: d.type || "OTHER",
 								}))
 							: [],
 						notes: (() => {
@@ -792,7 +761,7 @@ export function AddRequestDialog({
 				gender: (gender as "MALE" | "FEMALE" | "UNKNOWN") || "UNKNOWN",
 				birthDate: isoBirthDate,
 				ageLabel: experienceLevel || null,
-				targetClass: suggestedTrack,
+				proposedTrack: suggestedTrack || null,
 				guardianName: guardian.trim(),
 				guardianPhone: validPhone,
 				guardianEmail: guardianEmail.trim() || null,
@@ -804,15 +773,11 @@ export function AddRequestDialog({
 				preferredShift: preferredShift || null,
 				experienceLevel: experienceLevel || null,
 				priority: priority || "بدون أولوية",
-				status: statusToEnum(selectedColumn),
-				columnStatus: statusToEnum(selectedColumn),
-				appointmentDate:
-					appointmentIsoDate ||
-					(appointmentDate && appointmentDate !== "تاريخ الموعد"
-						? appointmentDate
-						: null),
+				// لا نسجل الطلب كأنه دخل المقابلة قبل نجاح الحجز الفعلي.
+				initialStatus: (appointmentIsoDate ? "QUEUE" : statusToEnum(selectedColumn)) as "QUEUE" | "SHORTLIST" | "INTERVIEW" | "AWAITING_PAYMENT" | "DUPLICATE",
 				reviewerId: reviewerId || null,
 				reviewerName: reviewer !== "المراجع" ? reviewer : null,
+				roomId: selectedRoomId,
 				roomName: selectedRoom !== "الغرفة" ? selectedRoom : null,
 				notes: (() => {
 					const parts: string[] = [];
@@ -828,14 +793,28 @@ export function AddRequestDialog({
 					url: l.url,
 				})),
 				documents: attachedDocuments.map((d: any) => ({
+					id: d.id,
 					title: d.name,
-					fileUrl: d.url || `/uploads/${d.name}`,
+					fileUrl: d.key || d.url || "",
 					fileSize: d.size,
-					type: "OTHER",
+					type: d.type || "OTHER",
 				})),
 			});
 
 			showRegistrationSuccessToast("تم تسجيل الطلب بنجاح");
+			if (appointmentIsoDate) {
+				try {
+					await scheduleMutation.mutateAsync({
+						requestId: created.id,
+						// المراجع عضو نظام وقد لا يملك سجل Staff؛ لا نرسل معرّفه كموظف للموعد.
+						// الخادم يختار أخصائي التقييم النشط الافتراضي عند عدم تحديد موظف موعد.
+						data: { startsAt: appointmentIsoDate, roomId: selectedRoomId || undefined, branchId: selectedRoomBranchId || undefined },
+					});
+					toast.success("تم تثبيت موعد التقييم والغرفة المطلوبة بنجاح");
+				} catch (scheduleError: any) {
+					toast.error(`تم إنشاء الطلب لكن تعذر تثبيت الموعد: ${scheduleError?.message || "خطأ غير متوقع"}`);
+				}
+			}
 			onSuccess?.(created);
 
 			if (createMore) {
@@ -884,7 +863,7 @@ export function AddRequestDialog({
 		};
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [open, step, initialData, studentName, birthDate, gender, learningMode, suggestedTrack, guardian, guardianPhone, guardianEmail, selectedOwnerId, appointmentDate, appointmentIsoDate, reviewer, reviewerId, selectedRoom, selectedColumn, priority, notifyWhatsapp, notes, attachedDocuments, attachedLinks]);
+	}, [open, step, initialData, studentName, birthDate, gender, learningMode, suggestedTrack, guardian, guardianPhone, guardianEmail, selectedOwnerId, appointmentDate, appointmentIsoDate, reviewer, reviewerId, selectedRoom, selectedRoomId, selectedRoomBranchId, selectedColumn, priority, notifyWhatsapp, notes, attachedDocuments, attachedLinks]);
 
 	const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
@@ -1233,6 +1212,7 @@ export function AddRequestDialog({
 										</SelectContent>
 									</Select>
 								</div>
+
 							</div>
 
 							{/* Row 3: مستوى | طريقة التعلم */}
@@ -1303,7 +1283,7 @@ export function AddRequestDialog({
 								</div>
 							</div>
 
-							{/* Row 4: المناوبة المفضلة | المجال المقترح */}
+							{/* Row 4: المناوبة المفضلة والمسار المقترح. */}
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 								{/* المناوبة المفضلة: صباحي / مسائي فقط */}
 								<div>
@@ -1354,24 +1334,9 @@ export function AddRequestDialog({
 											sideOffset={4}
 											className="z-[99] w-[var(--radix-select-trigger-width)] min-w-[200px] bg-popover text-popover-foreground border border-border/80 shadow-xl rounded-lg p-1 text-xs"
 										>
-											<SelectItem value="البرمجة والمنطق" className="text-right text-xs cursor-pointer py-1.5">
-												البرمجة والمنطق
-											</SelectItem>
-											<SelectItem value="الذكاء الاصطناعي" className="text-right text-xs cursor-pointer py-1.5">
-												الذكاء الاصطناعي
-											</SelectItem>
-											<SelectItem value="الروبوتيكس" className="text-right text-xs cursor-pointer py-1.5">
-												الروبوتيكس
-											</SelectItem>
-											<SelectItem value="تطوير الألعاب" className="text-right text-xs cursor-pointer py-1.5">
-												تطوير الألعاب
-											</SelectItem>
-											<SelectItem value="تحليل البيانات" className="text-right text-xs cursor-pointer py-1.5">
-												تحليل البيانات
-											</SelectItem>
-											<SelectItem value="ريادة الأعمال" className="text-right text-xs cursor-pointer py-1.5">
-												ريادة الأعمال
-											</SelectItem>
+											{REGISTRATION_TRACKS.map((track) => (
+												<SelectItem key={track} value={track} className="text-right text-xs cursor-pointer py-1.5">{track}</SelectItem>
+											))}
 										</SelectContent>
 									</Select>
 								</div>
@@ -1435,9 +1400,9 @@ export function AddRequestDialog({
 									</div>
 
 									<div className="flex items-center justify-between pt-1.5">
-										<span className="text-muted-foreground text-[11px] font-normal">التاريخ والوقت</span>
+										<span className="text-muted-foreground text-[11px] font-normal">موعد مقترح</span>
 										<span className="font-semibold text-foreground text-[11.5px] font-mono">
-											{appointmentDate && appointmentDate !== "تاريخ الموعد" ? appointmentDate : "قيد الجدولة والفرز"}
+											{appointmentDate && appointmentDate !== "تاريخ الموعد" ? `${appointmentDate} (يتطلب تثبيتاً)` : "يُثبت بعد إنشاء الطلب"}
 										</span>
 									</div>
 
@@ -1451,7 +1416,7 @@ export function AddRequestDialog({
 									<div className="flex items-center justify-between pt-1.5">
 										<span className="text-muted-foreground text-[11px] font-normal">الغرفة</span>
 										<span className="font-semibold text-foreground text-[11.5px]">
-											{channel === "CALL" ? "جلسة افتراضية" : (selectedRoom !== "الغرفة" ? selectedRoom : "قاعة المقابلات الرئيسية")}
+											{channel === "CALL" ? "جلسة افتراضية" : (selectedRoom !== "الغرفة" ? selectedRoom : "لم تُحدد")}
 										</span>
 									</div>
 
@@ -1578,6 +1543,19 @@ export function AddRequestDialog({
 									{doc.name}
 								</span>
 								<span className="text-[9px] text-muted-foreground">({doc.size})</span>
+								<Select
+									value={doc.type || "OTHER"}
+									onValueChange={(type) => setAttachedDocuments((prev) => prev.map((item) => item.id === doc.id ? { ...item, type } : item))}
+								>
+									<SelectTrigger className="h-5 w-24 text-[9px] px-1"><SelectValue /></SelectTrigger>
+									<SelectContent>
+										<SelectItem value="BIRTH_CERTIFICATE">شهادة ميلاد</SelectItem>
+										<SelectItem value="VACCINATION_CARD">تطعيمات</SelectItem>
+										<SelectItem value="GUARDIAN_ID">هوية ولي الأمر</SelectItem>
+										<SelectItem value="MEDICAL_REPORT">تقرير طبي</SelectItem>
+										<SelectItem value="OTHER">مستند آخر</SelectItem>
+									</SelectContent>
+								</Select>
 								<button
 									type="button"
 									onClick={() =>
@@ -1705,8 +1683,12 @@ export function AddRequestDialog({
 												key={s.id}
 												type="button"
 												onClick={() => {
+								if (!s.userId) {
+									toast.error("لا يوجد حساب مستخدم مرتبط بهذا الموظف لتعيينه كمراجع");
+									return;
+								}
 													setReviewer(s.name);
-													setReviewerId(s.id);
+								setReviewerId(s.userId);
 													setIsReviewerOpen(false);
 												}}
 												className={cn(
@@ -1764,33 +1746,9 @@ export function AddRequestDialog({
 						</PopoverContent>
 					</Popover>
 
-					{/* 2. [ تاريخ الموعد 📅+ ] - منسدلة التقويم المعتمدة مع اقتراحات رفيق AI والأوقات */}
-					<AppointmentPickerPopover
-						value={appointmentDate}
-						onChange={(val, isoVal) => {
-							setAppointmentDate(val);
-							setAppointmentIsoDate(isoVal || null);
-						}}
-						reviewerName={reviewer}
-						reviewerId={reviewerId || undefined}
-						enableReminders={notifyWhatsapp}
-						onEnableRemindersChange={setNotifyWhatsapp}
-						enableRecurrence={enableRecurrence}
-						onEnableRecurrenceChange={setEnableRecurrence}
-					/>
-
-					{/* 3. [ الغرفة 📍 ] - منسدلة اختيار القاعة/الغرفة المعتمدة مع التحقق من شرط تحديد الموعد أولاً وشارة محجوزة */}
-					<RoomPickerPopover
-						value={selectedRoom}
-						onChange={setSelectedRoom}
-						appointmentDate={appointmentDate}
-					/>
-
-					{/* 4. [ طابور ⚪ ] - منسدلة اختيار وتغيير الحالة المطابقة للتصميم مع الأيقونات والأرقام */}
-					<ColumnStatusPicker
-						value={selectedColumn}
-						onChange={setSelectedColumn}
-					/>
+					<AppointmentPickerPopover value={appointmentDate} onChange={(value, iso) => { setAppointmentDate(value); setAppointmentIsoDate(iso || null); }} reviewerName={reviewer} enableReminders={notifyWhatsapp} onEnableRemindersChange={setNotifyWhatsapp} enableRecurrence={enableRecurrence} onEnableRecurrenceChange={setEnableRecurrence} />
+					<RoomPickerPopover value={selectedRoom} onChange={(name, id, branchId) => { setSelectedRoom(name); setSelectedRoomId(id || null); setSelectedRoomBranchId(branchId || null); }} appointmentDate={appointmentDate} />
+					<ColumnStatusPicker value={selectedColumn} onChange={setSelectedColumn} allowedIds={["queue", "shortlist", "interview", "awaiting-payment", "duplicate"]} />
 
 					{/* 5. [ ... بدون أولوية ] - منسدلة اختيار الأولوية المطابقة للتصميم (الصورة b52ca17c) مع الأيقونات واختصارات 0-4 */}
 					<PriorityPickerPopover
@@ -2014,10 +1972,8 @@ export function AddRequestDialog({
 			open={isAddStaffOpen}
 			onClose={() => setIsAddStaffOpen(false)}
 			onCreated={(newStaff) => {
-				setReviewer(newStaff.name);
-				setReviewerId(newStaff.id);
 				setIsAddStaffOpen(false);
-				toast.success(`تمت إضافة الموظف ${newStaff.name} وتعيينه كمراجع`);
+				toast.success(`تمت إضافة الموظف ${newStaff.name}. أضف له حساب نظام أولاً ليظهر كمراجع.`);
 			}}
 		/>
 

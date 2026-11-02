@@ -3,8 +3,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
 	IconActivity,
-	IconAlertTriangle,
-	IconArrowDown,
 	IconBriefcase,
 	IconBuildingCommunity,
 	IconCalendar,
@@ -15,7 +13,6 @@ import {
 	IconClock,
 	IconCopy,
 	IconDots,
-	IconEye,
 	IconFileDescription,
 	IconFlag,
 	IconHourglass,
@@ -28,7 +25,6 @@ import {
 	IconPlayerPlayFilled,
 	IconPlus,
 	IconSparkles,
-	IconTrash,
 	IconUser,
 	IconVideo,
 	IconX,
@@ -41,7 +37,6 @@ import {
 	KanbanProvider,
 } from "@/components/kanban";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
 	DropdownMenu,
@@ -49,23 +44,16 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { AppointmentColumnHeader } from "@/features/appointments/components/appointment-column-header";
 import type { AppointmentColumn, AppointmentColumnId } from "@/features/appointments/types/appointment.types";
 import { toast } from "sonner";
 import { CampaignRequestSheet } from "./campaign-request-sheet";
+import { PriorityPickerPopover } from "./priority-picker-popover";
 import type { CampaignRequestItem } from "../types/campaign-request.types";
 import {
 	useCampaignRequests,
-	useDeleteRegistrationRequest,
+	useUpdateRequest,
 	useUpdateRequestStatus,
 } from "../hooks/use-digital-registration";
 
@@ -135,42 +123,28 @@ function getStageProgress(column: string): { current: number; total: number; per
 	return { current, total, percent };
 }
 
-/** حساب احتمالية الحضور الذكية */
-function getAttendanceProbability(item: CampaignRequestItem): number {
-	let prob = 86;
-	if (item.guardianPhone && item.guardianPhone.length >= 10) prob += 4;
-	if (item.channel === "CALL") prob += 2;
-	if (item.appointmentDate || item.assessmentAppointment) prob += 4;
-	if (item.status === "DUPLICATE") prob = 40;
-	if (item.status === "REJECTED") prob = 15;
-	return Math.min(prob, 96);
-}
-
 export function CampaignRequestsKanban({
 	campaignId,
 	searchQuery,
 	genderFilter,
-	onOpenAddRequest,
 	selectedRequestId: externalSelectedRequestId,
 	onSelectRequest: externalOnSelectRequest,
 }: {
 	campaignId: string;
 	searchQuery?: string;
 	genderFilter?: string;
-	onOpenAddRequest?: () => void;
 	selectedRequestId?: string | null;
 	onSelectRequest?: (id: string | null) => void;
 }) {
 	const { data: serverRequests = EMPTY_REQUESTS, isLoading } = useCampaignRequests(campaignId);
 	const updateStatusMutation = useUpdateRequestStatus(campaignId);
-	const deleteRequestMutation = useDeleteRegistrationRequest(campaignId || "");
+	const updateRequestMutation = useUpdateRequest(campaignId);
 
 	const [data, setData] = useState<CampaignRequestItem[]>([]);
 	const lastKnownColumns = useRef<Map<string, AppointmentColumnId>>(new Map());
 	const [internalSelectedRequestId, setInternalSelectedRequestId] = useState<string | null>(null);
 	const selectedRequestId = externalSelectedRequestId !== undefined ? externalSelectedRequestId : internalSelectedRequestId;
 	const setSelectedRequestId = externalOnSelectRequest || setInternalSelectedRequestId;
-	const [requestToDelete, setRequestToDelete] = useState<CampaignRequestItem | null>(null);
 
 	// Sync local state whenever server query refreshes
 	useEffect(() => {
@@ -243,7 +217,8 @@ export function CampaignRequestsKanban({
 			// Backward compatibility fallbacks
 			IN_EVALUATION: "interview",
 			EVALUATION: "interview",
-			WAITLIST: "awaiting-payment",
+			// قائمة الانتظار تُعرض تحت الطابور، وليست ضمن انتظار الدفع.
+			WAITLIST: "queue",
 			REVIEW: "shortlist",
 			AWAITING_REPLY: "shortlist",
 		};
@@ -292,6 +267,27 @@ export function CampaignRequestsKanban({
 						),
 					);
 					toast.error(err.message || "فشل تحديث حالة الطلب");
+				},
+			},
+		);
+	};
+
+	const handlePriorityChange = (request: CampaignRequestItem, priority: string) => {
+		const previousPriority = request.priority || "بدون أولوية";
+		setData((previous) =>
+			previous.map((item) => (item.id === request.id ? { ...item, priority } : item)),
+		);
+		updateRequestMutation.mutate(
+			{ requestId: request.id, data: { priority } },
+			{
+				onSuccess: () => toast.success(`تم تحديث أولوية الطلب إلى "${priority}"`),
+				onError: (error: any) => {
+					setData((previous) =>
+						previous.map((item) =>
+							item.id === request.id ? { ...item, priority: previousPriority } : item,
+						),
+					);
+					toast.error(error.message || "فشل تحديث أولوية الطلب");
 				},
 			},
 		);
@@ -369,7 +365,7 @@ export function CampaignRequestsKanban({
 	};
 
 	return (
-		<div className="min-h-0 flex-1 overflow-x-auto px-4 mt-4">
+		<div className="min-h-0 flex-1 overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-gutter:stable] px-3 lg:px-4 mt-3 pb-3">
 			{filteredData.length === 0 && data.length > 0 && (
 				<div className="flex items-center justify-between gap-2 rounded-md border border-amber-200 bg-amber-50/70 px-4 py-2 text-xs text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300 mb-3" dir="rtl">
 					<span>لا توجد طلبات تطابق شروط البحث والفلترة المحددة.</span>
@@ -378,7 +374,7 @@ export function CampaignRequestsKanban({
 			)}
 
 			<KanbanProvider
-				className="min-h-[calc(100vh-190px)] auto-cols-[minmax(375px,1fr)] items-start pb-10"
+				className="w-max min-w-full min-h-[60vh] auto-cols-[minmax(18.5rem,20rem)] gap-3 items-start pb-1"
 				collisionDetection={collisionDetection}
 				columns={columns}
 				data={filteredData}
@@ -388,30 +384,30 @@ export function CampaignRequestsKanban({
 					<KanbanBoard
 						key={column.id}
 						id={column.id}
-						className="bg-muted/40 w-full min-w-[365px] min-h-[calc(100vh-190px)] h-fit transition-all"
+						className="bg-muted/40 w-full min-w-[18.5rem] max-w-[20rem] min-h-[60vh] h-fit self-start rounded-lg border border-border/60 shadow-none transition-all"
 					>
 						<AppointmentColumnHeader column={column as AppointmentColumn} />
-
-						{column.id === "queue" && onOpenAddRequest && (
-							<button
-								type="button"
-								onClick={onOpenAddRequest}
-								className="flex h-7 w-full items-center justify-center rounded-md border border-dashed border-border/80 bg-background/60 hover:bg-background text-muted-foreground hover:text-foreground text-[10.5px] font-semibold gap-1.5 transition-colors mt-0.5 mb-1.5 shadow-2xs cursor-pointer"
-								title="تسجيل طالب جديد في الطابور"
-							>
-								<IconPlus className="size-3.5 text-primary" />
-								<span>تسجيل طالب جديد</span>
-							</button>
-						)}
-
-						<KanbanCards id={column.id} className="w-full">
+						<KanbanCards id={column.id} className="w-full gap-2 px-2 pb-3">
 							{(item: CampaignRequestItem) => {
 								const stage = getStageProgress(item.column);
-								const probability = getAttendanceProbability(item);
 								const studentInitials = getArabicInitials(item.patientName || item.name);
 								const guardianInitials = getArabicInitials(item.guardianName);
-								const reviewerName = item.assessmentAppointment?.staffName || "د.معاذ الغامدي";
+								const reviewerName = item.assignedStaff?.name || item.assessmentAppointment?.staffName || item.reviewerName || null;
 								const reviewerInitials = getArabicInitials(reviewerName);
+								const submittedAt = item.submittedAt ? new Date(item.submittedAt) : null;
+								const appointmentAt = item.assessmentAppointment?.startsAt ? new Date(item.assessmentAppointment.startsAt) : null;
+								const normalizedLearningMode = item.learningMode?.trim().toLowerCase() || "";
+								const isRemoteRequest =
+									item.channel === "CALL" ||
+									item.source === "DIRECT_LINK" ||
+									normalizedLearningMode.includes("اتصال") ||
+									normalizedLearningMode.includes("أونلاين") ||
+									normalizedLearningMode.includes("عن بعد") ||
+									normalizedLearningMode === "online" ||
+									normalizedLearningMode === "remote";
+								const isInterviewStage =
+									item.column === "interview" ||
+									["INTERVIEW", "IN_EVALUATION", "EVALUATION"].includes(item.status);
 
 								return (
 									<KanbanCard
@@ -424,7 +420,7 @@ export function CampaignRequestsKanban({
 									>
 										<Card
 											className={cn(
-												"w-full group/card flex flex-col gap-2.5 rounded-xl border border-zinc-200/90 dark:border-zinc-800 bg-white dark:bg-card p-3.5 shadow-2xs text-start hover:border-primary/40 hover:shadow-xs transition-all select-none",
+												"w-full group/card flex flex-col gap-2 rounded-lg border border-zinc-200/90 dark:border-zinc-800 bg-white dark:bg-card p-2.5 shadow-2xs text-start hover:border-primary/40 hover:shadow-xs transition-all select-none",
 												item.status === "ACCEPTED" ? "cursor-pointer" : "cursor-grab active:cursor-grabbing"
 											)}
 											dir="rtl"
@@ -440,14 +436,14 @@ export function CampaignRequestsKanban({
 
 													{/* اسم الطالب بخط بارز وواضح */}
 													<h4 className="truncate text-[12px] font-bold text-zinc-900 dark:text-zinc-100">
-														{item.patientName || item.name}
+														{item.patientName || item.name || "غير محدد"}
 													</h4>
 
 													{/* أيقونة Sparkles */}
 													<IconSparkles className="size-3 text-amber-500/80 shrink-0" />
 
 													{/* أيقونة وشارة معبرة عن (اتصال) أو (في الأكاديمية) كما طلب المستخدم */}
-													{item.channel === "CALL" || item.source === "DIRECT_LINK" ? (
+													{isRemoteRequest ? (
 														<span
 															className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[8.5px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40 shrink-0"
 															title="قناة التسجيل: اتصال"
@@ -466,14 +462,14 @@ export function CampaignRequestsKanban({
 													)}
 												</div>
 
-												{/* كود الطلب على اليسار بنمط مونو ناعم: APP - 01 */}
-												<span className="font-mono text-[9.5px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wide shrink-0 font-medium">
-													{item.code || "APP - 01"}
-												</span>
+														{/* كود الطلب يعرض قيمة المصدر فقط ولا ينشئ قيمة افتراضية مضللة. */}
+														<span className="font-mono text-[9.5px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wide font-medium">
+															{item.code || "—"}
+														</span>
 											</div>
 
 											{/* 2. جدول الحقول المنظم (Key - Value Rows) المطابق للصورة 651ca278 بأحجام متناسقة تماماً */}
-											<div className="space-y-1.5 text-[10.5px] pt-0.5 w-full">
+											<div className="space-y-1 text-[10.5px] pt-0.5 w-full">
 												{/* الصف 1: ولي الأمر */}
 												<div className="flex items-center justify-between gap-1 w-full">
 													<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
@@ -485,8 +481,8 @@ export function CampaignRequestsKanban({
 														<div className="size-4.5 rounded-full bg-[#3B82F6] text-white flex items-center justify-center text-[8.5px] font-bold shrink-0">
 															{guardianInitials}
 														</div>
-														<span className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100 truncate max-w-[110px]" title={item.guardianName}>
-															{item.guardianName}
+																	<span className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100 truncate max-w-[110px]" title={item.guardianName || undefined}>
+																		{item.guardianName || "غير محدد"}
 														</span>
 														{/* زر مراسلة ولي الأمر عبر الواتساب بإطار مربع دائري ناعم كما بالصورة */}
 														<button
@@ -495,7 +491,7 @@ export function CampaignRequestsKanban({
 																e.stopPropagation();
 																if (item.guardianPhone) {
 																	const cleanPhone = item.guardianPhone.replace(/\D/g, "");
-																	const waPhone = cleanPhone.startsWith("05") ? `966${cleanPhone.slice(1)}` : cleanPhone;
+																const waPhone = cleanPhone;
 																	window.open(`https://wa.me/${waPhone}`, "_blank");
 																} else {
 																	setSelectedRequestId(item.id);
@@ -516,7 +512,7 @@ export function CampaignRequestsKanban({
 														<span>العمر</span>
 													</div>
 													<span className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100">
-														{item.patientDetails || item.ageLabel || "3 سنوات"}
+														{item.ageLabel || "غير محدد"}
 													</span>
 												</div>
 
@@ -527,10 +523,8 @@ export function CampaignRequestsKanban({
 														<span>تاريخ التقديم</span>
 													</div>
 													<div className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-900 dark:text-zinc-100" dir="rtl">
-														<span>{item.date || "11/6/2026"}</span>
-														<span className="text-zinc-300 dark:text-zinc-600 font-normal">•</span>
-														<IconClock className="size-2.5 text-zinc-400 shrink-0" />
-														<span className="font-mono text-[9.5px]">10:00 ص</span>
+														<span>{submittedAt ? submittedAt.toLocaleDateString("ar-EG") : "غير محدد"}</span>
+														{submittedAt && <><span className="text-zinc-300 dark:text-zinc-600 font-normal">•</span><IconClock className="size-2.5 text-zinc-400 shrink-0" /><span className="font-mono text-[9.5px]">{submittedAt.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })}</span></>}
 													</div>
 												</div>
 
@@ -541,10 +535,8 @@ export function CampaignRequestsKanban({
 														<span>موعد الحضور</span>
 													</div>
 													<div className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-900 dark:text-zinc-100" dir="rtl">
-														<span>{item.assessmentAppointment ? new Date(item.assessmentAppointment.startsAt).toLocaleDateString("ar-EG", { month: "numeric", day: "numeric" }) : "اليوم"}</span>
-														<span className="text-zinc-300 dark:text-zinc-600 font-normal">•</span>
-														<IconClock className="size-2.5 text-zinc-400 shrink-0" />
-														<span className="font-mono text-[9.5px]">10:00 ص</span>
+														<span>{appointmentAt ? appointmentAt.toLocaleDateString("ar-EG", { month: "numeric", day: "numeric" }) : "غير محدد"}</span>
+														{appointmentAt && <><span className="text-zinc-300 dark:text-zinc-600 font-normal">•</span><IconClock className="size-2.5 text-zinc-400 shrink-0" /><span className="font-mono text-[9.5px]">{appointmentAt.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })}</span></>}
 													</div>
 												</div>
 
@@ -552,10 +544,10 @@ export function CampaignRequestsKanban({
 												<div className="flex items-center justify-between gap-1 w-full">
 													<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
 														<IconMapPin className="size-3 shrink-0" />
-														<span>المدينة</span>
+														<span>الغرفة</span>
 													</div>
 													<span className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100">
-														{item.roomName || "مكة"}
+														{item.roomName || "غير محددة"}
 													</span>
 												</div>
 
@@ -566,7 +558,7 @@ export function CampaignRequestsKanban({
 														<span>طريقة التسجيل</span>
 													</div>
 													<span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-[#EEF2FF] text-[#4F6BF5] dark:bg-indigo-950/60 dark:text-indigo-300 border border-[#E0E7FF]/70">
-														{item.channel === "CALL" ? "حجز أونلاين" : (item.learningMode || "في الأكاديمية")}
+														{isRemoteRequest ? "حجز أونلاين" : (item.learningMode || "غير محددة")}
 													</span>
 												</div>
 											</div>
@@ -578,11 +570,11 @@ export function CampaignRequestsKanban({
 											<div className="flex items-center justify-between gap-2 w-full">
 												<div className="flex items-center gap-1.5 min-w-0 flex-1">
 													<div className="size-6 rounded-full bg-[#3B82F6] text-white flex items-center justify-center text-[9.5px] font-bold shrink-0">
-														{reviewerInitials}
+														{reviewerInitials || "--"}
 													</div>
 													<div className="flex flex-col leading-tight min-w-0">
 														<span className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100 truncate">
-															{reviewerName}
+														{reviewerName || "غير معين"}
 														</span>
 														<span className="text-[8.5px] text-zinc-400 dark:text-zinc-500 font-normal">
 															المراجع
@@ -628,33 +620,30 @@ export function CampaignRequestsKanban({
 											{item.column === "rejected" || item.status === "REJECTED" ? (
 												<div className="w-full rounded-md bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 py-1 px-2.5 flex items-center justify-center gap-1.5 text-[10px] font-bold text-rose-600 dark:text-rose-400 select-none shadow-2xs">
 													<IconX className="size-3 text-rose-600 shrink-0" />
-													<span>{item.rejectionReason || "عدم استيفاء أوراق التسجيل المطلوبة"}</span>
+													<span>{item.rejectionReason || "لم يُسجل سبب الرفض"}</span>
 												</div>
 											) : (
 												<div className="w-full rounded-md bg-[#EFF6FF] dark:bg-blue-950/30 border border-[#DBEAFE]/80 dark:border-blue-900/40 py-1 px-2.5 flex items-center justify-center gap-1.5 text-[10px] font-semibold text-[#3B82F6] dark:text-blue-400 select-none shadow-2xs">
 													<IconSparkles className="size-3 text-[#3B82F6] shrink-0" />
-													<span>احتمالية الحضور: {probability}%</span>
+													<span>{item.attendanceProbability === undefined || item.attendanceProbability === null ? "لا يوجد تقدير للحضور" : `احتمالية الحضور: ${item.attendanceProbability}%`}</span>
 												</div>
 											)}
 
-											{/* زر دخول المقابلة الافتراضية إذا كان الطلب في عمود المقابلة وعبر اتصال */}
-											{(item.column === "interview" || item.status === "INTERVIEW") &&
-												(item.channel === "CALL" || item.source === "DIRECT_LINK") && (
-													<div className="w-full" onClick={(e) => e.stopPropagation()}>
-														<Link
-															to="/video-call"
-															search={{ room: `interview-${item.code.toLowerCase()}` }}
-															className="inline-flex items-center justify-center gap-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 text-[10px] font-bold shadow-2xs transition-colors w-full cursor-pointer"
-															title="دخول المقابلة الافتراضية الآن"
-														>
-															<IconVideo className="size-3 text-white" />
-															<span>دخول المقابلة الافتراضية</span>
-														</Link>
-													</div>
-												)}
+											{isInterviewStage && isRemoteRequest && (
+												<div className="w-full" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
+													<Link
+														to="/video-call"
+														search={{ room: `interview-${(item.code || item.id).toLowerCase()}` }}
+														className="inline-flex items-center justify-center gap-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 text-[10px] font-bold shadow-2xs transition-colors w-full cursor-pointer"
+														title="دخول المقابلة الافتراضية الآن"
+													>
+														<IconVideo className="size-3 text-white" />
+														<span>دخول المقابلة الافتراضية</span>
+													</Link>
+												</div>
+											)}
 
-											{/* 6. شريط الإجراءات السفلي المطابق تماماً للصورة 651ca278 */}
-											{/* في اليمين: [ 12 💬 ] ثم [ + إضافة ملاحظة ] | في اليسار: [ ↓ ] ثم [ ...تحديد كـ ⚑ ] */}
+											{/* 6. شريط الإجراءات السفلي */}
 											<div className="flex items-center justify-between gap-1 pt-0.5 w-full" dir="rtl" onClick={(e) => e.stopPropagation()}>
 												{/* المجموعة اليمنى بالصورة: زر التعليقات + زر إضافة ملاحظة */}
 												<div className="flex items-center gap-1 shrink-0">
@@ -681,55 +670,15 @@ export function CampaignRequestsKanban({
 													</button>
 												</div>
 
-												{/* المجموعة اليسرى بالصورة: زر السهم لأسفل + زر تحديد كـ... */}
+											{/* الأولوية تحل محل قائمة السهم؛ التفاصيل والحذف متاحان من شاشة الطلب. */}
 												<div className="flex items-center gap-1 shrink-0">
-													{/* زر السهم لأسفل */}
-													<DropdownMenu dir="rtl">
-														<DropdownMenuTrigger asChild>
-															<button
-																type="button"
-																className="size-6.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 flex items-center justify-center text-zinc-500 hover:text-zinc-800 transition-colors cursor-pointer shrink-0"
-																title="خيارات الطلب"
-															>
-																<IconArrowDown className="size-2.5" />
-															</button>
-														</DropdownMenuTrigger>
-														<DropdownMenuContent align="start" className="w-40 z-[99]">
-															<DropdownMenuItem
-																onClick={() => setSelectedRequestId(item.id)}
-																className="gap-2 text-xs cursor-pointer"
-															>
-																<IconEye size={13} className="text-muted-foreground" />
-																<span>عرض التفاصيل</span>
-															</DropdownMenuItem>
-															<DropdownMenuItem
-																onClick={() => {
-																	if (typeof window !== "undefined") {
-																		navigator.clipboard.writeText(`${window.location.origin}/call/interview-${item.code.toLowerCase()}`);
-																		toast.success("تم نسخ رابط المقابلة بنجاح");
-																	}
-																}}
-																className="gap-2 text-xs cursor-pointer"
-															>
-																<IconCopy size={13} className="text-muted-foreground" />
-																<span>نسخ رابط المقابلة</span>
-															</DropdownMenuItem>
-															<DropdownMenuItem
-																disabled={item.status === "ACCEPTED"}
-																onClick={() => {
-																	if (item.status === "ACCEPTED") {
-																		toast.error("لا يمكن حذف طالب تم اعتماده وقبوله نهائياً");
-																		return;
-																	}
-																	setRequestToDelete(item);
-																}}
-																className="gap-2 text-xs text-destructive focus:text-destructive cursor-pointer"
-															>
-																<IconTrash size={13} />
-																<span>حذف الطلب نهائياً</span>
-															</DropdownMenuItem>
-														</DropdownMenuContent>
-													</DropdownMenu>
+													<div onPointerDown={(event) => event.stopPropagation()}>
+														<PriorityPickerPopover
+															value={item.priority || "بدون أولوية"}
+															onChange={(priority) => handlePriorityChange(item, priority)}
+															iconOnly
+														/>
+													</div>
 
 													{/* زر ⚑ تحديد كـ... لتغيير المرحلة بنقرة واحدة */}
 													<DropdownMenu dir="rtl">
@@ -810,60 +759,6 @@ export function CampaignRequestsKanban({
 					setSelectedRequestId(null);
 				}}
 			/>
-
-			{/* نافذة تأكيد حذف طلب التسجيل نهائياً */}
-			<Dialog open={!!requestToDelete} onOpenChange={(open) => !open && setRequestToDelete(null)}>
-				<DialogContent className="max-w-md text-right" dir="rtl">
-					<DialogHeader>
-						<div className="flex items-center gap-2 text-destructive mb-1">
-							<IconAlertTriangle className="size-5" />
-							<DialogTitle className="text-base font-bold">تأكيد حذف طلب التسجيل</DialogTitle>
-						</div>
-						<DialogDescription className="text-xs text-muted-foreground leading-relaxed pt-1">
-							هل أنت متأكد من رغبتك في حذف طلب الطالب{" "}
-							<strong className="text-foreground font-semibold">"{requestToDelete?.patientName}"</strong>{" "}
-							برمز <span className="font-mono text-foreground font-semibold">({requestToDelete?.code})</span>؟
-							<br />
-							<span className="text-rose-600 dark:text-rose-400 mt-1 inline-block">
-								⚠️ هذا الإجراء نهائي وسيتم مسح بيانات التقديم والمستندات المرتبطة به.
-							</span>
-						</DialogDescription>
-					</DialogHeader>
-					<DialogFooter className="gap-2 sm:gap-0 mt-3 flex-row-reverse justify-start">
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => setRequestToDelete(null)}
-							disabled={deleteRequestMutation.isPending}
-						>
-							إلغاء
-						</Button>
-						<Button
-							type="button"
-							variant="destructive"
-							size="sm"
-							disabled={deleteRequestMutation.isPending}
-							onClick={() => {
-								if (!requestToDelete) return;
-								deleteRequestMutation.mutate(requestToDelete.id, {
-									onSuccess: () => {
-										toast.success("تم حذف طلب التسجيل بنجاح");
-										setRequestToDelete(null);
-									},
-									onError: (err: any) => {
-										toast.error(err.message || "فشل حذف طلب التسجيل");
-									},
-								});
-							}}
-							className="gap-1.5"
-						>
-							<IconTrash className="size-3.5" />
-							{deleteRequestMutation.isPending ? "جاري الحذف..." : "نعم، حذف الطلب"}
-						</Button>
-					</DialogFooter>
-				</DialogContent>
-			</Dialog>
 		</div>
 	);
 }

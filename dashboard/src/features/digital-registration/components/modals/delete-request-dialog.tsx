@@ -105,7 +105,7 @@ export function DeleteRequestDialog({
 		(reason !== "سبب آخر (تحديد يدوي)" || customReason.trim().length > 0);
 
 	return (
-		<Sheet open={open} onOpenChange={onOpenChange} modal={false}>
+		<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent
 				side="left"
 				showOverlay={false}
@@ -123,7 +123,7 @@ export function DeleteRequestDialog({
 					}
 				}}
 				onFocusOutside={(e) => e.preventDefault()}
-				className="w-full sm:w-[28vw]! md:w-[28vw]! lg:w-[28vw]! sm:max-w-none! left-[calc(60vw+0.75rem)]! right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background z-50"
+				className="w-full lg:w-[28vw]! lg:min-w-[20rem]! lg:max-w-[28rem]! lg:left-[calc(60vw+0.75rem)]! lg:right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background z-50 h-[calc(100dvh-1rem)]! max-h-[calc(100dvh-1rem)]! inset-y-2!"
 				dir="rtl"
 			>
 				{/* رأس اللوحة مع زر الرجوع والعنوان واسم الطالب بدون كود الطلب المكدس */}
@@ -151,7 +151,7 @@ export function DeleteRequestDialog({
 				</div>
 
 				{/* محتوى اللوحة القابل للتمرير */}
-				<div className="p-3.5 space-y-3 flex-1 overflow-y-auto">
+				<div className="p-3.5 space-y-3 flex-1 min-h-0 overflow-y-auto overscroll-contain sanad-scrollbar">
 					{/* كارت ملخص الطالب وولي الأمر */}
 					<div className="rounded-lg border border-rose-100 dark:border-rose-950/60 bg-rose-50/40 dark:bg-rose-950/20 p-2.5 flex items-center justify-between gap-2.5 shadow-2xs">
 						<div className="flex items-center gap-2 min-w-0">
@@ -286,7 +286,7 @@ export function DeleteRequestDialog({
 				</div>
 
 				{/* فوتر اللوحة */}
-				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-900/70 shrink-0 gap-2">
+				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/70 dark:bg-zinc-900/70 shrink-0 gap-2 mt-auto">
 					<div className="flex items-center gap-2">
 						<Switch
 							id="notify-email-delete"
@@ -309,19 +309,21 @@ export function DeleteRequestDialog({
 							size="sm"
 							onClick={() => onOpenChange(false)}
 							disabled={deleteMutation.isPending}
-							className="h-8 text-xs cursor-pointer"
+							className="h-8 text-xs font-medium border-border/80 hover:bg-muted cursor-pointer rounded-lg text-foreground"
 						>
 							إلغاء
 						</Button>
 						<Button
 							type="button"
-							variant="destructive"
 							size="sm"
 							onClick={handleDelete}
 							disabled={!canSubmit}
-							className="h-8 text-xs font-semibold px-3 gap-1.5 bg-rose-600 hover:bg-rose-700 cursor-pointer disabled:opacity-50"
+							className={canSubmit
+								? "h-8 text-xs font-bold px-3.5 gap-1.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white rounded-lg shadow-sm transition-all cursor-pointer"
+								: "h-8 text-xs font-bold px-3.5 gap-1.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600/70 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 rounded-lg cursor-not-allowed shadow-none select-none"
+							}
 						>
-							<IconTrash className="size-3.5" />
+							<IconTrash className="size-3.5 shrink-0" />
 							<span>{deleteMutation.isPending ? "جاري الحذف..." : "تأكيد الحذف النهائي"}</span>
 						</Button>
 					</div>

@@ -1,14 +1,10 @@
-import { useState } from "react";
 import {
 	IconDownload,
 	IconEye,
 	IconFileText,
 	IconLink,
-	IconPlus,
 } from "@tabler/icons-react";
-import { toast } from "sonner";
 
-import { Button } from "@/components/ui/button";
 import { getFileUrl } from "@/lib/file-url";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 
@@ -18,17 +14,8 @@ interface RequestDocumentsSectionProps {
 
 export function RequestDocumentsSection({ request }: RequestDocumentsSectionProps) {
 	const rawDocs = request.documents?.items || [];
-	const documents = rawDocs.length > 0
-		? rawDocs
-		: [
-			{ id: "doc-1", title: `شهادة ميلاد ${request.patientName || "الطالب"}`, fileSize: "مرفق رسمي مطلوب", fileUrl: "#" },
-			{ id: "doc-2", title: `هوية ولي الأمر (${request.guardianName || "ولي الأمر"})`, fileSize: "مرفق رسمي مطلوب", fileUrl: "#" },
-		  ];
-	const links = request.links || [];
-
-	const handleUploadClick = () => {
-		toast.info("سيتم فتح نافذة إرفاق الوثائق الرسمية أو الروابط المرجعية للطلب");
-	};
+	const documents = rawDocs;
+	const links = (request.links || []).filter((link) => /^https?:\/\//i.test(link.url));
 
 	return (
 		<div
@@ -41,19 +28,13 @@ export function RequestDocumentsSection({ request }: RequestDocumentsSectionProp
 					<span>المستندات والروابط</span>
 				</h4>
 
-				<Button
-					type="button"
-					variant="ghost"
-					size="sm"
-					className="h-5 px-1.5 text-[10px] text-primary hover:bg-primary/10 gap-0.5 font-semibold"
-					onClick={handleUploadClick}
-				>
-					<IconPlus className="size-2.5" />
-					<span>أضف مستنداً أو رابطاً...</span>
-				</Button>
+				<span className="text-[10px] text-muted-foreground">أضف المستندات عند تعديل الطلب</span>
 			</div>
 
 			<div className="space-y-1.5">
+				{documents.length === 0 && links.length === 0 && (
+					<p className="px-1 py-2 text-[10px] text-muted-foreground">لا توجد مستندات أو روابط مرفقة.</p>
+				)}
 				{documents.map((doc: any, idx) => {
 					const resolvedUrl = doc.fileUrl
 						? doc.fileUrl.startsWith("http") || doc.fileUrl === "#"
@@ -83,7 +64,7 @@ export function RequestDocumentsSection({ request }: RequestDocumentsSectionProp
 							<div className="flex items-center gap-0.5 shrink-0">
 								<button
 									type="button"
-									onClick={() => toast.info(`معاينة المستند: ${doc.title}`)}
+									onClick={() => resolvedUrl && window.open(resolvedUrl, "_blank", "noopener,noreferrer")}
 									className="size-6 rounded flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors"
 									title="معاينة"
 								>
@@ -91,7 +72,7 @@ export function RequestDocumentsSection({ request }: RequestDocumentsSectionProp
 								</button>
 								<button
 									type="button"
-									onClick={() => toast.success(`جاري تنزيل: ${doc.title}`)}
+									onClick={() => resolvedUrl && window.open(resolvedUrl, "_blank", "noopener,noreferrer")}
 									className="size-6 rounded flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-200/60 dark:hover:bg-zinc-800 transition-colors"
 									title="تنزيل"
 								>

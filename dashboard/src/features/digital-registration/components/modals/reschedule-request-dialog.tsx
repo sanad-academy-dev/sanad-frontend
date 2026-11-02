@@ -1,8 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	IconArrowRight,
-	IconCalendar,
-	IconCalendarEvent,
 	IconCheck,
 	IconChevronDown,
 	IconClock,
@@ -36,6 +34,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useStaffForBooking } from "@/features/appointments/hooks/use-staff-for-booking";
+import { AppointmentPickerPopover } from "../appointment-picker-popover";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import { useRescheduleRequest } from "../../hooks/use-digital-registration";
 import { generateRescheduleMessage } from "../../utils/ai-templates";
@@ -48,8 +47,8 @@ interface RescheduleRequestDialogProps {
 }
 
 const RESCHEDULE_REASONS = [
-	"عدم حضور الطالب أو ولي الأمر في الموعد",
-	"إجازة في الأكاديمية",
+	"المراجع لم يحضر في الموعد",
+	"أجازة في المركز",
 	"عدم توافر مقاعد شاغرة حالياً",
 	"طلب ولي الأمر تأجيل الموعد",
 	"ظروف طارئة للأخصائي المتابع",
@@ -62,29 +61,48 @@ export function RescheduleRequestDialog({
 	onOpenChange,
 	campaignId = "",
 }: RescheduleRequestDialogProps) {
-	const [reason, setReason] = useState<string>("عدم حضور الطالب أو ولي الأمر في الموعد");
+	const [reason, setReason] = useState<string>("المراجع لم يحضر في الموعد");
 	const [customReason, setCustomReason] = useState("");
-	const [newDate, setNewDate] = useState(() => {
-		const d = new Date();
-		d.setDate(d.getDate() + 2);
-		d.setHours(10, 0, 0, 0);
-		return d.toISOString().slice(0, 16);
-	});
-	const [assignedStaffId, setAssignedStaffId] = useState<string | null>(request?.assignedStaffId || null);
+	const [newDate, setNewDate] = useState("");
+	const [staffId, setStaffId] = useState<string | null>(request?.assessmentAppointment?.staffId || null);
 	const [subject, setSubject] = useState(
 		request ? `إعادة جدولة موعد المقابلة - طلب #${request.code}` : "",
 	);
 	const [messageText, setMessageText] = useState("");
-	const [enableMessage, setEnableMessage] = useState(true);
 	const [notifyEmail, setNotifyEmail] = useState(false);
+
 	const [staffPopoverOpen, setStaffPopoverOpen] = useState(false);
 
 	const { staff, isLoading: staffLoading } = useStaffForBooking();
 	const rescheduleMutation = useRescheduleRequest(campaignId);
 
+	useEffect(() => {
+		if (open && request) {
+			if (!staffId && staff.length > 0) {
+				setStaffId(request?.assessmentAppointment?.staffId || request?.assignedStaffId || staff[0].id);
+			}
+			const rawDate = request?.appointmentDate || request?.assessmentAppointment?.startsAt;
+			if (rawDate) {
+				const d = new Date(rawDate);
+				if (!isNaN(d.getTime()) && d > new Date()) {
+					setNewDate(d.toISOString().slice(0, 16));
+				} else {
+					setNewDate("");
+				}
+			} else {
+				setNewDate("");
+			}
+			setSubject(`إعادة جدولة موعد المقابلة - طلب #${request.code}`);
+		}
+	}, [open, staff, request]);
+
 	if (!request) return null;
 
 	const handleGenerateAI = () => {
+		if (!newDate || isNaN(new Date(newDate).getTime())) {
+			toast.error("اختر تاريخ ووقت الموعد الجديد أولاً");
+			return;
+		}
 		const activeReason = reason === "سبب آخر" ? customReason || "ظروف طارئة" : reason;
 		const formattedDate = new Date(newDate).toLocaleDateString("ar-EG", {
 			weekday: "long",
@@ -101,13 +119,18 @@ export function RescheduleRequestDialog({
 			newDate: formattedDate,
 		});
 		setMessageText(generated);
-		toast.success("تم توليد رسالة إعادة الجدولة بالذكاء الاصطناعي ✨");
+		toast.success("تمت إضافة مسودة رسالة قابلة للتعديل");
 	};
 
 	const handleSubmit = () => {
 		const activeReason = reason === "سبب آخر" ? customReason.trim() : reason;
 		if (!activeReason) {
 			toast.error("يرجى تحديد أو كتابة سبب إعادة الجدولة");
+			return;
+		}
+		const appointmentDate = new Date(newDate);
+		if (!newDate || isNaN(appointmentDate.getTime()) || appointmentDate <= new Date()) {
+			toast.error("يرجى اختيار تاريخ ووقت مستقبليين للموعد");
 			return;
 		}
 
@@ -117,10 +140,10 @@ export function RescheduleRequestDialog({
 				data: {
 					reason,
 					customReason: reason === "سبب آخر" ? customReason.trim() : undefined,
-					newAppointmentDate: new Date(newDate).toISOString(),
-					assignedStaffId,
+					newAppointmentDate: appointmentDate.toISOString(),
+					staffId,
 					subject: subject.trim(),
-					customMessage: enableMessage ? messageText.trim() : undefined,
+					customMessage: messageText.trim() ? messageText.trim() : undefined,
 					notifyEmail,
 				},
 			},
@@ -136,10 +159,17 @@ export function RescheduleRequestDialog({
 		);
 	};
 
-	const selectedStaffMember = staff.find((s) => s.id === assignedStaffId);
+	const selectedStaffMember = staff.find((s) => s.id === staffId);
+	const formattedNewDate = newDate ? new Date(newDate).toLocaleDateString("ar-EG", {
+		weekday: "short",
+		month: "short",
+		day: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+	}) : "لم يُحدد بعد";
 
 	return (
-		<Sheet open={open} onOpenChange={onOpenChange} modal={false}>
+		<Sheet modal={false} open={open} onOpenChange={onOpenChange}>
 			<SheetContent
 				side="left"
 				showOverlay={false}
@@ -157,53 +187,116 @@ export function RescheduleRequestDialog({
 					}
 				}}
 				onFocusOutside={(e) => e.preventDefault()}
-				className="w-full sm:w-[28vw]! md:w-[28vw]! lg:w-[28vw]! sm:max-w-none! left-[calc(60vw+0.75rem)]! right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background z-50"
+				onInteractOutside={(e) => {
+					const target = e.target as HTMLElement | null;
+					if (
+						target?.closest('[data-radix-portal]') ||
+						target?.closest('[data-radix-popper-content-wrapper]') ||
+						target?.closest('[role="dialog"]') ||
+						target?.closest('[role="menu"]')
+					) {
+						e.preventDefault();
+					}
+				}}
+				className="w-full lg:w-[28vw]! lg:min-w-[20rem]! lg:max-w-[28rem]! lg:left-[calc(60vw+0.75rem)]! lg:right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background z-50 h-[calc(100dvh-1rem)]! max-h-[calc(100dvh-1rem)]! inset-y-2!"
 				dir="rtl"
 			>
-				{/* رأس اللوحة مع زر الرجوع والعنوان واسم الطالب بدون كود الطلب المكدس */}
+				{/* 1. رأس اللوحة مطابق للترتيب المرجعي مع زر الرجوع ومعلومات الطالب وكود الطلب */}
 				<div className="p-3 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-right bg-white dark:bg-zinc-900 shrink-0">
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-1.5 min-w-0">
 						<button
 							type="button"
 							onClick={() => onOpenChange(false)}
-							className="size-7 rounded-md flex items-center justify-center text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+							className="size-7 rounded-md flex items-center justify-center text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
 							title="رجوع"
 						>
 							<IconArrowRight className="size-4" />
 						</button>
-						<span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+						<span className="text-[12px] font-bold text-zinc-900 dark:text-zinc-100 truncate">
 							إعادة جدولة موعد المقابلة
 						</span>
 					</div>
 
-					<div className="flex items-center gap-1.5 text-xs min-w-0">
-						<span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 truncate max-w-[150px]">
+					<div className="flex items-center gap-1.5 shrink-0">
+						<div className="size-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shadow-2xs">
+							{(request.patientName || "ط").slice(0, 1)}
+						</div>
+						<span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 max-w-[100px] truncate">
 							{request.patientName}
 						</span>
+						<Badge
+							variant="outline"
+							className="font-mono text-[9px] px-1 py-0 h-4 border-zinc-200 dark:border-zinc-700 text-zinc-500"
+						>
+							#{request.code}
+						</Badge>
 					</div>
 				</div>
 
-				{/* محتوى اللوحة القابل للتمرير */}
-				<div className="p-3.5 space-y-3.5 flex-1 overflow-y-auto">
-					{/* سبب إعادة الجدولة */}
+				{/* 2. محتوى اللوحة القابل للتمرير السلس مع sanad-scrollbar وثبات الفوتر */}
+				<div className="p-3.5 space-y-3.5 flex-1 min-h-0 overflow-y-auto overscroll-contain sanad-scrollbar text-right">
+					{/* كارت هوية ولي الأمر في أعلى المحتوى مطابق تماماً للصورة المرجعية */}
+					<div className="rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 p-2.5 flex items-center justify-between gap-2 shadow-2xs">
+						<div className="flex items-center gap-2 min-w-0">
+							<div className="size-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-2xs">
+								{(request.guardianName || "و").slice(0, 2)}
+							</div>
+							<div className="min-w-0">
+								<p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
+									{request.guardianName}
+								</p>
+								<span className="text-[10px] text-muted-foreground block truncate">
+									ولي أمر الطالب: {request.patientName}
+								</span>
+							</div>
+						</div>
+
+						<div className="text-left text-[10px] font-mono text-muted-foreground space-y-0.5 shrink-0" dir="ltr">
+							{request.guardianPhone && (
+								<div className="flex items-center gap-1 justify-end">
+									<span>{request.guardianPhone}</span>
+									<IconPhone className="size-3 text-zinc-400" />
+								</div>
+							)}
+							{request.guardianEmail && (
+								<div className="flex items-center gap-1 justify-end truncate max-w-[120px]">
+									<span className="truncate">{request.guardianEmail}</span>
+									<IconMail className="size-3 text-zinc-400 shrink-0" />
+								</div>
+							)}
+						</div>
+					</div>
+
+					{/* حقل 1: سبب إعادة الجدولة */}
 					<div className="space-y-1.5">
-						<label className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 block">
-							سبب إعادة الجدولة <span className="text-destructive">*</span>
-						</label>
+						<div className="flex items-center gap-1.5">
+							<label className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200">
+								سبب إعادة الجدولة
+							</label>
+							<span className="text-[9px] font-bold text-rose-600 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 px-1 py-0 rounded">
+								مطلوب
+							</span>
+						</div>
 						<DropdownMenu dir="rtl">
 							<DropdownMenuTrigger asChild>
 								<Button
 									variant="outline"
-									className="w-full justify-between h-8 text-xs font-medium border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50"
+									className="w-full justify-between h-8 text-xs font-medium border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 cursor-pointer"
 								>
 									<span className="truncate">{reason}</span>
 									<IconChevronDown className="size-3.5 opacity-60 shrink-0" />
 								</Button>
 							</DropdownMenuTrigger>
-							<DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width]" align="start">
+							<DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width] p-1" align="start">
+								<p className="text-[10px] text-muted-foreground font-semibold px-2 py-1">اختر السبب...</p>
 								{RESCHEDULE_REASONS.map((r) => (
-									<DropdownMenuItem key={r} onClick={() => setReason(r)} className="text-xs">
-										{r}
+									<DropdownMenuItem
+										key={r}
+										onClick={() => setReason(r)}
+										className="text-xs cursor-pointer flex items-center justify-between"
+									>
+										<span>{r}</span>
+										{reason === r && <IconCheck className="size-3 text-primary" />}
 									</DropdownMenuItem>
 								))}
 							</DropdownMenuContent>
@@ -219,149 +312,128 @@ export function RescheduleRequestDialog({
 						)}
 					</div>
 
-					{/* تحديد الموعد الجديد */}
+					{/* حقل 2: الموضوع */}
 					<div className="space-y-1.5">
-						<label className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 block">
-							التاريخ والوقت الجديد <span className="text-destructive">*</span>
-						</label>
+						<div className="flex items-center gap-1.5">
+							<label className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200">
+								الموضوع
+							</label>
+							<span className="text-[9px] font-bold text-rose-600 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 px-1 py-0 rounded">
+								مطلوب
+							</span>
+						</div>
 						<Input
-							type="datetime-local"
-							value={newDate}
-							onChange={(e) => setNewDate(e.target.value)}
-							className="h-8 text-xs font-mono"
+							value={subject}
+							onChange={(e) => setSubject(e.target.value)}
+							placeholder="موضوع الرسالة..."
+							className="h-8 text-xs bg-zinc-50/50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800 font-sans"
 						/>
 					</div>
 
-					{/* كارت هوية ولي الأمر */}
-					<div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 p-2.5 flex items-center justify-between gap-2.5 shadow-2xs">
+					{/* حقل 3: نص الرسالة مع اقتراح مسودة قابلة للتعديل */}
+					<div className="space-y-1.5">
+						<div className="flex items-center justify-between">
+							<label className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200">
+								نص رسالة
+							</label>
+							<button
+								type="button"
+								onClick={handleGenerateAI}
+								className="text-[10.5px] text-primary hover:underline font-bold flex items-center gap-1 transition-colors cursor-pointer"
+							>
+								<IconSparkles className="size-3 text-primary" />
+								<span>صياغة تلقائية للرسالة</span>
+							</button>
+						</div>
+						<Textarea
+							value={messageText}
+							onChange={(e) => setMessageText(e.target.value)}
+							placeholder="اكتب نص الإشعار بموعد المقابلة الجديد أو انقر على «صياغة تلقائية للرسالة»..."
+							className="min-h-24 text-xs leading-relaxed resize-none font-sans bg-zinc-50/50 dark:bg-zinc-900/50 border-zinc-200 dark:border-zinc-800"
+						/>
+					</div>
+
+					{/* بانر معلومات الموعد المعتمد الجديد */}
+					<div className="rounded-lg bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200/80 dark:border-purple-800/80 p-2.5 flex items-center justify-between text-xs">
 						<div className="flex items-center gap-2 min-w-0">
-							<Avatar className="size-8 border border-primary/20 shrink-0">
-								<AvatarFallback className="bg-primary/10 text-primary font-bold text-[10px]">
-									{request.guardianName.slice(0, 2)}
-								</AvatarFallback>
-							</Avatar>
+							<IconClock className="size-4 text-purple-600 shrink-0" />
 							<div className="min-w-0">
-								<p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
-									{request.guardianName}
-								</p>
-								<span className="text-[9.5px] text-muted-foreground block truncate">
-									ولي أمر الطالب • {request.patientName}
+								<span className="text-[9.5px] text-muted-foreground block truncate">موعد المقابلة المحدد:</span>
+								<span className="font-bold text-purple-950 dark:text-purple-200 text-[11px] block truncate">
+									{formattedNewDate}
 								</span>
 							</div>
 						</div>
-
-						<div className="text-left text-[10px] font-mono text-muted-foreground space-y-0.5" dir="ltr">
-							<div className="flex items-center gap-1">
-								<span>{request.guardianPhone}</span>
-								<IconPhone className="size-2.5 text-zinc-400" />
-							</div>
-							{request.guardianEmail && (
-								<div className="flex items-center gap-1 truncate max-w-[130px]">
-									<span className="truncate">{request.guardianEmail}</span>
-									<IconMail className="size-2.5 text-zinc-400 shrink-0" />
-								</div>
-							)}
-						</div>
-					</div>
-
-					{/* سويتش الرسالة */}
-					<div className="flex items-center justify-between pt-0.5">
-						<label
-							htmlFor="enable-msg-reschedule"
-							className="text-xs font-bold text-zinc-800 dark:text-zinc-200 cursor-pointer"
-						>
-							{enableMessage ? "إغلاق رسالة" : "إضافة رسالة"}
-						</label>
-						<Switch
-							id="enable-msg-reschedule"
-							checked={enableMessage}
-							onCheckedChange={setEnableMessage}
-						/>
-					</div>
-
-					{enableMessage && (
-						<div className="space-y-2">
-							<div className="space-y-1">
-								<label className="text-[10.5px] text-muted-foreground block font-medium">الموضوع</label>
-								<Input
-									value={subject}
-									onChange={(e) => setSubject(e.target.value)}
-									placeholder="موضوع الرسالة..."
-									className="h-8 text-xs"
-								/>
-							</div>
-
-							<div className="space-y-1">
-								<div className="flex items-center justify-between">
-									<label className="text-[10.5px] text-muted-foreground block font-medium">نص الرسالة</label>
-									<button
-										type="button"
-										onClick={handleGenerateAI}
-										className="text-[11px] text-primary hover:underline font-bold flex items-center gap-1 transition-colors"
-									>
-										<IconSparkles className="size-3 text-primary" />
-										<span>إنشاء بالذكاء الاصطناعي</span>
-									</button>
-								</div>
-								<Textarea
-									value={messageText}
-									onChange={(e) => setMessageText(e.target.value)}
-									placeholder="اكتب نص الإشعار بموعد المقابلة الجديد أو انقر على 'إنشاء بالذكاء الاصطناعي'..."
-									className="min-h-24 text-xs leading-relaxed resize-none font-sans"
-								/>
-							</div>
-						</div>
-					)}
-
-					{/* إسناد الموعد إلى مسؤول */}
-					<div className="pt-1">
-						<Popover open={staffPopoverOpen} onOpenChange={setStaffPopoverOpen}>
-							<PopoverTrigger asChild>
-								<Button
-									variant="outline"
-									size="sm"
-									className="h-8 text-xs border-zinc-200 dark:border-zinc-800 gap-1.5 w-full justify-between bg-zinc-50/50 dark:bg-zinc-900/50"
-								>
-									<span className="flex items-center gap-1.5 truncate">
-										<IconUser className="size-3.5 text-zinc-500 shrink-0" />
-										<span className="truncate">{selectedStaffMember?.name || "إسناد الموعد إلى مسؤول..."}</span>
-									</span>
-									<IconChevronDown className="size-3 opacity-60 shrink-0" />
-								</Button>
-							</PopoverTrigger>
-							<PopoverContent align="start" className="w-64 p-1.5" dir="rtl">
-								<p className="text-[11px] font-bold text-muted-foreground p-1.5">اختر الأخصائي / المراجع</p>
-								<div className="max-h-48 overflow-y-auto space-y-1">
-									{staffLoading ? (
-										<p className="text-xs p-2 text-center text-muted-foreground">جاري التحميل...</p>
-									) : (
-										staff.map((s) => (
-											<button
-												key={s.id}
-												type="button"
-												onClick={() => {
-													setAssignedStaffId(s.id);
-													setStaffPopoverOpen(false);
-												}}
-												className="w-full text-right text-xs px-2 py-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2"
-											>
-												<Avatar className="size-6">
-													<AvatarFallback className="text-[9px] bg-primary/10 text-primary font-bold">
-														{s.name.slice(0, 2)}
-													</AvatarFallback>
-												</Avatar>
-												<span className="truncate">{s.name}</span>
-											</button>
-										))
-									)}
-								</div>
-							</PopoverContent>
-						</Popover>
+						{selectedStaffMember && (
+							<Badge
+								variant="outline"
+								className="text-[9.5px] bg-white dark:bg-zinc-800 border-purple-200 text-purple-700 dark:text-purple-300 font-semibold shrink-0"
+							>
+								{selectedStaffMember.name}
+							</Badge>
+						)}
 					</div>
 				</div>
 
-				{/* فوتر اللوحة السفلي */}
-				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50 shrink-0">
+				{/* شريط أدوات إعادة الجدولة: أخصائي الموعد وتاريخ الموعد مثبت فوق الفوتر */}
+				<div className="border-t border-zinc-100 bg-background px-3.5 py-2.5 dark:border-zinc-800 flex items-center gap-1.5 flex-wrap shrink-0">
+					{/* 1. إسناد الموعد إلى مسؤول مع قائمة الأعضاء والأفاتار */}
+					<Popover open={staffPopoverOpen} onOpenChange={setStaffPopoverOpen}>
+						<PopoverTrigger asChild>
+							<Button
+								variant="outline"
+								size="sm"
+								className="h-7 text-[11px] border-zinc-200 dark:border-zinc-800 gap-1 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 font-medium cursor-pointer shadow-2xs"
+							>
+								<IconUser className="size-3 text-zinc-500 shrink-0" />
+								<span className="truncate max-w-[100px]">
+									{selectedStaffMember?.name ? `إسناد: ${selectedStaffMember.name}` : "إسناد إلى..."}
+								</span>
+								<IconChevronDown className="size-2.5 opacity-60 shrink-0" />
+							</Button>
+						</PopoverTrigger>
+						<PopoverContent align="start" className="w-56 p-1.5 z-50 bg-popover border border-border shadow-xl rounded-xl" dir="rtl">
+							<p className="text-[10.5px] font-bold text-zinc-900 dark:text-zinc-100 p-1 border-b border-border/50">
+								إسناد الموعد إلى...
+							</p>
+							<div className="max-h-48 overflow-y-auto space-y-0.5 pt-1">
+								{staffLoading ? (
+									<p className="text-[10px] p-2 text-center text-muted-foreground">جاري التحميل...</p>
+								) : staff.length === 0 ? (
+									<p className="text-[10px] p-2 text-center text-muted-foreground">لا يوجد موظفون متاحون</p>
+								) : (
+									staff.map((s) => (
+										<button
+											key={s.id}
+											type="button"
+											onClick={() => {
+												setStaffId(s.id);
+												setStaffPopoverOpen(false);
+											}}
+											className="w-full text-right text-xs p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors cursor-pointer"
+										>
+											<div className="size-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 shadow-2xs">
+												{s.name.slice(0, 1)}
+											</div>
+											<span className="truncate font-medium text-[11px]">{s.name}</span>
+										</button>
+									))
+								)}
+							</div>
+						</PopoverContent>
+					</Popover>
+
+					<AppointmentPickerPopover
+						value={newDate ? formattedNewDate : "تاريخ الموعد"}
+						onChange={(_label, isoDate) => setNewDate(isoDate || "")}
+						reviewerName={selectedStaffMember?.name || "المراجع"}
+						reviewerId={staffId || undefined}
+						className="h-7 text-[11px]"
+					/>
+				</div>
+
+				{/* 3. فوتر اللوحة السفلي المثبت دائماً بدون انقطاع أو خروج عن الإطار */}
+				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50 shrink-0 mt-auto">
 					<div className="flex items-center gap-2">
 						<Switch
 							id="notify-email-reschedule"
@@ -382,18 +454,19 @@ export function RescheduleRequestDialog({
 							size="sm"
 							onClick={() => onOpenChange(false)}
 							disabled={rescheduleMutation.isPending}
-							className="text-xs h-8"
+							className="text-xs h-8 cursor-pointer"
 						>
 							إلغاء
 						</Button>
+						{/* زر التأكيد بخلفية بنفسجية رسمية موحدة طبقاً لطلب المستخدم */}
 						<Button
 							size="sm"
 							onClick={handleSubmit}
 							disabled={rescheduleMutation.isPending}
-							className="text-xs h-8 font-semibold px-4 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white"
+							className="text-xs h-8 font-semibold px-4 gap-1.5 bg-purple-600 hover:bg-purple-700 text-white shadow-2xs cursor-pointer"
 						>
 							<IconCheck className="size-3.5" />
-							<span>{rescheduleMutation.isPending ? "جاري الحفظ..." : "تأكيد إعادة الجدولة"}</span>
+							<span>{rescheduleMutation.isPending ? "جاري الإرسال..." : "إرسال"}</span>
 						</Button>
 					</div>
 				</div>

@@ -5,6 +5,35 @@ import type { CampaignRequestItem, RequestNotificationItem } from "../types/camp
 
 const CAMPAIGNS_QUERY_KEY = ["digital-registration", "campaigns"];
 const SUMMARY_QUERY_KEY = ["digital-registration", "summary"];
+const WORKSPACE_QUERY_KEY = ["digital-registration", "workspace"];
+
+export type RegistrationReviewer = { id: string; name: string; image?: string | null; role: string; phone?: string | null };
+
+/** كل أعضاء النظام التابعين للأكاديمية يمكن تعيينهم كمراجعين، بمن فيهم المدير. */
+export function useRegistrationReviewers() {
+	return useQuery<RegistrationReviewer[]>({
+		queryKey: ["digital-registration", "reviewers"],
+		queryFn: async () => {
+			const res = await backendFetch("/api/digital-registration/reviewers");
+			if (!res.ok) throw new Error("فشل جلب قائمة المراجعين");
+			return res.json();
+		},
+		staleTime: 1000 * 60,
+	});
+}
+
+/** The dashboard has one registration board per clinic; the legacy campaign id stays internal. */
+export function useRegistrationWorkspace() {
+	return useQuery<{ id: string }>({
+		queryKey: WORKSPACE_QUERY_KEY,
+		queryFn: async () => {
+			const res = await backendFetch("/api/digital-registration/workspace");
+			if (!res.ok) throw new Error("فشل تجهيز لوحة التسجيل الرقمي");
+			return res.json();
+		},
+		staleTime: 1000 * 60 * 5,
+	});
+}
 
 // ─── جلب ملخص الإحصائيات ───────────────────────────────────────────────────────
 export function useCampaignsSummary() {
@@ -116,12 +145,13 @@ export function useCampaignRequests(campaignId: string) {
 	return useQuery<CampaignRequestItem[]>({
 		queryKey: ["digital-registration", "requests", campaignId],
 		queryFn: async () => {
-			const res = await backendFetch(`/api/digital-registration/campaigns/${campaignId}/requests`);
+			const res = await backendFetch("/api/digital-registration/requests");
 			if (!res.ok) throw new Error("فشل جلب طلبات الحملة");
 			return res.json();
 		},
 		enabled: !!campaignId,
 		staleTime: 1000 * 30,
+		refetchInterval: 1000 * 30,
 	});
 }
 
@@ -220,6 +250,7 @@ export function useCreateRequest(campaignId: string) {
 			birthDate?: string | null;
 			ageLabel?: string | null;
 			targetClass?: string | null;
+			proposedTrack?: string | null;
 			bloodType?: string | null;
 			allergies?: string | null;
 			hasChronicDiseases?: boolean;
@@ -235,6 +266,7 @@ export function useCreateRequest(campaignId: string) {
 			preferredShift?: string | null;
 			experienceLevel?: string | null;
 			priority?: string | null;
+			initialStatus?: "QUEUE" | "SHORTLIST" | "INTERVIEW" | "AWAITING_PAYMENT" | "DUPLICATE";
 			status?: string | null;
 			columnStatus?: string | null;
 			appointmentDate?: string | null;
@@ -246,17 +278,26 @@ export function useCreateRequest(campaignId: string) {
 			notifyWhatsapp?: boolean;
 			links?: Array<{ id?: string; title?: string; url: string }>;
 			documents?: Array<{
+				id?: string;
 				title: string;
 				fileUrl: string;
 				fileSize?: string;
 				type?: string;
 			}>;
 		}) => {
-			const res = await backendFetch(`/api/digital-registration/requests`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(payload),
-			});
+			let res: Response;
+			try {
+				res = await backendFetch(`/api/digital-registration/requests`, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(payload),
+				});
+			} catch (error) {
+				if (error instanceof TypeError) {
+					throw new Error("تعذر الاتصال بخادم النظام. تأكد من تشغيل خدمة الباك ثم أعد المحاولة.");
+				}
+				throw error;
+			}
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل تسجيل طلب الطالب");
@@ -313,6 +354,7 @@ export function useUpdateRequest(campaignId: string) {
 				birthDate: string | null;
 				ageLabel: string | null;
 				targetClass: string | null;
+				proposedTrack: string | null;
 				bloodType: string | null;
 				allergies: string | null;
 				hasChronicDiseases: boolean;
@@ -329,6 +371,7 @@ export function useUpdateRequest(campaignId: string) {
 				columnStatus: string | null;
 				column: string | null;
 				appointmentDate: string | null;
+				appointmentIsoDate: string | null;
 				assignedStaffId: string | null;
 				reviewerId: string | null;
 				reviewerName: string | null;
@@ -338,6 +381,7 @@ export function useUpdateRequest(campaignId: string) {
 				notifyWhatsapp: boolean;
 				links: Array<{ id?: string; title?: string; url: string }>;
 				documents: Array<{
+					id?: string;
 					title: string;
 					fileUrl: string;
 					fileSize?: string;
@@ -345,11 +389,20 @@ export function useUpdateRequest(campaignId: string) {
 				}>;
 			}>;
 		}) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}`, {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
+			let res: Response;
+			try {
+				res = await backendFetch(`/api/digital-registration/requests/${requestId}`, {
+					method: "PATCH",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(data),
+				});
+			} catch (error) {
+				// لا نعرض رسالة المتصفح العامة Failed to fetch؛ فهي غالباً تعني أن API غير متاح.
+				if (error instanceof TypeError) {
+					throw new Error("تعذر الاتصال بخادم النظام. تأكد من تشغيل خدمة الباك ثم أعد المحاولة.");
+				}
+				throw error;
+			}
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل تعديل بيانات طلب التسجيل");
@@ -383,6 +436,8 @@ export function useScheduleAssessmentAppointment(campaignId: string) {
 				durationMinutes?: number;
 				notes?: string;
 				branchId?: string;
+				roomId?: string;
+				roomName?: string;
 			};
 		}) => {
 			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/schedule-assessment`, {
@@ -491,6 +546,7 @@ export function useWaitlistRequest(campaignId: string) {
 			requestId: string;
 			data: {
 				assignedStaffId?: string | null;
+				priority?: string | null;
 				subject?: string;
 				customMessage?: string;
 				notifyEmail?: boolean;
@@ -526,7 +582,7 @@ export function useRescheduleRequest(campaignId: string) {
 				reason: string;
 				customReason?: string;
 				newAppointmentDate: string;
-				assignedStaffId?: string | null;
+				staffId?: string | null;
 				subject?: string;
 				customMessage?: string;
 				notifyEmail?: boolean;
