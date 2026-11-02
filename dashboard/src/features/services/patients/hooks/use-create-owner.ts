@@ -14,12 +14,21 @@ export const useCreateOwner = () => {
 				phone: data.phone,
 				email: data.email,
 				gender: data.gender ?? undefined,
+				ownerType: data.ownerType ?? undefined,
+				relationship: data.relationship ?? undefined,
 				country: data.country ?? undefined,
 				city: data.city ?? undefined,
 				address: data.address ?? undefined,
+				emergencyContactName: data.emergencyContactName ?? undefined,
+				emergencyContactPhone: data.emergencyContactPhone ?? undefined,
 				notes: data.notes ?? undefined,
 				active: data.active,
 				patientIds: data.patientIds ?? undefined,
+				patientRelationships: data.patientRelationships ?? undefined,
+				patients: (data.patientIds || []).map((pId) => ({
+					patientId: pId,
+					relationship: data.patientRelationships?.[pId] || "FATHER",
+				})),
 			});
 			if (res.error) {
 				const msg = (res.error.value as { message?: string })?.message || "فشل إضافة وليّ الأمر";
@@ -29,6 +38,7 @@ export const useCreateOwner = () => {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["owners"] });
+			queryClient.invalidateQueries({ queryKey: ["patients"] });
 		},
 	});
 

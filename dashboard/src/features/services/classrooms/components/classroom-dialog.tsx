@@ -33,6 +33,8 @@ import {
 	IconMapPinFilled,
 	IconArrowsDiagonal,
 	IconArrowsDiagonalMinimize2,
+	IconArrowsMaximize,
+	IconArrowsMinimize,
 	IconMoodHappy,
 	IconMoodSmile,
 	IconMusic,
@@ -445,6 +447,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 	const [showDraftConfirm, setShowDraftConfirm] = useState(false);
 	const [hasDraft, setHasDraft] = useState(false);
 	const [isAgentOpen, setIsAgentOpen] = useState(false);
+	const [isExpanded, setIsExpanded] = useState(false);
 	const [isReviewStep, setIsReviewStep] = useState(false);
 
 	// حالات التحقق من صحة المدخلات (Validation)
@@ -535,6 +538,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 	const resetForm = useCallback(() => {
 		setIsReviewStep(false);
 		setIsAgentOpen(false);
+		setIsExpanded(false);
 		setName("");
 		setCode("");
 		setDescription("");
@@ -1053,12 +1057,14 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 					dir="rtl"
 					showCloseButton={false}
 					className={cn(
-						"w-full p-0 gap-0 overflow-hidden transition-[max-width,width] duration-300 ease-in-out",
+						"p-0 gap-0 overflow-hidden rounded-xl bg-card border border-border/80 shadow-2xl transition-all duration-300 ease-out",
 						isReviewStep
-							? "max-w-xl!"
+							? "sm:max-w-xl max-w-[94vw]"
 							: isAgentOpen
-								? "max-w-5xl! xl:max-w-6xl!"
-								: "max-w-xl!",
+								? "sm:max-w-5xl xl:max-w-6xl max-w-[96vw]"
+								: isExpanded
+									? "sm:max-w-4xl max-w-[96vw]"
+									: "sm:max-w-[560px] max-w-[94vw]",
 					)}
 					onInteractOutside={(e) => {
 						if (isStaffSheetOpen || isAddBranchOpen || showDraftConfirm) {
@@ -1116,7 +1122,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 							{/* الجانب الأساسي: نموذج إنشاء/تعديل الفصل (يظهر على اليمين في نمط RTL) */}
 							<div
 								className={cn(
-									"flex flex-col min-h-0 bg-background transition-all duration-300",
+									"flex flex-col min-h-0 bg-background transition-all duration-300 ease-out",
 									isAgentOpen ? "w-full md:w-1/2 flex-1 min-w-0" : "w-full flex-1 min-w-0",
 								)}
 							>
@@ -1135,14 +1141,14 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 											type="button"
 											variant="ghost"
 											size="icon-xs"
-											onClick={() => setIsAgentOpen((prev) => !prev)}
-											className="size-7 text-muted-foreground hover:text-foreground hidden sm:flex cursor-pointer rounded-md"
-											title={isAgentOpen ? "تصغير وإخفاء المساعد" : "توسيع وعرض المساعد الذكي"}
+											onClick={() => setIsExpanded((prev) => !prev)}
+											className="size-7 text-muted-foreground hover:text-foreground hidden sm:flex cursor-pointer rounded-md transition-colors"
+											title={isExpanded ? "تصغير النافذة" : "توسيع النافذة"}
 										>
-											{isAgentOpen ? (
-												<IconArrowsDiagonalMinimize2 className="size-3.5" />
+											{isExpanded ? (
+												<IconArrowsMinimize className="size-3.5" />
 											) : (
-												<IconArrowsDiagonal className="size-3.5" />
+												<IconArrowsMaximize className="size-3.5" />
 											)}
 										</Button>
 									}

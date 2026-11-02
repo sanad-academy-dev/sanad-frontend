@@ -1,7 +1,18 @@
-// تبويبات وحدة الدورات التدريبية المعروضة في الهيدر العلوي
-export type TrainingModuleTab = "all" | "recurring" | "library";
+// تبويبات وحدة إدارة المحتوى المعروضة في الهيدر العلوي
+export type ContentManagementTab = "courses" | "quizzes" | "my-library" | "tracks";
 
-// التبويب النشط عبر الوحدة كلها — تبويبات الدورات
+export const CONTENT_MANAGEMENT_TABS: {
+	value: ContentManagementTab;
+	label: string;
+}[] = [
+	{ value: "courses", label: "الدورات" },
+	{ value: "quizzes", label: "التقييمات" },
+	{ value: "my-library", label: "مكتبتي" },
+	{ value: "tracks", label: "المسارات" },
+];
+
+// تبويبات حالة الدورات الداخلية
+export type TrainingModuleTab = "all" | "recurring" | "library";
 export type TrainingTab = TrainingModuleTab;
 
 // الترتيب هنا هو ترتيب DOM داخل حاوية RTL: أول عنصر يظهر في أقصى اليمين.

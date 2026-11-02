@@ -328,7 +328,7 @@ export function ClassroomAgentPanel({
 	return (
 		<aside
 			aria-label="لوحة سند لصياغة الفصل مع الذكاء الاصطناعي"
-			className="w-full md:w-1/2 flex-1 min-w-0 border-0 border-none bg-[#F8F9FA] dark:bg-muted/25 flex flex-col justify-between overflow-hidden relative transition-all duration-300"
+			className="w-full md:w-1/2 flex-1 min-w-0 border-0 border-none bg-[#F8F9FA] dark:bg-muted/25 flex flex-col justify-between overflow-hidden relative transition-all duration-300 animate-in fade-in-0"
 		>
 			{/* 1. الترويسة العلوية للوحة المساعد الذكي بمحاذاة ترويسة النموذج تماماً وبنفس الارتفاع والحجم */}
 			<div className="flex h-10 items-center justify-between gap-2 border-b border-border px-4 shrink-0 bg-transparent">
