@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import type {
 	ContentStatus,
 	CourseContentType,
+	CourseDetailResponse,
 	CreateLessonPayload,
 	LessonResponse,
 	LessonType,
@@ -26,8 +27,13 @@ const savedLabel = (type: LessonType) => SAVED_LABELS[type] ?? "الدرس";
 // كل عمليات الوحدات/الدروس تُبطل كاش الدورة الواحدة لإعادة جلب الشجرة
 export const useCourseContent = (courseId: string | null) => {
 	const qc = useQueryClient();
-	const invalidate = () => {
-		if (courseId) qc.invalidateQueries({ queryKey: ["training", "course", courseId] });
+	const invalidate = (targetCourseId?: string | null) => {
+		const id = targetCourseId || courseId;
+		if (id) {
+			qc.invalidateQueries({ queryKey: ["training", "course", id] });
+		}
+		qc.invalidateQueries({ queryKey: ["training", "course"] });
+		qc.invalidateQueries({ queryKey: ["training", "courses"] });
 		qc.invalidateQueries({ queryKey: ["training", "courses", "stats"] });
 	};
 
@@ -57,7 +63,24 @@ export const useCourseContent = (courseId: string | null) => {
 			if (error) throw new Error("تعذّر إضافة الوحدة");
 			return data as UnitResponse;
 		},
-		onSuccess: invalidate,
+		onSuccess: (data, variables) => {
+			const cid = variables.courseId || courseId;
+			if (cid && data) {
+				qc.setQueryData(
+					["training", "course", cid],
+					(old: CourseDetailResponse | undefined) => {
+						if (!old) return old;
+						const existingUnits = old.units || [];
+						if (existingUnits.some((u) => u.id === data.id)) return old;
+						return {
+							...old,
+							units: [...existingUnits, data],
+						};
+					},
+				);
+			}
+			invalidate(cid);
+		},
 	});
 
 	// تعديل بيانات بطاقة المحتوى (النوع/الحالة/المستوى) دون المساس بالدروس
@@ -111,7 +134,29 @@ export const useCourseContent = (courseId: string | null) => {
 			if (error) throw new Error("تعذّر حفظ الدرس");
 			return data as LessonResponse;
 		},
-		onSuccess: invalidate,
+		onSuccess: (data) => {
+			if (data) {
+				qc.setQueriesData(
+					{ queryKey: ["training", "course"] },
+					(old: CourseDetailResponse | undefined) => {
+						if (!old || !old.units) return old;
+						return {
+							...old,
+							units: old.units.map((u) => {
+								if (u.id !== data.unitId) return u;
+								const existing = u.lessons || [];
+								if (existing.some((l) => l.id === data.id)) return u;
+								return {
+									...u,
+									lessons: [...existing, data],
+								};
+							}),
+						};
+					},
+				);
+			}
+			invalidate();
+		},
 	});
 
 	const updateLesson = useMutation({
@@ -120,7 +165,28 @@ export const useCourseContent = (courseId: string | null) => {
 			if (error) throw new Error("تعذّر حفظ التعديلات");
 			return data as LessonResponse;
 		},
-		onSuccess: invalidate,
+		onSuccess: (data) => {
+			if (data) {
+				qc.setQueriesData(
+					{ queryKey: ["training", "course"] },
+					(old: CourseDetailResponse | undefined) => {
+						if (!old || !old.units) return old;
+						return {
+							...old,
+							units: old.units.map((u) => {
+								if (u.id !== data.unitId) return u;
+								return {
+									...u,
+									lessons: (u.lessons || []).map((l) => (l.id === data.id ? data : l)),
+								};
+							}),
+						};
+					},
+				);
+			}
+			invalidate();
+		},
+	});
 	});
 
 	const removeLesson = useMutation({

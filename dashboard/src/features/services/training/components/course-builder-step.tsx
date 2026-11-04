@@ -471,9 +471,15 @@ export function CourseBuilderStep({
 	onGenerateAI?: () => void;
 	onEnsureCourseCreated?: () => Promise<string>;
 }) {
-	const { course, isLoading } = useCourse(courseId);
+	const [internalCourseId, setInternalCourseId] = useState<string | null>(courseId);
+	useEffect(() => {
+		if (courseId) setInternalCourseId(courseId);
+	}, [courseId]);
+
+	const effectiveCourseId = courseId || internalCourseId;
+	const { course, isLoading } = useCourse(effectiveCourseId);
 	const { addUnit, duplicateUnit, removeUnit, addLesson, updateLesson, isSavingLesson } =
-		useCourseContent(courseId);
+		useCourseContent(effectiveCourseId);
 	const [copyingUnitId, setCopyingUnitId] = useState<string | null>(null);
 	// إضافة قسم جديد عبر الإدخال المباشر
 	const [isAddingSection, setIsAddingSection] = useState(false);
@@ -584,10 +590,11 @@ export function CourseBuilderStep({
 
 	const handleConfirmAddSection = async () => {
 		const trimmed = newSectionTitle.trim() || `الوحدة ${units.length + 1}`;
-		let currentCourseId = courseId;
+		let currentCourseId = effectiveCourseId;
 		if (!currentCourseId && onEnsureCourseCreated) {
 			try {
 				currentCourseId = await onEnsureCourseCreated();
+				setInternalCourseId(currentCourseId);
 			} catch (e) {
 				toast.error((e as Error).message);
 				return;
@@ -650,10 +657,11 @@ export function CourseBuilderStep({
 	};
 
 	const saveCover = async (coverKey: string | null) => {
-		let currentCourseId = courseId;
+		let currentCourseId = effectiveCourseId;
 		if (!currentCourseId && onEnsureCourseCreated) {
 			try {
 				currentCourseId = await onEnsureCourseCreated();
+				setInternalCourseId(currentCourseId);
 			} catch (e) {
 				toast.error((e as Error).message);
 				return;
@@ -691,10 +699,11 @@ export function CourseBuilderStep({
 	const handleSaveNewLesson = async (values: LessonFormValues) => {
 		if (editor?.mode !== "add") return;
 
-		let currentCourseId = courseId;
+		let currentCourseId = effectiveCourseId;
 		if (!currentCourseId && onEnsureCourseCreated) {
 			try {
 				currentCourseId = await onEnsureCourseCreated();
+				setInternalCourseId(currentCourseId);
 			} catch (e) {
 				toast.error((e as Error).message);
 				return;
@@ -907,7 +916,7 @@ export function CourseBuilderStep({
 						<button
 							type="button"
 							onClick={handleAddUnit}
-							disabled={!courseId && !onEnsureCourseCreated}
+							disabled={!effectiveCourseId && !onEnsureCourseCreated}
 							className="flex h-[24px] items-center gap-1 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white px-2 text-[10px] font-medium text-[#08090A] hover:bg-[#FAFAFA] disabled:opacity-50 transition-colors"
 						>
 							<IconPlus className="size-3" />
@@ -988,7 +997,7 @@ export function CourseBuilderStep({
 							<Fragment key={unit.id}>
 								<UnitAccordion
 									unit={unit}
-									courseId={courseId as string}
+									courseId={(effectiveCourseId || courseId) as string}
 									courseName={course?.name ?? ""}
 									onDuplicate={() => handleDuplicateUnit(unit)}
 									onDeleteUnit={handleDeleteUnit}
@@ -1034,7 +1043,7 @@ export function CourseBuilderStep({
 						<CoverPicker
 							value={course?.coverKey ?? null}
 							onChange={saveCover}
-							disabled={!courseId && !onEnsureCourseCreated}
+							disabled={!effectiveCourseId && !onEnsureCourseCreated}
 							triggerLabel={course?.coverKey ? "تغيير الغلاف" : "رفع غلاف"}
 						/>
 					</div>
