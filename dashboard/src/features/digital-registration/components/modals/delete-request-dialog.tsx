@@ -1,10 +1,16 @@
 import { useState } from "react";
 import {
-	IconAlertTriangle,
 	IconArrowRight,
 	IconCalendar,
+	IconCalendarOff,
+	IconCheck,
 	IconChevronDown,
+	IconFileX,
+	IconLoader2,
+	IconPhone,
+	IconShieldExclamation,
 	IconTrash,
+	IconUserMinus,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 
@@ -173,33 +179,43 @@ export function DeleteRequestDialog({
 						<div className="flex flex-col items-end gap-1 shrink-0">
 							<Badge
 								variant="outline"
-								className="text-[10px] px-1.5 py-0 border-rose-200 dark:border-rose-900/70 text-rose-700 dark:text-rose-300 font-semibold"
+								className="text-[10px] px-1.5 py-0.5 border-rose-200 dark:border-rose-900/70 text-rose-700 dark:text-rose-300 font-semibold flex items-center gap-1"
 							>
-								{request.guardianPhone || "بدون هاتف"}
+								<IconPhone className="size-2.5 text-rose-500 shrink-0" />
+								<span>{request.guardianPhone || "بدون هاتف"}</span>
 							</Badge>
 							{request.appointmentDate && (
 								<span className="text-[9.5px] text-amber-700 dark:text-amber-400 font-medium flex items-center gap-1">
-									<IconCalendar className="size-2.5" />
-									جلسة محجوزة
+									<IconCalendar className="size-2.5 shrink-0" />
+									<span>جلسة محجوزة</span>
 								</span>
 							)}
 						</div>
 					</div>
 
-					{/* صندوق النتائج والتحذير المترتبة على الحذف بالأحمر الصريح */}
-					<div className="rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50/80 dark:bg-rose-950/30 p-3 space-y-2">
+					{/* صندوق النتائج والتحذير المترتبة على الحذف بأيقونات حقيقية احترافية */}
+					<div className="rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50/80 dark:bg-rose-950/30 p-3 space-y-2.5">
 						<span className="text-xs font-bold text-rose-800 dark:text-rose-300 flex items-center gap-1.5">
-							<IconAlertTriangle className="size-4 text-rose-600 shrink-0" />
-							تنبيه أمني والنتائج المترتبة على الحذف:
+							<IconShieldExclamation className="size-4 text-rose-600 shrink-0" />
+							<span>تنبيه أمني والنتائج المترتبة على الحذف:</span>
 						</span>
-						<ul className="space-y-1.5 text-[11px] text-rose-700 dark:text-rose-300/90 pr-5 list-disc leading-relaxed">
-							<li>إلغاء وحذف موعد المقابلة / التقييم المحجوز فوراً وتفريغ المقعد في التقويم.</li>
-							<li>استرجاع الطاقة الاستيعابية الشاغرة للحملة أو الفصل المخصص.</li>
-							<li>مسح كافة المستندات والروابط والملاحظات المسجلة للطلب.</li>
-							<li className="font-bold text-rose-900 dark:text-rose-200">
-								⚠️ هذا الإجراء نهائي وغير قابل للتراجع بعد التنفيذ.
-							</li>
-						</ul>
+						<div className="space-y-2 text-[11px] text-rose-700 dark:text-rose-300/90 leading-relaxed pr-0.5">
+							<div className="flex items-start gap-2">
+								<IconCalendarOff className="size-3.5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+								<span>إلغاء وحذف موعد المقابلة / التقييم المحجوز فوراً وتفريغ المقعد في التقويم.</span>
+							</div>
+							<div className="flex items-start gap-2">
+								<IconUserMinus className="size-3.5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+								<span>استرجاع الطاقة الاستيعابية الشاغرة للحملة أو الفصل المخصص.</span>
+							</div>
+							<div className="flex items-start gap-2">
+								<IconFileX className="size-3.5 text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" />
+								<span>مسح كافة المستندات والروابط والملاحظات المسجلة للطلب.</span>
+							</div>
+							<div className="pt-1.5 border-t border-rose-200/60 dark:border-rose-900/40 text-[11px] font-bold text-rose-900 dark:text-rose-200">
+								هذا الإجراء نهائي وغير قابل للتراجع بعد التنفيذ.
+							</div>
+						</div>
 					</div>
 
 					{/* سبب الحذف */}
@@ -222,9 +238,10 @@ export function DeleteRequestDialog({
 									<DropdownMenuItem
 										key={r}
 										onClick={() => setReason(r)}
-										className="text-xs cursor-pointer py-1.5"
+										className="text-xs cursor-pointer py-1.5 flex items-center justify-between"
 									>
-										{r}
+										<span>{r}</span>
+										{reason === r && <IconCheck className="size-3.5 text-rose-600 shrink-0" />}
 									</DropdownMenuItem>
 								))}
 							</DropdownMenuContent>
@@ -323,7 +340,11 @@ export function DeleteRequestDialog({
 								: "h-8 text-xs font-bold px-3.5 gap-1.5 bg-rose-50 dark:bg-rose-950/40 text-rose-600/70 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 rounded-lg cursor-not-allowed shadow-none select-none"
 							}
 						>
-							<IconTrash className="size-3.5 shrink-0" />
+							{deleteMutation.isPending ? (
+								<IconLoader2 className="size-3.5 shrink-0 animate-spin" />
+							) : (
+								<IconTrash className="size-3.5 shrink-0" />
+							)}
 							<span>{deleteMutation.isPending ? "جاري الحذف..." : "تأكيد الحذف النهائي"}</span>
 						</Button>
 					</div>

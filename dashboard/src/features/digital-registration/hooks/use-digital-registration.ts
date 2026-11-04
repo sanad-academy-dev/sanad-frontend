@@ -514,6 +514,7 @@ export function useShortlistRequest(campaignId: string) {
 			data: {
 				targetClass?: string | null;
 				priority?: string | null;
+				assignedStaffId?: string | null;
 				customMessage?: string;
 				notifyEmail?: boolean;
 			};
@@ -547,6 +548,7 @@ export function useWaitlistRequest(campaignId: string) {
 			data: {
 				assignedStaffId?: string | null;
 				priority?: string | null;
+				reason?: string;
 				subject?: string;
 				customMessage?: string;
 				notifyEmail?: boolean;
@@ -634,8 +636,11 @@ export function useRejectRequest(campaignId: string) {
 			return res.json();
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
+			if (campaignId) {
+				queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+				queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			}
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: ["appointments"] });
@@ -700,8 +705,11 @@ export function useDeleteRequestWithReason(campaignId: string) {
 			return res.json();
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
+			if (campaignId) {
+				queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+				queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			}
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: ["appointments"] });

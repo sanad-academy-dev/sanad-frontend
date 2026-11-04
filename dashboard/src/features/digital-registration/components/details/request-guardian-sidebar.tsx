@@ -1,11 +1,9 @@
 import { useState } from "react";
 import {
-	IconArrowsExchange,
 	IconCalendar,
 	IconCopy,
 	IconPhone,
 	IconPlus,
-	IconUserCircle,
 	IconVideo,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
@@ -76,15 +74,15 @@ export function RequestGuardianSidebar({
 		: (request.date || "قيد المراجعة");
 
 	return (
-		<div
-			className="w-full lg:w-[17rem] xl:w-[18rem] shrink-0 border-t lg:border-t-0 lg:border-r border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/35 p-3 space-y-3 text-right font-sans text-xs lg:sticky lg:top-0 lg:h-fit"
+		<aside
+			className="w-full lg:w-[17rem] xl:w-[18rem] shrink-0 border-t lg:border-t-0 lg:border-r border-zinc-200 dark:border-zinc-800 bg-background p-3 text-right font-sans text-xs self-stretch flex flex-col"
 			dir="rtl"
 		>
-			{/* سكشن 1: تفاصيل ولي الأمر */}
-			<div className="space-y-2.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-background/90 p-3 shadow-sm">
+			<div className="space-y-3 lg:sticky lg:top-3">
+				{/* سكشن 1: تفاصيل ولي الأمر */}
+			<div className="space-y-2.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-background/90 p-3">
 				<div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-800 pb-2">
-					<h3 className="text-[11px] font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-						<IconUserCircle className="size-3.5 text-primary" />
+					<h3 className="text-[11px] font-bold text-zinc-900 dark:text-zinc-100">
 						<span>تفاصيل ولي الأمر</span>
 					</h3>
 				</div>
@@ -107,7 +105,7 @@ export function RequestGuardianSidebar({
 								href={`https://wa.me/${waPhone}`}
 								target="_blank"
 								rel="noopener noreferrer"
-								className="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[10px] font-semibold transition-colors shrink-0 shadow-2xs"
+								className="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[10px] font-semibold transition-colors shrink-0"
 								title="إرسال رسالة لولي الأمر"
 							>
 								<span>إرسال رسالة</span>
@@ -127,7 +125,7 @@ export function RequestGuardianSidebar({
 							<button
 								type="button"
 								onClick={() => handleCopy(request.guardianPhone, "رقم الهاتف")}
-								className="inline-flex items-center justify-center px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-[9.5px] font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors shadow-2xs cursor-pointer"
+								className="inline-flex items-center justify-center px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-[9.5px] font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
 								title="نسخ رقم الهاتف"
 							>
 								<span>نسخ</span>
@@ -153,12 +151,12 @@ export function RequestGuardianSidebar({
 			</div>
 
 			{/* سكشن 2: قسم تعيين المراجع */}
-			<div className="space-y-2.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-background/90 p-3 shadow-sm">
+			<div className="space-y-2.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-background/90 p-3">
 				{reviewer ? (
 					<>
 						{/* في حالة وجود مراجع: رأس القسم مع زر تعيين مراجع كما في التصميم المرفق */}
 						<div className="flex items-center justify-between border-b border-zinc-100 pb-2 text-[11px] font-bold text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">
-							<span className="flex items-center gap-1.5"><IconUserCircle className="size-3.5 text-primary" />المراجع</span>
+							<span>المراجع</span>
 							<Popover open={reviewerPopoverOpen} onOpenChange={setReviewerPopoverOpen}>
 								<PopoverTrigger asChild>
 									<button
@@ -217,7 +215,7 @@ export function RequestGuardianSidebar({
 							{/* الصف الأول: الدائرة الزرقاء واسم المراجع + زر إرسال رسالة */}
 							<div className="flex items-center justify-between gap-1.5">
 								<div className="flex items-center gap-1.5 min-w-0">
-									<div className="size-5 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 text-[10px] font-bold shadow-2xs">
+									<div className="size-5 rounded-full bg-blue-600 text-white flex items-center justify-center shrink-0 text-[10px] font-bold">
 										{reviewer.name.slice(0, 1)}
 									</div>
 									<span className="text-[11.5px] font-bold text-zinc-900 dark:text-zinc-100 truncate block">
@@ -231,7 +229,7 @@ export function RequestGuardianSidebar({
 										href={`https://wa.me/${reviewerCleanPhone}`}
 										target="_blank"
 										rel="noopener noreferrer"
-										className="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[10px] font-semibold transition-colors shrink-0 shadow-2xs"
+										className="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[10px] font-semibold transition-colors shrink-0"
 										title="إرسال رسالة للمراجع"
 									>
 										<span>إرسال رسالة</span>
@@ -240,7 +238,7 @@ export function RequestGuardianSidebar({
 									<button
 										type="button"
 										onClick={() => toast.info("لم يتم تسجيل رقم هاتف لهذا المراجع")}
-										className="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[10px] font-semibold transition-colors shrink-0 shadow-2xs"
+										className="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[10px] font-semibold transition-colors shrink-0"
 										title="إرسال رسالة للمراجع"
 									>
 										<span>إرسال رسالة</span>
@@ -260,7 +258,7 @@ export function RequestGuardianSidebar({
 									<button
 										type="button"
 										onClick={() => handleCopy(reviewerPhone, "رقم هاتف المراجع")}
-										className="inline-flex items-center justify-center px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-[9.5px] font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors shadow-2xs cursor-pointer"
+										className="inline-flex items-center justify-center px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-[9.5px] font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
 										title="نسخ رقم الهاتف"
 									>
 										<span>نسخ</span>
@@ -273,14 +271,14 @@ export function RequestGuardianSidebar({
 					<>
 						{/* في حالة عدم تعيين مراجع: يظل كما هو حالياً */}
 						<div className="flex items-center justify-between border-b border-zinc-100 pb-2 text-[11px] font-bold text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">
-							<span className="flex items-center gap-1.5"><IconUserCircle className="size-3.5 text-primary" />المراجع</span>
+							<span>المراجع</span>
 						</div>
 						<Popover open={reviewerPopoverOpen} onOpenChange={setReviewerPopoverOpen}>
 							<PopoverTrigger asChild>
 								<Button
 									type="button"
 									variant="outline"
-									className="w-full h-8 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-primary text-[10.5px] font-medium text-zinc-600 dark:text-zinc-300 gap-1 justify-center bg-white dark:bg-zinc-900 shadow-2xs cursor-pointer"
+									className="w-full h-8 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-primary text-[10.5px] font-medium text-zinc-600 dark:text-zinc-300 gap-1 justify-center bg-white dark:bg-zinc-900 cursor-pointer"
 								>
 									<IconPlus className="size-3 text-primary" />
 									<span>تعيين مراجع</span>
@@ -331,9 +329,9 @@ export function RequestGuardianSidebar({
 			</div>
 
 			{/* سكشن 3: قسم إحالة لجهة أخرى */}
-			<div className="space-y-2.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-background/90 p-3 shadow-sm">
-				<span className="flex items-center gap-1.5 border-b border-zinc-100 pb-2 text-[11px] font-bold text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">
-					<IconArrowsExchange className="size-3.5 text-purple-600" />إحالة لجهة أخرى
+			<div className="space-y-2.5 rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-background/90 p-3">
+				<span className="block border-b border-zinc-100 pb-2 text-[11px] font-bold text-zinc-800 dark:border-zinc-800 dark:text-zinc-200">
+					إحالة لجهة أخرى
 				</span>
 				{request.referredToStaff ? (
 					<div className="rounded-lg border border-purple-200 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-950/20 p-2 space-y-0.5 text-xs">
@@ -365,16 +363,17 @@ export function RequestGuardianSidebar({
 				)}
 			</div>
 
-			{/* سكشن 4: تاريخ وتوقيت التقديم */}
-			<div className="flex items-center justify-between gap-2 rounded-xl border border-zinc-200/80 bg-background/90 px-3 py-2.5 text-xs text-muted-foreground shadow-sm dark:border-zinc-800">
-				<span className="flex items-center gap-1 text-[10px]">
-					<IconCalendar className="size-3 text-zinc-400" />
-					<span>تاريخ التقديم</span>
-				</span>
-				<span className="font-semibold text-zinc-700 dark:text-zinc-300 text-[10px]">
-					{submittedAtFormatted}
-				</span>
+				{/* سكشن 4: تاريخ وتوقيت التقديم */}
+				<div className="flex items-center justify-between gap-2 rounded-xl border border-zinc-200/80 bg-background/90 px-3 py-2.5 text-xs text-muted-foreground dark:border-zinc-800">
+					<span className="flex items-center gap-1 text-[10px]">
+						<IconCalendar className="size-3 text-zinc-400" />
+						<span>تاريخ التقديم</span>
+					</span>
+					<span className="font-semibold text-zinc-700 dark:text-zinc-300 text-[10px]">
+						{submittedAtFormatted}
+					</span>
+				</div>
 			</div>
-		</div>
+		</aside>
 	);
 }

@@ -1,24 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
 	IconAlertCircle,
 	IconArrowRight,
 	IconCheck,
+	IconChevronDown,
 	IconClock,
+	IconFileText,
 	IconSparkles,
+	IconUser,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
 	Sheet,
 	SheetContent,
 } from "@/components/ui/sheet";
-import { Input } from "@/components/ui/input";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
-import { useWaitlistRequest } from "../../hooks/use-digital-registration";
+import { useRegistrationReviewers, useWaitlistRequest } from "../../hooks/use-digital-registration";
 import { generateWaitlistMessage } from "../../utils/ai-templates";
+import { PriorityPickerPopover } from "../priority-picker-popover";
 
 interface WaitlistRequestDialogProps {
 	request: CampaignRequestItem | null;
@@ -27,6 +37,14 @@ interface WaitlistRequestDialogProps {
 	campaignId?: string;
 }
 
+const WAITLIST_REASONS = [
+	"عدم توفر مقاعد شاغرة حالياً",
+	"اكتمال الطاقة الاستيعابية للفصل المطلوب",
+	"رغبة ولي الأمر في تأجيل موعد الالتحاق",
+	"سن الطالب دون المرحلة المطلوبة بأشهر",
+	"أسباب إدارية أخرى",
+];
+
 export function WaitlistRequestDialog({
 	request,
 	open,
@@ -34,12 +52,28 @@ export function WaitlistRequestDialog({
 	campaignId = "",
 }: WaitlistRequestDialogProps) {
 	const [enableMessage, setEnableMessage] = useState(true);
-	const [subject, setSubject] = useState(
-		request ? `إرسال تسجيل في قائمة الانتظار - #${request.code}` : "",
-	);
 	const [messageText, setMessageText] = useState("");
+	const [priority, setPriority] = useState<string>(request?.priority || "بدون أولوية");
+	const [assignedStaffId, setAssignedStaffId] = useState<string | null>(
+		request?.assignedStaff?.id || request?.assignedStaffId || null,
+	);
+	const [reason, setReason] = useState<string>(WAITLIST_REASONS[0]);
 	const [notifyEmail, setNotifyEmail] = useState(false);
+
+	const [staffPopoverOpen, setStaffPopoverOpen] = useState(false);
+	const [reasonPopoverOpen, setReasonPopoverOpen] = useState(false);
+
+	const { data: staff = [], isLoading: isStaffLoading } = useRegistrationReviewers();
 	const waitlistMutation = useWaitlistRequest(campaignId);
+
+	useEffect(() => {
+		if (open && request) {
+			setPriority(request.priority || "بدون أولوية");
+			setAssignedStaffId(request?.assignedStaff?.id || request?.assignedStaffId || null);
+			setReason(WAITLIST_REASONS[0]);
+			setMessageText("");
+		}
+	}, [open, request]);
 
 	if (!request) return null;
 
@@ -63,7 +97,10 @@ export function WaitlistRequestDialog({
 			{
 				requestId: request.id,
 				data: {
-					subject: subject.trim(),
+					priority: priority !== "بدون أولوية" ? priority : null,
+					assignedStaffId,
+					reason,
+					subject: `إدراج في قائمة الانتظار - #${request.code || request.requestNumber}`,
 					customMessage: enableMessage ? messageText.trim() : undefined,
 					notifyEmail,
 				},
@@ -114,7 +151,7 @@ export function WaitlistRequestDialog({
 							<IconArrowRight className="size-4" />
 						</button>
 						<span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-							إرسال تسجيل في قائمة الانتظار للطلب
+							إدراج في قائمة الانتظار
 						</span>
 					</div>
 
@@ -145,14 +182,19 @@ export function WaitlistRequestDialog({
 						)}
 					</div>
 
-					{/* سويتش إضافة / إغلاق رسالة */}
+					{/* سويتش تضمين رسالة لولي الأمر */}
 					<div className="flex items-center justify-between pt-1">
-						<label
-							htmlFor="enable-msg-waitlist"
-							className="text-xs font-bold text-zinc-800 dark:text-zinc-200 cursor-pointer"
-						>
-							{enableMessage ? "إغلاق رسالة" : "إضافة رسالة"}
-						</label>
+						<div className="flex flex-col gap-0.5">
+							<label
+								htmlFor="enable-msg-waitlist"
+								className="text-xs font-bold text-zinc-800 dark:text-zinc-200 cursor-pointer"
+							>
+								تضمين رسالة لولي الأمر
+							</label>
+							<span className="text-[10px] text-muted-foreground">
+								{enableMessage ? "سيتم توثيق الرسالة وإشعار ولي الأمر بالترتيب" : "لن يتم إرسال أي نص مكتوب"}
+							</span>
+						</div>
 						<Switch
 							id="enable-msg-waitlist"
 							checked={enableMessage}
@@ -165,18 +207,6 @@ export function WaitlistRequestDialog({
 							<p className="rounded-md bg-muted/60 px-2.5 py-2 text-[10px] text-muted-foreground">
 								سيكون المستلم ولي الأمر: <span className="font-mono" dir="ltr">{request.guardianPhone || "غير محدد"}</span>
 							</p>
-							{/* حقل الموضوع */}
-							<div className="space-y-1">
-								<div className="flex items-center justify-between text-xs font-bold text-zinc-800 dark:text-zinc-200">
-									<span>الموضوع</span>
-									<span className="text-[10px] text-rose-500 font-normal">مطلوب</span>
-								</div>
-								<Input
-									value={subject}
-									onChange={(e) => setSubject(e.target.value)}
-									className="h-8 text-xs font-sans"
-								/>
-							</div>
 
 							{/* مربع نص الرسالة */}
 							<div className="space-y-1">
@@ -200,46 +230,158 @@ export function WaitlistRequestDialog({
 							</div>
 						</div>
 					)}
+
+					{/* سبب الإدراج في قائمة الانتظار (تحت نص الرسالة مباشرة وبنفس عرض الصندوق) */}
+					<div className="space-y-1.5 pt-1 pb-4">
+						<label className="block text-xs font-bold text-zinc-800 dark:text-zinc-200">
+							سبب الإدراج في قائمة الانتظار
+						</label>
+						<Popover open={reasonPopoverOpen} onOpenChange={setReasonPopoverOpen}>
+							<PopoverTrigger asChild>
+								<Button
+									variant="outline"
+									className="w-full h-8.5 justify-between text-xs border-zinc-200 dark:border-zinc-800 font-normal px-2.5 bg-background hover:bg-zinc-50 dark:hover:bg-zinc-850"
+								>
+									<span className="flex items-center gap-2 truncate">
+										<IconFileText className="size-3.5 text-zinc-500 shrink-0" />
+										<span className="truncate text-zinc-800 dark:text-zinc-200">{reason}</span>
+									</span>
+									<IconChevronDown className="size-3 opacity-60 shrink-0" />
+								</Button>
+							</PopoverTrigger>
+							<PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-1.5" dir="rtl">
+								<p className="text-[11px] font-bold text-muted-foreground p-1.5">اختر سبب الإدراج بالانتظار</p>
+								<div className="space-y-0.5">
+									{WAITLIST_REASONS.map((r) => (
+										<button
+											key={r}
+											type="button"
+											onClick={() => {
+												setReason(r);
+												setReasonPopoverOpen(false);
+											}}
+											className={cn(
+												"w-full flex items-center justify-between text-right text-xs px-2.5 py-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer",
+												reason === r && "bg-muted font-bold text-primary",
+											)}
+										>
+											<span>{r}</span>
+											{reason === r && <IconCheck className="size-3 text-primary shrink-0" />}
+										</button>
+									))}
+								</div>
+							</PopoverContent>
+						</Popover>
+					</div>
 				</div>
 
-				{/* شريط الإجراءات والفوتر السفلي */}
-				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col gap-2 shrink-0 mt-auto">
-					{/* صف الإرسال والإلغاء مع إشعار البريد */}
-					<div className="flex items-center justify-between">
-						<div className="flex items-center gap-1.5">
-							<Switch
-								id="notify-email-waitlist"
-								checked={notifyEmail}
-								onCheckedChange={setNotifyEmail}
-							/>
-							<label
-								htmlFor="notify-email-waitlist"
-								className="text-[11px] text-muted-foreground cursor-pointer font-medium"
-							>
-								إشعار عبر البريد
-							</label>
-						</div>
+				{/* شريط أدوات التعيين السريعة */}
+				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center gap-1.5 shrink-0">
+					{/* اختيار الأولوية بالاعتماد على المكون الجاهز */}
+					<PriorityPickerPopover
+						value={priority}
+						onChange={setPriority}
+						className="h-7 text-[11px] border-zinc-200 dark:border-zinc-800"
+					/>
 
-						<div className="flex items-center gap-2">
+					{/* اختيار المراجع الأكاديمي */}
+					<Popover open={staffPopoverOpen} onOpenChange={setStaffPopoverOpen}>
+						<PopoverTrigger asChild>
 							<Button
 								variant="outline"
 								size="sm"
-								onClick={() => onOpenChange(false)}
-								disabled={waitlistMutation.isPending}
-								className="h-7 text-xs"
+								className="h-7 text-[11px] border-zinc-200 dark:border-zinc-800 gap-1 max-w-[140px] font-normal"
 							>
-								إلغاء
+								<IconUser className="size-3 text-zinc-500 shrink-0" />
+								<span className="truncate">
+									{staff.find((s) => s.id === assignedStaffId)?.name || "تعيين مراجع"}
+								</span>
+								<IconChevronDown className="size-2.5 opacity-60 shrink-0" />
 							</Button>
-							<Button
-								size="sm"
-								onClick={handleSubmit}
-								disabled={waitlistMutation.isPending}
-								className="h-7 text-xs font-semibold px-3 gap-1 bg-primary text-primary-foreground"
-							>
-								<IconCheck className="size-3" />
-								<span>{waitlistMutation.isPending ? "جاري الإرسال..." : "إرسال"}</span>
-							</Button>
-						</div>
+						</PopoverTrigger>
+						<PopoverContent align="start" className="w-56 p-1.5" dir="rtl">
+							<p className="text-[11px] font-bold text-muted-foreground p-1.5">اختر المراجع المسؤول</p>
+							{isStaffLoading ? (
+								<div className="p-2 text-center text-xs text-muted-foreground">جاري التحميل...</div>
+							) : staff.length === 0 ? (
+								<div className="p-2 text-center text-xs text-muted-foreground">لا يوجد موظفون متاحون</div>
+							) : (
+								<div className="space-y-0.5 max-h-48 overflow-y-auto sanad-scrollbar">
+									<button
+										type="button"
+										onClick={() => {
+											setAssignedStaffId(null);
+											setStaffPopoverOpen(false);
+										}}
+										className="w-full text-right text-xs px-2 py-1.5 rounded text-muted-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+									>
+										بدون مراجع (إلغاء التعيين)
+									</button>
+									{staff.map((s) => (
+										<button
+											key={s.id}
+											type="button"
+											onClick={() => {
+												setAssignedStaffId(s.id);
+												setStaffPopoverOpen(false);
+											}}
+											className={cn(
+												"w-full flex items-center gap-2 text-xs px-2 py-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-right cursor-pointer",
+												assignedStaffId === s.id && "bg-muted font-bold",
+											)}
+										>
+											<Avatar className="size-5 shrink-0">
+												<AvatarFallback className="text-[8px] bg-primary/10 text-primary font-bold">
+													{s.name.slice(0, 2)}
+												</AvatarFallback>
+											</Avatar>
+											<div className="flex flex-col min-w-0">
+												<span className="truncate">{s.name}</span>
+												{s.role && <span className="text-[9px] text-muted-foreground truncate">{s.role}</span>}
+											</div>
+										</button>
+									))}
+								</div>
+							)}
+						</PopoverContent>
+					</Popover>
+				</div>
+
+				{/* صف الإرسال والإلغاء مع إشعار البريد (فوتر مثبت) */}
+				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between bg-zinc-50/50 dark:bg-zinc-900/50 shrink-0 mt-auto">
+					<div className="flex items-center gap-1.5">
+						<Switch
+							id="notify-email-waitlist"
+							checked={notifyEmail}
+							onCheckedChange={setNotifyEmail}
+						/>
+						<label
+							htmlFor="notify-email-waitlist"
+							className="text-[11px] text-muted-foreground cursor-pointer font-medium"
+						>
+							إشعار عبر البريد
+						</label>
+					</div>
+
+					<div className="flex items-center gap-2">
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => onOpenChange(false)}
+							disabled={waitlistMutation.isPending}
+							className="h-8 text-xs cursor-pointer"
+						>
+							إلغاء
+						</Button>
+						<Button
+							size="sm"
+							onClick={handleSubmit}
+							disabled={waitlistMutation.isPending}
+							className="h-8 text-xs font-semibold px-3 gap-1 bg-primary text-primary-foreground cursor-pointer"
+						>
+							<IconCheck className="size-3" />
+							<span>{waitlistMutation.isPending ? "جاري الحفظ..." : "تأكيد الإدراج بالانتظار"}</span>
+						</Button>
 					</div>
 				</div>
 			</SheetContent>

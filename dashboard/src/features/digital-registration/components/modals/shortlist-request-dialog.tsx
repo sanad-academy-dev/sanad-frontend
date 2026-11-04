@@ -1,16 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
 	IconArrowRight,
 	IconCheck,
 	IconChevronDown,
-	IconClock,
-	IconSchool,
 	IconSparkles,
+	IconUser,
 	IconX,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
 	Sheet,
@@ -23,9 +22,11 @@ import {
 } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
-import { useShortlistRequest } from "../../hooks/use-digital-registration";
+import { useRegistrationReviewers, useShortlistRequest } from "../../hooks/use-digital-registration";
 import { generateShortlistMessage } from "../../utils/ai-templates";
+import { PriorityPickerPopover } from "../priority-picker-popover";
 
 interface ShortlistRequestDialogProps {
 	request: CampaignRequestItem | null;
@@ -33,15 +34,6 @@ interface ShortlistRequestDialogProps {
 	onOpenChange: (open: boolean) => void;
 	campaignId?: string;
 }
-
-const CLASS_OPTIONS = [
-	"النجوم",
-	"براعم النور",
-	"الصف التمهيدي",
-	"الروضة الأولى (KG1)",
-	"الروضة الثانية (KG2)",
-	"عباقرة الغد",
-];
 
 export function ShortlistRequestDialog({
 	request,
@@ -51,12 +43,23 @@ export function ShortlistRequestDialog({
 }: ShortlistRequestDialogProps) {
 	const [enableMessage, setEnableMessage] = useState(true);
 	const [messageText, setMessageText] = useState("");
-	const [selectedClass, setSelectedClass] = useState<string | null>(request?.targetClass || null);
+	const [priority, setPriority] = useState<string>(request?.priority || "بدون أولوية");
+	const [assignedStaffId, setAssignedStaffId] = useState<string | null>(
+		request?.assignedStaff?.id || request?.assignedStaffId || null,
+	);
 	const [notifyEmail, setNotifyEmail] = useState(false);
 
-	const [classPopoverOpen, setClassPopoverOpen] = useState(false);
+	const [staffPopoverOpen, setStaffPopoverOpen] = useState(false);
 
+	const { data: staff = [], isLoading: isStaffLoading } = useRegistrationReviewers();
 	const shortlistMutation = useShortlistRequest(campaignId);
+
+	useEffect(() => {
+		if (open && request) {
+			setPriority(request.priority || "بدون أولوية");
+			setAssignedStaffId(request?.assignedStaff?.id || request?.assignedStaffId || null);
+		}
+	}, [open, request]);
 
 	if (!request) return null;
 
@@ -64,7 +67,7 @@ export function ShortlistRequestDialog({
 		const generated = generateShortlistMessage({
 			studentName: request.patientName,
 			guardianName: request.guardianName,
-			targetClass: selectedClass || request.targetClass,
+			targetClass: request.targetClass,
 		});
 		setMessageText(generated);
 		toast.success("تمت إضافة مسودة رسالة قابلة للتعديل");
@@ -75,7 +78,9 @@ export function ShortlistRequestDialog({
 			{
 				requestId: request.id,
 				data: {
-					targetClass: selectedClass,
+					targetClass: request.targetClass,
+					priority: priority !== "بدون أولوية" ? priority : null,
+					assignedStaffId,
 					customMessage: enableMessage ? messageText.trim() : undefined,
 					notifyEmail,
 				},
@@ -139,14 +144,19 @@ export function ShortlistRequestDialog({
 
 				{/* محتوى اللوحة القابل للتمرير */}
 				<div className="p-4 space-y-4 flex-1 min-h-0 overflow-y-auto overscroll-contain sanad-scrollbar">
-					{/* سويتش إضافة / إغلاق رسالة */}
+					{/* سويتش تضمين رسالة لولي الأمر */}
 					<div className="flex items-center justify-between pt-1">
-						<label
-							htmlFor="enable-msg-shortlist"
-							className="text-xs font-bold text-zinc-800 dark:text-zinc-200 cursor-pointer"
-						>
-							{enableMessage ? "إغلاق رسالة" : "إضافة رسالة"}
-						</label>
+						<div className="flex flex-col gap-0.5">
+							<label
+								htmlFor="enable-msg-shortlist"
+								className="text-xs font-bold text-zinc-800 dark:text-zinc-200 cursor-pointer"
+							>
+								تضمين رسالة لولي الأمر
+							</label>
+							<span className="text-[10px] text-muted-foreground">
+								{enableMessage ? "سيتم حفظ الرسالة وإشعار ولي الأمر" : "لن يتم إرسال أي نص مكتوب"}
+							</span>
+						</div>
 						<Switch
 							id="enable-msg-shortlist"
 							checked={enableMessage}
@@ -183,46 +193,78 @@ export function ShortlistRequestDialog({
 					)}
 				</div>
 
-				{/* شريط الإجراءات والفوتر السفلي (مطابق للصورة 93b113b5) */}
+				{/* شريط الإجراءات والفوتر السفلي */}
 				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col gap-2 shrink-0">
 					{/* صف أدوات التعيين السريعة */}
 					<div className="flex items-center gap-1.5 flex-wrap">
-						{/* اختيار الفصل */}
-						<Popover open={classPopoverOpen} onOpenChange={setClassPopoverOpen}>
+						{/* اختيار الأولوية بالاعتماد على المكون الجاهز */}
+						<PriorityPickerPopover
+							value={priority}
+							onChange={setPriority}
+							className="h-7 text-[11px] border-zinc-200 dark:border-zinc-800"
+						/>
+
+						{/* اختيار المراجع الأكاديمي */}
+						<Popover open={staffPopoverOpen} onOpenChange={setStaffPopoverOpen}>
 							<PopoverTrigger asChild>
 								<Button
 									variant="outline"
 									size="sm"
-									className="h-7 text-[11px] border-zinc-200 dark:border-zinc-800 gap-1"
+									className="h-7 text-[11px] border-zinc-200 dark:border-zinc-800 gap-1 max-w-[130px] font-normal"
 								>
-									<IconSchool className="size-3 text-zinc-500" />
-									<span>{selectedClass || "تعيين فصل"}</span>
-									<IconChevronDown className="size-2.5 opacity-60" />
+									<IconUser className="size-3 text-zinc-500 shrink-0" />
+									<span className="truncate">
+										{staff.find((s) => s.id === assignedStaffId)?.name || "تعيين مراجع"}
+									</span>
+									<IconChevronDown className="size-2.5 opacity-60 shrink-0" />
 								</Button>
 							</PopoverTrigger>
-							<PopoverContent align="start" className="w-48 p-1.5" dir="rtl">
-								<p className="text-[11px] font-bold text-muted-foreground p-1.5">اختر الفصل</p>
-								{CLASS_OPTIONS.map((cls) => (
-									<button
-										key={cls}
-										type="button"
-										onClick={() => {
-											setSelectedClass(cls);
-											setClassPopoverOpen(false);
-										}}
-										className="w-full text-right text-xs px-2 py-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
-									>
-										{cls}
-									</button>
-								))}
+							<PopoverContent align="start" className="w-56 p-1.5" dir="rtl">
+								<p className="text-[11px] font-bold text-muted-foreground p-1.5">اختر المراجع المسؤول</p>
+								{isStaffLoading ? (
+									<div className="p-2 text-center text-xs text-muted-foreground">جاري التحميل...</div>
+								) : staff.length === 0 ? (
+									<div className="p-2 text-center text-xs text-muted-foreground">لا يوجد موظفون متاحون</div>
+								) : (
+									<div className="space-y-0.5 max-h-48 overflow-y-auto sanad-scrollbar">
+										<button
+											type="button"
+											onClick={() => {
+												setAssignedStaffId(null);
+												setStaffPopoverOpen(false);
+											}}
+											className="w-full text-right text-xs px-2 py-1.5 rounded text-muted-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+										>
+											بدون مراجع (إلغاء التعيين)
+										</button>
+										{staff.map((s) => (
+											<button
+												key={s.id}
+												type="button"
+												onClick={() => {
+													setAssignedStaffId(s.id);
+													setStaffPopoverOpen(false);
+												}}
+												className={cn(
+													"w-full flex items-center gap-2 text-xs px-2 py-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-right cursor-pointer",
+													assignedStaffId === s.id && "bg-muted font-bold",
+												)}
+											>
+												<Avatar className="size-5 shrink-0">
+													<AvatarFallback className="text-[8px] bg-primary/10 text-primary font-bold">
+														{s.name.slice(0, 2)}
+													</AvatarFallback>
+												</Avatar>
+												<div className="flex flex-col min-w-0">
+													<span className="truncate">{s.name}</span>
+													{s.role && <span className="text-[9px] text-muted-foreground truncate">{s.role}</span>}
+												</div>
+											</button>
+										))}
+									</div>
+								)}
 							</PopoverContent>
 						</Popover>
-
-						<Badge variant="outline" className="h-7 text-[11px] border-zinc-200 dark:border-zinc-800 gap-1 text-muted-foreground">
-							<IconClock className="size-3" />
-							<span>سيُنقل للقائمة المختصرة</span>
-						</Badge>
-
 					</div>
 				</div>
 
@@ -236,7 +278,7 @@ export function ShortlistRequestDialog({
 						/>
 						<label
 							htmlFor="notify-email-shortlist"
-							className="text-[11px] text-muted-foreground cursor-pointer font-medium"
+							className="text-[11px] text-muted-foreground cursor-pointer font-medium select-none"
 						>
 							إشعار عبر البريد
 						</label>
@@ -259,7 +301,7 @@ export function ShortlistRequestDialog({
 							className="h-8 text-xs font-semibold px-3 gap-1 bg-primary text-primary-foreground cursor-pointer"
 						>
 							<IconCheck className="size-3" />
-							<span>{shortlistMutation.isPending ? "جاري الإرسال..." : "إرسال قبول الطلب"}</span>
+							<span>{shortlistMutation.isPending ? "جاري الحفظ..." : "تأكيد الإضافة للمختصرة"}</span>
 						</Button>
 					</div>
 				</div>

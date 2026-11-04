@@ -49,6 +49,7 @@ import { AppointmentColumnHeader } from "@/features/appointments/components/appo
 import type { AppointmentColumn, AppointmentColumnId } from "@/features/appointments/types/appointment.types";
 import { toast } from "sonner";
 import { CampaignRequestSheet } from "./campaign-request-sheet";
+import { CancelAppointmentConfirmDialog } from "./modals/cancel-appointment-confirm-dialog";
 import { PriorityPickerPopover } from "./priority-picker-popover";
 import type { CampaignRequestItem } from "../types/campaign-request.types";
 import {
@@ -65,6 +66,7 @@ const collisionDetection: CollisionDetection = (args) => {
 const CAMPAIGN_COLUMNS: AppointmentColumn[] = [
 	{ id: "queue" as AppointmentColumnId, name: "طابور", count: 0, icon: <IconClock className="size-3.5" />, accent: "blue" },
 	{ id: "shortlist" as AppointmentColumnId, name: "قائمة مختصرة", count: 0, icon: <IconClipboardCheck className="size-3.5" />, accent: "neutral" },
+	{ id: "waitlist" as AppointmentColumnId, name: "قائمة الانتظار", count: 0, icon: <IconHourglass className="size-3.5" />, accent: "purple" },
 	{ id: "interview" as AppointmentColumnId, name: "المقابلة الشخصية", count: 0, icon: <IconActivity className="size-3.5" />, accent: "amber" },
 	{ id: "awaiting-payment" as AppointmentColumnId, name: "بانتظار الدفع", count: 0, icon: <IconHourglass className="size-3.5" />, accent: "purple" },
 	{ id: "accepted" as AppointmentColumnId, name: "مقبول", count: 0, icon: <IconCheck className="size-3.5" />, accent: "emerald" },
@@ -82,6 +84,7 @@ const COLUMN_STATUS_MAP: Record<
 > = {
 	queue: { status: "QUEUE", label: "طابور", variant: "warning" },
 	shortlist: { status: "SHORTLIST", label: "قائمة مختصرة", variant: "info" },
+	waitlist: { status: "WAITLIST", label: "قائمة الانتظار", variant: "warning" },
 	interview: { status: "INTERVIEW", label: "المقابلة الشخصية", variant: "info" },
 	accepted: { status: "ACCEPTED", label: "مقبول", variant: "default" },
 	"awaiting-payment": { status: "AWAITING_PAYMENT", label: "بانتظار الدفع", variant: "warning" },
@@ -90,7 +93,6 @@ const COLUMN_STATUS_MAP: Record<
 	duplicate: { status: "DUPLICATE", label: "مكرر", variant: "destructive" },
 	// Backward compatibility with legacy IDs
 	evaluation: { status: "INTERVIEW", label: "المقابلة الشخصية", variant: "info" },
-	waitlist: { status: "AWAITING_PAYMENT", label: "بانتظار الدفع", variant: "warning" },
 	"check-in": { status: "SHORTLIST", label: "قائمة مختصرة", variant: "info" },
 	"in-service": { status: "INTERVIEW", label: "المقابلة الشخصية", variant: "info" },
 	done: { status: "ACCEPTED", label: "مقبول", variant: "default" },
@@ -114,6 +116,7 @@ function getStageProgress(column: string): { current: number; total: number; per
 	let current = 1;
 	const col = (column || "").toLowerCase();
 	if (col === "shortlist" || col === "قائمة مختصرة") current = 2;
+	else if (col === "waitlist" || col === "قائمة الانتظار") current = 2;
 	else if (col === "interview" || col === "المقابلة الشخصية" || col === "المقابله الشخصيه") current = 3;
 	else if (col === "awaiting-payment" || col === "awaiting_payment" || col === "بانتظار الدفع") current = 4;
 	else if (col === "accepted" || col === "مقبول") current = 5;
@@ -143,6 +146,14 @@ export function CampaignRequestsKanban({
 	const [data, setData] = useState<CampaignRequestItem[]>([]);
 	const lastKnownColumns = useRef<Map<string, AppointmentColumnId>>(new Map());
 	const [internalSelectedRequestId, setInternalSelectedRequestId] = useState<string | null>(null);
+	const [pendingCancelAppointmentDrag, setPendingCancelAppointmentDrag] = useState<{
+		request: CampaignRequestItem;
+		targetColumn: string;
+		prevColumn: AppointmentColumnId;
+		targetStatus: CampaignRequestItem["status"];
+		targetLabel: string;
+		targetVariant: CampaignRequestItem["statusVariant"];
+	} | null>(null);
 	const selectedRequestId = externalSelectedRequestId !== undefined ? externalSelectedRequestId : internalSelectedRequestId;
 	const setSelectedRequestId = externalOnSelectRequest || setInternalSelectedRequestId;
 
@@ -209,6 +220,7 @@ export function CampaignRequestsKanban({
 		const statusToColumnMap: Record<string, string> = {
 			QUEUE: "queue",
 			SHORTLIST: "shortlist",
+			WAITLIST: "waitlist",
 			INTERVIEW: "interview",
 			ACCEPTED: "accepted",
 			AWAITING_PAYMENT: "awaiting-payment",
@@ -217,8 +229,6 @@ export function CampaignRequestsKanban({
 			// Backward compatibility fallbacks
 			IN_EVALUATION: "interview",
 			EVALUATION: "interview",
-			// قائمة الانتظار تُعرض تحت الطابور، وليست ضمن انتظار الدفع.
-			WAITLIST: "queue",
 			REVIEW: "shortlist",
 			AWAITING_REPLY: "shortlist",
 		};
@@ -228,6 +238,7 @@ export function CampaignRequestsKanban({
 
 		lastKnownColumns.current.set(req.id, newColumn);
 
+		const isBackwardDrag = ["QUEUE", "SHORTLIST", "WAITLIST"].includes(newStatus);
 		setData((prev) =>
 			prev.map((item) =>
 				item.id === req.id
@@ -237,6 +248,7 @@ export function CampaignRequestsKanban({
 							status: newStatus,
 							statusLabel: meta?.label || item.statusLabel,
 							statusVariant: meta?.variant || item.statusVariant,
+							assessmentAppointment: isBackwardDrag ? null : item.assessmentAppointment,
 					  }
 					: item,
 			),
@@ -316,15 +328,37 @@ export function CampaignRequestsKanban({
 			const targetColumn = item.column;
 			const meta = COLUMN_STATUS_MAP[targetColumn] || COLUMN_STATUS_MAP.queue;
 
+			// التحقق من السحب للخلف من المقابلة أو المراحل المتقدمة مع وجود موعد فعال
+			const hasActiveAppointment = Boolean(
+				oldItem?.assessmentAppointment && oldItem.assessmentAppointment.status !== "CANCELLED",
+			);
+			const isBackwardToQueueOrShortlist = ["queue", "shortlist", "waitlist"].includes(targetColumn);
+			const wasInInterviewOrLater = ["interview", "awaiting-payment", "accepted"].includes(prevCol);
+
+			if (hasActiveAppointment && isBackwardToQueueOrShortlist && wasInInterviewOrLater && oldItem) {
+				committed.push({ ...item, column: prevCol });
+				setPendingCancelAppointmentDrag({
+					request: oldItem,
+					targetColumn,
+					prevColumn: prevCol,
+					targetStatus: meta.status,
+					targetLabel: meta.label,
+					targetVariant: meta.variant,
+				});
+				continue;
+			}
+
 			// Synchronously record new column in ref so consecutive drag events don't duplicate
 			lastKnownColumns.current.set(item.id, targetColumn);
 
+			const isBackward = ["QUEUE", "SHORTLIST", "WAITLIST"].includes(meta.status);
 			const updatedItem: CampaignRequestItem = {
 				...item,
 				column: targetColumn,
 				status: meta.status,
 				statusLabel: meta.label,
 				statusVariant: meta.variant,
+				assessmentAppointment: isBackward ? null : item.assessmentAppointment,
 			};
 			committed.push(updatedItem);
 
@@ -362,6 +396,55 @@ export function CampaignRequestsKanban({
 		const committedMap = new Map(committed.map((d) => [d.id, d]));
 		const mergedData = data.map((d) => committedMap.get(d.id) || d);
 		setData(mergedData);
+	};
+
+	const handleConfirmCancelAppointmentDrag = () => {
+		if (!pendingCancelAppointmentDrag) return;
+		const { request, targetColumn, prevColumn, targetStatus, targetLabel, targetVariant } =
+			pendingCancelAppointmentDrag;
+		lastKnownColumns.current.set(request.id, targetColumn as AppointmentColumnId);
+		setData((prev) =>
+			prev.map((d) =>
+				d.id === request.id
+					? {
+							...d,
+							column: targetColumn,
+							status: targetStatus,
+							statusLabel: targetLabel,
+							statusVariant: targetVariant,
+							assessmentAppointment: null,
+					  }
+					: d,
+			),
+		);
+		updateStatusMutation.mutate(
+			{ requestId: request.id, status: targetStatus },
+			{
+				onSuccess: () => {
+					toast.success(`تم إلغاء الموعد ونقل الطلب إلى "${targetLabel}" بنجاح`);
+					setPendingCancelAppointmentDrag(null);
+				},
+				onError: (err: any) => {
+					lastKnownColumns.current.set(request.id, prevColumn);
+					setData((prev) =>
+						prev.map((d) =>
+							d.id === request.id
+								? {
+										...d,
+										column: prevColumn,
+										status: request.status,
+										statusLabel: request.statusLabel,
+										statusVariant: request.statusVariant,
+										assessmentAppointment: request.assessmentAppointment,
+								  }
+								: d,
+						),
+					);
+					toast.error(err.message || "فشل تحديث حالة الطلب");
+					setPendingCancelAppointmentDrag(null);
+				},
+			},
+		);
 	};
 
 	return (
@@ -758,6 +841,18 @@ export function CampaignRequestsKanban({
 				onDelete={() => {
 					setSelectedRequestId(null);
 				}}
+			/>
+
+			<CancelAppointmentConfirmDialog
+				open={Boolean(pendingCancelAppointmentDrag)}
+				onOpenChange={(open) => {
+					if (!open) setPendingCancelAppointmentDrag(null);
+				}}
+				request={pendingCancelAppointmentDrag?.request || null}
+				targetColumnName={pendingCancelAppointmentDrag?.targetLabel || ""}
+				onConfirm={handleConfirmCancelAppointmentDrag}
+				onCancel={() => setPendingCancelAppointmentDrag(null)}
+				isLoading={updateStatusMutation.isPending}
 			/>
 		</div>
 	);

@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 import type { CampaignRequestItem } from "../types/campaign-request.types";
 import { AddRequestDialog } from "./add-request-sheet";
 import { ScheduleAssessmentDialog } from "./schedule-assessment-dialog";
@@ -70,6 +71,7 @@ export function CampaignRequestSheet({
 	const [statusTransitionTarget, setStatusTransitionTarget] = useState<RequestTransitionTarget | null>(null);
 	const [isScheduleAssessmentOpen, setIsScheduleAssessmentOpen] = useState(false);
 	const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
+	const [isExpanded, setIsExpanded] = useState(false);
 	const lastDrawerClosedAtRef = useRef<number>(0);
 
 	const handleCloseDrawer = useCallback(() => {
@@ -155,7 +157,12 @@ export function CampaignRequestSheet({
 							return;
 						}
 					}}
-					className="w-full flex flex-col p-0 sm:w-[60vw]! md:w-[60vw]! lg:w-[60vw]! sm:max-w-none! overflow-hidden bg-background border-zinc-200 dark:border-zinc-800 shadow-2xl transition-all print:w-full print:max-w-none print:shadow-none print:border-none print:overflow-visible z-50"
+					className={cn(
+						"w-full flex flex-col p-0 sm:max-w-none! overflow-hidden bg-background border-zinc-200 dark:border-zinc-800 shadow-2xl transition-all duration-200 print:w-full print:max-w-none print:shadow-none print:border-none print:overflow-visible z-50",
+						isExpanded
+							? "sm:w-[65vw]! md:w-[65vw]! lg:w-[65vw]!"
+							: "sm:w-[60vw]! md:w-[60vw]! lg:w-[60vw]!"
+					)}
 				>
 					{/* الترويسة العلوية مع مسار التنقل والأزرار والقائمة السريعة */}
 					<RequestHeaderActions
@@ -175,10 +182,12 @@ export function CampaignRequestSheet({
 						onMoveToInterview={() => openStatusTransition("INTERVIEW")}
 						onMoveToAwaitingPayment={() => openStatusTransition("AWAITING_PAYMENT")}
 						onMarkDuplicate={() => openStatusTransition("DUPLICATE")}
+						isExpanded={isExpanded}
+						onToggleExpand={() => setIsExpanded((prev) => !prev)}
 					/>
 
 					{/* الحاوية الرئيسية للتمرير الموحد للعمودين معاً كصفحة واحدة متكاملة */}
-					<div className="flex-1 overflow-y-auto min-h-0 bg-zinc-50/40 dark:bg-zinc-950/40" dir="rtl">
+					<div className="flex-1 overflow-y-auto min-h-0 bg-background" dir="rtl">
 						<div className="flex min-h-full flex-col items-stretch lg:flex-row">
 
 							{/* العمود الرئيسي (الملف الأكاديمي، الطبي، المالي، المسار، والمستندات) - يميناً في RTL */}

@@ -1,20 +1,20 @@
 import {
 	IconActivity,
-	IconArrowsExchange,
+	IconArrowsDiagonal,
+	IconArrowsDiagonalMinimize,
 	IconCalendarPlus,
+	IconCalendarX,
 	IconCheck,
 	IconChevronDown,
 	IconClipboardCheck,
 	IconClock,
 	IconCoin,
-	IconCopy,
 	IconDots,
-	IconEdit,
 	IconHourglass,
+	IconLink,
 	IconPlus,
 	IconPrinter,
 	IconShare,
-	IconTrash,
 	IconX,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
@@ -28,7 +28,28 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
+
+/** أيقونة نسخ معرّف الطلب (بطاقتين متراكبتين مع رمز ID) مطابقة للشاشات المنظومية */
+function IconCopyId({ className = "size-3.5" }: { className?: string }) {
+	return (
+		<svg
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="2"
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			className={className}
+		>
+			<path d="M16 3H6a2 2 0 0 0-2 2v12" />
+			<rect x="6" y="6" width="14" height="15" rx="2.5" />
+			<path d="M9.5 11.5v4" />
+			<path d="M12.5 11.5v4h1.5a2 2 0 0 0 0-4h-1.5z" />
+		</svg>
+	);
+}
 
 interface RequestHeaderActionsProps {
 	request: CampaignRequestItem;
@@ -47,6 +68,8 @@ interface RequestHeaderActionsProps {
 	onMoveToInterview?: () => void;
 	onMoveToAwaitingPayment?: () => void;
 	onMarkDuplicate?: () => void;
+	isExpanded?: boolean;
+	onToggleExpand?: () => void;
 }
 
 export function RequestHeaderActions({
@@ -54,7 +77,7 @@ export function RequestHeaderActions({
 	onClose,
 	onOpenShortlist,
 	onOpenWaitlist,
-	onOpenSchedule,
+	onOpenSchedule: _onOpenSchedule,
 	onOpenReschedule,
 	onOpenReject,
 	onOpenDelete,
@@ -66,6 +89,8 @@ export function RequestHeaderActions({
 	onMoveToInterview,
 	onMoveToAwaitingPayment,
 	onMarkDuplicate,
+	isExpanded,
+	onToggleExpand,
 }: RequestHeaderActionsProps) {
 	const handlePrint = () => {
 		if (onOpenPrint) {
@@ -79,7 +104,13 @@ export function RequestHeaderActions({
 	const handleShare = () => {
 		const url = window.location.href;
 		navigator.clipboard.writeText(url);
-		toast.success("تم نسخ رابط داخلي؛ يعمل فقط للمستخدمين المصرح لهم");
+		toast.success("تم نسخ رابط الطلب المباشر للمشاركة");
+	};
+
+	const handleCopyId = () => {
+		const textToCopy = request.code || request.id;
+		navigator.clipboard.writeText(textToCopy);
+		toast.success(`تم نسخ معرّف الطلب (${textToCopy})`);
 	};
 
 	// فتح النوافذ الجانبية بتأخير بسيط لضمان اكتمال إغلاق القائمة المنسدلة بدون أي تعارض في التركيز
@@ -88,6 +119,138 @@ export function RequestHeaderActions({
 		setTimeout(() => {
 			fn();
 		}, 80);
+	};
+
+	// إعداد قائمة الخيارات الثلاثة المنطقية ديناميكياً بحسب عمود/حالة الكانبان
+	const getDynamicListItems = () => {
+		switch (request.status) {
+			case "QUEUE":
+				return [
+					{
+						label: "القائمة المختصرة",
+						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenShortlist,
+					},
+					{
+						label: "قائمة الإنتظار",
+						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenWaitlist,
+					},
+					{
+						label: "قائمة الرفض",
+						icon: <IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenReject,
+					},
+				];
+			case "SHORTLIST":
+				return [
+					{
+						label: "نقل إلى المقابلة الشخصية",
+						icon: <IconActivity className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onMoveToInterview,
+					},
+					{
+						label: "قائمة الإنتظار",
+						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenWaitlist,
+					},
+					{
+						label: "قائمة الرفض",
+						icon: <IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenReject,
+					},
+				];
+			case "INTERVIEW":
+				return [
+					{
+						label: "إدراج في بانتظار الدفع",
+						icon: <IconCoin className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onMoveToAwaitingPayment,
+					},
+					{
+						label: "قائمة الإنتظار",
+						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenWaitlist,
+					},
+					{
+						label: "قائمة الرفض",
+						icon: <IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenReject,
+					},
+				];
+			case "AWAITING_PAYMENT":
+				return [
+					{
+						label: "اعتماد وقبول نهائي",
+						icon: <IconCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onAcceptDirect,
+					},
+					{
+						label: "قائمة الإنتظار",
+						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenWaitlist,
+					},
+					{
+						label: "قائمة الرفض",
+						icon: <IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenReject,
+					},
+				];
+			case "REJECTED":
+				return [
+					{
+						label: "إعادة إلى الطابور",
+						icon: <IconClock className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onMoveToQueue,
+					},
+					{
+						label: "القائمة المختصرة",
+						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenShortlist,
+					},
+					{
+						label: "قائمة الإنتظار",
+						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenWaitlist,
+					},
+				];
+			case "DUPLICATE":
+				return [
+					{
+						label: "إعادة إلى الطابور",
+						icon: <IconClock className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onMoveToQueue,
+					},
+					{
+						label: "القائمة المختصرة",
+						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenShortlist,
+					},
+					{
+						label: "قائمة الرفض",
+						icon: <IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenReject,
+					},
+				];
+			default:
+				return [
+					{
+						label: "القائمة المختصرة",
+						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenShortlist,
+					},
+					{
+						label: "قائمة الإنتظار",
+						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenWaitlist,
+					},
+					{
+						label: "قائمة الرفض",
+						icon: <IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenReject,
+					},
+				];
+		}
 	};
 
 	return (
@@ -106,207 +269,165 @@ export function RequestHeaderActions({
 				<span className="font-mono text-[10.5px] text-zinc-400 font-semibold">
 					#{request.code}
 				</span>
-			</div>
 
-			{/* الأزرار والإجراءات */}
-			<div className="flex items-center gap-1.5 print:hidden">
-				{/* زر إضافة للقائمة مع تغطية شاملة لكافة مراحل وقوائم الطلب المنظومية */}
-				<DropdownMenu dir="rtl">
-					<DropdownMenuTrigger asChild>
-						<Button
-							size="sm"
-							className="h-7 gap-1 text-[11px] font-semibold bg-primary text-primary-foreground hover:bg-primary/90 shadow-2xs px-2.5 cursor-pointer [&_*]:pointer-events-none select-none transition-all"
-						>
-							<IconPlus className="size-3" />
-							<span>إضافة للقائمة</span>
-							<IconChevronDown className="size-2.5 opacity-80" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="w-56 text-xs z-[100]">
-						<DropdownMenuLabel className="text-[10px] text-muted-foreground font-semibold px-2 py-1">
-							نقل الطالب لمرحلة / قائمة:
-						</DropdownMenuLabel>
-
-						{/* 1. القائمة المختصرة */}
-						<DropdownMenuItem
-							onSelect={() => triggerSafeOpen(onOpenShortlist)}
-							className="gap-2 text-[11px] cursor-pointer"
-						>
-							<IconClipboardCheck className="size-3.5 text-blue-600" />
-							<span>تسجيل بالقائمة المختصرة</span>
-						</DropdownMenuItem>
-
-						{/* 2. إعادة جدولة موعد المقابلة */}
-						<DropdownMenuItem
-							onSelect={() => triggerSafeOpen(onOpenReschedule)}
-							className="gap-2 text-[11px] cursor-pointer"
-						>
-							<IconCalendarPlus className="size-3.5 text-purple-600" />
-							<span>إعادة جدولة موعد المقابلة</span>
-						</DropdownMenuItem>
-
-						<DropdownMenuItem
-							onSelect={() => triggerSafeOpen(onMoveToInterview)}
-							className="gap-2 text-[11px] cursor-pointer"
-						>
-							<IconActivity className="size-3.5 text-violet-600" />
-							<span>نقل إلى المقابلة الشخصية</span>
-						</DropdownMenuItem>
-
-						{/* 3. قائمة الانتظار */}
-						<DropdownMenuItem
-							onSelect={() => triggerSafeOpen(onOpenWaitlist)}
-							className="gap-2 text-[11px] cursor-pointer"
-						>
-							<IconHourglass className="size-3.5 text-orange-600" />
-							<span>إدراج في قائمة الانتظار</span>
-						</DropdownMenuItem>
-
-						{/* 5. بانتظار الدفع */}
-						<DropdownMenuItem
-							onSelect={() => triggerSafeOpen(onMoveToAwaitingPayment)}
-							className="gap-2 text-[11px] cursor-pointer"
-						>
-							<IconCoin className="size-3.5 text-indigo-600" />
-							<span>إدراج في بانتظار الدفع</span>
-						</DropdownMenuItem>
-
-						{/* 6. قبول واعتماد نهائي */}
-						{onAcceptDirect && (
-							<DropdownMenuItem
-								onSelect={() => triggerSafeOpen(onAcceptDirect)}
-								className="gap-2 text-[11px] cursor-pointer font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50/50 dark:bg-emerald-950/20"
-							>
-								<IconCheck className="size-3.5 text-emerald-600" />
-								<span>قبول واعتماد الطالب نهائياً</span>
-							</DropdownMenuItem>
-						)}
-
-						<DropdownMenuSeparator />
-
-						{/* 7. إحالة لجهة أخرى / أخصائي */}
-						{onOpenRefer && (
-							<DropdownMenuItem
-								onSelect={() => triggerSafeOpen(onOpenRefer)}
-								className="gap-2 text-[11px] cursor-pointer text-purple-700 dark:text-purple-300"
-							>
-								<IconArrowsExchange className="size-3.5 text-purple-600" />
-								<span>إحالة لجهة أو أخصائي آخر</span>
-							</DropdownMenuItem>
-						)}
-
-						{/* 8. نقل إلى الطابور */}
-						<DropdownMenuItem
-							onSelect={() => triggerSafeOpen(onMoveToQueue)}
-							className="gap-2 text-[11px] cursor-pointer"
-						>
-							<IconClock className="size-3.5 text-zinc-500" />
-							<span>إعادة إلى الطابور</span>
-						</DropdownMenuItem>
-
-						{/* 9. تعليم كطلب مكرر */}
-						<DropdownMenuItem
-							onSelect={() => triggerSafeOpen(onMarkDuplicate)}
-							className="gap-2 text-[11px] cursor-pointer text-amber-800 dark:text-amber-400"
-						>
-							<IconCopy className="size-3.5 text-amber-600" />
-							<span>تعليم كطلب مكرر</span>
-						</DropdownMenuItem>
-
-						<DropdownMenuSeparator />
-
-						{/* 10. إرسال رفض */}
-						<DropdownMenuItem
-							onSelect={() => triggerSafeOpen(onOpenReject)}
-							className="gap-2 text-[11px] text-destructive focus:text-destructive cursor-pointer font-semibold"
-						>
-							<IconX className="size-3.5" />
-							<span>إرسال رفض للطلب</span>
-						</DropdownMenuItem>
-
-						{/* 11. حذف طلب الطالب */}
-						{onOpenDelete && (
-							<DropdownMenuItem
-								onSelect={() => triggerSafeOpen(onOpenDelete)}
-								onClick={() => triggerSafeOpen(onOpenDelete)}
-								className="gap-2 text-[11px] text-destructive focus:text-destructive cursor-pointer font-semibold"
-							>
-								<IconTrash className="size-3.5" />
-								<span>حذف طلب الطالب</span>
-							</DropdownMenuItem>
-						)}
-					</DropdownMenuContent>
-				</DropdownMenu>
-
-				{/* زر تعديل بيانات الطلب */}
-				{onOpenEdit && (
-					<button
-						type="button"
-						onClick={onOpenEdit}
-						className="size-7 rounded flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-						title="تعديل بيانات الطلب"
-					>
-						<IconEdit className="size-3.5" />
-					</button>
-				)}
-
-				{/* زر المشاركة */}
-				<button
-					type="button"
-					onClick={handleShare}
-					className="size-7 rounded flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-					title="مشاركة الرابط"
-				>
-					<IconShare className="size-3.5" />
-				</button>
-
-				{/* زر الطباعة المباشر */}
-				<button
-					type="button"
-					onClick={handlePrint}
-					className="size-7 rounded flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-					title="طباعة استمارة تفاصيل الطلب"
-				>
-					<IconPrinter className="size-3.5" />
-				</button>
-
-				{/* القائمة العلوية السريعة (...) */}
+				{/* زر الثلاثة نقط بجانب كود الطلب مباشرة */}
 				<DropdownMenu dir="rtl">
 					<DropdownMenuTrigger asChild>
 						<button
 							type="button"
-							className="size-7 rounded flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+							className="size-5.5 rounded flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer shrink-0"
 							title="خيارات إضافية"
 						>
 							<IconDots className="size-3.5" />
 						</button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="w-44">
-						<DropdownMenuItem onClick={() => triggerSafeOpen(onOpenReschedule)} className="gap-2 text-[11px] cursor-pointer">
-							<IconCalendarPlus className="size-3.5 text-zinc-600" />
-							<span>إعادة جدولة موعد المقابلة</span>
+					<DropdownMenuContent align="start" className="w-36 p-1 text-xs z-[100] bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg rounded-xl">
+						{/* 1. تعديل */}
+						{onOpenEdit && (
+							<DropdownMenuItem
+								onClick={() => triggerSafeOpen(onOpenEdit)}
+								className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+							>
+								<IconCalendarPlus className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+								<span>تعديل</span>
+							</DropdownMenuItem>
+						)}
+
+						{/* 2. إعادة جدولة */}
+						<DropdownMenuItem
+							onClick={() => triggerSafeOpen(onOpenReschedule)}
+							className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+						>
+							<IconCalendarPlus className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+							<span>إعادة جدولة</span>
 						</DropdownMenuItem>
-						<DropdownMenuItem onClick={handlePrint} className="gap-2 text-[11px] cursor-pointer">
-							<IconPrinter className="size-3.5 text-zinc-600" />
+
+						{/* 3. حذف التسجيل */}
+						{onOpenDelete && (
+							<DropdownMenuItem
+								onSelect={() => triggerSafeOpen(onOpenDelete)}
+								onClick={() => triggerSafeOpen(onOpenDelete)}
+								className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+							>
+								<IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+								<span>حذف التسجيل</span>
+							</DropdownMenuItem>
+						)}
+
+						{/* 4. طباعة */}
+						<DropdownMenuItem
+							onClick={handlePrint}
+							className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+						>
+							<IconPrinter className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
 							<span>طباعة</span>
 						</DropdownMenuItem>
-						<DropdownMenuSeparator />
+
+						{/* 5. مشاركة */}
 						<DropdownMenuItem
-							onSelect={() => triggerSafeOpen(onOpenDelete)}
-							onClick={() => triggerSafeOpen(onOpenDelete)}
-							className="gap-2 text-[11px] text-destructive focus:text-destructive cursor-pointer font-medium"
+							onClick={handleShare}
+							className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
 						>
-							<IconTrash className="size-3.5" />
-							<span>حذف طلب الطالب</span>
+							<IconShare className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+							<span>مشاركة</span>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
+			</div>
 
-				{/* زر الإغلاق */}
+			{/* الأزرار والإجراءات */}
+			<div className="flex items-center gap-1.5 print:hidden">
+				{/* 1. زر إضافة للقائمة (أو زر تم الاعتماد النهائي إذا كان الطالب معتمداً رسمياً) */}
+				{request.status === "ACCEPTED" ? (
+					<Button
+						disabled
+						size="sm"
+						className="h-7.5 gap-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 shadow-none px-3 rounded-lg cursor-not-allowed select-none opacity-90"
+						title="تم اعتماد الطالب رسمياً في السجلات الأكاديمية"
+					>
+						<IconCheck className="size-3.5 stroke-[2.5]" />
+						<span>تم الاعتماد النهائي</span>
+					</Button>
+				) : (
+					<DropdownMenu dir="rtl">
+						<DropdownMenuTrigger asChild>
+							<Button
+								size="sm"
+								className="h-7.5 gap-1.5 text-xs font-semibold bg-[#4f6ae0] hover:bg-[#435bc4] text-white shadow-xs px-3 rounded-lg cursor-pointer [&_*]:pointer-events-none select-none transition-all border-none"
+							>
+								<IconPlus className="size-3.5 stroke-[2.5]" />
+								<span>إضافة لقائمة</span>
+								<IconChevronDown className="size-3 opacity-90" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="w-52 p-1 text-xs z-[100] bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg rounded-xl">
+							{getDynamicListItems().map((item, idx) => (
+								<DropdownMenuItem
+									key={`${item.label}-${idx}`}
+									onSelect={() => triggerSafeOpen(item.action)}
+									disabled={!item.action}
+									className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus:bg-zinc-100 dark:focus:bg-zinc-800 rounded-lg cursor-pointer transition-colors"
+								>
+									{item.icon}
+									<span>{item.label}</span>
+								</DropdownMenuItem>
+							))}
+						</DropdownMenuContent>
+					</DropdownMenu>
+				)}
+
+				{/* 2. زر نسخ رابط الطلب */}
+				<button
+					type="button"
+					onClick={handleShare}
+					className="size-7 rounded-md flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+					title="نسخ رابط الطلب"
+				>
+					<IconLink className="size-4" />
+					<span className="sr-only">نسخ رابط الطلب</span>
+				</button>
+
+				{/* 3. زر نسخ معرّف/كود الطلب */}
+				<button
+					type="button"
+					onClick={handleCopyId}
+					className="size-7 rounded-md flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+					title="نسخ معرّف الطلب"
+				>
+					<IconCopyId className="size-4" />
+					<span className="sr-only">نسخ معرّف الطلب</span>
+				</button>
+
+				{/* 4. فاصل رأسي */}
+				<div className="h-4.5 w-px bg-zinc-200 dark:bg-zinc-700 mx-0.5" />
+
+				{/* 5. زر التمدد (يكبر العرض 5% زيادة فقط) */}
+				{onToggleExpand && (
+					<button
+						type="button"
+						onClick={onToggleExpand}
+						className={cn(
+							"size-7 rounded-md flex items-center justify-center transition-colors cursor-pointer",
+							isExpanded
+								? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
+								: "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+						)}
+						title={isExpanded ? "استعادة العرض الافتراضي (-5%)" : "توسيع العرض (+5%)"}
+					>
+						{isExpanded ? (
+							<IconArrowsDiagonalMinimize className="size-4" />
+						) : (
+							<IconArrowsDiagonal className="size-4" />
+						)}
+						<span className="sr-only">تمدد العرض</span>
+					</button>
+				)}
+
+				{/* 6. زر الإغلاق */}
 				<button
 					type="button"
 					onClick={onClose}
-					className="size-7 rounded flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+					className="size-7 rounded-md flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
 					title="إغلاق"
 				>
 					<IconX className="size-4" />

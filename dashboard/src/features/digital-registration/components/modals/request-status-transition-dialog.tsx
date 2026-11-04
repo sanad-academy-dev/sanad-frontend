@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { IconArrowRight, IconCheck, IconInfoCircle } from "@tabler/icons-react";
+import { IconAlertTriangle, IconArrowRight, IconCheck, IconInfoCircle } from "@tabler/icons-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -69,6 +69,15 @@ export function RequestStatusTransitionDialog({ request, target, open, onOpenCha
 				</div>
 				<div className="p-4 space-y-3 flex-1">
 					<div className="rounded-lg border border-muted bg-muted/40 p-3 flex gap-2 text-xs leading-5"><IconInfoCircle className="size-4 shrink-0 text-primary mt-0.5" /><p>{config.description}</p></div>
+					{target === "QUEUE" && Boolean(request.assessmentAppointment && request.assessmentAppointment.status !== "CANCELLED") && (
+						<div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-950/30 p-2.5 flex items-start gap-2 text-xs text-amber-800 dark:text-amber-300">
+							<IconAlertTriangle className="size-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+							<div className="space-y-0.5 leading-snug">
+								<span className="font-bold">تنبيه الموعد:</span>
+								<span> سيتم إلغاء موعد المقابلة المرتبط وتفريغ وقت الأخصائي والقاعة تلقائياً فور النقل للطابور.</span>
+							</div>
+						</div>
+					)}
 					<div className="space-y-1.5"><label className="text-[11px] font-bold">ملاحظة داخلية (اختيارية)</label><Textarea value={note} onChange={(event) => setNote(event.target.value)} className="min-h-24 text-xs resize-none" placeholder="سبب النقل أو أي معلومة لفريق العمل..." /></div>
 				</div>
 				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-end gap-2 shrink-0">
