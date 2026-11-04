@@ -35,7 +35,6 @@ export function CampaignDetailsToolbar({
 	onOpenAssistant,
 	onToggleStats,
 	onOpenSettings,
-	onOpenShare,
 }: {
 	searchValue?: string;
 	onSearchChange?: (val: string) => void;
@@ -47,7 +46,6 @@ export function CampaignDetailsToolbar({
 	onOpenAssistant?: () => void;
 	onToggleStats?: () => void;
 	onOpenSettings?: () => void;
-	onOpenShare?: () => void;
 }) {
 	const handleCopyPublicLink = () => {
 		const publicUrl =
@@ -272,7 +270,7 @@ export function CampaignDetailsToolbar({
 					variant="outline"
 					size="sm"
 					className="h-7.5 px-2.5 rounded-md border-border/80 bg-background hover:bg-muted/60 text-foreground text-[11px] font-medium flex items-center gap-1 shadow-2xs transition-colors cursor-pointer whitespace-nowrap"
-					onClick={onOpenShare || handleCopyPublicLink}
+					onClick={handleCopyPublicLink}
 					title="مشاركة رابط التسجيل المباشر"
 				>
 					<IconShare className="size-3 text-muted-foreground" />

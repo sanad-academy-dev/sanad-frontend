@@ -66,7 +66,6 @@ const collisionDetection: CollisionDetection = (args) => {
 const CAMPAIGN_COLUMNS: AppointmentColumn[] = [
 	{ id: "queue" as AppointmentColumnId, name: "طابور", count: 0, icon: <IconClock className="size-3.5" />, accent: "blue" },
 	{ id: "shortlist" as AppointmentColumnId, name: "قائمة مختصرة", count: 0, icon: <IconClipboardCheck className="size-3.5" />, accent: "neutral" },
-	{ id: "waitlist" as AppointmentColumnId, name: "قائمة الانتظار", count: 0, icon: <IconHourglass className="size-3.5" />, accent: "purple" },
 	{ id: "interview" as AppointmentColumnId, name: "المقابلة الشخصية", count: 0, icon: <IconActivity className="size-3.5" />, accent: "amber" },
 	{ id: "awaiting-payment" as AppointmentColumnId, name: "بانتظار الدفع", count: 0, icon: <IconHourglass className="size-3.5" />, accent: "purple" },
 	{ id: "accepted" as AppointmentColumnId, name: "مقبول", count: 0, icon: <IconCheck className="size-3.5" />, accent: "emerald" },
@@ -84,7 +83,6 @@ const COLUMN_STATUS_MAP: Record<
 > = {
 	queue: { status: "QUEUE", label: "طابور", variant: "warning" },
 	shortlist: { status: "SHORTLIST", label: "قائمة مختصرة", variant: "info" },
-	waitlist: { status: "WAITLIST", label: "قائمة الانتظار", variant: "warning" },
 	interview: { status: "INTERVIEW", label: "المقابلة الشخصية", variant: "info" },
 	accepted: { status: "ACCEPTED", label: "مقبول", variant: "default" },
 	"awaiting-payment": { status: "AWAITING_PAYMENT", label: "بانتظار الدفع", variant: "warning" },
@@ -93,6 +91,7 @@ const COLUMN_STATUS_MAP: Record<
 	duplicate: { status: "DUPLICATE", label: "مكرر", variant: "destructive" },
 	// Backward compatibility with legacy IDs
 	evaluation: { status: "INTERVIEW", label: "المقابلة الشخصية", variant: "info" },
+	waitlist: { status: "AWAITING_PAYMENT", label: "بانتظار الدفع", variant: "warning" },
 	"check-in": { status: "SHORTLIST", label: "قائمة مختصرة", variant: "info" },
 	"in-service": { status: "INTERVIEW", label: "المقابلة الشخصية", variant: "info" },
 	done: { status: "ACCEPTED", label: "مقبول", variant: "default" },
@@ -116,7 +115,6 @@ function getStageProgress(column: string): { current: number; total: number; per
 	let current = 1;
 	const col = (column || "").toLowerCase();
 	if (col === "shortlist" || col === "قائمة مختصرة") current = 2;
-	else if (col === "waitlist" || col === "قائمة الانتظار") current = 2;
 	else if (col === "interview" || col === "المقابلة الشخصية" || col === "المقابله الشخصيه") current = 3;
 	else if (col === "awaiting-payment" || col === "awaiting_payment" || col === "بانتظار الدفع") current = 4;
 	else if (col === "accepted" || col === "مقبول") current = 5;
@@ -220,7 +218,6 @@ export function CampaignRequestsKanban({
 		const statusToColumnMap: Record<string, string> = {
 			QUEUE: "queue",
 			SHORTLIST: "shortlist",
-			WAITLIST: "waitlist",
 			INTERVIEW: "interview",
 			ACCEPTED: "accepted",
 			AWAITING_PAYMENT: "awaiting-payment",
@@ -229,6 +226,8 @@ export function CampaignRequestsKanban({
 			// Backward compatibility fallbacks
 			IN_EVALUATION: "interview",
 			EVALUATION: "interview",
+			// قائمة الانتظار تُعرض تحت الطابور، وليست ضمن انتظار الدفع.
+			WAITLIST: "queue",
 			REVIEW: "shortlist",
 			AWAITING_REPLY: "shortlist",
 		};
@@ -332,7 +331,7 @@ export function CampaignRequestsKanban({
 			const hasActiveAppointment = Boolean(
 				oldItem?.assessmentAppointment && oldItem.assessmentAppointment.status !== "CANCELLED",
 			);
-			const isBackwardToQueueOrShortlist = ["queue", "shortlist", "waitlist"].includes(targetColumn);
+			const isBackwardToQueueOrShortlist = ["queue", "shortlist"].includes(targetColumn);
 			const wasInInterviewOrLater = ["interview", "awaiting-payment", "accepted"].includes(prevCol);
 
 			if (hasActiveAppointment && isBackwardToQueueOrShortlist && wasInInterviewOrLater && oldItem) {
