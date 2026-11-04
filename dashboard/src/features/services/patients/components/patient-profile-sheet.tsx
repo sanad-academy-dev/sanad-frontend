@@ -11,6 +11,7 @@ import {
 	IconDots,
 	IconEdit,
 	IconPhone,
+	IconSchool,
 	IconTrash,
 	IconUser,
 	IconWeight,
@@ -358,12 +359,12 @@ export function PatientProfileSheet({
 										</span>
 									</div>
 
-									{/* age group */}
+									{/* academic stage */}
 									{patient && (
 										<div className="flex items-center gap-1.5">
-											<IconCake className="size-4 text-muted-foreground" />
+											<IconSchool className="size-4 text-muted-foreground" />
 											<span className="text-sm font-semibold text-foreground">
-												{getStudentAgeGroup(patient)}
+												{patient.academicStage || getStudentAgeGroup(patient)}
 											</span>
 										</div>
 									)}

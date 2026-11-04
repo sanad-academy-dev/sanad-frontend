@@ -64,7 +64,6 @@ import { AssignStudentDialog } from "@/features/services/classrooms/components/a
 import { useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
 import {
 	getStudentAgeGroup,
-	isStudentMatchingClassroomAge,
 } from "@/features/services/classrooms/utils/age-group-utils";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { backendFetch } from "@/lib/backend-fetch";
@@ -143,6 +142,7 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 				age: s.age ?? full?.age ?? null,
 				birthDate: s.birthDate || full?.birthDate || null,
 				ageGroup: s.ageGroup || (full as { ageGroup?: string | null } | undefined)?.ageGroup || null,
+				academicStage: s.academicStage || full?.academicStage || null,
 				guardianName:
 					s.guardianName || full?.owner?.name || full?.emergencyContactName || null,
 				guardianPhone:
@@ -160,13 +160,15 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 			};
 		});
 
-		// صفحة الطلاب في تفاصيل الفصل تعرض فقط الطلاب المتوافقين مع الفئة العمرية للفصل
-		if (!classroom.ageGroup || classroom.ageGroup === "جميع الأعمار") {
-			return mapped;
-		}
-
-		return mapped.filter((s) => isStudentMatchingClassroomAge(s, classroom.ageGroup));
-	}, [rawStudents, patientsMap, classroom.ageGroup]);
+		// صفحة الطلاب في تفاصيل الفصل تعرض الطلاب المسجلين مع مطابقة المرحلة الدراسية
+		const classroomStage = classroom.academicStage || classroom.classification;
+		if (!classroomStage) return mapped;
+		const normalizeStage = (value?: string | null) => value?.trim().toLocaleLowerCase() || null;
+		return mapped.filter((student) => {
+			if (!student.academicStage) return true;
+			return normalizeStage(student.academicStage) === normalizeStage(classroomStage);
+		});
+	}, [rawStudents, patientsMap, classroom.academicStage, classroom.classification]);
 
 	// استدعاء سجلات حضور ومناوبات الطلاب لليوم الحالي تحديداً
 	const todayDate = useMemo(() => new Date(), []);
@@ -559,7 +561,7 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 			"ولي الأمر",
 			"رقم الهاتف",
 			"الجنس",
-			"الفئة العمرية",
+			"المرحلة الدراسية",
 			"المناوبة",
 			"حالة الحضور",
 			"الحالة",
@@ -570,7 +572,7 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 			s.guardianName ?? "غير محدد",
 			s.guardianPhone ?? "",
 			s.gender === "FEMALE" ? "أنثى" : "ذكر",
-			getStudentAgeGroup(s),
+			s.academicStage || getStudentAgeGroup(s),
 			studentShiftsMap.get(s.id)?.label || "عطلة",
 			studentAttendanceMap.get(s.id)?.label || "لم يسجل",
 			s.active !== false ? "نشط" : "غير نشط",
@@ -643,12 +645,14 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 		}
 	};
 
-	// الفصول المتاحة للنقل إليها (المطابقة للفئة العمرية للطالب المستهدف)
+	// الفصول المتاحة للنقل إليها (المطابقة للمرحلة الدراسية للطالب المستهدف)
 	const availableTransferClassrooms = useMemo(() => {
 		return classrooms.filter((c) => {
 			if (c.id === classroom.id || !c.active) return false;
 			if (!transferStudent) return true;
-			return isStudentMatchingClassroomAge(transferStudent, c.ageGroup);
+			const targetStage = transferStudent.academicStage?.trim().toLocaleLowerCase() || null;
+			const classStage = (c.academicStage || c.classification)?.trim().toLocaleLowerCase() || null;
+			return targetStage === classStage;
 		});
 	}, [classrooms, classroom.id, transferStudent]);
 
@@ -769,15 +773,16 @@ export function ClassroomStudentsTab({ classroom, onRefetch }: ClassroomStudents
 				},
 			},
 			{
-				id: "ageGroup",
-				header: "الفئة العمرية",
-				size: 110,
-				minSize: 95,
+				id: "academicStage",
+				header: "المرحلة الدراسية",
+				size: 130,
+				minSize: 110,
 				cell: ({ row }) => {
-					const group = getStudentAgeGroup(row.original);
+					const stage = row.original.academicStage;
+					if (!stage) return <span className="text-[11px] text-muted-foreground">—</span>;
 					return (
-						<span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 w-fit">
-							{group}
+						<span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 w-fit">
+							{stage}
 						</span>
 					);
 				},

@@ -1,8 +1,9 @@
 import {
 	IconArrowsDiagonal,
+	IconCheck,
 	IconChevronDown,
 	IconChevronLeft,
-	IconFilter,
+	IconSchool,
 	IconSearch,
 	IconX,
 } from "@tabler/icons-react";
@@ -18,13 +19,9 @@ import {
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { AssignStudentConfirmDialog } from "@/features/services/classrooms/components/assign-student-confirm-dialog";
-import {
-	getStudentAgeGroup,
-	isStudentMatchingClassroomAge,
-} from "@/features/services/classrooms/utils/age-group-utils";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
-import { useAssignTrackStudents, useTracks } from "../hooks/use-tracks";
 import { cn } from "@/lib/utils";
+import { useAssignTrackStudents, useTrack, useTracks } from "../hooks/use-tracks";
 import type { TrackRow } from "./tracks-view";
 
 export interface AssignTrackStudentsSheetProps {
@@ -59,13 +56,14 @@ export function AssignTrackStudentsSheet({
 	onSaveStudents,
 }: AssignTrackStudentsSheetProps) {
 	const { patients, isLoading: isPatientsLoading } = usePatients();
-	const { tracks } = useTracks();
+	const { tracks } = useTracks(undefined, 1, 100, true, open);
+	const { track: loadedTrack } = useTrack(track?.id, open);
 	const { mutate: assignStudents, isPending } = useAssignTrackStudents();
 
 	const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
 	const [search, setSearch] = useState("");
 	const [filter, setFilter] = useState<FilterKey>("all");
-	const [matchAgeOnly, setMatchAgeOnly] = useState(true);
+	const [matchStageOnly, setMatchStageOnly] = useState(true);
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
@@ -94,16 +92,16 @@ export function AssignTrackStudentsSheet({
 			if (initialSelectedStudentIds !== undefined) {
 				setSelectedStudentIds(initialSelectedStudentIds);
 			} else if (track) {
-				setSelectedStudentIds(track.studentIds || []);
+				setSelectedStudentIds(loadedTrack?.studentIds || track.studentIds || []);
 			} else {
 				setSelectedStudentIds([]);
 			}
 			setSearch("");
 			setFilter("all");
-			setMatchAgeOnly(Boolean(track?.ageGroup && track.ageGroup !== "جميع الأعمار"));
+			setMatchStageOnly(Boolean(track?.academicStage));
 			setConfirmModalOpen(false);
 		}
-	}, [open, track, initialSelectedStudentIds]);
+	}, [open, track, loadedTrack?.studentIds, initialSelectedStudentIds]);
 
 	// خريطة لتحديد المسارات التي ينتمي إليها كل طالب
 	const studentTrackMap = useMemo(() => {
@@ -129,7 +127,7 @@ export function AssignTrackStudentsSheet({
 		return map;
 	}, [tracks, track]);
 
-	// تصفية الطلاب بناءً على الفئة العمرية والبحث والفلتر
+	// تصفية الطلاب بناءً على المرحلة الدراسية والبحث والفلتر
 	const filteredStudents = useMemo(() => {
 		const q = search.trim().toLowerCase();
 
@@ -149,11 +147,13 @@ export function AssignTrackStudentsSheet({
 			const isAssignedHere = selectedStudentIds.includes(p.id);
 			const hasNoTracks = !assignedInfo;
 
-			// التحقق من توافق الفئة العمرية مع المسار التدريبي
-			if (matchAgeOnly && track?.ageGroup && track.ageGroup !== "جميع الأعمار") {
-				const matchesAge = isStudentMatchingClassroomAge(p, track.ageGroup);
-				// نسمح للطالب المسجل بالفعل في هذا المسار بالظهور دائماً، بينما الآخرين يجب مطابقتهم للفئة العمرية
-				if (!matchesAge && !isAssignedHere) {
+			// التحقق من توافق المرحلة الدراسية مع المسار التدريبي
+			const trackStage = track?.academicStage;
+			if (matchStageOnly && trackStage) {
+				const normalizeStage = (value?: string | null) => value?.trim().toLowerCase() || "";
+				const matchesStage = normalizeStage(p.academicStage) === normalizeStage(trackStage);
+				// نسمح للطالب المسجل بالفعل في هذا المسار بالظهور دائماً، بينما الآخرين يجب مطابقتهم للمرحلة الدراسية
+				if (!matchesStage && !isAssignedHere) {
 					return false;
 				}
 			}
@@ -164,7 +164,7 @@ export function AssignTrackStudentsSheet({
 
 			return true;
 		});
-	}, [patients, search, filter, matchAgeOnly, studentTrackMap, selectedStudentIds, track]);
+	}, [patients, search, filter, matchStageOnly, studentTrackMap, selectedStudentIds, track]);
 
 	const allChecked =
 		filteredStudents.length > 0 &&
@@ -268,9 +268,10 @@ export function AssignTrackStudentsSheet({
 									· {track.name}
 								</span>
 							)}
-							{track?.ageGroup && (
-								<span className="mr-1 text-[9px] font-semibold bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
-									{track.ageGroup}
+							{track?.academicStage && (
+								<span className="mr-1 text-[9px] font-semibold bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 px-1.5 py-0.5 rounded-full inline-flex items-center gap-1">
+									<IconSchool className="size-2.5" />
+									<span>{track.academicStage}</span>
 								</span>
 							)}
 						</div>
@@ -358,13 +359,13 @@ export function AssignTrackStudentsSheet({
 							</span>
 						</div>
 
-						{/* مفتاح تبديل مطابقة الفئة العمرية إذا كان المسار محدداً له فئة عمرية */}
-						{track?.ageGroup && (
+						{/* مفتاح تبديل مطابقة المرحلة الدراسية إذا كان المسار محدداً له مرحلة دراسية */}
+						{track?.academicStage && (
 							<div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-								<span>مطابقة الفئة العمرية ({track.ageGroup})</span>
+								<span>مطابقة المرحلة الدراسية ({track.academicStage})</span>
 								<Switch
-									checked={matchAgeOnly}
-									onCheckedChange={setMatchAgeOnly}
+									checked={matchStageOnly}
+									onCheckedChange={setMatchStageOnly}
 									className="scale-75"
 								/>
 							</div>
@@ -383,17 +384,17 @@ export function AssignTrackStudentsSheet({
 						) : filteredStudents.length === 0 ? (
 							<div className="py-12 text-center text-xs text-muted-foreground space-y-1">
 								<p>
-									{matchAgeOnly && track?.ageGroup
-										? `لا يوجد طلاب مطابقون للفئة العمرية لهذا المسار (${track.ageGroup})`
+									{matchStageOnly && track?.academicStage
+										? `لا يوجد طلاب مطابقون للمرحلة الدراسية لهذا المسار (${track.academicStage})`
 										: "لا يوجد طلاب مطابقون للبحث"}
 								</p>
-								{matchAgeOnly && track?.ageGroup && (
+								{matchStageOnly && track?.academicStage && (
 									<button
 										type="button"
-										onClick={() => setMatchAgeOnly(false)}
+										onClick={() => setMatchStageOnly(false)}
 										className="text-primary hover:underline font-semibold cursor-pointer text-[11px]"
 									>
-										إلغاء قفل الفئة العمرية وعرض كل الطلاب
+										إلغاء قفل المرحلة وعرض كل الطلاب
 									</button>
 								)}
 							</div>
@@ -409,10 +410,17 @@ export function AssignTrackStudentsSheet({
 								const avatar = (p as { avatar?: string | null }).avatar;
 
 								return (
-									<button
+									<div
 										key={p.id}
-										type="button"
+										role="button"
+										tabIndex={0}
 										onClick={() => toggleStudent(p.id)}
+										onKeyDown={(e) => {
+											if (e.key === "Enter" || e.key === " ") {
+												e.preventDefault();
+												toggleStudent(p.id);
+											}
+										}}
 										className={cn(
 											"flex h-[48px] w-full cursor-pointer items-center justify-between rounded-[4px] px-2 text-right transition-colors hover:bg-[#F9FAFB] dark:hover:bg-muted/40",
 											isSelected && "bg-[#F4F7FF] dark:bg-muted/20",
@@ -420,12 +428,16 @@ export function AssignTrackStudentsSheet({
 									>
 										{/* الجانب الأيمن: مربع الاختيار + الأفاتار + الاسم والبيانات */}
 										<div className="flex items-center gap-2 min-w-0 flex-1">
-											<Checkbox
-												checked={isSelected}
-												aria-hidden
-												tabIndex={-1}
-												className="pointer-events-none size-4 rounded-[4px] border-[1.5px] border-[#E5E5E5] dark:border-border shrink-0"
-											/>
+											<div
+												className={cn(
+													"flex size-4 shrink-0 items-center justify-center rounded-[4px] border-[1.5px] transition-colors",
+													isSelected
+														? "border-primary bg-primary text-primary-foreground"
+														: "border-[#E5E5E5] bg-transparent dark:border-border",
+												)}
+											>
+												{isSelected && <IconCheck className="size-3" />}
+											</div>
 											<span className="flex size-[28px] shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white bg-emerald-500 overflow-hidden shadow-2xs">
 												{avatar ? (
 													<img
@@ -450,8 +462,8 @@ export function AssignTrackStudentsSheet({
 													{guardian ? `ولي الأمر: ${guardian}` : "بدون ولي أمر مسجل"}
 													{p.gender === "FEMALE" ? " • أنثى" : " • ذكر"}
 													{" • "}
-													<span className="font-semibold text-foreground/90">
-														{getStudentAgeGroup(p)}
+													<span className="font-semibold text-purple-700 dark:text-purple-300">
+														{p.academicStage ? `المرحلة: ${p.academicStage}` : "بدون مرحلة دراسية"}
 													</span>
 												</span>
 											</div>
@@ -473,7 +485,7 @@ export function AssignTrackStudentsSheet({
 												</span>
 											)}
 										</div>
-									</button>
+									</div>
 								);
 							})
 						)}
@@ -517,4 +529,3 @@ export function AssignTrackStudentsSheet({
 		</>
 	);
 }
-

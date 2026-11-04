@@ -75,7 +75,7 @@ export function PatientsTable() {
 	const [deletingPatient, setDeletingPatient] = useState<PatientResponse | null>(null);
 
 	// فلاتر جدول الطلاب
-	const [selectedAgeGroups, setSelectedAgeGroups] = useState<string[]>([]);
+	const [selectedAcademicStages, setSelectedAcademicStages] = useState<string[]>([]);
 	const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
 	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
 	const [selectedClassrooms, setSelectedClassrooms] = useState<string[]>([]);
@@ -192,15 +192,22 @@ export function PatientsTable() {
 				},
 			},
 			{
-				id: "ageGroup",
-				header: "الفئة العمرية",
-				size: 110,
-				minSize: 95,
+				id: "academicStage",
+				header: "المرحلة الدراسية",
+				size: 130,
+				minSize: 110,
 				cell: ({ row }) => {
-					const group = getStudentAgeGroup(row.original);
+					const stage = row.original.academicStage || row.original.ageGroup;
+					if (!stage) {
+						return (
+							<span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-muted/60 text-muted-foreground border border-border/50">
+								بدون مرحلة
+							</span>
+						);
+					}
 					return (
 						<span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 w-fit">
-							{group}
+							{stage}
 						</span>
 					);
 				},
@@ -575,9 +582,9 @@ export function PatientsTable() {
 			if (selectedGenders.length > 0) {
 				if (!p.gender || !selectedGenders.includes(p.gender)) return false;
 			}
-			if (selectedAgeGroups.length > 0) {
-				const grp = getStudentAgeGroup(p);
-				if (!selectedAgeGroups.includes(grp)) return false;
+			if (selectedAcademicStages.length > 0) {
+				const stage = (p.academicStage || p.ageGroup || "").trim();
+				if (!selectedAcademicStages.includes(stage)) return false;
 			}
 			if (selectedStatuses.length > 0) {
 				const isPendingOrSuspended = p.status === "SUSPENDED" || p.status === "PENDING";
@@ -608,14 +615,14 @@ export function PatientsTable() {
 	}, [
 		patients,
 		selectedGenders,
-		selectedAgeGroups,
+		selectedAcademicStages,
 		selectedStatuses,
 		selectedClassrooms,
 		selectedGuardianStatus,
 	]);
 
 	const clearAllFilters = useCallback(() => {
-		setSelectedAgeGroups([]);
+		setSelectedAcademicStages([]);
 		setSelectedGenders([]);
 		setSelectedStatuses([]);
 		setSelectedClassrooms([]);
@@ -628,17 +635,25 @@ export function PatientsTable() {
 			new Set(patients.map((p) => p.classroom?.trim()).filter(Boolean)),
 		).map((c) => ({ value: c as string, label: c as string }));
 
+		const stageSet = new Set<string>();
+		patients.forEach((p) => {
+			const s = (p.academicStage || p.ageGroup)?.trim();
+			if (s) stageSet.add(s);
+		});
+		const stageOptions = Array.from(stageSet).map((s) => ({ value: s, label: s }));
+
 		return [
 			{
-				key: "ageGroup",
-				label: "الفئة العمرية",
+				key: "academicStage",
+				label: "المرحلة الدراسية",
 				Icon: IconCalendarEvent,
-				options: AGE_GROUPS.map((g) => ({ value: g, label: g })),
-				selected: selectedAgeGroups,
+				options: stageOptions,
+				selected: selectedAcademicStages,
 				onToggle: (val) =>
-					setSelectedAgeGroups((prev) =>
+					setSelectedAcademicStages((prev) =>
 						prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val],
 					),
+				emptyLabel: "لا توجد مراحل مسجلة",
 			},
 			{
 				key: "gender",
@@ -688,7 +703,7 @@ export function PatientsTable() {
 		];
 	}, [
 		patients,
-		selectedAgeGroups,
+		selectedAcademicStages,
 		selectedGenders,
 		selectedStatuses,
 		selectedClassrooms,
@@ -712,13 +727,15 @@ export function PatientsTable() {
 			const studentName = p.name || "";
 			const code = p.code || "";
 			const classroom = p.classroom || "";
+			const stage = p.academicStage || "";
 			return (
 				studentName.toLowerCase().includes(search) ||
 				code.toLowerCase().includes(search) ||
 				guardianName.toLowerCase().includes(search) ||
 				guardianPhone.toLowerCase().includes(search) ||
 				guardianEmail.toLowerCase().includes(search) ||
-				classroom.toLowerCase().includes(search)
+				classroom.toLowerCase().includes(search) ||
+				stage.toLowerCase().includes(search)
 			);
 		},
 	});

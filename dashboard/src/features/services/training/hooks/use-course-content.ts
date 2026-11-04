@@ -34,18 +34,21 @@ export const useCourseContent = (courseId: string | null) => {
 	const addUnit = useMutation({
 		mutationFn: async ({
 			title,
+			courseId: overrideCourseId,
 			lessons,
 			levelId,
 			contentType,
 		}: {
 			title: string;
+			courseId?: string | null;
 			lessons?: RestoredLessonInput[];
 			levelId?: string | null;
 			contentType?: CourseContentType;
 		}) => {
-			if (!courseId) throw new Error("لم يتم إنشاء الدورة بعد");
+			const activeCourseId = overrideCourseId || courseId;
+			if (!activeCourseId) throw new Error("لم يتم إنشاء الدورة بعد");
 			const { data, error } = await api.training.units.post({
-				courseId,
+				courseId: activeCourseId,
 				title,
 				lessons,
 				levelId,
@@ -130,12 +133,15 @@ export const useCourseContent = (courseId: string | null) => {
 	});
 
 	return {
-		addUnit: (title: string) =>
-			toast.promise(addUnit.mutateAsync({ title }), {
+		addUnit: async (title: string, customCourseId?: string) => {
+			const promise = addUnit.mutateAsync({ title, courseId: customCourseId });
+			toast.promise(promise, {
 				loading: "جارٍ إضافة الوحدة...",
 				success: "تمت إضافة الوحدة",
 				error: (e: Error) => e.message,
-			}),
+			});
+			return await promise;
+		},
 		// إضافة بطاقة محتوى إلى مستوى محدّد بنوع محدّد (المعالج، الخطوة 2)
 		// lessons اختيارية — تُنشأ فصولًا مبدئية مع البطاقة (صفحة/اختبار) في نفس المعاملة
 		addContent: (input: {

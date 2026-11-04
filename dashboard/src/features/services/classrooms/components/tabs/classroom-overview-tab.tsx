@@ -1,6 +1,7 @@
 import {
 	IconBook,
 	IconCalendar,
+	IconCalendarEvent,
 	IconCalendarStats,
 	IconChartBar,
 	IconCheck,
@@ -8,6 +9,7 @@ import {
 	IconFileDescription,
 	IconGenderBigender,
 	IconLayoutGrid,
+	IconRoute,
 	IconSchool,
 	IconUser,
 	IconUserExclamation,
@@ -722,22 +724,22 @@ export function ClassroomOverviewTab({
 									</span>
 								</div>
 
-								{/* الفئة العمرية */}
+								{/* المرحلة الدراسية */}
 								<div className="flex items-center justify-between gap-2">
 									<div className="flex items-center gap-2 text-muted-foreground">
-										<IconGenderBigender className="size-4 shrink-0 text-muted-foreground/70" />
-										<span>الفئة العمرية</span>
+										<IconCalendarEvent className="size-4 shrink-0 text-muted-foreground/70" />
+										<span>المرحلة الدراسية</span>
 									</div>
 									<span className="font-semibold text-foreground text-start">
-										{classroom.ageGroup || "غير محددة"}
+										{classroom.academicStage || classroom.classification || "غير محددة"}
 									</span>
 								</div>
 
-								{/* تصنيف الفصل */}
+								{/* المسار */}
 								<div className="flex items-center justify-between gap-2">
 									<div className="flex items-center gap-2 text-muted-foreground">
-										<IconBook className="size-4 shrink-0 text-muted-foreground/70" />
-										<span>تصنيف الفصل</span>
+										<IconRoute className="size-4 shrink-0 text-muted-foreground/70" />
+										<span>المسار</span>
 									</div>
 									<span className="font-semibold text-foreground text-start">
 										{classroom.classification || "عام"}

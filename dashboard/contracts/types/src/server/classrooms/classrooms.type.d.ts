@@ -26,6 +26,7 @@ export interface ClassroomStudentInfo {
 	guardianPhone?: string | null;
 	guardianRelationship?: string | null;
 	preferredShift?: string | null;
+	academicStage?: string | null;
 }
 
 export interface ClassroomResponse {
@@ -34,6 +35,7 @@ export interface ClassroomResponse {
 	clinicId: string;
 	name: string;
 	ageGroup?: string | null;
+	academicStage?: string | null;
 	category?: string | null;
 	classification?: string | null;
 	learningMode: LearningMode;
@@ -58,6 +60,7 @@ export interface CreateClassroomInput {
 	name: string;
 	code?: string;
 	ageGroup?: string | null;
+	academicStage: string;
 	category: string;
 	classification?: string | null;
 	learningMode?: LearningMode;

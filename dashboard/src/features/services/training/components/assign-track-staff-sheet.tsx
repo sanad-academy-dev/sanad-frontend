@@ -1,5 +1,6 @@
 import {
 	IconArrowsDiagonal,
+	IconCheck,
 	IconChevronDown,
 	IconChevronLeft,
 	IconSearch,
@@ -63,7 +64,7 @@ export function AssignTrackStaffSheet({
 	allTracks,
 }: AssignTrackStaffSheetProps) {
 	const { staff, isLoading: isStaffLoading } = useStaff();
-	const { tracks: serverTracks } = useTracks();
+	const { tracks: serverTracks } = useTracks(undefined, 1, 100, false, open);
 	const { mutate: assignStaff, isPending } = useAssignTrackStaff();
 
 	const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
@@ -146,8 +147,7 @@ export function AssignTrackStaffSheet({
 	}, [staff, search, filter, staffTracksMap, selectedStaffIds]);
 
 	const allChecked =
-		filteredStaff.length > 0 &&
-		filteredStaff.every((s) => selectedStaffIds.includes(s.id));
+		filteredStaff.length > 0 && filteredStaff.every((s) => selectedStaffIds.includes(s.id));
 
 	const toggleAll = (checked: boolean) => {
 		setSelectedStaffIds((prev) => {
@@ -195,7 +195,10 @@ export function AssignTrackStaffSheet({
 	const displayTrackName = track?.name || trackName;
 
 	return (
-		<Sheet open={open} onOpenChange={onOpenChange}>
+		<Sheet
+			open={open}
+			onOpenChange={onOpenChange}
+		>
 			<SheetContent
 				side="left"
 				showCloseButton={false}
@@ -244,7 +247,10 @@ export function AssignTrackStaffSheet({
 				</div>
 
 				{/* شريط الفلتر والبحث */}
-				<div className="flex items-center gap-2 px-3 pt-3" dir="rtl">
+				<div
+					className="flex items-center gap-2 px-3 pt-3"
+					dir="rtl"
+				>
 					<div className="relative flex-1">
 						<IconSearch className="pointer-events-none absolute right-2.5 top-1/2 size-2.5 -translate-y-1/2 text-[#9B9B9D]" />
 						<input
@@ -265,7 +271,10 @@ export function AssignTrackStaffSheet({
 								<IconChevronDown className="size-2.5 text-[#9B9B9D]" />
 							</button>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="min-w-[140px] p-[3px]">
+						<DropdownMenuContent
+							align="end"
+							className="min-w-[140px] p-[3px]"
+						>
 							{(Object.keys(FILTER_LABELS) as FilterKey[]).map((key) => (
 								<DropdownMenuItem
 									key={key}
@@ -315,28 +324,37 @@ export function AssignTrackStaffSheet({
 							const hasNoTracks = assignedTracks.length === 0;
 
 							const roleName =
-								typeof s.role === "string"
-									? s.role
-									: (s.role?.name ?? "مدرب معتمد");
+								typeof s.role === "string" ? s.role : (s.role?.name ?? "مدرب معتمد");
 
 							return (
-								<button
+								<div
 									key={s.id}
-									type="button"
+									role="button"
+									tabIndex={0}
 									onClick={() => toggleStaff(s.id)}
+									onKeyDown={(e) => {
+										if (e.key === "Enter" || e.key === " ") {
+											e.preventDefault();
+											toggleStaff(s.id);
+										}
+									}}
 									className={cn(
-										"flex h-[44px] w-full cursor-pointer items-center justify-between rounded-[4px] px-2 text-right transition-colors hover:bg-[#F9FAFB] dark:hover:bg-muted/40",
+										"flex h-[44px] w-full cursor-pointer items-center justify-between rounded-[4px] px-2 text-right transition-colors hover:bg-[#F9FAFB] dark:hover:bg-muted/40 select-none",
 										isSelected && "bg-[#F4F7FF] dark:bg-muted/20",
 									)}
 								>
 									{/* الجانب الأيمن: مربع الاختيار + الأفاتار + الاسم والبيانات */}
 									<div className="flex items-center gap-2 min-w-0 flex-1">
-										<Checkbox
-											checked={isSelected}
-											aria-hidden
-											tabIndex={-1}
-											className="pointer-events-none size-4 rounded-[4px] border-[1.5px] border-[#E5E5E5] dark:border-border shrink-0"
-										/>
+										<div
+											className={cn(
+												"size-4 rounded-[4px] border-[1.5px] flex items-center justify-center transition-colors shrink-0",
+												isSelected
+													? "bg-primary border-primary text-primary-foreground"
+													: "border-[#E5E5E5] dark:border-border bg-white dark:bg-background",
+											)}
+										>
+											{isSelected && <IconCheck className="size-3 text-white stroke-[3]" />}
+										</div>
 										<span className="flex size-[25px] shrink-0 items-center justify-center rounded-full text-[9.5px] font-bold text-white bg-[#4F6AE0] overflow-hidden">
 											{s.avatar ? (
 												<img
@@ -380,7 +398,7 @@ export function AssignTrackStaffSheet({
 											</div>
 										)}
 									</div>
-								</button>
+								</div>
 							);
 						})
 					)}
@@ -417,4 +435,3 @@ export function AssignTrackStaffSheet({
 		</Sheet>
 	);
 }
-

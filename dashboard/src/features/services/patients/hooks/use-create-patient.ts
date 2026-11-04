@@ -26,6 +26,7 @@ export const useCreatePatient = () => {
 						? Number(data.age)
 						: undefined,
 				ageGroup: data.ageGroup?.trim() || undefined,
+				academicStage: data.academicStage?.trim() || undefined,
 				birthDate: data.birthDate,
 				nationalId: data.nationalId?.trim() || undefined,
 				classroom: data.classroom?.trim() || undefined,

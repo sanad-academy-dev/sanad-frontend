@@ -1,11 +1,5 @@
-import { useMemo, useState } from "react";
+import { IconDots, IconEdit, IconTrash, IconUserPlus } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import {
-	IconDots,
-	IconEdit,
-	IconTrash,
-	IconUserPlus,
-} from "@tabler/icons-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
 	getCoreRowModel,
@@ -14,9 +8,10 @@ import {
 	getSortedRowModel,
 	useReactTable,
 } from "@tanstack/react-table";
-import { TableDataView } from "@/components/common/table-data-view";
+import { useMemo, useState } from "react";
 import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
 import { StaffHoverCard } from "@/components/common/hover-cards";
+import { TableDataView } from "@/components/common/table-data-view";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -29,13 +24,17 @@ import {
 import { AssignStaffDialog } from "@/features/services/classrooms/components/assign-staff-dialog";
 import { ClassroomDialog } from "@/features/services/classrooms/components/classroom-dialog";
 import { ClassroomStatusSelect } from "@/features/services/classrooms/components/classroom-status-select";
-import { DeleteClassroomDialog } from "@/features/services/classrooms/components/delete-classroom-dialog";
 import { ClassroomsGrid } from "@/features/services/classrooms/components/classrooms-grid";
+import { DeleteClassroomDialog } from "@/features/services/classrooms/components/delete-classroom-dialog";
+import { LEARNING_MODES } from "@/features/services/classrooms/data/constants";
 import { useUpdateClassroom } from "@/features/services/classrooms/hooks/use-classroom-mutations";
 import { useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
-import { LEARNING_MODES } from "@/features/services/classrooms/data/constants";
-import type { ClassroomResponse, ClassroomTeacher, LearningMode } from "@/server/classrooms/classrooms.type";
 import { cn } from "@/lib/utils";
+import type {
+	ClassroomResponse,
+	ClassroomTeacher,
+	LearningMode,
+} from "@/server/classrooms/classrooms.type";
 
 function formatArabicDate(dateVal?: string | Date | null) {
 	if (!dateVal) return "—";
@@ -106,23 +105,6 @@ function CapacityCell({ enrolled, capacity }: { enrolled: number; capacity: numb
 				/>
 			</div>
 		</div>
-	);
-}
-
-function StatusBadge({ active }: { active: boolean }) {
-	if (active) {
-		return (
-			<span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900">
-				<span className="size-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
-				نشط
-			</span>
-		);
-	}
-	return (
-		<span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700">
-			<span className="size-1.5 rounded-full bg-slate-400" />
-			غير نشط
-		</span>
 	);
 }
 
@@ -217,15 +199,15 @@ export function ClassroomsTable({
 				),
 			},
 			{
-				accessorKey: "ageGroup",
-				header: "الفئة العمرية",
-				size: 110,
-				minSize: 95,
+				id: "academicStage",
+				header: "المرحلة الدراسية",
+				size: 130,
+				minSize: 110,
 				cell: ({ row }) => {
-					const val = row.original.ageGroup;
+					const val = row.original.academicStage || row.original.classification;
 					if (!val) return <span className="text-[11px] text-muted-foreground">—</span>;
 					return (
-						<span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-50 text-slate-700 border border-slate-200 dark:bg-slate-800/60 dark:text-slate-200 dark:border-slate-700">
+						<span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800">
 							{val}
 						</span>
 					);
@@ -243,7 +225,8 @@ export function ClassroomsTable({
 					const colorMap: Record<string, string> = {
 						بنين: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900",
 						بنات: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900",
-						مختلط: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-900",
+						مختلط:
+							"bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-900",
 					};
 
 					const badgeClass =
@@ -391,7 +374,7 @@ export function ClassroomsTable({
 									onSelect={() => setAssigningClassroom(row.original)}
 								>
 									<IconUserPlus className="size-3.5" />
-								    الموظفين
+									الموظفين
 								</DropdownMenuItem>
 								<DropdownMenuSeparator />
 								<DropdownMenuItem
@@ -407,12 +390,13 @@ export function ClassroomsTable({
 				),
 			},
 		],
-		[],
+		[updateClassroom, updatingClassroomId],
 	);
 
 	const table = useReactTable({
 		data: sortedClassrooms,
 		columns,
+		initialState: { pagination: { pageSize: 100 } },
 		getCoreRowModel: getCoreRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
@@ -469,8 +453,11 @@ export function ClassroomsTable({
 					}
 					emptyState={{
 						title: "لا توجد فصول دراسية حتى الآن",
-						description: "قم بإنشاء الفصول لتنظيم الطلاب ومجموعات التعلم وتعيين المعلمين والمشرفين",
-						action: onAddClassroom ? { label: "إضافة فصل جديد", onClick: onAddClassroom } : undefined,
+						description:
+							"قم بإنشاء الفصول لتنظيم الطلاب ومجموعات التعلم وتعيين المعلمين والمشرفين",
+						action: onAddClassroom
+							? { label: "إضافة فصل جديد", onClick: onAddClassroom }
+							: undefined,
 					}}
 				/>
 			)}

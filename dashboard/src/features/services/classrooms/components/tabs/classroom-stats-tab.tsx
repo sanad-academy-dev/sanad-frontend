@@ -1,5 +1,6 @@
 import {
 	IconCalendar,
+	IconCalendarEvent,
 	IconCategory,
 	IconChartBar,
 	IconCheck,
@@ -339,10 +340,10 @@ export function ClassroomStatsTab({ classroom }: ClassroomStatsTabProps) {
 					</InfoField>
 
 					<InfoField
-						label="الفئة العمرية"
-						icon={<IconGenderBigender className="size-3.5" />}
+						label="المرحلة الدراسية"
+						icon={<IconCalendarEvent className="size-3.5" />}
 					>
-						<span>{classroom.ageGroup || "جميع الأعمار"}</span>
+						<span>{classroom.academicStage || classroom.classification || "غير محددة"}</span>
 					</InfoField>
 
 					<InfoField

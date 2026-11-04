@@ -11,6 +11,14 @@ export interface TrackStats {
 	totalRevenue: number;
 }
 
+interface TrackPage {
+	items: TrackRow[];
+	total: number;
+	page: number;
+	pageSize: number;
+	totalPages: number;
+}
+
 export interface CreateTrackInput {
 	name: string;
 	code?: string;
@@ -19,33 +27,53 @@ export interface CreateTrackInput {
 	locationMode?: "ONLINE" | "IN_PERSON" | "HYBRID";
 	locationLabel?: string;
 	duration?: string;
-	studentsCount?: number;
 	price?: number;
-	revenue?: number;
 	status?: "ACTIVE" | "PENDING" | "COMPLETED" | "DRAFT";
 	description?: string;
 	notes?: string;
+	academicStage?: string;
 	ageGroup?: string;
-	trainers?: { id: string; name: string; avatar?: string }[];
 	selectedIcon?: string;
 	selectedColor?: string;
 }
 
 export interface UpdateTrackInput extends Partial<CreateTrackInput> {}
 
-export const useTracks = (search?: string) => {
-	const { data, isLoading, refetch } = useQuery<TrackRow[]>({
-		queryKey: ["tracks", search],
+export const useTracks = (
+	search?: string,
+	page?: number,
+	pageSize?: number,
+	includeStudents = false,
+	enabled = true,
+) => {
+	const { data, isLoading, refetch } = useQuery<TrackPage | TrackRow[]>({
+		queryKey: ["tracks", search, page, pageSize, includeStudents],
 		queryFn: async () => {
-			const queryParam = search ? `?search=${encodeURIComponent(search)}` : "";
+			const params = new URLSearchParams();
+			if (search) params.set("search", search);
+			if (page) params.set("page", String(page));
+			if (pageSize) params.set("pageSize", String(pageSize));
+			if (includeStudents) params.set("includeStudents", "true");
+			const queryParam = params.toString() ? `?${params.toString()}` : "";
 			const res = await backendFetch(`/api/tracks${queryParam}`);
 			if (!res.ok) throw new Error("فشل جلب قائمة المسارات التدريبية");
 			return res.json();
 		},
+		enabled,
 		staleTime: 1000 * 60 * 2,
 	});
 
-	return { tracks: data ?? [], isLoading, refetch };
+	const tracks = Array.isArray(data) ? data : (data?.items ?? []);
+
+	return {
+		tracks,
+		total: Array.isArray(data) ? tracks.length : (data?.total ?? tracks.length),
+		page: Array.isArray(data) ? 1 : (data?.page ?? 1),
+		pageSize: Array.isArray(data) ? tracks.length : (data?.pageSize ?? tracks.length),
+		totalPages: Array.isArray(data) ? 1 : (data?.totalPages ?? 1),
+		isLoading,
+		refetch,
+	};
 };
 
 export const useTrackStats = () => {
@@ -72,7 +100,7 @@ export const useTrackStats = () => {
 	};
 };
 
-export const useTrack = (id?: string) => {
+export const useTrack = (id?: string, enabled = true) => {
 	const { data, isLoading, refetch } = useQuery<TrackRow | null>({
 		queryKey: ["tracks", id],
 		queryFn: async () => {
@@ -81,7 +109,7 @@ export const useTrack = (id?: string) => {
 			if (!res.ok) throw new Error("فشل جلب بيانات المسار");
 			return res.json();
 		},
-		enabled: Boolean(id),
+		enabled: Boolean(id) && enabled,
 	});
 
 	return { track: data ?? null, isLoading, refetch };
@@ -171,7 +199,11 @@ export const useAssignTrackStudent = () => {
 			trackId,
 			studentId,
 			notes,
-		}: { trackId: string; studentId: string; notes?: string }) => {
+		}: {
+			trackId: string;
+			studentId: string;
+			notes?: string;
+		}) => {
 			const res = await backendFetch(`/api/tracks/${trackId}/assign`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -197,10 +229,7 @@ export const useAssignTrackStaff = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: async ({
-			id,
-			staffIds,
-		}: { id: string; staffIds: string[] }) => {
+		mutationFn: async ({ id, staffIds }: { id: string; staffIds: string[] }) => {
 			const res = await backendFetch(`/api/tracks/${id}/staff`, {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
@@ -226,10 +255,7 @@ export const useAssignTrackStudents = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: async ({
-			id,
-			studentIds,
-		}: { id: string; studentIds: string[] }) => {
+		mutationFn: async ({ id, studentIds }: { id: string; studentIds: string[] }) => {
 			const res = await backendFetch(`/api/tracks/${id}/students`, {
 				method: "PUT",
 				headers: { "Content-Type": "application/json" },
@@ -251,4 +277,3 @@ export const useAssignTrackStudents = () => {
 		},
 	});
 };
-

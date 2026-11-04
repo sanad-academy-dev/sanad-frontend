@@ -15,6 +15,7 @@ import { TableToolbar } from "@/components/common/table-toolbar";
 import { Button } from "@/components/ui/button";
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import { AddCourseSheet } from "@/features/services/training/components/add-course-sheet";
+import { CourseDialog } from "@/features/services/training/components/course-dialog";
 import { AssignEmployeeDialog } from "@/features/services/training/components/assign-employee-dialog";
 import { CloneSuccessToast } from "@/features/services/training/components/clone-success-toast";
 import { CourseCard } from "@/features/services/training/components/course-card";
@@ -300,9 +301,17 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 				</div>
 			)}
 
-			<AddCourseSheet
+			{/* تم تحويل الشيت القديم لإنشاء الدورة إلى تعليق بناءً على طلب التحديث */}
+			{/* <AddCourseSheet
 				open={addOpen}
 				onClose={() => setAddOpen(false)}
+				editCourseId={editId}
+			/> */}
+
+			{/* النافذة المنبثقة الموحدة لإنشاء وتعديل الدورة التدريبية */}
+			<CourseDialog
+				open={addOpen}
+				onOpenChange={setAddOpen}
 				editCourseId={editId}
 			/>
 
