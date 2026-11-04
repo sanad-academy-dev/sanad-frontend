@@ -23,7 +23,8 @@ export interface TrackAgentFormState {
 	notes?: string;
 	category: string;
 	duration: string;
-	ageGroup: string;
+	academicStage?: string;
+	ageGroup?: string;
 	coursesCount: number;
 	price: number;
 	selectedTrainer?: string;
@@ -171,7 +172,7 @@ export function TrackAgentPanel({
 						"مسار تدريبي تأسيسي يهدف لتعليم الأطفال مهارات التفكير البرمجي وبناء الألعاب والتطبيقات التفاعلية.",
 					category: "البرمجة والمنطق",
 					duration: "6 أسابيع",
-					ageGroup: "9-11 سنة",
+					academicStage: "المرحلة الابتدائية",
 					coursesCount: 4,
 					price: 7000,
 					locationMode: "ONLINE",
@@ -187,7 +188,7 @@ export function TrackAgentPanel({
 						"برنامج إكلينيكي وتأهيلي متكامل لتطوير القدرات اللغوية والتعبيرية لدى الأطفال ذوي صعوبات التواصل.",
 					category: "طبي وتأهيلي",
 					duration: "8 أسابيع",
-					ageGroup: "4-6 سنه",
+					academicStage: "رياض الأطفال",
 					coursesCount: 5,
 					price: 9500,
 					locationMode: "IN_PERSON",
@@ -203,7 +204,7 @@ export function TrackAgentPanel({
 						"تأهيل الكادر التعليمي على أحدث استراتيجيات التعلم النشط وإدارة البيئة الصفية التفاعلية.",
 					category: "تدريب تربوي",
 					duration: "4 أسابيع",
-					ageGroup: "26+ سنة",
+					academicStage: "المرحلة الجامعية",
 					coursesCount: 3,
 					price: 5000,
 					locationMode: "ONLINE",
@@ -219,7 +220,7 @@ export function TrackAgentPanel({
 						"رحلة تعليمية تطبيقية تركز على استخدام أدوات الذكاء الاصطناعي وحل المشكلات بأساليب مبتكرة.",
 					category: "البرمجة والمنطق",
 					duration: "8 أسابيع",
-					ageGroup: "15-17 سنة",
+					academicStage: "المرحلة المتوسطة",
 					coursesCount: 4,
 					price: 8500,
 					locationMode: "HYBRID",

@@ -123,6 +123,7 @@ export function AddPatientSheet({
 				name: patient.name ?? "",
 				birthDate: birthDateInput,
 				ageGroup: derivedAgeGroup,
+				academicStage: (patient as any).academicStage ?? "",
 				nationalId: patient.nationalId ?? "",
 				gender: patient.gender ?? "MALE",
 				classroom: patient.classroom ?? "",

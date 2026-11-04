@@ -19,10 +19,6 @@ import { AssignStudentConfirmDialog } from "@/features/services/classrooms/compo
 import { useAssignClassroomStudents } from "@/features/services/classrooms/hooks/use-classroom-mutations";
 import { useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
-import {
-	getStudentAgeGroup,
-	isStudentMatchingClassroomAge,
-} from "@/features/services/classrooms/utils/age-group-utils";
 import { cn } from "@/lib/utils";
 import type {
 	ClassroomResponse,
@@ -160,12 +156,16 @@ export function AssignStudentDialog({
 			const isAssignedHere = selectedStudentIds.includes(p.id);
 			const hasNoClasses = !assignedInfo;
 
-			// التحقق من توافق الفئة العمرية مع الفصل الدراسي
-			if (classroom?.ageGroup && classroom.ageGroup !== "جميع الأعمار") {
-				const matchesAge = isStudentMatchingClassroomAge(p, classroom.ageGroup);
-				// نسمح للطالب المسجل بالفعل في هذا الفصل بالظهور، بينما الطلاب الآخرين يجب مطابقتهم للفئة العمرية
-				if (!matchesAge && !isAssignedHere) {
-					return false;
+			// التحقق من توافق المرحلة الدراسية مع الفصل الدراسي
+			if (classroom) {
+				const classroomStage = classroom.academicStage || classroom.classification;
+				if (classroomStage) {
+					const normalizeStage = (value?: string | null) => value?.trim().toLocaleLowerCase() || "";
+					const matchesStage = normalizeStage(p.academicStage) === normalizeStage(classroomStage);
+					// نسمح للطالب المسجل بالفعل في هذا الفصل بالظهور، بينما الطلاب الآخرين يجب مطابقتهم للمرحلة الدراسية
+					if (!matchesStage && !isAssignedHere) {
+						return false;
+					}
 				}
 			}
 
@@ -281,9 +281,9 @@ export function AssignStudentDialog({
 									· {displayClassName}
 								</span>
 							)}
-							{classroom?.ageGroup && (
-								<span className="mr-1 text-[9px] font-semibold bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
-									{classroom.ageGroup}
+							{(classroom?.academicStage || classroom?.classification) && (
+								<span className="mr-1 text-[9px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 px-1.5 py-0.5 rounded-full">
+									{classroom.academicStage || classroom.classification}
 								</span>
 							)}
 						</div>
@@ -376,8 +376,8 @@ export function AssignStudentDialog({
 							</div>
 						) : filteredStudents.length === 0 ? (
 							<div className="py-12 text-center text-xs text-muted-foreground">
-								{classroom?.ageGroup
-									? `لا يوجد طلاب مطابقون للفئة العمرية لهذا الفصل (${classroom.ageGroup})`
+								{(classroom?.academicStage || classroom?.classification)
+									? `لا يوجد طلاب مطابقون للمرحلة الدراسية لهذا الفصل (${classroom.academicStage || classroom.classification})`
 									: "لا يوجد طلاب مطابقون للبحث"}
 							</div>
 						) : (
@@ -433,7 +433,9 @@ export function AssignStudentDialog({
 													{guardian ? `ولي الأمر: ${guardian}` : "بدون ولي أمر مسجل"}
 													{p.gender === "FEMALE" ? " • أنثى" : " • ذكر"}
 													{" • "}
-													<span className="font-semibold text-foreground/90">{getStudentAgeGroup(p)}</span>
+													<span className="font-semibold text-emerald-600 dark:text-emerald-400">
+														{p.academicStage || "بدون مرحلة"}
+													</span>
 												</span>
 											</div>
 										</div>

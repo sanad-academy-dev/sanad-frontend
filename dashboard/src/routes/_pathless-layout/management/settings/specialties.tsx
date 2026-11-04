@@ -1,20 +1,144 @@
-import { createFileRoute } from "@tanstack/react-router";
+import {
+	IconChevronLeft,
+	IconChevronRight,
+	IconDots,
+	IconFolders,
+	IconRoute,
+	IconSchool,
+	IconSettings,
+} from "@tabler/icons-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Stats } from "@/components/common/stats";
+import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { SpecializationsTable } from "@/features/settings/specializations/components/table";
 import { SPECIALTIES_STATS } from "@/features/settings/specializations/data/stats";
+import { usePageHeaderTakeover } from "@/hooks/use-page-header-takeover";
 
 export const Route = createFileRoute("/_pathless-layout/management/settings/specialties")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
+	const navigate = useNavigate();
+	const setTitleSuppressed = usePageHeaderTakeover((state) => state.setTitleSuppressed);
+	const [slot, setSlot] = useState<HTMLElement | null>(null);
+
+	useEffect(() => {
+		setSlot(document.getElementById("page-header-slot"));
+	}, []);
+
+	useEffect(() => {
+		setTitleSuppressed(true);
+		return () => setTitleSuppressed(false);
+	}, [setTitleSuppressed]);
+
+	const headerContent = (
+		<div className="flex items-center gap-2" dir="rtl">
+			<Link
+				to="/management/settings"
+				className="whitespace-nowrap text-xs font-semibold text-foreground hover:underline"
+			>
+				الإعدادات
+			</Link>
+			<IconChevronLeft className="size-3 shrink-0 text-muted-foreground ltr:rotate-180" />
+			<Link
+				to="/management/settings/classifications"
+				className="whitespace-nowrap text-xs font-semibold text-foreground hover:underline"
+			>
+				التصنيفات
+			</Link>
+			<IconChevronLeft className="size-3 shrink-0 text-muted-foreground ltr:rotate-180" />
+			<span className="whitespace-nowrap text-xs font-bold text-foreground">
+				تخصصات الموظفين
+			</span>
+
+			<span className="h-4 w-px bg-border shrink-0" />
+
+			{/* زر خيارات إضافية في الهيدر */}
+			<div className="flex items-center gap-1.5">
+				<DropdownMenu dir="rtl">
+					<DropdownMenuTrigger asChild>
+						<Button
+							variant="ghost"
+							size="icon"
+							className="size-7 text-muted-foreground hover:text-foreground"
+						>
+							<IconDots className="size-3.5" />
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="start">
+						<DropdownMenuItem
+							className="gap-2 text-xs"
+							onSelect={() => navigate({ to: "/management/settings/academic-stages" })}
+						>
+							<IconSchool className="size-3.5" />
+							المراحل الدراسية
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							className="gap-2 text-xs"
+							onSelect={() => navigate({ to: "/management/settings/tracks" })}
+						>
+							<IconRoute className="size-3.5" />
+							المسارات
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							className="gap-2 text-xs"
+							onSelect={() => navigate({ to: "/management/settings/classifications" })}
+						>
+							<IconFolders className="size-3.5" />
+							العودة إلى التصنيفات
+						</DropdownMenuItem>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem
+							className="gap-2 text-xs"
+							onSelect={() => navigate({ to: "/management/settings" })}
+						>
+							<IconSettings className="size-3.5" />
+							العودة إلى الإعدادات
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			</div>
+		</div>
+	);
+
 	return (
-		<div className="flex flex-1 flex-col">
+		<div className="flex flex-1 flex-col gap-4">
+			{slot && createPortal(headerContent, slot)}
+
+			{/* <div className="flex items-center gap-2 px-6 pt-6">
+				<Link
+					to="/management/settings/classifications"
+					className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+				>
+					<IconChevronRight className="size-4 rtl:rotate-180" />
+					<span>العودة إلى التصنيفات</span>
+				</Link>
+			</div>
+
+			<div className="px-6 pb-1">
+				<h1 className="text-2xl font-bold tracking-tight text-foreground">تخصصات الموظفين</h1>
+				<p className="text-sm text-muted-foreground mt-1">
+					إدارة تصنيفات تخصصات ومجالات عمل الموظفين.
+				</p>
+			</div> */}
+
 			<Stats
-				className="px-4"
+				className="px-6"
 				stats={SPECIALTIES_STATS}
 			/>
+			
 			<SpecializationsTable />
+			
 		</div>
 	);
 }

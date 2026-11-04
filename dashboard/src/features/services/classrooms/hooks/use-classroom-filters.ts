@@ -15,6 +15,7 @@ type ClassroomFilterKey =
 	| "status"
 	| "category"
 	| "learningMode"
+	| "academicStage"
 	| "ageGroup"
 	| "teacher"
 	| "classification";
@@ -23,6 +24,7 @@ const EMPTY: Record<ClassroomFilterKey, string[]> = {
 	status: [],
 	category: [],
 	learningMode: [],
+	academicStage: [],
 	ageGroup: [],
 	teacher: [],
 	classification: [],
@@ -86,6 +88,15 @@ export function useClassroomFilters(classrooms: ClassroomResponse[]) {
 				onToggle: (v) => toggleFilter("learningMode", v),
 			},
 			{
+				key: "academicStage",
+				label: "المرحلة الدراسية",
+				Icon: IconSchool,
+				options: uniqueOptions(classrooms.map((c) => c.academicStage || c.classification)),
+				selected: filters.academicStage,
+				onToggle: (v) => toggleFilter("academicStage", v),
+				emptyLabel: "لا توجد مراحل دراسية",
+			},
+			{
 				key: "ageGroup",
 				label: "الفئة العمرية",
 				Icon: IconCalendar,
@@ -143,6 +154,14 @@ export function useClassroomFilters(classrooms: ClassroomResponse[]) {
 				);
 			}
 
+			if (filters.academicStage.length > 0) {
+				result = result.filter(
+					(c) =>
+						(c.academicStage && filters.academicStage.includes(c.academicStage)) ||
+						(c.classification && filters.academicStage.includes(c.classification)),
+				);
+			}
+
 			if (filters.ageGroup.length > 0) {
 				result = result.filter((c) => c.ageGroup && filters.ageGroup.includes(c.ageGroup));
 			}
@@ -166,6 +185,9 @@ export function useClassroomFilters(classrooms: ClassroomResponse[]) {
 					const nameMatch = c.name?.toLowerCase().includes(q);
 					const codeMatch = c.code?.toLowerCase().includes(q);
 					const categoryMatch = c.category?.toLowerCase().includes(q);
+					const stageMatch =
+						c.academicStage?.toLowerCase().includes(q) ||
+						c.classification?.toLowerCase().includes(q);
 					const ageGroupMatch = c.ageGroup?.toLowerCase().includes(q);
 					const classificationMatch = c.classification?.toLowerCase().includes(q);
 					const teacherMatch = c.teachers?.some((t) => t.name.toLowerCase().includes(q));
@@ -176,6 +198,7 @@ export function useClassroomFilters(classrooms: ClassroomResponse[]) {
 						nameMatch ||
 						codeMatch ||
 						categoryMatch ||
+						stageMatch ||
 						ageGroupMatch ||
 						classificationMatch ||
 						teacherMatch ||

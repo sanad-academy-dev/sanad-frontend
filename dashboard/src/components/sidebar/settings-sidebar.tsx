@@ -6,6 +6,7 @@ import {
 	IconBriefcase,
 	IconBuildingHospital,
 	IconCalendar,
+	IconCategory,
 	IconCircleDot,
 	IconClock,
 	IconCreditCardPay,
@@ -82,10 +83,12 @@ export function SettingsSidebar(props: React.ComponentProps<typeof Sidebar>) {
 						isActive: isActive("/management/settings/cases"),
 					},
 					{
-						title: t("settings.sidebar.items.specialties"),
-						url: "/management/settings/specialties",
-						icon: <IconBriefcase className="size-[14px]" />,
-						isActive: isActive("/management/settings/specialties"),
+						title: t("settings.sidebar.items.classifications"),
+						url: "/management/settings/classifications",
+						icon: <IconCategory className="size-[14px]" />,
+						isActive:
+							isActive("/management/settings/classifications") ||
+							isActive("/management/settings/specialties"),
 					},
 					{
 						title: t("settings.sidebar.items.services"),

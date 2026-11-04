@@ -19,7 +19,7 @@ export declare const createPatientSchema: z.ZodObject<{
     notes: z.ZodOptional<z.ZodString>;
     active: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
 }, z.core.$strip>;
-export type CreatePatientInput = Pick<Prisma.PatientUncheckedCreateInput, "clinicId" | "name" | "gender" | "ownerId" | "age" | "birthDate" | "weight" | "notes" | "active" | "status" | "nationalId" | "classroom" | "bloodType" | "developmentStatus" | "allergies" | "pocketMoneyEnabled" | "transportation" | "feeType" | "healthConditions" | "previousNursery" | "guardianRelationship" | "emergencyContactPhone" | "emergencyContactName" | "level" | "learningMethod" | "preferredShift" | "address">;
+export type CreatePatientInput = Pick<Prisma.PatientUncheckedCreateInput, "clinicId" | "name" | "gender" | "ownerId" | "age" | "birthDate" | "weight" | "notes" | "active" | "status" | "nationalId" | "classroom" | "bloodType" | "developmentStatus" | "allergies" | "pocketMoneyEnabled" | "transportation" | "feeType" | "healthConditions" | "previousNursery" | "guardianRelationship" | "emergencyContactPhone" | "emergencyContactName" | "level" | "learningMethod" | "preferredShift" | "address"> & { academicStage: string };
 export type UpdatePatientInput = Partial<Omit<CreatePatientInput, "clinicId">> & {
 	guardianName?: string | null;
 	guardianPhone?: string | null;
@@ -83,7 +83,7 @@ export type PatientResponse = Prisma.PatientGetPayload<{
             };
         };
     };
-}>;
+}> & { academicStage?: string | null };
 export declare const transferPatientOwnershipSchema: z.ZodObject<{
     ownerId: z.ZodString;
     comment: z.ZodPipe<z.ZodOptional<z.ZodString>, z.ZodTransform<string | undefined, string | undefined>>;
