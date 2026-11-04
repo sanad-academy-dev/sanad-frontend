@@ -10,6 +10,7 @@ import {
 import { RegistrationStatsBar } from "@/features/digital-registration/components/campaign-details-stats";
 import { CampaignDetailsToolbar } from "@/features/digital-registration/components/campaign-details-toolbar";
 import { CampaignRequestsKanban } from "@/features/digital-registration/components/campaign-requests-kanban";
+import { CampaignShareDialog } from "@/features/digital-registration/components/campaign-share-dialog";
 import { CampaignInfo } from "@/features/digital-registration/components/campaign-info";
 import { RegistrationActivityLog } from "@/features/digital-registration/components/registration-activity-log";
 import { AddRequestSheet } from "@/features/digital-registration/components/add-request-sheet";
@@ -29,6 +30,7 @@ function DigitalRegistrationRoute() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [genderFilter, setGenderFilter] = useState("ALL");
 	const [isAddRequestOpen, setIsAddRequestOpen] = useState(false);
+	const [isShareOpen, setIsShareOpen] = useState(false);
 	const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
 	// One board per clinic. The backend keeps its legacy campaign id internal.
@@ -52,6 +54,8 @@ function DigitalRegistrationRoute() {
 			} else if (r.status === "EVALUATION" || r.column === "check-in") {
 				evaluation++;
 			} else if (
+				r.status === "WAITLIST" ||
+				r.column === "waitlist" ||
 				r.status === "REVIEW" ||
 				r.status === "AWAITING_REPLY" ||
 				r.column === "in-service" ||
@@ -257,6 +261,7 @@ function DigitalRegistrationRoute() {
 						genderFilter={genderFilter}
 						onGenderFilterChange={setGenderFilter}
 						onOpenAddRequest={() => setIsAddRequestOpen(true)}
+						onOpenShare={() => setIsShareOpen(true)}
 						onExport={handleExportExcel}
 						onExportCsv={handleExportCsv}
 					/>
@@ -291,6 +296,14 @@ function DigitalRegistrationRoute() {
 						campaignId={activeCampaignId}
 						// الحفظ يحدث قائمة الكانبان فقط؛ فتح التفاصيل قرار صريح من المستخدم.
 						onSuccess={() => setSelectedRequestId(null)}
+					/>
+
+					{/* Share Campaign & Collaborators Modal */}
+					<CampaignShareDialog
+						open={isShareOpen}
+						onOpenChange={setIsShareOpen}
+						campaignId={activeCampaignId}
+						campaignName={workspace?.name || "التسجيل الرقمي"}
 					/>
 				</div>
 			)}
