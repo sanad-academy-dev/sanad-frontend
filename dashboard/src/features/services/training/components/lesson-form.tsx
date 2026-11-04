@@ -93,6 +93,7 @@ export function LessonForm({
 	unitTitle = "",
 	restored,
 	onValuesChange,
+	initialType = "VIDEO",
 }: {
 	// يستقبل القيم غير المحفوظة عند «تجاهل وخروج» لتمكين «تراجع» من استرجاعها
 	onCancel: (discarded?: CreateLessonFormInput) => void;
@@ -103,6 +104,7 @@ export function LessonForm({
 	unitTitle?: string;
 	restored?: CreateLessonFormInput;
 	onValuesChange?: (values: CreateLessonFormInput) => void;
+	initialType?: LessonType;
 }) {
 	const isEditing = !!lesson;
 	const [confirmingDiscard, setConfirmingDiscard] = useState(false);
@@ -134,7 +136,7 @@ export function LessonForm({
 				}
 			: {
 					title: "",
-					type: "VIDEO",
+					type: initialType || "VIDEO",
 					description: "",
 					mediaSource: "DEVICE",
 					// تُترك فارغة ليظهر نص ساعة/دقيقة/ثانية كـ placeholder مطابقًا للتصميم
@@ -143,6 +145,13 @@ export function LessonForm({
 					seconds: undefined,
 				},
 	});
+
+	// مزامنة initialType عند اختياره من الخارج
+	useEffect(() => {
+		if (!lesson && initialType) {
+			setValue("type", initialType);
+		}
+	}, [initialType, lesson, setValue]);
 
 	// استعادة تعديلات مُهمَلة: نضع القيم مع إبقاء defaultValues مرجعًا حتى تبقى الحقول «معدّلة»
 	useEffect(() => {
@@ -259,63 +268,67 @@ export function LessonForm({
 				</div>
 			)}
 
-			{/* منتقي نوع المادة — نوع الدرس ثابت أثناء التعديل */}
-			<div className={cn("flex flex-col gap-3", isEditing && "hidden")}>
-				<FieldLabel label="أضف مواد تعليمية للدرس" />
-				<Controller
-					name="type"
-					control={control}
-					render={({ field }) => (
-						<div className="flex items-start gap-[7px]">
-							{LESSON_TYPE_OPTIONS.map((opt) => {
-								const Icon = LESSON_TYPE_ICONS[opt.value];
-								const active = field.value === opt.value;
-								return (
-									<button
-										key={opt.value}
-										type="button"
-										onClick={() => field.onChange(opt.value)}
-										className={cn(
-											"flex h-[34px] flex-1 items-center justify-center gap-1.5 rounded-[4px] border-[0.75px] text-[13px] text-[#08090A]",
-											active
-												? "border-[#C3C2C2] bg-[#9B9B9D]/[0.07]"
-												: "border-[#E5E5E5] bg-white",
-										)}
-									>
-										{opt.label}
-										<Icon className="size-[19px]" />
-									</button>
-								);
-							})}
-						</div>
-					)}
-				/>
-			</div>
+			<div className="flex flex-col gap-3.5 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white p-3 shadow-2xs">
+				{/* 1. اسم الدرس أولاً */}
+				<Field
+					className="gap-[5px]"
+					data-invalid={!!errors.title}
+				>
+					<FieldLabel
+						label={type === "QUIZ" ? "عنوان التقييم" : titleLabel}
+						required
+					/>
+					<Input
+						placeholder={
+							type === "QUIZ"
+								? "مثال: تقييم سريع عن الوحدة الأولى"
+								: "مثال: خطوات تجهيز قاعة العمليات قبل الجراحة"
+						}
+						className="h-[34px] text-[11px]"
+						aria-invalid={!!errors.title}
+						disabled={busy}
+						{...register("title")}
+					/>
+					<FieldError errors={[errors.title]} />
+				</Field>
 
-			{/* بطاقة التقييم — تحلّ محل بطاقة تفاصيل الدرس لنوع «تقييم» */}
-			{type === "QUIZ" ? (
-				<div className="flex flex-col gap-3 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white p-2">
-					{/* عنوان التقييم — هو نفسه عنوان الدرس المحفوظ */}
-					<Field
-						className="gap-[5px]"
-						data-invalid={!!errors.title}
-					>
-						<FieldLabel
-							label="عنوان التقييم"
-							required
-						/>
-						<Input
-							placeholder="مثال: تقييم سريع عن الوحدة الأولى"
-							className="h-[34px] text-[11px]"
-							aria-invalid={!!errors.title}
-							disabled={busy}
-							{...register("title")}
-						/>
-						<FieldError errors={[errors.title]} />
-					</Field>
+				{/* 2. نوع ومواد المحتوى التعليمي ثانياً */}
+				<div className={cn("flex flex-col gap-2", isEditing && "hidden")}>
+					<FieldLabel label="نوع ومواد المحتوى التعليمي للدرس" />
+					<Controller
+						name="type"
+						control={control}
+						render={({ field }) => (
+							<div className="flex items-start gap-[7px]">
+								{LESSON_TYPE_OPTIONS.map((opt) => {
+									const Icon = LESSON_TYPE_ICONS[opt.value];
+									const active = field.value === opt.value;
+									return (
+										<button
+											key={opt.value}
+											type="button"
+											onClick={() => field.onChange(opt.value)}
+											className={cn(
+												"flex h-[36px] flex-1 items-center justify-center gap-1.5 rounded-[4px] border-[0.75px] text-[12px] transition-all cursor-pointer",
+												active
+													? "border-[#6366F1] bg-[#6366F1]/10 text-[#4F46E5] font-semibold shadow-2xs ring-1 ring-[#6366F1]/30"
+													: "border-[#E5E5E5] bg-white text-[#08090A] hover:bg-[#FAFAFA]",
+											)}
+										>
+											<span>{opt.label}</span>
+											<Icon className="size-[17px] shrink-0" />
+										</button>
+									);
+								})}
+							</div>
+						)}
+					/>
+				</div>
 
-					{/* باني التقييم — الحالة الفارغة حتى يُضاف أول سؤال */}
-					{questions.length === 0 ? (
+				{/* 3. تفاصيل المحتوى ثالثاً */}
+				{type === "QUIZ" ? (
+					/* باني التقييم — الحالة الفارغة حتى يُضاف أول سؤال */
+					questions.length === 0 ? (
 						<div className="flex h-[161px] flex-col items-center justify-center gap-[11px] rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-[#9B9B9D]/[0.09] px-1.5 py-[4.5px]">
 							<span className="flex size-[29px] items-center justify-center rounded-full border border-[#E5E5E5] bg-[#ECECED]">
 								<IconFileTextSpark className="size-[15px] text-[#9B9B9D]" />
@@ -333,7 +346,7 @@ export function LessonForm({
 								variant="outline"
 								onClick={addFirstQuestion}
 								disabled={busy}
-								className="h-[26px] gap-1 rounded-[4px] px-[7px] text-[12px] font-medium"
+								className="h-[26px] gap-1 rounded-[4px] px-[7px] text-[12px] font-medium cursor-pointer"
 							>
 								إضافة أول سؤال
 								<IconPlus className="size-[15px]" />
@@ -348,203 +361,166 @@ export function LessonForm({
 							errors={errors}
 							disabled={busy}
 						/>
-					)}
+					)
+				) : (
+					<>
+						{/* الوسيط — في RTL: المصدر يمينًا (137px) وحقل الرفع يسارًا */}
+						{needsMedia && (
+							<div className="flex items-start gap-[5px]">
+								<div className="flex w-[137px] shrink-0 flex-col gap-1">
+									<span className="text-[12px] font-semibold leading-4 text-[#08090A]">
+										{sourceLabel}
+									</span>
+									<Controller
+										name="mediaSource"
+										control={control}
+										render={({ field }) => (
+											<Select
+												dir="rtl"
+												value={field.value}
+												onValueChange={field.onChange}
+												disabled={busy}
+											>
+												<SelectTrigger className="h-[34px]! w-full text-[11px]">
+													<SelectValue />
+												</SelectTrigger>
+												<SelectContent>
+													<SelectItem value="DEVICE">رفع من الجهاز</SelectItem>
+													<SelectItem value="URL">رابط خارجي</SelectItem>
+												</SelectContent>
+											</Select>
+										)}
+									/>
+								</div>
 
-					{/* أزرار البطاقة — في RTL: إلغاء يمين، حفظ الاختبار يسار */}
-					<div className="flex items-center justify-between border-t border-[#E5E5E5] px-3 pt-[7.5px]">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={handleCancel}
-							disabled={busy}
-							className="h-[27px] w-[72px] rounded-[4px] text-[11px] font-medium"
-						>
-							إلغاء وتراجع
-						</Button>
-						<Button
-							type="button"
-							onClick={submit}
-							disabled={busy || !quizReady || (isEditing && editCount === 0)}
-							className={cn(
-								"h-[30px] w-[102px] rounded-[4px] text-[11px] font-semibold text-white",
-								quizReady
-									? "bg-[#4F6AE0] hover:bg-[#4F6AE0]/90"
-									: // حالة التصميم غير المفعّلة: لون بشفافية 41% بلا تعتيم إضافي
-										"bg-[#4F6AE0]/[0.41] disabled:opacity-100",
-							)}
-						>
-							{saveLabel}
-						</Button>
-					</div>
-				</div>
-			) : (
-				<div className="flex flex-col gap-3 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white p-2">
-					{/* اسم الدرس */}
-					<Field
-						className="gap-[5px]"
-						data-invalid={!!errors.title}
-					>
-						<FieldLabel
-							label={titleLabel}
-							required
-						/>
-						<Input
-							placeholder="مثال: خطوات تجهيز قاعة العمليات قبل الجراحة"
-							className="h-[34px] text-[11px]"
-							aria-invalid={!!errors.title}
-							disabled={busy}
-							{...register("title")}
-						/>
-						<FieldError errors={[errors.title]} />
-					</Field>
-
-					{/* الوسيط — في RTL: المصدر يمينًا (137px) وحقل الرفع يسارًا */}
-					{needsMedia && (
-						<div className="flex items-start gap-[5px]">
-							<div className="flex w-[137px] shrink-0 flex-col gap-1">
-								<span className="text-[12px] font-semibold leading-4 text-[#08090A]">
-									{sourceLabel}
-								</span>
-								<Controller
-									name="mediaSource"
-									control={control}
-									render={({ field }) => (
-										<Select
-											dir="rtl"
-											value={field.value}
-											onValueChange={field.onChange}
+								<Field
+									className="flex-1 gap-[5px]"
+									data-invalid={!!errors.mediaKey}
+								>
+									<FieldLabel
+										label={MEDIA_LABEL[type] ?? "رفع ملف"}
+										required={REQUIRE_LESSON_MEDIA}
+									/>
+									{mediaSource === "URL" ? (
+										<Input
+											placeholder="ألصق رابط الملف هنا..."
+											className="h-[34px] text-[11px]"
 											disabled={busy}
-										>
-											<SelectTrigger className="h-[34px]! w-full text-[11px]">
-												<SelectValue />
-											</SelectTrigger>
-											<SelectContent>
-												<SelectItem value="DEVICE">رفع من الجهاز</SelectItem>
-												<SelectItem value="URL">رابط خارجي</SelectItem>
-											</SelectContent>
-										</Select>
+											{...register("mediaUrl")}
+										/>
+									) : (
+										<MediaUploadField
+											fileName={fileName}
+											progress={progress}
+											isUploading={isUploading}
+											placeholder={`أضف ${MEDIA_NOUN[type] ?? "ملف"} بسحب والإفلات أو الضغط علي الأيقون للتحميل...`}
+											accept={LESSON_ACCEPT[type]}
+											disabled={busy}
+											onPick={handleFile}
+											onClear={clearFile}
+										/>
 									)}
-								/>
+									<FieldError errors={[errors.mediaKey]} />
+								</Field>
 							</div>
+						)}
 
+						{/* نص الدرس */}
+						{type === "TEXT" && (
 							<Field
-								className="flex-1 gap-[5px]"
-								data-invalid={!!errors.mediaKey}
+								className="gap-[5px]"
+								data-invalid={!!errors.content}
 							>
 								<FieldLabel
-									label={MEDIA_LABEL[type] ?? "رفع ملف"}
-									required={REQUIRE_LESSON_MEDIA}
+									label="محتوى الدرس"
+									required
 								/>
-								{mediaSource === "URL" ? (
-									<Input
-										placeholder="ألصق رابط الملف هنا..."
-										className="h-[34px] text-[11px]"
-										disabled={busy}
-										{...register("mediaUrl")}
-									/>
-								) : (
-									<MediaUploadField
-										fileName={fileName}
-										progress={progress}
-										isUploading={isUploading}
-										placeholder={`أضف ${MEDIA_NOUN[type] ?? "ملف"} بسحب والإفلات أو الضغط علي الأيقون للتحميل...`}
-										accept={LESSON_ACCEPT[type]}
-										disabled={busy}
-										onPick={handleFile}
-										onClear={clearFile}
-									/>
-								)}
-								<FieldError errors={[errors.mediaKey]} />
+								<Textarea
+									placeholder="اكتب محتوى الدرس هنا..."
+									className="min-h-[120px] text-[13px]"
+									disabled={busy}
+									{...register("content")}
+								/>
+								<FieldError errors={[errors.content]} />
 							</Field>
-						</div>
-					)}
+						)}
 
-					{/* نص الدرس */}
-					{type === "TEXT" && (
-						<Field
-							className="gap-[5px]"
-							data-invalid={!!errors.content}
-						>
-							<FieldLabel
-								label="محتوى الدرس"
-								required
-							/>
-							<Textarea
-								placeholder="اكتب محتوى الدرس هنا..."
-								className="min-h-[120px] text-[13px]"
-								disabled={busy}
-								{...register("content")}
-							/>
-							<FieldError errors={[errors.content]} />
-						</Field>
-					)}
-
-					{/* المدة الزمنية — في RTL: ساعة يمينًا ثم دقيقة ثم ثانية */}
-					{showDuration && (
-						<div className="flex flex-col gap-[5px]">
-							<FieldLabel
-								label={DURATION_LABEL[type] ?? "المدة الزمنيه"}
-								required
-							/>
-							<div className="flex items-start gap-[5px]">
-								{(
-									[
-										["hours", "ساعة", 99],
-										["minutes", "دقيقة", 59],
-										["seconds", "ثانية", 59],
-									] as const
-								).map(([name, label, max]) => (
-									<Input
-										key={name}
-										type="number"
-										min={0}
-										max={max}
-										placeholder={label}
-										aria-label={label}
-										className="h-[34px] flex-1 text-[11px]"
-										disabled={busy}
-										{...register(name)}
-									/>
-								))}
+						{/* المدة الزمنية — في RTL: ساعة يمينًا ثم دقيقة ثم ثانية */}
+						{showDuration && (
+							<div className="flex flex-col gap-[5px]">
+								<FieldLabel
+									label={DURATION_LABEL[type] ?? "المدة الزمنيه"}
+									required
+								/>
+								<div className="flex items-start gap-[5px]">
+									{(
+										[
+											["hours", "ساعة", 99],
+											["minutes", "دقيقة", 59],
+											["seconds", "ثانية", 59],
+										] as const
+									).map(([name, label, max]) => (
+										<Input
+											key={name}
+											type="number"
+											min={0}
+											max={max}
+											placeholder={label}
+											aria-label={label}
+											className="h-[34px] flex-1 text-[11px]"
+											disabled={busy}
+											{...register(name)}
+										/>
+									))}
+								</div>
 							</div>
-						</div>
-					)}
+						)}
+					</>
+				)}
 
-					{/* وصف الدرس */}
-					<Field className="gap-[5px]">
-						<span className="text-[12px] font-medium leading-[18px] text-[#08090A]">
-							{descriptionLabel}
-						</span>
-						<Textarea
-							placeholder="أضف ملخصًا قصيرًا يوضح ما سيتعلمه المتدرب من هذا الدرس...."
-							className="min-h-[74px] text-[13px]"
-							disabled={busy}
-							{...register("description")}
-						/>
-					</Field>
+				{/* 4. وصف الدرس */}
+				<Field className="gap-[5px]">
+					<span className="text-[12px] font-medium leading-[18px] text-[#08090A]">
+						{descriptionLabel}
+					</span>
+					<Textarea
+						placeholder="أضف ملخصًا قصيرًا يوضح ما سيتعلمه المتدرب من هذا الدرس...."
+						className="min-h-[74px] text-[13px]"
+						disabled={busy}
+						{...register("description")}
+					/>
+				</Field>
 
-					{/* أزرار البطاقة — في RTL: إلغاء يمين، حفظ الدرس يسار */}
-					<div className="flex items-center justify-between border-t border-[#E5E5E5] px-3 pt-[7.5px]">
-						<Button
-							type="button"
-							variant="outline"
-							onClick={handleCancel}
-							disabled={busy}
-							className="h-[26px] rounded-[4px] px-3 text-[11px] font-medium"
-						>
-							إلغاء وتراجع
-						</Button>
-						<Button
-							type="button"
-							onClick={submit}
-							disabled={busy}
-							className="h-[26px] rounded-[4px] px-3 text-[11px] font-semibold"
-						>
-							حفظ الدرس
-						</Button>
-					</div>
+				{/* 5. أزرار البطاقة — في RTL: إلغاء يمين، حفظ الدرس يسار */}
+				<div className="flex items-center justify-between border-t border-[#E5E5E5] px-1 pt-[9px]">
+					<Button
+						type="button"
+						variant="outline"
+						onClick={handleCancel}
+						disabled={busy}
+						className="h-[27px] rounded-[4px] px-3 text-[11px] font-medium cursor-pointer"
+					>
+						إلغاء وتراجع
+					</Button>
+					<Button
+						type="button"
+						onClick={submit}
+						disabled={
+							busy ||
+							(type === "QUIZ" ? !quizReady : false) ||
+							(isEditing && editCount === 0)
+						}
+						className={cn(
+							"h-[28px] rounded-[4px] px-3.5 text-[11px] font-semibold text-white cursor-pointer",
+							type === "QUIZ" && !quizReady
+								? "bg-[#4F6AE0]/[0.41] disabled:opacity-100"
+								: "bg-[#4F6AE0] hover:bg-[#4F6AE0]/90",
+						)}
+					>
+						{saveLabel}
+					</Button>
 				</div>
-			)}
+			</div>
 
 			{isEditing && lesson && (
 				<UnsavedChangesDialog

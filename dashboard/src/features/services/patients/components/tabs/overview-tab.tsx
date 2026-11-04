@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/select";
 import { TRANSPORT_OPTIONS } from "@/features/services/patients/data/patient-form-constants";
 import { AGE_GROUPS } from "@/features/services/classrooms/data/constants";
+import { useAcademicStageOptions } from "@/features/services/classrooms/hooks/use-classrooms";
 import { getStudentAgeGroup } from "@/features/services/classrooms/utils/age-group-utils";
 import type { PatientTabProps } from "@/features/services/patients/types/tabs.types";
 import { cn } from "@/lib/utils";
@@ -276,6 +277,7 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 	const { patient, isLoading } = usePatient(patientId);
 	const { autosave } = useAutosavePatient(patientId);
 	const { history } = usePatientHistory(patientId);
+	const { academicStages } = useAcademicStageOptions();
 
 	function patch(data: PatientAutosaveInput) {
 		autosave(data);
@@ -302,10 +304,10 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 				tooltip: "الوزن الحالي المسجل للطالب بالكيلوجرام",
 			},
 			{
-				title: "الفئة العمرية",
+				title: "المرحلة الدراسية",
 				value: 0,
-				valueLabel: studentAgeGroup || "—",
-				tooltip: "الفئة العمرية المعتمدة للطالب والفصول",
+				valueLabel: patient?.academicStage || studentAgeGroup || "—",
+				tooltip: "المرحلة الدراسية المعتمدة للطالب والفصول",
 			},
 			{
 				title: "عدد الزيارات",
@@ -313,7 +315,7 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 				tooltip: "إجمالي عدد الزيارات والجلسات المسجلة للطالب",
 			},
 		],
-		[patient?.weight, studentAgeGroup, visitsCount],
+		[patient?.weight, patient?.academicStage, studentAgeGroup, visitsCount],
 	);
 
 	if (!patientId || (isLoading && !patient)) {
@@ -378,21 +380,27 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 				</div>
 				<div className="grid grid-cols-2 gap-3">
 					<InfoField
-						label="الفئة العمرية"
-						icon={<IconScale className="size-3.5" />}
+						label="المرحلة الدراسية"
+						icon={<IconSchool className="size-3.5" />}
 					>
 						<Select
-							value={patient.ageGroup || studentAgeGroup || ""}
-							onValueChange={(val) => patch({ ageGroup: val })}
+							value={patient.academicStage || ""}
+							onValueChange={(val) => patch({ academicStage: val || null } as any)}
 							dir="rtl"
 						>
 							<SelectTrigger className="h-7 text-xs border border-border/60 bg-background/50 hover:bg-muted/40 px-2 rounded font-semibold text-foreground">
-								<SelectValue placeholder="اختر الفئة العمرية..." />
+								<SelectValue placeholder="اختر المرحلة الدراسية..." />
 							</SelectTrigger>
 							<SelectContent dir="rtl">
-								{AGE_GROUPS.map((group) => (
-									<SelectItem key={group} value={group} className="text-xs">
-										{group}
+								{Array.from(
+									new Set(
+										[...academicStages, patient.academicStage].filter(
+											(s): s is string => Boolean(s),
+										),
+									),
+								).map((st) => (
+									<SelectItem key={st} value={st} className="text-xs">
+										{st}
 									</SelectItem>
 								))}
 							</SelectContent>

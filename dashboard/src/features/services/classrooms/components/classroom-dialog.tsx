@@ -44,6 +44,7 @@ import {
 	IconPuzzle,
 	IconRobot,
 	IconRocket,
+	IconRoute,
 	IconScan,
 	IconSchool,
 	IconSearch,
@@ -91,12 +92,11 @@ import {
 	LEARNING_MODES,
 } from "@/features/services/classrooms/data/constants";
 import {
-	useAddClassroomClassification,
 	useCreateClassroom,
-	useDeleteClassroomClassification,
 	useUpdateClassroom,
 } from "@/features/services/classrooms/hooks/use-classroom-mutations";
-import { useClassroomClassifications } from "@/features/services/classrooms/hooks/use-classrooms";
+import { useAcademicStageOptions } from "@/features/services/classrooms/hooks/use-classrooms";
+import { useTrackClassifications } from "@/features/settings/tracks/hooks/use-track-classifications";
 import { useBranches } from "@/features/settings/branches/hooks/use-branches";
 import { cn } from "@/lib/utils";
 import type { ClassroomResponse, LearningMode } from "@/server/classrooms/classrooms.type";
@@ -340,19 +340,16 @@ const CLASSROOM_TEMPLATES = [
 	// },
 ];
 
-// تصنيفات الفصول الافتراضية للدروب داون
-const DEFAULT_CLASSIFICATIONS = ["برمجة", "ذكاء اصطناعي", "روبوتكس", "إدارة أعمال"];
-
 // تسميات الحقول لعرضها في نافذة التحذير من البيانات غير المحفوظة
 const CLASSROOM_FIELD_LABELS: Record<string, string> = {
 	name: "اسم الفصل",
 	code: "المعرّف الكودي",
 	description: "الوصف",
-	category: "التصنيف",
+	category: "فئة الطلاب",
 	capacity: "السعة الاستيعابية",
 	notes: "الملاحظات",
 	branch: "الفرع",
-	classification: "نوع الفصل",
+	classification: "المسار",
 	ageGroup: "الفئة العمرية",
 	learningMode: "نمط التعلم",
 	staff: "الموظفون المعينون",
@@ -369,11 +366,14 @@ export interface ClassroomDialogProps {
 export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogProps) {
 	const isEdit = Boolean(classroom);
 	const { branches } = useBranches();
-	const { classifications: backendClassifications, isLoading: isClassificationsLoading } =
-		useClassroomClassifications();
-	const { mutate: addClassificationMutation, isPending: isAddingClassification } =
-		useAddClassroomClassification();
-	const { mutate: deleteClassificationMutation } = useDeleteClassroomClassification();
+	const {
+		trackClassifications,
+		isLoading: isTracksLoading,
+		addClassification: addTrackClassification,
+		deleteClassification: deleteTrackClassification,
+		isAdding: isAddingTrack,
+	} = useTrackClassifications();
+	const { academicStages } = useAcademicStageOptions();
 	const { mutate: createClassroom, isPending: isCreating } = useCreateClassroom();
 	const { mutate: updateClassroom, isPending: isUpdating } = useUpdateClassroom();
 	const isPending = isCreating || isUpdating;
@@ -396,6 +396,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 
 	// حالات الدروب داونز السفلية (Drop-downs)
 	const [ageGroup, setAgeGroup] = useState<string>("");
+	const [academicStage, setAcademicStage] = useState<string>("");
 	const [branch, setBranch] = useState<string>("");
 	const [branchSearch, setBranchSearch] = useState<string>("");
 	const [classification, setClassification] = useState<string>("");
@@ -424,15 +425,17 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 		);
 	}, [branches, fallbackBranches, branchSearch]);
 
-	// دمج التصنيفات الافتراضية مع تصنيفات الباك إند والإضافات المحلية
-	const mergedClassifications = useMemo(() => {
-		const set = new Set([
-			...DEFAULT_CLASSIFICATIONS,
-			...(backendClassifications || []),
-			...classificationsList,
-		]);
-		return Array.from(set).filter(Boolean);
-	}, [backendClassifications, classificationsList]);
+	// مسارات الإعدادات النشطة المتاحة للاختيار في الفصل
+	const activeTrackNames = useMemo(() => {
+		const active = (trackClassifications || [])
+			.filter((t) => t.isActive !== false)
+			.map((t) => t.name);
+		const list = [...active, ...classificationsList];
+		if (classification && !list.includes(classification)) {
+			list.unshift(classification);
+		}
+		return Array.from(new Set(list)).filter(Boolean);
+	}, [trackClassifications, classificationsList, classification]);
 
 	// خيارات إضافية وتفاعلية
 	const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
@@ -546,6 +549,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 		setCapacity("");
 		setNotes("");
 		setAgeGroup("");
+		setAcademicStage("");
 		setBranch("");
 		setClassification("");
 		setNewClassificationInput("");
@@ -571,6 +575,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 			setCode(classroom.code || "");
 			setCategory(classroom.category || "مختلط");
 			setAgeGroup(classroom.ageGroup || "8-12 سنة");
+			setAcademicStage(classroom.academicStage || classroom.classification || "");
 			setLearningMode(classroom.learningMode || "");
 			setCapacity(classroom.capacity || 10);
 
@@ -579,7 +584,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 			const matchDesc = rawNotes.match(/الوصف:\s*([^\n\r]+)/);
 			const matchNotes = rawNotes.match(/الملاحظات:\s*([^\n\r]+)/);
 			const matchBranch = rawNotes.match(/الفرع:\s*([^\n\r]+)/);
-			const matchClass = rawNotes.match(/التصنيف:\s*([^\n\r]+)/);
+			const matchClass = rawNotes.match(/(?:التصنيف|المسار):\s*([^\n\r]+)/);
 			const matchIcon = rawNotes.match(/رمز_الفصل:\s*([^\n\r]+)/);
 			const matchType = rawNotes.match(/نوع_الرمز:\s*([^\n\r]+)/);
 			const matchColor = rawNotes.match(/لون_الفصل:\s*([^\n\r]+)/);
@@ -592,6 +597,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 				rawNotes &&
 				!rawNotes.includes("الوصف:") &&
 				!rawNotes.includes("التصنيف:") &&
+				!rawNotes.includes("المسار:") &&
 				!rawNotes.includes("رمز_الفصل:")
 			) {
 				setNotes(rawNotes);
@@ -647,6 +653,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 		setName(tpl.title);
 		setCategory(tpl.category);
 		setAgeGroup(tpl.ageGroup);
+		setAcademicStage("");
 		setLearningMode(tpl.learningMode);
 		setCapacity(tpl.capacity);
 		setDescription(tpl.description);
@@ -668,6 +675,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 			setName("");
 			setCategory("");
 			setAgeGroup("");
+			setAcademicStage("");
 			setLearningMode("");
 			setCapacity("");
 			setDescription("");
@@ -852,7 +860,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 		return found ? found.icon : IconCube;
 	}, [selectedIcon]);
 
-	// إضافة تصنيف مخصص جديد
+	// إضافة مسار مخصص جديد في إعدادات المسارات
 	const handleAddCustomClassification = (
 		e?: React.FormEvent | React.MouseEvent | React.KeyboardEvent,
 	) => {
@@ -868,8 +876,8 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 		setClassification(trimmed);
 		setNewClassificationInput("");
 
-		// حفظ وتخزين التصنيف فورياً في الباك إند وقاعدة البيانات
-		addClassificationMutation(trimmed);
+		// حفظ وتخزين المسار فورياً في إعدادات المسارات بالباك إند وقاعدة البيانات
+		addTrackClassification(trimmed);
 	};
 
 	// 3 حقول مطلوبة أساسية لإنشاء الفصل: اسم الفصل، فئة الفصل، والسعة القصوى
@@ -958,6 +966,10 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 
 	// 2. تأكيد الإرسال الفعلي بعد مراجعة البيانات
 	const handleFinalSubmit = () => {
+		if (!academicStage) {
+			toast.error("اختر المرحلة الدراسية للفصل");
+			return;
+		}
 		const validationErrors = validateForm();
 		if (Object.keys(validationErrors).length > 0) {
 			setErrors(validationErrors);
@@ -974,7 +986,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 			description.trim() ? `الوصف: ${description.trim()}` : "",
 			notes.trim() ? `الملاحظات: ${notes.trim()}` : "",
 			branch ? `الفرع: ${branch}` : "",
-			classification ? `التصنيف: ${classification}` : "",
+			classification ? `المسار: ${classification}` : "",
 			`رمز_الفصل: ${selectedIcon}`,
 			`نوع_الرمز: ${selectedIconType}`,
 			`لون_الفصل: ${selectedColor}`,
@@ -988,6 +1000,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 			category: trimmedCategory,
 			classification: classification || null,
 			ageGroup: ageGroup || "8-12 سنة",
+			academicStage,
 			learningMode: (learningMode as LearningMode) || "REMOTE",
 			capacity: validCapacity,
 			active: true,
@@ -1746,8 +1759,27 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 
 										{/* ب) شريط أزرار الخطوات الإضافية (الدروب داونز الأربعة + زر النقاط) */}
 										<div className="flex items-center gap-2 flex-wrap justify-start px-5 py-2.5 bg-background">
+							<DropdownMenu dir="rtl" modal={false}>
+								<DropdownMenuTrigger asChild>
+									<Button type="button" variant={academicStage ? "secondary" : "outline"} size="sm" className="gap-1.5">
+										<IconSchool className="size-3.5 shrink-0" />
+										<span>{academicStage || "المرحلة الدراسية"}</span>
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end" className="w-56">
+									<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
+										اختر المرحلة الدراسية
+									</DropdownMenuLabel>
+									<DropdownMenuSeparator />
+									{academicStages.map((stage) => (
+										<DropdownMenuItem key={stage} onClick={() => setAcademicStage(stage)} className="cursor-pointer text-xs">
+											{stage}
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
 											{/* 1. الفئة العمرية */}
-											<DropdownMenu
+											{/* <DropdownMenu
 												dir="rtl"
 												modal={false}
 											>
@@ -1794,7 +1826,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 														</>
 													)}
 												</DropdownMenuContent>
-											</DropdownMenu>
+											</DropdownMenu> */}
 
 											{/* 2. الفرع */}
 											<DropdownMenu
@@ -1905,7 +1937,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 												</DropdownMenuContent>
 											</DropdownMenu>
 
-											{/* 3. التصنيف (مع إمكانية إضافة تصنيف مخصص داخل القائمة) */}
+											{/* 3. المسار (المربوط بمسارات الإعدادات) */}
 											<DropdownMenu
 												dir="rtl"
 												modal={false}
@@ -1917,7 +1949,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 														size="sm"
 														className="gap-1.5"
 													>
-														<IconCircle className="size-3.5 text-muted-foreground/70 shrink-0" />
+														<IconRoute className="size-3.5 text-muted-foreground/70 shrink-0" />
 														<span>{classification || "التصنيف"}</span>
 													</Button>
 												</DropdownMenuTrigger>
@@ -1929,7 +1961,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 														اختر أو أضف تصنيف
 													</DropdownMenuLabel>
 
-													{/* حقل تخصيص وإضافة تصنيف جديد */}
+													{/* حقل تخصيص وإضافة مسار جديد */}
 													{/* biome-ignore lint/a11y/noStaticElementInteractions: stops dropdown closing on click */}
 													<div
 														className="p-1 mb-1.5 border-b"
@@ -1967,11 +1999,11 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 																}}
 																onClick={handleAddCustomClassification}
 																disabled={
-																	!newClassificationInput.trim() || isAddingClassification
+																	!newClassificationInput.trim() || isAddingTrack
 																}
 																className="h-7 px-2 text-xs shrink-0 gap-1 cursor-pointer"
 															>
-																{isAddingClassification ? (
+																{isAddingTrack ? (
 																	<Spinner className="size-3" />
 																) : (
 																	<IconPlus className="size-3" />
@@ -1981,15 +2013,31 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 														</div>
 													</div>
 
-													{/* قائمة التصنيفات المتاحة */}
+													{/* خيار بدون مسار في الأعلى */}
+													<DropdownMenuItem
+														onClick={() => setClassification("")}
+														className={cn(
+															"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md mb-1",
+															!classification && "bg-muted font-medium text-foreground",
+														)}
+													>
+														<span>بدون تصنيف</span>
+														{!classification && (
+															<IconCheck className="size-3.5 text-primary" />
+														)}
+													</DropdownMenuItem>
+													<DropdownMenuSeparator className="my-1" />
+
+													{/* قائمة المسارات المتاحة */}
 													<div className="max-h-48 overflow-y-auto space-y-0.5">
-														{isClassificationsLoading && mergedClassifications.length === 0 ? (
+														{isTracksLoading && activeTrackNames.length === 0 ? (
 															<div className="py-2 text-center text-xs text-muted-foreground">
 																جاري التحميل...
 															</div>
 														) : (
-															mergedClassifications.map((item) => {
-																const isCustom = !DEFAULT_CLASSIFICATIONS.includes(item);
+															activeTrackNames.map((item) => {
+																const trackObj = (trackClassifications || []).find((t) => t.name === item);
+																const isCustom = trackObj ? !trackObj.isDefault : true;
 																return (
 																	// biome-ignore lint/a11y/noStaticElementInteractions: dropdown option
 																	// biome-ignore lint/a11y/useKeyWithClickEvents: dropdown option
@@ -2011,7 +2059,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 																		{isCustom && (
 																			<button
 																				type="button"
-																				title="حذف هذا التصنيف"
+																				title="حذف هذا التنصيف"
 																				onPointerDown={(e) => {
 																					e.preventDefault();
 																					e.stopPropagation();
@@ -2027,7 +2075,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 																					setClassificationsList((prev) =>
 																						prev.filter((c) => c !== item),
 																					);
-																					deleteClassificationMutation(item);
+																					deleteTrackClassification(item);
 																				}}
 																				className="opacity-50 hover:opacity-100 hover:text-destructive p-0.5 rounded transition-opacity"
 																			>
@@ -2039,18 +2087,6 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 															})
 														)}
 													</div>
-
-													{classification && (
-														<>
-															<DropdownMenuSeparator className="my-1" />
-															<DropdownMenuItem
-																onClick={() => setClassification("")}
-																className="cursor-pointer text-xs text-muted-foreground hover:text-foreground py-1.5 px-2.5 justify-center transition-colors"
-															>
-																بدون تصنيف
-															</DropdownMenuItem>
-														</>
-													)}
 												</DropdownMenuContent>
 											</DropdownMenu>
 

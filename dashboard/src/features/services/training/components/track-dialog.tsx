@@ -22,6 +22,7 @@ import {
 	IconPlus,
 	IconRobot,
 	IconRocket,
+	IconRoute,
 	IconScan,
 	IconSchool,
 	IconSearch,
@@ -57,18 +58,49 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { AGE_GROUPS } from "@/features/services/classrooms/data/constants";
-import {
-	useAddClassroomClassification,
-	useDeleteClassroomClassification,
-} from "@/features/services/classrooms/hooks/use-classroom-mutations";
-import { useClassroomClassifications } from "@/features/services/classrooms/hooks/use-classrooms";
+import { useAcademicStageOptions } from "@/features/services/classrooms/hooks/use-classrooms";
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
+import { useAcademicStages } from "@/features/settings/academic-stages/hooks/use-academic-stages";
+import { useTrackClassifications } from "@/features/settings/tracks/hooks/use-track-classifications";
 import { cn } from "@/lib/utils";
 import { useCreateTrack, useUpdateTrack } from "../hooks/use-tracks";
 import { AssignTrackStaffSheet } from "./assign-track-staff-sheet";
 import { TrackAgentPanel } from "./track-agent-panel";
+import { TrackCoursesStep } from "./track-courses-step";
 import type { TrackRow } from "./tracks-view";
+
+// تجريد الملاحظات والوصف من أي وسوم داخلية لحفظ الدورات أو المرحلة لكي لا تظهر للمستخدم أبداً
+const stripSystemTags = (text?: string | null): string => {
+	if (!text) return "";
+	return text
+		.replace(/<p>\s*\[courses:[^\]]*\]\s*<\/p>/gi, "")
+		.replace(/<div>\s*\[courses:[^\]]*\]\s*<\/div>/gi, "")
+		.replace(/\[courses:[^\]]*\]/gi, "")
+		.replace(/(?:\[(?:المرحلة|stage):[^\]]+\]|\n?(?:المرحلة|stage):[^\n]+)/gi, "")
+		.replace(/(?:\[icon:[^\]]+\])/gi, "")
+		.replace(/(?:\[color:[^\]]+\])/gi, "")
+		.replace(/(?:\[notes:[^\]]+\])/gi, "")
+		.replace(/&#91;courses:[^&]*&#93;/gi, "")
+		.trim();
+};
+
+const DEFAULT_ACADEMIC_STAGES = [
+	"رياض الأطفال",
+	"المرحلة الابتدائية",
+	"المرحلة المتوسطة",
+	"المرحلة الثانوية",
+	"المرحلة الجامعية",
+];
+
+const extractCourseIds = (text?: string | null): string[] => {
+	if (!text) return [];
+	const match = text.match(/\[courses:([^\]]+)\]/i);
+	if (!match?.[1]) return [];
+	return match[1]
+		.split(",")
+		.map((s) => s.trim())
+		.filter(Boolean);
+};
 
 const POPULAR_ICONS = [
 	{ id: "cube", name: "مكعب فضاء", icon: IconCube },
@@ -146,7 +178,7 @@ const TRACK_TEMPLATES = [
 		notes: "يشمل شهادة إتمام معتمدة وتطبيق عملي على المنصات الرقمية.",
 		category: "إدارة أعمال",
 		duration: "8 أسابيع",
-		ageGroup: "17+ سنة",
+		academicStage: "المرحلة الثانوية",
 		coursesCount: 6,
 		price: 8500,
 		locationMode: "ONLINE" as const,
@@ -162,7 +194,7 @@ const TRACK_TEMPLATES = [
 		notes: "يتطلب حاسوب شخصي واتصال بالإنترنت والتدريب العملي المستمر.",
 		category: "البرمجة والمنطق",
 		duration: "6 أسابيع",
-		ageGroup: "9-11 سنة",
+		academicStage: "المرحلة الابتدائية",
 		coursesCount: 4,
 		price: 7000,
 		locationMode: "ONLINE" as const,
@@ -178,7 +210,7 @@ const TRACK_TEMPLATES = [
 		notes: "جلسات جماعية وفردية في العيادة التأهيلية مع أخصائي معتمد.",
 		category: "طبي وتأهيلي",
 		duration: "8 أسابيع",
-		ageGroup: "4-6 سنه",
+		academicStage: "رياض الأطفال",
 		coursesCount: 5,
 		price: 9500,
 		locationMode: "IN_PERSON" as const,
@@ -194,7 +226,7 @@ const TRACK_TEMPLATES = [
 		notes: "توفير حقيبة تدريبية وشهادة معتمدة بعد إتمام المسار.",
 		category: "تدريب تربوي",
 		duration: "4 أسابيع",
-		ageGroup: "26+ سنة",
+		academicStage: "المرحلة الجامعية",
 		coursesCount: 3,
 		price: 5000,
 		locationMode: "ONLINE" as const,
@@ -210,7 +242,7 @@ const TRACK_TEMPLATES = [
 		notes: "تدريب تطبيقي على نماذج الذكاء الاصطناعي وأدوات التطوير الحديثة.",
 		category: "ذكاء اصطناعي",
 		duration: "8 أسابيع",
-		ageGroup: "15-17 سنة",
+		academicStage: "المرحلة المتوسطة",
 		coursesCount: 4,
 		price: 8500,
 		locationMode: "HYBRID" as const,
@@ -225,9 +257,9 @@ const TRACK_FIELD_LABELS: Record<string, string> = {
 	code: "المعرّف",
 	description: "الوصف",
 	notes: "الملاحظات والأفكار",
-	category: "التصنيف",
+	category: "المسار",
+	academicStage: "المرحلة الدراسية",
 	duration: "مدة المسار",
-	ageGroup: "الفئة العمرية",
 	selectedTrainer: "المدرب",
 	price: "السعر",
 	coursesCount: "عدد الدورات",
@@ -243,11 +275,13 @@ export interface TrackDialogProps {
 export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialogProps) {
 	const isEdit = Boolean(track);
 	useStaff();
-	const { classifications: backendClassifications, isLoading: isClassificationsLoading } =
-		useClassroomClassifications();
-	const { mutate: addClassificationMutation, isPending: isAddingClassification } =
-		useAddClassroomClassification();
-	const { mutate: deleteClassificationMutation } = useDeleteClassroomClassification();
+	const {
+		trackClassifications,
+		isLoading: isClassificationsLoading,
+		isAdding: isAddingClassification,
+		addClassification: addClassificationMutation,
+		deleteClassification: deleteClassificationMutation,
+	} = useTrackClassifications();
 	const { mutate: createTrackMutation, isPending: isCreatingTrack } = useCreateTrack();
 	const { mutate: updateTrackMutation, isPending: isUpdatingTrack } = useUpdateTrack();
 
@@ -262,7 +296,11 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 	const [iconSearch, setIconSearch] = useState("");
 
 	// الخيارات الإضافية (الشرائح/الخطوات)
-	const [ageGroup, setAgeGroup] = useState("");
+	const [academicStage, setAcademicStage] = useState("");
+	const [newStageInput, setNewStageInput] = useState("");
+	const [isAddingStage, setIsAddingStage] = useState(false);
+	const { academicStages: optionsStages } = useAcademicStageOptions();
+	const { stages, isLoading: isStagesLoading, addStage } = useAcademicStages();
 	const [category, setCategory] = useState("");
 	const [classificationsList, setClassificationsList] = useState<string[]>([]);
 	const [newClassificationInput, setNewClassificationInput] = useState("");
@@ -279,7 +317,60 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 		"ONLINE",
 	);
 
-	// خيارات الفوتر والتحكم والقوالب
+	// استخراج المراحل الدراسية النشطة مع قيم قياسية تضمن عدم ظهور القائمة فارغة نهائياً
+	const activeAcademicStages = useMemo(() => {
+		const set = new Set<string>();
+
+		// دائماً تضمين المراحل الدراسية الأساسية لضمان عدم ظهور القائمة فارغة نهائياً
+		DEFAULT_ACADEMIC_STAGES.forEach((st) => set.add(st));
+
+		if (Array.isArray(optionsStages)) {
+			for (const st of optionsStages) {
+				if (typeof st === "string" && st.trim()) set.add(st.trim());
+			}
+		}
+
+		if (Array.isArray(stages)) {
+			for (const s of stages) {
+				if (s?.isActive && typeof s?.name === "string" && s.name.trim()) {
+					set.add(s.name.trim());
+				}
+			}
+		}
+
+		if (academicStage?.trim()) {
+			set.add(academicStage.trim());
+		}
+
+		return Array.from(set);
+	}, [optionsStages, stages, academicStage]);
+
+	// إضافة مرحلة دراسية مخصصة
+	const handleAddCustomStage = async (e?: React.MouseEvent | React.KeyboardEvent) => {
+		e?.preventDefault();
+		e?.stopPropagation();
+		const trimmed = newStageInput.trim();
+		if (!trimmed) return;
+		setIsAddingStage(true);
+		try {
+			if (addStage) {
+				await addStage(trimmed);
+			}
+			setAcademicStage(trimmed);
+			setNewStageInput("");
+			toast.success(`تمت إضافة المرحلة (${trimmed}) بنجاح`);
+		} catch {
+			// في حال حدث خطأ اتصال، يتم ضبطها محلياً ليستمر المستخدم
+			setAcademicStage(trimmed);
+			setNewStageInput("");
+		} finally {
+			setIsAddingStage(false);
+		}
+	};
+
+	// خيارات الفوتر والتحكم والقوالب والخطوات
+	const [isCoursesStep, setIsCoursesStep] = useState(false);
+	const [selectedCourseIds, setSelectedCourseIds] = useState<string[]>([]);
 	const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>("none");
 	const [templateSearch, setTemplateSearch] = useState("");
 	const [templateMenuOpen, setTemplateMenuOpen] = useState(false);
@@ -294,11 +385,13 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 	// تعبئة البيانات عند الفتح أو التعديل
 	useEffect(() => {
 		if (open) {
+			setIsCoursesStep(false);
 			if (track) {
 				setName(track.name);
 				setCode(track.code);
-				setDescription(track.description || "");
-				setNotes(track.notes || "");
+				setDescription(stripSystemTags(track.description));
+				// تنظيف الملاحظات تماماً من وسوم الدورات أو المرحلة لكي لا تظهر كنص مشوه أو كأنه خطأ برمجياً
+				setNotes(stripSystemTags(track.notes));
 				setCategory(track.category || "");
 				setDuration(track.duration || "");
 				setCoursesCount(track.coursesCount);
@@ -307,9 +400,17 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 				setSelectedTrainer(track.trainers?.[0]?.name ?? "");
 				setSelectedStaffIds((track.trainers || []).map((t) => t.id));
 				setSelectedStaffMembers(track.trainers || []);
-				setAgeGroup(track.ageGroup || "");
+				let stageVal = track.academicStage || "";
+				if (!stageVal && track.notes) {
+					const stageMatch = track.notes.match(/(?:المرحلة|stage):\s*([^\n\]]+)/i);
+					if (stageMatch?.[1]) stageVal = stageMatch[1].trim();
+				}
+				setAcademicStage(stageVal);
 				setSelectedIcon(track.selectedIcon || "cube");
 				setSelectedColor(track.selectedColor || "blue");
+
+				// استخراج معرفات الدورات المحددة سابقاً من الملاحظات
+				setSelectedCourseIds(extractCourseIds(track.notes));
 			} else {
 				setName("");
 				setCode(`PR-${Math.floor(10 + Math.random() * 90)}`);
@@ -323,9 +424,11 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 				setSelectedTrainer("");
 				setSelectedStaffIds([]);
 				setSelectedStaffMembers([]);
-				setAgeGroup("");
+				setAcademicStage("");
+				setNewStageInput("");
 				setSelectedIcon("cube");
 				setSelectedColor("blue");
+				setSelectedCourseIds([]);
 			}
 			setSelectedTemplateId("none");
 			setTemplateSearch("");
@@ -335,15 +438,17 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 		}
 	}, [open, track]);
 
-	// قائمة التصنيفات المدمجة من الـ API والتصنيفات الافتراضية
-	const mergedClassifications = useMemo(() => {
-		const set = new Set([
-			...DEFAULT_CLASSIFICATIONS,
-			...(backendClassifications || []),
-			...classificationsList,
-		]);
-		return Array.from(set).filter(Boolean);
-	}, [backendClassifications, classificationsList]);
+	// قائمة المسارات النشطة من إعدادات المسارات بالباك إند وقاعدة البيانات
+	const activeTrackClassifications = useMemo(() => {
+		const active = (trackClassifications || [])
+			.filter((t) => t.isActive !== false)
+			.map((t) => t.name);
+		const list = [...active, ...classificationsList];
+		if (category && !list.includes(category)) {
+			list.unshift(category);
+		}
+		return Array.from(new Set(list)).filter(Boolean);
+	}, [trackClassifications, classificationsList, category]);
 
 	const currentColorConfig = useMemo(
 		() => COLOR_OPTIONS.find((c) => c.id === selectedColor) ?? COLOR_OPTIONS[0],
@@ -393,6 +498,15 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 		};
 	}, [name]);
 
+	// تبديل اختيار دورة معينة
+	const handleToggleCourse = (courseId: string) => {
+		setSelectedCourseIds((prev) =>
+			prev.includes(courseId)
+				? prev.filter((id) => id !== courseId)
+				: [...prev, courseId],
+		);
+	};
+
 	// فحص وجود تعديلات غير محفوظة
 	const isDirty = useMemo(() => {
 		const originalStaffKey = (track?.trainers || [])
@@ -404,34 +518,37 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 		if (isEdit)
 			return (
 				name !== (track?.name || "") ||
-				notes !== (track?.notes || "") ||
+				notes.trim() !== stripSystemTags(track?.notes) ||
 				description !== (track?.description || "") ||
 				category !== (track?.category || "") ||
+				academicStage !== (track?.academicStage || "") ||
 				duration !== (track?.duration || "") ||
-				ageGroup !== (track?.ageGroup || "") ||
 				currentStaffKey !== originalStaffKey ||
 				selectedIcon !== (track?.selectedIcon || "cube") ||
-				selectedColor !== (track?.selectedColor || "blue")
+				selectedColor !== (track?.selectedColor || "blue") ||
+				selectedCourseIds.length > 0
 			);
 		return Boolean(
 			name.trim() ||
 				description.trim() ||
 				notes.trim() ||
-				ageGroup ||
+				academicStage ||
 				selectedStaffIds.length > 0 ||
 				category ||
-				duration,
+				duration ||
+				selectedCourseIds.length > 0,
 		);
 	}, [
 		name,
 		description,
 		notes,
-		ageGroup,
+		academicStage,
 		selectedStaffIds,
 		category,
 		duration,
 		selectedIcon,
 		selectedColor,
+		selectedCourseIds,
 		isEdit,
 		track,
 	]);
@@ -442,11 +559,12 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 		if (description.trim()) list.push("description");
 		if (notes.trim()) list.push("notes");
 		if (category) list.push("category");
-		if (ageGroup) list.push("ageGroup");
+		if (academicStage) list.push("academicStage");
 		if (selectedTrainer) list.push("selectedTrainer");
 		if (duration) list.push("duration");
+		if (selectedCourseIds.length > 0) list.push("coursesCount");
 		return list;
-	}, [name, description, notes, category, ageGroup, selectedTrainer, duration]);
+	}, [name, description, notes, category, academicStage, selectedTrainer, duration, selectedCourseIds]);
 
 	const handleSelectTemplate = (tpl: (typeof TRACK_TEMPLATES)[0] | null) => {
 		if (!tpl) {
@@ -455,8 +573,8 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 			setDescription("");
 			setNotes("");
 			setCategory("");
+			setAcademicStage("");
 			setDuration("");
-			setAgeGroup("");
 			setSelectedTrainer("");
 			setSelectedIcon("cube");
 			setSelectedColor("blue");
@@ -473,8 +591,8 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 		setDescription(tpl.description);
 		setNotes(tpl.notes || "");
 		setCategory(tpl.category);
+		setAcademicStage(tpl.academicStage || "");
 		setDuration(tpl.duration);
-		setAgeGroup(tpl.ageGroup);
 		setCoursesCount(tpl.coursesCount);
 		setPrice(tpl.price);
 		setLocationMode(tpl.locationMode);
@@ -512,11 +630,24 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 		addClassificationMutation(trimmed);
 	};
 
-	// إرسال النموذج وحفظه بالباك إند وقاعدة البيانات
-	const handleSubmit = (e: React.FormEvent) => {
+	// الانتقال إلى خطوة اختيار الدورات بعد التحقق من البيانات الأساسية
+	const handleFormSubmitToCourses = (e: React.FormEvent) => {
 		e.preventDefault();
 		if (!name.trim()) {
 			toast.error("يرجى إدخال اسم المسار التدريبي");
+			return;
+		}
+		setIsCoursesStep(true);
+	};
+
+	// إرسال النموذج وحفظه بالباك إند وقاعدة البيانات مع الدورات المحددة
+	const handleFinalSubmit = (e?: React.FormEvent | React.MouseEvent) => {
+		if (e) {
+			e.preventDefault();
+		}
+		if (!name.trim()) {
+			toast.error("يرجى إدخال اسم المسار التدريبي");
+			setIsCoursesStep(false);
 			return;
 		}
 
@@ -528,27 +659,31 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 			HYBRID: "مدمج",
 		};
 
+		const effectiveCoursesCount =
+			selectedCourseIds.length > 0 ? selectedCourseIds.length : (coursesCount || 4);
+
+		// تضمين وسوم الدورات المختارة في الملاحظات لحفظها ومزامنتها برمجياً
+		const courseTag =
+			selectedCourseIds.length > 0 ? `[courses:${selectedCourseIds.join(",")}]` : "";
+		const cleanUserNotes = stripSystemTags(notes);
+		const finalNotes = courseTag
+			? (cleanUserNotes ? `${cleanUserNotes}\n${courseTag}` : courseTag)
+			: cleanUserNotes;
+
 		const payload = {
 			name: name.trim(),
 			code: code || `PR-${Math.floor(10 + Math.random() * 90)}`,
 			category: category.trim(),
-			coursesCount,
+			academicStage: academicStage.trim() || undefined,
+			coursesCount: effectiveCoursesCount,
 			locationMode,
 			locationLabel: locLabelMap[locationMode],
-			trainers: selectedStaffMembers.map((s) => ({
-				id: s.id,
-				name: s.name,
-				avatar: s.avatar,
-			})),
 			staffIds: selectedStaffIds,
 			duration: duration.trim(),
-			studentsCount: track?.studentsCount ?? 0,
 			price,
-			revenue: track?.revenue ?? (track ? track.revenue : 0),
 			status: track?.status ?? "ACTIVE",
 			description: description.trim(),
-			notes: notes.trim(),
-			ageGroup: ageGroup.trim() || undefined,
+			notes: finalNotes,
 			selectedIcon,
 			selectedColor,
 		};
@@ -577,6 +712,8 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 						setCode(`PR-${Math.floor(10 + Math.random() * 90)}`);
 						setDescription("");
 						setNotes("");
+						setSelectedCourseIds([]);
+						setIsCoursesStep(false);
 					} else {
 						onOpenChange(false);
 					}
@@ -602,11 +739,13 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 					showCloseButton={false}
 					className={cn(
 						"p-0 gap-0 overflow-hidden rounded-xl bg-card border border-border/80 shadow-2xl transition-all duration-300 ease-out",
-						isAgentOpen
-							? "sm:max-w-5xl xl:max-w-6xl max-w-[96vw]"
-							: isExpanded
-								? "sm:max-w-4xl max-w-[96vw]"
-								: "sm:max-w-[560px] max-w-[94vw]",
+						isCoursesStep
+							? "sm:max-w-4xl md:max-w-5xl max-w-[96vw] h-[90vh] max-h-[92vh]"
+							: isAgentOpen
+								? "sm:max-w-5xl xl:max-w-6xl max-w-[96vw]"
+								: isExpanded
+									? "sm:max-w-4xl max-w-[96vw]"
+									: "sm:max-w-[560px] max-w-[94vw]",
 					)}
 					onInteractOutside={(e) => {
 						if (isDiscardOpen || isStaffSheetOpen) {
@@ -623,13 +762,39 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 							e.preventDefault();
 							return;
 						}
+						if (isCoursesStep) {
+							e.preventDefault();
+							setIsCoursesStep(false);
+							return;
+						}
 						if (!isEdit && isDirty) {
 							e.preventDefault();
 							setIsDiscardOpen(true);
 						}
 					}}
 				>
-					<div className="flex flex-col md:flex-row w-full items-stretch overflow-hidden max-h-[88vh]">
+					{isCoursesStep ? (
+						<TrackCoursesStep
+							isEdit={isEdit}
+							trackName={name}
+							trackCode={code}
+							selectedIcon={selectedIcon}
+							selectedColor={selectedColor}
+							selectedCourseIds={selectedCourseIds}
+							onToggleCourse={handleToggleCourse}
+							onSelectAll={(ids) => setSelectedCourseIds(ids)}
+							onClearAll={() => setSelectedCourseIds([])}
+							onBackToForm={() => setIsCoursesStep(false)}
+							onSubmit={handleFinalSubmit}
+							isSubmitting={isSubmitting || isCreatingTrack || isUpdatingTrack}
+							notifyWhatsApp={notifyWhatsApp}
+							onNotifyWhatsAppChange={setNotifyWhatsApp}
+							createAnother={createAnother}
+							onCreateAnotherChange={setCreateAnother}
+							onClose={handleCloseAttempt}
+						/>
+					) : (
+						<div className="flex flex-col md:flex-row w-full items-stretch overflow-hidden max-h-[88vh]">
 						{/* الجانب الأساسي: نموذج إنشاء المسار */}
 						<div
 							className={cn(
@@ -778,7 +943,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 
 							{/* 2. جسم النموذج القابل للتمرير */}
 							<form
-								onSubmit={handleSubmit}
+								onSubmit={handleFormSubmitToCourses}
 								className="flex flex-col flex-1 min-h-0 overflow-hidden"
 							>
 								<div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
@@ -815,7 +980,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 														htmlFor="trk-name"
 														className="text-xs font-semibold"
 													>
-														اسم الدورة
+														اسم المسار
 													</Label>
 												</FieldLabel>
 											</div>
@@ -990,7 +1155,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 										<div className="w-full bg-[#FFFBEB] dark:bg-amber-950/40 border-b border-amber-200/80 dark:border-amber-900/40 px-5 py-2.5 flex items-center justify-between text-xs text-amber-800 dark:text-amber-300">
 											<div className="flex items-center gap-1.5 font-medium">
 												<span className="font-bold">تنبيه:</span>
-												<span>يمكنك تخطي الخطوات التالية وإضافتها بعد إنشاء الفصل</span>
+												<span>يمكنك تخطي الخطوات التالية وإضافتها بعد إنشاء المسار</span>
 											</div>
 											<button
 												type="button"
@@ -1003,9 +1168,9 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 										</div>
 									)}
 
-									{/* ب) شريط شرائح الخطوات الإضافية (الفئة العمرية، التصنيف، المدرب، المدة، والخيارات) */}
+									{/* ب) شريط شرائح الخطوات الإضافية (المرحلة الدراسية، التصنيف، المدرب، المدة، والخيارات) */}
 									<div className="flex items-center gap-2 flex-wrap justify-start px-5 py-2.5 bg-background">
-										{/* 1. الفئة العمرية */}
+										{/* 1. المرحلة الدراسية المربوطة بإعدادات المراحل الدراسية والـ API */}
 										<DropdownMenu
 											dir="rtl"
 											modal={false}
@@ -1013,57 +1178,117 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 											<DropdownMenuTrigger asChild>
 												<Button
 													type="button"
-													variant={ageGroup ? "secondary" : "outline"}
+													variant={academicStage ? "secondary" : "outline"}
 													size="sm"
 													className="gap-1.5 h-8 text-xs font-normal"
 												>
-													<IconCalendarPlus className="size-3.5 shrink-0 text-muted-foreground" />
-													<span>{ageGroup || "بدون فئة عمرية"}</span>
+													<IconSchool className="size-3.5 text-muted-foreground/70 shrink-0" />
+													<span>{academicStage || "المرحلة الدراسية"}</span>
 												</Button>
 											</DropdownMenuTrigger>
 											<DropdownMenuContent
 												align="end"
-												className="w-48! min-w-48 p-1.5"
+												className="w-56! min-w-56 p-1.5"
 											>
 												<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
-													الفئة العمرية
+													المرحلة الدراسية
 												</DropdownMenuLabel>
-												<DropdownMenuSeparator className="my-1" />
 
-												{/* خيار بدون فئة عمرية في الأعلى */}
+												{/* حقل تخصيص وإضافة مرحلة دراسية جديدة */}
+												{/* biome-ignore lint/a11y/noStaticElementInteractions: stops dropdown closing on click */}
+												<div
+													className="p-1 mb-1.5 border-b"
+													onClickCapture={(e) => e.stopPropagation()}
+													onKeyDownCapture={(e) => e.stopPropagation()}
+													onPointerDownCapture={(e) => e.stopPropagation()}
+													onMouseDown={(e) => e.stopPropagation()}
+												>
+													<div className="flex items-center gap-1.5">
+														<Input
+															value={newStageInput}
+															onChange={(e) => setNewStageInput(e.target.value)}
+															onKeyDown={(e) => {
+																e.stopPropagation();
+																if (e.key === "Enter") {
+																	e.preventDefault();
+																	handleAddCustomStage(e);
+																}
+															}}
+															placeholder="مرحلة دراسية جديدة..."
+															className="h-7 text-xs px-2 flex-1"
+														/>
+														<Button
+															type="button"
+															size="sm"
+															variant="secondary"
+															onPointerDown={(e) => {
+																e.preventDefault();
+																e.stopPropagation();
+															}}
+															onMouseDown={(e) => {
+																e.preventDefault();
+																e.stopPropagation();
+																handleAddCustomStage(e);
+															}}
+															onClick={handleAddCustomStage}
+															disabled={!newStageInput.trim() || isAddingStage}
+															className="h-7 px-2 text-xs shrink-0 gap-1 cursor-pointer"
+														>
+															{isAddingStage ? (
+																<Spinner className="size-3" />
+															) : (
+																<IconPlus className="size-3" />
+															)}
+															<span>إضافة</span>
+														</Button>
+													</div>
+												</div>
+
+												{/* خيار بدون مرحلة دراسية في الأعلى */}
 												<DropdownMenuItem
-													onClick={() => setAgeGroup("")}
+													onClick={() => setAcademicStage("")}
 													className={cn(
-														"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md",
-														!ageGroup && "bg-muted font-medium text-foreground",
+														"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md mb-1",
+														!academicStage && "bg-muted font-medium text-foreground",
 													)}
 												>
-													<span>بدون فئة عمرية</span>
-													{!ageGroup && <IconCheck className="size-3.5 text-primary" />}
+													<span>بدون مرحلة دراسية</span>
+													{!academicStage && <IconCheck className="size-3.5 text-primary" />}
 												</DropdownMenuItem>
 												<DropdownMenuSeparator className="my-1" />
 
+												{/* قائمة المراحل المتاحة */}
 												<div className="max-h-48 overflow-y-auto space-y-0.5">
-													{AGE_GROUPS.map((ag) => (
-														<DropdownMenuItem
-															key={ag}
-															onClick={() => setAgeGroup(ag)}
-															className={cn(
-																"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md",
-																ageGroup === ag && "bg-muted font-medium text-foreground",
-															)}
-														>
-															<span>{ag}</span>
-															{ageGroup === ag && (
-																<IconCheck className="size-3.5 text-primary" />
-															)}
-														</DropdownMenuItem>
-													))}
+													{isStagesLoading && activeAcademicStages.length === 0 ? (
+														<div className="py-2 text-center text-xs text-muted-foreground">
+															جاري التحميل...
+														</div>
+													) : (
+														activeAcademicStages.map((item) => (
+															// biome-ignore lint/a11y/noStaticElementInteractions: stage option
+															// biome-ignore lint/a11y/useKeyWithClickEvents: stage option
+															<div
+																key={item}
+																onClick={() => setAcademicStage(item)}
+																className={cn(
+																	"relative flex cursor-pointer select-none items-center justify-between rounded-sm px-2 py-1.5 text-xs outline-none transition-colors hover:bg-accent hover:text-accent-foreground group",
+																	academicStage === item && "bg-accent/60 font-medium",
+																)}
+															>
+																<div className="flex items-center gap-1.5 min-w-0">
+																	<span>{item}</span>
+																	{academicStage === item && (
+																		<IconCheck className="size-3.5 text-primary shrink-0" />
+																	)}
+																</div>
+															</div>
+														))
+													)}
 												</div>
 											</DropdownMenuContent>
 										</DropdownMenu>
 
-										{/* 2. التصنيف المربوط بالـ API وإضافة/حذف التصنيفات المطابق لنموذج الفصل */}
+										{/* 2. المسار المربوط بإعدادات المسارات والـ API */}
 										<DropdownMenu
 											dir="rtl"
 											modal={false}
@@ -1075,8 +1300,8 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 													size="sm"
 													className="gap-1.5 h-8 text-xs font-normal"
 												>
-													<IconCircle className="size-3.5 text-muted-foreground/70 shrink-0" />
-													<span>{category || "بدون تصنيف"}</span>
+													<IconRoute className="size-3.5 text-muted-foreground/70 shrink-0" />
+													<span>{category || "التصنيف"}</span>
 												</Button>
 											</DropdownMenuTrigger>
 											<DropdownMenuContent
@@ -1087,7 +1312,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 													التصنيف
 												</DropdownMenuLabel>
 
-												{/* حقل تخصيص وإضافة تصنيف جديد */}
+												{/* حقل تخصيص وإضافة مسار جديد */}
 												{/* biome-ignore lint/a11y/noStaticElementInteractions: stops dropdown closing on click */}
 												<div
 													className="p-1 mb-1.5 border-b"
@@ -1107,7 +1332,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 																	handleAddCustomClassification(e);
 																}
 															}}
-															placeholder="تصنيف جديد..."
+															placeholder="التصنيف جديد..."
 															className="h-7 text-xs px-2 flex-1"
 														/>
 														<Button
@@ -1139,7 +1364,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 													</div>
 												</div>
 
-												{/* خيار بدون تصنيف في الأعلى */}
+												{/* خيار بدون مسار في الأعلى */}
 												<DropdownMenuItem
 													onClick={() => setCategory("")}
 													className={cn(
@@ -1152,15 +1377,16 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 												</DropdownMenuItem>
 												<DropdownMenuSeparator className="my-1" />
 
-												{/* قائمة التصنيفات المتاحة */}
+												{/* قائمة المسارات المتاحة */}
 												<div className="max-h-48 overflow-y-auto space-y-0.5">
-													{isClassificationsLoading && mergedClassifications.length === 0 ? (
+													{isClassificationsLoading && activeTrackClassifications.length === 0 ? (
 														<div className="py-2 text-center text-xs text-muted-foreground">
 															جاري التحميل...
 														</div>
 													) : (
-														mergedClassifications.map((item) => {
-															const isCustom = !DEFAULT_CLASSIFICATIONS.includes(item);
+														activeTrackClassifications.map((item) => {
+															const trackObj = (trackClassifications || []).find((t) => t.name === item);
+															const isCustom = trackObj ? !trackObj.isDefault : true;
 															return (
 																// biome-ignore lint/a11y/noStaticElementInteractions: dropdown option
 																// biome-ignore lint/a11y/useKeyWithClickEvents: dropdown option
@@ -1182,7 +1408,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 																	{isCustom && (
 																		<button
 																			type="button"
-																			title="حذف هذا التصنيف"
+																			title="حذف هذا المسار"
 																			onPointerDown={(e) => {
 																				e.preventDefault();
 																				e.stopPropagation();
@@ -1345,7 +1571,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 											/>
 										</div> */}
 
-												<div className="space-y-1 pt-1 border-t">
+												{/* <div className="space-y-1 pt-1 border-t">
 													<span className="text-[11px] font-semibold text-muted-foreground block">
 														السعر (ج.م)
 													</span>
@@ -1358,7 +1584,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 														}
 														className="h-7 text-xs"
 													/>
-												</div>
+												</div> */}
 
 												<div className="pt-1 border-t">
 													<button
@@ -1410,6 +1636,21 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 											إلغاء
 										</Button>
 
+										{isEdit && (
+											<Button
+												type="button"
+												variant="outline"
+												size="sm"
+												onClick={handleFinalSubmit}
+												disabled={
+													isSubmitting || isCreatingTrack || isUpdatingTrack || !name.trim()
+												}
+												className="text-xs font-medium cursor-pointer"
+											>
+												حفظ مباشر
+											</Button>
+										)}
+
 										<Button
 											type="submit"
 											size="sm"
@@ -1417,14 +1658,11 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 												isSubmitting || isCreatingTrack || isUpdatingTrack || !name.trim()
 											}
 											className={cn(
-												"gap-1.5 font-semibold transition-all shadow-xs",
+												"gap-1.5 font-semibold transition-all shadow-xs cursor-pointer",
 												!name.trim() && "opacity-50 cursor-not-allowed",
 											)}
 										>
-											{(isSubmitting || isCreatingTrack || isUpdatingTrack) && (
-												<Spinner className="size-3.5" />
-											)}
-											<span>{isEdit ? "حفظ التعديلات" : "إنشاء الدورة ⤶"}</span>
+											<span>التالي: اختيار الدورات ←</span>
 										</Button>
 									</FormFooter>
 								</div>
@@ -1442,8 +1680,8 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 									if (data.description !== undefined) setDescription(data.description);
 									if (data.notes !== undefined) setNotes(data.notes);
 									if (data.category !== undefined) setCategory(data.category);
+									if (data.academicStage !== undefined) setAcademicStage(data.academicStage);
 									if (data.duration !== undefined) setDuration(data.duration);
-									if (data.ageGroup !== undefined) setAgeGroup(data.ageGroup);
 									if (data.coursesCount !== undefined) setCoursesCount(data.coursesCount);
 									if (data.price !== undefined) setPrice(data.price);
 									if (data.selectedTrainer !== undefined)
@@ -1456,8 +1694,8 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 									description,
 									notes,
 									category,
+									academicStage,
 									duration,
-									ageGroup,
 									coursesCount,
 									price,
 									selectedTrainer,
@@ -1466,6 +1704,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 							/>
 						)}
 					</div>
+				)}
 				</DialogContent>
 			</Dialog>
 

@@ -7,6 +7,7 @@ export const createClassroomSchema = z.object({
 	name: z.string({ error: "اسم الفصل مطلوب" }).min(1, "اسم الفصل مطلوب"),
 	code: z.string().optional(),
 	ageGroup: z.string().optional().nullable(),
+	academicStage: z.string().trim().min(1).max(60),
 	category: z.string().optional().nullable(),
 	learningMode: learningModeEnum.default("REMOTE"),
 	capacity: z.coerce.number().int().min(1, "السعة يجب أن تكون 1 على الأقل").default(10),
@@ -43,6 +44,7 @@ export interface ClassroomStudentInfo {
 	guardianPhone?: string | null;
 	guardianRelationship?: string | null;
 	preferredShift?: string | null;
+	academicStage?: string | null;
 }
 
 export interface ClassroomResponse {
@@ -51,6 +53,7 @@ export interface ClassroomResponse {
 	clinicId: string;
 	name: string;
 	ageGroup?: string | null;
+	academicStage?: string | null;
 	category?: string | null;
 	learningMode: LearningMode;
 	capacity: number;

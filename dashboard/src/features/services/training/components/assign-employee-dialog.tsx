@@ -1,9 +1,8 @@
-import { IconSearch, IconUserPlus, IconUsersGroup } from "@tabler/icons-react";
+import { IconCheck, IconSearch, IconUserPlus, IconUsersGroup } from "@tabler/icons-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { showSuccessToast } from "@/components/common/success-toast";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
 	Select,
@@ -20,6 +19,7 @@ import {
 } from "@/features/services/training/hooks/use-course-assignments";
 import { useBranches } from "@/features/settings/branches/hooks/use-branches";
 import { getFileUrl } from "@/lib/file-url";
+import { cn } from "@/lib/utils";
 import type { CourseListItemResponse } from "@/server/training/training.type";
 
 const ALL = "__ALL__";
@@ -223,18 +223,30 @@ export function AssignEmployeeDialog({
 				{/* رأس القائمة: العنوان + تحديد الكل */}
 				<div className="flex shrink-0 items-center justify-between px-3 pt-3">
 					<span className="text-[13px] font-bold text-foreground">الموظفون</span>
-					<button
-						type="button"
+					<div
+						role="button"
+						tabIndex={0}
 						onClick={toggleAll}
-						className="flex items-center gap-1.5 text-[10px] font-medium text-foreground"
+						onKeyDown={(e) => {
+							if (e.key === "Enter" || e.key === " ") {
+								e.preventDefault();
+								toggleAll();
+							}
+						}}
+						className="flex items-center gap-1.5 text-[10px] font-medium text-foreground cursor-pointer select-none"
 					>
-						تحديد كل الموظفين ({filtered.length})
-						<Checkbox
-							checked={allFilteredSelected}
-							aria-hidden
-							className="pointer-events-none size-4 rounded-[4px] border-[1.5px] border-[#E5E5E5]"
-						/>
-					</button>
+						<span>تحديد كل الموظفين ({filtered.length})</span>
+						<div
+							className={cn(
+								"flex size-4 shrink-0 items-center justify-center rounded-[4px] border-[1.5px] transition-colors",
+								allFilteredSelected
+									? "border-primary bg-primary text-primary-foreground"
+									: "border-[#E5E5E5] bg-transparent",
+							)}
+						>
+							{allFilteredSelected && <IconCheck className="size-3" />}
+						</div>
+					</div>
 				</div>
 
 				{/* قائمة الموظفين */}
@@ -250,34 +262,49 @@ export function AssignEmployeeDialog({
 						</div>
 					) : (
 						<ul className="flex flex-col">
-							{filtered.map((l) => (
-								<li key={l.id}>
-									<button
-										type="button"
-										onClick={() => toggle(l.id, l.name)}
-										className="flex w-full items-center gap-2 rounded-[4px] px-2 py-1.5 text-start hover:bg-muted"
-									>
-										{/* في RTL أول عنصر يمين: مربّع الاختيار ثم الصورة ثم الاسم/الوصف */}
-										<Checkbox
-											checked={selected.has(l.id)}
-											aria-hidden
-											className="pointer-events-none size-4 rounded-[4px] border-[1.5px] border-[#E5E5E5]"
-										/>
-										<StaffAvatar
-											name={l.name}
-											avatar={l.avatar}
-										/>
-										<div className="flex min-w-0 flex-1 flex-col">
-											<span className="truncate text-[11px] font-medium text-foreground">
-												{l.name}
-											</span>
-											<span className="truncate text-[9px] text-[#9B9B9D]">
-												{[l.role?.name, l.code].filter(Boolean).join(" · ")}
-											</span>
+							{filtered.map((l) => {
+								const isSel = selected.has(l.id);
+								return (
+									<li key={l.id}>
+										<div
+											role="button"
+											tabIndex={0}
+											onClick={() => toggle(l.id, l.name)}
+											onKeyDown={(e) => {
+												if (e.key === "Enter" || e.key === " ") {
+													e.preventDefault();
+													toggle(l.id, l.name);
+												}
+											}}
+											className="flex w-full items-center gap-2 rounded-[4px] px-2 py-1.5 text-start hover:bg-muted cursor-pointer select-none"
+										>
+											{/* في RTL أول عنصر يمين: مربّع الاختيار ثم الصورة ثم الاسم/الوصف */}
+											<div
+												className={cn(
+													"flex size-4 shrink-0 items-center justify-center rounded-[4px] border-[1.5px] transition-colors",
+													isSel
+														? "border-primary bg-primary text-primary-foreground"
+														: "border-[#E5E5E5] bg-transparent",
+												)}
+											>
+												{isSel && <IconCheck className="size-3" />}
+											</div>
+											<StaffAvatar
+												name={l.name}
+												avatar={l.avatar}
+											/>
+											<div className="flex min-w-0 flex-1 flex-col">
+												<span className="truncate text-[11px] font-medium text-foreground">
+													{l.name}
+												</span>
+												<span className="truncate text-[9px] text-[#9B9B9D]">
+													{[l.role?.name, l.code].filter(Boolean).join(" · ")}
+												</span>
+											</div>
 										</div>
-									</button>
-								</li>
-							))}
+									</li>
+								);
+							})}
 						</ul>
 					)}
 				</div>

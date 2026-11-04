@@ -42,11 +42,10 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
+import { useAcademicStageOptions, useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
 import { AGE_GROUPS } from "@/features/services/classrooms/data/constants";
 import {
 	calculateAge,
-	filterClassroomsByAgeGroup,
 	getAgeGroupFromAge,
 } from "@/features/services/classrooms/utils/age-group-utils";
 import {
@@ -104,9 +103,16 @@ export function PatientFormContent({
 	idPrefix = "patient-form",
 }: PatientFormContentProps) {
 	const { classrooms } = useClassrooms();
+	const { academicStages, isLoading: areStagesLoading } = useAcademicStageOptions();
 	const values = watch();
 	const watchedBirthDate = watch("birthDate");
 	const watchedAgeGroup = watch("ageGroup");
+	const watchedAcademicStage = watch("academicStage");
+	const watchedClassroom = watch("classroom");
+	const availableAcademicStages = useMemo(
+		() => Array.from(new Set([...academicStages, watchedAcademicStage].filter((stage): stage is string => Boolean(stage)))),
+		[academicStages, watchedAcademicStage],
+	);
 
 	// اشتقاق الفئة العمرية تلقائياً عند إدخال أو تغيير تاريخ الميلاد أو إذا كانت الفئة العمرية فارغة
 	const prevBirthDateRef = useRef<string | undefined>(undefined);
@@ -130,11 +136,19 @@ export function PatientFormContent({
 		watchedAgeGroup ||
 		(watchedBirthDate ? getAgeGroupFromAge(calculateAge(watchedBirthDate)) : "");
 
-	// تصفية الفصول المتاحة طبقاً للفئة العمرية
+	const normalizeStage = (value?: string | null) => value?.trim().toLocaleLowerCase() || null;
+	// الفصول المتاحة مرتبطة بالمرحلة الدراسية؛ الفئة العمرية للمعلومة فقط.
 	const availableClassrooms = useMemo(() => {
-		if (!effectiveAgeGroup) return classrooms;
-		return filterClassroomsByAgeGroup(classrooms, effectiveAgeGroup);
-	}, [classrooms, effectiveAgeGroup]);
+		return classrooms.filter((classroom) => normalizeStage(classroom.academicStage) === normalizeStage(watchedAcademicStage));
+	}, [classrooms, watchedAcademicStage]);
+
+	useEffect(() => {
+		if (!watchedClassroom) return;
+		const current = classrooms.find((classroom) => classroom.name === watchedClassroom);
+		if (current && normalizeStage(current.academicStage) !== normalizeStage(watchedAcademicStage)) {
+			setValue("classroom", "", { shouldDirty: true, shouldValidate: true });
+		}
+	}, [classrooms, watchedAcademicStage, watchedClassroom, setValue]);
 	const [ownerSearch, setOwnerSearch] = useState("");
 	const [internalOpen, setInternalOpen] = useState(false);
 	const comboOpen = setOwnerSelectOpen ? (ownerSelectOpen ?? false) : internalOpen;
@@ -230,45 +244,49 @@ export function PatientFormContent({
 						</Field>
 					</div>
 
-					{/* الفئة العمرية */}
+					{/* المرحلة الدراسية */}
 					<div className="flex flex-col gap-1.5">
-						<FieldLabel info="الفئة العمرية المناسبة للطفل (يتم تحديدها تلقائياً من تاريخ الميلاد وتستخدم لفلترة الفصول المتاحة)">
+						<FieldLabel
+							required
+							info="المرحلة الدراسية للطفل، وتستخدم للربط والفلترة التلقائية مع الفصول المتاحة"
+						>
 							<Label
 								className="text-sm font-medium"
-								htmlFor={`${idPrefix}-age-group`}
+								htmlFor={`${idPrefix}-academic-stage`}
 							>
-								الفئة العمرية
+								المرحلة الدراسية
 							</Label>
 						</FieldLabel>
 						<Controller
-							name="ageGroup"
+							name="academicStage"
 							control={control}
 							render={({ field }) => (
-								<Field data-invalid={!!errors.ageGroup}>
+								<Field data-invalid={!!errors.academicStage}>
 									<Select
 										value={field.value || ""}
-										onValueChange={field.onChange}
-										disabled={isPending || readOnly}
+										onValueChange={(value) => {
+											field.onChange(value);
+											const current = classrooms.find((classroom) => classroom.name === watchedClassroom);
+											if (current && normalizeStage(current.academicStage || current.classification) !== normalizeStage(value)) {
+												setValue("classroom", "", { shouldDirty: true, shouldValidate: true });
+											}
+										}}
+										disabled={isPending || readOnly || areStagesLoading}
 										dir="rtl"
 									>
 										<SelectTrigger
-											id={`${idPrefix}-age-group`}
+											id={`${idPrefix}-academic-stage`}
 											className="w-full text-right text-sm"
 										>
-											<SelectValue placeholder="اختر الفئة العمرية..." />
+											<SelectValue placeholder="اختر المرحلة الدراسية..." />
 										</SelectTrigger>
 										<SelectContent dir="rtl">
-											{AGE_GROUPS.map((group) => (
-												<SelectItem
-													key={group}
-													value={group}
-												>
-													{group}
-												</SelectItem>
+											{availableAcademicStages.map((stage) => (
+												<SelectItem key={stage} value={stage}>{stage}</SelectItem>
 											))}
 										</SelectContent>
 									</Select>
-									<FieldError errors={[errors.ageGroup]} />
+									<FieldError errors={[errors.academicStage]} />
 								</Field>
 							)}
 						/>
@@ -340,8 +358,8 @@ export function PatientFormContent({
 
 				{/* الفصل */}
 				<div className="flex flex-col gap-1.5">
-					<FieldLabel info="المجموعة أو الصف الدراسي المسجل به الطالب (يتم فلترة الفصول تلقائياً حسب الفئة العمرية المحددة)">
-						<Label className="text-sm font-medium">الفصل</Label>
+					<FieldLabel info="المجموعة أو الصف الدراسي المسجل به الطالب (يتم فلترة الفصول تلقائياً حسب المرحلة الدراسية المحددة)">
+						<Label className="text-sm font-medium">الفصل الدراسي</Label>
 					</FieldLabel>
 					<Controller
 						name="classroom"
@@ -376,8 +394,9 @@ export function PatientFormContent({
 											<SelectItem value="__NONE__">بدون فصل (غير مسجل)</SelectItem>
 											{displayedClassrooms.length === 0 ? (
 												<div className="py-2.5 px-3 text-center text-xs text-muted-foreground">
-													لا توجد فصول متاحة للفئة العمرية (
-													{effectiveAgeGroup || "المحددة"})
+													{watchedAcademicStage
+														? `لا توجد فصول متاحة للمرحلة الدراسية (${watchedAcademicStage})`
+														: "يرجى تحديد المرحلة الدراسية أولاً لعرض الفصول المتوافقة"}
 												</div>
 											) : (
 												displayedClassrooms.map((cls) => (
@@ -388,9 +407,9 @@ export function PatientFormContent({
 														<div className="flex items-center justify-between w-full gap-2">
 															<span className="font-medium">{cls.name}</span>
 															<div className="flex items-center gap-1.5 text-[10px] text-muted-foreground font-mono">
-																{cls.ageGroup && (
-																	<span className="bg-muted px-1.5 py-0.5 rounded text-[10px] text-primary font-sans font-medium">
-																		{cls.ageGroup}
+																{(cls.academicStage || cls.classification) && (
+																	<span className="bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 px-1.5 py-0.5 rounded text-[10px] font-sans font-medium">
+																		{cls.academicStage || cls.classification}
 																	</span>
 																)}
 																<span>
@@ -403,10 +422,14 @@ export function PatientFormContent({
 											)}
 										</SelectContent>
 									</Select>
-									{effectiveAgeGroup && (
+									{watchedAcademicStage ? (
 										<p className="text-[11px] text-muted-foreground mt-0.5">
-											معروضة الفصول المتوافقة مع الفئة العمرية:{" "}
-											<span className="font-semibold text-primary">{effectiveAgeGroup}</span>
+											معروضة الفصول المتوافقة مع المرحلة الدراسية:{" "}
+											<span className="font-semibold text-primary">{watchedAcademicStage}</span>
+										</p>
+									) : (
+										<p className="text-[11px] text-amber-600 dark:text-amber-400 mt-0.5">
+											اختر المرحلة الدراسية أعلاه لتصفية واختيار الفصول التابعة لها.
 										</p>
 									)}
 									<FieldError errors={[errors.classroom]} />

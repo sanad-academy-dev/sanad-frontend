@@ -194,3 +194,6 @@ export const useDeleteClassroomClassification = () => {
 		},
 	});
 };
+
+export const useAddClassification = useAddClassroomClassification;
+export const useDeleteClassification = useDeleteClassroomClassification;

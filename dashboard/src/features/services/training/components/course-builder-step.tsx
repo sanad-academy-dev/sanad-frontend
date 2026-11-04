@@ -1,16 +1,28 @@
 import {
+	IconAlignRight,
 	IconArrowsHorizontal,
+	IconBuildingBank,
+	IconCheck,
+	IconCheckbox,
 	IconChevronDown,
 	IconCopy,
 	IconDots,
 	IconEye,
+	IconFileCheck,
+	IconFileDiff,
 	IconFileText,
+	IconFileTextSpark,
 	IconFocusCentered,
 	IconGripVertical,
+	IconInfoCircle,
+	IconMicrophone,
 	IconPencil,
 	IconPlus,
+	IconSchool,
 	IconSparkles,
+	IconStack2,
 	IconTrash,
+	IconVideoPlus,
 	IconX,
 } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -40,8 +52,10 @@ import type {
 	CreateLessonFormInput,
 	LessonFormValues,
 	LessonResponse,
+	LessonType,
 	UnitResponse,
 } from "@/server/training/training.type";
+import { toast } from "sonner";
 
 const UNIT_NAME_MAX = 60;
 
@@ -111,7 +125,7 @@ function ResizeHandle({
 						: "bg-[#E5E5E5] group-hover:w-[2px] group-hover:bg-[#6366F1]/80",
 				)}
 			/>
-			{/* مقبض السهم الموف القابل للسحب */}
+			{/* مقبض السهم الموف القابل للسحب بالماوس */}
 			<div
 				className={cn(
 					"pointer-events-none absolute flex h-7 w-4 items-center justify-center rounded-[4px] border border-[#4F46E5] bg-[#6366F1] text-white shadow-[0_2px_6px_rgba(99,102,241,0.35)] transition-all duration-150",
@@ -444,21 +458,26 @@ function UnitAccordion({
 
 // حالة المحرر المركزي
 type EditorState =
-	| { mode: "add"; unitId: string; unitTitle: string }
+	| { mode: "add"; unitId: string; unitTitle: string; initialType?: LessonType }
 	| { mode: "edit"; lesson: LessonResponse; unitTitle: string; unitId: string }
 	| null;
 
 export function CourseBuilderStep({
 	courseId,
 	onGenerateAI,
+	onEnsureCourseCreated,
 }: {
 	courseId: string | null;
 	onGenerateAI?: () => void;
+	onEnsureCourseCreated?: () => Promise<string>;
 }) {
 	const { course, isLoading } = useCourse(courseId);
 	const { addUnit, duplicateUnit, removeUnit, addLesson, updateLesson, isSavingLesson } =
 		useCourseContent(courseId);
 	const [copyingUnitId, setCopyingUnitId] = useState<string | null>(null);
+	// إضافة قسم جديد عبر الإدخال المباشر
+	const [isAddingSection, setIsAddingSection] = useState(false);
+	const [newSectionTitle, setNewSectionTitle] = useState("");
 	// المحرر المركزي — في العمود الأوسط
 	const [editor, setEditor] = useState<EditorState>(null);
 	// تعديلات مُهمَلة محفوظة ليستعيدها زر «تراجع»
@@ -559,40 +578,57 @@ export function CourseBuilderStep({
 	const units = course?.units ?? [];
 	const cover = resolveCover(course?.coverKey);
 
-	const handleAddUnit = () => addUnit(`الوحدة ${units.length + 1}`);
+	const handleAddUnit = () => {
+		setIsAddingSection(true);
+	};
 
-	// إضافة وحدة أولى تلقائيًا للدورة الجديدة
-	const autoAddedForRef = useRef<string | null>(null);
-	// biome-ignore lint/correctness/useExhaustiveDependencies: تأثير تهيئة يُشغَّل مرة واحدة لكل دورة عبر حارس ref
-	useEffect(() => {
-		if (!courseId || isLoading) return;
-		if (autoAddedForRef.current === courseId) return;
-		autoAddedForRef.current = courseId;
-		if (units.length > 0) return;
-		handleAddUnit();
-	}, [courseId, isLoading, units.length]);
+	const handleConfirmAddSection = async () => {
+		const trimmed = newSectionTitle.trim() || `الوحدة ${units.length + 1}`;
+		let currentCourseId = courseId;
+		if (!currentCourseId && onEnsureCourseCreated) {
+			try {
+				currentCourseId = await onEnsureCourseCreated();
+			} catch (e) {
+				toast.error((e as Error).message);
+				return;
+			}
+		}
+		if (!currentCourseId) {
+			toast.error("يرجى التأكد من بيانات الدورة أولاً");
+			return;
+		}
+		await addUnit(trimmed, currentCourseId);
+		setIsAddingSection(false);
+		setNewSectionTitle("");
+	};
 
-	// فتح المحرر تلقائياً على أول درس أو إضافة درس عند توفر وحدات
+	// فتح المحرر تلقائياً على أول درس فقط إن كانت هناك دروس مسبقاً
 	const autoOpenedEditorRef = useRef(false);
 	useEffect(() => {
 		if (autoOpenedEditorRef.current || !units.length || editor !== null) return;
 		autoOpenedEditorRef.current = true;
 		const firstUnit = units[0];
-		if (firstUnit.lessons.length > 0) {
+		if (firstUnit && firstUnit.lessons.length > 0) {
 			setEditor({
 				mode: "edit",
 				lesson: firstUnit.lessons[0],
 				unitTitle: firstUnit.title,
 				unitId: firstUnit.id,
 			});
-		} else {
-			setEditor({
-				mode: "add",
-				unitId: firstUnit.id,
-				unitTitle: firstUnit.title,
-			});
 		}
 	}, [units, editor]);
+
+	// إنشاء أول درس للدورة — مجرد فتح محرر الدرس محلياً بدون إرسال إلى قاعدة البيانات
+	const handleCreateFirstLesson = () => {
+		const existingUnit = units[0];
+		setRestoredEdit(undefined);
+		setLiveDraft(null);
+		setEditor({
+			mode: "add",
+			unitId: existingUnit ? existingUnit.id : "pending",
+			unitTitle: existingUnit ? existingUnit.title : "الوحدة 1",
+		});
+	};
 
 	const handleDuplicateUnit = async (unit: UnitResponse) => {
 		setCopyingUnitId(unit.id);
@@ -614,21 +650,34 @@ export function CourseBuilderStep({
 	};
 
 	const saveCover = async (coverKey: string | null) => {
-		if (!courseId) return;
-		await fetch(backendUrl(`/api/training/courses/${courseId}`), {
+		let currentCourseId = courseId;
+		if (!currentCourseId && onEnsureCourseCreated) {
+			try {
+				currentCourseId = await onEnsureCourseCreated();
+			} catch (e) {
+				toast.error((e as Error).message);
+				return;
+			}
+		}
+		if (!currentCourseId) return;
+		await fetch(backendUrl(`/api/training/courses/${currentCourseId}`), {
 			method: "PATCH",
 			headers: { "Content-Type": "application/json" },
 			credentials: "include",
 			body: JSON.stringify({ coverKey }),
 		});
-		qc.invalidateQueries({ queryKey: ["training", "course", courseId] });
+		qc.invalidateQueries({ queryKey: ["training", "course", currentCourseId] });
 	};
 
 	// المحرر: إضافة درس
-	const handleOpenAddLesson = (unitId: string, unitTitle: string) => {
+	const handleOpenAddLesson = (
+		unitId: string,
+		unitTitle: string,
+		initialType?: LessonType,
+	) => {
 		setRestoredEdit(undefined);
 		setLiveDraft(null);
-		setEditor({ mode: "add", unitId, unitTitle });
+		setEditor({ mode: "add", unitId, unitTitle, initialType });
 	};
 
 	// المحرر: تعديل درس
@@ -641,8 +690,43 @@ export function CourseBuilderStep({
 	// حفظ درس جديد
 	const handleSaveNewLesson = async (values: LessonFormValues) => {
 		if (editor?.mode !== "add") return;
+
+		let currentCourseId = courseId;
+		if (!currentCourseId && onEnsureCourseCreated) {
+			try {
+				currentCourseId = await onEnsureCourseCreated();
+			} catch (e) {
+				toast.error((e as Error).message);
+				return;
+			}
+		}
+
+		if (!currentCourseId) {
+			toast.error("يرجى التأكد من بيانات الدورة أولاً");
+			return;
+		}
+
+		let targetUnitId = editor.unitId;
+		let targetUnitTitle = editor.unitTitle;
+		if (!targetUnitId || targetUnitId === "pending") {
+			const existingUnit = units[0];
+			if (existingUnit) {
+				targetUnitId = existingUnit.id;
+				targetUnitTitle = existingUnit.title;
+			} else {
+				try {
+					const newUnit = await addUnit(targetUnitTitle || "الوحدة 1", currentCourseId);
+					targetUnitId = newUnit.id;
+					targetUnitTitle = newUnit.title;
+				} catch (e) {
+					toast.error((e as Error).message);
+					return;
+				}
+			}
+		}
+
 		const saved = await addLesson({
-			unitId: editor.unitId,
+			unitId: targetUnitId,
 			title: values.title,
 			type: values.type,
 			description: values.description || null,
@@ -655,13 +739,14 @@ export function CourseBuilderStep({
 					: values.content || null,
 			durationSeconds: toDurationSeconds(values),
 		}).catch(() => null);
+
 		if (saved) {
 			setLiveDraft(null);
 			setEditor({
 				mode: "edit",
 				lesson: saved,
-				unitTitle: editor.unitTitle,
-				unitId: editor.unitId,
+				unitTitle: targetUnitTitle,
+				unitId: targetUnitId,
 			});
 		}
 	};
@@ -822,7 +907,7 @@ export function CourseBuilderStep({
 						<button
 							type="button"
 							onClick={handleAddUnit}
-							disabled={!courseId}
+							disabled={!courseId && !onEnsureCourseCreated}
 							className="flex h-[24px] items-center gap-1 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white px-2 text-[10px] font-medium text-[#08090A] hover:bg-[#FAFAFA] disabled:opacity-50 transition-colors"
 						>
 							<IconPlus className="size-3" />
@@ -831,11 +916,72 @@ export function CourseBuilderStep({
 					</div>
 				</div>
 
+				{/* حقل إدخال اسم القسم الجديد المباشر المطابق للتصميم */}
+				{isAddingSection && (
+					<div className="flex items-center gap-2 rounded-[4px] border border-[#6366F1] bg-white px-2.5 py-1.5 shadow-2xs shrink-0">
+						<input
+							autoFocus
+							value={newSectionTitle}
+							onChange={(e) => setNewSectionTitle(e.target.value)}
+							maxLength={UNIT_NAME_MAX}
+							placeholder="أدخل اسم القسم"
+							onKeyDown={(e) => {
+								if (e.key === "Enter") handleConfirmAddSection();
+								if (e.key === "Escape") {
+									setIsAddingSection(false);
+									setNewSectionTitle("");
+								}
+							}}
+							className="flex-1 text-[11px] text-[#08090A] bg-transparent outline-none border-0 p-0"
+						/>
+						<span className="text-[10px] text-[#9B9B9D] tabular-nums">
+							{newSectionTitle.length}/{UNIT_NAME_MAX}
+						</span>
+						<button
+							type="button"
+							onClick={handleConfirmAddSection}
+							className="text-[#6366F1] hover:text-[#4F46E5] p-0.5 cursor-pointer"
+							title="تأكيد"
+						>
+							<IconCheck className="size-4" />
+						</button>
+						<button
+							type="button"
+							onClick={() => {
+								setIsAddingSection(false);
+								setNewSectionTitle("");
+							}}
+							className="text-[#9B9B9D] hover:text-[#08090A] p-0.5 cursor-pointer"
+							title="إلغاء"
+						>
+							<IconX className="size-4" />
+						</button>
+					</div>
+				)}
+
 				{/* قائمة الأقسام والوحدات */}
 				<div className="flex min-h-0 flex-1 flex-col gap-[9px] overflow-y-auto pb-4">
 					{isLoading ? (
 						<div className="flex justify-center py-6">
 							<Spinner />
+						</div>
+					) : units.length === 0 ? (
+						<div className="flex flex-col items-center justify-center gap-2 rounded-[4px] border border-dashed border-[#E5E5E5] bg-[#FAFAFA]/60 p-4 text-center">
+							<IconStack2 className="size-5 text-[#9B9B9D]" />
+							<span className="text-[11px] font-semibold text-[#08090A]">
+								لا توجد وحدات حتى الآن
+							</span>
+							<p className="text-[10px] text-[#6B6B67] leading-4">
+								ابدأ بإضافة أول وحدة لتنظيم دروس ومحتوى الدورة
+							</p>
+							<button
+								type="button"
+								onClick={() => setIsAddingSection(true)}
+								className="mt-1 flex h-[24px] items-center gap-1 rounded-[4px] border border-[#6366F1] bg-white px-2.5 text-[10px] font-medium text-[#4F46E5] hover:bg-[#6366F1]/5 transition-colors cursor-pointer"
+							>
+								<IconPlus className="size-3" />
+								إضافة وحدة
+							</button>
 						</div>
 					) : (
 						units.map((unit) => (
@@ -888,13 +1034,13 @@ export function CourseBuilderStep({
 						<CoverPicker
 							value={course?.coverKey ?? null}
 							onChange={saveCover}
-							disabled={!courseId}
+							disabled={!courseId && !onEnsureCourseCreated}
 							triggerLabel={course?.coverKey ? "تغيير الغلاف" : "رفع غلاف"}
 						/>
 					</div>
 				</div>
 
-				{/* المحرر والتابس أسفل الغلاف */}
+				{/* المحرر وأسفله النموذج أو الحالة الفارغة النظيفة */}
 				{editor ? (
 					<div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
 						{/* شريط معلومات الدرس قيد التحرير */}
@@ -911,7 +1057,7 @@ export function CourseBuilderStep({
 										type="button"
 										onClick={handleDuplicateLesson}
 										disabled={isSavingLesson}
-										className="flex h-[22px] items-center gap-1 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white px-2 text-[10px] font-medium text-[#08090A] disabled:opacity-50"
+										className="flex h-[22px] items-center gap-1 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white px-2 text-[10px] font-medium text-[#08090A] disabled:opacity-50 cursor-pointer"
 									>
 										<IconCopy className="size-3" />
 										استنساخ
@@ -923,7 +1069,7 @@ export function CourseBuilderStep({
 										setEditor(null);
 										setLiveDraft(null);
 									}}
-									className="flex size-5 items-center justify-center rounded text-[#9B9B9D] hover:text-[#08090A]"
+									className="flex size-5 items-center justify-center rounded text-[#9B9B9D] hover:text-[#08090A] cursor-pointer"
 									aria-label="إغلاق المحرر"
 								>
 									<IconX className="size-3.5" />
@@ -942,6 +1088,7 @@ export function CourseBuilderStep({
 									onSave={handleSaveNewLesson}
 									isSaving={isSavingLesson}
 									onValuesChange={setLiveDraft}
+									initialType={editor.initialType}
 								/>
 							) : (
 								<LessonForm
@@ -957,28 +1104,44 @@ export function CourseBuilderStep({
 						</div>
 					</div>
 				) : (
-					/* حالة عدم اختيار درس */
-					<div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 py-6">
+					/* الحالة المركزية عند عدم اختيار درس: إضافة وحدة أولاً إن لم تكن هناك وحدات، ثم إضافة درس */
+					<div className="flex flex-1 flex-col items-center justify-center gap-3 p-8">
 						<div className="flex size-11 items-center justify-center rounded-full border border-[#E5E5E5] bg-[#FAFAFA]">
-							<IconFileText className="size-5 text-[#9B9B9D]" />
+							{units.length === 0 ? (
+								<IconStack2 className="size-5 text-[#9B9B9D]" />
+							) : (
+								<IconFileText className="size-5 text-[#9B9B9D]" />
+							)}
 						</div>
 						<div className="flex flex-col items-center gap-1">
 							<p className="text-center text-[12px] font-semibold text-[#08090A]">
-								اختر درساً للتعديل أو أضف درساً جديداً
+								{units.length === 0
+									? "ابدأ بإضافة أول وحدة للدورة"
+									: "ابدأ بإضافة درس جديد"}
 							</p>
 							<p className="text-center text-[10px] leading-5 text-[#6B6B67]">
-								اضغط على أي درس من قائمة الهيكل في اليمين لتحريره، أو أضف قسماً ودرساً جديدين
+								{units.length === 0
+									? "أنشئ وحدة أو قسماً لتنظيم الدروس والمحتوى التعليمي بداخلها"
+									: `أضف درساً ومحتوى تعليمياً إلى "${units[0]?.title || "الوحدة 1"}"`}
 							</p>
 						</div>
-						{units.length > 0 && (
+						{units.length === 0 ? (
 							<Button
 								type="button"
-								variant="outline"
-								onClick={() => handleOpenAddLesson(units[0].id, units[0].title)}
-								className="mt-1 h-[28px] gap-1 rounded-[4px] px-3 text-[11px]"
+								onClick={() => setIsAddingSection(true)}
+								className="h-[30px] gap-1.5 rounded-[4px] px-3.5 text-[11px] font-semibold cursor-pointer"
 							>
-								<IconPlus className="size-3" />
-								إضافة درس في {units[0].title}
+								<IconPlus className="size-3.5" />
+								إضافة أول وحدة للدورة
+							</Button>
+						) : (
+							<Button
+								type="button"
+								onClick={handleCreateFirstLesson}
+								className="h-[30px] gap-1.5 rounded-[4px] px-3.5 text-[11px] font-semibold cursor-pointer"
+							>
+								<IconPlus className="size-3.5" />
+								إضافة درس جديد
 							</Button>
 						)}
 					</div>

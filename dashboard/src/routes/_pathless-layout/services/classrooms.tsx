@@ -1,22 +1,26 @@
-import { useState, useMemo } from "react";
-import { createFileRoute } from "@tanstack/react-router";
 import { IconPlus } from "@tabler/icons-react";
-import { Stats } from "@/components/common/stats";
-import { TableToolbar } from "@/components/common/table-toolbar";
+import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 import { FiltersMenu } from "@/components/common/filters-menu";
+import { Stats } from "@/components/common/stats";
+import { TablePagination } from "@/components/common/table-pagination";
+import { TableToolbar } from "@/components/common/table-toolbar";
 import {
 	ViewGridIcon,
 	ViewListIcon,
 	ViewOptionsMenu,
 } from "@/components/common/view-options-menu";
 import { Button } from "@/components/ui/button";
+import type { StatItem } from "@/features/dashboard/types/dashboard.types";
 import { ClassroomDialog } from "@/features/services/classrooms/components/classroom-dialog";
 import { ClassroomsTable } from "@/features/services/classrooms/components/classrooms-table";
-import { useClassroomStats, useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
-import { useClassroomFilters } from "@/features/services/classrooms/hooks/use-classroom-filters";
-import { downloadCsv } from "@/lib/csv";
 import { LEARNING_MODES } from "@/features/services/classrooms/data/constants";
-import type { StatItem } from "@/features/dashboard/types/dashboard.types";
+import { useClassroomFilters } from "@/features/services/classrooms/hooks/use-classroom-filters";
+import {
+	useClassroomStats,
+	useClassrooms,
+} from "@/features/services/classrooms/hooks/use-classrooms";
+import { downloadCsv } from "@/lib/csv";
 import type { LearningMode } from "@/server/classrooms/classrooms.type";
 
 const VIEW_OPTIONS = [
@@ -35,9 +39,18 @@ function ClassroomsPage() {
 	const [searchQuery, setSearchQuery] = useState("");
 	const [viewMode, setViewMode] = useState<ClassroomViewMode>("table");
 	const [oldestFirst, setOldestFirst] = useState(false);
+	const [page, setPage] = useState(1);
+	const pageSize = 100;
 
 	const { stats } = useClassroomStats();
-	const { classrooms, isLoading } = useClassrooms();
+	const { classrooms, isLoading, total, totalPages } = useClassrooms(
+		searchQuery,
+		page,
+		pageSize,
+	);
+	useEffect(() => {
+		if (page > totalPages) setPage(totalPages);
+	}, [page, totalPages]);
 	const { filterGroups, applyClassroomFilters, clearFilters } =
 		useClassroomFilters(classrooms);
 
@@ -108,14 +121,20 @@ function ClassroomsPage() {
 	return (
 		<div className="flex flex-1 flex-col">
 			{/* بطاقات الإحصائيات الأربع العلوية المطابقة تماماً لتصميم الشاشة */}
-			<Stats className="px-4" stats={statsItems} />
+			<Stats
+				className="px-4"
+				stats={statsItems}
+			/>
 
 			{/* شريط الأدوات الموحد للمنصة (TableToolbar) مع الفلترة والبحث الفعّال */}
 			<TableToolbar
 				className="border-t"
 				searchPlaceholder="ابحث عن اسم الفصل / المعرف..."
 				searchValue={searchQuery}
-				onSearchChange={setSearchQuery}
+				onSearchChange={(value) => {
+					setSearchQuery(value);
+					setPage(1);
+				}}
 				onExport={handleExport}
 				showView={false}
 				filterMenu={
@@ -158,6 +177,16 @@ function ClassroomsPage() {
 					viewMode={viewMode}
 					oldestFirst={oldestFirst}
 				/>
+				<TablePagination
+					page={page - 1}
+					pageCount={totalPages}
+					pageSize={pageSize}
+					totalRows={total}
+					fromRow={total ? (page - 1) * pageSize + 1 : 0}
+					toRow={Math.min(page * pageSize, total)}
+					showPageSize={false}
+					onPageChange={(index) => setPage(index + 1)}
+				/>
 			</div>
 
 			{/* نموذج إضافة فصل جديد */}
@@ -168,4 +197,3 @@ function ClassroomsPage() {
 		</div>
 	);
 }
-
