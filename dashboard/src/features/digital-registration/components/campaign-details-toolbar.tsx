@@ -1,10 +1,14 @@
+import { useMemo, useState } from "react";
 import {
 	IconAdjustmentsHorizontal,
+	IconAlertCircle,
+	IconCalendarTime,
+	IconCheck,
+	IconSortAscendingLetters,
 	IconChartBar,
 	IconDownload,
 	IconFileSpreadsheet,
 	IconFilter,
-	IconLayoutColumns,
 	IconPlus,
 	IconSearch,
 	IconSettings,
@@ -14,20 +18,49 @@ import {
 	IconX,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { useAgentPanelStore } from "@/features/agent/stores/agent-panel.store";
+import { CampaignShareDialog } from "./campaign-share-dialog";
+import { useRegistrationShareAccess } from "../hooks/use-digital-registration";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuLabel,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group";
+
+// Palette matching the Notion/Linear reference design
+const AVATAR_COLORS = [
+	"bg-[#EDE9FE] text-[#6D28D9] dark:bg-[#4C1D95]/40 dark:text-[#C4B5FD]", // TI Purple
+	"bg-[#E0F2FE] text-[#0369A1] dark:bg-[#0C4A6E]/40 dark:text-[#7DD3FC]", // Sky Blue
+	"bg-[#FCE7F3] text-[#BE185D] dark:bg-[#831843]/40 dark:text-[#F472B6]", // Soft Pink
+	"bg-[#CCFBF1] text-[#0F766E] dark:bg-[#134E4A]/40 dark:text-[#5EEAD4]", // Teal
+	"bg-[#FEF3C7] text-[#B45309] dark:bg-[#78350F]/40 dark:text-[#FCD34D]", // Amber
+];
+
+function getInitials(name?: string | null): string {
+	if (!name) return "م";
+	const clean = name
+		.trim()
+		.replace(/^(د\.|أ\.|م\.|مهندس|دكتور|أستاذ)\s*/i, "")
+		.split(/\s+/);
+	if (clean.length === 0 || !clean[0]) return "م";
+	if (clean.length === 1) return clean[0].slice(0, 2).toUpperCase();
+	return `${clean[0][0]}${clean[1][0]}`.toUpperCase();
+}
+
+export type CampaignSortOption = "DATE_DESC" | "DATE_ASC" | "PRIORITY_DESC" | "NAME_ASC";
 
 export function CampaignDetailsToolbar({
 	searchValue,
 	onSearchChange,
 	genderFilter,
+	sortBy = "DATE_DESC",
+	onSortChange,
 	onGenderFilterChange,
 	onOpenAddRequest,
 	onExport,
@@ -35,11 +68,14 @@ export function CampaignDetailsToolbar({
 	onOpenAssistant,
 	onToggleStats,
 	onOpenSettings,
-	onOpenShare,
+	campaignId,
+	campaignName,
 }: {
 	searchValue?: string;
 	onSearchChange?: (val: string) => void;
 	genderFilter?: string;
+	sortBy?: CampaignSortOption;
+	onSortChange?: (sort: CampaignSortOption) => void;
 	onGenderFilterChange?: (val: string) => void;
 	onOpenAddRequest?: () => void;
 	onExport?: () => void;
@@ -47,8 +83,49 @@ export function CampaignDetailsToolbar({
 	onOpenAssistant?: () => void;
 	onToggleStats?: () => void;
 	onOpenSettings?: () => void;
-	onOpenShare?: () => void;
+	campaignId?: string;
+	campaignName?: string;
 }) {
+	const [shareOpen, setShareOpen] = useState(false);
+	const [focusInviteOnOpen, setFocusInviteOnOpen] = useState(false);
+	const openAgent = useAgentPanelStore((s) => s.open);
+	const handleAssistantClick = onOpenAssistant || openAgent;
+
+	const handleOpenInvite = () => {
+		setFocusInviteOnOpen(true);
+		setShareOpen(true);
+	};
+
+	const handleOpenShare = () => {
+		setFocusInviteOnOpen(false);
+		setShareOpen(true);
+	};
+
+	const { data: shareData, isLoading: isShareLoading } = useRegistrationShareAccess(campaignId);
+
+	const collaborators = useMemo(() => {
+		const list: Array<{
+			id: string;
+			name: string;
+			email?: string;
+			image?: string | null;
+			title?: string;
+			isCurrent?: boolean;
+		}> = [];
+
+		if (shareData?.currentUser) {
+			list.push({ ...shareData.currentUser, isCurrent: true });
+		}
+		if (Array.isArray(shareData?.members)) {
+			for (const m of shareData.members) {
+				if (!list.some((existing) => existing.id === m.id)) {
+					list.push(m);
+				}
+			}
+		}
+		return list;
+	}, [shareData]);
+
 	const handleCopyPublicLink = () => {
 		const publicUrl =
 			typeof window !== "undefined"
@@ -168,27 +245,93 @@ export function CampaignDetailsToolbar({
 					</DropdownMenuContent>
 				</DropdownMenu>
 
-				{/* العرض (View Layout) */}
-				<Button
-					type="button"
-					variant="outline"
-					size="sm"
-					className="h-7.5 px-2.5 gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
-				>
-					<IconLayoutColumns className="size-3 text-muted-foreground/80" />
-					<span>العرض</span>
-				</Button>
+				{/* التصفية والفرز (Sort & Order) */}
+				<DropdownMenu dir="rtl">
+					<DropdownMenuTrigger asChild>
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							className={cn(
+								"h-7.5 px-2.5 gap-1 text-[11px] font-medium shrink-0 cursor-pointer transition-colors",
+								sortBy && sortBy !== "DATE_DESC"
+									? "text-primary border-primary/50 bg-primary/5 font-semibold"
+									: "text-muted-foreground hover:text-foreground",
+							)}
+						>
+							<IconAdjustmentsHorizontal className="size-3" />
+							<span>التصفية</span>
+							{sortBy && sortBy !== "DATE_DESC" && (
+								<span className="size-1.5 rounded-full bg-primary" />
+							)}
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="start" className="w-56 text-xs select-none">
+						<DropdownMenuLabel className="text-[11px] text-muted-foreground">
+							ترتيب وفرز الكروت
+						</DropdownMenuLabel>
+						<DropdownMenuSeparator />
 
-				{/* التصفية (Sort) */}
-				<Button
-					type="button"
-					variant="outline"
-					size="sm"
-					className="h-7.5 px-2.5 gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
-				>
-					<IconAdjustmentsHorizontal className="size-3 text-muted-foreground/80" />
-					<span>التصفية</span>
-				</Button>
+						{/* خيارات تاريخ التقديم */}
+						<DropdownMenuItem
+							onClick={() => onSortChange?.("DATE_DESC")}
+							className="cursor-pointer justify-between py-1.5"
+						>
+							<div className="flex items-center gap-2">
+								<IconCalendarTime className="size-3.5 text-muted-foreground" />
+								<span>تاريخ التقديم: الأحدث أولاً</span>
+							</div>
+							{(!sortBy || sortBy === "DATE_DESC") && (
+								<IconCheck className="size-3.5 text-primary" />
+							)}
+						</DropdownMenuItem>
+
+						<DropdownMenuItem
+							onClick={() => onSortChange?.("DATE_ASC")}
+							className="cursor-pointer justify-between py-1.5"
+						>
+							<div className="flex items-center gap-2">
+								<IconCalendarTime className="size-3.5 text-muted-foreground" />
+								<span>تاريخ التقديم: الأقدم أولاً</span>
+							</div>
+							{sortBy === "DATE_ASC" && (
+								<IconCheck className="size-3.5 text-primary" />
+							)}
+						</DropdownMenuItem>
+
+						<DropdownMenuSeparator />
+
+						{/* خيار الأولوية */}
+						<DropdownMenuItem
+							onClick={() => onSortChange?.("PRIORITY_DESC")}
+							className="cursor-pointer justify-between py-1.5"
+						>
+							<div className="flex items-center gap-2">
+								<IconAlertCircle className="size-3.5 text-rose-500" />
+								<span>الأولوية: من الأعلى إلى الأقل</span>
+							</div>
+							{sortBy === "PRIORITY_DESC" && (
+								<IconCheck className="size-3.5 text-primary" />
+							)}
+						</DropdownMenuItem>
+
+						<DropdownMenuSeparator />
+
+						{/* خيار أبجدياً */}
+						<DropdownMenuItem
+							onClick={() => onSortChange?.("NAME_ASC")}
+							className="cursor-pointer justify-between py-1.5"
+						>
+							<div className="flex items-center gap-2">
+								<IconSortAscendingLetters className="size-3.5 text-muted-foreground" />
+								<span>أبجدياً: حسب اسم الطالب (أ - ي)</span>
+							</div>
+							{sortBy === "NAME_ASC" && (
+								<IconCheck className="size-3.5 text-primary" />
+							)}
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
 
 				{/* مساعدك الذكي (Assistant) */}
 				<Button
@@ -196,14 +339,14 @@ export function CampaignDetailsToolbar({
 					variant="outline"
 					size="sm"
 					className="h-7.5 px-2.5 gap-1 text-[11px] font-medium text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
-					onClick={onOpenAssistant}
+					onClick={handleAssistantClick}
 				>
 					<IconSparkles className="size-3 text-amber-500" />
 					<span>مساعدك</span>
 				</Button>
 			</div>
 
-			{/* Left Section: Compact Buttons & Team Avatars */}
+			{/* Left Section: Compact Buttons & Team Avatars (مطابق تماماً للصورة) */}
 			<div className="flex items-center gap-1.5 shrink-0 flex-nowrap" dir="ltr">
 				{/* 1. Primary Action Button: + تسجيل طالب جديد */}
 				{onOpenAddRequest && (
@@ -235,45 +378,82 @@ export function CampaignDetailsToolbar({
 
 				{/* 4. Overlapping Avatars & Invite Icon */}
 				<div className="flex items-center">
-					<div className="flex items-center -space-x-1.5">
-						<div
-							className="size-6 rounded-full bg-[#FCE7F3] text-[#BE185D] border-2 border-background flex items-center justify-center text-[9px] font-bold shadow-2xs select-none"
-							title="سارة خالد"
-						>
-							SC
+					{isShareLoading ? (
+						<div className="flex items-center -space-x-1.5 animate-pulse">
+							<div className="size-6 rounded-full bg-muted border-2 border-background" />
+							<div className="size-6 rounded-full bg-muted border-2 border-background" />
 						</div>
-						<div
-							className="size-6 rounded-full bg-[#E0F2FE] text-[#0369A1] border-2 border-background flex items-center justify-center text-[9px] font-bold shadow-2xs select-none"
-							title="جمال عادل"
+					) : collaborators.length > 0 ? (
+						<button
+							type="button"
+							onClick={handleOpenShare}
+							className="flex items-center -space-x-1.5 cursor-pointer group focus:outline-hidden focus:ring-1 focus:ring-ring rounded-full"
+							title="أعضاء الفريق ومشاركو الحملة - انقر للمشاركة"
+							aria-label="أعضاء الفريق ومشاركو الحملة"
 						>
-							JC
-						</div>
-						<div
-							className="size-6 rounded-full bg-[#CCFBF1] text-[#0F766E] border-2 border-background flex items-center justify-center text-[9px] font-bold shadow-2xs select-none"
-							title="إيمان وائل"
+							{collaborators.slice(0, 3).map((collab, idx) => {
+								const colorClass = AVATAR_COLORS[idx % AVATAR_COLORS.length];
+								return (
+									<div
+										key={collab.id || idx}
+										className={cn(
+											"size-6 rounded-full border-2 border-background flex items-center justify-center text-[9px] font-bold shadow-2xs select-none shrink-0 overflow-hidden transition-transform group-hover:scale-105",
+											colorClass,
+										)}
+										title={`${collab.name}${collab.isCurrent ? " (أنت)" : ""}${collab.title ? ` • ${collab.title}` : ""}`}
+									>
+										{collab.image ? (
+											<img
+												src={collab.image}
+												alt={collab.name}
+												className="size-full object-cover rounded-full"
+											/>
+										) : (
+											<span>{getInitials(collab.name)}</span>
+										)}
+									</div>
+								);
+							})}
+
+							{collaborators.length > 3 && (
+								<div
+									className="size-6 rounded-full bg-muted/80 text-foreground border-2 border-background flex items-center justify-center text-[8.5px] font-bold shadow-2xs select-none shrink-0 transition-transform group-hover:scale-105"
+									title={`+${collaborators.length - 3} أعضاء إضافيون`}
+								>
+									+{collaborators.length - 3}
+								</div>
+							)}
+						</button>
+					) : (
+						<button
+							type="button"
+							onClick={handleOpenInvite}
+							className="size-6 rounded-full bg-muted/60 text-muted-foreground border-2 border-background flex items-center justify-center text-[9px] font-medium shadow-2xs cursor-pointer hover:bg-muted"
+							title="أعضاء الفريق - انقر للمشاركة"
 						>
-							EW
-						</div>
-					</div>
+							<IconUserPlus className="size-3" />
+						</button>
+					)}
 
 					<button
 						type="button"
-						className="size-6.5 ms-1 rounded-md hover:bg-muted/70 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
-						title="دعوة عضو فريق"
-						onClick={onOpenSettings}
+						className="size-6.5 ms-1 rounded-md hover:bg-muted/70 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer focus:outline-hidden focus:ring-1 focus:ring-ring"
+						title="دعوة عضو فريق للحملة"
+						aria-label="دعوة عضو فريق للحملة"
+						onClick={handleOpenInvite}
 					>
 						<IconUserPlus className="size-3.5" />
 					</button>
 				</div>
 
-				{/* 5. Share Button */}
+				{/* 5. Share Button (يفتح نافذة المشاركة الفاخرة) */}
 				<Button
 					type="button"
 					variant="outline"
 					size="sm"
 					className="h-7.5 px-2.5 rounded-md border-border/80 bg-background hover:bg-muted/60 text-foreground text-[11px] font-medium flex items-center gap-1 shadow-2xs transition-colors cursor-pointer whitespace-nowrap"
-					onClick={onOpenShare || handleCopyPublicLink}
-					title="مشاركة رابط وإعدادات التسجيل"
+					onClick={handleOpenShare}
+					title="مشاركة حملة التسجيل والرابط والباركود"
 				>
 					<IconShare className="size-3 text-muted-foreground" />
 					<span>Share</span>
@@ -291,6 +471,17 @@ export function CampaignDetailsToolbar({
 					<IconSettings className="size-3.5" />
 				</Button>
 			</div>
+
+			<CampaignShareDialog
+				open={shareOpen}
+				onOpenChange={(open) => {
+					setShareOpen(open);
+					if (!open) setFocusInviteOnOpen(false);
+				}}
+				campaignId={campaignId}
+				campaignName={campaignName}
+				initialFocusInvite={focusInviteOnOpen}
+			/>
 		</div>
 	);
 }

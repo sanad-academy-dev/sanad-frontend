@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 import { CampaignDetailsStats } from "@/features/digital-registration/components/campaign-details-stats";
 import { CampaignDetailsHeader, type CampaignView } from "@/features/digital-registration/components/campaign-details-header";
-import { CampaignDetailsToolbar } from "@/features/digital-registration/components/campaign-details-toolbar";
+import { CampaignDetailsToolbar, type CampaignSortOption } from "@/features/digital-registration/components/campaign-details-toolbar";
 import { CampaignRequestsKanban } from "@/features/digital-registration/components/campaign-requests-kanban";
 import { CampaignInfo } from "@/features/digital-registration/components/campaign-info";
 import { AddRequestSheet } from "@/features/digital-registration/components/add-request-sheet";
@@ -21,6 +21,7 @@ function CampaignDetailsRoute() {
 	const [view, setView] = useState<CampaignView>("requests");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [genderFilter, setGenderFilter] = useState("ALL");
+	const [sortBy, setSortBy] = useState<CampaignSortOption>("DATE_DESC");
 	const [isAddRequestOpen, setIsAddRequestOpen] = useState(false);
 	const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
@@ -195,10 +196,13 @@ function CampaignDetailsRoute() {
 			{view === "requests" && (
 				<>
 					<CampaignDetailsToolbar
+						campaignId={campaignId}
 						searchValue={searchQuery}
 						onSearchChange={setSearchQuery}
 						genderFilter={genderFilter}
 						onGenderFilterChange={setGenderFilter}
+						sortBy={sortBy}
+						onSortChange={setSortBy}
 						onExport={handleExportExcel}
 						onExportCsv={handleExportCsv}
 					/>
@@ -207,6 +211,7 @@ function CampaignDetailsRoute() {
 						campaignId={campaignId}
 						searchQuery={searchQuery}
 						genderFilter={genderFilter}
+						sortBy={sortBy}
 						selectedRequestId={selectedRequestId}
 						onSelectRequest={setSelectedRequestId}
 					/>

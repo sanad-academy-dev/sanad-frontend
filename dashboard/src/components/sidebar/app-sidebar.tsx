@@ -203,7 +203,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				title: t("sidebar.sections.care"),
 				items: [
 					{
-						title: "التسجيل الرقمي",
+						title: t("sidebar.items.digitalRegistration") !== "sidebar.items.digitalRegistration" ? t("sidebar.items.digitalRegistration") : "التسجيل الرقمي",
 						url: "/digital-registration",
 						icon: <IconFileDescription className="size-[14px]" />,
 						isActive: isActive("/digital-registration"),

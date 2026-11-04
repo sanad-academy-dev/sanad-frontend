@@ -163,6 +163,10 @@ function RouteComponent() {
 	const pageTitle = (() => {
 		// صفحة ترسم مسارها بنفسها (تفاصيل تقرير مثلًا) — لا نضيف عنوانًا مشتقًا بجانبه
 		if (titleSuppressed) return "";
+		if (pathname.startsWith("/digital-registration")) {
+			const label = t("sidebar.items.digitalRegistration");
+			return label && label !== "sidebar.items.digitalRegistration" ? label : (isRtl ? "التسجيل الرقمي" : "Digital Registration");
+		}
 		const financeGroupKey = activeGroupKeyOf(pathname, search?.tab);
 		if (financeGroupKey) {
 			const group = FINANCE_NAV_GROUPS.find((g) => g.key === financeGroupKey);

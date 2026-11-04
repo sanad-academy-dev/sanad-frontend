@@ -26,39 +26,22 @@ export function CampaignDetailsHeader({
 
 	if (!slot) return null;
 
-	const tabs: { value: RegistrationView; label: React.ReactNode }[] = [
-		{
-			value: "requests",
-			label: (
-				<span className="flex items-center gap-1.5">
-					<span>الطلبات</span>
-					{requestsCount > 0 && (
-						<span className="bg-muted px-1.5 py-0.2 rounded-full text-[9px] font-bold">
-							{requestsCount}
-						</span>
-					)}
-				</span>
-			),
-		},
+	const tabs: { value: RegistrationView; label: string }[] = [
+		{ value: "requests", label: "الطلبات" },
 		{ value: "info", label: "المعلومات" },
 		{ value: "activity", label: "سجل النشاط" },
 	];
 
 	return createPortal(
 		<div
-			className="flex items-center gap-2.5"
+			className="flex items-center gap-[12px]"
 			dir={isRtl ? "rtl" : "ltr"}
 		>
-			{/* عنوان الصفحة: التسجيل الرقمي */}
-			<span className="text-xs sm:text-sm font-bold text-foreground select-none whitespace-nowrap">
-				التسجيل الرقمي
-			</span>
+			{/* فاصل بين عنوان "التسجيل الرقمي" والتبويبات */}
+			<span className="h-[18px] w-px bg-[#E5E7EB] dark:bg-zinc-700" />
 
-			{/* فاصل رأسي */}
-			<span className="h-4 w-px bg-border/70" />
-
-			{/* ألسنة التنقل (الطلبات، المعلومات، سجل النشاط) */}
-			<nav className="flex items-center gap-1 rounded-md bg-muted/50 p-0.5 border border-border/60 select-none">
+			{/* ألسنة التنقل (الطلبات، المعلومات، سجل النشاط) بنفس تصميم الموارد البشرية */}
+			<nav className="flex items-center gap-[3.49px]">
 				{tabs.map((tab) => {
 					const isTabActive = activeView === tab.value;
 					return (
@@ -67,10 +50,10 @@ export function CampaignDetailsHeader({
 							type="button"
 							onClick={() => onChangeView(tab.value)}
 							className={cn(
-								"flex h-6.5 items-center justify-center rounded-[4px] px-3 text-[11px] font-semibold transition-all cursor-pointer whitespace-nowrap",
+								"flex h-[25px] items-center justify-center gap-[4px] rounded-[4px] px-[14px] text-[11px] font-medium leading-[16px] transition-colors cursor-pointer",
 								isTabActive
-									? "bg-background text-foreground shadow-2xs border border-border/40 font-bold"
-									: "text-muted-foreground hover:text-foreground hover:bg-background/40",
+									? "border-[0.75px] border-[#E5E7EB] bg-[#F9FAFB] text-[#1F2937] dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+									: "text-[#6B7280] hover:text-[#1F2937] dark:text-zinc-400 dark:hover:text-zinc-200",
 							)}
 						>
 							{tab.label}
