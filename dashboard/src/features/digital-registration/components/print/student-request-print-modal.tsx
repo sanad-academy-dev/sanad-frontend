@@ -115,7 +115,7 @@ export function StudentRequestPrintModal({
 					</div>
 
 					{/* Modal Body: A4 Paper Preview */}
-					<div className="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center bg-zinc-200/80 dark:bg-zinc-950 sanad-scrollbar">
+					<div className="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center bg-zinc-200/80 dark:bg-zinc-950 scrollbar-thin">
 						<div
 							style={{
 								transform: `scale(${zoomLevel / 100})`,

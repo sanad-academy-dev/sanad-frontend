@@ -62,11 +62,11 @@ export function RegistrationStatsBar({
 	];
 
 	return (
-		<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 px-3 pt-2 pb-1 select-none" dir="rtl">
+		<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 px-3 pt-2.5 pb-2 border-b border-border/40 select-none" dir="rtl">
 			{items.map((item) => (
 				<div
 					key={item.id}
-					className="flex items-center justify-between rounded-lg border border-border/70 bg-card px-3 py-1.5 shadow-2xs hover:border-primary/40 transition-colors"
+					className="flex items-center justify-between rounded-lg border border-border/70 bg-card px-3 py-2 shadow-2xs hover:border-primary/40 transition-colors"
 				>
 					{/* الكلمة والأيقونة على اليمين */}
 					<div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium">

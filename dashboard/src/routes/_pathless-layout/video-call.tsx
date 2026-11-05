@@ -6,12 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { VideoCallRoom } from "@/features/video-calls/components/video-call-room";
 import { useVideoCallToken } from "@/features/video-calls/hooks/use-video-call-token";
+import { useRegistrationInterviewToken } from "@/features/digital-registration/hooks/use-registration-interview-token";
 import { useI18n } from "@/hooks/use-i18n";
 
 export const Route = createFileRoute("/_pathless-layout/video-call")({
-	validateSearch: (search): { room?: string } => {
+	validateSearch: (search): { room?: string; registrationRequestId?: string } => {
 		const raw = (search as { room?: string }).room;
-		return { room: typeof raw === "string" && raw ? raw : undefined };
+		const registrationRequestId = (search as { registrationRequestId?: string }).registrationRequestId;
+		return {
+			room: typeof raw === "string" && raw ? raw : undefined,
+			registrationRequestId:
+				typeof registrationRequestId === "string" && registrationRequestId
+					? registrationRequestId
+					: undefined,
+		};
 	},
 	component: RouteComponent,
 });
@@ -20,12 +28,18 @@ export const Route = createFileRoute("/_pathless-layout/video-call")({
 const generateRoomCode = () => Math.random().toString(36).slice(2, 8).toUpperCase();
 
 function RouteComponent() {
-	const { room } = Route.useSearch();
+	const { room, registrationRequestId } = Route.useSearch();
 	const navigate = useNavigate({ from: Route.fullPath });
 	const { t } = useI18n();
 	const [roomInput, setRoomInput] = useState("");
 
-	const { call, isLoading, error } = useVideoCallToken(room ?? null);
+	// لا تستدعي المكالمة العامة عند فتح مقابلة تسجيل، وإلا أمكن تجاوز فحص المراجع.
+	const genericToken = useVideoCallToken(registrationRequestId ? null : room ?? null);
+	const registrationToken = useRegistrationInterviewToken(registrationRequestId ?? null);
+	const call = registrationRequestId ? registrationToken.call : genericToken.call;
+	const isLoading = registrationRequestId ? registrationToken.isLoading : genericToken.isLoading;
+	const error = registrationRequestId ? registrationToken.error : genericToken.error;
+	const roomLabel = registrationRequestId ? "مقابلة تسجيل" : room;
 
 	const joinRoom = (code: string) => {
 		const trimmed = code.trim();
@@ -44,7 +58,7 @@ function RouteComponent() {
 		toast.success(t("videoCall.room.copied"));
 	};
 
-	if (!room) {
+	if (!room && !registrationRequestId) {
 		return (
 			<div className="flex flex-1 items-center justify-center p-4">
 				<div className="flex w-full max-w-md flex-col gap-4 rounded-lg border p-6">
@@ -122,7 +136,7 @@ function RouteComponent() {
 						dir="ltr"
 						className="rounded bg-muted px-2 py-0.5 font-mono text-xs"
 					>
-						{room}
+						{roomLabel}
 					</code>
 					<Button
 						type="button"

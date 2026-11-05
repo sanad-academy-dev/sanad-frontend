@@ -89,6 +89,7 @@ interface ColumnStatusPickerProps {
 	onChange: (columnName: string) => void;
 	className?: string;
 	allowedIds?: string[];
+	disabled?: boolean;
 }
 
 export function ColumnStatusPicker({
@@ -96,6 +97,7 @@ export function ColumnStatusPicker({
 	onChange,
 	className,
 	allowedIds,
+	disabled = false,
 }: ColumnStatusPickerProps) {
 	const [open, setOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -123,7 +125,7 @@ export function ColumnStatusPicker({
 
 	// دعم الاختصار عبر لوحة المفاتيح عند فتح القائمة (0-7)
 	useEffect(() => {
-		if (!open) return;
+		if (!open || disabled) return;
 		const handleKeyDown = (e: KeyboardEvent) => {
 			const target = filteredColumns.find(
 				(c) => c.shortcut === e.key,
@@ -136,12 +138,13 @@ export function ColumnStatusPicker({
 		};
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [open, onChange]);
+	}, [open, onChange, disabled, filteredColumns]);
 
 	return (
 		<Popover
 			open={open}
 			onOpenChange={(isOpen) => {
+				if (disabled) return;
 				setOpen(isOpen);
 				if (!isOpen) setSearchQuery("");
 			}}
@@ -149,8 +152,11 @@ export function ColumnStatusPicker({
 			<PopoverTrigger asChild>
 				<button
 					type="button"
+					disabled={disabled}
+					title={disabled ? "تغيير الحالة يتم من إجراءات الطلب" : undefined}
 					className={cn(
 						"h-6.5 px-2 rounded-md border border-border/80 bg-background hover:bg-muted text-[10.5px] font-medium text-foreground flex items-center gap-1.5 transition-colors cursor-pointer select-none",
+						disabled && "cursor-default opacity-70 hover:bg-background",
 						className,
 					)}
 				>
@@ -159,13 +165,14 @@ export function ColumnStatusPicker({
 				</button>
 			</PopoverTrigger>
 
-			<PopoverContent
-				side="top"
-				align="start"
-				sideOffset={8}
-				className="z-[99] w-48 sm:w-52 p-1 bg-popover text-popover-foreground border border-border/80 shadow-2xl rounded-xl select-none"
-				dir="rtl"
-			>
+			{!disabled ? (
+				<PopoverContent
+					side="top"
+					align="start"
+					sideOffset={8}
+					className="z-[99] w-48 sm:w-52 p-1 bg-popover text-popover-foreground border border-border/80 shadow-2xl rounded-xl select-none"
+					dir="rtl"
+				>
 				{/* ─── الترويسة مع حقل البحث المطابق للتصميم ──────────────── */}
 				<div className="px-2 py-1 border-b border-border/50 mb-0.5">
 					<Input
@@ -212,7 +219,8 @@ export function ColumnStatusPicker({
 						);
 					})}
 				</div>
-			</PopoverContent>
+				</PopoverContent>
+			) : null}
 		</Popover>
 	);
 }

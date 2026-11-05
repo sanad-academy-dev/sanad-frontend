@@ -8,13 +8,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { useUpdateRequestStatus } from "../../hooks/use-digital-registration";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 
-export type RequestTransitionTarget = "QUEUE" | "SHORTLIST" | "WAITLIST" | "INTERVIEW" | "AWAITING_PAYMENT" | "DUPLICATE" | "ACCEPTED";
+export type RequestTransitionTarget = "QUEUE" | "SHORTLIST" | "WAITLIST" | "AWAITING_PAYMENT" | "DUPLICATE" | "ACCEPTED";
 
 const TRANSITIONS: Record<RequestTransitionTarget, { title: string; description: string; confirm: string; tone: string }> = {
 	QUEUE: { title: "إعادة الطلب إلى الطابور", description: "سيعود الطلب إلى مرحلة الاستقبال المبدئي لمتابعته من جديد.", confirm: "نقل إلى الطابور", tone: "bg-zinc-700 hover:bg-zinc-800" },
 	SHORTLIST: { title: "نقل إلى القائمة المختصرة", description: "سيُنقل الطلب إلى القائمة المختصرة للمراجعة والتدقيق.", confirm: "نقل إلى القائمة المختصرة", tone: "bg-slate-700 hover:bg-slate-800" },
 	WAITLIST: { title: "نقل إلى قائمة الانتظار", description: "سيُنقل الطلب إلى قائمة الانتظار لتحديد الأولوية والدور.", confirm: "نقل إلى قائمة الانتظار", tone: "bg-amber-600 hover:bg-amber-700" },
-	INTERVIEW: { title: "نقل إلى المقابلة الشخصية", description: "سيُنقل الطلب لمرحلة المقابلة والتقييم. حدّد الموعد من زر الجدولة بعد النقل عند الحاجة.", confirm: "نقل إلى المقابلة", tone: "bg-violet-600 hover:bg-violet-700" },
 	AWAITING_PAYMENT: { title: "نقل إلى انتظار الدفع", description: "سيُنقل الطلب إلى مرحلة انتظار سداد الرسوم وتأكيد حجز المقعد.", confirm: "نقل إلى انتظار الدفع", tone: "bg-indigo-600 hover:bg-indigo-700" },
 	DUPLICATE: { title: "تعليم كطلب مكرر", description: "سيُعلّم الطلب كمكرر حتى لا يُتابَع كطلب مستقل قبل مراجعة السجل المرتبط.", confirm: "تعليم كمكرر", tone: "bg-amber-600 hover:bg-amber-700" },
 	ACCEPTED: { title: "قبول واعتماد الطالب", description: "هذا إجراء نهائي ينشئ الاعتماد الدراسي وفق مسار القبول المعتمد في النظام.", confirm: "تأكيد القبول والاعتماد", tone: "bg-emerald-600 hover:bg-emerald-700" },

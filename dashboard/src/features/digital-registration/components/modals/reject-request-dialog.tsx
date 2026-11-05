@@ -153,7 +153,7 @@ export function RejectRequestDialog({
 				</div>
 
 				{/* محتوى اللوحة */}
-				<div className="p-3.5 space-y-3.5 flex-1 min-h-0 overflow-y-auto overscroll-contain sanad-scrollbar">
+				<div className="p-3.5 space-y-3.5 flex-1 min-h-0 overflow-y-auto overscroll-contain scrollbar-thin">
 					{/* سبب الرفض */}
 					<div className="space-y-1.5">
 						<label className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200 block">

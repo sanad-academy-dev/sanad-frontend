@@ -3,21 +3,24 @@ import { IconCopy, IconCheck, IconExternalLink, IconFileCheck, IconShieldCheck, 
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 import { useCampaignDetails } from "../hooks/use-digital-registration";
+import { getRegistrationFormUrl } from "../utils/registration-urls";
 
 export function CampaignInfo({ campaignId }: { campaignId?: string }) {
 	const { data: campaign, isLoading } = useCampaignDetails(campaignId || "");
 	const [copied, setCopied] = useState(false);
+	const [linkType, setLinkType] = useState<"general" | "campaign">("general");
 
-	const registrationUrl =
-		typeof window !== "undefined"
-			? `${window.location.origin}/register`
-			: "https://sanad.app/register";
+	const registrationUrl = getRegistrationFormUrl(
+		campaign?.code,
+		linkType === "campaign",
+	);
 
 	const handleCopy = () => {
 		navigator.clipboard.writeText(registrationUrl);
 		setCopied(true);
-		toast.success("تم نسخ رابط التسجيل المباشر بنجاح");
+		toast.success("تم نسخ رابط استمارة التسجيل بنجاح");
 		setTimeout(() => setCopied(false), 2000);
 	};
 
@@ -25,12 +28,42 @@ export function CampaignInfo({ campaignId }: { campaignId?: string }) {
 		<div className="flex w-full flex-col gap-5 p-4 mt-2 max-w-5xl mx-auto" dir="rtl">
 			{/* Public Link Card */}
 			<div className="flex flex-col gap-3 rounded-lg border border-primary/20 bg-primary/5 p-5 text-start shadow-2xs">
-				<div className="flex items-center gap-2">
-					<IconInfoCircle className="size-5 text-primary" />
-					<h3 className="text-sm font-bold text-foreground">رابط التسجيل الرقمي المباشر لأولياء الأمور</h3>
+				<div className="flex items-center justify-between flex-wrap gap-2">
+					<div className="flex items-center gap-2">
+						<IconInfoCircle className="size-5 text-primary" />
+						<h3 className="text-sm font-bold text-foreground">رابط استمارة التسجيل الإلكتروني لأولياء الأمور</h3>
+					</div>
+					{campaign?.code && (
+						<div className="flex items-center gap-1.5 bg-background/80 p-0.5 rounded-lg border border-border/60 text-xs">
+							<button
+								type="button"
+								onClick={() => setLinkType("general")}
+								className={cn(
+									"px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer",
+									linkType === "general"
+										? "bg-primary text-primary-foreground shadow-2xs font-semibold"
+										: "text-muted-foreground hover:text-foreground",
+								)}
+							>
+								الاستمارة العامة (/register)
+							</button>
+							<button
+								type="button"
+								onClick={() => setLinkType("campaign")}
+								className={cn(
+									"px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors cursor-pointer",
+									linkType === "campaign"
+										? "bg-primary text-primary-foreground shadow-2xs font-semibold"
+										: "text-muted-foreground hover:text-foreground",
+								)}
+							>
+								استمارة الحملة ({campaign.code})
+							</button>
+						</div>
+					)}
 				</div>
 				<p className="text-xs text-muted-foreground leading-relaxed">
-					شارك هذا الرابط مع أولياء الأمور للتقديم الذاتي عبر المنظومة الرقمية وتعبئة بيانات الطالب ورفع المرفقات مباشرة دون وسيط.
+					شارك هذا الرابط مع أولياء الأمور لفتح استمارة التقديم على موقع المركز وتعبئة بيانات الطالب ورفع المرفقات مباشرة.
 				</p>
 				<div className="flex items-center gap-2 pt-1">
 					<Input
@@ -43,7 +76,7 @@ export function CampaignInfo({ campaignId }: { campaignId?: string }) {
 						variant="outline"
 						size="sm"
 						onClick={handleCopy}
-						className="bg-background hover:bg-muted text-foreground px-4 text-xs font-semibold gap-1.5 h-9"
+						className="bg-background hover:bg-muted text-foreground px-4 text-xs font-semibold gap-1.5 h-9 cursor-pointer"
 					>
 						{copied ? <IconCheck className="size-3.5 text-emerald-600" /> : <IconCopy className="size-3.5" />}
 						{copied ? "تم النسخ" : "نسخ الرابط"}
@@ -52,9 +85,9 @@ export function CampaignInfo({ campaignId }: { campaignId?: string }) {
 						variant="outline"
 						size="sm"
 						asChild
-						className="bg-background hover:bg-muted text-foreground px-3 text-xs h-9"
+						className="bg-background hover:bg-muted text-foreground px-3 text-xs h-9 cursor-pointer"
 					>
-						<a href={registrationUrl} target="_blank" rel="noopener noreferrer" title="فتح الرابط في تبويب جديد">
+						<a href={registrationUrl} target="_blank" rel="noopener noreferrer" title="فتح استمارة التسجيل في تبويب جديد">
 							<IconExternalLink className="size-3.5" />
 						</a>
 					</Button>

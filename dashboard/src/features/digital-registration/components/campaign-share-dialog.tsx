@@ -1,21 +1,12 @@
 import {
-	IconArrowLeft,
-	IconBrandWhatsapp,
-	IconBuilding,
 	IconCheck,
 	IconChevronDown,
-	IconDownload,
-	IconLink,
+	IconHistory,
 	IconLoader2,
 	IconLock,
-	IconMail,
-	IconPhoto,
-	IconQrcode,
-	IconShare,
 	IconTrash,
 	IconX,
 } from "@tabler/icons-react";
-import QRCode from "qrcode";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -32,10 +23,16 @@ import { cn } from "@/lib/utils";
 import {
 	useInviteCollaborator,
 	useRegistrationShareAccess,
+	useRegistrationShareAccessAudit,
 	useStaffCandidates,
-	useUpdateGeneralAccess,
 	useUpdateMemberAccess,
 } from "../hooks/use-digital-registration";
+import { useDigitalRegistrationCapabilities } from "../hooks/use-digital-registration-capabilities";
+import type {
+	ShareAccessMember,
+	ShareAccessAuditEntry,
+	StaffCandidate,
+} from "../types/campaign-share.types";
 
 // Subtle avatar colors matching the Figma/Notion/Linear reference design
 const AVATAR_COLORS = [
@@ -47,29 +44,60 @@ const AVATAR_COLORS = [
 ];
 
 function getInitials(name?: string | null): string {
-	if (!name) return "U";
+	if (!name) return "م";
 	const clean = name
 		.trim()
-		.replace(/^(د\.|أ\.|م\.|مهندس|دكتور)\s*/i, "")
+		.replace(/^(د\.|أ\.|م\.|مهندس|دكتور|أستاذ)\s*/i, "")
 		.split(/\s+/);
-	if (clean.length === 0 || !clean[0]) return "U";
+	if (clean.length === 0 || !clean[0]) return "م";
 	if (clean.length === 1) return clean[0].slice(0, 2).toUpperCase();
 	return `${clean[0][0]}${clean[1][0]}`.toUpperCase();
+}
+
+function getErrorMessage(error: unknown, fallback: string): string {
+	return error instanceof Error && error.message ? error.message : fallback;
+}
+
+function getAccessLevelLabel(accessLevel: unknown): string {
+	if (accessLevel === "can_edit") return "يمكنه التعديل";
+	if (accessLevel === "can_view") return "عرض فقط";
+	return "";
+}
+
+function getAuditDescription(entry: ShareAccessAuditEntry): string {
+	const target = entry.targetName || entry.targetEmail || "الموظف";
+	const accessLevel = getAccessLevelLabel(entry.after?.accessLevel);
+
+	switch (entry.action) {
+		case "member.added":
+			return `أضاف ${target}${accessLevel ? ` — ${accessLevel}` : ""}`;
+		case "member.access_changed":
+			return `غيّر صلاحية ${target}${accessLevel ? ` إلى ${accessLevel}` : ""}`;
+		case "member.removed":
+			return `أزال وصول ${target}`;
+	}
+}
+
+function formatAuditDate(value: string): string {
+	const date = new Date(value);
+	if (Number.isNaN(date.getTime())) return "";
+	return new Intl.DateTimeFormat("ar-EG", {
+		day: "numeric",
+		month: "short",
+		hour: "numeric",
+		minute: "2-digit",
+	}).format(date);
 }
 
 interface CampaignShareDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	campaignId?: string;
-	campaignName?: string;
 	initialFocusInvite?: boolean;
 }
 
 export function CampaignShareDialog({
 	open,
 	onOpenChange,
-	campaignId,
-	campaignName = "Digital Registration",
 	initialFocusInvite = false,
 }: CampaignShareDialogProps) {
 	const inviteInputRef = useRef<HTMLInputElement>(null);
@@ -82,757 +110,557 @@ export function CampaignShareDialog({
 			return () => clearTimeout(timer);
 		}
 	}, [open, initialFocusInvite]);
+
 	// Queries and mutations
-	const { data: shareData, isLoading } = useRegistrationShareAccess(campaignId);
+	const { data: shareData, isLoading: isShareLoading } = useRegistrationShareAccess();
+	const { capabilities, isLoading: isCapabilitiesLoading } = useDigitalRegistrationCapabilities();
 	const inviteMutation = useInviteCollaborator();
 	const updateAccessMutation = useUpdateMemberAccess();
-	const updateGeneralAccessMutation = useUpdateGeneralAccess();
-
-	// Clean canonical URL without dirty search/filters
-	const cleanDashboardUrl =
-		typeof window !== "undefined"
-			? `${window.location.origin}${window.location.pathname}`
-			: "https://sanad.app/digital-registration";
+	const canManage = capabilities.canManageTeam;
+	const isLoading = isShareLoading || isCapabilitiesLoading;
+	const currentUser = shareData?.currentUser;
+	const members = shareData?.members || [];
+	const {
+		data: auditEntries = [],
+		isLoading: isAuditLoading,
+		isError: isAuditError,
+	} = useRegistrationShareAccessAudit(canManage && open);
 
 	// Local form state
 	const [inviteQuery, setInviteQuery] = useState("");
+	const [selectedStaff, setSelectedStaff] = useState<StaffCandidate | null>(null);
 	const [selectedRole, setSelectedRole] = useState<"can_edit" | "can_view">("can_edit");
 	const [showSuggestions, setShowSuggestions] = useState(false);
-	const [generalAccessLevel, setGeneralAccessLevel] = useState<"everyone_view" | "restricted">(
-		shareData?.generalAccess?.level || "everyone_view",
-	);
-	const [qrUrl, setQrUrl] = useState<string | null>(null);
-	const [showQr, setShowQr] = useState(false);
-
-	// Synchronize generalAccessLevel when backend data loads
-	useEffect(() => {
-		if (shareData?.generalAccess?.level) {
-			setGeneralAccessLevel(shareData.generalAccess.level);
-		}
-	}, [shareData?.generalAccess?.level]);
-
-	useEffect(() => {
-		if (open && typeof window !== "undefined") {
-			QRCode.toDataURL(cleanDashboardUrl, {
-				width: 480,
-				margin: 1,
-				color: {
-					dark: "#0F172A",
-					light: "#FFFFFF",
-				},
-			})
-				.then(setQrUrl)
-				.catch(() => {});
-		}
-	}, [open, cleanDashboardUrl]);
-
-	// General access change handler (persisted to DB)
-	const handleGeneralAccessChange = async (newLevel: "everyone_view" | "restricted") => {
-		setGeneralAccessLevel(newLevel);
-		try {
-			await updateGeneralAccessMutation.mutateAsync({ level: newLevel, campaignId });
-			toast.success("تم تحديث إعداد الوصول العام بنجاح!");
-		} catch (err: any) {
-			toast.error(err.message || "فشل تعديل إعداد الوصول العام");
-			setGeneralAccessLevel(shareData?.generalAccess?.level || "everyone_view");
-		}
-	};
-
-	// Download QR Code image
-	const handleDownloadQr = () => {
-		if (!qrUrl) return;
-		const a = document.createElement("a");
-		a.href = qrUrl;
-		a.download = `sanad-digital-registration-qr.png`;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		toast.success("QR Code downloaded successfully!");
-	};
-
-	// Check if native system share is supported
-	const hasNativeShare =
-		typeof navigator !== "undefined" && typeof navigator.share === "function";
-
-	// Copy QR Image directly to clipboard (for desktop apps/chats)
-	const handleCopyQrImage = async () => {
-		if (!qrUrl) return;
-		try {
-			const res = await fetch(qrUrl);
-			const blob = await res.blob();
-			if (typeof ClipboardItem !== "undefined" && navigator.clipboard?.write) {
-				const item = new ClipboardItem({ "image/png": blob });
-				await navigator.clipboard.write([item]);
-				toast.success(
-					"تم نسخ صورة الـ QR كصورة إلى الحافظة! يمكنك لصقها مباشرة في أي محادثة أو مستند.",
-				);
-				return;
-			}
-			await navigator.clipboard.writeText(cleanDashboardUrl);
-			toast.success("تم نسخ الرابط إلى الحافظة!");
-		} catch {
-			await navigator.clipboard.writeText(cleanDashboardUrl);
-			toast.success("تم نسخ الرابط إلى الحافظة!");
-		}
-	};
-
-	// Share on WhatsApp Web / App
-	const handleShareWhatsApp = () => {
-		const text = encodeURIComponent(
-			`رابط لوحة التسجيل الرقمي (${clinicName}):\n${cleanDashboardUrl}`,
-		);
-		window.open(`https://api.whatsapp.com/send?text=${text}`, "_blank");
-	};
-
-	// Share via Email
-	const handleShareEmail = () => {
-		const subject = encodeURIComponent(`رابط لوحة التسجيل الرقمي - ${clinicName}`);
-		const body = encodeURIComponent(
-			`مرحباً،\n\nيمكنك الوصول إلى لوحة التسجيل الرقمي عبر الرابط التالي:\n${cleanDashboardUrl}\n\nتحياتنا،\n${clinicName}`,
-		);
-		window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
-	};
-
-	// Native system share fallback
-	const handleNativeShare = async () => {
-		if (typeof navigator !== "undefined" && navigator.share) {
-			try {
-				if (qrUrl && navigator.canShare) {
-					const res = await fetch(qrUrl);
-					const blob = await res.blob();
-					const file = new File([blob], "sanad-digital-registration-qr.png", {
-						type: "image/png",
-					});
-					if (navigator.canShare({ files: [file] })) {
-						await navigator.share({
-							title: `لوحة التسجيل الرقمي - ${clinicName}`,
-							text: "Scan this QR code to access the registration board:",
-							url: cleanDashboardUrl,
-							files: [file],
-						});
-						return;
-					}
-				}
-				await navigator.share({
-					title: `لوحة التسجيل الرقمي - ${clinicName}`,
-					text: "Access the digital registration board:",
-					url: cleanDashboardUrl,
-				});
-			} catch (err: any) {
-				if (err.name !== "AbortError") {
-					await navigator.clipboard.writeText(cleanDashboardUrl);
-					toast.success("تم نسخ الرابط إلى الحافظة!");
-				}
-			}
-		} else {
-			await navigator.clipboard.writeText(cleanDashboardUrl);
-			toast.success("تم نسخ الرابط إلى الحافظة!");
-		}
-	};
+	const [memberToRemove, setMemberToRemove] = useState<ShareAccessMember | null>(null);
 
 	// Staff autocomplete candidates
-	const { data: candidates = [] } = useStaffCandidates(inviteQuery);
+	const { data: candidates = [], isLoading: isCandidatesLoading } = useStaffCandidates(
+		inviteQuery,
+		canManage && showSuggestions,
+	);
 
 	const filteredCandidates = useMemo(() => {
-		if (!inviteQuery.trim()) return candidates.slice(0, 5);
+		const unassignedCandidates = candidates.filter(
+			(candidate) =>
+				!members.some(
+					(member) => member.email.toLowerCase() === candidate.email.toLowerCase(),
+				),
+		);
+		if (!inviteQuery.trim()) return unassignedCandidates.slice(0, 5);
 		const q = inviteQuery.toLowerCase();
-		return candidates.filter(
+		return unassignedCandidates.filter(
 			(c) => c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q),
 		);
-	}, [candidates, inviteQuery]);
+	}, [candidates, inviteQuery, members]);
 
-	// Copy dashboard link handler
-	const handleCopyLink = () => {
-		navigator.clipboard.writeText(cleanDashboardUrl);
-		toast.success("Link copied to clipboard!");
-	};
-
-	// Invite collaborator handler
-	const handleInvite = async () => {
-		const identifier = inviteQuery.trim();
-		if (!identifier) {
-			toast.error("Please enter a name or email");
+	// Add eligible staff member to digital registration team handler
+	const handleAddStaff = async () => {
+		if (!capabilities.canManageTeam) return;
+		if (!selectedStaff?.staffId) {
+			toast.error("يرجى اختيار موظف من القائمة");
 			return;
 		}
 
 		try {
-			await inviteMutation.mutateAsync({
-				identifier,
+			const res = await inviteMutation.mutateAsync({
+				staffId: selectedStaff.staffId,
 				accessLevel: selectedRole,
-				campaignId,
 			});
-			toast.success("Invite sent successfully!");
+			if (res?.alreadyExisted) {
+				toast.success("تم تحديث صلاحية الموظف في فريق التسجيل الرقمي");
+			} else {
+				toast.success("تمت إضافة الموظف إلى فريق التسجيل بنجاح");
+			}
 			setInviteQuery("");
+			setSelectedStaff(null);
 			setShowSuggestions(false);
-		} catch (err: any) {
-			toast.error(err.message || "Failed to invite collaborator");
+		} catch (error: unknown) {
+			toast.error(getErrorMessage(error, "فشلت إضافة الموظف إلى فريق التسجيل"));
 		}
 	};
 
-	// Update or remove member access handler
-	const handleUpdateMember = async (
-		memberId: string,
-		level: "can_edit" | "can_view" | "remove",
-	) => {
+	// Update member access level handler
+	const handleUpdateRole = async (memberId: string, level: "can_edit" | "can_view") => {
+		if (!capabilities.canManageTeam) return;
 		try {
 			await updateAccessMutation.mutateAsync({
 				memberId,
 				accessLevel: level,
 			});
-			if (level === "remove") {
-				toast.success("Member removed");
-			} else {
-				toast.success("Access updated");
-			}
-		} catch (err: any) {
-			toast.error(err.message || "Failed to update access");
+			toast.success("تم تحديث صلاحية الموظف");
+		} catch (error: unknown) {
+			toast.error(getErrorMessage(error, "فشل تحديث الصلاحية"));
 		}
 	};
 
-	const clinicName = shareData?.clinicName || "Personal";
-	const currentUser = shareData?.currentUser;
-	const members = shareData?.members || [];
-	const canManage = shareData?.canManage !== false;
+	// الإزالة إجراء حساس لكل عضو، لذلك لا ينفذ مباشرة من القائمة.
+	const handleInitiateRemove = (member: ShareAccessMember) => {
+		if (!capabilities.canManageTeam) return;
+		if (member.accessLevel === "full") return;
+		setMemberToRemove(member);
+	};
+
+	// Execute member removal
+	const executeRemoveMember = async (member: ShareAccessMember) => {
+		if (!capabilities.canManageTeam) return;
+		try {
+			const res = await updateAccessMutation.mutateAsync({
+				memberId: member.id,
+				accessLevel: "remove",
+			});
+
+			if (member.isPending) {
+				if (res?.inviteRevoked) {
+					toast.success("تم إلغاء الدعوة المعلقة وإزالة وصول الموظف إلى التسجيل الرقمي.");
+				} else if (res?.warning) {
+					toast.warning(res.warning);
+				} else {
+					toast.success("تمت إزالة صلاحية الموظف من التسجيل الرقمي.");
+				}
+			} else {
+				toast.success("تمت إزالة صلاحية الموظف من التسجيل الرقمي.");
+			}
+		} catch (error: unknown) {
+			toast.error(getErrorMessage(error, "فشلت إزالة العضو من فريق التسجيل"));
+		} finally {
+			setMemberToRemove(null);
+		}
+	};
 
 	return (
+		<>
 		<Dialog
 			open={open}
 			onOpenChange={onOpenChange}
 		>
 			<DialogContent
 				showCloseButton={false}
-				dir="ltr"
-				className="!fixed !left-1/2 !right-auto !top-1/2 !-translate-x-1/2 rtl:!-translate-x-1/2 !-translate-y-1/2 w-[94vw] sm:max-w-[580px] md:max-w-[620px] p-6 sm:p-7 rounded-2xl gap-5 border border-gray-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-900 text-left font-sans"
+				dir="rtl"
+				className="!fixed !left-1/2 !right-auto !top-1/2 !-translate-x-1/2 rtl:!-translate-x-1/2 !-translate-y-1/2 w-[94vw] sm:max-w-[560px] md:max-w-[600px] max-h-[86vh] overflow-y-auto p-4 sm:p-5 rounded-xl gap-3.5 border border-gray-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-900 text-right font-sans"
 			>
-				{/* Header: Share and X on the exact same horizontal level */}
+				{/* Header: Title and Close button */}
 				<div className="flex items-center justify-between">
-					<DialogTitle className="text-[17px] font-bold text-gray-900 dark:text-zinc-100 tracking-tight">
-						Share
+					<DialogTitle className="text-[16px] font-bold text-gray-900 dark:text-zinc-100 tracking-tight">
+						فريق التسجيل الرقمي
 					</DialogTitle>
 					<button
 						type="button"
 						onClick={() => onOpenChange(false)}
-						className="text-gray-400 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors cursor-pointer rounded-md p-1 -mr-1"
-						aria-label="Close"
+						className="text-gray-400 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors cursor-pointer rounded-md p-1 -ml-1"
+						aria-label="إغلاق"
 					>
 						<IconX className="size-4" />
 					</button>
 				</div>
 
-				{/* Invite Row */}
+				{/* Description note */}
+				<p className="text-[12px] text-gray-500 dark:text-zinc-400 leading-relaxed -mt-1.5">
+					يستطيع مدير النظام إضافة موظفين محددين ومنحهم صلاحية العرض أو التعديل.
+				</p>
+
+				{/* إضافة موظف إلى فريق التسجيل */}
 				{canManage ? (
-					<div className="relative flex items-center gap-2">
-						<div className="relative flex-1">
-							<Input
-								ref={inviteInputRef}
-								value={inviteQuery}
-								onChange={(e) => {
-									setInviteQuery(e.target.value);
-									setShowSuggestions(true);
-								}}
-								onFocus={() => setShowSuggestions(true)}
-								placeholder="Add people by name or email"
-								className="h-9 text-[13px] px-3 rounded-lg border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 focus-visible:ring-1 focus-visible:ring-blue-500 placeholder:text-gray-400"
-							/>
+					<div className="flex flex-col gap-1">
+						<span className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider select-none">
+							إضافة موظف إلى فريق التسجيل
+						</span>
+						<div className="relative flex items-center gap-2">
+							<div className="relative flex-1">
+								<Input
+									ref={inviteInputRef}
+									value={inviteQuery}
+									onChange={(e) => {
+										setInviteQuery(e.target.value);
+										setSelectedStaff(null);
+										setShowSuggestions(true);
+									}}
+									onFocus={() => setShowSuggestions(true)}
+									placeholder="ابحث عن موظف بالاسم أو البريد"
+									className="h-8.5 text-[12px] px-2.5 rounded-lg border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 focus-visible:ring-1 focus-visible:ring-blue-500 placeholder:text-gray-400 text-right"
+									dir="rtl"
+								/>
 
-							{/* Autocomplete dropdown for academy staff */}
-							{showSuggestions && filteredCandidates.length > 0 && (
-								<>
-									<div
-										className="fixed inset-0 z-40"
-										onClick={() => setShowSuggestions(false)}
-									/>
-									<div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-xl py-1.5 max-h-52 overflow-y-auto">
-										<div className="px-3 py-1 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
-											Suggested Staff
+								{/* قائمة اقتراحات موظفي الأكاديمية المؤهلين */}
+								{showSuggestions && (
+									<>
+										<button
+											type="button"
+											aria-label="إغلاق قائمة الموظفين"
+											className="fixed inset-0 z-40 cursor-default border-0 bg-transparent p-0"
+											onClick={() => setShowSuggestions(false)}
+										/>
+										<div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 shadow-xl py-1.5 max-h-56 overflow-y-auto">
+											<div className="px-3 py-1.5 text-[10px] font-semibold text-gray-400 uppercase tracking-wider text-right border-b border-gray-100 dark:border-zinc-800">
+												موظفو الأكاديمية المؤهلون
+											</div>
+											{isCandidatesLoading ? (
+												<div className="flex items-center justify-center gap-2 px-3 py-3 text-xs text-gray-500">
+													<IconLoader2 className="size-3.5 animate-spin" />
+													جارٍ تحميل الموظفين المؤهلين...
+												</div>
+											) : filteredCandidates.length > 0 ? (
+												filteredCandidates.map((c) => (
+													<button
+														key={c.staffId || c.id}
+														type="button"
+														className="w-full px-3 py-2 text-right flex items-center justify-between hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer text-xs"
+														onClick={() => {
+															setSelectedStaff(c);
+															setInviteQuery(c.name || c.email);
+															setShowSuggestions(false);
+														}}
+													>
+														<div className="flex items-center gap-2.5 min-w-0">
+															<div className="size-7 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-semibold text-[11px] shrink-0">
+																{getInitials(c.name)}
+															</div>
+															<div className="flex flex-col min-w-0 text-right">
+																<span className="font-semibold text-gray-900 dark:text-zinc-100 truncate">
+																	{c.name}
+																</span>
+																<span className="text-[11px] text-gray-500 truncate">{c.email}</span>
+															</div>
+														</div>
+														{c.title && (
+															<span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-zinc-800 text-gray-500 shrink-0">
+																{c.title}
+															</span>
+														)}
+													</button>
+												))
+											) : (
+												<div className="px-3 py-3 text-center text-xs text-gray-500">
+													لا يوجد موظفون نشطون مرتبطون بحسابات دخول يمكن إضافتهم
+												</div>
+											)}
 										</div>
-										{filteredCandidates.map((c) => (
-											<button
-												key={c.id}
-												type="button"
-												className="w-full px-3 py-2 text-left flex items-center gap-2.5 hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer text-xs"
-												onClick={() => {
-													setInviteQuery(c.email || c.name);
-													setShowSuggestions(false);
-												}}
-											>
-												<div className="size-7 rounded-full bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center font-semibold text-[11px] shrink-0">
-													{getInitials(c.name)}
-												</div>
-												<div className="flex flex-col min-w-0">
-													<span className="font-semibold text-gray-900 dark:text-zinc-100 truncate">
-														{c.name}
-													</span>
-													<span className="text-[11px] text-gray-500 truncate">{c.email}</span>
-												</div>
-											</button>
-										))}
-									</div>
-								</>
-							)}
-						</div>
+									</>
+								)}
+							</div>
 
-						{/* Role Select: Can edit / Can view */}
-						<DropdownMenu dir="ltr">
-							<DropdownMenuTrigger asChild>
-								<Button
-									type="button"
-									variant="outline"
-									className="h-9 px-3 gap-1.5 text-[13px] font-normal border-gray-200 dark:border-zinc-700 rounded-lg shrink-0 text-gray-700 dark:text-zinc-200 bg-white dark:bg-zinc-800/80 cursor-pointer shadow-none"
+							{/* Role Select: Can edit / Can view */}
+							<DropdownMenu dir="rtl">
+								<DropdownMenuTrigger asChild>
+									<Button
+										type="button"
+										variant="outline"
+										className="h-8.5 px-2.5 gap-1 text-[12px] font-normal border-gray-200 dark:border-zinc-700 rounded-lg shrink-0 text-gray-700 dark:text-zinc-200 bg-white dark:bg-zinc-800/80 cursor-pointer shadow-none"
+									>
+										<span>{selectedRole === "can_edit" ? "يمكنه التعديل" : "عرض فقط"}</span>
+										<IconChevronDown className="size-3.5 text-gray-400" />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									align="end"
+									className="w-36 text-xs text-right"
 								>
-									<span>{selectedRole === "can_edit" ? "Can edit" : "Can view"}</span>
-									<IconChevronDown className="size-3.5 text-gray-400" />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								align="end"
-								className="w-36 text-xs"
+									<DropdownMenuItem
+										onClick={() => setSelectedRole("can_edit")}
+										className="cursor-pointer justify-between"
+									>
+										<span>يمكنه التعديل</span>
+										{selectedRole === "can_edit" && (
+											<IconCheck className="size-3.5 text-blue-600" />
+										)}
+									</DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() => setSelectedRole("can_view")}
+										className="cursor-pointer justify-between"
+									>
+										<span>عرض فقط</span>
+										{selectedRole === "can_view" && (
+											<IconCheck className="size-3.5 text-blue-600" />
+										)}
+									</DropdownMenuItem>
+								</DropdownMenuContent>
+							</DropdownMenu>
+
+							{/* Add Button */}
+							<Button
+								type="button"
+								disabled={inviteMutation.isPending || !selectedStaff}
+								onClick={handleAddStaff}
+								className="h-8.5 px-3.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-[12px] rounded-lg shrink-0 shadow-none cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
 							>
-								<DropdownMenuItem
-									onClick={() => setSelectedRole("can_edit")}
-									className="cursor-pointer justify-between"
-								>
-									<span>Can edit</span>
-									{selectedRole === "can_edit" && (
-										<IconCheck className="size-3.5 text-blue-600" />
-									)}
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									onClick={() => setSelectedRole("can_view")}
-									className="cursor-pointer justify-between"
-								>
-									<span>Can view</span>
-									{selectedRole === "can_view" && (
-										<IconCheck className="size-3.5 text-blue-600" />
-									)}
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
-
-						{/* Invite Button */}
-						<Button
-							type="button"
-							disabled={inviteMutation.isPending || !inviteQuery.trim()}
-							onClick={handleInvite}
-							className="h-9 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-[13px] rounded-lg shrink-0 shadow-none cursor-pointer transition-colors"
-						>
-							{inviteMutation.isPending ? (
-								<IconLoader2 className="size-4 animate-spin" />
-							) : (
-								"Invite"
-							)}
-						</Button>
+								{inviteMutation.isPending ? (
+									<IconLoader2 className="size-4 animate-spin" />
+								) : (
+									"إضافة"
+								)}
+							</Button>
+						</div>
 					</div>
 				) : (
-					<div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/80 text-[12px] text-gray-500 dark:text-zinc-400">
+					<div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700/80 text-[12px] text-gray-500 dark:text-zinc-400 text-right">
 						<IconLock className="size-3.5 text-gray-400 shrink-0" />
 						<span>
-							View-only access — only academy administrators can invite or manage members.
+							صلاحية عرض فقط — مدير النظام وحده يملك صلاحية إضافة موظفين وإدارة فريق التسجيل.
 						</span>
 					</div>
 				)}
 
-				{/* PEOPLE WITH ACCESS Section */}
-				<div className="flex flex-col gap-2.5">
+				{/* الموظفون المصرح لهم Section */}
+				<div className="flex flex-col gap-2">
 					<span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 select-none">
-						PEOPLE WITH ACCESS
+						الموظفون المصرح لهم
 					</span>
 
 					{/* Current User Row */}
 					{currentUser && (
-						<div className="flex items-center justify-between py-1">
-							<div className="flex items-center gap-3 min-w-0">
-								<div className="size-8 rounded-full bg-[#EDE9FE] text-[#6D28D9] dark:bg-[#4C1D95]/40 dark:text-[#C4B5FD] flex items-center justify-center font-semibold text-[12px] shrink-0 select-none">
+						<div className="flex items-center justify-between py-0.5">
+							<div className="flex items-center gap-2.5 min-w-0">
+								<div className="size-7 rounded-full bg-[#EDE9FE] text-[#6D28D9] dark:bg-[#4C1D95]/40 dark:text-[#C4B5FD] flex items-center justify-center font-semibold text-[11px] shrink-0 select-none">
 									{getInitials(currentUser.name)}
 								</div>
 								<div className="flex flex-col min-w-0">
-									<div className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-900 dark:text-zinc-100 truncate">
+									<div className="flex items-center gap-1.5 text-[12.5px] font-semibold text-gray-900 dark:text-zinc-100 truncate">
 										<span>{currentUser.name}</span>
-										<span className="text-gray-500 font-normal">(you)</span>
+										<span className="text-gray-500 font-normal">(أنت)</span>
 									</div>
-									<div className="text-[12px] text-gray-500 truncate">
-										{currentUser.email} · {currentUser.title || "Project lead"}
+									<div className="text-[11px] text-gray-500 truncate">
+										{currentUser.email} · {currentUser.title || "مدير النظام"}
 									</div>
 								</div>
 							</div>
-							<span className="text-[13px] text-gray-500 font-normal shrink-0">
-								Full access
+									<span className="text-[12px] text-gray-500 font-normal shrink-0">
+								{currentUser.accessLevel === "full"
+									? "كامل الصلاحيات"
+									: currentUser.accessLevel === "can_edit"
+										? "يمكنك التعديل"
+										: "عرض فقط"}
 							</span>
 						</div>
 					)}
 
 					{/* Other Members */}
-					{members.map((member, idx) => {
-						const colorClass = AVATAR_COLORS[(idx + 1) % AVATAR_COLORS.length];
-						return (
-							<div
-								key={member.id}
-								className="flex items-center justify-between py-1"
-							>
-								<div className="flex items-center gap-3 min-w-0">
-									<div
-										className={cn(
-											"size-8 rounded-full flex items-center justify-center font-semibold text-[12px] shrink-0 select-none",
-											colorClass,
-										)}
-									>
-										{getInitials(member.name)}
-									</div>
-									<div className="flex flex-col min-w-0">
-										<div className="flex items-center gap-1.5 text-[13px] font-semibold text-gray-900 dark:text-zinc-100 truncate">
-											<span>{member.name}</span>
-											{member.isPending && (
-												<span className="text-[10px] bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 px-1.5 py-0.5 rounded font-medium">
-													Pending
-												</span>
+					{isLoading ? (
+						<div className="flex items-center justify-center gap-2 py-5 text-xs text-gray-500 dark:text-zinc-400">
+							<IconLoader2 className="size-3.5 animate-spin" />
+							جارٍ تحميل فريق التسجيل...
+						</div>
+					) : members.length > 0 ? (
+						members.map((member, idx) => {
+							const colorClass = AVATAR_COLORS[(idx + 1) % AVATAR_COLORS.length];
+							return (
+								<div
+									key={member.id}
+									className="flex items-center justify-between py-0.5"
+								>
+									<div className="flex items-center gap-2.5 min-w-0">
+										<div
+											className={cn(
+											"size-7 rounded-full flex items-center justify-center font-semibold text-[11px] shrink-0 select-none",
+												colorClass,
 											)}
+										>
+											{getInitials(member.name)}
 										</div>
-										<div className="text-[12px] text-gray-500 truncate">
-											{member.email} · {member.title || "Collaborator"}
+										<div className="flex flex-col min-w-0">
+										<div className="flex items-center gap-1.5 text-[12.5px] font-semibold text-gray-900 dark:text-zinc-100 truncate">
+												<span>{member.name}</span>
+												{member.isPending && (
+													<span className="text-[10px] bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 px-1.5 py-0.5 rounded font-medium">
+														دعوة معلقة
+													</span>
+												)}
+											</div>
+										<div className="text-[11px] text-gray-500 truncate">
+												{member.email} · {member.title || "عضو فريق"}
+											</div>
 										</div>
 									</div>
-								</div>
 
-								{/* Access Level Dropdown */}
-								<DropdownMenu dir="ltr">
-									<DropdownMenuTrigger asChild>
-										<button
-											type="button"
-											className="flex items-center gap-1 text-[13px] text-gray-500 hover:text-gray-800 dark:hover:text-zinc-200 cursor-pointer transition-colors p-1 rounded"
-										>
-											<span>
-												{member.accessLevel === "can_edit" ? "Can edit" : "Can view"}
-											</span>
-											<IconChevronDown className="size-3 text-gray-400" />
-										</button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent
-										align="end"
-										className="w-36 text-xs"
-									>
-										<DropdownMenuItem
-											onClick={() => handleUpdateMember(member.id, "can_edit")}
-											className="cursor-pointer justify-between"
-										>
-											<span>Can edit</span>
-											{member.accessLevel === "can_edit" && (
-												<IconCheck className="size-3.5 text-blue-600" />
-											)}
-										</DropdownMenuItem>
-										<DropdownMenuItem
-											onClick={() => handleUpdateMember(member.id, "can_view")}
-											className="cursor-pointer justify-between"
-										>
-											<span>Can view</span>
-											{member.accessLevel === "can_view" && (
-												<IconCheck className="size-3.5 text-blue-600" />
-											)}
-										</DropdownMenuItem>
-										<DropdownMenuSeparator />
-										<DropdownMenuItem
-											onClick={() => handleUpdateMember(member.id, "remove")}
-											className="cursor-pointer text-destructive focus:text-destructive gap-1.5"
-										>
-											<IconTrash className="size-3.5" />
-											<span>Remove access</span>
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</div>
-						);
-					})}
+									{/* Access Level Dropdown */}
+									{canManage && member.accessLevel !== "full" ? (
+										<DropdownMenu dir="rtl">
+											<DropdownMenuTrigger asChild>
+												<button
+													type="button"
+											className="flex items-center gap-1 text-[12px] text-gray-500 hover:text-gray-800 dark:hover:text-zinc-200 cursor-pointer transition-colors p-1 rounded"
+												>
+													<span>
+														{member.accessLevel === "can_edit" ? "يمكنه التعديل" : "عرض فقط"}
+													</span>
+													<IconChevronDown className="size-3 text-gray-400" />
+												</button>
+											</DropdownMenuTrigger>
+											<DropdownMenuContent
+												align="end"
+												className="w-40 text-xs text-right"
+											>
+												<DropdownMenuItem
+													onClick={() => handleUpdateRole(member.id, "can_edit")}
+													className="cursor-pointer justify-between"
+												>
+													<span>يمكنه التعديل</span>
+													{member.accessLevel === "can_edit" && (
+														<IconCheck className="size-3.5 text-blue-600" />
+													)}
+												</DropdownMenuItem>
+												<DropdownMenuItem
+													onClick={() => handleUpdateRole(member.id, "can_view")}
+													className="cursor-pointer justify-between"
+												>
+													<span>عرض فقط</span>
+													{member.accessLevel === "can_view" && (
+														<IconCheck className="size-3.5 text-blue-600" />
+													)}
+												</DropdownMenuItem>
+												<DropdownMenuSeparator />
+												<DropdownMenuItem
+													onClick={() => handleInitiateRemove(member)}
+													className="cursor-pointer text-destructive focus:text-destructive justify-between"
+												>
+													<span>{member.isPending ? "إلغاء الدعوة المعلقة" : "إزالة الموظف"}</span>
+													<IconTrash className="size-3.5" />
+												</DropdownMenuItem>
+											</DropdownMenuContent>
+										</DropdownMenu>
+									) : (
+										<span className="text-[12px] text-gray-500 shrink-0">
+											{member.accessLevel === "full"
+												? "كامل الصلاحيات"
+												: member.accessLevel === "can_edit"
+													? "يمكنه التعديل"
+													: "عرض فقط"}
+										</span>
+									)}
+								</div>
+							);
+						})
+					) : (
+						<div className="py-4 px-3 text-center text-xs text-gray-500 dark:text-zinc-400 border border-dashed border-gray-200 dark:border-zinc-800 rounded-lg">
+							لم تتم إضافة أي موظفين إلى فريق التسجيل الرقمي بعد.
+						</div>
+					)}
 				</div>
 
-				{/* Divider between People with access and General access */}
-				<div className="-mx-6 sm:-mx-7 border-b border-gray-200 dark:border-zinc-700" />
+				{/* سجل تدقيق الوصول: مدير النظام فقط */}
+				{canManage && (
+					<div className="flex flex-col gap-2 border-t border-gray-200 pt-3 dark:border-zinc-800">
+						<div className="flex items-center gap-2 text-right">
+							<IconHistory className="size-4 text-gray-500 dark:text-zinc-400" />
+							<span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+								سجل تغييرات الوصول
+							</span>
+						</div>
+						{isAuditLoading ? (
+							<div className="flex items-center justify-center gap-2 py-3 text-xs text-gray-500 dark:text-zinc-400">
+								<IconLoader2 className="size-3.5 animate-spin" />
+								جارٍ تحميل سجل التغييرات...
+							</div>
+						) : isAuditError ? (
+							<p className="py-2 text-xs text-amber-700 dark:text-amber-300">
+								تعذر تحميل سجل التغييرات حالياً.
+							</p>
+						) : auditEntries.length > 0 ? (
+							<div className="max-h-32 overflow-y-auto divide-y divide-gray-100 rounded-lg border border-gray-100 dark:divide-zinc-800 dark:border-zinc-800">
+								{auditEntries.map((entry) => (
+									<div key={entry.id} className="px-3 py-2 text-right">
+										<p className="text-[12px] font-medium text-gray-700 dark:text-zinc-200">
+											{getAuditDescription(entry)}
+										</p>
+										<p className="mt-0.5 text-[11px] text-gray-500 dark:text-zinc-400">
+											بواسطة {entry.actorName || "مدير النظام"} · {formatAuditDate(entry.createdAt)}
+										</p>
+									</div>
+								))}
+							</div>
+						) : (
+							<p className="py-2 text-xs text-gray-500 dark:text-zinc-400">
+								لا توجد تغييرات وصول مسجلة حتى الآن.
+							</p>
+						)}
+					</div>
+				)}
 
-				{/* GENERAL ACCESS Section */}
+				{/* Divider */}
+				<div className="-mx-4 sm:-mx-5 border-b border-gray-200 dark:border-zinc-800" />
+
+				{/* قسم وصول فريق التسجيل الرقمي (Restricted by design) */}
 				<div className="flex flex-col gap-2">
-					<span className="text-[11px] font-semibold uppercase tracking-wider text-gray-500 select-none">
-						GENERAL ACCESS
-					</span>
-
 					<div className="flex items-center justify-between py-1">
 						<div className="flex items-center gap-3 min-w-0">
-							{/* Building Icon Container */}
-							<div className="size-9 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-500 shrink-0">
-								<IconBuilding className="size-5 text-gray-600 dark:text-zinc-400" />
+							<div className="size-8 rounded-lg bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-gray-500 shrink-0">
+								<IconLock className="size-4 text-gray-600 dark:text-zinc-400" />
 							</div>
-							<div className="flex flex-col min-w-0 text-left">
-								<DropdownMenu dir="ltr">
-									<DropdownMenuTrigger asChild>
-										<button
-											type="button"
-											className="flex items-center gap-1 text-[14px] font-semibold text-gray-900 dark:text-zinc-100 hover:text-blue-600 cursor-pointer text-left transition-colors"
-										>
-											<span>
-												{generalAccessLevel === "everyone_view"
-													? `Everyone at ${clinicName}`
-													: "Restricted"}
-											</span>
-											<IconChevronDown className="size-3.5 text-gray-500" />
-										</button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent
-										align="start"
-										className="w-56 text-xs"
-									>
-										<DropdownMenuItem
-											onClick={() => handleGeneralAccessChange("everyone_view")}
-											className="cursor-pointer justify-between py-2"
-										>
-											<div className="flex flex-col text-left">
-												<span className="font-semibold text-gray-900 dark:text-zinc-100">{`Everyone at ${clinicName}`}</span>
-												<span className="text-[11px] text-gray-500">
-													Anyone in the workspace can view and comment
-												</span>
-											</div>
-											{generalAccessLevel === "everyone_view" && (
-												<IconCheck className="size-3.5 text-blue-600" />
-											)}
-										</DropdownMenuItem>
-										<DropdownMenuItem
-											onClick={() => handleGeneralAccessChange("restricted")}
-											className="cursor-pointer justify-between py-2"
-										>
-											<div className="flex flex-col text-left">
-												<span className="font-semibold text-gray-900 dark:text-zinc-100">
-													Restricted
-												</span>
-												<span className="text-[11px] text-gray-500">
-													Only people with access can open
-												</span>
-											</div>
-											{generalAccessLevel === "restricted" && (
-												<IconCheck className="size-3.5 text-blue-600" />
-											)}
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-
-								<span className="text-[12px] text-gray-500">
-									{generalAccessLevel === "everyone_view"
-										? "Anyone in the workspace can view and comment."
-										: "Only people added can access."}
+							<div className="flex flex-col min-w-0 text-right">
+								<span className="text-[13px] font-semibold text-gray-900 dark:text-zinc-100">
+									وصول فريق التسجيل الرقمي
+								</span>
+								<span className="text-[11px] text-gray-500 dark:text-zinc-400">
+									الوصول مقصور على الموظفين المحددين من مدير النظام.
 								</span>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				{/* Divider between General access and Footer */}
-				<div className="-mx-6 sm:-mx-7 border-b border-gray-200 dark:border-zinc-700" />
+				{/* Divider */}
+				<div className="-mx-4 sm:-mx-5 border-b border-gray-200 dark:border-zinc-800" />
 
-				{/* Footer */}
-				<div className="flex items-center justify-between pt-0.5">
-					<div className="flex items-center gap-2">
-						{/* Copy link button */}
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={handleCopyLink}
-							className="h-9 px-3.5 gap-2 text-[13px] font-medium rounded-lg border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 cursor-pointer shadow-none"
-						>
-							<IconLink className="size-4 text-gray-600 dark:text-zinc-400" />
-							<span>Copy link</span>
-						</Button>
-
-						{/* QR Code button */}
-						<Button
-							type="button"
-							variant="outline"
-							size="sm"
-							onClick={() => setShowQr(true)}
-							className="h-9 px-3.5 gap-2 text-[13px] font-medium rounded-lg border-gray-200 dark:border-zinc-700 hover:bg-purple-50/50 dark:hover:bg-purple-950/20 text-[#6366F1] dark:text-[#818CF8] cursor-pointer shadow-none"
-						>
-							<IconQrcode className="size-4 text-[#6366F1] dark:text-[#818CF8]" />
-							<span className="font-semibold">QR Code</span>
-						</Button>
-					</div>
-
+				{/* Footer: إغلاق */}
+				<div className="flex items-center justify-end pt-0.5">
 					<Button
 						type="button"
 						size="sm"
 						onClick={() => onOpenChange(false)}
-						className="h-9 px-6 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-[13px] rounded-lg cursor-pointer shadow-none transition-colors"
+						className="h-8.5 px-5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-[12px] rounded-lg cursor-pointer shadow-none transition-colors"
 					>
-						Done
+						إغلاق
 					</Button>
 				</div>
-
-				{/* Centered QR Code Overlay (Centered, Download & Share capable) */}
-				{showQr && (
-					<div className="absolute inset-0 z-50 bg-white dark:bg-zinc-900 rounded-2xl p-6 sm:p-7 flex flex-col justify-between animate-in fade-in-0 duration-150">
-						{/* Header: Title and X on the exact same level */}
-						<div className="flex items-center justify-between">
-							<div className="flex items-center gap-2">
-								<button
-									type="button"
-									onClick={() => setShowQr(false)}
-									className="p-1 text-gray-500 hover:text-gray-900 dark:hover:text-zinc-100 rounded-md transition-colors cursor-pointer"
-									aria-label="Back"
-								>
-									<IconArrowLeft className="size-4" />
-								</button>
-								<DialogTitle className="text-[17px] font-bold text-gray-900 dark:text-zinc-100 tracking-tight">
-									QR Code
-								</DialogTitle>
-							</div>
-							<button
-								type="button"
-								onClick={() => {
-									setShowQr(false);
-									onOpenChange(false);
-								}}
-								className="text-gray-400 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors cursor-pointer rounded-md p-1 -mr-1"
-								aria-label="Close"
-							>
-								<IconX className="size-4" />
-							</button>
-						</div>
-
-						{/* Dead-Center QR Presentation */}
-						<div className="flex flex-col items-center justify-center my-auto py-2 text-center">
-							<div className="p-3.5 rounded-2xl bg-white border border-gray-100 shadow-lg">
-								{qrUrl ? (
-									<img
-										src={qrUrl}
-										alt="Digital Registration QR Code"
-										className="size-44 object-contain rounded-lg"
-									/>
-								) : (
-									<div className="size-44 flex items-center justify-center">
-										<IconLoader2 className="size-8 animate-spin text-muted-foreground" />
-									</div>
-								)}
-							</div>
-							<h3 className="mt-4 text-[15px] font-bold text-gray-900 dark:text-zinc-100">
-								Scan to Open Digital Registration
-							</h3>
-							<p className="mt-1 text-xs text-gray-500 max-w-[300px] leading-relaxed">
-								Scan this QR code with any mobile device camera to open this board directly.
-							</p>
-						</div>
-
-						{/* Horizontal divider */}
-						<div className="-mx-6 sm:-mx-7 border-b border-gray-200 dark:border-zinc-700" />
-
-						{/* Footer Actions: Download, Share, and Back */}
-						<div className="flex items-center justify-between pt-0.5">
-							<div className="flex items-center gap-2">
-								{/* Download Button */}
-								<Button
-									type="button"
-									variant="outline"
-									size="sm"
-									onClick={handleDownloadQr}
-									className="h-9 px-3.5 gap-2 text-[13px] font-medium rounded-lg border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 cursor-pointer shadow-none"
-								>
-									<IconDownload className="size-4 text-gray-600 dark:text-zinc-400" />
-									<span>Download</span>
-								</Button>
-
-								{/* Share Dropdown Button (Optimized for Desktop & Mobile) */}
-								<DropdownMenu dir="ltr">
-									<DropdownMenuTrigger asChild>
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											className="h-9 px-3.5 gap-1.5 text-[13px] font-medium rounded-lg border-gray-200 dark:border-zinc-700 hover:bg-purple-50/50 dark:hover:bg-purple-950/20 text-[#6366F1] dark:text-[#818CF8] cursor-pointer shadow-none"
-										>
-											<IconShare className="size-4 text-[#6366F1] dark:text-[#818CF8]" />
-											<span className="font-semibold">Share</span>
-											<IconChevronDown className="size-3.5 opacity-70" />
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent
-										align="start"
-										className="w-60 text-xs p-1.5 shadow-xl"
-									>
-										<DropdownMenuItem
-											onClick={handleCopyQrImage}
-											className="cursor-pointer gap-2 py-2"
-										>
-											<IconPhoto className="size-4 text-purple-600 shrink-0" />
-											<div className="flex flex-col text-left">
-												<span className="font-semibold text-gray-900 dark:text-zinc-100">
-													Copy QR image
-												</span>
-												<span className="text-[10.5px] text-gray-500">
-													Paste image directly into chats
-												</span>
-											</div>
-										</DropdownMenuItem>
-
-										<DropdownMenuItem
-											onClick={handleCopyLink}
-											className="cursor-pointer gap-2 py-2"
-										>
-											<IconLink className="size-4 text-blue-600 shrink-0" />
-											<div className="flex flex-col text-left">
-												<span className="font-semibold text-gray-900 dark:text-zinc-100">
-													Copy link
-												</span>
-												<span className="text-[10.5px] text-gray-500">
-													Clean direct dashboard link
-												</span>
-											</div>
-										</DropdownMenuItem>
-
-										<DropdownMenuSeparator />
-
-										<DropdownMenuItem
-											onClick={handleShareWhatsApp}
-											className="cursor-pointer gap-2 py-2"
-										>
-											<IconBrandWhatsapp className="size-4 text-emerald-600 shrink-0" />
-											<span className="font-medium text-gray-800 dark:text-zinc-200">
-												Share on WhatsApp
-											</span>
-										</DropdownMenuItem>
-
-										<DropdownMenuItem
-											onClick={handleShareEmail}
-											className="cursor-pointer gap-2 py-2"
-										>
-											<IconMail className="size-4 text-amber-600 shrink-0" />
-											<span className="font-medium text-gray-800 dark:text-zinc-200">
-												Share via Email
-											</span>
-										</DropdownMenuItem>
-
-										{hasNativeShare && (
-											<>
-												<DropdownMenuSeparator />
-												<DropdownMenuItem
-													onClick={handleNativeShare}
-													className="cursor-pointer gap-2 py-2"
-												>
-													<IconShare className="size-4 text-indigo-600 shrink-0" />
-													<span className="font-medium text-gray-800 dark:text-zinc-200">
-														More options (System share)...
-													</span>
-												</DropdownMenuItem>
-											</>
-										)}
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</div>
-
-							<Button
-								type="button"
-								size="sm"
-								onClick={() => setShowQr(false)}
-								className="h-9 px-6 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-[13px] rounded-lg cursor-pointer shadow-none transition-colors"
-							>
-								Back
-							</Button>
-						</div>
-					</div>
-				)}
 			</DialogContent>
 		</Dialog>
+
+		{/* تأكيد إلغاء الدعوة المعلقة */}
+		<Dialog
+			open={!!memberToRemove}
+			onOpenChange={(isOpen) => !isOpen && setMemberToRemove(null)}
+		>
+			<DialogContent
+				dir="rtl"
+				className="!fixed !left-1/2 !right-auto !top-1/2 !-translate-x-1/2 rtl:!-translate-x-1/2 !-translate-y-1/2 w-[90vw] sm:max-w-[420px] p-5 rounded-2xl gap-4 border border-gray-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-900 text-right font-sans z-60"
+			>
+				<div className="flex flex-col gap-2">
+					<DialogTitle className="text-[16px] font-bold text-gray-900 dark:text-zinc-100">
+						{memberToRemove?.isPending ? "تأكيد إلغاء الدعوة المعلقة" : "تأكيد إزالة الموظف"}
+					</DialogTitle>
+					<p className="text-[13px] text-gray-500 dark:text-zinc-400 leading-relaxed">
+						{memberToRemove?.isPending
+							? "سيتم إلغاء دعوة الموظف المعلقة وإزالة وصوله إلى التسجيل الرقمي."
+							: "سيتم إزالة وصول الموظف إلى التسجيل الرقمي، ولن يتم حذف حسابه أو ملفه الوظيفي."}
+					</p>
+				</div>
+
+				<div className="flex items-center justify-end gap-2 pt-2">
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={() => setMemberToRemove(null)}
+						disabled={updateAccessMutation.isPending}
+						className="h-8.5 px-3 text-xs cursor-pointer"
+					>
+						تراجع
+					</Button>
+					<Button
+						type="button"
+						variant="destructive"
+						size="sm"
+						disabled={updateAccessMutation.isPending}
+						onClick={() => memberToRemove && executeRemoveMember(memberToRemove)}
+						className="h-8.5 px-3.5 text-xs font-semibold cursor-pointer"
+					>
+						{updateAccessMutation.isPending ? (
+							<IconLoader2 className="size-3.5 animate-spin" />
+						) : (
+							memberToRemove?.isPending ? "إلغاء الدعوة وإزالة الوصول" : "إزالة الوصول"
+						)}
+					</Button>
+				</div>
+			</DialogContent>
+		</Dialog>
+		</>
 	);
 }

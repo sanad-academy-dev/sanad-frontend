@@ -280,7 +280,7 @@ function DigitalRegistrationRoute() {
 					/>
 
 					{/* Polling indicator: this board refreshes periodically, it is not a socket feed. */}
-					<div className="flex items-center justify-between px-4 py-1.5 text-xs text-muted-foreground border-b border-border/40" dir="rtl">
+					<div className="flex items-center justify-between px-4 py-2 text-xs text-muted-foreground border-b border-border/40" dir="rtl">
 						<div className="flex items-center gap-1.5 text-muted-foreground">
 							<IconBellRinging className="size-3.5 text-red-500" />
 							<span className="font-semibold text-[11px] text-foreground">مباشر</span>

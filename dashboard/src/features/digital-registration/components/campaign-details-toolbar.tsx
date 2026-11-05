@@ -12,16 +12,14 @@ import {
 	IconPlus,
 	IconSearch,
 	IconSettings,
-	IconShare,
 	IconSparkles,
 	IconUserPlus,
 	IconX,
 } from "@tabler/icons-react";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { useAgentPanelStore } from "@/features/agent/stores/agent-panel.store";
 import { CampaignShareDialog } from "./campaign-share-dialog";
-import { useRegistrationShareAccess } from "../hooks/use-digital-registration";
+import { useRegistrationShareAccess, useDigitalRegistrationCapabilities } from "../hooks/use-digital-registration";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -68,8 +66,6 @@ export function CampaignDetailsToolbar({
 	onOpenAssistant,
 	onToggleStats,
 	onOpenSettings,
-	campaignId,
-	campaignName,
 }: {
 	searchValue?: string;
 	onSearchChange?: (val: string) => void;
@@ -92,6 +88,7 @@ export function CampaignDetailsToolbar({
 	const handleAssistantClick = onOpenAssistant || openAgent;
 
 	const handleOpenInvite = () => {
+		if (!capabilities.canManageTeam) return;
 		setFocusInviteOnOpen(true);
 		setShareOpen(true);
 	};
@@ -101,7 +98,8 @@ export function CampaignDetailsToolbar({
 		setShareOpen(true);
 	};
 
-	const { data: shareData, isLoading: isShareLoading } = useRegistrationShareAccess(campaignId);
+	const { capabilities } = useDigitalRegistrationCapabilities();
+	const { data: shareData, isLoading: isShareLoading } = useRegistrationShareAccess();
 
 	const collaborators = useMemo(() => {
 		const list: Array<{
@@ -126,19 +124,9 @@ export function CampaignDetailsToolbar({
 		return list;
 	}, [shareData]);
 
-	const handleCopyPublicLink = () => {
-		const publicUrl =
-			typeof window !== "undefined"
-				? `${window.location.origin}/register`
-				: "https://sanad.app/register";
-
-		navigator.clipboard.writeText(publicUrl);
-		toast.success("تم نسخ رابط التسجيل المباشر بنجاح!");
-	};
-
 	return (
 		<div
-			className="flex items-center justify-between gap-2 px-3 py-1.5 border-b border-border/40 bg-background select-none flex-nowrap overflow-x-auto min-w-0"
+			className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border/40 bg-background select-none flex-nowrap overflow-x-auto min-w-0"
 			dir="rtl"
 		>
 			{/* Right Section: Compact Search & Filter Toolbar */}
@@ -215,6 +203,7 @@ export function CampaignDetailsToolbar({
 				</DropdownMenu>
 
 				{/* تصدير (Export Dropdown) */}
+				{capabilities.canExport && (
 				<DropdownMenu dir="rtl">
 					<DropdownMenuTrigger asChild>
 						<Button
@@ -244,6 +233,7 @@ export function CampaignDetailsToolbar({
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
+				)}
 
 				{/* التصفية والفرز (Sort & Order) */}
 				<DropdownMenu dir="rtl">
@@ -349,7 +339,7 @@ export function CampaignDetailsToolbar({
 			{/* Left Section: Compact Buttons & Team Avatars (مطابق تماماً للصورة) */}
 			<div className="flex items-center gap-1.5 shrink-0 flex-nowrap" dir="ltr">
 				{/* 1. Primary Action Button: + تسجيل طالب جديد */}
-				{onOpenAddRequest && (
+				{capabilities.canCreateRequest && onOpenAddRequest && (
 					<Button
 						type="button"
 						size="sm"
@@ -388,8 +378,8 @@ export function CampaignDetailsToolbar({
 							type="button"
 							onClick={handleOpenShare}
 							className="flex items-center -space-x-1.5 cursor-pointer group focus:outline-hidden focus:ring-1 focus:ring-ring rounded-full"
-							title="أعضاء الفريق ومشاركو الحملة - انقر للمشاركة"
-							aria-label="أعضاء الفريق ومشاركو الحملة"
+							title="الموظفون المصرح لهم في التسجيل الرقمي"
+							aria-label="الموظفون المصرح لهم في التسجيل الرقمي"
 						>
 							{collaborators.slice(0, 3).map((collab, idx) => {
 								const colorClass = AVATAR_COLORS[idx % AVATAR_COLORS.length];
@@ -424,39 +414,40 @@ export function CampaignDetailsToolbar({
 								</div>
 							)}
 						</button>
-					) : (
+					) : capabilities.canManageTeam ? (
 						<button
 							type="button"
 							onClick={handleOpenInvite}
 							className="size-6 rounded-full bg-muted/60 text-muted-foreground border-2 border-background flex items-center justify-center text-[9px] font-medium shadow-2xs cursor-pointer hover:bg-muted"
-							title="أعضاء الفريق - انقر للمشاركة"
+							title="إضافة موظف إلى فريق التسجيل الرقمي"
 						>
 							<IconUserPlus className="size-3" />
 						</button>
-					)}
+					) : null}
 
-					<button
-						type="button"
-						className="size-6.5 ms-1 rounded-md hover:bg-muted/70 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer focus:outline-hidden focus:ring-1 focus:ring-ring"
-						title="دعوة عضو فريق للحملة"
-						aria-label="دعوة عضو فريق للحملة"
-						onClick={handleOpenInvite}
-					>
-						<IconUserPlus className="size-3.5" />
-					</button>
+					{capabilities.canManageTeam && (
+						<button
+							type="button"
+							className="size-6.5 ms-1 rounded-md hover:bg-muted/70 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer focus:outline-hidden focus:ring-1 focus:ring-ring"
+							title="إضافة موظف إلى فريق التسجيل الرقمي"
+							aria-label="إضافة موظف إلى فريق التسجيل الرقمي"
+							onClick={handleOpenInvite}
+						>
+							<IconUserPlus className="size-3.5" />
+						</button>
+					)}
 				</div>
 
-				{/* 5. Share Button (يفتح نافذة المشاركة الفاخرة) */}
+				{/* 5. Team Button (إدارة فريق التسجيل الرقمي) */}
 				<Button
 					type="button"
 					variant="outline"
 					size="sm"
 					className="h-7.5 px-2.5 rounded-md border-border/80 bg-background hover:bg-muted/60 text-foreground text-[11px] font-medium flex items-center gap-1 shadow-2xs transition-colors cursor-pointer whitespace-nowrap"
 					onClick={handleOpenShare}
-					title="مشاركة حملة التسجيل والرابط والباركود"
+					title="إدارة فريق التسجيل الرقمي"
 				>
-					<IconShare className="size-3 text-muted-foreground" />
-					<span>Share</span>
+					<span>فريق التسجيل</span>
 				</Button>
 
 				{/* 6. Settings Gear Icon */}
@@ -478,8 +469,6 @@ export function CampaignDetailsToolbar({
 					setShareOpen(open);
 					if (!open) setFocusInviteOnOpen(false);
 				}}
-				campaignId={campaignId}
-				campaignName={campaignName}
 				initialFocusInvite={focusInviteOnOpen}
 			/>
 		</div>

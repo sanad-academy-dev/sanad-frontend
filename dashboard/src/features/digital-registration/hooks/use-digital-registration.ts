@@ -1,15 +1,27 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { backendFetch } from "@/lib/backend-fetch";
 import type { Campaign, CampaignSummaryStats } from "../types/campaign.types";
-import type { CampaignRequestItem, RequestNotificationItem } from "../types/campaign-request.types";
+import type { CampaignRequestItem, RegistrationCommentItem, RequestNotificationItem } from "../types/campaign-request.types";
 
 const CAMPAIGNS_QUERY_KEY = ["digital-registration", "campaigns"];
 const SUMMARY_QUERY_KEY = ["digital-registration", "summary"];
 const WORKSPACE_QUERY_KEY = ["digital-registration", "workspace"];
 
-export type RegistrationReviewer = { id: string; name: string; image?: string | null; role: string; phone?: string | null };
+export type RegistrationReviewer = {
+	/** معرّف المستخدم: يُخزَّن في assignedStaffId داخل طلب التسجيل. */
+	id: string;
+	userId: string;
+	/** معرّف Staff: يُستخدم حصراً لحجز الموعد في التقويم. */
+	staffId: string;
+	name: string;
+	image?: string | null;
+	role: string;
+	title?: string | null;
+	phone?: string | null;
+	isSystemManager?: boolean;
+};
 
-/** كل أعضاء النظام التابعين للأكاديمية يمكن تعيينهم كمراجعين، بمن فيهم المدير. */
+/** مراجعو التسجيل المؤهلون للحجز: مدير بسجل Staff أو عضو فريق can_edit فقط. */
 export function useRegistrationReviewers() {
 	return useQuery<RegistrationReviewer[]>({
 		queryKey: ["digital-registration", "reviewers"],
@@ -198,7 +210,7 @@ export function useAddRequestComment(campaignId: string, defaultRequestId?: stri
 			const requestId = typeof payload === "string" ? defaultRequestId : payload.requestId;
 			const content = typeof payload === "string" ? payload : payload.content;
 			if (!requestId) throw new Error("معرف الطلب غير متوفر لإضافة التعليق");
-			if (!content || !content.trim()) throw new Error("محتوى التعليق لا يمكن أن يكون فارغاً");
+			if (!content?.trim()) throw new Error("محتوى التعليق لا يمكن أن يكون فارغاً");
 			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/comments`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -261,6 +273,7 @@ export function useCreateRequest(campaignId: string) {
 			guardianEmail?: string | null;
 			guardianNationalId?: string | null;
 			source?: "WEBSITE" | "DIRECT_LINK" | "REFERRAL" | "SOCIAL" | "OTHER";
+			interviewMode?: "IN_CLINIC" | "REMOTE";
 			existingPatientId?: string | null;
 			existingOwnerId?: string | null;
 			learningMode?: string | null;
@@ -368,9 +381,6 @@ export function useUpdateRequest(campaignId: string) {
 				preferredShift: string | null;
 				experienceLevel: string | null;
 				priority: string | null;
-				status: string | null;
-				columnStatus: string | null;
-				column: string | null;
 				appointmentDate: string | null;
 				appointmentIsoDate: string | null;
 				assignedStaffId: string | null;
@@ -586,6 +596,8 @@ export function useRescheduleRequest(campaignId: string) {
 				customReason?: string;
 				newAppointmentDate: string;
 				staffId?: string | null;
+				interviewMode?: "IN_CLINIC" | "REMOTE";
+				roomId?: string | null;
 				subject?: string;
 				customMessage?: string;
 				notifyEmail?: boolean;
@@ -736,8 +748,8 @@ export function useQuickUpdateRequest(campaignId: string) {
 				includeMeals?: boolean;
 				enableDailyStipend?: boolean;
 				allergies?: string | null;
-				allergiesList?: any;
-				medications?: any;
+				allergiesList?: unknown;
+				medications?: unknown;
 				assignedStaffId?: string | null;
 				notes?: string | null;
 				attendanceProbability?: number;
@@ -764,23 +776,24 @@ export function useQuickUpdateRequest(campaignId: string) {
 // ─── ميزة المشاركة والوصول للوحة التسجيل (Share Modal) ────────────────────────
 
 export type {
+	ShareAccessAuditEntry,
 	ShareAccessLevel,
 	ShareAccessMember,
-	ShareGeneralAccess,
 	ShareAccessResponse,
+	ShareGeneralAccess,
 	StaffCandidate,
+	UpdateMemberAccessResult,
 } from "../types/campaign-share.types";
 
 const SHARE_ACCESS_QUERY_KEY = ["digital-registration", "share-access"];
+const SHARE_ACCESS_AUDIT_QUERY_KEY = ["digital-registration", "share-access", "audit"];
 
-export function useRegistrationShareAccess(campaignId?: string) {
+export function useRegistrationShareAccess(_campaignId?: string) {
 	return useQuery<import("../types/campaign-share.types").ShareAccessResponse>({
-		queryKey: [...SHARE_ACCESS_QUERY_KEY, campaignId],
+		// إدارة الوصول تخص مساحة التسجيل الواحدة، لذلك لا نجزئ الـ cache بحسب حملة.
+		queryKey: SHARE_ACCESS_QUERY_KEY,
 		queryFn: async () => {
-			const url = campaignId
-				? `/api/digital-registration/share-access?campaignId=${encodeURIComponent(campaignId)}`
-				: "/api/digital-registration/share-access";
-			const res = await backendFetch(url);
+			const res = await backendFetch("/api/digital-registration/share-access");
 			if (!res.ok) throw new Error("فشل جلب بيانات مشاركة اللوحة");
 			return res.json();
 		},
@@ -788,9 +801,10 @@ export function useRegistrationShareAccess(campaignId?: string) {
 	});
 }
 
-export function useStaffCandidates(search?: string) {
+export function useStaffCandidates(search?: string, enabled = true) {
 	return useQuery<import("../types/campaign-share.types").StaffCandidate[]>({
 		queryKey: ["digital-registration", "staff-candidates", search],
+		enabled,
 		queryFn: async () => {
 			const url = search
 				? `/api/digital-registration/staff-candidates?search=${encodeURIComponent(search)}`
@@ -803,10 +817,23 @@ export function useStaffCandidates(search?: string) {
 	});
 }
 
+export function useRegistrationShareAccessAudit(enabled = true) {
+	return useQuery<import("../types/campaign-share.types").ShareAccessAuditEntry[]>({
+		queryKey: SHARE_ACCESS_AUDIT_QUERY_KEY,
+		enabled,
+		queryFn: async () => {
+			const res = await backendFetch("/api/digital-registration/share-access/audit?limit=20");
+			if (!res.ok) throw new Error("فشل جلب سجل تدقيق صلاحيات التسجيل");
+			return res.json();
+		},
+		staleTime: 1000 * 30,
+	});
+}
+
 export function useInviteCollaborator() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: async (payload: { identifier: string; accessLevel: "can_edit" | "can_view"; campaignId?: string }) => {
+		mutationFn: async (payload: { staffId: string; accessLevel: "can_edit" | "can_view" }) => {
 			const res = await backendFetch("/api/digital-registration/share-access/invite", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -814,19 +841,24 @@ export function useInviteCollaborator() {
 			});
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
-				throw new Error(err.message || "فشلت دعوة العضو");
+				throw new Error(err.message || "فشلت إضافة الموظف إلى فريق التسجيل");
 			}
 			return res.json();
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: SHARE_ACCESS_QUERY_KEY });
+			queryClient.invalidateQueries({ queryKey: SHARE_ACCESS_AUDIT_QUERY_KEY });
 		},
 	});
 }
 
 export function useUpdateMemberAccess() {
 	const queryClient = useQueryClient();
-	return useMutation({
+	return useMutation<
+		import("../types/campaign-share.types").UpdateMemberAccessResult,
+		Error,
+		{ memberId: string; accessLevel: "can_edit" | "can_view" | "remove" }
+	>({
 		mutationFn: async ({
 			memberId,
 			accessLevel,
@@ -847,6 +879,7 @@ export function useUpdateMemberAccess() {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: SHARE_ACCESS_QUERY_KEY });
+			queryClient.invalidateQueries({ queryKey: SHARE_ACCESS_AUDIT_QUERY_KEY });
 		},
 	});
 }
@@ -856,15 +889,13 @@ export function useUpdateGeneralAccess() {
 	return useMutation({
 		mutationFn: async ({
 			level,
-			campaignId,
 		}: {
-			level: "everyone_view" | "restricted";
-			campaignId?: string;
+			level: "restricted";
 		}) => {
 			const res = await backendFetch("/api/digital-registration/share-access/general", {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ level, campaignId }),
+				body: JSON.stringify({ level }),
 			});
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
@@ -877,3 +908,5 @@ export function useUpdateGeneralAccess() {
 		},
 	});
 }
+
+export { useDigitalRegistrationCapabilities } from "./use-digital-registration-capabilities";

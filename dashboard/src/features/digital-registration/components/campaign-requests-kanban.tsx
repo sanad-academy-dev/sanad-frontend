@@ -21,7 +21,6 @@ import {
 	IconMessage2,
 	IconMessageCircle,
 	IconPhone,
-	IconPlayerPauseFilled,
 	IconPlayerPlayFilled,
 	IconPlus,
 	IconSparkles,
@@ -57,6 +56,7 @@ import {
 	useCampaignRequests,
 	useUpdateRequest,
 	useUpdateRequestStatus,
+	useDigitalRegistrationCapabilities,
 } from "../hooks/use-digital-registration";
 
 const collisionDetection: CollisionDetection = (args) => {
@@ -142,6 +142,7 @@ export function CampaignRequestsKanban({
 	selectedRequestId?: string | null;
 	onSelectRequest?: (id: string | null) => void;
 }) {
+	const { capabilities } = useDigitalRegistrationCapabilities(campaignId);
 	const { data: serverRequests = EMPTY_REQUESTS, isLoading } = useCampaignRequests(campaignId);
 	const updateStatusMutation = useUpdateRequestStatus(campaignId);
 	const updateRequestMutation = useUpdateRequest(campaignId);
@@ -149,6 +150,7 @@ export function CampaignRequestsKanban({
 	const [data, setData] = useState<CampaignRequestItem[]>([]);
 	const lastKnownColumns = useRef<Map<string, AppointmentColumnId>>(new Map());
 	const [internalSelectedRequestId, setInternalSelectedRequestId] = useState<string | null>(null);
+	const [scheduleWorkflowRequestId, setScheduleWorkflowRequestId] = useState<string | null>(null);
 	const [pendingCancelAppointmentDrag, setPendingCancelAppointmentDrag] = useState<{
 		request: CampaignRequestItem;
 		targetColumn: string;
@@ -159,6 +161,11 @@ export function CampaignRequestsKanban({
 	} | null>(null);
 	const selectedRequestId = externalSelectedRequestId !== undefined ? externalSelectedRequestId : internalSelectedRequestId;
 	const setSelectedRequestId = externalOnSelectRequest || setInternalSelectedRequestId;
+	const startScheduleWorkflow = (request: CampaignRequestItem) => {
+		setScheduleWorkflowRequestId(request.id);
+		setSelectedRequestId(request.id);
+		toast.info("ثبّت الموعد والمراجع أولاً؛ سيُنقل الطلب إلى المقابلة تلقائياً بعد الحجز");
+	};
 
 	// Sync local state whenever server query refreshes
 	useEffect(() => {
@@ -269,6 +276,14 @@ export function CampaignRequestsKanban({
 		req: CampaignRequestItem,
 		newStatus: CampaignRequestItem["status"],
 	) => {
+		if (!capabilities.canChangeStatus) return;
+		const hasActiveAppointment = Boolean(
+			req.assessmentAppointment && req.assessmentAppointment.status !== "CANCELLED",
+		);
+		if (newStatus === "INTERVIEW" && !hasActiveAppointment) {
+			startScheduleWorkflow(req);
+			return;
+		}
 		const statusToColumnMap: Record<string, string> = {
 			QUEUE: "queue",
 			SHORTLIST: "shortlist",
@@ -337,6 +352,7 @@ export function CampaignRequestsKanban({
 	};
 
 	const handlePriorityChange = (request: CampaignRequestItem, priority: string) => {
+		if (!capabilities.canChangeStatus) return;
 		const previousPriority = request.priority || "بدون أولوية";
 		setData((previous) =>
 			previous.map((item) => (item.id === request.id ? { ...item, priority } : item)),
@@ -386,6 +402,11 @@ export function CampaignRequestsKanban({
 			);
 			const isBackwardToQueueOrShortlist = ["queue", "shortlist"].includes(targetColumn);
 			const wasInInterviewOrLater = ["interview", "awaiting-payment", "accepted"].includes(prevCol);
+			if (meta.status === "INTERVIEW" && !hasActiveAppointment && oldItem) {
+				committed.push({ ...item, column: prevCol });
+				startScheduleWorkflow(oldItem);
+				continue;
+			}
 
 			if (hasActiveAppointment && isBackwardToQueueOrShortlist && wasInInterviewOrLater && oldItem) {
 				committed.push({ ...item, column: prevCol });
@@ -451,7 +472,7 @@ export function CampaignRequestsKanban({
 	};
 
 	const handleConfirmCancelAppointmentDrag = () => {
-		if (!pendingCancelAppointmentDrag) return;
+		if (!capabilities.canChangeStatus || !pendingCancelAppointmentDrag) return;
 		const { request, targetColumn, prevColumn, targetStatus, targetLabel, targetVariant } =
 			pendingCancelAppointmentDrag;
 		lastKnownColumns.current.set(request.id, targetColumn as AppointmentColumnId);
@@ -513,7 +534,9 @@ export function CampaignRequestsKanban({
 				collisionDetection={collisionDetection}
 				columns={columns}
 				data={sortedAndFilteredData}
-				onDataChange={handleDataChange}
+				previewCrossColumnOnDragOver={false}
+				onDataChange={capabilities.canChangeStatus ? handleDataChange : undefined}
+				disabled={!capabilities.canChangeStatus}
 			>
 				{(column) => (
 					<KanbanBoard
@@ -531,15 +554,9 @@ export function CampaignRequestsKanban({
 								const reviewerInitials = getArabicInitials(reviewerName);
 								const submittedAt = item.submittedAt ? new Date(item.submittedAt) : null;
 								const appointmentAt = item.assessmentAppointment?.startsAt ? new Date(item.assessmentAppointment.startsAt) : null;
-								const normalizedLearningMode = item.learningMode?.trim().toLowerCase() || "";
-								const isRemoteRequest =
-									item.channel === "CALL" ||
-									item.source === "DIRECT_LINK" ||
-									normalizedLearningMode.includes("اتصال") ||
-									normalizedLearningMode.includes("أونلاين") ||
-									normalizedLearningMode.includes("عن بعد") ||
-									normalizedLearningMode === "online" ||
-									normalizedLearningMode === "remote";
+								// مصدر الطلب وطريقة الدراسة لا يحددان مكان مقابلة القبول.
+								// القرار الوحيد هو interviewMode المثبت مع الموعد.
+								const isRemoteInterview = item.interviewMode === "REMOTE";
 								const isInterviewStage =
 									item.column === "interview" ||
 									["INTERVIEW", "IN_EVALUATION", "EVALUATION"].includes(item.status);
@@ -550,13 +567,13 @@ export function CampaignRequestsKanban({
 										id={item.id}
 										name={item.name}
 										column={item.column}
-										disabled={item.status === "ACCEPTED"}
+										disabled={!capabilities.canChangeStatus || item.status === "ACCEPTED"}
 										className="w-full border-0 bg-transparent p-0 py-0 shadow-none ring-0 ring-transparent gap-0 rounded-none"
 									>
 										<Card
 											className={cn(
 												"w-full group/card flex flex-col gap-2 rounded-lg border border-zinc-200/90 dark:border-zinc-800 bg-white dark:bg-card p-2.5 shadow-2xs text-start hover:border-primary/40 hover:shadow-xs transition-all select-none",
-												item.status === "ACCEPTED" ? "cursor-pointer" : "cursor-grab active:cursor-grabbing"
+												(!capabilities.canChangeStatus || item.status === "ACCEPTED") ? "cursor-pointer" : "cursor-grab active:cursor-grabbing"
 											)}
 											dir="rtl"
 											onClick={() => setSelectedRequestId(item.id)}
@@ -578,21 +595,21 @@ export function CampaignRequestsKanban({
 													<IconSparkles className="size-3 text-amber-500/80 shrink-0" />
 
 													{/* أيقونة وشارة معبرة عن (اتصال) أو (في الأكاديمية) كما طلب المستخدم */}
-													{isRemoteRequest ? (
+											{isRemoteInterview ? (
 														<span
 															className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[8.5px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40 shrink-0"
-															title="قناة التسجيل: اتصال"
+													title="نوع المقابلة: عبر اتصال"
 														>
 															<IconPhone className="size-2.5" />
-															<span>اتصال</span>
+													<span>عبر اتصال</span>
 														</span>
 													) : (
 														<span
 															className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[8.5px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/40 shrink-0"
-															title="قناة التسجيل: في الأكاديمية"
+													title="نوع المقابلة: في الأكاديمية"
 														>
 															<IconBuildingCommunity className="size-2.5" />
-															<span>الأكاديمية</span>
+													<span>في الأكاديمية</span>
 														</span>
 													)}
 												</div>
@@ -690,10 +707,10 @@ export function CampaignRequestsKanban({
 												<div className="flex items-center justify-between gap-1 w-full">
 													<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
 														<IconCalendarTime className="size-3 shrink-0" />
-														<span>طريقة التسجيل</span>
+														<span>نوع المقابلة</span>
 													</div>
 													<span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-[#EEF2FF] text-[#4F6BF5] dark:bg-indigo-950/60 dark:text-indigo-300 border border-[#E0E7FF]/70">
-														{isRemoteRequest ? "حجز أونلاين" : (item.learningMode || "غير محددة")}
+														{isRemoteInterview ? "عبر اتصال" : "في الأكاديمية"}
 													</span>
 												</div>
 											</div>
@@ -776,11 +793,11 @@ export function CampaignRequestsKanban({
 												</div>
 											)}
 
-											{isInterviewStage && isRemoteRequest && (
+											{isInterviewStage && isRemoteInterview && (
 												<div className="w-full" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
 													<Link
 														to="/video-call"
-														search={{ room: `interview-${(item.code || item.id).toLowerCase()}` }}
+												search={{ registrationRequestId: item.id }}
 														className="inline-flex items-center justify-center gap-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 text-[10px] font-bold shadow-2xs transition-colors w-full cursor-pointer"
 														title="دخول المقابلة الافتراضية الآن"
 													>
@@ -804,26 +821,35 @@ export function CampaignRequestsKanban({
 												</button>
 
 												{/* زر + إضافة ملاحظة */}
-												<button
-													type="button"
-													onClick={() => setSelectedRequestId(item.id)}
-													className="inline-flex items-center gap-1 px-2 h-6.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-600 hover:text-zinc-900 text-[9.5px] font-medium transition-colors cursor-pointer shrink-0"
-													title="إضافة ملاحظة على الطلب"
-												>
-													<IconPlus className="size-2.5 text-zinc-500" />
-													<span>إضافة ملاحظة</span>
-												</button>
+												{capabilities.canComment && (
+													<button
+														type="button"
+														onClick={() => setSelectedRequestId(item.id)}
+														className="inline-flex items-center gap-1 px-2 h-6.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-600 hover:text-zinc-900 text-[9.5px] font-medium transition-colors cursor-pointer shrink-0"
+														title="إضافة ملاحظة على الطلب"
+													>
+														<IconPlus className="size-2.5 text-zinc-500" />
+														<span>إضافة ملاحظة</span>
+													</button>
+												)}
 
 												{/* زر الأولوية */}
 												<div onPointerDown={(event) => event.stopPropagation()} className="shrink-0">
-													<PriorityPickerPopover
-														value={item.priority || "بدون أولوية"}
-														onChange={(priority) => handlePriorityChange(item, priority)}
-														iconOnly
-													/>
+													{capabilities.canChangeStatus ? (
+														<PriorityPickerPopover
+															value={item.priority || "بدون أولوية"}
+															onChange={(priority) => handlePriorityChange(item, priority)}
+															iconOnly
+														/>
+													) : item.priority && item.priority !== "بدون أولوية" ? (
+														<span className="text-[9.5px] px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-medium">
+															{item.priority}
+														</span>
+													) : null}
 												</div>
 
 												{/* زر ⚑ تحديد كـ... لتغيير المرحلة بنقرة واحدة */}
+												{capabilities.canChangeStatus && (
 												<DropdownMenu dir="rtl">
 													<DropdownMenuTrigger asChild>
 														<button
@@ -885,6 +911,7 @@ export function CampaignRequestsKanban({
 														</DropdownMenuItem>
 													</DropdownMenuContent>
 												</DropdownMenu>
+												)}
 											</div>
 										</Card>
 									</KanbanCard>
@@ -899,15 +926,21 @@ export function CampaignRequestsKanban({
 				campaignId={campaignId}
 				request={selectedRequest}
 				open={!!selectedRequest}
-				onOpenChange={(open) => !open && setSelectedRequestId(null)}
-				isUpdating={updateStatusMutation.isPending}
-				onStatusChange={handleStatusChange}
-				onAccept={(req) => handleStatusChange(req, "ACCEPTED")}
-				onWaitlist={(req) => handleStatusChange(req, "QUEUE")}
-				onReject={(req) => handleStatusChange(req, "REJECTED")}
-				onDelete={() => {
-					setSelectedRequestId(null);
+				onOpenChange={(open) => {
+					if (!open) {
+						setSelectedRequestId(null);
+						setScheduleWorkflowRequestId(null);
+					}
 				}}
+				openRescheduleOnOpen={scheduleWorkflowRequestId === selectedRequest?.id}
+				isUpdating={updateStatusMutation.isPending}
+				onStatusChange={capabilities.canChangeStatus ? handleStatusChange : undefined}
+				onAccept={capabilities.canAcceptOrReject ? (req) => handleStatusChange(req, "ACCEPTED") : undefined}
+				onWaitlist={capabilities.canChangeStatus ? (req) => handleStatusChange(req, "QUEUE") : undefined}
+				onReject={capabilities.canAcceptOrReject ? (req) => handleStatusChange(req, "REJECTED") : undefined}
+				onDelete={capabilities.canDeleteRequest ? () => {
+					setSelectedRequestId(null);
+				} : undefined}
 			/>
 
 			<CancelAppointmentConfirmDialog

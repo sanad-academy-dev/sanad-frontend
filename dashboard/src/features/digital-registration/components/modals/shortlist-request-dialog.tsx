@@ -143,7 +143,7 @@ export function ShortlistRequestDialog({
 				</div>
 
 				{/* محتوى اللوحة القابل للتمرير */}
-				<div className="p-4 space-y-4 flex-1 min-h-0 overflow-y-auto overscroll-contain sanad-scrollbar">
+				<div className="p-4 space-y-4 flex-1 min-h-0 overflow-y-auto overscroll-contain scrollbar-thin">
 					{/* سويتش تضمين رسالة لولي الأمر */}
 					<div className="flex items-center justify-between pt-1">
 						<div className="flex flex-col gap-0.5">
@@ -226,7 +226,7 @@ export function ShortlistRequestDialog({
 								) : staff.length === 0 ? (
 									<div className="p-2 text-center text-xs text-muted-foreground">لا يوجد موظفون متاحون</div>
 								) : (
-									<div className="space-y-0.5 max-h-48 overflow-y-auto sanad-scrollbar">
+									<div className="space-y-0.5 max-h-48 overflow-y-auto scrollbar-thin">
 										<button
 											type="button"
 											onClick={() => {

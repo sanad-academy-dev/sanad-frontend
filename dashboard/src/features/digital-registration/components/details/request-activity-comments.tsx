@@ -136,15 +136,12 @@ export function RequestActivityComments({
 	};
 
 	return (
-		<div
-			className="rounded-lg border border-zinc-200/90 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-3 space-y-3 font-sans shadow-2xs"
-			dir="rtl"
-		>
+		<div className="space-y-1.5 font-sans" dir="rtl">
 			{/* رأس القسم: سجل النشاط والتعليقات مطابق لتصميم الصورة المرجعية */}
 			<div className="flex items-center justify-between">
-				<h4 className="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-					<span>سجل النشاط والتعليقات</span>
-				</h4>
+				<h3 className="text-[13.5px] font-bold text-zinc-900 dark:text-zinc-100">
+					سجل النشاط والتعليقات
+				</h3>
 				<span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
 					{commentsList.length} {commentsList.length === 1 ? "نشاط" : "نشاطات"}
 				</span>

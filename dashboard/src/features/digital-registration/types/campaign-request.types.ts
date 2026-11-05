@@ -64,6 +64,7 @@ export interface CampaignRequestItem {
 	guardianEmail?: string | null;
 	guardianNationalId?: string | null;
 	source?: "WEBSITE" | "DIRECT_LINK" | "REFERRAL" | "SOCIAL" | "OTHER";
+	interviewMode?: "IN_CLINIC" | "REMOTE";
 	channel?: "CALL" | "ACADEMY";
 	meetingUrl?: string | null;
 	tags: { label: string; variant: "warning" | "destructive" | "default" }[];

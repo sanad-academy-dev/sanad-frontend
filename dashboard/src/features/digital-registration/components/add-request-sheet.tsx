@@ -21,7 +21,6 @@ import {
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuLabel,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -43,28 +42,21 @@ import {
 	IconArrowsMaximize,
 	IconArrowsMinimize,
 	IconBuildingCommunity,
-	IconCalendarPlus,
 	IconCheck,
 	IconChevronDown,
 	IconChevronLeft,
-	IconCircle,
 	IconCircleCheckFilled,
-	IconCopy,
 	IconDots,
 	IconHeadset,
 	IconInfoCircle,
-	IconMapPin,
 	IconPhone,
 	IconMail,
 	IconPlus,
-	IconQrcode,
 	IconUser,
 	IconX,
-	IconArrowRight,
 	IconLinkPlus,
 	IconFileFilled,
 } from "@tabler/icons-react";
-import QRCode from "qrcode";
 import { BirthDatePicker } from "./birth-date-picker";
 import { AppointmentPickerPopover } from "./appointment-picker-popover";
 import { RoomPickerPopover } from "./room-picker-popover";
@@ -103,7 +95,12 @@ function parseStrictBirthDate(value: string): Date | null {
 	const month = Number(match[2] || match[5]);
 	const day = Number(match[3] || match[4]);
 	const date = new Date(Date.UTC(year, month - 1, day));
-	return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day ? date : null;
+	if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
+		return null;
+	}
+	const today = new Date();
+	const todayUtc = Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate());
+	return date.getTime() <= todayUtc ? date : null;
 }
 
 // تحويل مسميات الحالات السبع للأكواد المعتمدة في قاعدة البيانات
@@ -196,8 +193,8 @@ export function AddRequestDialog({
 	const [step, setStep] = useState<1 | 2>(1);
 	const [isExpanded, setIsExpanded] = useState(false);
 
-	// ─── Channel (Only: عبر اتصال OR في الأكاديمية) ─────────────────────────────
-	const [channel, setChannel] = useState<"CALL" | "ACADEMY">("CALL");
+	// ─── Interview mode (عبر اتصال أو في الأكاديمية، مستقل عن مصدر التسجيل) ───
+	const [channel, setChannel] = useState<"CALL" | "ACADEMY">("ACADEMY");
 
 	// ─── Form Fields matching Screenshot ────────────────────────────────────────
 	const [studentName, setStudentName] = useState("");
@@ -213,40 +210,6 @@ export function AddRequestDialog({
 	const [guardianEmail, setGuardianEmail] = useState("");
 	const [notes, setNotes] = useState("");
 	const [selectedOwnerId, setSelectedOwnerId] = useState<string | null>(null);
-
-	// ─── Step 2 Review & Share Controls (مطابق لصورة المستخدم f6725d6d) ─────────
-	const [includeMessage, setIncludeMessage] = useState(false);
-	const [customMessage, setCustomMessage] = useState("");
-	const [isQrOpen, setIsQrOpen] = useState(false);
-	const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string | null>(null);
-	const [copiedShareLink, setCopiedShareLink] = useState(false);
-
-	const previewShareLink = useMemo(() => {
-		if (typeof window === "undefined") return "https://sanad-academy.edu/call/interview-applicant";
-		const safeSlug = studentName ? encodeURIComponent(studentName.trim().replace(/\s+/g, "-")) : "applicant";
-		return `${window.location.origin}/call/interview-${safeSlug}`;
-	}, [studentName]);
-
-	const handleCopyShareLink = () => {
-		navigator.clipboard.writeText(previewShareLink);
-		setCopiedShareLink(true);
-		toast.success("تم نسخ رابط المشاركة بنجاح");
-		setTimeout(() => setCopiedShareLink(false), 2000);
-	};
-
-	const handleOpenQr = async () => {
-		try {
-			const dataUrl = await QRCode.toDataURL(previewShareLink, {
-				width: 220,
-				margin: 1.5,
-				color: { dark: "#1E1B4B", light: "#FFFFFF" },
-			});
-			setQrCodeDataUrl(dataUrl);
-			setIsQrOpen(true);
-		} catch (err) {
-			toast.error("فشل توليد رمز QR");
-		}
-	};
 
 	// ─── Guardian Combobox Filtering ────────────────────────────────────────────
 	const [guardianDropdownOpen, setGuardianDropdownOpen] = useState(false);
@@ -272,7 +235,7 @@ export function AddRequestDialog({
 			(g) =>
 				g.name.toLowerCase().includes(q) ||
 				g.phone.includes(q) ||
-				Boolean(g.email && g.email.toLowerCase().includes(q)),
+				Boolean(g.email?.toLowerCase().includes(q)),
 		);
 	}, [allGuardians, guardian]);
 
@@ -293,18 +256,21 @@ export function AddRequestDialog({
 	// ─── Action Pills State (Matching Screenshot: المراجع, تاريخ الموعد, الغرفة, طابور, بدون أولوية) ─
 	const [reviewer, setReviewer] = useState("المراجع");
 	const [reviewerId, setReviewerId] = useState<string | null>(null);
+	const [reviewerStaffId, setReviewerStaffId] = useState<string | null>(null);
 	const [isReviewerOpen, setIsReviewerOpen] = useState(false);
 	const [searchStaff, setSearchStaff] = useState("");
 	const [isAddStaffOpen, setIsAddStaffOpen] = useState(false);
 
 	const { data: systemStaff = [], isLoading: isStaffLoading } = useRegistrationReviewers();
 
-	// كل أعضاء النظام التابعين للأكاديمية، بمن فيهم المدير، متاحون كمراجعين.
+	// تأتي القائمة من الباك بعد التحقق: مدير النظام المؤهل مؤقتاً أو عضو فريق التسجيل
+	// بصلاحية can_edit، وفي الحالتين يلزم سجل Staff نشط قابل للحجز.
 	const staffList = useMemo(() => {
 		if (systemStaff.length > 0) {
 			return systemStaff.map((s) => ({
 				id: s.id,
-				userId: s.id,
+				userId: s.userId,
+				staffId: s.staffId,
 				name: s.name,
 				isBusy: false,
 			}));
@@ -353,7 +319,6 @@ export function AddRequestDialog({
 
 	const [appointmentDate, setAppointmentDate] = useState("تاريخ الموعد");
 	const [appointmentIsoDate, setAppointmentIsoDate] = useState<string | null>(null);
-	const [enableRecurrence, setEnableRecurrence] = useState(false);
 	const [selectedRoom, setSelectedRoom] = useState("الغرفة");
 	const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
 	const [selectedRoomBranchId, setSelectedRoomBranchId] = useState<string | null>(null);
@@ -479,7 +444,7 @@ export function AddRequestDialog({
 			setGuardianEmail(initialData.guardianEmail || "");
 			setSelectedOwnerId(initialData.convertedOwnerId || null);
 			setNotes(initialData.notes || "");
-			if (initialData.channel) setChannel(initialData.channel);
+			setChannel(initialData.interviewMode === "REMOTE" ? "CALL" : "ACADEMY");
 
 			// 1. المراجع (Reviewer)
 			let rName = initialData.assignedStaff?.name || (initialData as any).reviewerName || initialData.assessmentAppointment?.staffName || "";
@@ -490,6 +455,10 @@ export function AddRequestDialog({
 			}
 			setReviewer(rName || "المراجع");
 			setReviewerId(rId);
+			const reviewerMatch = rId
+				? staffList.find((staff) => staff.userId === rId || staff.id === rId)
+				: undefined;
+			setReviewerStaffId(initialData.assessmentAppointment?.staffId || reviewerMatch?.staffId || null);
 
 			// 2. تاريخ الموعد (Appointment Date)
 			const rawDate = initialData.appointmentDate || initialData.assessmentAppointment?.startsAt || null;
@@ -586,7 +555,7 @@ export function AddRequestDialog({
 	// Reset form
 	const resetForm = () => {
 		setStep(1);
-		setChannel("CALL");
+		setChannel("ACADEMY");
 		setStudentName("");
 		setBirthDate("");
 		setGender("");
@@ -600,6 +569,7 @@ export function AddRequestDialog({
 		setNotes("");
 		setReviewer("المراجع");
 		setReviewerId(null);
+		setReviewerStaffId(null);
 		setGuardianDropdownOpen(false);
 		setSearchStaff("");
 		setIsReviewerOpen(false);
@@ -615,11 +585,6 @@ export function AddRequestDialog({
 		setLinkTitle("");
 		setLinkUrl("");
 		setNotifyWhatsapp(false);
-		setIncludeMessage(false);
-		setCustomMessage("");
-		setIsQrOpen(false);
-		setQrCodeDataUrl(null);
-		setCopiedShareLink(false);
 		setError(null);
 	};
 
@@ -694,8 +659,31 @@ export function AddRequestDialog({
 		setError(null);
 		if (!validateForm()) return;
 
-		const backendSource = channel === "CALL" ? "DIRECT_LINK" : "OTHER";
+		// التسجيل اليدوي من لوحة الموظفين مصدره OTHER دائماً؛ نوع المقابلة يُحفظ
+		// في حقل مستقل حتى لا يختلط مصدر وصول الطلب بطريقة إجراء المقابلة لاحقاً.
+		const backendSource = "OTHER" as const;
+		const interviewMode = channel === "CALL" ? "REMOTE" : "IN_CLINIC";
+		if (appointmentIsoDate && interviewMode === "IN_CLINIC" && !selectedRoomId) {
+			setError("يجب اختيار الغرفة قبل تثبيت موعد المقابلة الحضورية");
+			toast.error("اختر الغرفة قبل حفظ موعد المقابلة في الأكاديمية");
+			return;
+		}
+		const roomForInterview = interviewMode === "IN_CLINIC"
+			? {
+				roomId: selectedRoomId,
+				roomName: selectedRoom !== "الغرفة" ? selectedRoom : null,
+			}
+			: { roomId: null, roomName: null };
 		const validPhone = guardianPhone.trim();
+		const reviewerAssignment = reviewerStaffId
+			? {
+					assignedStaffId: reviewerId,
+					reviewerId,
+					reviewerName: reviewer !== "المراجع" ? reviewer : null,
+				}
+			: reviewerId === null
+				? { assignedStaffId: null, reviewerId: null, reviewerName: null }
+				: {};
 
 		const parsedBirthDate = parseStrictBirthDate(birthDate);
 		if (!parsedBirthDate) return;
@@ -718,15 +706,8 @@ export function AddRequestDialog({
 						preferredShift: preferredShift || null,
 						experienceLevel: experienceLevel || null,
 						priority: priority || "بدون أولوية",
-						status: selectedColumn ? statusToEnum(selectedColumn) : undefined,
-						column: selectedColumn,
-						appointmentDate: appointmentIsoDate || (appointmentDate !== "تاريخ الموعد" ? appointmentDate : null),
-						appointmentIsoDate: appointmentIsoDate || null,
-						assignedStaffId: reviewerId || null,
-						reviewerId: reviewerId || null,
-						reviewerName: reviewer !== "المراجع" ? reviewer : null,
-						roomId: selectedRoomId,
-						roomName: selectedRoom !== "الغرفة" ? selectedRoom : null,
+						// الموعد والمراجع والغرفة ونوع المقابلة تعدّل من «إعادة الجدولة»
+						// فقط؛ لا نحدّث نسخة الطلب من دون تحديث Appointment الفعلي.
 						notifyWhatsapp,
 						links: attachedLinks.length > 0 ? attachedLinks : [],
 						documents: attachedDocuments.length > 0
@@ -740,9 +721,7 @@ export function AddRequestDialog({
 							: [],
 						notes: (() => {
 							const parts: string[] = [];
-							if (includeMessage && customMessage.trim()) parts.push(customMessage.trim());
 							if (notes.trim()) parts.push(notes.trim());
-							if (enableRecurrence) parts.push("📌 [ملاحظة: مطلوب جدولة زيارات متكررة للطالب بعد القبول]");
 							return parts.join("\n") || null;
 						})(),
 					},
@@ -770,6 +749,7 @@ export function AddRequestDialog({
 				guardianPhone: validPhone,
 				guardianEmail: guardianEmail.trim() || null,
 				source: backendSource,
+				interviewMode,
 
 				// الربط المتكامل مع أولياء الأمور والمواعيد والقاعات
 				existingOwnerId: selectedOwnerId,
@@ -779,15 +759,11 @@ export function AddRequestDialog({
 				priority: priority || "بدون أولوية",
 				// لا نسجل الطلب كأنه دخل المقابلة قبل نجاح الحجز الفعلي.
 				initialStatus: (appointmentIsoDate ? "QUEUE" : statusToEnum(selectedColumn)) as "QUEUE" | "SHORTLIST" | "WAITLIST" | "INTERVIEW" | "AWAITING_PAYMENT" | "DUPLICATE",
-				reviewerId: reviewerId || null,
-				reviewerName: reviewer !== "المراجع" ? reviewer : null,
-				roomId: selectedRoomId,
-				roomName: selectedRoom !== "الغرفة" ? selectedRoom : null,
+				...reviewerAssignment,
+				...roomForInterview,
 				notes: (() => {
 					const parts: string[] = [];
-					if (includeMessage && customMessage.trim()) parts.push(customMessage.trim());
 					if (notes.trim()) parts.push(notes.trim());
-					if (enableRecurrence) parts.push("📌 [ملاحظة: مطلوب جدولة زيارات متكررة للطالب بعد القبول]");
 					return parts.length > 0 ? parts.join("\n") : null;
 				})(),
 				notifyWhatsapp: notifyWhatsapp,
@@ -810,11 +786,18 @@ export function AddRequestDialog({
 				try {
 					await scheduleMutation.mutateAsync({
 						requestId: created.id,
-						// المراجع عضو نظام وقد لا يملك سجل Staff؛ لا نرسل معرّفه كموظف للموعد.
-						// الخادم يختار أخصائي التقييم النشط الافتراضي عند عدم تحديد موظف موعد.
-						data: { startsAt: appointmentIsoDate, roomId: selectedRoomId || undefined, branchId: selectedRoomBranchId || undefined },
+						data: {
+							staffId: reviewerStaffId || undefined,
+							startsAt: appointmentIsoDate,
+							roomId: roomForInterview.roomId || undefined,
+							branchId: interviewMode === "IN_CLINIC" ? selectedRoomBranchId || undefined : undefined,
+						},
 					});
-					toast.success("تم تثبيت موعد التقييم والغرفة المطلوبة بنجاح");
+					toast.success(
+						interviewMode === "REMOTE"
+							? "تم تثبيت موعد المقابلة عن بُعد بنجاح"
+							: "تم تثبيت موعد التقييم والغرفة المطلوبة بنجاح",
+					);
 				} catch (scheduleError: any) {
 					toast.error(`تم إنشاء الطلب لكن تعذر تثبيت الموعد: ${scheduleError?.message || "خطأ غير متوقع"}`);
 				}
@@ -838,7 +821,6 @@ export function AddRequestDialog({
 				setNotes("");
 				setAppointmentDate("تاريخ الموعد");
 				setAppointmentIsoDate(null);
-				setEnableRecurrence(false);
 				setSelectedRoom("الغرفة");
 				setAttachedDocuments([]);
 				setAttachedLinks([]);
@@ -867,7 +849,7 @@ export function AddRequestDialog({
 		};
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [open, step, initialData, studentName, birthDate, gender, learningMode, suggestedTrack, guardian, guardianPhone, guardianEmail, selectedOwnerId, appointmentDate, appointmentIsoDate, reviewer, reviewerId, selectedRoom, selectedRoomId, selectedRoomBranchId, selectedColumn, priority, notifyWhatsapp, notes, attachedDocuments, attachedLinks]);
+	}, [open, step, initialData, studentName, birthDate, gender, learningMode, suggestedTrack, guardian, guardianPhone, guardianEmail, selectedOwnerId, appointmentDate, appointmentIsoDate, reviewer, reviewerId, reviewerStaffId, selectedRoom, selectedRoomId, selectedRoomBranchId, selectedColumn, priority, notifyWhatsapp, notes, attachedDocuments, attachedLinks]);
 
 	const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
@@ -875,7 +857,7 @@ export function AddRequestDialog({
 		Boolean(studentName.trim()) &&
 		Boolean(guardian.trim()) &&
 		(!isNewGuardian || (Boolean(guardianPhone.trim()) && Boolean(guardianEmail.trim()))) &&
-		Boolean(birthDate.trim()) &&
+		Boolean(parseStrictBirthDate(birthDate)) &&
 		Boolean(gender) &&
 		Boolean(learningMode) &&
 		Boolean(suggestedTrack);
@@ -897,13 +879,15 @@ export function AddRequestDialog({
 						/* Step 1 Title + Channel Dropdown */
 						<div className="flex items-center gap-2">
 							<span className="text-[13px] font-bold text-foreground">
-								{initialData ? `تعديل بيانات طلب الطالب - #${initialData.code}` : "تسجيل طلب جديد في:"}
+								{initialData ? `تعديل بيانات طلب الطالب - #${initialData.code}` : "تسجيل طلب جديد — المقابلة:"}
 							</span>
 							<DropdownMenu dir="rtl">
 								<DropdownMenuTrigger asChild>
 									<button
 										type="button"
-										className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-border/70 bg-background text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors cursor-pointer shadow-2xs"
+										disabled={Boolean(initialData)}
+										title={initialData ? "يُغيَّر نوع المقابلة من إجراء إعادة الجدولة" : "نوع المقابلة"}
+										className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-border/70 bg-background text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors cursor-pointer shadow-2xs disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-background"
 									>
 										{channel === "CALL" ? (
 											<IconPhone className="size-3 text-emerald-600" />
@@ -916,7 +900,7 @@ export function AddRequestDialog({
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="start" className="w-44 text-xs z-[99]">
 									<DropdownMenuLabel className="text-[10px] text-muted-foreground">
-										قناة التسجيل المعتمدة
+										نوع المقابلة
 									</DropdownMenuLabel>
 									<DropdownMenuItem
 										onClick={() => setChannel("CALL")}
@@ -954,9 +938,16 @@ export function AddRequestDialog({
 					<div className="flex items-center gap-0.5">
 						<button
 							type="button"
+							disabled={Boolean(initialData)}
+							title={
+								initialData
+									? "يُعدّل المراجع من إجراء إعادة الجدولة"
+									: isExpanded
+										? "تصغير"
+										: "تكبير"
+							}
 							onClick={() => setIsExpanded((prev) => !prev)}
 							className="size-6.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
-							title={isExpanded ? "تصغير" : "تكبير"}
 						>
 							{isExpanded ? (
 								<IconArrowsMinimize className="size-3.5" />
@@ -978,7 +969,7 @@ export function AddRequestDialog({
 				{/* ─── 2. Body Content (ارتفاع مرن يستجيب للتكبير بسلاسة لمنع اختفاء المحتوى) ─── */}
 				<div
 					className={cn(
-						"px-4 py-2 overflow-y-auto flex-1 min-h-0 sanad-scrollbar",
+						"px-4 py-2 overflow-y-auto flex-1 min-h-0 scrollbar-thin",
 						isExpanded ? "max-h-[calc(92vh-155px)]" : "max-h-[calc(88vh-165px)]",
 					)}
 				>
@@ -1003,7 +994,7 @@ export function AddRequestDialog({
 										value={studentName}
 										onChange={(e) => setStudentName(e.target.value)}
 										placeholder="مثال: يوسف أحمد"
-										className="h-8 text-[11.5px] text-right px-2.5 rounded-md border-border/80 bg-background"
+										className="h-9 text-[12px] leading-5 text-right px-2.5 rounded-md border-border/80 bg-background"
 										required
 									/>
 								</div>
@@ -1025,7 +1016,7 @@ export function AddRequestDialog({
 											}}
 											onFocus={() => setGuardianDropdownOpen(true)}
 											placeholder="اختر أو اكتب ولي الأمر..."
-											className="h-8 text-[11.5px] text-right pr-2.5 pl-8 rounded-md border-border/80 bg-background"
+											className="h-9 text-[12px] leading-5 text-right pr-2.5 pl-8 rounded-md border-border/80 bg-background"
 											required
 										/>
 										<button
@@ -1137,7 +1128,7 @@ export function AddRequestDialog({
 												onChange={(e) => setGuardianPhone(e.target.value)}
 												placeholder="05xxxxxxxx"
 												dir="ltr"
-												className="h-8 text-[11.5px] text-left rounded-md border-border/80 bg-background pl-8"
+												className="h-9 text-[12px] leading-5 text-left rounded-md border-border/80 bg-background pl-8"
 												required
 											/>
 											<IconPhone className="size-3 text-muted-foreground absolute left-2.5 top-2.5 pointer-events-none" />
@@ -1158,7 +1149,7 @@ export function AddRequestDialog({
 												onChange={(e) => setGuardianEmail(e.target.value)}
 												placeholder="example@domain.com"
 												dir="ltr"
-												className="h-8 text-[11.5px] text-left rounded-md border-border/80 bg-background pl-8"
+												className="h-9 text-[12px] leading-5 text-left rounded-md border-border/80 bg-background pl-8"
 												required
 											/>
 											<IconMail className="size-3 text-muted-foreground absolute left-2.5 top-2.5 pointer-events-none" />
@@ -1181,6 +1172,7 @@ export function AddRequestDialog({
 										onChange={setBirthDate}
 										placeholder="مثال: 19/02/2008"
 										required
+										className="text-[12px] leading-5"
 									/>
 								</div>
 
@@ -1195,7 +1187,7 @@ export function AddRequestDialog({
 										value={gender}
 										onValueChange={(val: any) => setGender(val)}
 									>
-										<SelectTrigger className="w-full h-8 text-[11.5px] text-right rounded-md border-border/80" dir="rtl">
+										<SelectTrigger className="w-full h-9! min-h-9! text-[12px] leading-5 text-right rounded-md border-border/80" dir="rtl">
 											<SelectValue placeholder="اختر جنس الطالب..." />
 										</SelectTrigger>
 										<SelectContent
@@ -1231,7 +1223,7 @@ export function AddRequestDialog({
 										value={experienceLevel}
 										onValueChange={setExperienceLevel}
 									>
-										<SelectTrigger className="w-full h-8 text-[11.5px] text-right rounded-md border-border/80" dir="rtl">
+										<SelectTrigger className="w-full h-9! min-h-9! text-[12px] leading-5 text-right rounded-md border-border/80" dir="rtl">
 											<SelectValue placeholder="حدد مستوي الخبرة" />
 										</SelectTrigger>
 										<SelectContent
@@ -1267,7 +1259,7 @@ export function AddRequestDialog({
 										value={learningMode}
 										onValueChange={setLearningMode}
 									>
-										<SelectTrigger className="w-full h-8 text-[11.5px] text-right rounded-md border-border/80" dir="rtl">
+										<SelectTrigger className="w-full h-9! min-h-9! text-[12px] leading-5 text-right rounded-md border-border/80" dir="rtl">
 											<SelectValue placeholder="اختر الطريقة..." />
 										</SelectTrigger>
 										<SelectContent
@@ -1299,7 +1291,7 @@ export function AddRequestDialog({
 										value={preferredShift}
 										onValueChange={setPreferredShift}
 									>
-										<SelectTrigger className="w-full h-8 text-[11.5px] text-right rounded-md border-border/80" dir="rtl">
+										<SelectTrigger className="w-full h-9! min-h-9! text-[12px] leading-5 text-right rounded-md border-border/80" dir="rtl">
 											<SelectValue placeholder="اختر المناوبة" />
 										</SelectTrigger>
 										<SelectContent
@@ -1329,7 +1321,7 @@ export function AddRequestDialog({
 										value={suggestedTrack}
 										onValueChange={setSuggestedTrack}
 									>
-										<SelectTrigger className="w-full h-8 text-[11.5px] text-right rounded-md border-border/80" dir="rtl">
+										<SelectTrigger className="w-full h-9! min-h-9! text-[12px] leading-5 text-right rounded-md border-border/80" dir="rtl">
 											<SelectValue placeholder="اختر" />
 										</SelectTrigger>
 										<SelectContent
@@ -1357,7 +1349,7 @@ export function AddRequestDialog({
 									value={notes}
 									onChange={(e) => setNotes(e.target.value)}
 									placeholder="أضف أي ملاحظات أكاديمية..."
-									className="text-[11.5px] text-right h-12 min-h-[48px] resize-none rounded-md border-border/80 placeholder:text-muted-foreground/60 py-1.5"
+									className="h-12 min-h-[48px] resize-none rounded-md border-border/80 py-1.5 text-[12px] leading-5 text-right placeholder:text-muted-foreground/60"
 								/>
 							</div>
 						</div>
@@ -1460,72 +1452,6 @@ export function AddRequestDialog({
 								</div>
 							</div>
 
-							{/* 2. قسم رابط المشاركة (مطابق تماماً لصورة f6725d6d) */}
-							<div className="space-y-2 pt-1">
-								<Label className="text-xs font-bold text-foreground block">
-									رابط المشاركة
-								</Label>
-								<div className="flex items-center gap-2">
-									<div className="relative flex-1">
-										<Input
-											readOnly
-											value={previewShareLink}
-											placeholder="e.g: www.website.com/username"
-											className="h-8.5 text-xs text-left font-mono bg-muted/40 border-border/80 text-foreground"
-											dir="ltr"
-										/>
-									</div>
-									<Button
-										type="button"
-										variant="outline"
-										size="sm"
-										onClick={handleCopyShareLink}
-										className="h-8.5 px-3 text-xs gap-1.5 font-medium cursor-pointer shrink-0 border-border/80"
-									>
-										{copiedShareLink ? (
-											<IconCheck className="size-3.5 text-emerald-600" />
-										) : (
-											<IconCopy className="size-3.5" />
-										)}
-										<span>{copiedShareLink ? "تم النسخ" : "نسخ"}</span>
-									</Button>
-									<Button
-										type="button"
-										variant="outline"
-										size="sm"
-										onClick={handleOpenQr}
-										className="h-8.5 px-3 text-xs gap-1.5 font-medium cursor-pointer shrink-0 border-border/80"
-									>
-										<IconQrcode className="size-3.5" />
-										<span>رمز QR</span>
-									</Button>
-								</div>
-
-								{/* مفتاح إضافة رسالة */}
-								<div className="flex items-center justify-between pt-1">
-									<label className="flex items-center gap-2 cursor-pointer select-none">
-										<Switch
-											checked={includeMessage}
-											onCheckedChange={setIncludeMessage}
-											size="sm"
-										/>
-										<span className="text-[11.5px] font-semibold text-foreground">
-											إضافة رسالة
-										</span>
-									</label>
-								</div>
-
-								{includeMessage && (
-									<div className="animate-in fade-in duration-150 pt-1">
-										<Textarea
-											value={customMessage}
-											onChange={(e) => setCustomMessage(e.target.value)}
-											placeholder="اكتب رسالة مخصصة لولي الأمر بخصوص تفاصيل المقابلة والطلب..."
-											className="text-xs text-right h-16 min-h-[64px] resize-none rounded-md"
-										/>
-									</div>
-								)}
-							</div>
 						</div>
 					)}
 				</div>
@@ -1672,7 +1598,7 @@ export function AddRequestDialog({
 										el.scrollTop = target;
 									}
 								}}
-								className="max-h-60 overflow-y-auto overscroll-contain p-1.5 space-y-0.5 sanad-scrollbar"
+								className="max-h-60 overflow-y-auto overscroll-contain p-1.5 space-y-0.5 scrollbar-thin"
 							>
 								{isStaffLoading ? (
 									<div className="py-6 text-center text-xs text-muted-foreground">
@@ -1693,6 +1619,7 @@ export function AddRequestDialog({
 								}
 													setReviewer(s.name);
 								setReviewerId(s.userId);
+								setReviewerStaffId(s.staffId);
 													setIsReviewerOpen(false);
 												}}
 												className={cn(
@@ -1739,6 +1666,7 @@ export function AddRequestDialog({
 										onClick={() => {
 											setReviewer("المراجع");
 											setReviewerId(null);
+									setReviewerStaffId(null);
 											setIsReviewerOpen(false);
 										}}
 										className="w-full py-1 text-center text-[10.5px] text-muted-foreground hover:text-foreground hover:bg-muted/50 rounded-md transition-colors cursor-pointer"
@@ -1750,9 +1678,42 @@ export function AddRequestDialog({
 						</PopoverContent>
 					</Popover>
 
-					<AppointmentPickerPopover value={appointmentDate} onChange={(value, iso) => { setAppointmentDate(value); setAppointmentIsoDate(iso || null); }} reviewerName={reviewer} enableReminders={notifyWhatsapp} onEnableRemindersChange={setNotifyWhatsapp} enableRecurrence={enableRecurrence} onEnableRecurrenceChange={setEnableRecurrence} />
-					<RoomPickerPopover value={selectedRoom} onChange={(name, id, branchId) => { setSelectedRoom(name); setSelectedRoomId(id || null); setSelectedRoomBranchId(branchId || null); }} appointmentDate={appointmentDate} />
-					<ColumnStatusPicker value={selectedColumn} onChange={setSelectedColumn} allowedIds={["queue", "shortlist", "waitlist", "interview", "awaiting-payment", "duplicate"]} />
+					<div
+						className={initialData ? "pointer-events-none opacity-60" : undefined}
+						title={initialData ? "يُعدّل الموعد من إجراء إعادة الجدولة" : undefined}
+					>
+						<AppointmentPickerPopover
+							value={appointmentDate}
+							isoValue={appointmentIsoDate}
+							onChange={(value, iso) => {
+								setAppointmentDate(value);
+								setAppointmentIsoDate(iso || null);
+								// تغيير اليوم يلغي الغرفة السابقة حتى لا يبدو أنها متاحة للوقت الجديد بلا فحص.
+								if (!iso) {
+									setSelectedRoom("الغرفة");
+									setSelectedRoomId(null);
+									setSelectedRoomBranchId(null);
+								}
+							}}
+							reviewerName={reviewer}
+							reviewerId={reviewerStaffId || undefined}
+							enableReminders={notifyWhatsapp}
+							onEnableRemindersChange={setNotifyWhatsapp}
+						/>
+					</div>
+					<div
+						className={initialData ? "pointer-events-none opacity-60" : undefined}
+						title={initialData ? "تُعدّل الغرفة من إجراء إعادة الجدولة" : undefined}
+					>
+						<RoomPickerPopover value={selectedRoom} onChange={(name, id, branchId) => { setSelectedRoom(name); setSelectedRoomId(id || null); setSelectedRoomBranchId(branchId || null); }} appointmentDate={appointmentIsoDate || ""} />
+					</div>
+					<ColumnStatusPicker
+						value={selectedColumn}
+						onChange={setSelectedColumn}
+						allowedIds={["queue", "shortlist", "waitlist", "interview", "awaiting-payment", "duplicate"]}
+						// تعديل بيانات الطلب لا يغيّر مرحلته؛ الحالة تُنقل من Kanban/إجراءات الطلب
+						disabled={Boolean(initialData)}
+					/>
 
 					{/* 5. [ ... بدون أولوية ] - منسدلة اختيار الأولوية المطابقة للتصميم (الصورة b52ca17c) مع الأيقونات واختصارات 0-4 */}
 					<PriorityPickerPopover
@@ -1804,27 +1765,29 @@ export function AddRequestDialog({
 						<>
 							{/* في Step 1 أقصى اليمين: أنشئ المزيد + إشعار عبر الواتساب */}
 							<div className="flex items-center gap-4">
-								<label className="flex items-center gap-1.5 cursor-pointer select-none">
+								<div className="flex items-center gap-1.5 select-none">
 									<span className="text-[11px] font-medium text-muted-foreground hover:text-foreground">
 										أنشئ المزيد
 									</span>
 									<Checkbox
+										aria-label="أنشئ المزيد"
 										checked={createMore}
 										onCheckedChange={(checked) => setCreateMore(!!checked)}
 										className="size-3.5 rounded-[3px]"
 									/>
-								</label>
+								</div>
 
-								<label className="flex items-center gap-1.5 cursor-pointer select-none">
+								<div className="flex items-center gap-1.5 select-none">
 									<span className="text-[11px] font-medium text-muted-foreground hover:text-foreground">
 										إشعار عبر الواتساب
 									</span>
 									<Switch
+										aria-label="إشعار عبر الواتساب"
 										size="sm"
 										checked={notifyWhatsapp}
 										onCheckedChange={setNotifyWhatsapp}
 									/>
-								</label>
+								</div>
 							</div>
 
 							{/* في Step 1 أقصى اليسار: زر تحديث الطلب (في وضع التعديل) أو زر التالي (في وضع الإضافة) */}
@@ -1885,16 +1848,17 @@ export function AddRequestDialog({
 
 							{/* في Step 2 أقصى اليسار في RTL: إشعار عبر الواتساب + زر حفظ التسجيل (مطابق للصورة f6725d6d) */}
 							<div className="flex items-center gap-3">
-								<label className="flex items-center gap-1.5 cursor-pointer select-none">
+								<div className="flex items-center gap-1.5 select-none">
 									<span className="text-[11px] font-medium text-muted-foreground hover:text-foreground">
 										إشعار عبر الواتساب
 									</span>
 									<Switch
+										aria-label="إشعار عبر الواتساب"
 										size="sm"
 										checked={notifyWhatsapp}
 										onCheckedChange={setNotifyWhatsapp}
 									/>
-								</label>
+								</div>
 
 								<Button
 									type="button"
@@ -1911,61 +1875,6 @@ export function AddRequestDialog({
 								</Button>
 							</div>
 						</>
-					)}
-				</div>
-			</DialogContent>
-		</Dialog>
-
-		{/* نافذة عرض رمز QR للمشاركة */}
-		<Dialog open={isQrOpen} onOpenChange={setIsQrOpen}>
-			<DialogContent className="sm:max-w-xs p-5 text-center" dir="rtl">
-				<DialogHeader>
-					<DialogTitle className="text-sm font-bold flex items-center justify-center gap-2 text-foreground">
-						<IconQrcode className="size-4 text-[#4F6BF5]" />
-						<span>رمز QR للمشاركة</span>
-					</DialogTitle>
-				</DialogHeader>
-				<div className="py-3 flex flex-col items-center justify-center gap-2">
-					{qrCodeDataUrl ? (
-						<img
-							src={qrCodeDataUrl}
-							alt="QR Code"
-							className="size-44 rounded-lg border border-border/70 p-2 bg-white shadow-xs"
-						/>
-					) : (
-						<div className="size-44 bg-muted animate-pulse rounded-lg flex items-center justify-center">
-							<IconQrcode className="size-8 text-muted-foreground animate-spin" />
-						</div>
-					)}
-					<p className="text-[11px] text-muted-foreground mt-1">
-						امسح الرمز بكاميرا الهاتف لفتح رابط جلسة المقابلة
-					</p>
-				</div>
-				<div className="flex items-center justify-center gap-2 pt-2 border-t border-border/50">
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						onClick={() => setIsQrOpen(false)}
-						className="h-7.5 text-xs px-3 cursor-pointer"
-					>
-						إغلاق
-					</Button>
-					{qrCodeDataUrl && (
-						<Button
-							type="button"
-							size="sm"
-							onClick={() => {
-								const a = document.createElement("a");
-								a.href = qrCodeDataUrl;
-								a.download = `QR-${studentName || "candidate"}.png`;
-								a.click();
-								toast.success("تم تنزيل رمز QR بنجاح");
-							}}
-							className="h-7.5 text-xs px-3 bg-[#5B50E5] hover:bg-[#4E43D8] text-white cursor-pointer"
-						>
-							تنزيل الصورة
-						</Button>
 					)}
 				</div>
 			</DialogContent>

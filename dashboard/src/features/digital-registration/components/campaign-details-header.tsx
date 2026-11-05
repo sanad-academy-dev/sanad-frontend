@@ -50,7 +50,7 @@ export function CampaignDetailsHeader({
 							type="button"
 							onClick={() => onChangeView(tab.value)}
 							className={cn(
-								"flex h-[25px] items-center justify-center gap-[4px] rounded-[4px] px-[14px] text-[11px] font-medium leading-[16px] transition-colors cursor-pointer",
+								"flex h-[27px] items-center justify-center gap-[4px] rounded-[4px] px-[14px] py-0.5 text-[11px] font-medium leading-[16px] transition-colors cursor-pointer",
 								isTabActive
 									? "border-[0.75px] border-[#E5E7EB] bg-[#F9FAFB] text-[#1F2937] dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
 									: "text-[#6B7280] hover:text-[#1F2937] dark:text-zinc-400 dark:hover:text-zinc-200",

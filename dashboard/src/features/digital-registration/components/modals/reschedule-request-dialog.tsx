@@ -1,18 +1,17 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
 	IconArrowRight,
 	IconCheck,
+	IconBuildingCommunity,
 	IconChevronDown,
 	IconClock,
 	IconMail,
 	IconPhone,
 	IconSparkles,
 	IconUser,
-	IconX,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -33,10 +32,13 @@ import {
 } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useStaffForBooking } from "@/features/appointments/hooks/use-staff-for-booking";
 import { AppointmentPickerPopover } from "../appointment-picker-popover";
+import { RoomPickerPopover } from "../room-picker-popover";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
-import { useRescheduleRequest } from "../../hooks/use-digital-registration";
+import {
+	useRegistrationReviewers,
+	useRescheduleRequest,
+} from "../../hooks/use-digital-registration";
 import { generateRescheduleMessage } from "../../utils/ai-templates";
 
 interface RescheduleRequestDialogProps {
@@ -44,6 +46,8 @@ interface RescheduleRequestDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	campaignId?: string;
+	/** Staff ID selected from the request sidebar; it is only committed with the schedule. */
+	initialStaffId?: string | null;
 }
 
 const RESCHEDULE_REASONS = [
@@ -60,11 +64,17 @@ export function RescheduleRequestDialog({
 	open,
 	onOpenChange,
 	campaignId = "",
+	initialStaffId = null,
 }: RescheduleRequestDialogProps) {
 	const [reason, setReason] = useState<string>("المراجع لم يحضر في الموعد");
 	const [customReason, setCustomReason] = useState("");
 	const [newDate, setNewDate] = useState("");
 	const [staffId, setStaffId] = useState<string | null>(request?.assessmentAppointment?.staffId || null);
+	const [interviewMode, setInterviewMode] = useState<"IN_CLINIC" | "REMOTE">(
+		request?.interviewMode === "REMOTE" ? "REMOTE" : "IN_CLINIC",
+	);
+	const [roomName, setRoomName] = useState(request?.roomName || "الغرفة");
+	const [roomId, setRoomId] = useState<string | null>(request?.roomId || null);
 	const [subject, setSubject] = useState(
 		request ? `إعادة جدولة موعد المقابلة - طلب #${request.code}` : "",
 	);
@@ -72,19 +82,19 @@ export function RescheduleRequestDialog({
 	const [notifyEmail, setNotifyEmail] = useState(false);
 
 	const [staffPopoverOpen, setStaffPopoverOpen] = useState(false);
+	const appliedInitialStaffIdRef = useRef<string | null>(null);
 
-	const { staff, isLoading: staffLoading } = useStaffForBooking();
+	// لا نعرض جميع موظفي المنشأة هنا: القائمة نفسها هي المراجعين الذين يملكون
+	// can_edit في فريق التسجيل ولهم Staff نشط قابل للحجز.
+	const { data: staff = [], isLoading: staffLoading } = useRegistrationReviewers();
 	const rescheduleMutation = useRescheduleRequest(campaignId);
 
 	useEffect(() => {
 		if (open && request) {
-			if (!staffId && staff.length > 0) {
-				setStaffId(request?.assessmentAppointment?.staffId || request?.assignedStaffId || staff[0].id);
-			}
 			const rawDate = request?.appointmentDate || request?.assessmentAppointment?.startsAt;
 			if (rawDate) {
 				const d = new Date(rawDate);
-				if (!isNaN(d.getTime()) && d > new Date()) {
+				if (!Number.isNaN(d.getTime()) && d > new Date()) {
 					setNewDate(d.toISOString().slice(0, 16));
 				} else {
 					setNewDate("");
@@ -93,13 +103,42 @@ export function RescheduleRequestDialog({
 				setNewDate("");
 			}
 			setSubject(`إعادة جدولة موعد المقابلة - طلب #${request.code}`);
+			const requestInterviewMode = request.interviewMode === "REMOTE" ? "REMOTE" : "IN_CLINIC";
+			setInterviewMode(requestInterviewMode);
+			setRoomName(requestInterviewMode === "IN_CLINIC" ? request.roomName || "الغرفة" : "الغرفة");
+			setRoomId(requestInterviewMode === "IN_CLINIC" ? request.roomId || null : null);
 		}
-	}, [open, staff, request]);
+	}, [open, request]);
+
+	// لا نعيد ضبط اختيار المستخدم عند إعادة جلب القائمة؛ نحدّثه فقط إن كان
+	// المراجع السابق لم يعد مؤهلاً أو لم يكن له Staff صالح من الأساس.
+	useEffect(() => {
+		if (!open) appliedInitialStaffIdRef.current = null;
+	}, [open]);
+
+	useEffect(() => {
+		if (!open || !request || staff.length === 0) return;
+		setStaffId((currentStaffId) => {
+			if (
+				initialStaffId &&
+				appliedInitialStaffIdRef.current !== initialStaffId &&
+				staff.some((member) => member.staffId === initialStaffId)
+			) {
+				appliedInitialStaffIdRef.current = initialStaffId;
+				return initialStaffId;
+			}
+			if (currentStaffId && staff.some((member) => member.staffId === currentStaffId)) {
+				return currentStaffId;
+			}
+			const requestedStaffId = request.assessmentAppointment?.staffId || request.assignedStaffId;
+			return staff.find((member) => member.staffId === requestedStaffId || member.userId === requestedStaffId)?.staffId || staff[0].staffId;
+		});
+	}, [initialStaffId, open, request, staff]);
 
 	if (!request) return null;
 
 	const handleGenerateAI = () => {
-		if (!newDate || isNaN(new Date(newDate).getTime())) {
+		if (!newDate || Number.isNaN(new Date(newDate).getTime())) {
 			toast.error("اختر تاريخ ووقت الموعد الجديد أولاً");
 			return;
 		}
@@ -129,8 +168,12 @@ export function RescheduleRequestDialog({
 			return;
 		}
 		const appointmentDate = new Date(newDate);
-		if (!newDate || isNaN(appointmentDate.getTime()) || appointmentDate <= new Date()) {
+		if (!newDate || Number.isNaN(appointmentDate.getTime()) || appointmentDate <= new Date()) {
 			toast.error("يرجى اختيار تاريخ ووقت مستقبليين للموعد");
+			return;
+		}
+		if (interviewMode === "IN_CLINIC" && !roomId) {
+			toast.error("اختر الغرفة قبل حفظ موعد المقابلة في الأكاديمية");
 			return;
 		}
 
@@ -142,6 +185,11 @@ export function RescheduleRequestDialog({
 					customReason: reason === "سبب آخر" ? customReason.trim() : undefined,
 					newAppointmentDate: appointmentDate.toISOString(),
 					staffId,
+					interviewMode:
+						interviewMode !== (request.interviewMode === "REMOTE" ? "REMOTE" : "IN_CLINIC")
+							? interviewMode
+							: undefined,
+					roomId: interviewMode === "IN_CLINIC" ? roomId : undefined,
 					subject: subject.trim(),
 					customMessage: messageText.trim() ? messageText.trim() : undefined,
 					notifyEmail,
@@ -152,14 +200,14 @@ export function RescheduleRequestDialog({
 					toast.success(`تمت إعادة جدولة موعد الطالب "${request.patientName}" بنجاح`);
 					onOpenChange(false);
 				},
-				onError: (err: any) => {
-					toast.error(err.message || "فشل إعادة جدولة الموعد");
+				onError: (err: unknown) => {
+					toast.error(err instanceof Error ? err.message : "فشل إعادة جدولة الموعد");
 				},
 			},
 		);
 	};
 
-	const selectedStaffMember = staff.find((s) => s.id === staffId);
+	const selectedStaffMember = staff.find((s) => s.staffId === staffId);
 	const formattedNewDate = newDate ? new Date(newDate).toLocaleDateString("ar-EG", {
 		weekday: "short",
 		month: "short",
@@ -233,8 +281,8 @@ export function RescheduleRequestDialog({
 					</div>
 				</div>
 
-				{/* 2. محتوى اللوحة القابل للتمرير السلس مع sanad-scrollbar وثبات الفوتر */}
-				<div className="p-3.5 space-y-3.5 flex-1 min-h-0 overflow-y-auto overscroll-contain sanad-scrollbar text-right">
+				{/* 2. محتوى اللوحة القابل للتمرير بالسجل الرسمي وثبات الفوتر */}
+				<div className="p-3.5 space-y-3.5 flex-1 min-h-0 overflow-y-auto overscroll-contain scrollbar-thin text-right">
 					{/* كارت هوية ولي الأمر في أعلى المحتوى مطابق تماماً للصورة المرجعية */}
 					<div className="rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 p-2.5 flex items-center justify-between gap-2 shadow-2xs">
 						<div className="flex items-center gap-2 min-w-0">
@@ -377,6 +425,43 @@ export function RescheduleRequestDialog({
 
 				{/* شريط أدوات إعادة الجدولة: أخصائي الموعد وتاريخ الموعد مثبت فوق الفوتر */}
 				<div className="border-t border-zinc-100 bg-background px-3.5 py-2.5 dark:border-zinc-800 flex items-center gap-1.5 flex-wrap shrink-0">
+					{/* نوع المقابلة جزء من إعادة الجدولة حتى يتغير الموعد ومكانه في معاملة واحدة. */}
+					<DropdownMenu dir="rtl">
+						<DropdownMenuTrigger asChild>
+							<Button
+								variant="outline"
+								size="sm"
+								className="h-7 text-[11px] border-zinc-200 dark:border-zinc-800 gap-1 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 font-medium cursor-pointer shadow-2xs"
+							>
+								{interviewMode === "REMOTE" ? (
+									<IconPhone className="size-3 text-emerald-600 shrink-0" />
+								) : (
+									<IconBuildingCommunity className="size-3 text-blue-600 shrink-0" />
+								)}
+								<span>{interviewMode === "REMOTE" ? "عبر اتصال" : "في الأكاديمية"}</span>
+								<IconChevronDown className="size-2.5 opacity-60 shrink-0" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="start" className="w-44 p-1" dir="rtl">
+							<DropdownMenuItem
+								onClick={() => setInterviewMode("IN_CLINIC")}
+								className="text-xs cursor-pointer gap-2"
+							>
+								<IconBuildingCommunity className="size-3.5 text-blue-600" />
+								في الأكاديمية
+								{interviewMode === "IN_CLINIC" && <IconCheck className="size-3 ms-auto text-primary" />}
+							</DropdownMenuItem>
+							<DropdownMenuItem
+								onClick={() => setInterviewMode("REMOTE")}
+								className="text-xs cursor-pointer gap-2"
+							>
+								<IconPhone className="size-3.5 text-emerald-600" />
+								عبر اتصال
+								{interviewMode === "REMOTE" && <IconCheck className="size-3 ms-auto text-primary" />}
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+
 					{/* 1. إسناد الموعد إلى مسؤول مع قائمة الأعضاء والأفاتار */}
 					<Popover open={staffPopoverOpen} onOpenChange={setStaffPopoverOpen}>
 						<PopoverTrigger asChild>
@@ -407,7 +492,7 @@ export function RescheduleRequestDialog({
 											key={s.id}
 											type="button"
 											onClick={() => {
-												setStaffId(s.id);
+												setStaffId(s.staffId);
 												setStaffPopoverOpen(false);
 											}}
 											className="w-full text-right text-xs p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors cursor-pointer"
@@ -425,11 +510,25 @@ export function RescheduleRequestDialog({
 
 					<AppointmentPickerPopover
 						value={newDate ? formattedNewDate : "تاريخ الموعد"}
+						isoValue={newDate || null}
 						onChange={(_label, isoDate) => setNewDate(isoDate || "")}
 						reviewerName={selectedStaffMember?.name || "المراجع"}
 						reviewerId={staffId || undefined}
 						className="h-7 text-[11px]"
 					/>
+
+					{interviewMode === "IN_CLINIC" && (
+						<RoomPickerPopover
+							value={roomName}
+							appointmentDate={newDate}
+							excludeAppointmentId={request.assessmentAppointment?.id || request.appointmentId || null}
+							onChange={(name, id) => {
+								setRoomName(name);
+								setRoomId(id || null);
+							}}
+							className="h-7 text-[11px]"
+						/>
+					)}
 				</div>
 
 				{/* 3. فوتر اللوحة السفلي المثبت دائماً بدون انقطاع أو خروج عن الإطار */}

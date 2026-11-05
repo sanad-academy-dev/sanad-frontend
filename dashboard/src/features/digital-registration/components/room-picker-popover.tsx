@@ -9,17 +9,19 @@ import {
 	IconCalendar,
 	IconCheck,
 	IconMapPin,
-	IconX,
 	IconAlertCircle,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { useBranches } from "@/features/settings/branches/hooks/use-branches";
 import { useRooms } from "@/features/settings/branches/hooks/use-rooms";
+import { backendFetch } from "@/lib/backend-fetch";
 
 interface RoomPickerPopoverProps {
 	value: string;
 	onChange: (roomName: string, roomId?: string, branchId?: string) => void;
 	appointmentDate: string;
+	/** الموعد الحالي في إعادة الجدولة لا يحجب غرفته عن نفسه. */
+	excludeAppointmentId?: string | null;
 	onOpenAppointmentPicker?: () => void;
 	className?: string;
 }
@@ -34,12 +36,15 @@ export function RoomPickerPopover({
 	value,
 	onChange,
 	appointmentDate,
+	excludeAppointmentId,
 	onOpenAppointmentPicker,
 	className,
 }: RoomPickerPopoverProps) {
 	const [open, setOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [warningRoom, setWarningRoom] = useState<RoomItem | null>(null);
+	const [busyRoomIds, setBusyRoomIds] = useState<Set<string>>(new Set());
+	const [availabilityState, setAvailabilityState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+	const [availabilityRetry, setAvailabilityRetry] = useState(0);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const popoverContentRef = useRef<HTMLDivElement>(null);
 
@@ -52,10 +57,40 @@ export function RoomPickerPopover({
 	const isAppointmentSelected =
 		Boolean(appointmentDate) && appointmentDate !== "تاريخ الموعد";
 
+	const roomIdsKey = useMemo(() => rooms.map((room) => room.id).sort().join(","), [rooms]);
+
+	// لا تُعرض الغرف كمتاحة بمجرد أنها نشطة: نفحص حجزها في وقت الموعد نفسه.
+	// يبقى فحص الباك عند الحفظ هو الحاسم لحماية سباق الحجز المتزامن.
+	useEffect(() => {
+		if (!isAppointmentSelected || !roomIdsKey) {
+			setBusyRoomIds(new Set());
+			setAvailabilityState("idle");
+			return;
+		}
+
+		let cancelled = false;
+		setAvailabilityState("loading");
+		const query = new URLSearchParams({ startsAt: appointmentDate, roomIds: roomIdsKey });
+		if (excludeAppointmentId) query.set("excludeAppointmentId", excludeAppointmentId);
+		backendFetch(`/api/digital-registration/room-availability?${query}`)
+			.then(async (response) => {
+				if (!response.ok) throw new Error("room availability failed");
+				const data = await response.json() as { busyRoomIds?: string[] };
+				if (cancelled) return;
+				setBusyRoomIds(new Set(data.busyRoomIds || []));
+				setAvailabilityState("ready");
+			})
+			.catch(() => {
+				if (!cancelled) setAvailabilityState("error");
+			});
+
+		return () => { cancelled = true; };
+	}, [appointmentDate, availabilityRetry, excludeAppointmentId, isAppointmentSelected, roomIdsKey]);
+
 	// الغرف تأتي من إعدادات الفروع فقط؛ لا نعرض أسماء تجريبية يمكن أن تفشل عند الحفظ.
 	const roomsList: RoomItem[] = useMemo(() => {
-		return rooms.map((room) => ({ id: room.id, name: room.name, isBooked: false }));
-	}, [rooms]);
+		return rooms.map((room) => ({ id: room.id, name: room.name, isBooked: busyRoomIds.has(room.id) }));
+	}, [busyRoomIds, rooms]);
 
 	// تصفية القاعات بالبحث
 	const filteredRooms = useMemo(() => {
@@ -106,21 +141,14 @@ export function RoomPickerPopover({
 	}, [open, filteredRooms]);
 
 	// معالجة اختيار الغرفة
-	const handleSelectRoom = (room: RoomItem, force = false) => {
-		if (room.isBooked && !force) {
-			// إظهار التنبيه: هذه الغرفة محجوزة في نفس الوقت
-			setWarningRoom(room);
-			return;
-		}
-
+	const handleSelectRoom = (room: RoomItem) => {
+		if (availabilityState !== "ready" || room.isBooked) return;
 		onChange(room.name, room.id, activeBranchId);
-		setWarningRoom(null);
 		setOpen(false);
 	};
 
 	const handleReset = () => {
 		onChange("الغرفة", undefined, undefined);
-		setWarningRoom(null);
 		setOpen(false);
 	};
 
@@ -131,10 +159,7 @@ export function RoomPickerPopover({
 			open={open}
 			onOpenChange={(isOpen) => {
 				setOpen(isOpen);
-				if (!isOpen) {
-					setWarningRoom(null);
-					setSearchQuery("");
-				}
+				if (!isOpen) setSearchQuery("");
 			}}
 		>
 			<PopoverTrigger asChild>
@@ -203,29 +228,13 @@ export function RoomPickerPopover({
 							/>
 						</div>
 
-						{/* شريط التحذير إذا كانت الغرفة محجوزة (مطابق تماماً لصورة المستخدم 8dc33446) */}
-						{warningRoom && (
-							<div className="bg-[#FFFDF5] dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/50 rounded-lg p-2 flex items-center justify-between text-xs mb-1.5 animate-in fade-in">
-								<div className="flex items-center gap-1.5 text-amber-900 dark:text-amber-200 font-semibold text-[11px]">
-									<span>هذه الغرفة محجوزة في نفس الوقت.</span>
-								</div>
-								<div className="flex items-center gap-2">
-									<button
-										type="button"
-										onClick={() => handleSelectRoom(warningRoom, true)}
-										className="text-amber-900 dark:text-amber-300 font-bold hover:underline cursor-pointer text-[11px]"
-									>
-										متابعة
-									</button>
-									<button
-										type="button"
-										onClick={() => setWarningRoom(null)}
-										className="text-muted-foreground hover:text-foreground cursor-pointer"
-										title="إلغاء"
-									>
-										<IconX className="size-3.5" />
-									</button>
-								</div>
+						{availabilityState === "loading" && (
+							<p className="px-1 pb-1.5 text-[10.5px] text-muted-foreground">جارِ التحقق من إتاحة الغرف…</p>
+						)}
+						{availabilityState === "error" && (
+							<div className="mb-1.5 flex items-center justify-between gap-2 rounded-md bg-amber-50 px-2 py-1.5 text-[10.5px] text-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
+								<span>تعذر التحقق من إتاحة الغرف.</span>
+								<button type="button" onClick={() => setAvailabilityRetry((value) => value + 1)} className="font-bold hover:underline">إعادة المحاولة</button>
 							</div>
 						)}
 
@@ -247,7 +256,7 @@ export function RoomPickerPopover({
 									el.scrollTop = target;
 								}
 							}}
-							className="max-h-56 overflow-y-auto overscroll-contain space-y-0.5 p-0.5 select-none sanad-scrollbar"
+							className="max-h-56 overflow-y-auto overscroll-contain space-y-0.5 p-0.5 select-none scrollbar-thin"
 						>
 							{isLoading ? (
 								<div className="py-5 text-center text-xs text-muted-foreground">
@@ -256,15 +265,19 @@ export function RoomPickerPopover({
 							) : filteredRooms.length > 0 ? (
 								filteredRooms.map((room) => {
 									const isSelected = value === room.name;
+									const disabled = availabilityState !== "ready" || room.isBooked;
 
 									return (
 										<button
 											key={room.id}
 											type="button"
+											disabled={disabled}
 											onClick={() => handleSelectRoom(room)}
+											title={room.isBooked ? "الغرفة محجوزة في هذا الوقت" : availabilityState !== "ready" ? "بانتظار التحقق من الإتاحة" : undefined}
 											className={cn(
-												"w-full flex items-center justify-between p-1.5 rounded-lg text-right transition-colors cursor-pointer group",
-												isSelected ? "bg-muted/90" : "hover:bg-muted/60",
+												"w-full flex items-center justify-between p-1.5 rounded-lg text-right transition-colors group",
+												disabled ? "cursor-not-allowed opacity-55" : "cursor-pointer",
+												isSelected ? "bg-muted/90" : !disabled && "hover:bg-muted/60",
 											)}
 										>
 											{/* اليمين: مربع الاختيار المستدير + اسم الغرفة */}

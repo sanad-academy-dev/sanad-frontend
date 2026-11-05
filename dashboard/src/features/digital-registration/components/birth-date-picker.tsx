@@ -15,7 +15,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
 	IconCalendar,
-	IconChevronDown,
 	IconChevronLeft,
 	IconChevronRight,
 } from "@tabler/icons-react";
@@ -47,9 +46,35 @@ const MONTHS = [
 // أسماء أيام الأسبوع باللغة العربية السليمة
 const WEEKDAYS = ["سبت", "أحد", "اثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة"];
 
-// قائمة السنوات من السنة الحالية رجوعاً حتى 1990
+// تاريخ الميلاد لا ينبغي أن يكون مستقبلياً، لكن نسمح بكل نطاق الأعمار الواقعي.
 const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: CURRENT_YEAR - 1989 }, (_, i) => CURRENT_YEAR - i);
+const CURRENT_MONTH = new Date().getMonth();
+const CURRENT_DAY = new Date().getDate();
+const MIN_BIRTH_YEAR = 1900;
+const YEARS = Array.from({ length: CURRENT_YEAR - MIN_BIRTH_YEAR + 1 }, (_, i) => CURRENT_YEAR - i);
+
+type BirthDateParts = { day: number; month: number; year: number };
+
+function parseBirthDate(value: string): BirthDateParts | null {
+	const trimmedValue = value.trim();
+	const match = trimmedValue.match(/^(?:(\d{4})-(\d{2})-(\d{2})|(\d{2})\/(\d{2})\/(\d{4}))$/);
+	if (!match) return null;
+
+	const year = Number(match[1] || match[6]);
+	const month = Number(match[2] || match[5]) - 1;
+	const day = Number(match[3] || match[4]);
+	if (year < MIN_BIRTH_YEAR || year > CURRENT_YEAR || month < 0 || month > 11 || day < 1) {
+		return null;
+	}
+
+	const date = new Date(year, month, day);
+	if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
+		return null;
+	}
+	if (date > new Date(CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY)) return null;
+
+	return { day, month, year };
+}
 
 export function BirthDatePicker({
 	value,
@@ -60,28 +85,9 @@ export function BirthDatePicker({
 }: BirthDatePickerProps) {
 	const [open, setOpen] = useState(false);
 
-	// تحليل التاريخ المدخل سواء بصيغة DD/MM/YYYY أو YYYY-MM-DD
-	const parsedDate = useMemo(() => {
-		if (!value) return null;
-		if (value.includes("/")) {
-			const parts = value.split("/");
-			if (parts.length === 3) {
-				const d = parseInt(parts[0], 10);
-				const m = parseInt(parts[1], 10) - 1;
-				const y = parseInt(parts[2], 10);
-				if (!isNaN(d) && !isNaN(m) && !isNaN(y)) return { day: d, month: m, year: y };
-			}
-		} else if (value.includes("-")) {
-			const parts = value.split("-");
-			if (parts.length === 3) {
-				const y = parseInt(parts[0], 10);
-				const m = parseInt(parts[1], 10) - 1;
-				const d = parseInt(parts[2], 10);
-				if (!isNaN(d) && !isNaN(m) && !isNaN(y)) return { day: d, month: m, year: y };
-			}
-		}
-		return null;
-	}, [value]);
+	// يقبل الإدخال اليدوي بصيغتي DD/MM/YYYY و YYYY-MM-DD، ويطابقه مع التقويم
+	// فقط إذا كان تاريخاً صحيحاً وغير مستقبلي.
+	const parsedDate = useMemo(() => parseBirthDate(value), [value]);
 
 	// السنة الافتراضية 2008 (مطابقة لمثال التصميم) أو السنة المحللة
 	const [selectedYear, setSelectedYear] = useState<number>(parsedDate?.year || 2008);
@@ -110,6 +116,7 @@ export function BirthDatePicker({
 
 	// التنقل بين الأشهر
 	const handlePrevMonth = () => {
+		if (selectedYear === MIN_BIRTH_YEAR && selectedMonth === 0) return;
 		if (selectedMonth === 0) {
 			setSelectedMonth(11);
 			setSelectedYear((y) => y - 1);
@@ -119,6 +126,7 @@ export function BirthDatePicker({
 	};
 
 	const handleNextMonth = () => {
+		if (selectedYear === CURRENT_YEAR && selectedMonth === CURRENT_MONTH) return;
 		if (selectedMonth === 11) {
 			setSelectedMonth(0);
 			setSelectedYear((y) => y + 1);
@@ -127,8 +135,24 @@ export function BirthDatePicker({
 		}
 	};
 
+	const handleSelectYear = (year: number) => {
+		setSelectedYear(year);
+		if (year === CURRENT_YEAR && selectedMonth > CURRENT_MONTH) {
+			setSelectedMonth(CURRENT_MONTH);
+		}
+	};
+
+	const handleSelectMonth = (month: number) => {
+		setSelectedMonth(selectedYear === CURRENT_YEAR && month > CURRENT_MONTH ? CURRENT_MONTH : month);
+	};
+
 	// اختيار اليوم
 	const handleSelectDay = (day: number) => {
+		const isFutureDate =
+			selectedYear === CURRENT_YEAR &&
+			(selectedMonth > CURRENT_MONTH ||
+				(selectedMonth === CURRENT_MONTH && day > CURRENT_DAY));
+		if (isFutureDate) return;
 		setSelectedDay(day);
 		const formatted = `${String(day).padStart(2, "0")}/${String(selectedMonth + 1).padStart(2, "0")}/${selectedYear}`;
 		onChange(formatted);
@@ -137,15 +161,15 @@ export function BirthDatePicker({
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<div className="relative">
+			<div className="relative h-9">
 				<PopoverTrigger asChild>
-					<div className="relative cursor-pointer">
+					<div className="relative h-full cursor-pointer">
 						<Input
 							value={value}
 							onChange={(e) => onChange(e.target.value)}
 							placeholder={placeholder}
 							className={cn(
-								"h-8 text-xs text-right font-mono pr-2.5 pl-8 rounded-md border-border/80 cursor-pointer bg-background",
+								"h-9! min-h-9! h-full box-border text-[12px] leading-5 text-right font-mono pr-2.5 pl-8 rounded-md border-border/80 cursor-pointer bg-background",
 								className,
 							)}
 							required={required}
@@ -158,7 +182,7 @@ export function BirthDatePicker({
 			</div>
 
 			<PopoverContent
-				align="start"
+				align="end"
 				sideOffset={4}
 				className="z-[99] w-[295px] p-2.5 bg-card border border-border/80 shadow-2xl rounded-xl select-none"
 				dir="rtl"
@@ -171,7 +195,8 @@ export function BirthDatePicker({
 						variant="ghost"
 						size="icon"
 						onClick={handlePrevMonth}
-						className="size-6.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
+						disabled={selectedYear === MIN_BIRTH_YEAR && selectedMonth === 0}
+						className="size-8 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground shrink-0 cursor-pointer disabled:cursor-not-allowed disabled:opacity-35"
 						title="الشهر السابق"
 					>
 						<IconChevronRight className="size-3.5" />
@@ -181,9 +206,9 @@ export function BirthDatePicker({
 					<div className="flex-1 min-w-0">
 						<Select
 							value={String(selectedMonth)}
-							onValueChange={(val) => setSelectedMonth(Number(val))}
+							onValueChange={(val) => handleSelectMonth(Number(val))}
 						>
-							<SelectTrigger className="w-full h-7 px-2 text-[11px] font-semibold text-foreground border-border/70 rounded-md">
+							<SelectTrigger className="w-full h-8! min-h-8! px-2 text-[11px] font-semibold text-foreground border-border/70 rounded-md">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent
@@ -205,9 +230,9 @@ export function BirthDatePicker({
 					<div className="w-[84px] shrink-0">
 						<Select
 							value={String(selectedYear)}
-							onValueChange={(val) => setSelectedYear(Number(val))}
+							onValueChange={(val) => handleSelectYear(Number(val))}
 						>
-							<SelectTrigger className="w-full h-7 px-2 text-[11px] font-bold font-mono text-foreground border-border/70 rounded-md">
+							<SelectTrigger className="w-full h-8! min-h-8! px-2 text-[11px] font-bold font-mono text-foreground border-border/70 rounded-md">
 								<SelectValue />
 							</SelectTrigger>
 							<SelectContent
@@ -231,7 +256,8 @@ export function BirthDatePicker({
 						variant="ghost"
 						size="icon"
 						onClick={handleNextMonth}
-						className="size-6.5 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
+						disabled={selectedYear === CURRENT_YEAR && selectedMonth === CURRENT_MONTH}
+						className="size-8 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground shrink-0 cursor-pointer disabled:cursor-not-allowed disabled:opacity-35"
 						title="الشهر القادم"
 					>
 						<IconChevronLeft className="size-3.5" />
@@ -257,12 +283,16 @@ export function BirthDatePicker({
 				<div className="grid grid-cols-7 gap-1 text-center">
 					{/* الفراغات قبل اليوم الأول */}
 					{Array.from({ length: startDayOffset }).map((_, i) => (
-						<span key={`empty-${i}`} className="size-7" />
+						<span key={`empty-${i}`} className="size-8" />
 					))}
 
 					{/* أزرار الأيام */}
 					{Array.from({ length: daysInMonth }).map((_, i) => {
 						const dayNum = i + 1;
+						const isFutureDate =
+							selectedYear === CURRENT_YEAR &&
+							(selectedMonth > CURRENT_MONTH ||
+								(selectedMonth === CURRENT_MONTH && dayNum > CURRENT_DAY));
 						const isSelected =
 							selectedDay === dayNum &&
 							parsedDate?.month === selectedMonth &&
@@ -273,8 +303,9 @@ export function BirthDatePicker({
 								key={dayNum}
 								type="button"
 								onClick={() => handleSelectDay(dayNum)}
+								disabled={isFutureDate}
 								className={cn(
-									"size-7 rounded-md text-[11px] font-semibold transition-all flex items-center justify-center font-mono cursor-pointer",
+									"size-8 rounded-md text-[11px] font-semibold transition-all flex items-center justify-center font-mono cursor-pointer disabled:cursor-not-allowed disabled:text-muted-foreground/35",
 									isSelected
 										? "bg-[#5B50E5] text-white shadow-xs font-bold"
 										: "text-foreground hover:bg-muted/80 hover:text-foreground",
@@ -286,21 +317,8 @@ export function BirthDatePicker({
 					})}
 				</div>
 
-				{/* ─── 4. أزرار الاختصار السريعة ─────────────────────────────── */}
-				<div className="flex items-center justify-between pt-2 mt-2 border-t border-border/50 text-[11px]">
-					<button
-						type="button"
-						onClick={() => {
-							const now = new Date();
-							setSelectedYear(now.getFullYear());
-							setSelectedMonth(now.getMonth());
-							handleSelectDay(now.getDate());
-						}}
-						className="text-primary hover:underline font-semibold cursor-pointer"
-					>
-						اليوم
-					</button>
-
+				{/* تاريخ الميلاد لا يستخدم «اليوم»؛ الإجراء الوحيد الآمن هنا هو المسح. */}
+				<div className="flex items-center justify-end pt-2 mt-2 border-t border-border/50 text-[11px]">
 					{value && (
 						<button
 							type="button"
@@ -310,7 +328,7 @@ export function BirthDatePicker({
 							}}
 							className="text-muted-foreground hover:text-destructive cursor-pointer"
 						>
-							مسح
+							مسح التاريخ
 						</button>
 					)}
 				</div>

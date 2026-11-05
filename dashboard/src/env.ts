@@ -10,6 +10,7 @@ export const env = createEnv({
 		VITE_API_URL: z.string().url(),
 		VITE_SENTRY_DSN: z.string().optional(),
 		VITE_MAP_STYLE_URL: z.string().url().optional(),
+		VITE_PUBLIC_WEBSITE_URL: z.string().url().optional().or(z.literal("")),
 	},
 	clientPrefix: "VITE_",
 	runtimeEnv: import.meta.env,

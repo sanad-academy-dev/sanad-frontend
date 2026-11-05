@@ -157,7 +157,7 @@ export function DeleteRequestDialog({
 				</div>
 
 				{/* محتوى اللوحة القابل للتمرير */}
-				<div className="p-3.5 space-y-3 flex-1 min-h-0 overflow-y-auto overscroll-contain sanad-scrollbar">
+				<div className="p-3.5 space-y-3 flex-1 min-h-0 overflow-y-auto overscroll-contain scrollbar-thin">
 					{/* كارت ملخص الطالب وولي الأمر */}
 					<div className="rounded-lg border border-rose-100 dark:border-rose-950/60 bg-rose-50/40 dark:bg-rose-950/20 p-2.5 flex items-center justify-between gap-2.5 shadow-2xs">
 						<div className="flex items-center gap-2 min-w-0">

@@ -163,7 +163,7 @@ export function WaitlistRequestDialog({
 				</div>
 
 				{/* محتوى اللوحة القابل للتمرير */}
-				<div className="p-4 space-y-3.5 flex-1 min-h-0 overflow-y-auto overscroll-contain sanad-scrollbar">
+				<div className="p-4 space-y-3.5 flex-1 min-h-0 overflow-y-auto overscroll-contain scrollbar-thin">
 					{/* بانر قائمة الانتظار الأزرق (مطابق للصورة 3) */}
 					<div className="rounded-lg border border-blue-200 dark:border-blue-900/60 bg-blue-50/70 dark:bg-blue-950/30 p-2.5 space-y-1.5 text-xs text-blue-900 dark:text-blue-300">
 						<div className="flex items-center gap-1.5 font-bold">
@@ -306,7 +306,7 @@ export function WaitlistRequestDialog({
 							) : staff.length === 0 ? (
 								<div className="p-2 text-center text-xs text-muted-foreground">لا يوجد موظفون متاحون</div>
 							) : (
-								<div className="space-y-0.5 max-h-48 overflow-y-auto sanad-scrollbar">
+								<div className="space-y-0.5 max-h-48 overflow-y-auto scrollbar-thin">
 									<button
 										type="button"
 										onClick={() => {

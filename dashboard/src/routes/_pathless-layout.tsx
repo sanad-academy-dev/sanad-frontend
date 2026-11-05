@@ -191,7 +191,7 @@ function RouteComponent() {
 			<SidebarInset className="flex h-svh flex-col overflow-hidden rounded-[4px]! md:h-[calc(100svh-1rem)] print:h-auto print:overflow-visible">
 				{/* صفحة تستولي على الرأس (تفاصيل الوظيفة مثلًا) ترسم رأسها بنفسها */}
 				{!takeover && (
-					<header className="z-30 flex h-10 shrink-0 items-center justify-between gap-2 overflow-hidden border-b border-sidebar-border bg-background px-3 backdrop-blur supports-backdrop-filter:bg-background/80 print:hidden">
+					<header className="z-30 flex h-[42px] py-0.5 shrink-0 items-center justify-between gap-2 overflow-hidden border-b border-sidebar-border bg-background px-3 backdrop-blur supports-backdrop-filter:bg-background/80 print:hidden">
 						<div className="flex items-center gap-1.5 pr-2">
 							<Breadcrumb>
 								<BreadcrumbList>

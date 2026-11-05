@@ -54,6 +54,7 @@ type KanbanContextProps<
 > = {
 	columns: C[];
 	data: T[];
+	disabled?: boolean;
 	activeCardId: string | null;
 };
 
@@ -77,8 +78,8 @@ export const KanbanBoard = ({ id, children, className }: KanbanBoardProps) => {
 	return (
 		<div
 			className={cn(
-				"flex size-full min-h-[calc(100vh-190px)] flex-col divide-y rounded-md bg-secondary text-xs shadow-sm ring-2 transition-all",
-				isOver ? "ring-primary" : "ring-transparent",
+				"flex size-full min-h-[calc(100vh-190px)] flex-col divide-y rounded-md bg-secondary text-xs shadow-sm ring-1 transition-colors",
+				isOver ? "bg-primary/[0.025] ring-primary/35" : "ring-transparent",
 				className,
 			)}
 			ref={setNodeRef}
@@ -101,13 +102,15 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
 	className,
 	disabled,
 }: KanbanCardProps<T>) => {
+	const { activeCardId, disabled: contextDisabled } = useContext(KanbanContext) as KanbanContextProps;
+	const isCardDisabled = disabled ?? contextDisabled ?? false;
+
 	const { attributes, listeners, setNodeRef, transition, transform, isDragging } = useSortable(
 		{
 			id,
-			disabled,
+			disabled: isCardDisabled,
 		},
 	);
-	const { activeCardId } = useContext(KanbanContext) as KanbanContextProps;
 
 	const style = {
 		transition,
@@ -118,13 +121,14 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
 		<>
 			<div
 				style={style}
-				{...listeners}
+				{...(!isCardDisabled ? listeners : {})}
 				{...attributes}
 				ref={setNodeRef}
 			>
 				<Card
 					className={cn(
-						"cursor-grab gap-4 rounded-md p-3 shadow-sm",
+						isCardDisabled ? "cursor-default" : "cursor-grab",
+						"gap-4 rounded-md p-3 shadow-sm",
 						isDragging && "pointer-events-none cursor-grabbing opacity-30",
 						className,
 					)}
@@ -203,6 +207,12 @@ export type KanbanProviderProps<
 	className?: string;
 	columns: C[];
 	data: T[];
+	/**
+	 * Some boards persist a column change as soon as `onDataChange` fires.  They
+	 * must opt out of the temporary cross-column update emitted while dragging,
+	 * otherwise merely hovering a column is treated as a committed transition.
+	 */
+	previewCrossColumnOnDragOver?: boolean;
 	onDataChange?: (data: T[]) => void;
 	onDragStart?: (event: DragStartEvent) => void;
 	onDragEnd?: (event: DragEndEvent) => void;
@@ -220,18 +230,23 @@ export const KanbanProvider = <
 	className,
 	columns,
 	data,
+	disabled = false,
+	previewCrossColumnOnDragOver = true,
 	onDataChange,
 	...props
 }: KanbanProviderProps<T, C>) => {
 	const [activeCardId, setActiveCardId] = useState<string | null>(null);
 
-	const sensors = useSensors(
+	const standardSensors = useSensors(
 		useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
 		useSensor(TouchSensor, { activationConstraint: { distance: 5 } }),
 		useSensor(KeyboardSensor),
 	);
+	const emptySensors = useSensors();
+	const sensors = disabled ? emptySensors : standardSensors;
 
 	const handleDragStart = (event: DragStartEvent) => {
+		if (disabled) return;
 		const card = data.find((item) => item.id === event.active.id);
 		if (card) {
 			setActiveCardId(event.active.id as string);
@@ -240,6 +255,7 @@ export const KanbanProvider = <
 	};
 
 	const handleDragOver = (event: DragOverEvent) => {
+		if (disabled) return;
 		const { active, over } = event;
 
 		if (!over) {
@@ -257,7 +273,7 @@ export const KanbanProvider = <
 		const overColumn =
 			overItem?.column || columns.find((col) => col.id === over.id)?.id || columns[0]?.id;
 
-		if (activeColumn !== overColumn) {
+		if (previewCrossColumnOnDragOver && activeColumn !== overColumn) {
 			let newData = [...data];
 			const activeIndex = newData.findIndex((item) => item.id === active.id);
 			if (activeIndex !== -1) {
@@ -278,6 +294,7 @@ export const KanbanProvider = <
 	};
 
 	const handleDragEnd = (event: DragEndEvent) => {
+		if (disabled) return;
 		setActiveCardId(null);
 
 		onDragEnd?.(event);
@@ -346,7 +363,7 @@ export const KanbanProvider = <
 	};
 
 	return (
-		<KanbanContext.Provider value={{ columns, data, activeCardId }}>
+		<KanbanContext.Provider value={{ columns, data, activeCardId, disabled }}>
 			<DndContext
 				accessibility={{ announcements }}
 				collisionDetection={closestCenter}

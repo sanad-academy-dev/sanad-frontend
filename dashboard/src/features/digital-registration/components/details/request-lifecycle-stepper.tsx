@@ -1,5 +1,6 @@
 import {
 	IconActivity,
+	IconEye,
 	IconCheck,
 	IconClipboardCheck,
 	IconCoin,
@@ -47,25 +48,20 @@ export function RequestLifecycleStepper({
 	if (activeIndex === -1) activeIndex = 0;
 
 	return (
-		<div
-			className="rounded-md border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-2 space-y-1.5 font-sans shadow-2xs"
-			dir="rtl"
-		>
+		<div className="space-y-1.5 font-sans" dir="rtl">
 			<div className="flex items-center justify-between">
-				<h4 className="text-[11px] font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1">
-					<span>مسار الطلب</span>
-				</h4>
-				<Badge
-					variant="outline"
-					className="text-[9px] px-1 py-0 gap-0.5 font-semibold border-zinc-200 dark:border-zinc-700 text-zinc-500"
-				>
-					<IconInfoCircle className="size-2.5" />
+				<h3 className="text-[13.5px] font-bold text-zinc-900 dark:text-zinc-100">
+					مسار الطلب
+				</h3>
+				<div className="flex items-center gap-1 text-xs text-zinc-500 select-none">
+					<IconEye className="size-3.5 text-zinc-400" />
 					<span>بروتوكول القبول</span>
-				</Badge>
+				</div>
 			</div>
 
-			{/* شريط المسار الأفقي */}
-			<div className="relative flex items-center justify-between gap-1 pt-1.5 pb-0.5 overflow-x-auto">
+			<div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-3 shadow-2xs">
+				{/* شريط المسار الأفقي */}
+				<div className="relative flex items-center justify-between gap-1 pt-1 pb-1 overflow-x-auto">
 				{STEPS.map((step, idx) => {
 					const Icon = step.icon;
 					const isStepRejected = step.id === "rejected";
@@ -135,6 +131,7 @@ export function RequestLifecycleStepper({
 						</div>
 					);
 				})}
+				</div>
 			</div>
 		</div>
 	);

@@ -14,7 +14,6 @@ import {
 	IconLink,
 	IconPlus,
 	IconPrinter,
-	IconShare,
 	IconX,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
@@ -24,8 +23,6 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
@@ -56,6 +53,7 @@ interface RequestHeaderActionsProps {
 	onClose: () => void;
 	onOpenShortlist: () => void;
 	onOpenWaitlist: () => void;
+	/** تثبيت أو إعادة جدولة الموعد هو المسار الوحيد للوصول إلى المقابلة. */
 	onOpenSchedule: () => void;
 	onOpenReschedule: () => void;
 	onOpenReject: () => void;
@@ -65,7 +63,6 @@ interface RequestHeaderActionsProps {
 	onOpenRefer?: () => void;
 	onOpenPrint?: () => void;
 	onMoveToQueue?: () => void;
-	onMoveToInterview?: () => void;
 	onMoveToAwaitingPayment?: () => void;
 	onMarkDuplicate?: () => void;
 	isExpanded?: boolean;
@@ -77,18 +74,17 @@ export function RequestHeaderActions({
 	onClose,
 	onOpenShortlist,
 	onOpenWaitlist,
-	onOpenSchedule: _onOpenSchedule,
+	onOpenSchedule,
 	onOpenReschedule,
 	onOpenReject,
 	onOpenDelete,
 	onAcceptDirect,
 	onOpenEdit,
-	onOpenRefer,
+	onOpenRefer: _onOpenRefer,
 	onOpenPrint,
 	onMoveToQueue,
-	onMoveToInterview,
 	onMoveToAwaitingPayment,
-	onMarkDuplicate,
+	onMarkDuplicate: _onMarkDuplicate,
 	isExpanded,
 	onToggleExpand,
 }: RequestHeaderActionsProps) {
@@ -101,10 +97,13 @@ export function RequestHeaderActions({
 		}
 	};
 
-	const handleShare = () => {
-		const url = window.location.href;
-		navigator.clipboard.writeText(url);
-		toast.success("تم نسخ رابط الطلب المباشر للمشاركة");
+	const handleCopyInternalLink = async () => {
+		try {
+			await navigator.clipboard.writeText(window.location.href);
+			toast.success("تم نسخ الرابط الداخلي للطلب. لا يمنح الرابط أي صلاحية وصول.");
+		} catch {
+			toast.error("تعذر نسخ الرابط الداخلي للطلب");
+		}
 	};
 
 	const handleCopyId = () => {
@@ -145,9 +144,9 @@ export function RequestHeaderActions({
 			case "SHORTLIST":
 				return [
 					{
-						label: "نقل إلى المقابلة الشخصية",
+						label: "تثبيت موعد المقابلة",
 						icon: <IconActivity className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onMoveToInterview,
+						action: onOpenSchedule,
 					},
 					{
 						label: "قائمة الإنتظار",
@@ -323,13 +322,13 @@ export function RequestHeaderActions({
 							<span>طباعة</span>
 						</DropdownMenuItem>
 
-						{/* 5. مشاركة */}
+						{/* 5. رابط داخلي: الوصول نفسه يظل محروساً بصلاحيات فريق التسجيل. */}
 						<DropdownMenuItem
-							onClick={handleShare}
+							onClick={handleCopyInternalLink}
 							className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
 						>
-							<IconShare className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
-							<span>مشاركة</span>
+							<IconLink className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+							<span>نسخ رابط داخلي</span>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -376,15 +375,15 @@ export function RequestHeaderActions({
 					</DropdownMenu>
 				)}
 
-				{/* 2. زر نسخ رابط الطلب */}
+				{/* 2. نسخ رابط داخلي — لا يعمل إلا ضمن صلاحيات التسجيل المطبقة من الباك إند. */}
 				<button
 					type="button"
-					onClick={handleShare}
+					onClick={handleCopyInternalLink}
 					className="size-7 rounded-md flex items-center justify-center text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-					title="نسخ رابط الطلب"
+					title="نسخ رابط داخلي للطلب"
 				>
 					<IconLink className="size-4" />
-					<span className="sr-only">نسخ رابط الطلب</span>
+					<span className="sr-only">نسخ رابط داخلي للطلب</span>
 				</button>
 
 				{/* 3. زر نسخ معرّف/كود الطلب */}
