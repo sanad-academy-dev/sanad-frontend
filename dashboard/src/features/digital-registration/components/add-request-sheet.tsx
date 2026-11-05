@@ -109,7 +109,7 @@ function parseStrictBirthDate(value: string): Date | null {
 // تحويل مسميات الحالات السبع للأكواد المعتمدة في قاعدة البيانات
 function statusToEnum(
 	s?: string,
-): "QUEUE" | "SHORTLIST" | "INTERVIEW" | "ACCEPTED" | "AWAITING_PAYMENT" | "REJECTED" | "DUPLICATE" {
+): "QUEUE" | "SHORTLIST" | "WAITLIST" | "INTERVIEW" | "ACCEPTED" | "AWAITING_PAYMENT" | "REJECTED" | "DUPLICATE" {
 	if (!s) return "QUEUE";
 	switch (s) {
 		case "shortlist":
@@ -117,6 +117,10 @@ function statusToEnum(
 		case "القائمة المختصرة":
 		case "قائمة مختصرة":
 			return "SHORTLIST";
+		case "waitlist":
+		case "WAITLIST":
+		case "قائمة الانتظار":
+			return "WAITLIST";
 		case "interview":
 		case "INTERVIEW":
 		case "المقابلة الشخصية":
@@ -774,7 +778,7 @@ export function AddRequestDialog({
 				experienceLevel: experienceLevel || null,
 				priority: priority || "بدون أولوية",
 				// لا نسجل الطلب كأنه دخل المقابلة قبل نجاح الحجز الفعلي.
-				initialStatus: (appointmentIsoDate ? "QUEUE" : statusToEnum(selectedColumn)) as "QUEUE" | "SHORTLIST" | "INTERVIEW" | "AWAITING_PAYMENT" | "DUPLICATE",
+				initialStatus: (appointmentIsoDate ? "QUEUE" : statusToEnum(selectedColumn)) as "QUEUE" | "SHORTLIST" | "WAITLIST" | "INTERVIEW" | "AWAITING_PAYMENT" | "DUPLICATE",
 				reviewerId: reviewerId || null,
 				reviewerName: reviewer !== "المراجع" ? reviewer : null,
 				roomId: selectedRoomId,
@@ -1748,7 +1752,7 @@ export function AddRequestDialog({
 
 					<AppointmentPickerPopover value={appointmentDate} onChange={(value, iso) => { setAppointmentDate(value); setAppointmentIsoDate(iso || null); }} reviewerName={reviewer} enableReminders={notifyWhatsapp} onEnableRemindersChange={setNotifyWhatsapp} enableRecurrence={enableRecurrence} onEnableRecurrenceChange={setEnableRecurrence} />
 					<RoomPickerPopover value={selectedRoom} onChange={(name, id, branchId) => { setSelectedRoom(name); setSelectedRoomId(id || null); setSelectedRoomBranchId(branchId || null); }} appointmentDate={appointmentDate} />
-					<ColumnStatusPicker value={selectedColumn} onChange={setSelectedColumn} allowedIds={["queue", "shortlist", "interview", "awaiting-payment", "duplicate"]} />
+					<ColumnStatusPicker value={selectedColumn} onChange={setSelectedColumn} allowedIds={["queue", "shortlist", "waitlist", "interview", "awaiting-payment", "duplicate"]} />
 
 					{/* 5. [ ... بدون أولوية ] - منسدلة اختيار الأولوية المطابقة للتصميم (الصورة b52ca17c) مع الأيقونات واختصارات 0-4 */}
 					<PriorityPickerPopover

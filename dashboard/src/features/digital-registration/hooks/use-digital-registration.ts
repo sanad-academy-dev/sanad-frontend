@@ -141,11 +141,12 @@ export function useDeleteCampaign() {
 }
 
 // ─── جلب طلبات الحملة (للكانبان) ────────────────────────────────────────────────
-export function useCampaignRequests(campaignId: string) {
+export function useCampaignRequests(campaignId: string, sortBy?: string) {
 	return useQuery<CampaignRequestItem[]>({
-		queryKey: ["digital-registration", "requests", campaignId],
+		queryKey: ["digital-registration", "requests", campaignId, sortBy],
 		queryFn: async () => {
-			const res = await backendFetch("/api/digital-registration/requests");
+			const url = sortBy ? `/api/digital-registration/requests?sortBy=${encodeURIComponent(sortBy)}` : "/api/digital-registration/requests";
+			const res = await backendFetch(url);
 			if (!res.ok) throw new Error("فشل جلب طلبات الحملة");
 			return res.json();
 		},
@@ -266,7 +267,7 @@ export function useCreateRequest(campaignId: string) {
 			preferredShift?: string | null;
 			experienceLevel?: string | null;
 			priority?: string | null;
-			initialStatus?: "QUEUE" | "SHORTLIST" | "INTERVIEW" | "AWAITING_PAYMENT" | "DUPLICATE";
+			initialStatus?: "QUEUE" | "SHORTLIST" | "WAITLIST" | "INTERVIEW" | "AWAITING_PAYMENT" | "DUPLICATE";
 			status?: string | null;
 			columnStatus?: string | null;
 			appointmentDate?: string | null;
@@ -755,6 +756,124 @@ export function useQuickUpdateRequest(campaignId: string) {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+		},
+	});
+}
+
+
+// ─── ميزة المشاركة والوصول للوحة التسجيل (Share Modal) ────────────────────────
+
+export type {
+	ShareAccessLevel,
+	ShareAccessMember,
+	ShareGeneralAccess,
+	ShareAccessResponse,
+	StaffCandidate,
+} from "../types/campaign-share.types";
+
+const SHARE_ACCESS_QUERY_KEY = ["digital-registration", "share-access"];
+
+export function useRegistrationShareAccess(campaignId?: string) {
+	return useQuery<import("../types/campaign-share.types").ShareAccessResponse>({
+		queryKey: [...SHARE_ACCESS_QUERY_KEY, campaignId],
+		queryFn: async () => {
+			const url = campaignId
+				? `/api/digital-registration/share-access?campaignId=${encodeURIComponent(campaignId)}`
+				: "/api/digital-registration/share-access";
+			const res = await backendFetch(url);
+			if (!res.ok) throw new Error("فشل جلب بيانات مشاركة اللوحة");
+			return res.json();
+		},
+		staleTime: 1000 * 60,
+	});
+}
+
+export function useStaffCandidates(search?: string) {
+	return useQuery<import("../types/campaign-share.types").StaffCandidate[]>({
+		queryKey: ["digital-registration", "staff-candidates", search],
+		queryFn: async () => {
+			const url = search
+				? `/api/digital-registration/staff-candidates?search=${encodeURIComponent(search)}`
+				: "/api/digital-registration/staff-candidates";
+			const res = await backendFetch(url);
+			if (!res.ok) throw new Error("فشل جلب قائمة موظفي الأكاديمية");
+			return res.json();
+		},
+		staleTime: 1000 * 30,
+	});
+}
+
+export function useInviteCollaborator() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async (payload: { identifier: string; accessLevel: "can_edit" | "can_view"; campaignId?: string }) => {
+			const res = await backendFetch("/api/digital-registration/share-access/invite", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(payload),
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "فشلت دعوة العضو");
+			}
+			return res.json();
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: SHARE_ACCESS_QUERY_KEY });
+		},
+	});
+}
+
+export function useUpdateMemberAccess() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			memberId,
+			accessLevel,
+		}: {
+			memberId: string;
+			accessLevel: "can_edit" | "can_view" | "remove";
+		}) => {
+			const res = await backendFetch(`/api/digital-registration/share-access/${memberId}`, {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ accessLevel }),
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "فشل تعديل صلاحية العضو");
+			}
+			return res.json();
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: SHARE_ACCESS_QUERY_KEY });
+		},
+	});
+}
+
+export function useUpdateGeneralAccess() {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			level,
+			campaignId,
+		}: {
+			level: "everyone_view" | "restricted";
+			campaignId?: string;
+		}) => {
+			const res = await backendFetch("/api/digital-registration/share-access/general", {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ level, campaignId }),
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "فشل تعديل الوصول العام");
+			}
+			return res.json();
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: SHARE_ACCESS_QUERY_KEY });
 		},
 	});
 }

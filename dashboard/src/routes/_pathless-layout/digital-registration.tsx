@@ -8,9 +8,8 @@ import {
 	type RegistrationView,
 } from "@/features/digital-registration/components/campaign-details-header";
 import { RegistrationStatsBar } from "@/features/digital-registration/components/campaign-details-stats";
-import { CampaignDetailsToolbar } from "@/features/digital-registration/components/campaign-details-toolbar";
+import { CampaignDetailsToolbar, type CampaignSortOption } from "@/features/digital-registration/components/campaign-details-toolbar";
 import { CampaignRequestsKanban } from "@/features/digital-registration/components/campaign-requests-kanban";
-import { CampaignShareDialog } from "@/features/digital-registration/components/campaign-share-dialog";
 import { CampaignInfo } from "@/features/digital-registration/components/campaign-info";
 import { RegistrationActivityLog } from "@/features/digital-registration/components/registration-activity-log";
 import { AddRequestSheet } from "@/features/digital-registration/components/add-request-sheet";
@@ -29,8 +28,8 @@ function DigitalRegistrationRoute() {
 	const [view, setView] = useState<RegistrationView>("requests");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [genderFilter, setGenderFilter] = useState("ALL");
+	const [sortBy, setSortBy] = useState<CampaignSortOption>("DATE_DESC");
 	const [isAddRequestOpen, setIsAddRequestOpen] = useState(false);
-	const [isShareOpen, setIsShareOpen] = useState(false);
 	const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
 	// One board per clinic. The backend keeps its legacy campaign id internal.
@@ -49,22 +48,34 @@ function DigitalRegistrationRoute() {
 		let rejected = 0;
 
 		for (const r of requests) {
-			if (r.status === "QUEUE" || r.column === "queue") {
+			if (
+				r.status === "QUEUE" ||
+				r.status === "SHORTLIST" ||
+				r.column === "queue" ||
+				r.column === "shortlist"
+			) {
 				queue++;
-			} else if (r.status === "EVALUATION" || r.column === "check-in") {
+			} else if (
+				r.status === "INTERVIEW" ||
+				r.status === "IN_EVALUATION" ||
+				r.status === "EVALUATION" ||
+				r.column === "interview" ||
+				r.column === "check-in"
+			) {
 				evaluation++;
 			} else if (
-				r.status === "WAITLIST" ||
-				r.column === "waitlist" ||
 				r.status === "REVIEW" ||
 				r.status === "AWAITING_REPLY" ||
+				r.status === "WAITLIST" ||
+				r.status === "AWAITING_PAYMENT" ||
+				r.column === "waitlist" ||
 				r.column === "in-service" ||
 				r.column === "awaiting-payment"
 			) {
 				waiting++;
-			} else if (r.status === "ACCEPTED" || r.column === "done") {
+			} else if (r.status === "ACCEPTED" || r.column === "accepted" || r.column === "done") {
 				accepted++;
-			} else if (r.status === "REJECTED" || r.column === "cancelled") {
+			} else if (r.status === "REJECTED" || r.column === "rejected" || r.column === "cancelled") {
 				rejected++;
 			}
 		}
@@ -260,18 +271,19 @@ function DigitalRegistrationRoute() {
 						onSearchChange={setSearchQuery}
 						genderFilter={genderFilter}
 						onGenderFilterChange={setGenderFilter}
+						sortBy={sortBy}
+						onSortChange={setSortBy}
 						onOpenAddRequest={() => setIsAddRequestOpen(true)}
-						onOpenShare={() => setIsShareOpen(true)}
 						onExport={handleExportExcel}
 						onExportCsv={handleExportCsv}
+						campaignId={workspace?.id}
 					/>
 
 					{/* Polling indicator: this board refreshes periodically, it is not a socket feed. */}
-					<div className="flex items-center justify-between px-4 py-0.5 text-xs text-muted-foreground border-b border-border/40" dir="rtl">
+					<div className="flex items-center justify-between px-4 py-1.5 text-xs text-muted-foreground border-b border-border/40" dir="rtl">
 						<div className="flex items-center gap-1.5 text-muted-foreground">
-							<IconBellRinging className="size-3.5 text-primary" />
-							<span className="font-semibold text-[11px] text-foreground">محدّث تلقائياً</span>
-							<span className="text-[10px] text-muted-foreground">· يتم تحديث الطلبات كل 30 ثانية</span>
+							<IconBellRinging className="size-3.5 text-red-500" />
+							<span className="font-semibold text-[11px] text-foreground">مباشر</span>
 						</div>
 						<span className="text-[10px] text-muted-foreground font-mono">
 							إجمالي المتقدمين: {requests.length}
@@ -284,6 +296,7 @@ function DigitalRegistrationRoute() {
 							campaignId={activeCampaignId}
 							searchQuery={searchQuery}
 							genderFilter={genderFilter}
+						sortBy={sortBy}
 							selectedRequestId={selectedRequestId}
 							onSelectRequest={setSelectedRequestId}
 						/>
@@ -296,14 +309,6 @@ function DigitalRegistrationRoute() {
 						campaignId={activeCampaignId}
 						// الحفظ يحدث قائمة الكانبان فقط؛ فتح التفاصيل قرار صريح من المستخدم.
 						onSuccess={() => setSelectedRequestId(null)}
-					/>
-
-					{/* Share Campaign & Collaborators Modal */}
-					<CampaignShareDialog
-						open={isShareOpen}
-						onOpenChange={setIsShareOpen}
-						campaignId={activeCampaignId}
-						campaignName={workspace?.name || "التسجيل الرقمي"}
 					/>
 				</div>
 			)}

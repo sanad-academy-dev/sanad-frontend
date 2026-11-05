@@ -607,6 +607,7 @@
     },
     "items": {
       "dashboard": "Dashboard",
+      "digitalRegistration": "Digital Registration",
       "inbox": "Inbox",
       "tasks": "My Tasks",
       "appointments": "My Appointments",

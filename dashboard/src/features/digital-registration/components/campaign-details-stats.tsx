@@ -68,13 +68,16 @@ export function RegistrationStatsBar({
 					key={item.id}
 					className="flex items-center justify-between rounded-lg border border-border/70 bg-card px-3 py-1.5 shadow-2xs hover:border-primary/40 transition-colors"
 				>
-					<span className="text-base font-bold text-foreground tabular-nums">
-						{item.count}
-					</span>
+					{/* الكلمة والأيقونة على اليمين */}
 					<div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-medium">
 						<span># {item.label}</span>
 						<item.icon className={cn("size-3", item.color)} />
 					</div>
+
+					{/* الرقم على الشمال */}
+					<span className="text-base font-bold text-foreground tabular-nums font-mono">
+						{item.count}
+					</span>
 				</div>
 			))}
 		</div>

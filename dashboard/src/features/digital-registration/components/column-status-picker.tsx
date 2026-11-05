@@ -24,7 +24,7 @@ export interface ColumnStatusOption {
 	pillIcon: React.ReactNode;
 }
 
-// حالات وأعمدة نظام التسجيل الرقمي الـ 7 المعتمدة بالأكاديمية
+// حالات وأعمدة نظام التسجيل الرقمي الـ 8 المعتمدة بالأكاديمية
 export const SYSTEM_REGISTRATION_COLUMNS: ColumnStatusOption[] = [
 	{
 		id: "queue",
@@ -41,37 +41,44 @@ export const SYSTEM_REGISTRATION_COLUMNS: ColumnStatusOption[] = [
 		pillIcon: <IconClipboardCheck className="size-2 text-slate-500" />,
 	},
 	{
+		id: "waitlist",
+		name: "قائمة الانتظار",
+		shortcut: "3",
+		icon: <IconClock className="size-3.5 text-amber-500 shrink-0" />,
+		pillIcon: <IconClock className="size-2 text-amber-500" />,
+	},
+	{
 		id: "interview",
 		name: "المقابلة الشخصية",
-		shortcut: "3",
-		icon: <IconActivity className="size-3.5 text-amber-500 shrink-0" />,
-		pillIcon: <IconActivity className="size-2 text-amber-500" />,
+		shortcut: "4",
+		icon: <IconActivity className="size-3.5 text-indigo-500 shrink-0" />,
+		pillIcon: <IconActivity className="size-2 text-indigo-500" />,
 	},
 	{
 		id: "awaiting-payment",
 		name: "بانتظار الدفع",
-		shortcut: "4",
+		shortcut: "5",
 		icon: <IconHourglass className="size-3.5 text-purple-500 shrink-0" />,
 		pillIcon: <IconHourglass className="size-2 text-purple-500" />,
 	},
 	{
 		id: "accepted",
 		name: "مقبول",
-		shortcut: "5",
+		shortcut: "6",
 		icon: <IconCircleCheck className="size-3.5 text-emerald-500 shrink-0" />,
 		pillIcon: <IconCircleCheck className="size-2 text-emerald-500" />,
 	},
 	{
 		id: "rejected",
 		name: "مرفوض",
-		shortcut: "6",
+		shortcut: "7",
 		icon: <IconCircleX className="size-3.5 text-rose-500 shrink-0" />,
 		pillIcon: <IconCircleX className="size-2 text-rose-500" />,
 	},
 	{
 		id: "duplicate",
 		name: "مكرر",
-		shortcut: "7",
+		shortcut: "8",
 		icon: <IconCopy className="size-3.5 text-orange-500 shrink-0" />,
 		pillIcon: <IconCopy className="size-2 text-orange-500" />,
 	},

@@ -51,6 +51,7 @@ import { toast } from "sonner";
 import { CampaignRequestSheet } from "./campaign-request-sheet";
 import { CancelAppointmentConfirmDialog } from "./modals/cancel-appointment-confirm-dialog";
 import { PriorityPickerPopover } from "./priority-picker-popover";
+import type { CampaignSortOption } from "./campaign-details-toolbar";
 import type { CampaignRequestItem } from "../types/campaign-request.types";
 import {
 	useCampaignRequests,
@@ -66,8 +67,8 @@ const collisionDetection: CollisionDetection = (args) => {
 const CAMPAIGN_COLUMNS: AppointmentColumn[] = [
 	{ id: "queue" as AppointmentColumnId, name: "طابور", count: 0, icon: <IconClock className="size-3.5" />, accent: "blue" },
 	{ id: "shortlist" as AppointmentColumnId, name: "قائمة مختصرة", count: 0, icon: <IconClipboardCheck className="size-3.5" />, accent: "neutral" },
-	{ id: "waitlist" as AppointmentColumnId, name: "قائمة الانتظار", count: 0, icon: <IconHourglass className="size-3.5" />, accent: "purple" },
-	{ id: "interview" as AppointmentColumnId, name: "المقابلة الشخصية", count: 0, icon: <IconActivity className="size-3.5" />, accent: "amber" },
+	{ id: "waitlist" as AppointmentColumnId, name: "قائمة الانتظار", count: 0, icon: <IconClock className="size-3.5" />, accent: "amber" },
+	{ id: "interview" as AppointmentColumnId, name: "المقابلة الشخصية", count: 0, icon: <IconActivity className="size-3.5" />, accent: "indigo" },
 	{ id: "awaiting-payment" as AppointmentColumnId, name: "بانتظار الدفع", count: 0, icon: <IconHourglass className="size-3.5" />, accent: "purple" },
 	{ id: "accepted" as AppointmentColumnId, name: "مقبول", count: 0, icon: <IconCheck className="size-3.5" />, accent: "emerald" },
 	{ id: "rejected" as AppointmentColumnId, name: "مرفوض", count: 0, icon: <IconX className="size-3.5" />, accent: "red" },
@@ -84,6 +85,7 @@ const COLUMN_STATUS_MAP: Record<
 > = {
 	queue: { status: "QUEUE", label: "طابور", variant: "warning" },
 	shortlist: { status: "SHORTLIST", label: "قائمة مختصرة", variant: "info" },
+	waitlist: { status: "WAITLIST", label: "قائمة الانتظار", variant: "warning" },
 	interview: { status: "INTERVIEW", label: "المقابلة الشخصية", variant: "info" },
 	accepted: { status: "ACCEPTED", label: "مقبول", variant: "default" },
 	"awaiting-payment": { status: "AWAITING_PAYMENT", label: "بانتظار الدفع", variant: "warning" },
@@ -92,7 +94,6 @@ const COLUMN_STATUS_MAP: Record<
 	duplicate: { status: "DUPLICATE", label: "مكرر", variant: "destructive" },
 	// Backward compatibility with legacy IDs
 	evaluation: { status: "INTERVIEW", label: "المقابلة الشخصية", variant: "info" },
-	waitlist: { status: "WAITLIST", label: "قائمة الانتظار", variant: "warning" },
 	"check-in": { status: "SHORTLIST", label: "قائمة مختصرة", variant: "info" },
 	"in-service": { status: "INTERVIEW", label: "المقابلة الشخصية", variant: "info" },
 	done: { status: "ACCEPTED", label: "مقبول", variant: "default" },
@@ -130,12 +131,14 @@ export function CampaignRequestsKanban({
 	campaignId,
 	searchQuery,
 	genderFilter,
+	sortBy = "DATE_DESC",
 	selectedRequestId: externalSelectedRequestId,
 	onSelectRequest: externalOnSelectRequest,
 }: {
 	campaignId: string;
 	searchQuery?: string;
 	genderFilter?: string;
+	sortBy?: CampaignSortOption;
 	selectedRequestId?: string | null;
 	onSelectRequest?: (id: string | null) => void;
 }) {
@@ -206,12 +209,61 @@ export function CampaignRequestsKanban({
 		});
 	}, [data, searchQuery, genderFilter]);
 
+	// مستويات ترتيب الأولوية تنازلياً
+	const priorityRanks: Record<string, number> = useMemo(() => ({
+		urgent: 4,
+		عاجلة: 4,
+		high: 3,
+		مرتفعة: 3,
+		medium: 2,
+		متوسطة: 2,
+		low: 1,
+		منخفضة: 1,
+		none: 0,
+		"بدون أولوية": 0,
+	}), []);
+
+	// تطبيق التصفية والفرز المختار (تاريخ / أولوية / أبجدي)
+	const sortedAndFilteredData = useMemo(() => {
+		const result = [...filteredData];
+		switch (sortBy) {
+			case "DATE_ASC":
+				return result.sort((a, b) => {
+					const dateA = new Date(a.submittedAt || a.createdAt || 0).getTime();
+					const dateB = new Date(b.submittedAt || b.createdAt || 0).getTime();
+					return dateA - dateB;
+				});
+			case "PRIORITY_DESC":
+				return result.sort((a, b) => {
+					const pA = priorityRanks[(a.priority || "").trim().toLowerCase()] ?? 0;
+					const pB = priorityRanks[(b.priority || "").trim().toLowerCase()] ?? 0;
+					if (pB !== pA) return pB - pA;
+					const dateA = new Date(a.submittedAt || a.createdAt || 0).getTime();
+					const dateB = new Date(b.submittedAt || b.createdAt || 0).getTime();
+					return dateB - dateA;
+				});
+			case "NAME_ASC":
+				return result.sort((a, b) => {
+					const nameA = (a.patientName || a.name || "").trim();
+					const nameB = (b.patientName || b.name || "").trim();
+					return nameA.localeCompare(nameB, "ar", { sensitivity: "base" });
+				});
+			case "DATE_DESC":
+			default:
+				return result.sort((a, b) => {
+					const dateA = new Date(a.submittedAt || a.createdAt || 0).getTime();
+					const dateB = new Date(b.submittedAt || b.createdAt || 0).getTime();
+					return dateB - dateA;
+				});
+		}
+	}, [filteredData, sortBy, priorityRanks]);
+
 	const columns = useMemo(() => {
 		return CAMPAIGN_COLUMNS.map((col) => ({
 			...col,
-			count: filteredData.filter((d) => d.column === col.id).length,
+			count: sortedAndFilteredData.filter((d) => d.column === col.id).length,
 		}));
-	}, [filteredData]);
+	}, [sortedAndFilteredData]);
 
 	const handleStatusChange = (
 		req: CampaignRequestItem,
@@ -220,6 +272,7 @@ export function CampaignRequestsKanban({
 		const statusToColumnMap: Record<string, string> = {
 			QUEUE: "queue",
 			SHORTLIST: "shortlist",
+			WAITLIST: "waitlist",
 			INTERVIEW: "interview",
 			ACCEPTED: "accepted",
 			AWAITING_PAYMENT: "awaiting-payment",
@@ -228,7 +281,6 @@ export function CampaignRequestsKanban({
 			// Backward compatibility fallbacks
 			IN_EVALUATION: "interview",
 			EVALUATION: "interview",
-			WAITLIST: "waitlist",
 			REVIEW: "shortlist",
 			AWAITING_REPLY: "shortlist",
 		};
@@ -332,7 +384,7 @@ export function CampaignRequestsKanban({
 			const hasActiveAppointment = Boolean(
 				oldItem?.assessmentAppointment && oldItem.assessmentAppointment.status !== "CANCELLED",
 			);
-			const isBackwardToQueueOrShortlist = ["queue", "shortlist", "waitlist"].includes(targetColumn);
+			const isBackwardToQueueOrShortlist = ["queue", "shortlist"].includes(targetColumn);
 			const wasInInterviewOrLater = ["interview", "awaiting-payment", "accepted"].includes(prevCol);
 
 			if (hasActiveAppointment && isBackwardToQueueOrShortlist && wasInInterviewOrLater && oldItem) {
@@ -457,17 +509,17 @@ export function CampaignRequestsKanban({
 			)}
 
 			<KanbanProvider
-				className="w-max min-w-full min-h-[60vh] auto-cols-[minmax(18.5rem,20rem)] gap-3 items-start pb-1"
+				className="w-max min-w-full min-h-[calc(60vh+200px)] auto-cols-[minmax(18.5rem,20rem)] gap-3 items-start pb-1"
 				collisionDetection={collisionDetection}
 				columns={columns}
-				data={filteredData}
+				data={sortedAndFilteredData}
 				onDataChange={handleDataChange}
 			>
 				{(column) => (
 					<KanbanBoard
 						key={column.id}
 						id={column.id}
-						className="bg-muted/40 w-full min-w-[18.5rem] max-w-[20rem] min-h-[60vh] h-fit self-start rounded-lg border border-border/60 shadow-none transition-all"
+						className="bg-muted/40 w-full min-w-[18.5rem] max-w-[20rem] min-h-[calc(60vh+200px)] h-fit self-start rounded-lg border border-border/60 shadow-none transition-all"
 					>
 						<AppointmentColumnHeader column={column as AppointmentColumn} />
 						<KanbanCards id={column.id} className="w-full gap-2 px-2 pb-3">
@@ -699,11 +751,23 @@ export function CampaignRequestsKanban({
 												</span>
 											</div>
 
-											{/* 5. بانر حالة الرفض الصريح (مطابق للصورة 11) أو احتمالية الحضور */}
+											{/* 5. بانر حالة الرفض الصريح (مطابق للصورة 11) أو احتمالية الحضور أو الترتيب في الانتظار */}
 											{item.column === "rejected" || item.status === "REJECTED" ? (
 												<div className="w-full rounded-md bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 py-1 px-2.5 flex items-center justify-center gap-1.5 text-[10px] font-bold text-rose-600 dark:text-rose-400 select-none shadow-2xs">
 													<IconX className="size-3 text-rose-600 shrink-0" />
 													<span>{item.rejectionReason || "لم يُسجل سبب الرفض"}</span>
+												</div>
+											) : item.column === "waitlist" || item.status === "WAITLIST" ? (
+												<div className="w-full rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/40 py-1 px-2.5 flex items-center justify-between text-[10px] font-semibold text-amber-700 dark:text-amber-400 select-none shadow-2xs">
+													<div className="flex items-center gap-1.5">
+														<IconClock className="size-3 text-amber-600 shrink-0" />
+														<span>قائمة الانتظار {item.queueRank ? `(#${item.queueRank})` : ""}</span>
+													</div>
+													{item.estimatedWait && (
+														<span className="text-[9px] font-medium text-amber-600/80 dark:text-amber-400/80">
+															متوقع: {item.estimatedWait}
+														</span>
+													)}
 												</div>
 											) : (
 												<div className="w-full rounded-md bg-[#EFF6FF] dark:bg-blue-950/30 border border-[#DBEAFE]/80 dark:border-blue-900/40 py-1 px-2.5 flex items-center justify-center gap-1.5 text-[10px] font-semibold text-[#3B82F6] dark:text-blue-400 select-none shadow-2xs">
@@ -726,98 +790,101 @@ export function CampaignRequestsKanban({
 												</div>
 											)}
 
-											{/* 6. شريط الإجراءات السفلي */}
-											<div className="flex items-center justify-between gap-1 pt-0.5 w-full" dir="rtl" onClick={(e) => e.stopPropagation()}>
-												{/* المجموعة اليمنى بالصورة: زر التعليقات + زر إضافة ملاحظة */}
-												<div className="flex items-center gap-1 shrink-0">
-													{/* زر 💬 (المحادثات / الملاحظات) */}
-													<button
-														type="button"
-														onClick={() => setSelectedRequestId(item.id)}
-														className="inline-flex items-center gap-1 px-1.5 h-6.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-500 hover:text-zinc-800 text-[9.5px] font-medium transition-colors cursor-pointer shrink-0"
-														title="المحادثات والملاحظات"
-													>
-														<IconMessageCircle className="size-2.5 text-zinc-400" />
-														<span className="font-mono text-[9px]">{item.comments?.length ?? 0}</span>
-													</button>
+											{/* 6. شريط الإجراءات السفلي: جميع الأزرار مصفوفة على اليمين مباشرة دون فراغ فاصل */}
+											<div className="flex items-center justify-start gap-1 pt-0.5 w-full overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" dir="rtl" onClick={(e) => e.stopPropagation()}>
+												{/* زر 💬 (المحادثات / الملاحظات) */}
+												<button
+													type="button"
+													onClick={() => setSelectedRequestId(item.id)}
+													className="inline-flex items-center gap-1 px-1.5 h-6.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-500 hover:text-zinc-800 text-[9.5px] font-medium transition-colors cursor-pointer shrink-0"
+													title="المحادثات والملاحظات"
+												>
+													<IconMessageCircle className="size-2.5 text-zinc-400" />
+													<span className="font-mono text-[9px]">{item.comments?.length ?? 0}</span>
+												</button>
 
-													{/* زر + إضافة ملاحظة */}
-													<button
-														type="button"
-														onClick={() => setSelectedRequestId(item.id)}
-														className="inline-flex items-center gap-1 px-2 h-6.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-600 hover:text-zinc-900 text-[9.5px] font-medium transition-colors cursor-pointer shrink-0"
-														title="إضافة ملاحظة على الطلب"
-													>
-														<IconPlus className="size-2.5 text-zinc-500" />
-														<span>إضافة ملاحظة</span>
-													</button>
+												{/* زر + إضافة ملاحظة */}
+												<button
+													type="button"
+													onClick={() => setSelectedRequestId(item.id)}
+													className="inline-flex items-center gap-1 px-2 h-6.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-600 hover:text-zinc-900 text-[9.5px] font-medium transition-colors cursor-pointer shrink-0"
+													title="إضافة ملاحظة على الطلب"
+												>
+													<IconPlus className="size-2.5 text-zinc-500" />
+													<span>إضافة ملاحظة</span>
+												</button>
+
+												{/* زر الأولوية */}
+												<div onPointerDown={(event) => event.stopPropagation()} className="shrink-0">
+													<PriorityPickerPopover
+														value={item.priority || "بدون أولوية"}
+														onChange={(priority) => handlePriorityChange(item, priority)}
+														iconOnly
+													/>
 												</div>
 
-											{/* الأولوية تحل محل قائمة السهم؛ التفاصيل والحذف متاحان من شاشة الطلب. */}
-												<div className="flex items-center gap-1 shrink-0">
-													<div onPointerDown={(event) => event.stopPropagation()}>
-														<PriorityPickerPopover
-															value={item.priority || "بدون أولوية"}
-															onChange={(priority) => handlePriorityChange(item, priority)}
-															iconOnly
-														/>
-													</div>
-
-													{/* زر ⚑ تحديد كـ... لتغيير المرحلة بنقرة واحدة */}
-													<DropdownMenu dir="rtl">
-														<DropdownMenuTrigger asChild>
-															<button
-																type="button"
-																className="inline-flex items-center gap-1 px-2 h-6.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-600 hover:text-zinc-900 text-[9.5px] font-medium transition-colors cursor-pointer shrink-0"
-																title="تحديد مرحلة الطلب السريعة"
-															>
-																<IconFlag className="size-2.5 text-zinc-500" />
-																<span>{item.column === "rejected" || item.status === "REJECTED" ? "تقييم" : "تحديد كـ..."}</span>
-															</button>
-														</DropdownMenuTrigger>
-														<DropdownMenuContent align="end" className="w-44 text-xs z-[99]">
-															<DropdownMenuItem
-																disabled={item.status === "ACCEPTED"}
-																onClick={() => handleStatusChange(item, "SHORTLIST")}
-																className="gap-2 text-xs cursor-pointer"
-															>
-																<IconClipboardCheck className="size-3.5 text-blue-600" />
-																<span>نقل: قائمة مختصرة</span>
-															</DropdownMenuItem>
-															<DropdownMenuItem
-																disabled={item.status === "ACCEPTED"}
-																onClick={() => handleStatusChange(item, "INTERVIEW")}
-																className="gap-2 text-xs cursor-pointer"
-															>
-																<IconActivity className="size-3.5 text-amber-600" />
-																<span>نقل: المقابلة الشخصية</span>
-															</DropdownMenuItem>
-															<DropdownMenuItem
-																disabled={item.status === "ACCEPTED"}
-																onClick={() => handleStatusChange(item, "AWAITING_PAYMENT")}
-																className="gap-2 text-xs cursor-pointer"
-															>
-																<IconHourglass className="size-3.5 text-purple-600" />
-																<span>نقل: بانتظار الدفع</span>
-															</DropdownMenuItem>
-															<DropdownMenuItem
-																onClick={() => handleStatusChange(item, "ACCEPTED")}
-																className="gap-2 text-xs cursor-pointer"
-															>
-																<IconCheck className="size-3.5 text-emerald-600" />
-																<span>اعتماد وقبول نهائي</span>
-															</DropdownMenuItem>
-															<DropdownMenuItem
-																disabled={item.status === "ACCEPTED"}
-																onClick={() => handleStatusChange(item, "REJECTED")}
-																className="gap-2 text-xs text-destructive cursor-pointer"
-															>
-																<IconX className="size-3.5" />
-																<span>استبعاد / مرفوض</span>
-															</DropdownMenuItem>
-														</DropdownMenuContent>
-													</DropdownMenu>
-												</div>
+												{/* زر ⚑ تحديد كـ... لتغيير المرحلة بنقرة واحدة */}
+												<DropdownMenu dir="rtl">
+													<DropdownMenuTrigger asChild>
+														<button
+															type="button"
+															className="inline-flex items-center gap-1 px-2 h-6.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-600 hover:text-zinc-900 text-[9.5px] font-medium transition-colors cursor-pointer shrink-0"
+															title="تحديد مرحلة الطلب السريعة"
+														>
+															<IconFlag className="size-2.5 text-zinc-500" />
+															<span>{item.column === "rejected" || item.status === "REJECTED" ? "تقييم" : "تحديد كـ..."}</span>
+														</button>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent align="start" className="w-44 text-xs z-[99]">
+														<DropdownMenuItem
+															disabled={item.status === "ACCEPTED"}
+															onClick={() => handleStatusChange(item, "SHORTLIST")}
+															className="gap-2 text-xs cursor-pointer"
+														>
+															<IconClipboardCheck className="size-3.5 text-blue-600" />
+															<span>نقل: قائمة مختصرة</span>
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															disabled={item.status === "ACCEPTED"}
+															onClick={() => handleStatusChange(item, "WAITLIST")}
+															className="gap-2 text-xs cursor-pointer"
+														>
+															<IconClock className="size-3.5 text-amber-600" />
+															<span>نقل: قائمة الانتظار</span>
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															disabled={item.status === "ACCEPTED"}
+															onClick={() => handleStatusChange(item, "INTERVIEW")}
+															className="gap-2 text-xs cursor-pointer"
+														>
+															<IconActivity className="size-3.5 text-indigo-600" />
+															<span>نقل: المقابلة الشخصية</span>
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															disabled={item.status === "ACCEPTED"}
+															onClick={() => handleStatusChange(item, "AWAITING_PAYMENT")}
+															className="gap-2 text-xs cursor-pointer"
+														>
+															<IconHourglass className="size-3.5 text-purple-600" />
+															<span>نقل: بانتظار الدفع</span>
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															onClick={() => handleStatusChange(item, "ACCEPTED")}
+															className="gap-2 text-xs cursor-pointer"
+														>
+															<IconCheck className="size-3.5 text-emerald-600" />
+															<span>اعتماد وقبول نهائي</span>
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															disabled={item.status === "ACCEPTED"}
+															onClick={() => handleStatusChange(item, "REJECTED")}
+															className="gap-2 text-xs text-destructive cursor-pointer"
+														>
+															<IconX className="size-3.5" />
+															<span>استبعاد / مرفوض</span>
+														</DropdownMenuItem>
+													</DropdownMenuContent>
+												</DropdownMenu>
 											</div>
 										</Card>
 									</KanbanCard>

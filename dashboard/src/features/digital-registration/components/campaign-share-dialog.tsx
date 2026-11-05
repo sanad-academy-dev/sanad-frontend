@@ -16,7 +16,7 @@ import {
 	IconX,
 } from "@tabler/icons-react";
 import QRCode from "qrcode";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -62,6 +62,7 @@ interface CampaignShareDialogProps {
 	onOpenChange: (open: boolean) => void;
 	campaignId?: string;
 	campaignName?: string;
+	initialFocusInvite?: boolean;
 }
 
 export function CampaignShareDialog({
@@ -69,7 +70,18 @@ export function CampaignShareDialog({
 	onOpenChange,
 	campaignId,
 	campaignName = "Digital Registration",
+	initialFocusInvite = false,
 }: CampaignShareDialogProps) {
+	const inviteInputRef = useRef<HTMLInputElement>(null);
+
+	useEffect(() => {
+		if (open && initialFocusInvite) {
+			const timer = setTimeout(() => {
+				inviteInputRef.current?.focus();
+			}, 120);
+			return () => clearTimeout(timer);
+		}
+	}, [open, initialFocusInvite]);
 	// Queries and mutations
 	const { data: shareData, isLoading } = useRegistrationShareAccess(campaignId);
 	const inviteMutation = useInviteCollaborator();
@@ -312,6 +324,7 @@ export function CampaignShareDialog({
 					<div className="relative flex items-center gap-2">
 						<div className="relative flex-1">
 							<Input
+								ref={inviteInputRef}
 								value={inviteQuery}
 								onChange={(e) => {
 									setInviteQuery(e.target.value);
