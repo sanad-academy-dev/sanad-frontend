@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import type {
 	ContentStatus,
 	CourseContentType,
+	CourseDetailResponse,
 	CreateLessonPayload,
 	LessonResponse,
 	LessonType,
@@ -23,11 +24,31 @@ const SAVED_LABELS: Partial<Record<LessonType, string>> = {
 };
 const savedLabel = (type: LessonType) => SAVED_LABELS[type] ?? "الدرس";
 
+function extractErrorMessage(error: unknown, fallback: string): string {
+	if (!error) return fallback;
+	if (typeof error === "string") return error;
+	const errObj = error as { value?: unknown; message?: string };
+	if (typeof errObj.value === "string") return errObj.value;
+	if (errObj.value && typeof errObj.value === "object") {
+		const val = errObj.value as { message?: string; summary?: string; error?: string };
+		if (val.message) return String(val.message);
+		if (val.summary) return String(val.summary);
+		if (val.error) return String(val.error);
+	}
+	if (errObj.message) return String(errObj.message);
+	return fallback;
+}
+
 // كل عمليات الوحدات/الدروس تُبطل كاش الدورة الواحدة لإعادة جلب الشجرة
 export const useCourseContent = (courseId: string | null) => {
 	const qc = useQueryClient();
-	const invalidate = () => {
-		if (courseId) qc.invalidateQueries({ queryKey: ["training", "course", courseId] });
+	const invalidate = (targetCourseId?: string | null) => {
+		const id = targetCourseId || courseId;
+		if (id) {
+			qc.invalidateQueries({ queryKey: ["training", "course", id] });
+		}
+		qc.invalidateQueries({ queryKey: ["training", "course"] });
+		qc.invalidateQueries({ queryKey: ["training", "courses"] });
 		qc.invalidateQueries({ queryKey: ["training", "courses", "stats"] });
 	};
 
@@ -57,7 +78,24 @@ export const useCourseContent = (courseId: string | null) => {
 			if (error) throw new Error("تعذّر إضافة الوحدة");
 			return data as UnitResponse;
 		},
-		onSuccess: invalidate,
+		onSuccess: (data, variables) => {
+			const cid = variables.courseId || courseId;
+			if (cid && data) {
+				qc.setQueryData(
+					["training", "course", cid],
+					(old: CourseDetailResponse | undefined) => {
+						if (!old) return old;
+						const existingUnits = old.units || [];
+						if (existingUnits.some((u) => u.id === data.id)) return old;
+						return {
+							...old,
+							units: [...existingUnits, data],
+						};
+					},
+				);
+			}
+			invalidate(cid);
+		},
 	});
 
 	// تعديل بيانات بطاقة المحتوى (النوع/الحالة/المستوى) دون المساس بالدروس
@@ -75,7 +113,19 @@ export const useCourseContent = (courseId: string | null) => {
 			if (error) throw new Error("تعذّر تحديث البطاقة");
 			return res;
 		},
-		onSuccess: invalidate,
+		onSuccess: (_res, variables) => {
+			qc.setQueriesData(
+				{ queryKey: ["training", "course"] },
+				(old: CourseDetailResponse | undefined) => {
+					if (!old?.units) return old;
+					return {
+						...old,
+						units: old.units.map((u) => (u.id === variables.id ? { ...u, ...variables } : u)),
+					};
+				},
+			);
+			invalidate();
+		},
 	});
 
 	const renameUnit = useMutation({
@@ -84,16 +134,45 @@ export const useCourseContent = (courseId: string | null) => {
 			if (error) throw new Error("تعذّر تعديل اسم الوحدة");
 			return data;
 		},
-		onSuccess: invalidate,
+		onSuccess: (_data, variables) => {
+			qc.setQueriesData(
+				{ queryKey: ["training", "course"] },
+				(old: CourseDetailResponse | undefined) => {
+					if (!old?.units) return old;
+					return {
+						...old,
+						units: old.units.map((u) =>
+							u.id === variables.id ? { ...u, title: variables.title } : u,
+						),
+					};
+				},
+			);
+			invalidate();
+		},
 	});
 
 	const duplicateUnit = useMutation({
 		mutationFn: async (id: string) => {
-			const { data, error } = await api.training.units({ id }).duplicate.post();
+			const { data, error } = await api.training.units({ id }).duplicate.post({});
 			if (error) throw new Error("تعذّر نسخ الوحدة");
 			return data as UnitResponse;
 		},
-		onSuccess: invalidate,
+		onSuccess: (data) => {
+			if (data) {
+				qc.setQueriesData(
+					{ queryKey: ["training", "course"] },
+					(old: CourseDetailResponse | undefined) => {
+						if (!old?.units) return old;
+						if (old.units.some((u) => u.id === data.id)) return old;
+						return {
+							...old,
+							units: [...old.units, data],
+						};
+					},
+				);
+			}
+			invalidate(data?.courseId);
+		},
 	});
 
 	const removeUnit = useMutation({
@@ -101,26 +180,87 @@ export const useCourseContent = (courseId: string | null) => {
 			const { error } = await api.training.units({ id }).delete();
 			// 404 يعني أنها محذوفة أصلًا — النتيجة المطلوبة متحقّقة فلا نعتبره فشلًا
 			if (error && error.status !== 404) throw new Error("تعذّر حذف الوحدة");
+			return id;
 		},
-		onSuccess: invalidate,
+		onSuccess: (_data, deletedId) => {
+			qc.setQueriesData(
+				{ queryKey: ["training", "course"] },
+				(old: CourseDetailResponse | undefined) => {
+					if (!old?.units) return old;
+					return {
+						...old,
+						units: old.units.filter((u) => u.id !== deletedId),
+					};
+				},
+			);
+			invalidate();
+		},
 	});
 
 	const addLesson = useMutation({
 		mutationFn: async (input: CreateLessonPayload) => {
 			const { data, error } = await api.training.lessons.post(input);
-			if (error) throw new Error("تعذّر حفظ الدرس");
+			if (error) {
+				console.error("addLesson error:", error);
+				throw new Error(extractErrorMessage(error, "تعذّر حفظ الدرس"));
+			}
 			return data as LessonResponse;
 		},
-		onSuccess: invalidate,
+		onSuccess: (data) => {
+			if (data) {
+				qc.setQueriesData(
+					{ queryKey: ["training", "course"] },
+					(old: CourseDetailResponse | undefined) => {
+						if (!old?.units) return old;
+						return {
+							...old,
+							units: old.units.map((u) => {
+								if (u.id !== data.unitId) return u;
+								const existing = u.lessons || [];
+								if (existing.some((l) => l.id === data.id)) return u;
+								return {
+									...u,
+									lessons: [...existing, data],
+								};
+							}),
+						};
+					},
+				);
+			}
+			invalidate();
+		},
 	});
 
 	const updateLesson = useMutation({
 		mutationFn: async ({ id, ...input }: UpdateLessonPayload & { id: string }) => {
 			const { data, error } = await api.training.lessons({ id }).patch(input);
-			if (error) throw new Error("تعذّر حفظ التعديلات");
+			if (error) {
+				console.error("updateLesson error:", error);
+				throw new Error(extractErrorMessage(error, "تعذّر حفظ التعديلات"));
+			}
 			return data as LessonResponse;
 		},
-		onSuccess: invalidate,
+		onSuccess: (data) => {
+			if (data) {
+				qc.setQueriesData(
+					{ queryKey: ["training", "course"] },
+					(old: CourseDetailResponse | undefined) => {
+						if (!old?.units) return old;
+						return {
+							...old,
+							units: old.units.map((u) => {
+								if (u.id !== data.unitId) return u;
+								return {
+									...u,
+									lessons: (u.lessons || []).map((l) => (l.id === data.id ? data : l)),
+								};
+							}),
+						};
+					},
+				);
+			}
+			invalidate();
+		},
 	});
 
 	const removeLesson = useMutation({
@@ -128,8 +268,24 @@ export const useCourseContent = (courseId: string | null) => {
 			const { error } = await api.training.lessons({ id }).delete();
 			// 404 يعني أنه محذوف أصلًا — النتيجة المطلوبة متحقّقة
 			if (error && error.status !== 404) throw new Error("تعذّر حذف الدرس");
+			return id;
 		},
-		onSuccess: invalidate,
+		onSuccess: (_data, deletedLessonId) => {
+			qc.setQueriesData(
+				{ queryKey: ["training", "course"] },
+				(old: CourseDetailResponse | undefined) => {
+					if (!old?.units) return old;
+					return {
+						...old,
+						units: old.units.map((u) => ({
+							...u,
+							lessons: (u.lessons || []).filter((l) => l.id !== deletedLessonId),
+						})),
+					};
+				},
+			);
+			invalidate();
+		},
 	});
 
 	return {

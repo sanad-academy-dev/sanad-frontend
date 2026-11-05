@@ -47,8 +47,10 @@ export function CoverPicker({
 		setOpen(false);
 	};
 	const remove = () => {
+		setDraft(null);
 		onChange(null);
 		setOpen(false);
+		toast.success("تمت إزالة الغلاف");
 	};
 
 	const handleUpload = async (file: File | undefined) => {
@@ -56,7 +58,11 @@ export function CoverPicker({
 		try {
 			const uploaded = await uploadFile(file);
 			setDraft(uploaded.url);
-		} catch {
+			onChange(uploaded.url);
+			setOpen(false);
+			toast.success("تم رفع وحفظ صورة الغلاف");
+		} catch (err) {
+			console.error("Cover upload error:", err);
 			toast.error("تعذّر رفع الصورة");
 		}
 	};

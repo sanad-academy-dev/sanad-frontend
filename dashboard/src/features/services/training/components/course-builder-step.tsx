@@ -1,24 +1,17 @@
 import {
 	IconAlignRight,
 	IconArrowsHorizontal,
-	IconBuildingBank,
 	IconCheck,
-	IconCheckbox,
 	IconChevronDown,
 	IconCopy,
 	IconDots,
 	IconEye,
 	IconFileCheck,
 	IconFileDiff,
-	IconFileText,
-	IconFileTextSpark,
 	IconFocusCentered,
 	IconGripVertical,
-	IconInfoCircle,
-	IconMicrophone,
 	IconPencil,
 	IconPlus,
-	IconSchool,
 	IconSparkles,
 	IconStack2,
 	IconTrash,
@@ -27,6 +20,7 @@ import {
 } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import { showUndoToast } from "@/components/common/undo-toast";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,7 +49,6 @@ import type {
 	LessonType,
 	UnitResponse,
 } from "@/server/training/training.type";
-import { toast } from "sonner";
 
 const UNIT_NAME_MAX = 60;
 
@@ -80,6 +73,15 @@ const LESSON_CONSEQUENCES = [
 	"سيتم حذف محتوى الدرس والمواد التعليمية المرتبطة به بشكل نهائي، ولن تتمكن من استعادته لاحقًا",
 	"إذا كانت الدورة منشورة أو يوجد متدربون بدأوا هذا الدرس، فقد يؤثر الحذف على تقدمهم.",
 ];
+
+const LESSON_TYPE_AR_LABELS: Record<LessonType, string> = {
+	VIDEO: "فيديو",
+	QUIZ: "تقييم واختبار",
+	TEXT: "محتوى نصي",
+	DOCUMENT: "مستند",
+	AUDIO: "ملف صوتي",
+	SURVEY: "استبيان",
+};
 
 // يحوّل ساعة/دقيقة/ثانية إلى ثوانٍ، ويعيد null إذا كانت المدة صفرًا
 function toDurationSeconds(
@@ -243,51 +245,68 @@ function UnitCopyingSkeleton({ unit }: { unit: UnitResponse }) {
 // أكورديون وحدة واحدة — يرفع أحداث اختيار/إضافة الدرس للمحرر المركزي
 function UnitAccordion({
 	unit,
-	courseId,
 	courseName,
 	onDuplicate,
+	onRenameUnit,
+	onRemoveLesson,
 	onAddLesson,
 	onEditLesson,
 	onDeleteUnit,
 	activeEditorLessonId,
+	isSelected,
+	onSelect,
 }: {
 	unit: UnitResponse;
-	courseId: string;
 	courseName: string;
 	onDuplicate: () => void;
+	onRenameUnit: (unitId: string, title: string) => void;
+	onRemoveLesson: (lesson: LessonResponse) => void;
 	onAddLesson: (unitId: string, unitTitle: string) => void;
 	onEditLesson: (lesson: LessonResponse, unitTitle: string, unitId: string) => void;
 	onDeleteUnit: (unit: UnitResponse) => void;
 	activeEditorLessonId?: string | null;
+	isSelected?: boolean;
+	onSelect?: () => void;
 }) {
 	const [expanded, setExpanded] = useState(true);
 	const [editingName, setEditingName] = useState(false);
 	const [title, setTitle] = useState(unit.title);
 	const [confirmingDelete, setConfirmingDelete] = useState(false);
 	const [deletingLesson, setDeletingLesson] = useState<LessonResponse | null>(null);
-	const { renameUnit, removeLesson } = useCourseContent(courseId);
 
 	const commitRename = () => {
 		setEditingName(false);
-		if (title.trim() && title !== unit.title) renameUnit(unit.id, title.trim());
+		if (title.trim() && title !== unit.title) onRenameUnit(unit.id, title.trim());
 		else setTitle(unit.title);
 	};
 
 	const hasLessons = unit.lessons.length > 0;
 
 	return (
-		<div className="flex w-full flex-col">
+		<div
+			className={cn(
+				"flex w-full flex-col rounded-[4px] transition-colors",
+				isSelected && "ring-1 ring-[#6366F1]/50 shadow-2xs",
+			)}
+		>
 			{/* رأس الوحدة */}
+			{/* biome-ignore lint/a11y/useKeyWithClickEvents: header delegates unit selection */}
+			{/* biome-ignore lint/a11y/noStaticElementInteractions: clickable header for active unit */}
 			<div
+				onClick={() => onSelect?.()}
 				className={cn(
-					"flex h-[27px] items-center justify-between border-[0.75px] border-[#E5E5E5] bg-[#FAFAFA] ps-2 pe-3",
+					"flex h-[27px] items-center justify-between border-[0.75px] border-[#E5E5E5] bg-[#FAFAFA] ps-2 pe-3 cursor-pointer",
 					expanded ? "rounded-t-[4px]" : "rounded-[4px]",
+					isSelected && "bg-[#6366F1]/[0.04]",
 				)}
 			>
 				<div className="flex min-w-0 items-center gap-1.5">
 					<button
 						type="button"
-						onClick={() => setExpanded((v) => !v)}
+						onClick={(e) => {
+							e.stopPropagation();
+							setExpanded((v) => !v);
+						}}
 						aria-label={expanded ? "طي الوحدة" : "توسيع الوحدة"}
 						className="flex size-2.5 items-center justify-center text-[#9B9B9D]"
 					>
@@ -303,6 +322,7 @@ function UnitAccordion({
 							value={title}
 							maxLength={UNIT_NAME_MAX}
 							onChange={(e) => setTitle(e.target.value)}
+							onClick={(e) => e.stopPropagation()}
 							onBlur={commitRename}
 							onKeyDown={(e) => {
 								if (e.key === "Enter") commitRename();
@@ -320,7 +340,10 @@ function UnitAccordion({
 							</span>
 							<button
 								type="button"
-								onClick={() => setEditingName(true)}
+								onClick={(e) => {
+									e.stopPropagation();
+									setEditingName(true);
+								}}
 								aria-label="تعديل اسم الوحدة"
 								className="text-[#9B9B9D]"
 							>
@@ -330,11 +353,15 @@ function UnitAccordion({
 					)}
 				</div>
 
-				<RowMenu
-					label="خيارات الوحدة"
-					onDuplicate={onDuplicate}
-					onDelete={() => setConfirmingDelete(true)}
-				/>
+				{/* biome-ignore lint/a11y/noStaticElementInteractions: stopPropagation for menu */}
+				{/* biome-ignore lint/a11y/useKeyWithClickEvents: stopPropagation for menu */}
+				<div onClick={(e) => e.stopPropagation()}>
+					<RowMenu
+						label="خيارات الوحدة"
+						onDuplicate={onDuplicate}
+						onDelete={() => setConfirmingDelete(true)}
+					/>
+				</div>
 			</div>
 
 			<DeleteConfirmDialog
@@ -363,7 +390,10 @@ function UnitAccordion({
 					onOpenChange={(next) => {
 						if (!next) setDeletingLesson(null);
 					}}
-					onConfirm={() => removeLesson(deletingLesson)}
+					onConfirm={() => {
+						onRemoveLesson(deletingLesson);
+						setDeletingLesson(null);
+					}}
 				/>
 			)}
 
@@ -429,26 +459,17 @@ function UnitAccordion({
 							</Button>
 						</div>
 					) : (
-						<div className="flex h-[130px] flex-col items-center justify-center gap-2.5 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-[#FAFAFA]/40 px-4 py-3">
-							<IconFileText className="size-5 text-[#9B9B9D]" />
-							<div className="flex flex-col items-center gap-1">
-								<p className="text-center text-[11px] font-semibold text-[#08090A]">
-									ابدأ بإضافة أول درس
-								</p>
-								<p className="text-center text-[10px] leading-4 text-[#6B6B67]">
-									أضف محتوى تعليمياً كفيديو أو مستند أو تقييم.
-								</p>
-							</div>
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => onAddLesson(unit.id, unit.title)}
-								className="h-[24px] gap-1 rounded-[4px] px-2 text-[11px] font-medium"
-							>
-								إضافة أول درس
-								<IconPlus className="size-3" />
-							</Button>
-						</div>
+						<button
+							type="button"
+							onClick={() => {
+								onSelect?.();
+								onAddLesson(unit.id, unit.title);
+							}}
+							className="flex items-center justify-center gap-1.5 rounded-[4px] border border-dashed border-[#E5E5E5] bg-[#FAFAFA]/60 py-2.5 text-[11px] font-medium text-[#6B6B67] hover:border-[#6366F1]/50 hover:bg-[#6366F1]/5 hover:text-[#6366F1] transition-all cursor-pointer"
+						>
+							<IconPlus className="size-3.5" />
+							<span>إضافة أول درس للوحدة</span>
+						</button>
 					)}
 				</div>
 			)}
@@ -471,9 +492,23 @@ export function CourseBuilderStep({
 	onGenerateAI?: () => void;
 	onEnsureCourseCreated?: () => Promise<string>;
 }) {
-	const { course, isLoading } = useCourse(courseId);
-	const { addUnit, duplicateUnit, removeUnit, addLesson, updateLesson, isSavingLesson } =
-		useCourseContent(courseId);
+	const [internalCourseId, setInternalCourseId] = useState<string | null>(courseId);
+	useEffect(() => {
+		if (courseId) setInternalCourseId(courseId);
+	}, [courseId]);
+
+	const effectiveCourseId = courseId || internalCourseId;
+	const { course, isLoading } = useCourse(effectiveCourseId);
+	const {
+		addUnit,
+		duplicateUnit,
+		removeUnit,
+		addLesson,
+		updateLesson,
+		removeLesson,
+		renameUnit,
+		isSavingLesson,
+	} = useCourseContent(effectiveCourseId);
 	const [copyingUnitId, setCopyingUnitId] = useState<string | null>(null);
 	// إضافة قسم جديد عبر الإدخال المباشر
 	const [isAddingSection, setIsAddingSection] = useState(false);
@@ -577,6 +612,12 @@ export function CourseBuilderStep({
 
 	const units = course?.units ?? [];
 	const cover = resolveCover(course?.coverKey);
+	const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
+	const activeUnit =
+		units.find((u) => u.id === (editor ? editor.unitId : selectedUnitId || units[0]?.id)) ||
+		units[0] ||
+		null;
+	const activeUnitId = activeUnit?.id || null;
 
 	const handleAddUnit = () => {
 		setIsAddingSection(true);
@@ -584,10 +625,11 @@ export function CourseBuilderStep({
 
 	const handleConfirmAddSection = async () => {
 		const trimmed = newSectionTitle.trim() || `الوحدة ${units.length + 1}`;
-		let currentCourseId = courseId;
+		let currentCourseId = effectiveCourseId;
 		if (!currentCourseId && onEnsureCourseCreated) {
 			try {
 				currentCourseId = await onEnsureCourseCreated();
+				setInternalCourseId(currentCourseId);
 			} catch (e) {
 				toast.error((e as Error).message);
 				return;
@@ -618,18 +660,6 @@ export function CourseBuilderStep({
 		}
 	}, [units, editor]);
 
-	// إنشاء أول درس للدورة — مجرد فتح محرر الدرس محلياً بدون إرسال إلى قاعدة البيانات
-	const handleCreateFirstLesson = () => {
-		const existingUnit = units[0];
-		setRestoredEdit(undefined);
-		setLiveDraft(null);
-		setEditor({
-			mode: "add",
-			unitId: existingUnit ? existingUnit.id : "pending",
-			unitTitle: existingUnit ? existingUnit.title : "الوحدة 1",
-		});
-	};
-
 	const handleDuplicateUnit = async (unit: UnitResponse) => {
 		setCopyingUnitId(unit.id);
 		try {
@@ -650,23 +680,34 @@ export function CourseBuilderStep({
 	};
 
 	const saveCover = async (coverKey: string | null) => {
-		let currentCourseId = courseId;
+		let currentCourseId = effectiveCourseId;
 		if (!currentCourseId && onEnsureCourseCreated) {
 			try {
 				currentCourseId = await onEnsureCourseCreated();
+				setInternalCourseId(currentCourseId);
 			} catch (e) {
 				toast.error((e as Error).message);
 				return;
 			}
 		}
 		if (!currentCourseId) return;
-		await fetch(backendUrl(`/api/training/courses/${currentCourseId}`), {
-			method: "PATCH",
-			headers: { "Content-Type": "application/json" },
-			credentials: "include",
-			body: JSON.stringify({ coverKey }),
-		});
-		qc.invalidateQueries({ queryKey: ["training", "course", currentCourseId] });
+		try {
+			const res = await fetch(backendUrl(`/api/training/courses/${currentCourseId}`), {
+				method: "PATCH",
+				headers: { "Content-Type": "application/json" },
+				credentials: "include",
+				body: JSON.stringify({ coverKey }),
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "تعذّر حفظ الغلاف");
+			}
+			await qc.invalidateQueries({ queryKey: ["training", "course", currentCourseId] });
+			await qc.invalidateQueries({ queryKey: ["training", "courses"] });
+		} catch (e) {
+			console.error("saveCover error:", e);
+			toast.error((e as Error).message || "تعذّر حفظ الغلاف");
+		}
 	};
 
 	// المحرر: إضافة درس
@@ -675,6 +716,7 @@ export function CourseBuilderStep({
 		unitTitle: string,
 		initialType?: LessonType,
 	) => {
+		setSelectedUnitId(unitId);
 		setRestoredEdit(undefined);
 		setLiveDraft(null);
 		setEditor({ mode: "add", unitId, unitTitle, initialType });
@@ -682,6 +724,7 @@ export function CourseBuilderStep({
 
 	// المحرر: تعديل درس
 	const handleOpenEditLesson = (lesson: LessonResponse, unitTitle: string, unitId: string) => {
+		setSelectedUnitId(unitId);
 		setRestoredEdit(undefined);
 		setLiveDraft(null);
 		setEditor({ mode: "edit", lesson, unitTitle, unitId });
@@ -691,10 +734,11 @@ export function CourseBuilderStep({
 	const handleSaveNewLesson = async (values: LessonFormValues) => {
 		if (editor?.mode !== "add") return;
 
-		let currentCourseId = courseId;
+		let currentCourseId = effectiveCourseId;
 		if (!currentCourseId && onEnsureCourseCreated) {
 			try {
 				currentCourseId = await onEnsureCourseCreated();
+				setInternalCourseId(currentCourseId);
 			} catch (e) {
 				toast.error((e as Error).message);
 				return;
@@ -725,20 +769,25 @@ export function CourseBuilderStep({
 			}
 		}
 
+		const isMedia =
+			values.type === "VIDEO" || values.type === "AUDIO" || values.type === "DOCUMENT";
 		const saved = await addLesson({
 			unitId: targetUnitId,
 			title: values.title,
 			type: values.type,
 			description: values.description || null,
-			mediaSource: values.mediaSource ?? null,
-			mediaKey: values.mediaKey || null,
-			mediaUrl: values.mediaUrl || null,
+			mediaSource: isMedia ? (values.mediaSource ?? null) : null,
+			mediaKey: isMedia ? values.mediaKey || null : null,
+			mediaUrl: isMedia ? values.mediaUrl || null : null,
 			content:
 				values.type === "QUIZ"
 					? JSON.stringify({ questions: values.questions ?? [] })
 					: values.content || null,
 			durationSeconds: toDurationSeconds(values),
-		}).catch(() => null);
+		}).catch((err) => {
+			console.error("handleSaveNewLesson error:", err);
+			return null;
+		});
 
 		if (saved) {
 			setLiveDraft(null);
@@ -754,19 +803,24 @@ export function CourseBuilderStep({
 	// حفظ تعديل درس
 	const handleUpdateLesson = async (values: LessonFormValues) => {
 		if (editor?.mode !== "edit") return;
+		const isMedia =
+			values.type === "VIDEO" || values.type === "AUDIO" || values.type === "DOCUMENT";
 		const saved = await updateLesson(editor.lesson.id, {
 			title: values.title,
 			type: values.type,
 			description: values.description || null,
-			mediaSource: values.mediaSource ?? null,
-			mediaKey: values.mediaKey || null,
-			mediaUrl: values.mediaUrl || null,
+			mediaSource: isMedia ? (values.mediaSource ?? null) : null,
+			mediaKey: isMedia ? values.mediaKey || null : null,
+			mediaUrl: isMedia ? values.mediaUrl || null : null,
 			content:
 				values.type === "QUIZ"
 					? JSON.stringify({ questions: values.questions ?? [] })
 					: values.content || null,
 			durationSeconds: toDurationSeconds(values),
-		}).catch(() => null);
+		}).catch((err) => {
+			console.error("handleUpdateLesson error:", err);
+			return null;
+		});
 		if (saved) {
 			setLiveDraft(null);
 			setEditor({
@@ -874,10 +928,16 @@ export function CourseBuilderStep({
 		};
 	}, [editor, liveDraft]);
 
+	const activeEditorType: LessonType =
+		liveDraft?.type ||
+		(editor?.mode === "edit" ? editor.lesson.type : editor?.initialType) ||
+		"VIDEO";
+	const ActiveTypeIcon = LESSON_TYPE_ICONS[activeEditorType] || IconVideoPlus;
+
 	return (
 		<div
 			ref={containerRef}
-			className="relative flex min-h-0 flex-1 items-start gap-0 overflow-hidden"
+			className="relative flex min-h-0 flex-1 w-full h-full items-stretch gap-0 overflow-hidden"
 		>
 			{/* ===== 1. يمين: الهيكل (الأقسام والوحدات) — قابل لتعديل العرض ===== */}
 			<div
@@ -907,7 +967,7 @@ export function CourseBuilderStep({
 						<button
 							type="button"
 							onClick={handleAddUnit}
-							disabled={!courseId && !onEnsureCourseCreated}
+							disabled={!effectiveCourseId && !onEnsureCourseCreated}
 							className="flex h-[24px] items-center gap-1 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white px-2 text-[10px] font-medium text-[#08090A] hover:bg-[#FAFAFA] disabled:opacity-50 transition-colors"
 						>
 							<IconPlus className="size-3" />
@@ -920,7 +980,7 @@ export function CourseBuilderStep({
 				{isAddingSection && (
 					<div className="flex items-center gap-2 rounded-[4px] border border-[#6366F1] bg-white px-2.5 py-1.5 shadow-2xs shrink-0">
 						<input
-							autoFocus
+							ref={(el) => el?.focus()}
 							value={newSectionTitle}
 							onChange={(e) => setNewSectionTitle(e.target.value)}
 							maxLength={UNIT_NAME_MAX}
@@ -988,9 +1048,12 @@ export function CourseBuilderStep({
 							<Fragment key={unit.id}>
 								<UnitAccordion
 									unit={unit}
-									courseId={courseId as string}
 									courseName={course?.name ?? ""}
+									isSelected={activeUnitId === unit.id}
+									onSelect={() => setSelectedUnitId(unit.id)}
 									onDuplicate={() => handleDuplicateUnit(unit)}
+									onRenameUnit={renameUnit}
+									onRemoveLesson={removeLesson}
 									onDeleteUnit={handleDeleteUnit}
 									onAddLesson={handleOpenAddLesson}
 									onEditLesson={handleOpenEditLesson}
@@ -1016,48 +1079,69 @@ export function CourseBuilderStep({
 			/>
 
 			{/* ===== 2. وسط: محرر المحتوى والتابس + الغلاف — مرن يتسع تلقائياً ===== */}
-			<div className="flex min-h-0 min-w-[340px] flex-1 flex-col self-stretch overflow-hidden">
-				{/* الغلاف أعلى العمود الأوسط — مطابق للصورة 2 */}
+			<div className="flex min-h-0 min-w-[340px] flex-1 flex-col self-stretch overflow-y-auto bg-[#FBFBFC]">
+				{/* غلاف الدورة أعلى العمود الأوسط */}
 				<div
-					className="relative flex h-[135px] shrink-0 flex-col items-start justify-end overflow-hidden border-b border-[#E5E5E5] px-6 py-3"
+					className={cn(
+						"relative flex shrink-0 overflow-hidden border-b border-[#E5E5E5] px-5 transition-all duration-300",
+						editor ? "h-[46px] items-center py-2" : "h-[125px] items-end py-3",
+					)}
 					style={cover?.type === "color" ? { backgroundColor: cover.color } : undefined}
 				>
 					{cover?.type === "image" && (
 						<img
+							key={cover.url}
 							src={cover.url}
 							alt="غلاف الدورة"
 							className="absolute inset-0 size-full object-cover"
 						/>
 					)}
 					{!cover && <div className="absolute inset-0 bg-[#6366F1]/[0.38]" />}
-					<div className="relative">
+					<div className="relative z-10 flex items-center justify-between w-full">
 						<CoverPicker
 							value={course?.coverKey ?? null}
 							onChange={saveCover}
-							disabled={!courseId && !onEnsureCourseCreated}
-							triggerLabel={course?.coverKey ? "تغيير الغلاف" : "رفع غلاف"}
+							disabled={!effectiveCourseId && !onEnsureCourseCreated}
+							triggerLabel={course?.coverKey ? "تغيير الغلاف" : "رفع غلاف الدورة"}
 						/>
+						{editor && (
+							<span className="text-[10px] font-medium text-white/95 bg-black/40 px-2.5 py-0.5 rounded backdrop-blur-xs">
+								غلاف الدورة التدريبية
+							</span>
+						)}
 					</div>
 				</div>
-
-				{/* المحرر وأسفله النموذج أو الحالة الفارغة النظيفة */}
 				{editor ? (
-					<div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-						{/* شريط معلومات الدرس قيد التحرير */}
-						<div className="flex shrink-0 items-center justify-between border-b border-[#E5E5E5] px-4 py-2 bg-[#FAFAFA]/70">
-							<div className="flex flex-col gap-0.5">
-								<span className="text-[11px] font-bold text-[#08090A]">
-									{editor.mode === "add" ? "إضافة درس جديد" : "تعديل الدرس"}
+					<div className="flex min-h-0 flex-1 flex-col bg-white">
+						{/* شريط ترويسة محرر الدرس */}
+						<div className="sticky top-0 z-10 flex shrink-0 items-center justify-between border-b border-[#E5E5E5] px-4 py-2.5 bg-white shadow-2xs">
+							<div className="flex items-center gap-2">
+								<span className="flex size-7 items-center justify-center rounded-md bg-[#6366F1]/10 text-[#6366F1]">
+									<ActiveTypeIcon className="size-4" />
 								</span>
-								<span className="text-[10px] text-[#6B6B67]">القسم: {editor.unitTitle}</span>
+								<div className="flex flex-col">
+									<div className="flex items-center gap-1.5">
+										<span className="text-[12px] font-bold text-[#08090A]">
+											{editor.mode === "add" ? "إضافة درس جديد" : "تعديل بيانات الدرس"}
+										</span>
+										<span className="rounded bg-[#6366F1]/10 px-1.5 py-0.5 text-[9px] font-semibold text-[#6366F1]">
+											{LESSON_TYPE_AR_LABELS[activeEditorType] || "درس"}
+										</span>
+									</div>
+									<span className="text-[10px] text-[#6B6B67]">
+										القسم:{" "}
+										<span className="font-semibold text-[#08090A]">{editor.unitTitle}</span>
+									</span>
+								</div>
 							</div>
+
 							<div className="flex items-center gap-2">
 								{editor.mode === "edit" && (
 									<button
 										type="button"
 										onClick={handleDuplicateLesson}
 										disabled={isSavingLesson}
-										className="flex h-[22px] items-center gap-1 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white px-2 text-[10px] font-medium text-[#08090A] disabled:opacity-50 cursor-pointer"
+										className="flex h-[24px] items-center gap-1 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white px-2 text-[10px] font-medium text-[#08090A] hover:bg-[#FAFAFA] disabled:opacity-50 cursor-pointer"
 									>
 										<IconCopy className="size-3" />
 										استنساخ
@@ -1066,21 +1150,26 @@ export function CourseBuilderStep({
 								<button
 									type="button"
 									onClick={() => {
-										setEditor(null);
-										setLiveDraft(null);
+										if (editor.mode === "edit" && liveDraft) {
+											handleDiscardEdit(liveDraft);
+										} else {
+											setEditor(null);
+											setLiveDraft(null);
+										}
 									}}
-									className="flex size-5 items-center justify-center rounded text-[#9B9B9D] hover:text-[#08090A] cursor-pointer"
+									className="flex size-6 items-center justify-center rounded-md text-[#9B9B9D] hover:bg-[#FAFAFA] hover:text-[#08090A] cursor-pointer transition-colors"
 									aria-label="إغلاق المحرر"
 								>
-									<IconX className="size-3.5" />
+									<IconX className="size-4" />
 								</button>
 							</div>
 						</div>
 
 						{/* نموذج الدرس بالتابس والحقول */}
-						<div className="flex-1 overflow-y-auto px-4 py-3">
+						<div className="flex-1 px-5 py-4 pb-10">
 							{editor.mode === "add" ? (
 								<LessonForm
+									key={`add-${editor.unitId}-${editor.initialType ?? "default"}`}
 									onCancel={() => {
 										setEditor(null);
 										setLiveDraft(null);
@@ -1092,6 +1181,7 @@ export function CourseBuilderStep({
 								/>
 							) : (
 								<LessonForm
+									key={`edit-${editor.lesson.id}`}
 									lesson={editor.lesson}
 									unitTitle={editor.unitTitle}
 									isSaving={isSavingLesson}
@@ -1104,45 +1194,120 @@ export function CourseBuilderStep({
 						</div>
 					</div>
 				) : (
-					/* الحالة المركزية عند عدم اختيار درس: إضافة وحدة أولاً إن لم تكن هناك وحدات، ثم إضافة درس */
-					<div className="flex flex-1 flex-col items-center justify-center gap-3 p-8">
-						<div className="flex size-11 items-center justify-center rounded-full border border-[#E5E5E5] bg-[#FAFAFA]">
-							{units.length === 0 ? (
-								<IconStack2 className="size-5 text-[#9B9B9D]" />
-							) : (
-								<IconFileText className="size-5 text-[#9B9B9D]" />
-							)}
-						</div>
-						<div className="flex flex-col items-center gap-1">
-							<p className="text-center text-[12px] font-semibold text-[#08090A]">
-								{units.length === 0
-									? "ابدأ بإضافة أول وحدة للدورة"
-									: "ابدأ بإضافة درس جديد"}
-							</p>
-							<p className="text-center text-[10px] leading-5 text-[#6B6B67]">
-								{units.length === 0
-									? "أنشئ وحدة أو قسماً لتنظيم الدروس والمحتوى التعليمي بداخلها"
-									: `أضف درساً ومحتوى تعليمياً إلى "${units[0]?.title || "الوحدة 1"}"`}
-							</p>
-						</div>
+					/* الحالة المركزية عند عدم فتح محرر: مركز تفاعلي حديث وسهل جداً لإضافة المحتوى */
+					<div className="flex flex-1 flex-col items-center justify-center p-8 max-w-[620px] mx-auto text-center">
 						{units.length === 0 ? (
-							<Button
-								type="button"
-								onClick={() => setIsAddingSection(true)}
-								className="h-[30px] gap-1.5 rounded-[4px] px-3.5 text-[11px] font-semibold cursor-pointer"
-							>
-								<IconPlus className="size-3.5" />
-								إضافة أول وحدة للدورة
-							</Button>
+							<div className="flex flex-col items-center gap-4">
+								<div className="flex size-14 items-center justify-center rounded-full border border-dashed border-[#6366F1]/30 bg-[#6366F1]/5 shadow-2xs">
+									<IconStack2 className="size-7 text-[#6366F1]" />
+								</div>
+								<div className="flex flex-col items-center gap-1.5">
+									<h3 className="text-center text-[15px] font-bold text-[#08090A]">
+										ابدأ بإضافة أول وحدة للدورة
+									</h3>
+									<p className="text-center text-[12px] leading-5 text-[#6B6B67] max-w-[380px]">
+										أنشئ قسماً أو وحدة لتنظيم الدروس، الفيديوهات والاختبارات بداخلها.
+									</p>
+								</div>
+								<Button
+									type="button"
+									onClick={() => setIsAddingSection(true)}
+									className="h-[36px] gap-2 rounded-[6px] px-5 text-[12px] font-semibold cursor-pointer shadow-xs"
+								>
+									<IconPlus className="size-4" />
+									إضافة أول وحدة الآن
+								</Button>
+							</div>
 						) : (
-							<Button
-								type="button"
-								onClick={handleCreateFirstLesson}
-								className="h-[30px] gap-1.5 rounded-[4px] px-3.5 text-[11px] font-semibold cursor-pointer"
-							>
-								<IconPlus className="size-3.5" />
-								إضافة درس جديد
-							</Button>
+							<div className="flex flex-col items-center gap-6 w-full">
+								<div className="flex flex-col items-center gap-2">
+									<div className="flex size-12 items-center justify-center rounded-xl border border-[#6366F1]/20 bg-[#6366F1]/10 text-[#6366F1] shadow-2xs">
+										<IconSparkles className="size-6" />
+									</div>
+									<h3 className="text-[15px] font-bold text-[#08090A]">
+										إضافة محتوى تعليمي إلى "{activeUnit?.title || units[0]?.title}"
+									</h3>
+									<p className="text-[12px] leading-5 text-[#6B6B67] max-w-[420px]">
+										اختر نوع الدرس الذي تريد إعداده لفتح المحرر وضبط تفاصيله مباشرة:
+									</p>
+								</div>
+
+								{/* شبكة خيارات سريعة لإضافة المحتوى مباشرة بنقرة واحدة */}
+								<div className="grid grid-cols-2 gap-3 w-full">
+									{[
+										{
+											type: "VIDEO" as LessonType,
+											title: "درس فيديو",
+											desc: "رفع ملف فيديو أو رابط YouTube / Vimeo",
+											icon: IconVideoPlus,
+											badge: "مرئي",
+											color:
+												"text-blue-600 bg-blue-50 border-blue-200 group-hover:border-blue-400",
+										},
+										{
+											type: "QUIZ" as LessonType,
+											title: "تقييم واختبار",
+											desc: "أسئلة تفاعلية وخيارات لقياس الفهم",
+											icon: IconFileCheck,
+											badge: "تفاعلي",
+											color:
+												"text-indigo-600 bg-indigo-50 border-indigo-200 group-hover:border-indigo-400",
+										},
+										{
+											type: "TEXT" as LessonType,
+											title: "شرح ومحتوى نصي",
+											desc: "كتابة مقال أو ملخص تعليمي منسق",
+											icon: IconAlignRight,
+											badge: "قراءة ومقال",
+											color:
+												"text-emerald-600 bg-emerald-50 border-emerald-200 group-hover:border-emerald-400",
+										},
+										{
+											type: "DOCUMENT" as LessonType,
+											title: "مستند وملف مرفق",
+											desc: "ملفات PDF وعروض توضيحية ومراجع",
+											icon: IconFileDiff,
+											badge: "ملفات ومراجع",
+											color:
+												"text-amber-600 bg-amber-50 border-amber-200 group-hover:border-amber-400",
+										},
+									].map((item) => (
+										<button
+											key={item.type}
+											type="button"
+											onClick={() => {
+												const targetUnit = activeUnit || units[0];
+												if (targetUnit) {
+													handleOpenAddLesson(targetUnit.id, targetUnit.title, item.type);
+												}
+											}}
+											className="flex items-start gap-3 rounded-[8px] border border-[#E5E5E5] bg-white p-3.5 text-right hover:border-[#6366F1] hover:bg-[#6366F1]/5 hover:shadow-xs transition-all cursor-pointer group"
+										>
+											<div
+												className={cn(
+													"flex size-9 shrink-0 items-center justify-center rounded-[6px] border transition-transform group-hover:scale-105",
+													item.color,
+												)}
+											>
+												<item.icon className="size-5" />
+											</div>
+											<div className="flex flex-col min-w-0 flex-1">
+												<div className="flex items-center justify-between gap-1 mb-0.5">
+													<span className="text-[12px] font-bold text-[#08090A] group-hover:text-[#4F46E5] transition-colors">
+														{item.title}
+													</span>
+													<span className="text-[9px] text-[#9B9B9D] font-medium">
+														{item.badge}
+													</span>
+												</div>
+												<span className="text-[10px] text-[#6B6B67] leading-4 line-clamp-2">
+													{item.desc}
+												</span>
+											</div>
+										</button>
+									))}
+								</div>
+							</div>
 						)}
 					</div>
 				)}
