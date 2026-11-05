@@ -12,6 +12,7 @@ import {
 import { IconFileTextSpark, IconInfoCircle, IconPlus } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { ChangesBadge } from "@/components/common/changes-badge";
 import { Button } from "@/components/ui/button";
 import { Field, FieldError } from "@/components/ui/field";
@@ -23,6 +24,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { MediaUploadField } from "@/features/services/training/components/media-upload-field";
 import { QuizBuilder } from "@/features/services/training/components/quiz-builder";
@@ -54,6 +56,20 @@ const MEDIA_NOUN: Partial<Record<LessonType, string>> = {
 const DURATION_LABEL: Partial<Record<LessonType, string>> = {
 	VIDEO: "المدة الزمنيه للفيديو",
 	AUDIO: "المدة الزمنيه للصوت",
+};
+
+const FIELD_LABELS: Record<string, string> = {
+	title: "اسم الدرس",
+	type: "نوع الدرس",
+	description: "الوصف",
+	mediaSource: "مصدر الوسيط",
+	mediaKey: "الملف",
+	mediaUrl: "رابط الملف",
+	content: "محتوى الدرس",
+	hours: "الساعات",
+	minutes: "الدقائق",
+	seconds: "الثواني",
+	questions: "أسئلة الاختبار",
 };
 
 // تسمية الحقل — في RTL: النص ← «مطلوب» ← أيقونة المعلومات
@@ -110,6 +126,7 @@ export function LessonForm({
 	const [confirmingDiscard, setConfirmingDiscard] = useState(false);
 	const [fileName, setFileName] = useState(fileNameFromKey(lesson?.mediaKey));
 	const { upload, reset: resetUpload, progress, isUploading } = useUploadMedia();
+	const busy = isSaving || isUploading;
 
 	const {
 		register,
@@ -175,29 +192,36 @@ export function LessonForm({
 	const type = watch("type");
 	const mediaSource = watch("mediaSource");
 	const questions = watch("questions") ?? [];
-	const title = watch("title");
-
-	// «حفظ الاختبار» لا يُفعَّل إلا باكتمال المطلوب: عنوان + سؤال واحد على الأقل
-	// نصّه مكتوب، وخيارات مكتوبة لكل سؤال ليس من نوع «نص»
-	const quizReady =
-		!!title?.trim() &&
-		questions.length > 0 &&
-		questions.every(
-			(question) =>
-				!!question.text?.trim() &&
-				(question.answerType === "TEXT" ||
-					((question.options?.length ?? 0) > 0 &&
-						(question.options ?? []).every((option) => !!option.text?.trim()))),
-		);
 
 	// أول سؤال يبدأ بخيار واحد محدَّد كإجابة صحيحة
 	const addFirstQuestion = () =>
-		setValue("questions", [
-			{ text: "", answerType: "SINGLE", options: [{ text: "", correct: true }] },
-		]);
+		setValue(
+			"questions",
+			[{ text: "", answerType: "SINGLE", options: [{ text: "", correct: true }] }],
+			{ shouldDirty: true, shouldValidate: true },
+		);
 
 	const needsMedia = MEDIA_LESSON_TYPES.includes(type);
 	const showDuration = type === "VIDEO" || type === "AUDIO";
+
+	// في وضع التعديل التسميات تتبع نوع المادة نفسها («عنوان الملف»، «وصف الصوت»...)
+	const mediaNoun = MEDIA_NOUN[type];
+	const titleLabel = isEditing && mediaNoun ? "عنوان الملف" : "اسم الدرس";
+	const sourceLabel =
+		isEditing && mediaNoun ? `مصدر ملف ${mediaNoun}` : (SOURCE_LABEL[type] ?? "مصدر الملف");
+	const descriptionLabel =
+		type === "QUIZ"
+			? "وصف التقييم"
+			: isEditing && mediaNoun
+				? `وصف ${mediaNoun}`
+				: "وصف الدرس";
+
+	const fieldLabels: Record<string, string> = {
+		...FIELD_LABELS,
+		title: titleLabel,
+		mediaSource: sourceLabel,
+		description: descriptionLabel,
+	};
 
 	// يرفع الملف إلى S3 مع تتبّع التقدّم ثم يخزّن المفتاح في النموذج
 	const handleFile = async (file: File | undefined) => {
@@ -205,11 +229,11 @@ export function LessonForm({
 		setFileName(file.name);
 		try {
 			const uploaded = await upload(file);
-			setValue("mediaKey", uploaded.key, { shouldValidate: true });
+			setValue("mediaKey", uploaded.key, { shouldDirty: true, shouldValidate: true });
 		} catch {
 			// الإلغاء أو الفشل يعيد الحقل لحالته الفارغة
 			setFileName("");
-			setValue("mediaKey", undefined, { shouldValidate: true });
+			setValue("mediaKey", undefined, { shouldDirty: true, shouldValidate: true });
 		}
 	};
 
@@ -217,35 +241,33 @@ export function LessonForm({
 	const clearFile = () => {
 		resetUpload();
 		setFileName("");
-		setValue("mediaKey", undefined, { shouldValidate: true });
+		setValue("mediaKey", undefined, { shouldDirty: true, shouldValidate: true });
 	};
 
-	const submit = handleSubmit((values) => onSave(values));
+	const changedFields = Object.keys(dirtyFields).map((key) => fieldLabels[key] ?? key);
 
-	const busy = isSaving || isUploading;
+	const executeSubmit = handleSubmit(
+		(values) => onSave(values),
+		(validationErrors) => {
+			console.error("LessonForm validation errors:", validationErrors);
+			const firstKey = Object.keys(validationErrors)[0] as keyof typeof validationErrors;
+			const firstError = validationErrors[firstKey];
+			const rootMsg = (firstError as { root?: { message?: string } })?.root?.message;
+			const message =
+				firstError?.message ||
+				rootMsg ||
+				`يرجى التحقق من حقل: ${fieldLabels[firstKey] ?? String(firstKey)}`;
+			toast.error(String(message));
+		},
+	);
 
-	// في وضع التعديل التسميات تتبع نوع المادة نفسها («عنوان الملف»، «وصف الصوت»...)
-	const mediaNoun = MEDIA_NOUN[type];
-	const titleLabel = isEditing && mediaNoun ? "عنوان الملف" : "اسم الدرس";
-	const sourceLabel =
-		isEditing && mediaNoun ? `مصدر ملف ${mediaNoun}` : (SOURCE_LABEL[type] ?? "مصدر الملف");
-	const descriptionLabel = isEditing && mediaNoun ? `وصف ${mediaNoun}` : "وصف الدرس";
-
-	// أسماء عربية للحقول المعدّلة تُعرض في حوار «بيانات غير محفوظة»
-	const FIELD_LABELS: Record<string, string> = {
-		title: titleLabel,
-		type: "نوع المادة",
-		mediaSource: sourceLabel,
-		mediaKey: MEDIA_LABEL[type] ?? "الملف",
-		mediaUrl: "رابط الملف",
-		content: "محتوى الدرس",
-		description: descriptionLabel,
-		hours: "المدة (ساعات)",
-		minutes: "المدة (دقائق)",
-		seconds: "المدة (ثوانٍ)",
-		questions: "أسئلة التقييم",
+	const submit = () => {
+		if (isEditing && editCount === 0) {
+			toast.info("لم تقم بإجراء أي تغييرات على الدرس لحفظها");
+			return;
+		}
+		return executeSubmit();
 	};
-	const changedFields = Object.keys(dirtyFields).map((key) => FIELD_LABELS[key] ?? key);
 
 	// الخروج من التعديل يمرّ بتأكيد إن كانت هناك تغييرات غير محفوظة
 	const handleCancel = () => {
@@ -492,7 +514,7 @@ export function LessonForm({
 				</Field>
 
 				{/* 5. أزرار البطاقة — في RTL: إلغاء يمين، حفظ الدرس يسار */}
-				<div className="flex items-center justify-between border-t border-[#E5E5E5] px-1 pt-[9px]">
+				<div className="sticky bottom-0 z-20 -mx-3 -mb-3 flex items-center justify-between border-t border-[#E5E5E5] bg-white px-3 py-2.5 shadow-[0_-2px_10px_rgba(0,0,0,0.06)] rounded-b-[4px]">
 					<Button
 						type="button"
 						variant="outline"
@@ -505,19 +527,20 @@ export function LessonForm({
 					<Button
 						type="button"
 						onClick={submit}
-						disabled={
-							busy ||
-							(type === "QUIZ" ? !quizReady : false) ||
-							(isEditing && editCount === 0)
-						}
+						disabled={busy}
 						className={cn(
-							"h-[28px] rounded-[4px] px-3.5 text-[11px] font-semibold text-white cursor-pointer",
-							type === "QUIZ" && !quizReady
-								? "bg-[#4F6AE0]/[0.41] disabled:opacity-100"
-								: "bg-[#4F6AE0] hover:bg-[#4F6AE0]/90",
+							"h-[28px] rounded-[4px] px-3.5 text-[11px] font-semibold text-white cursor-pointer bg-[#4F6AE0] hover:bg-[#4F6AE0]/90 transition-all",
+							isEditing && editCount === 0 && "opacity-60",
 						)}
 					>
-						{saveLabel}
+						{busy ? (
+							<span className="flex items-center gap-1.5">
+								<Spinner className="size-3.5" />
+								<span>جارٍ الحفظ...</span>
+							</span>
+						) : (
+							saveLabel
+						)}
 					</Button>
 				</div>
 			</div>

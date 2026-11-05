@@ -946,15 +946,17 @@ export function CourseDialog({
 				<DialogContent
 					showCloseButton={false}
 					className={cn(
-						"p-0 gap-0 overflow-hidden border border-border shadow-2xl transition-all duration-300 max-h-[92vh] flex flex-col",
-						// يتمدد إلى العرض الكامل في الخطوة الثانية (باني المحتوى الكبير)
+						"p-0 gap-0 overflow-hidden border border-border shadow-2xl transition-all duration-300 flex flex-col",
+						// يتمدد إلى العرض والارتفاع الكامل في الخطوة الثانية (باني المحتوى الكبير)
 						step === 2
-							? "sm:max-w-[96vw]! md:max-w-[1574px]! h-[92vh]"
+							? isExpanded
+								? "w-[99vw] max-w-[99vw] sm:max-w-[99vw] h-[99vh] max-h-[99vh] rounded-none"
+								: "w-[98vw] max-w-[98vw] sm:max-w-[98vw] md:max-w-[1720px] h-[98vh] max-h-[98vh]"
 							: step === 3 || step === 4
-								? "sm:max-w-[840px]! h-[92vh]"
+								? "w-[90vw] max-w-[860px] sm:max-w-[860px] h-[95vh] max-h-[95vh]"
 								: isExpanded
-									? "sm:max-w-[94vw] h-[92vh]"
-									: "sm:max-w-2xl md:max-w-3xl",
+									? "w-[96vw] max-w-[96vw] sm:max-w-[96vw] h-[96vh] max-h-[96vh]"
+									: "w-[90vw] max-w-2xl sm:max-w-2xl md:max-w-3xl max-h-[95vh]",
 					)}
 					onInteractOutside={(e) => {
 						if (isStaffSheetOpen || isAiSheetOpen) {
@@ -982,7 +984,7 @@ export function CourseDialog({
 						}
 					}}
 				>
-					<div className="flex flex-col w-full items-stretch overflow-hidden h-full max-h-[92vh]">
+					<div className="flex flex-col w-full items-stretch overflow-hidden h-full max-h-[97vh]">
 						{/* 1. الترويسة الموحدة */}
 						<FormHeader
 							variant="dialog"
@@ -1833,7 +1835,7 @@ export function CourseDialog({
 						{/* الخطوة 2: باني محتوى الدورة والدروس الكبير (CourseBuilderStep) */}
 						{step === 2 && (
 							<div className="flex flex-col flex-1 min-h-0 overflow-hidden bg-background">
-								<div className="flex-1 min-h-0 overflow-hidden">
+								<div className="flex-1 min-h-0 overflow-hidden flex flex-col">
 									<CourseBuilderStep
 										courseId={activeCourseId}
 										onGenerateAI={() => setIsAiSheetOpen(true)}

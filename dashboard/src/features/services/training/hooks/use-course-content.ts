@@ -24,6 +24,21 @@ const SAVED_LABELS: Partial<Record<LessonType, string>> = {
 };
 const savedLabel = (type: LessonType) => SAVED_LABELS[type] ?? "الدرس";
 
+function extractErrorMessage(error: unknown, fallback: string): string {
+	if (!error) return fallback;
+	if (typeof error === "string") return error;
+	const errObj = error as { value?: unknown; message?: string };
+	if (typeof errObj.value === "string") return errObj.value;
+	if (errObj.value && typeof errObj.value === "object") {
+		const val = errObj.value as { message?: string; summary?: string; error?: string };
+		if (val.message) return String(val.message);
+		if (val.summary) return String(val.summary);
+		if (val.error) return String(val.error);
+	}
+	if (errObj.message) return String(errObj.message);
+	return fallback;
+}
+
 // كل عمليات الوحدات/الدروس تُبطل كاش الدورة الواحدة لإعادة جلب الشجرة
 export const useCourseContent = (courseId: string | null) => {
 	const qc = useQueryClient();
@@ -98,7 +113,19 @@ export const useCourseContent = (courseId: string | null) => {
 			if (error) throw new Error("تعذّر تحديث البطاقة");
 			return res;
 		},
-		onSuccess: invalidate,
+		onSuccess: (_res, variables) => {
+			qc.setQueriesData(
+				{ queryKey: ["training", "course"] },
+				(old: CourseDetailResponse | undefined) => {
+					if (!old?.units) return old;
+					return {
+						...old,
+						units: old.units.map((u) => (u.id === variables.id ? { ...u, ...variables } : u)),
+					};
+				},
+			);
+			invalidate();
+		},
 	});
 
 	const renameUnit = useMutation({
@@ -126,11 +153,26 @@ export const useCourseContent = (courseId: string | null) => {
 
 	const duplicateUnit = useMutation({
 		mutationFn: async (id: string) => {
-			const { data, error } = await api.training.units({ id }).duplicate.post();
+			const { data, error } = await api.training.units({ id }).duplicate.post({});
 			if (error) throw new Error("تعذّر نسخ الوحدة");
 			return data as UnitResponse;
 		},
-		onSuccess: invalidate,
+		onSuccess: (data) => {
+			if (data) {
+				qc.setQueriesData(
+					{ queryKey: ["training", "course"] },
+					(old: CourseDetailResponse | undefined) => {
+						if (!old?.units) return old;
+						if (old.units.some((u) => u.id === data.id)) return old;
+						return {
+							...old,
+							units: [...old.units, data],
+						};
+					},
+				);
+			}
+			invalidate(data?.courseId);
+		},
 	});
 
 	const removeUnit = useMutation({
@@ -158,7 +200,10 @@ export const useCourseContent = (courseId: string | null) => {
 	const addLesson = useMutation({
 		mutationFn: async (input: CreateLessonPayload) => {
 			const { data, error } = await api.training.lessons.post(input);
-			if (error) throw new Error("تعذّر حفظ الدرس");
+			if (error) {
+				console.error("addLesson error:", error);
+				throw new Error(extractErrorMessage(error, "تعذّر حفظ الدرس"));
+			}
 			return data as LessonResponse;
 		},
 		onSuccess: (data) => {
@@ -189,7 +234,10 @@ export const useCourseContent = (courseId: string | null) => {
 	const updateLesson = useMutation({
 		mutationFn: async ({ id, ...input }: UpdateLessonPayload & { id: string }) => {
 			const { data, error } = await api.training.lessons({ id }).patch(input);
-			if (error) throw new Error("تعذّر حفظ التعديلات");
+			if (error) {
+				console.error("updateLesson error:", error);
+				throw new Error(extractErrorMessage(error, "تعذّر حفظ التعديلات"));
+			}
 			return data as LessonResponse;
 		},
 		onSuccess: (data) => {

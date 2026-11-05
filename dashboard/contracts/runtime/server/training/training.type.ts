@@ -124,9 +124,21 @@ export const createLessonSchema = z
 		mediaKey: z.string().optional(),
 		mediaUrl: z.string().optional(),
 		content: z.string().optional(),
-		hours: z.coerce.number().int().min(0).max(99).optional(),
-		minutes: z.coerce.number().int().min(0).max(59).optional(),
-		seconds: z.coerce.number().int().min(0).max(59).optional(),
+		hours: z
+			.preprocess(
+				(v) => (v === "" || v === null || v === undefined || Number.isNaN(Number(v)) ? undefined : Number(v)),
+				z.number().int().min(0).max(99).optional(),
+			),
+		minutes: z
+			.preprocess(
+				(v) => (v === "" || v === null || v === undefined || Number.isNaN(Number(v)) ? undefined : Number(v)),
+				z.number().int().min(0).max(59).optional(),
+			),
+		seconds: z
+			.preprocess(
+				(v) => (v === "" || v === null || v === undefined || Number.isNaN(Number(v)) ? undefined : Number(v)),
+				z.number().int().min(0).max(59).optional(),
+			),
 		// أسئلة الاختبار — تُستخدم لنوع QUIZ فقط وتُسلسَل إلى content عند الحفظ
 		questions: z.array(quizQuestionSchema).optional().default([]),
 	})
@@ -146,7 +158,15 @@ export const createLessonSchema = z
 	// أسئلة وخيارات الاختبار لا تُلزَم إلا حين يكون الدرس من نوع QUIZ
 	.superRefine((v, ctx) => {
 		if (v.type !== "QUIZ") return;
-		v.questions?.forEach((question, i) => {
+		if (!v.questions || v.questions.length === 0) {
+			ctx.addIssue({
+				code: "custom",
+				message: "يرجى إضافة سؤال واحد على الأقل للتقييم",
+				path: ["questions"],
+			});
+			return;
+		}
+		v.questions.forEach((question, i) => {
 			if (!question.text.trim())
 				ctx.addIssue({
 					code: "custom",
@@ -154,7 +174,15 @@ export const createLessonSchema = z
 					path: ["questions", i, "text"],
 				});
 			if (question.answerType === "TEXT") return;
-			question.options?.forEach((option, j) => {
+			if (!question.options || question.options.length === 0) {
+				ctx.addIssue({
+					code: "custom",
+					message: "يرجى إضافة خيار واحد على الأقل للسؤال",
+					path: ["questions", i, "options"],
+				});
+				return;
+			}
+			question.options.forEach((option, j) => {
 				if (!option.text.trim())
 					ctx.addIssue({
 						code: "custom",
