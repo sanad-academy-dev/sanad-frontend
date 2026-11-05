@@ -107,7 +107,21 @@ export const useCourseContent = (courseId: string | null) => {
 			if (error) throw new Error("تعذّر تعديل اسم الوحدة");
 			return data;
 		},
-		onSuccess: invalidate,
+		onSuccess: (_data, variables) => {
+			qc.setQueriesData(
+				{ queryKey: ["training", "course"] },
+				(old: CourseDetailResponse | undefined) => {
+					if (!old?.units) return old;
+					return {
+						...old,
+						units: old.units.map((u) =>
+							u.id === variables.id ? { ...u, title: variables.title } : u,
+						),
+					};
+				},
+			);
+			invalidate();
+		},
 	});
 
 	const duplicateUnit = useMutation({
@@ -124,8 +138,21 @@ export const useCourseContent = (courseId: string | null) => {
 			const { error } = await api.training.units({ id }).delete();
 			// 404 يعني أنها محذوفة أصلًا — النتيجة المطلوبة متحقّقة فلا نعتبره فشلًا
 			if (error && error.status !== 404) throw new Error("تعذّر حذف الوحدة");
+			return id;
 		},
-		onSuccess: invalidate,
+		onSuccess: (_data, deletedId) => {
+			qc.setQueriesData(
+				{ queryKey: ["training", "course"] },
+				(old: CourseDetailResponse | undefined) => {
+					if (!old?.units) return old;
+					return {
+						...old,
+						units: old.units.filter((u) => u.id !== deletedId),
+					};
+				},
+			);
+			invalidate();
+		},
 	});
 
 	const addLesson = useMutation({
@@ -139,7 +166,7 @@ export const useCourseContent = (courseId: string | null) => {
 				qc.setQueriesData(
 					{ queryKey: ["training", "course"] },
 					(old: CourseDetailResponse | undefined) => {
-						if (!old || !old.units) return old;
+						if (!old?.units) return old;
 						return {
 							...old,
 							units: old.units.map((u) => {
@@ -170,7 +197,7 @@ export const useCourseContent = (courseId: string | null) => {
 				qc.setQueriesData(
 					{ queryKey: ["training", "course"] },
 					(old: CourseDetailResponse | undefined) => {
-						if (!old || !old.units) return old;
+						if (!old?.units) return old;
 						return {
 							...old,
 							units: old.units.map((u) => {
@@ -187,15 +214,30 @@ export const useCourseContent = (courseId: string | null) => {
 			invalidate();
 		},
 	});
-	});
 
 	const removeLesson = useMutation({
 		mutationFn: async (id: string) => {
 			const { error } = await api.training.lessons({ id }).delete();
 			// 404 يعني أنه محذوف أصلًا — النتيجة المطلوبة متحقّقة
 			if (error && error.status !== 404) throw new Error("تعذّر حذف الدرس");
+			return id;
 		},
-		onSuccess: invalidate,
+		onSuccess: (_data, deletedLessonId) => {
+			qc.setQueriesData(
+				{ queryKey: ["training", "course"] },
+				(old: CourseDetailResponse | undefined) => {
+					if (!old?.units) return old;
+					return {
+						...old,
+						units: old.units.map((u) => ({
+							...u,
+							lessons: (u.lessons || []).filter((l) => l.id !== deletedLessonId),
+						})),
+					};
+				},
+			);
+			invalidate();
+		},
 	});
 
 	return {

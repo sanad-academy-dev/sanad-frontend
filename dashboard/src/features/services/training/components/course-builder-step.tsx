@@ -1,32 +1,23 @@
 import {
-	IconAlignRight,
 	IconArrowsHorizontal,
-	IconBuildingBank,
 	IconCheck,
-	IconCheckbox,
 	IconChevronDown,
 	IconCopy,
 	IconDots,
 	IconEye,
-	IconFileCheck,
-	IconFileDiff,
 	IconFileText,
-	IconFileTextSpark,
 	IconFocusCentered,
 	IconGripVertical,
-	IconInfoCircle,
-	IconMicrophone,
 	IconPencil,
 	IconPlus,
-	IconSchool,
 	IconSparkles,
 	IconStack2,
 	IconTrash,
-	IconVideoPlus,
 	IconX,
 } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 import { showUndoToast } from "@/components/common/undo-toast";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,7 +46,6 @@ import type {
 	LessonType,
 	UnitResponse,
 } from "@/server/training/training.type";
-import { toast } from "sonner";
 
 const UNIT_NAME_MAX = 60;
 
@@ -243,18 +233,20 @@ function UnitCopyingSkeleton({ unit }: { unit: UnitResponse }) {
 // أكورديون وحدة واحدة — يرفع أحداث اختيار/إضافة الدرس للمحرر المركزي
 function UnitAccordion({
 	unit,
-	courseId,
 	courseName,
 	onDuplicate,
+	onRenameUnit,
+	onRemoveLesson,
 	onAddLesson,
 	onEditLesson,
 	onDeleteUnit,
 	activeEditorLessonId,
 }: {
 	unit: UnitResponse;
-	courseId: string;
 	courseName: string;
 	onDuplicate: () => void;
+	onRenameUnit: (unitId: string, title: string) => void;
+	onRemoveLesson: (lesson: LessonResponse) => void;
 	onAddLesson: (unitId: string, unitTitle: string) => void;
 	onEditLesson: (lesson: LessonResponse, unitTitle: string, unitId: string) => void;
 	onDeleteUnit: (unit: UnitResponse) => void;
@@ -265,11 +257,10 @@ function UnitAccordion({
 	const [title, setTitle] = useState(unit.title);
 	const [confirmingDelete, setConfirmingDelete] = useState(false);
 	const [deletingLesson, setDeletingLesson] = useState<LessonResponse | null>(null);
-	const { renameUnit, removeLesson } = useCourseContent(courseId);
 
 	const commitRename = () => {
 		setEditingName(false);
-		if (title.trim() && title !== unit.title) renameUnit(unit.id, title.trim());
+		if (title.trim() && title !== unit.title) onRenameUnit(unit.id, title.trim());
 		else setTitle(unit.title);
 	};
 
@@ -363,7 +354,10 @@ function UnitAccordion({
 					onOpenChange={(next) => {
 						if (!next) setDeletingLesson(null);
 					}}
-					onConfirm={() => removeLesson(deletingLesson)}
+					onConfirm={() => {
+						onRemoveLesson(deletingLesson);
+						setDeletingLesson(null);
+					}}
 				/>
 			)}
 
@@ -478,8 +472,16 @@ export function CourseBuilderStep({
 
 	const effectiveCourseId = courseId || internalCourseId;
 	const { course, isLoading } = useCourse(effectiveCourseId);
-	const { addUnit, duplicateUnit, removeUnit, addLesson, updateLesson, isSavingLesson } =
-		useCourseContent(effectiveCourseId);
+	const {
+		addUnit,
+		duplicateUnit,
+		removeUnit,
+		addLesson,
+		updateLesson,
+		removeLesson,
+		renameUnit,
+		isSavingLesson,
+	} = useCourseContent(effectiveCourseId);
 	const [copyingUnitId, setCopyingUnitId] = useState<string | null>(null);
 	// إضافة قسم جديد عبر الإدخال المباشر
 	const [isAddingSection, setIsAddingSection] = useState(false);
@@ -929,7 +931,7 @@ export function CourseBuilderStep({
 				{isAddingSection && (
 					<div className="flex items-center gap-2 rounded-[4px] border border-[#6366F1] bg-white px-2.5 py-1.5 shadow-2xs shrink-0">
 						<input
-							autoFocus
+							ref={(el) => el?.focus()}
 							value={newSectionTitle}
 							onChange={(e) => setNewSectionTitle(e.target.value)}
 							maxLength={UNIT_NAME_MAX}
@@ -997,9 +999,10 @@ export function CourseBuilderStep({
 							<Fragment key={unit.id}>
 								<UnitAccordion
 									unit={unit}
-									courseId={(effectiveCourseId || courseId) as string}
 									courseName={course?.name ?? ""}
 									onDuplicate={() => handleDuplicateUnit(unit)}
+									onRenameUnit={renameUnit}
+									onRemoveLesson={removeLesson}
 									onDeleteUnit={handleDeleteUnit}
 									onAddLesson={handleOpenAddLesson}
 									onEditLesson={handleOpenEditLesson}
@@ -1124,9 +1127,7 @@ export function CourseBuilderStep({
 						</div>
 						<div className="flex flex-col items-center gap-1">
 							<p className="text-center text-[12px] font-semibold text-[#08090A]">
-								{units.length === 0
-									? "ابدأ بإضافة أول وحدة للدورة"
-									: "ابدأ بإضافة درس جديد"}
+								{units.length === 0 ? "ابدأ بإضافة أول وحدة للدورة" : "ابدأ بإضافة درس جديد"}
 							</p>
 							<p className="text-center text-[10px] leading-5 text-[#6B6B67]">
 								{units.length === 0
