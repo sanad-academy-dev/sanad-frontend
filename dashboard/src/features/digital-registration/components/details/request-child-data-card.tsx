@@ -10,6 +10,9 @@ import {
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
+import { formatAppointmentDate, formatAppointmentTime, DEFAULT_CLINIC_TIMEZONE } from "../../utils/date-format";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -70,7 +73,7 @@ function computeAgeLabel(birthDate?: string | null, fallbackAge?: string | null)
 			return `${months} شهر`;
 		}
 	}
-	return "3 سنوات";
+	return "غير محدد";
 }
 
 export function RequestChildDataCard({
@@ -114,18 +117,59 @@ export function RequestChildDataCard({
 
 	const attendanceProbability = request.attendanceProbability ?? 92;
 
+	// مؤشرات الحالة المنطقية
+	const status = request.status;
+	const isQueue = status === "QUEUE";
+	const isShortlist = status === "SHORTLIST" || status === "REVIEW";
+	const isInterview = status === "INTERVIEW" || status === "IN_EVALUATION" || status === "EVALUATION";
+	const isWaitlist = status === "WAITLIST";
+	const isAwaitingPayment = status === "AWAITING_PAYMENT";
+	const isAccepted = status === "ACCEPTED";
+	const isRejected = status === "REJECTED";
+	const isDuplicate = status === "DUPLICATE";
+
+	const hasAppointment = Boolean(
+		request.appointmentDate ||
+		(request.assessmentAppointment && request.assessmentAppointment.status !== "CANCELLED")
+	);
+
 	// Date formatters
-	const birthDateFormatted = request.birthDate
-		? new Date(request.birthDate).toLocaleDateString("ar-SA", {
-				year: "numeric",
-				month: "long",
-				day: "numeric",
-		  })
-		: "1 يناير 2023";
+	const birthDateFormatted = (() => {
+		if (!request.birthDate) return "غير محدد";
+		const d = new Date(request.birthDate);
+		if (isNaN(d.getTime())) return "غير محدد";
+		return new Intl.DateTimeFormat("ar-EG-u-nu-latn", {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+		}).format(d);
+	})();
+
+	const shiftLabel = request.preferredShift
+		? request.preferredShift === "MORNING"
+			? "صباحي"
+			: request.preferredShift === "EVENING"
+			? "مسائي"
+			: request.preferredShift
+		: null;
+	const learningModeLabel = request.learningMode
+		? request.learningMode === "IN_PERSON"
+			? "حضوري"
+			: request.learningMode === "REMOTE"
+			? "عن بعد"
+			: request.learningMode === "HYBRID"
+			? "مدمج"
+			: request.learningMode
+		: null;
+	const studyPeriodDisplay =
+		[shiftLabel, learningModeLabel].filter(Boolean).join(" • ") || "غير محدد";
+
+	const { clinicInfo } = useClinicInfo();
+	const clinicTimezone = clinicInfo?.timezone || DEFAULT_CLINIC_TIMEZONE;
 
 	const appointmentTimeFormatted = request.appointmentDate
-		? `${new Date(request.appointmentDate).toLocaleDateString("ar-SA", { month: "short", day: "numeric" })} • ${new Date(request.appointmentDate).toLocaleTimeString("ar-SA", { hour: "2-digit", minute: "2-digit" })}`
-		: "اليوم • 10:00 ص";
+		? `${formatAppointmentDate(request.appointmentDate, clinicTimezone, "ar-EG-u-nu-latn", { month: "short", day: "numeric", weekday: undefined, year: undefined })} • ${formatAppointmentTime(request.appointmentDate, clinicTimezone, "ar-EG-u-nu-latn")}`
+		: "لم يُحدد بعد";
 
 	// Allergies list
 	const allergies: string[] = Array.isArray(request.allergiesList) && request.allergiesList.length > 0
@@ -287,7 +331,7 @@ export function RequestChildDataCard({
 			</h3>
 
 			{/* البوكس الموحد الكبير الشامل من الاسم حتى الاشتراك */}
-			<div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 space-y-4 shadow-2xs">
+			<div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 py-4 px-[13px] space-y-4 shadow-2xs">
 				{/* 1. السطر الأول: الاسم والعمر */}
 				<div className="flex items-center gap-2 min-w-0">
 					<div className="size-6.5 rounded-full bg-[#4F46E5] text-white flex items-center justify-center font-bold text-[11px] shrink-0 select-none">
@@ -306,22 +350,24 @@ export function RequestChildDataCard({
 					</span>
 				</div>
 
-				{/* 2. بانر احتمال حضور المقابلة */}
-				<div className="flex items-center justify-between gap-2 rounded-md bg-[#EEF2FF] dark:bg-indigo-950/40 border border-[#E0E7FF] dark:border-indigo-900/40 px-3 py-1.5 text-xs">
-					<div className="flex items-center gap-1.5 font-medium text-[#4F46E5] dark:text-indigo-300">
-						<IconSparkles className="size-3.5 text-[#6366F1] shrink-0" />
-						<span>احتمال حضور المقابلة: {attendanceProbability}% (تقدير آلي).</span>
+				{/* 2. بانر احتمال حضور المقابلة - يظهر فقط في مرحلة المقابلة إذا كان هناك موعد محدد */}
+				{isInterview && hasAppointment && (
+					<div className="flex items-center justify-between gap-2 rounded-md bg-[#EEF2FF] dark:bg-indigo-950/40 border border-[#E0E7FF] dark:border-indigo-900/40 px-3 py-1.5 text-xs">
+						<div className="flex items-center gap-1.5 font-medium text-[#4F46E5] dark:text-indigo-300">
+							<IconSparkles className="size-3.5 text-[#6366F1] shrink-0" />
+							<span>احتمال حضور المقابلة: {attendanceProbability}% (تقدير آلي).</span>
+						</div>
+						{request.guardianPhone && (
+							<button
+								type="button"
+								onClick={handleSendWhatsappReminder}
+								className="h-6 px-2.5 rounded border border-[#C7D2FE] dark:border-indigo-800 bg-white dark:bg-zinc-800 text-[11px] font-medium text-[#4F46E5] dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-zinc-700 transition-colors shadow-2xs cursor-pointer shrink-0"
+							>
+								إرسال تذكير
+							</button>
+						)}
 					</div>
-					{request.guardianPhone && (
-						<button
-							type="button"
-							onClick={handleSendWhatsappReminder}
-							className="h-6 px-2.5 rounded border border-[#C7D2FE] dark:border-indigo-800 bg-white dark:bg-zinc-800 text-[11px] font-medium text-[#4F46E5] dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-zinc-700 transition-colors shadow-2xs cursor-pointer shrink-0"
-						>
-							إرسال تذكير
-						</button>
-					)}
-				</div>
+				)}
 
 				{/* 3. ملاحظات المراجع */}
 				<div className="space-y-1.5">
@@ -387,101 +433,154 @@ export function RequestChildDataCard({
 					)}
 				</div>
 
-				{/* 4. قائمة البيانات الأساسية (تاريخ الميلاد، المدينة، الموعد، المدة، الفصل) بدون خطوط سفلية داخلية */}
+				{/* 4. قائمة البيانات الأساسية (تاريخ الميلاد، المسار المطلوب، فترة الدراسة، الموعد، المدة، الفصل) بدون خطوط سفلية داخلية */}
 				<div className="space-y-1.5 pt-1 text-xs">
 					{/* تاريخ الميلاد */}
 					<div className="flex items-center justify-between py-1">
-						<span className="text-zinc-400 dark:text-zinc-500">تاريخ الميلاد</span>
-						<span className="font-semibold text-zinc-800 dark:text-zinc-200">{birthDateFormatted}</span>
+						<span className="font-medium text-zinc-600 dark:text-zinc-400">تاريخ الميلاد</span>
+						<span className="font-semibold text-zinc-900 dark:text-zinc-100">{birthDateFormatted}</span>
 					</div>
 
-					{/* المدينة */}
+					{/* المسار المطلوب */}
 					<div className="flex items-center justify-between py-1">
-						<span className="text-zinc-400 dark:text-zinc-500">المدينة</span>
-						<span className="font-semibold text-zinc-800 dark:text-zinc-200">{request.city || "مكة"}</span>
+						<span className="font-medium text-zinc-600 dark:text-zinc-400">المسار المطلوب</span>
+						<span className="font-semibold text-zinc-900 dark:text-zinc-100">
+							{request.proposedTrack || "مسار عام"}
+						</span>
 					</div>
 
-					{/* موعد المقابلة */}
+					{/* فترة وطريقة الدراسة */}
 					<div className="flex items-center justify-between py-1">
-						<span className="text-zinc-400 dark:text-zinc-500">موعد المقابلة</span>
-						<div className="flex items-center gap-2">
-							{capabilities.canSchedule && onOpenReschedule && (
-								<button
-									type="button"
-									onClick={onOpenReschedule}
-									className="h-5 px-1.5 text-[10px] font-medium text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-								>
-									إعادة الجدولة
-								</button>
-							)}
-							<span className="font-semibold text-zinc-800 dark:text-zinc-200">
-								{appointmentTimeFormatted}
-							</span>
+						<span className="font-medium text-zinc-600 dark:text-zinc-400">فترة الدراسة</span>
+						<span className="font-semibold text-zinc-900 dark:text-zinc-100">
+							{studyPeriodDisplay}
+						</span>
+					</div>
+
+					{/* موعد المقابلة - منطق ذكي متخصص لكل مرحلة */}
+					{isShortlist && !hasAppointment && (
+						<div className="flex items-center justify-between py-1">
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">موعد المقابلة</span>
+							<div className="flex items-center gap-2">
+								{capabilities.canSchedule && onOpenReschedule && (
+									<button
+										type="button"
+										onClick={onOpenReschedule}
+										className="h-6 px-2.5 text-[11px] font-semibold text-primary border border-primary/30 bg-primary/5 hover:bg-primary/10 rounded transition-colors cursor-pointer"
+									>
+										تثبيت موعد المقابلة
+									</button>
+								)}
+								{!capabilities.canSchedule && (
+									<span className="text-zinc-400 italic text-[11px]">بانتظار تحديد موعد</span>
+								)}
+							</div>
 						</div>
-					</div>
+					)}
 
-					{/* مدة المقابلة */}
-					<div className="flex items-center justify-between py-1">
-						<span className="text-zinc-400 dark:text-zinc-500">مدة المقابلة</span>
-						<span className="font-semibold text-zinc-800 dark:text-zinc-200">{request.interviewDurationMinutes ?? 20} دقيقة</span>
-					</div>
-
-					{/* الفصل المقترح */}
-					<div className="flex items-center justify-between py-1">
-						<span className="text-zinc-400 dark:text-zinc-500">الفصل المقترح</span>
-						{capabilities.canEdit ? (
-							<Popover open={classPopoverOpen} onOpenChange={setClassPopoverOpen}>
-								<PopoverTrigger asChild>
-									{request.targetClass ? (
+					{isInterview && (
+						<>
+							<div className="flex items-center justify-between py-1">
+								<div className="flex items-center gap-1.5">
+									<span className="font-medium text-zinc-600 dark:text-zinc-400">موعد المقابلة</span>
+									{request.assessmentAppointment?.code && (
+										<Badge variant="outline" className="text-[10px] font-mono px-1 py-0 bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-300">
+											{request.assessmentAppointment.code}
+										</Badge>
+									)}
+								</div>
+								<div className="flex items-center gap-2">
+									{capabilities.canSchedule && onOpenReschedule && (
 										<button
 											type="button"
-											className="h-6 px-2 text-[11px] font-medium text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+											onClick={onOpenReschedule}
+											className="h-5 px-1.5 text-[10px] font-medium text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
 										>
-											{request.targetClass}
-										</button>
-									) : (
-										<button
-											type="button"
-											className="inline-flex items-center gap-1 h-6 px-2 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-										>
-											<IconPlus className="size-3 text-zinc-500" />
-											<span>تعيين فصل</span>
+											{hasAppointment ? "إعادة الجدولة" : "جدولة موعد"}
 										</button>
 									)}
-								</PopoverTrigger>
-								<PopoverContent align="end" className="w-52 p-1.5" dir="rtl">
-									<p className="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 px-1.5 py-0.5">
-										اختر الفصل المناسب للطالب
-									</p>
-									<div className="space-y-0.5 mt-1 max-h-48 overflow-y-auto">
-										{classrooms.map((cls) => (
-											<button
-												key={cls.id}
-												type="button"
-												onClick={() => handleAssignClass(cls.name)}
-												className="w-full text-right text-[11px] px-1.5 py-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium transition-colors cursor-pointer"
-											>
-												{cls.name}
-											</button>
-										))}
-									</div>
-								</PopoverContent>
-							</Popover>
-						) : (
-							<span className="font-semibold text-zinc-800 dark:text-zinc-200">
-								{request.targetClass || "غير محدد"}
+									<span className="font-semibold text-zinc-900 dark:text-zinc-100">
+										{appointmentTimeFormatted}
+									</span>
+								</div>
+							</div>
+
+							<div className="flex items-center justify-between py-1">
+								<span className="font-medium text-zinc-600 dark:text-zinc-400">مدة المقابلة</span>
+								<span className="font-semibold text-zinc-900 dark:text-zinc-100">
+									{request.assessmentAppointment?.durationMinutes ?? request.interviewDurationMinutes ?? 60} دقيقة
+								</span>
+							</div>
+						</>
+					)}
+
+					{(isAwaitingPayment || isAccepted) && hasAppointment && (
+						<div className="flex items-center justify-between py-1">
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">تاريخ المقابلة</span>
+							<span className="font-semibold text-emerald-700 dark:text-emerald-400">
+								{appointmentTimeFormatted} (تمت المقابلة)
 							</span>
-						)}
-					</div>
+						</div>
+					)}
+
+					{/* الفصل المقترح - يظهر في المراحل النشطة أو إذا كان الفصل محدداً مسبقاً */}
+					{((isShortlist || isInterview || isAwaitingPayment || isAccepted) || Boolean(request.targetClass)) && (
+						<div className="flex items-center justify-between py-1">
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">الفصل المقترح</span>
+							{capabilities.canEdit && !isAccepted && !isRejected && !isDuplicate ? (
+								<Popover open={classPopoverOpen} onOpenChange={setClassPopoverOpen}>
+									<PopoverTrigger asChild>
+										{request.targetClass ? (
+											<button
+												type="button"
+												className="h-6 px-2 text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+											>
+												{request.targetClass}
+											</button>
+										) : (
+											<button
+												type="button"
+												className="inline-flex items-center gap-1 h-6 px-2 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+											>
+												<IconPlus className="size-3 text-zinc-500" />
+												<span>تعيين فصل</span>
+											</button>
+										)}
+									</PopoverTrigger>
+									<PopoverContent align="end" className="w-52 p-1.5" dir="rtl">
+										<p className="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 px-1.5 py-0.5">
+											اختر الفصل المناسب للطالب
+										</p>
+										<div className="space-y-0.5 mt-1 max-h-48 overflow-y-auto">
+											{classrooms.map((cls) => (
+												<button
+													key={cls.id}
+													type="button"
+													onClick={() => handleAssignClass(cls.name)}
+													className="w-full text-right text-[11px] px-1.5 py-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium transition-colors cursor-pointer"
+												>
+													{cls.name}
+												</button>
+											))}
+										</div>
+									</PopoverContent>
+								</Popover>
+							) : (
+								<span className="font-semibold text-zinc-900 dark:text-zinc-100">
+									{request.targetClass || "غير محدد"}
+								</span>
+							)}
+						</div>
+					)}
 				</div>
 
 				{/* 5. المعلومات الطبية: فاصل علوي فقط بين السكاشن */}
-				<div className="space-y-2 border-t border-zinc-100 dark:border-zinc-800/80 pt-3 text-xs">
+				<div className="space-y-1 border-t border-zinc-100 dark:border-zinc-800/80 pt-3 text-xs">
 					<h4 className="font-bold text-xs text-zinc-900 dark:text-zinc-100 pb-0.5">المعلومات الطبية</h4>
 
 					{/* الحساسية */}
-					<div className="flex items-center justify-between py-1">
-						<span className="text-zinc-400 dark:text-zinc-500">الحساسية</span>
+					<div className="flex items-center justify-between py-0.5">
+						<span className="font-medium text-zinc-600 dark:text-zinc-400">الحساسية</span>
 						<div className="flex items-center gap-1 flex-wrap justify-end">
 							{allergies.map((item, idx) => (
 								<Badge
@@ -543,8 +642,8 @@ export function RequestChildDataCard({
 					</div>
 
 					{/* الأدوية */}
-					<div className="flex items-center justify-between py-1">
-						<span className="text-zinc-400 dark:text-zinc-500">الأدوية</span>
+					<div className="flex items-center justify-between py-0.5">
+						<span className="font-medium text-zinc-600 dark:text-zinc-400">الأدوية</span>
 						<div className="flex items-center gap-1 flex-wrap justify-end">
 							{medications.map((item, idx) => (
 								<Badge
@@ -606,93 +705,110 @@ export function RequestChildDataCard({
 					</div>
 				</div>
 
-				{/* 6. الاشتراك: فاصل علوي فقط بين السكاشن */}
-				<div className="space-y-2 border-t border-zinc-100 dark:border-zinc-800/80 pt-3 text-xs">
-					<h4 className="font-bold text-xs text-zinc-900 dark:text-zinc-100 pb-0.5">الاشتراك</h4>
-
-					{/* اختيار الباقة */}
-					<div className="flex items-center justify-between py-1">
-						<span className="text-zinc-400 dark:text-zinc-500">اختيار الباقة</span>
-						{capabilities.canEdit ? (
-							<Popover open={planPopoverOpen} onOpenChange={setPlanPopoverOpen}>
-								<PopoverTrigger asChild>
-									{request.subscriptionPlanName ? (
-										<button
-											type="button"
-											className="h-6 px-2 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/30 rounded hover:bg-emerald-100 cursor-pointer"
-										>
-											{request.subscriptionPlanName}
-										</button>
-									) : (
-										<button
-											type="button"
-											className="inline-flex items-center gap-1 h-6 px-2 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-										>
-											<IconPlus className="size-3 text-zinc-500" />
-											<span>تعيين إشتراك</span>
-										</button>
-									)}
-								</PopoverTrigger>
-								<PopoverContent align="end" className="w-56 p-1.5" dir="rtl">
-									<p className="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 px-1.5 py-0.5">
-										اختر باقة الاشتراك الأكاديمية
-									</p>
-									<div className="space-y-0.5 mt-0.5">
-										{SUBSCRIPTION_PLANS.map((p) => (
-											<button
-												key={p.id}
-												type="button"
-												onClick={() => handleAssignPlan(p)}
-												className="w-full flex items-center justify-between p-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-right transition-colors cursor-pointer"
-											>
-												<span className="text-[10.5px] font-semibold text-zinc-800 dark:text-zinc-200">
-													{p.name}
-												</span>
-												<span className="text-[10.5px] font-bold text-emerald-600 font-mono">
-													{p.price} ج.م
-												</span>
-											</button>
-										))}
-									</div>
-								</PopoverContent>
-							</Popover>
-						) : (
-							<span className="font-semibold text-zinc-800 dark:text-zinc-200">
-								{request.subscriptionPlanName || "غير محدد"}
-							</span>
+				{/* 6. الاشتراك: يظهر في مراحل الدفع والاعتماد والتقييم فقط */}
+				{(isAwaitingPayment || isAccepted || isInterview) && (
+					<div
+						className={cn(
+							"space-y-2 border-t border-zinc-100 dark:border-zinc-800/80 pt-3 text-xs transition-colors",
+							isAwaitingPayment &&
+								"p-3 rounded-lg border border-indigo-200/90 dark:border-indigo-900/60 bg-indigo-50/30 dark:bg-indigo-950/20",
 						)}
-					</div>
+					>
+						<div className="flex items-center justify-between pb-0.5">
+							<h4 className="font-bold text-xs text-zinc-900 dark:text-zinc-100">
+								{isAwaitingPayment ? "باقة الرسوم الأكاديمية والاشتراك المقترح للسداد" : "الاشتراك"}
+							</h4>
+							{isAwaitingPayment && (
+								<span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-300">
+									مرحلة السداد المالي
+								</span>
+							)}
+						</div>
 
-					{/* المبلغ */}
-					<div className="flex items-center justify-between py-1">
-						<span className="text-zinc-400 dark:text-zinc-500">المبلغ (يُحسب بعد اختيار الباقة)</span>
-						<span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700">
-							{request.subscriptionAmount ? `${request.subscriptionAmount} ج.م` : "00 ج.م"}
-						</span>
-					</div>
+						{/* اختيار الباقة */}
+						<div className="flex items-center justify-between py-1">
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">اختيار الباقة</span>
+							{capabilities.canEdit && !isAccepted ? (
+								<Popover open={planPopoverOpen} onOpenChange={setPlanPopoverOpen}>
+									<PopoverTrigger asChild>
+										{request.subscriptionPlanName ? (
+											<button
+												type="button"
+												className="h-6 px-2 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/30 rounded hover:bg-emerald-100 cursor-pointer"
+											>
+												{request.subscriptionPlanName}
+											</button>
+										) : (
+											<button
+												type="button"
+												className="inline-flex items-center gap-1 h-6 px-2 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+											>
+												<IconPlus className="size-3 text-zinc-500" />
+												<span>تعيين إشتراك</span>
+											</button>
+										)}
+									</PopoverTrigger>
+									<PopoverContent align="end" className="w-56 p-1.5" dir="rtl">
+										<p className="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 px-1.5 py-0.5">
+											اختر باقة الاشتراك الأكاديمية
+										</p>
+										<div className="space-y-0.5 mt-0.5">
+											{SUBSCRIPTION_PLANS.map((p) => (
+												<button
+													key={p.id}
+													type="button"
+													onClick={() => handleAssignPlan(p)}
+													className="w-full flex items-center justify-between p-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-right transition-colors cursor-pointer"
+												>
+													<span className="text-[10.5px] font-semibold text-zinc-800 dark:text-zinc-200">
+														{p.name}
+													</span>
+													<span className="text-[10.5px] font-bold text-emerald-600 font-mono">
+														{p.price} ج.م
+													</span>
+												</button>
+											))}
+										</div>
+									</PopoverContent>
+								</Popover>
+							) : (
+								<span className="font-semibold text-zinc-900 dark:text-zinc-100">
+									{request.subscriptionPlanName || "غير محدد"}
+								</span>
+							)}
+						</div>
 
-					{/* تضمين الوجبات */}
-					<div className="flex items-center justify-between py-1">
-						<span className="text-zinc-400 dark:text-zinc-500">تضمين الوجبات (تُضاف تكلفتها للاشتراك)</span>
-						<Switch
-							checked={request.includeMeals ?? false}
-							onCheckedChange={handleToggleMeals}
-							disabled={!capabilities.canEdit || quickUpdateMutation.isPending}
-							className="scale-85"
-						/>
-					</div>
+						{/* المبلغ */}
+						<div className="flex items-center justify-between py-1">
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">المبلغ (يُحسب بعد اختيار الباقة)</span>
+							<span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700">
+								{request.subscriptionAmount ? `${request.subscriptionAmount} ج.م` : "00 ج.م"}
+							</span>
+						</div>
 
-					{/* تفعيل المصروف اليومي */}
-					<div className="flex items-center justify-between py-1">
-						<span className="text-zinc-400 dark:text-zinc-500">تفعيل المصروف اليومي</span>
-						<Switch
-							checked={request.enableDailyStipend ?? false}
-							onCheckedChange={handleToggleStipend}
-							disabled={!capabilities.canEdit || quickUpdateMutation.isPending}
-							className="scale-85"
-						/>
+						{/* تضمين الوجبات */}
+						<div className="flex items-center justify-between py-1">
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">تضمين الوجبات (تُضاف تكلفتها للاشتراك)</span>
+							<Switch
+								checked={request.includeMeals ?? false}
+								onCheckedChange={handleToggleMeals}
+								disabled={!capabilities.canEdit || isAccepted || quickUpdateMutation.isPending}
+								className="scale-85"
+							/>
+						</div>
+
+						{/* تفعيل المصروف اليومي */}
+						<div className="flex items-center justify-between py-1">
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">تفعيل المصروف اليومي</span>
+							<Switch
+								checked={request.enableDailyStipend ?? false}
+								onCheckedChange={handleToggleStipend}
+								disabled={!capabilities.canEdit || isAccepted || quickUpdateMutation.isPending}
+								className="scale-85"
+							/>
+						</div>
 					</div>
-				</div>
+				)}
 			</div>
 		</div>
 	);

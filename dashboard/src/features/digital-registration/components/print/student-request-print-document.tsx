@@ -33,12 +33,13 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 		}
 	};
 
-	const currentDateFormatted = new Intl.DateTimeFormat("ar-SA", {
+	const currentDateFormatted = new Intl.DateTimeFormat("ar-EG-u-nu-latn", {
 		year: "numeric",
 		month: "long",
 		day: "numeric",
 		hour: "2-digit",
 		minute: "2-digit",
+		timeZone: "Africa/Cairo",
 	}).format(new Date());
 
 	// Compute student age from birthDate or fallback to ageLabel

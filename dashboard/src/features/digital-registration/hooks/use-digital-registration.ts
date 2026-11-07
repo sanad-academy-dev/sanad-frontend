@@ -252,6 +252,7 @@ export function useDeleteRequestComment(campaignId: string, _defaultRequestId?: 
 	});
 }
 
+
 // ─── إنشاء طلب تسجيل يدوي جديد من الداشبورد ──────────────────────────────────
 export function useCreateRequest(campaignId: string) {
 	const queryClient = useQueryClient();
@@ -583,6 +584,46 @@ export function useWaitlistRequest(campaignId: string) {
 	});
 }
 
+export function useAwaitingPaymentRequest(campaignId: string) {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			requestId,
+			data,
+		}: {
+			requestId: string;
+			data: {
+				subscriptionPlanId?: string | null;
+				subscriptionPlanName?: string | null;
+				subscriptionAmount?: number | null;
+				includeMeals?: boolean;
+				enableDailyStipend?: boolean;
+				priority?: string | null;
+				assignedStaffId?: string | null;
+				subject?: string;
+				customMessage?: string;
+				notifyEmail?: boolean;
+				notes?: string;
+			};
+		}) => {
+			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/awaiting-payment`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data),
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "فشل نقل الطلب إلى بانتظار الدفع");
+			}
+			return res.json();
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+			queryClient.invalidateQueries({ queryKey: ["digital-registration", "summary"] });
+		},
+	});
+}
+
 export function useRescheduleRequest(campaignId: string) {
 	const queryClient = useQueryClient();
 	return useMutation({
@@ -673,6 +714,9 @@ export function useReferRequest(campaignId: string) {
 				referredToStaffId: string;
 				reason: string;
 				notifyEmail?: boolean;
+				notifyGuardian?: boolean;
+				customMessage?: string;
+				subject?: string;
 			};
 		}) => {
 			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/refer`, {
@@ -691,6 +735,7 @@ export function useReferRequest(campaignId: string) {
 		},
 	});
 }
+
 
 export function useDeleteRequestWithReason(campaignId: string) {
 	const queryClient = useQueryClient();
@@ -763,6 +808,27 @@ export function useQuickUpdateRequest(campaignId: string) {
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل التحديث السريع للطلب");
+			}
+			return res.json();
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+		},
+	});
+}
+
+export function useAssignReviewer(campaignId: string = "") {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({ requestId, staffId }: { requestId: string; staffId: string }) => {
+			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/assign-reviewer`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ staffId }),
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "فشل تعيين المراجع");
 			}
 			return res.json();
 		},

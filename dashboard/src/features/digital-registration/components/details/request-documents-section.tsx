@@ -16,6 +16,49 @@ interface RequestDocumentsSectionProps {
 	onOpenAddDocument?: () => void;
 }
 
+function formatUploadedAt(uploadedAt?: string): string | null {
+	if (!uploadedAt) return null;
+	try {
+		const d = new Date(uploadedAt);
+		if (Number.isNaN(d.getTime())) return null;
+		return new Intl.DateTimeFormat("ar-EG-u-nu-latn", {
+			day: "numeric",
+			month: "short",
+			year: "numeric",
+			hour: "2-digit",
+			minute: "2-digit",
+			timeZone: "Africa/Cairo",
+		}).format(d);
+	} catch {
+		return null;
+	}
+}
+
+async function handleDownload(url: string, filename: string) {
+	try {
+		const res = await fetch(url);
+		if (!res.ok) throw new Error("فشل تحميل الملف");
+		const blob = await res.blob();
+		const blobUrl = URL.createObjectURL(blob);
+		const a = document.createElement("a");
+		a.href = blobUrl;
+		a.download = filename || "document";
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(blobUrl);
+	} catch {
+		const a = document.createElement("a");
+		a.href = url;
+		a.download = filename || "document";
+		a.target = "_blank";
+		a.rel = "noopener noreferrer";
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+	}
+}
+
 export function RequestDocumentsSection({
 	request,
 	campaignId,
@@ -73,7 +116,7 @@ export function RequestDocumentsSection({
 							{/* يسار: تاريخ ووقت الرفع وأزرار المعاينة والتحميل */}
 							<div className="flex items-center gap-2 shrink-0">
 								<span className="text-[11px] text-zinc-400 dark:text-zinc-500 font-sans">
-									{doc.fileSize || "2 يونيو 2006 02:30 مساءً"}
+									{doc.fileSize || formatUploadedAt(doc.uploadedAt) || "مستند مرفق"}
 								</span>
 
 								{capabilities.canDownloadDocuments ? (
@@ -88,7 +131,7 @@ export function RequestDocumentsSection({
 										</button>
 										<button
 											type="button"
-											onClick={() => resolvedUrl && window.open(resolvedUrl, "_blank", "noopener,noreferrer")}
+											onClick={() => resolvedUrl && handleDownload(resolvedUrl, doc.title || "document")}
 											className="size-6 rounded flex items-center justify-center text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
 											title="تنزيل"
 										>

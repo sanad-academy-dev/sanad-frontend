@@ -6,6 +6,8 @@ import {
 	IconUser,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
+import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
+import { formatAppointmentDate, formatAppointmentTime, DEFAULT_CLINIC_TIMEZONE } from "../../utils/date-format";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 
@@ -39,16 +41,8 @@ export function CancelAppointmentConfirmDialog({
 		try {
 			const d = new Date(rawDate);
 			if (!Number.isNaN(d.getTime())) {
-				formattedDateStr = d.toLocaleDateString("ar-EG", {
-					weekday: "long",
-					year: "numeric",
-					month: "long",
-					day: "numeric",
-				});
-				formattedTimeStr = d.toLocaleTimeString("ar-EG", {
-					hour: "2-digit",
-					minute: "2-digit",
-				});
+				formattedDateStr = formatAppointmentDate(d, clinicTimezone, "ar-EG");
+				formattedTimeStr = formatAppointmentTime(d, clinicTimezone, "ar-EG");
 			}
 		} catch {
 			formattedDateStr = String(rawDate);
@@ -83,8 +77,7 @@ export function CancelAppointmentConfirmDialog({
 							تأكيد إلغاء الموعد وتفريغ الخانة
 						</DialogTitle>
 						<p className="text-xs text-muted-foreground mt-1">
-							الطالب: <span className="font-semibold text-foreground">{studentName}</span> · #
-							{request.code}
+							الطالب: <span className="font-semibold text-foreground">{studentName}</span>
 						</p>
 					</div>
 				</DialogHeader>

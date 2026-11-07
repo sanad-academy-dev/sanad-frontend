@@ -54,6 +54,7 @@ function formatAppointmentDate(dateStr?: string | null): string {
 }
 
 export function RequestStudentHero({
+
 	request,
 	onOpenSchedule,
 }: RequestStudentHeroProps) {

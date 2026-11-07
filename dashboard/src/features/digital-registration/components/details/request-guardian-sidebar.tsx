@@ -18,7 +18,14 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
-import { useRegistrationReviewers } from "../../hooks/use-digital-registration";
+import { useRegistrationReviewers, useAssignReviewer } from "../../hooks/use-digital-registration";
+import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
+import {
+	formatAppointmentDate,
+	formatAppointmentTime,
+	DEFAULT_CLINIC_TIMEZONE,
+} from "../../utils/date-format";
+import { getWhatsAppUrl } from "../../utils/phone-format";
 
 interface RequestGuardianSidebarProps {
 	request: CampaignRequestItem;
@@ -33,6 +40,7 @@ export function RequestGuardianSidebar({
 }: RequestGuardianSidebarProps) {
 	const [reviewerPopoverOpen, setReviewerPopoverOpen] = useState(false);
 	const { data: reviewers = [], isLoading: staffLoading } = useRegistrationReviewers();
+	const assignReviewerMutation = useAssignReviewer();
 
 	const handleCopy = async (text: string, label: string) => {
 		try {
@@ -44,27 +52,43 @@ export function RequestGuardianSidebar({
 	};
 
 	const handleAssignReviewer = (staffId: string) => {
-		// لا نحدّث المراجع وحده: اختيار الموظف يفتح نفس إعادة الجدولة حتى يُحفظ
-		// مع الموعد وAppointment الفعلي في معاملة واحدة.
 		setReviewerPopoverOpen(false);
-		onOpenReschedule(staffId);
+		const targetStaff = reviewers.find((r) => r.staffId === staffId || r.id === staffId);
+		assignReviewerMutation.mutate(
+			{ requestId: request.id, staffId },
+			{
+				onSuccess: () => {
+					toast.success(`تم تعيين المراجع: ${targetStaff?.name || ""}`);
+				},
+				onError: (err: any) => {
+					toast.error(err.message || "فشل تعيين المراجع");
+				},
+			},
+		);
 	};
 
-	const cleanPhone = request.guardianPhone ? request.guardianPhone.replace(/\D/g, "") : "";
-	const waPhone = cleanPhone;
+	const guardianWaUrl = request.guardianPhone ? getWhatsAppUrl(request.guardianPhone) : "";
 
 	const reviewer = request.assignedStaff || (request.reviewerName ? { name: request.reviewerName, id: request.assignedStaffId || "", phone: null } : null);
 	const matchedReviewer = reviewers.find((r) => r.id === reviewer?.id || r.userId === reviewer?.id);
 	const reviewerPhone = (reviewer as any)?.phone || matchedReviewer?.phone || "";
-	const reviewerCleanPhone = reviewerPhone ? reviewerPhone.replace(/\D/g, "") : "";
+	const reviewerWaUrl = reviewerPhone ? getWhatsAppUrl(reviewerPhone) : "";
+
+	const { clinicInfo } = useClinicInfo();
+	const clinicTimezone = clinicInfo?.timezone || DEFAULT_CLINIC_TIMEZONE;
 
 	const submittedAtFormatted = request.submittedAt
-		? `${new Date(request.submittedAt).toLocaleDateString("ar-EG", { month: "short", day: "numeric" })} • ${new Date(request.submittedAt).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })}`
+		? `${formatAppointmentDate(request.submittedAt, clinicTimezone, "ar-EG-u-nu-latn", { month: "short", day: "numeric", weekday: undefined, year: undefined })} • ${formatAppointmentTime(request.submittedAt, clinicTimezone, "ar-EG-u-nu-latn")}`
 		: (request.date || "قيد المراجعة");
 	const hasActiveRemoteAppointment = Boolean(
 		request.interviewMode === "REMOTE" &&
 		request.appointmentId &&
 		(!request.assessmentAppointment || request.assessmentAppointment.status !== "CANCELLED"),
+	);
+	const hasInterviewContext = Boolean(
+		request.status === "INTERVIEW" ||
+		request.appointmentDate ||
+		request.assessmentAppointment
 	);
 
 	return (
@@ -92,9 +116,9 @@ export function RequestGuardianSidebar({
 							</div>
 
 							{/* زر إرسال رسالة لولي الأمر */}
-							{request.guardianPhone && (
+							{guardianWaUrl && (
 								<a
-									href={`https://wa.me/${waPhone}`}
+									href={guardianWaUrl}
 									target="_blank"
 									rel="noopener noreferrer"
 									className="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[10px] font-semibold transition-colors shrink-0"
@@ -125,89 +149,42 @@ export function RequestGuardianSidebar({
 							)}
 						</div>
 
-						{/* مكان الجلسة / طريقة الحضور (بدون خط سفلي) */}
-						<div className="flex items-center justify-between gap-2 text-xs pt-0.5">
-							<span className="text-[10px] text-zinc-400 dark:text-zinc-500">مكان الجلسة:</span>
-							<span className="text-[10.5px] font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1">
-								{request.interviewMode === "REMOTE" ? (
-									<>
-										<IconVideo className="size-3 text-blue-500" />
-										<span>عبر اتصال</span>
-									</>
-								) : (
-									<span>في الأكاديمية</span>
+						{/* مكان الجلسة / طريقة الحضور (يظهر فقط عند وجود مقابلة أو موعد) */}
+						{hasInterviewContext && (
+							<>
+								<div className="flex items-center justify-between gap-2 text-xs pt-0.5">
+									<span className="text-[10px] text-zinc-400 dark:text-zinc-500">مكان الجلسة:</span>
+									<span className="text-[10.5px] font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1">
+										{request.interviewMode === "REMOTE" ? (
+											<>
+												<IconVideo className="size-3 text-blue-500" />
+												<span>عبر اتصال</span>
+											</>
+										) : (
+											<span>في الأكاديمية</span>
+										)}
+									</span>
+								</div>
+								{hasActiveRemoteAppointment && (
+									<Link
+										to="/video-call"
+										search={{ registrationRequestId: request.id }}
+										className="flex h-7 w-full items-center justify-center gap-1 rounded-md bg-emerald-600 px-2 text-[10px] font-semibold text-white transition-colors hover:bg-emerald-700"
+										title="دخول المقابلة عن بُعد"
+									>
+										<IconVideo className="size-3" />
+										<span>دخول المقابلة عن بُعد</span>
+									</Link>
 								)}
-							</span>
-						</div>
-						{hasActiveRemoteAppointment && (
-							<Link
-								to="/video-call"
-								search={{ registrationRequestId: request.id }}
-								className="flex h-7 w-full items-center justify-center gap-1 rounded-md bg-emerald-600 px-2 text-[10px] font-semibold text-white transition-colors hover:bg-emerald-700"
-								title="دخول المقابلة عن بُعد"
-							>
-								<IconVideo className="size-3" />
-								<span>دخول المقابلة عن بُعد</span>
-							</Link>
+							</>
 						)}
 					</div>
 				</div>
 
-				{/* سكشن 2: قسم تعيين المراجع بدون border */}
+				{/* سكشن 2: قسم المراجع (بدون زر تعيين عند وجود مراجع بالفعل، لأن الإحالة لجهة أخرى تتكفل بإعادة الإسناد) */}
 				<div className="space-y-2 border-t border-zinc-200/80 dark:border-zinc-800 pt-3">
 					<div className="flex items-center justify-between text-xs font-bold text-zinc-900 dark:text-zinc-100">
 						<span>المراجع</span>
-						<Popover open={reviewerPopoverOpen} onOpenChange={setReviewerPopoverOpen}>
-							<PopoverTrigger asChild>
-								<button
-									type="button"
-									className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-[9.5px] font-semibold transition-colors cursor-pointer"
-									title="تغيير أو اختيار مراجع آخر"
-								>
-									<IconPlus className="size-2.5" />
-									<span>تعيين مراجع</span>
-								</button>
-							</PopoverTrigger>
-							<PopoverContent align="end" className="w-56 p-1.5 z-50 bg-popover border border-border shadow-xl rounded-xl" dir="rtl">
-								<div className="space-y-1">
-									<p className="text-[10.5px] font-bold text-zinc-900 dark:text-zinc-100 px-1.5 py-0.5">
-										اختر الأخصائي / المراجع
-									</p>
-									<div className="max-h-44 overflow-y-auto space-y-0.5">
-										{staffLoading ? (
-											<p className="text-[10px] text-muted-foreground p-1 text-center">جاري التحميل...</p>
-										) : reviewers.length === 0 ? (
-											<p className="text-[10px] text-muted-foreground p-1 text-center">لا يوجد أعضاء متاحين</p>
-										) : (
-											reviewers.map((s) => (
-												<button
-													key={s.id}
-													type="button"
-													onClick={() => handleAssignReviewer(s.staffId)}
-													className="w-full flex items-center gap-1.5 p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-right transition-colors cursor-pointer"
-												>
-													<Avatar className="size-5">
-														<AvatarFallback className="text-[8.5px] bg-primary/10 text-primary font-bold">
-															{s.name.slice(0, 2)}
-														</AvatarFallback>
-													</Avatar>
-													<div className="min-w-0 flex-1">
-														<span className="text-[10.5px] font-medium text-zinc-800 dark:text-zinc-200 truncate block">
-															{s.name}
-														</span>
-														{s.phone && (
-															<span className="text-[9px] text-muted-foreground font-mono block" dir="ltr">
-																{s.phone}
-															</span>
-														)}
-													</div>
-												</button>
-											))
-										)}
-									</div>
-								</div>
-							</PopoverContent>
-						</Popover>
 					</div>
 
 					{reviewer ? (
@@ -224,9 +201,9 @@ export function RequestGuardianSidebar({
 								</div>
 
 								{/* زر إرسال رسالة للمراجع */}
-								{reviewerPhone ? (
+								{reviewerWaUrl ? (
 									<a
-										href={`https://wa.me/${reviewerCleanPhone}`}
+										href={reviewerWaUrl}
 										target="_blank"
 										rel="noopener noreferrer"
 										className="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[10px] font-semibold transition-colors shrink-0"
@@ -268,15 +245,57 @@ export function RequestGuardianSidebar({
 						</div>
 					) : (
 						<div className="pt-0.5">
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => setReviewerPopoverOpen(true)}
-								className="w-full h-8 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-primary text-[10.5px] font-medium text-zinc-600 dark:text-zinc-300 gap-1 justify-center bg-white dark:bg-zinc-900 cursor-pointer"
-							>
-								<IconPlus className="size-3 text-primary" />
-								<span>تعيين مراجع</span>
-							</Button>
+							<Popover open={reviewerPopoverOpen} onOpenChange={setReviewerPopoverOpen}>
+								<PopoverTrigger asChild>
+									<Button
+										type="button"
+										variant="outline"
+										className="w-full h-8 border-dashed border-zinc-300 dark:border-zinc-700 hover:border-primary text-[10.5px] font-medium text-zinc-600 dark:text-zinc-300 gap-1 justify-center bg-white dark:bg-zinc-900 cursor-pointer"
+									>
+										<IconPlus className="size-3 text-primary" />
+										<span>تعيين مراجع</span>
+									</Button>
+								</PopoverTrigger>
+								<PopoverContent align="end" className="w-56 p-1.5 z-50 bg-popover border border-border shadow-xl rounded-xl" dir="rtl">
+									<div className="space-y-1">
+										<p className="text-[10.5px] font-bold text-zinc-900 dark:text-zinc-100 px-1.5 py-0.5">
+											اختر الأخصائي / المراجع
+										</p>
+										<div className="max-h-44 overflow-y-auto space-y-0.5">
+											{staffLoading ? (
+												<p className="text-[10px] text-muted-foreground p-1 text-center">جاري التحميل...</p>
+											) : reviewers.length === 0 ? (
+												<p className="text-[10px] text-muted-foreground p-1 text-center">لا يوجد أعضاء متاحين</p>
+											) : (
+												reviewers.map((s) => (
+													<button
+														key={s.id}
+														type="button"
+														onClick={() => handleAssignReviewer(s.staffId)}
+														className="w-full flex items-center gap-1.5 p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-right transition-colors cursor-pointer"
+													>
+														<Avatar className="size-5">
+															<AvatarFallback className="text-[8.5px] bg-primary/10 text-primary font-bold">
+																{s.name.slice(0, 2)}
+															</AvatarFallback>
+														</Avatar>
+														<div className="min-w-0 flex-1">
+															<span className="text-[10.5px] font-medium text-zinc-800 dark:text-zinc-200 truncate block">
+																{s.name}
+															</span>
+															{s.phone && (
+																<span className="text-[9px] text-muted-foreground font-mono block" dir="ltr">
+																	{s.phone}
+																</span>
+															)}
+														</div>
+													</button>
+												))
+											)}
+										</div>
+									</div>
+								</PopoverContent>
+							</Popover>
 						</div>
 					)}
 				</div>

@@ -50,6 +50,15 @@ import { toast } from "sonner";
 import { CampaignRequestSheet } from "./campaign-request-sheet";
 import { CancelAppointmentConfirmDialog } from "./modals/cancel-appointment-confirm-dialog";
 import { PriorityPickerPopover } from "./priority-picker-popover";
+import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
+import {
+	formatAppointmentDate,
+	formatAppointmentTime,
+	DEFAULT_CLINIC_TIMEZONE,
+} from "../utils/date-format";
+import { getWhatsAppUrl } from "../utils/phone-format";
+import {
+} from "../utils/date-format";
 import type { CampaignSortOption } from "./campaign-details-toolbar";
 import type { CampaignRequestItem } from "../types/campaign-request.types";
 import {
@@ -111,18 +120,18 @@ function getArabicInitials(name?: string | null): string {
 	return `${clean[0][0]}${clean[1][0]}`;
 }
 
-/** حساب مرحلة الطلب ونسبة شريط التقدم (مثال: 1/5 مرحلة) */
+/** حساب مرحلة الطلب ونسبة شريط التقدم عبر قمع القبول المكون من 5 مراحل رئيسية */
 function getStageProgress(column: string): { current: number; total: number; percent: number } {
 	const total = 5;
 	let current = 1;
 	const col = (column || "").toLowerCase();
 	if (col === "shortlist" || col === "قائمة مختصرة") current = 2;
-	else if (col === "waitlist" || col === "قائمة الانتظار") current = 2;
+	else if (col === "waitlist" || col === "قائمة الانتظار") current = 2; // حالة تعليق مؤقتة وليست مرحلة تقدم
 	else if (col === "interview" || col === "المقابلة الشخصية" || col === "المقابله الشخصيه") current = 3;
 	else if (col === "awaiting-payment" || col === "awaiting_payment" || col === "بانتظار الدفع") current = 4;
-	else if (col === "accepted" || col === "مقبول") current = 5;
-	else if (col === "rejected" || col === "مرفوض") current = 5;
-	else if (col === "duplicate" || col === "مكرر") current = 1;
+	else if (col === "accepted" || col === "مقبول") current = 5; // القرار النهائي بالقبول
+	else if (col === "rejected" || col === "مرفوض") current = 5; // القرار النهائي بالرفض
+	else if (col === "duplicate" || col === "مكرر") current = 1; // مكرر تنظيمي
 	const percent = Math.min(100, Math.round((current / total) * 100));
 	return { current, total, percent };
 }
@@ -143,6 +152,8 @@ export function CampaignRequestsKanban({
 	onSelectRequest?: (id: string | null) => void;
 }) {
 	const { capabilities } = useDigitalRegistrationCapabilities(campaignId);
+	const { clinicInfo } = useClinicInfo();
+	const clinicTimezone = clinicInfo?.timezone || DEFAULT_CLINIC_TIMEZONE;
 	const { data: serverRequests = EMPTY_REQUESTS, isLoading } = useCampaignRequests(campaignId);
 	const updateStatusMutation = useUpdateRequestStatus(campaignId);
 	const updateRequestMutation = useUpdateRequest(campaignId);
@@ -641,10 +652,9 @@ export function CampaignRequestsKanban({
 															type="button"
 															onClick={(e) => {
 																e.stopPropagation();
-																if (item.guardianPhone) {
-																	const cleanPhone = item.guardianPhone.replace(/\D/g, "");
-																const waPhone = cleanPhone;
-																	window.open(`https://wa.me/${waPhone}`, "_blank");
+																const waUrl = getWhatsAppUrl(item.guardianPhone);
+																if (waUrl) {
+																	window.open(waUrl, "_blank");
 																} else {
 																	setSelectedRequestId(item.id);
 																}
@@ -687,8 +697,8 @@ export function CampaignRequestsKanban({
 														<span>موعد الحضور</span>
 													</div>
 													<div className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-900 dark:text-zinc-100" dir="rtl">
-														<span>{appointmentAt ? appointmentAt.toLocaleDateString("ar-EG", { month: "numeric", day: "numeric" }) : "غير محدد"}</span>
-														{appointmentAt && <><span className="text-zinc-300 dark:text-zinc-600 font-normal">•</span><IconClock className="size-2.5 text-zinc-400 shrink-0" /><span className="font-mono text-[9.5px]">{appointmentAt.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })}</span></>}
+														<span>{appointmentAt ? formatAppointmentDate(appointmentAt, clinicTimezone, "ar-EG", { month: "numeric", day: "numeric", weekday: undefined, year: undefined }) : "غير محدد"}</span>
+														{appointmentAt && <><span className="text-zinc-300 dark:text-zinc-600 font-normal">•</span><IconClock className="size-2.5 text-zinc-400 shrink-0" /><span className="font-mono text-[9.5px]">{formatAppointmentTime(appointmentAt, clinicTimezone, "ar-EG")}</span></>}
 													</div>
 												</div>
 
@@ -758,13 +768,15 @@ export function CampaignRequestsKanban({
 															"h-full rounded-full transition-all duration-300",
 															item.column === "rejected" || item.status === "REJECTED"
 																? "bg-rose-500"
+																: item.column === "waitlist" || item.status === "WAITLIST"
+																? "bg-amber-500"
 																: "bg-[#3B82F6]",
 														)}
-														style={{ width: item.column === "rejected" || item.status === "REJECTED" ? "60%" : `${stage.percent}%` }}
+														style={{ width: item.column === "rejected" || item.status === "REJECTED" ? "100%" : `${stage.percent}%` }}
 													/>
 												</div>
 												<span className="shrink-0 font-medium font-mono text-[9px] text-zinc-400">
-													{item.column === "rejected" || item.status === "REJECTED" ? "3/5 مرحلة" : `${stage.current}/${stage.total} مرحلة`}
+													{item.column === "rejected" || item.status === "REJECTED" ? "مرفوض (5/5)" : item.column === "waitlist" || item.status === "WAITLIST" ? "قيد الانتظار" : item.column === "duplicate" || item.status === "DUPLICATE" ? "مكرر" : `${stage.current}/${stage.total} مرحلة`}
 												</span>
 											</div>
 

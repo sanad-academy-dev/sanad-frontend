@@ -1,5 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
+	IconActivity,
+	IconArrowsRightLeft,
 	IconAt,
 	IconArrowUp,
 	IconCornerDownLeft,
@@ -11,6 +13,7 @@ import {
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/lib/auth/client";
@@ -54,6 +57,18 @@ function formatArabicRelativeTime(dateString: string): string {
 	}
 }
 
+
+function getTimelineBadgeStyle(badge?: string | null) {
+	if (!badge) return "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 border-zinc-200/60 dark:border-zinc-700";
+	if (badge.includes("مقبول")) return "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-800";
+	if (badge.includes("مرفوض")) return "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800";
+	if (badge.includes("دفع") || badge.includes("سداد")) return "bg-indigo-50 text-indigo-700 border-indigo-200 dark:bg-indigo-950/40 dark:text-indigo-300 dark:border-indigo-800";
+	if (badge.includes("مقابلة")) return "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800";
+	if (badge.includes("مختصر")) return "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800";
+	if (badge.includes("انتظار") || badge.includes("مكرر")) return "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800";
+	return "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 border-zinc-200/60 dark:border-zinc-700";
+}
+
 export function RequestActivityComments({
 	request,
 	campaignId = "",
@@ -67,6 +82,57 @@ export function RequestActivityComments({
 
 	const addCommentMutation = useAddRequestComment(campaignId, request.id);
 	const deleteCommentMutation = useDeleteRequestComment(campaignId, request.id);
+
+	const combinedActivities = useMemo(() => {
+		const items: Array<
+			| { type: "comment"; id: string; authorId?: string; authorName: string; body: string; createdAt: string }
+			| { type: "timeline"; id: string; title: string; actorName: string; statusBadge?: string | null; isCompleted: boolean; completedAt: string; order: number }
+		> = [];
+
+		for (const c of commentsList) {
+			items.push({
+				type: "comment",
+				id: c.id,
+				authorId: c.authorId,
+				authorName: c.authorName,
+				body: c.body,
+				createdAt: c.createdAt,
+			});
+		}
+
+		if (request.timeline && Array.isArray(request.timeline)) {
+			for (const t of request.timeline) {
+				// إظهار فقط حركات النقل والعمليات التشغيلية الفعلية واستبعاد أي عناصر وهمية سابقة
+				if (!t.isCompleted || !t.completedAt) continue;
+				if (
+					t.title.includes("تسجيل أولي") ||
+					t.title.includes("مراجعة المستندات") ||
+					t.title.includes("اعتماد الإدارة") ||
+					t.title.includes("تحديث وتصحيح")
+				) {
+					continue;
+				}
+
+				items.push({
+					type: "timeline",
+					id: t.id,
+					title: t.title,
+					actorName: t.actorName,
+					statusBadge: t.statusBadge,
+					isCompleted: t.isCompleted,
+					completedAt: t.completedAt,
+					order: t.order,
+				});
+			}
+		}
+
+		return items.sort((a, b) => {
+			const dateA = new Date(a.type === "comment" ? a.createdAt : a.completedAt).getTime() || 0;
+			const dateB = new Date(b.type === "comment" ? b.createdAt : b.completedAt).getTime() || 0;
+			return dateB - dateA;
+		});
+	}, [commentsList, request.timeline, request.submittedAt, request.date]);
+
 
 	// Synchronize with external request prop updates
 	useEffect(() => {
@@ -143,7 +209,7 @@ export function RequestActivityComments({
 					سجل النشاط والتعليقات
 				</h3>
 				<span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">
-					{commentsList.length} {commentsList.length === 1 ? "نشاط" : "نشاطات"}
+					{combinedActivities.length} {combinedActivities.length === 1 ? "نشاط" : "نشاطات"}
 				</span>
 			</div>
 
@@ -152,12 +218,53 @@ export function RequestActivityComments({
 				ref={commentsContainerRef}
 				className="space-y-2 max-h-56 overflow-y-auto pr-0.5 scrollbar-thin"
 			>
-				{commentsList.length === 0 ? (
+				{combinedActivities.length === 0 ? (
 					<div className="text-center py-4 text-[11px] text-zinc-400 dark:text-zinc-500 bg-zinc-50/60 dark:bg-zinc-900/40 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-800">
 						لا توجد نشاطات أو تعليقات مدونة بعد.
 					</div>
 				) : (
-					commentsList.map((c) => {
+					combinedActivities.map((item) => {
+						if (item.type === "timeline") {
+							return (
+								<div
+									key={item.id}
+									className="group relative rounded-lg border border-zinc-200/70 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/40 p-2.5 transition-colors hover:bg-zinc-100/60 dark:hover:bg-zinc-800/40 shadow-2xs"
+								>
+									<div className="flex items-center justify-between gap-2">
+										<div className="flex items-center gap-2 min-w-0">
+											<div className="size-6 rounded-full bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 flex items-center justify-center shrink-0 shadow-2xs">
+												<IconArrowsRightLeft className="size-3 text-zinc-600 dark:text-zinc-400" />
+											</div>
+											<div className="flex items-center gap-1.5 text-[11px] flex-wrap min-w-0">
+												<span className="font-bold text-zinc-800 dark:text-zinc-200">
+													{item.actorName || "النظام"}
+												</span>
+												<span className="text-zinc-300 dark:text-zinc-700">•</span>
+												<span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
+													حركة بالنظام
+												</span>
+												<span className="text-zinc-300 dark:text-zinc-700">•</span>
+												<span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-normal">
+													{formatArabicRelativeTime(item.completedAt)}
+												</span>
+											</div>
+										</div>
+										{item.statusBadge && (
+											<span className={cn("text-[9.5px] px-1.5 py-0.5 rounded font-medium border", getTimelineBadgeStyle(item.statusBadge))}>
+												{item.statusBadge}
+											</span>
+										)}
+									</div>
+									<div className="mt-1.5 pr-8">
+										<p className="text-[11px] font-medium text-zinc-700 dark:text-zinc-300 leading-relaxed font-sans">
+											{item.title}
+										</p>
+									</div>
+								</div>
+							);
+						}
+
+						const c = item;
 						const initials = (c.authorName || "فريق")
 							.split(" ")
 							.filter(Boolean)
@@ -184,7 +291,7 @@ export function RequestActivityComments({
 											</span>
 											<span className="text-zinc-300 dark:text-zinc-700">•</span>
 											<span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-medium">
-											طلب تسجيل
+												طلب تسجيل
 											</span>
 											<span className="text-zinc-300 dark:text-zinc-700">•</span>
 											<span className="text-[10px] text-zinc-400 dark:text-zinc-500 font-normal">
@@ -195,14 +302,14 @@ export function RequestActivityComments({
 
 									{/* لا يظهر الحذف إلا لصاحب التعليق. */}
 									{c.authorId === session?.user?.id && (
-									<button
-										type="button"
-										onClick={() => handleDeleteComment(c.id)}
-										className="size-6 rounded flex items-center justify-center text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
-										title="حذف التعليق"
-									>
-										<IconTrash className="size-3.5" />
-									</button>
+										<button
+											type="button"
+											onClick={() => handleDeleteComment(c.id)}
+											className="size-6 rounded flex items-center justify-center text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+											title="حذف التعليق"
+										>
+											<IconTrash className="size-3.5" />
+										</button>
 									)}
 								</div>
 

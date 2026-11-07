@@ -28,6 +28,7 @@ interface RequestBasicInfoGridProps {
 }
 
 export function RequestBasicInfoGrid({
+
 	request,
 	campaignId = "",
 	onOpenReschedule,
@@ -80,6 +81,9 @@ export function RequestBasicInfoGrid({
 		);
 	};
 
+	const { clinicInfo } = useClinicInfo();
+	const clinicTimezone = clinicInfo?.timezone || DEFAULT_CLINIC_TIMEZONE;
+
 	const birthDateFormatted = request.birthDate
 		? new Date(request.birthDate).toLocaleDateString("ar-EG", {
 				year: "numeric",
@@ -89,7 +93,7 @@ export function RequestBasicInfoGrid({
 		: (request.ageLabel || "غير محدد");
 
 	const appointmentTimeFormatted = request.appointmentDate
-		? `${new Date(request.appointmentDate).toLocaleDateString("ar-EG", { month: "short", day: "numeric" })} • ${new Date(request.appointmentDate).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })}`
+		? `${formatAppointmentDate(request.appointmentDate, clinicTimezone, "ar-EG", { month: "short", day: "numeric", weekday: undefined, year: undefined })} • ${formatAppointmentTime(request.appointmentDate, clinicTimezone, "ar-EG")}`
 		: "قيد التحديد";
 
 	return (
@@ -109,14 +113,14 @@ export function RequestBasicInfoGrid({
 					</span>
 				</div>
 
-				{/* المدينة لا تُعرض بقيمة ثابتة؛ الطلب لا يحتوي هذا الحقل حالياً. */}
+				{/* المسار المطلوب */}
 				<div className="flex items-center justify-between py-0.5 border-b border-zinc-100 dark:border-zinc-800/60">
 					<span className="text-zinc-500 dark:text-zinc-400 flex items-center gap-1 text-[10px]">
-						<IconMapPin className="size-3 text-zinc-400" />
-						<span>المدينة</span>
+						<IconCompass className="size-3 text-zinc-400" />
+						<span>المسار المطلوب</span>
 					</span>
 					<span className="font-bold text-zinc-900 dark:text-zinc-100 text-[10.5px]">
-						غير محددة
+						{request.proposedTrack || "مسار عام"}
 					</span>
 				</div>
 

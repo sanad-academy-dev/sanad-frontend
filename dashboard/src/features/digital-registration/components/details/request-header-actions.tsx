@@ -14,6 +14,8 @@ import {
 	IconLink,
 	IconPlus,
 	IconPrinter,
+	IconShare,
+	IconCopy,
 	IconX,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
@@ -27,6 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
+import { useDigitalRegistrationCapabilities } from "../../hooks/use-digital-registration";
 
 /** أيقونة نسخ معرّف الطلب (بطاقتين متراكبتين مع رمز ID) مطابقة للشاشات المنظومية */
 function IconCopyId({ className = "size-3.5" }: { className?: string }) {
@@ -80,14 +83,15 @@ export function RequestHeaderActions({
 	onOpenDelete,
 	onAcceptDirect,
 	onOpenEdit,
-	onOpenRefer: _onOpenRefer,
+	onOpenRefer,
 	onOpenPrint,
 	onMoveToQueue,
 	onMoveToAwaitingPayment,
-	onMarkDuplicate: _onMarkDuplicate,
+	onMarkDuplicate,
 	isExpanded,
 	onToggleExpand,
 }: RequestHeaderActionsProps) {
+	const { capabilities } = useDigitalRegistrationCapabilities();
 	const handlePrint = () => {
 		if (onOpenPrint) {
 			onOpenPrint();
@@ -120,11 +124,22 @@ export function RequestHeaderActions({
 		}, 80);
 	};
 
-	// إعداد قائمة الخيارات الثلاثة المنطقية ديناميكياً بحسب عمود/حالة الكانبان
+	// إعداد قائمة الخيارات الثلاثة المنطقية ديناميكياً بحسب عمود/حالة الكانبان مع فحص صلاحية الرفض
 	const getDynamicListItems = () => {
+		const canReject = Boolean(capabilities.canAcceptOrReject && onOpenReject);
+		const rejectItem = canReject
+			? {
+					label: "قائمة الرفض",
+					icon: <IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+					action: onOpenReject,
+			  }
+			: null;
+
+		let rawItems: Array<{ label: string; icon: React.ReactNode; action?: () => void } | null> = [];
+
 		switch (request.status) {
 			case "QUEUE":
-				return [
+				rawItems = [
 					{
 						label: "القائمة المختصرة",
 						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
@@ -135,14 +150,11 @@ export function RequestHeaderActions({
 						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenWaitlist,
 					},
-					{
-						label: "قائمة الرفض",
-						icon: <IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onOpenReject,
-					},
+					rejectItem,
 				];
+				break;
 			case "SHORTLIST":
-				return [
+				rawItems = [
 					{
 						label: "تثبيت موعد المقابلة",
 						icon: <IconActivity className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
@@ -153,16 +165,13 @@ export function RequestHeaderActions({
 						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenWaitlist,
 					},
-					{
-						label: "قائمة الرفض",
-						icon: <IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onOpenReject,
-					},
+					rejectItem,
 				];
+				break;
 			case "INTERVIEW":
-				return [
+				rawItems = [
 					{
-						label: "إدراج في بانتظار الدفع",
+						label: "نقل إلى بانتظار الدفع",
 						icon: <IconCoin className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onMoveToAwaitingPayment,
 					},
@@ -171,32 +180,30 @@ export function RequestHeaderActions({
 						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenWaitlist,
 					},
-					{
-						label: "قائمة الرفض",
-						icon: <IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onOpenReject,
-					},
+					rejectItem,
 				];
+				break;
 			case "AWAITING_PAYMENT":
-				return [
-					{
-						label: "اعتماد وقبول نهائي",
-						icon: <IconCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onAcceptDirect,
-					},
+				rawItems = [
+					...(capabilities.canAcceptOrReject && onAcceptDirect
+						? [
+								{
+									label: "اعتماد وقبول نهائي",
+									icon: <IconCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+									action: onAcceptDirect,
+								},
+						  ]
+						: []),
 					{
 						label: "قائمة الإنتظار",
 						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenWaitlist,
 					},
-					{
-						label: "قائمة الرفض",
-						icon: <IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onOpenReject,
-					},
+					rejectItem,
 				];
+				break;
 			case "REJECTED":
-				return [
+				rawItems = [
 					{
 						label: "إعادة إلى الطابور",
 						icon: <IconClock className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
@@ -213,8 +220,9 @@ export function RequestHeaderActions({
 						action: onOpenWaitlist,
 					},
 				];
+				break;
 			case "DUPLICATE":
-				return [
+				rawItems = [
 					{
 						label: "إعادة إلى الطابور",
 						icon: <IconClock className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
@@ -225,14 +233,11 @@ export function RequestHeaderActions({
 						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenShortlist,
 					},
-					{
-						label: "قائمة الرفض",
-						icon: <IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onOpenReject,
-					},
+					rejectItem,
 				];
+				break;
 			default:
-				return [
+				rawItems = [
 					{
 						label: "القائمة المختصرة",
 						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
@@ -243,13 +248,14 @@ export function RequestHeaderActions({
 						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenWaitlist,
 					},
-					{
-						label: "قائمة الرفض",
-						icon: <IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onOpenReject,
-					},
+					rejectItem,
 				];
 		}
+
+		return rawItems.filter(
+			(item): item is { label: string; icon: React.ReactNode; action?: () => void } =>
+				item !== null && Boolean(item.action),
+		);
 	};
 
 	return (
@@ -263,10 +269,6 @@ export function RequestHeaderActions({
 				<span className="text-zinc-300 dark:text-zinc-600">›</span>
 				<span className="font-bold text-zinc-800 dark:text-zinc-200 truncate">
 					{request.patientName}
-				</span>
-				<span className="text-zinc-300 dark:text-zinc-600">›</span>
-				<span className="font-mono text-[10.5px] text-zinc-400 font-semibold">
-					#{request.code}
 				</span>
 
 				{/* زر الثلاثة نقط بجانب كود الطلب مباشرة */}
@@ -292,15 +294,41 @@ export function RequestHeaderActions({
 							</DropdownMenuItem>
 						)}
 
-						{/* 2. إعادة جدولة */}
+						{/* 2. جدولة أو إعادة جدولة */}
 						<DropdownMenuItem
 							onClick={() => triggerSafeOpen(onOpenReschedule)}
 							className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
 						>
 							<IconCalendarPlus className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
-							<span>إعادة جدولة</span>
+							<span>
+								{request.appointmentDate || request.appointmentId || request.assessmentAppointment
+									? "إعادة جدولة"
+									: "جدولة موعد"}
+							</span>
 						</DropdownMenuItem>
 
+						
+						{/* إحالة الطلب */}
+						{onOpenRefer && (
+							<DropdownMenuItem
+								onClick={() => triggerSafeOpen(onOpenRefer)}
+								className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+							>
+								<IconShare className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+								<span>إحالة الطلب</span>
+							</DropdownMenuItem>
+						)}
+
+						{/* تحديد كمكرر */}
+						{onMarkDuplicate && (
+							<DropdownMenuItem
+								onClick={() => triggerSafeOpen(onMarkDuplicate)}
+								className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+							>
+								<IconCopy className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+								<span>تحديد كمكرر</span>
+							</DropdownMenuItem>
+						)}
 						{/* 3. حذف التسجيل */}
 						{onOpenDelete && (
 							<DropdownMenuItem

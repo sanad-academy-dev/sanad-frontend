@@ -86,9 +86,9 @@ export function AppointmentPickerPopover({
 	className,
 }: AppointmentPickerPopoverProps) {
 	const { clinicInfo } = useClinicInfo();
-	const clinicTimezone = clinicInfo?.timezone || "Asia/Riyadh";
+	const clinicTimezone = clinicInfo?.timezone || "Africa/Cairo";
 	const [open, setOpen] = useState(false);
-	const [clinicNow, setClinicNow] = useState(() => toZonedTime(new Date(), "Asia/Riyadh"));
+	const [clinicNow, setClinicNow] = useState(() => toZonedTime(new Date(), clinicTimezone));
 	const today = clinicNow;
 	const currentYear = today.getFullYear();
 	const currentMonth = today.getMonth();

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { useState, useEffect, useRef } from "react";
 import {
 	IconArrowRight,
 	IconCalendar,
@@ -25,14 +26,14 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import {
-	Sheet,
-	SheetContent,
-} from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import { useDeleteRequestWithReason } from "../../hooks/use-digital-registration";
+import {
+	RegistrationDrawerHeader,
+	RegistrationDrawerGuardianCard,
+} from "./registration-drawer-header";
 
 interface DeleteRequestDialogProps {
 	request: CampaignRequestItem | null;
@@ -40,6 +41,7 @@ interface DeleteRequestDialogProps {
 	onOpenChange: (open: boolean) => void;
 	campaignId?: string;
 	onDeletedSuccess?: () => void;
+	isExpanded?: boolean;
 }
 
 const DELETION_REASONS = [
@@ -59,6 +61,7 @@ export function DeleteRequestDialog({
 	onOpenChange,
 	campaignId = "",
 	onDeletedSuccess,
+	isExpanded = false,
 }: DeleteRequestDialogProps) {
 	const [reason, setReason] = useState<string>("طلب ولي الأمر إلغاء التسجيل / الاعتذار");
 	const [customReason, setCustomReason] = useState("");
@@ -66,9 +69,45 @@ export function DeleteRequestDialog({
 	const [notifyEmail, setNotifyEmail] = useState(true);
 	const [isConfirmed, setIsConfirmed] = useState(false);
 
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
+
 	const deleteMutation = useDeleteRequestWithReason(campaignId);
 
-	if (!request) return null;
+	useEffect(() => {
+		if (open && request) {
+			setReason(DELETION_REASONS[0]);
+			setCustomReason("");
+			setNotes("");
+			setNotifyEmail(true);
+			setIsConfirmed(false);
+		}
+	}, [open, request]);
+
+	// إغلاق اللوحة عند الضغط على مفتاح Escape
+	useEffect(() => {
+		if (!open) return;
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				onOpenChange(false);
+			}
+		};
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, [open, onOpenChange]);
+
+	// معالج تمرير الماوس بالـ wheel لضمان التمرير السلس دائماً عبر عجلة الماوس
+	const handleDrawerWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+		const target = e.target as HTMLElement | null;
+		if (target?.tagName === "TEXTAREA") {
+			const isTextareaScrollable = target.scrollHeight > target.clientHeight;
+			if (isTextareaScrollable) return;
+		}
+		if (scrollContainerRef.current) {
+			scrollContainerRef.current.scrollTop += e.deltaY;
+		}
+	};
+
+	if (!open || !request) return null;
 
 	const handleDelete = () => {
 		const activeReason = reason === "سبب آخر (تحديد يدوي)" ? customReason.trim() : reason;
@@ -111,87 +150,34 @@ export function DeleteRequestDialog({
 		(reason !== "سبب آخر (تحديد يدوي)" || customReason.trim().length > 0);
 
 	return (
-		<Sheet open={open} onOpenChange={onOpenChange}>
-			<SheetContent
-				side="left"
-				showOverlay={false}
-				showCloseButton={false}
-				onPointerDownOutside={(e) => {
-					const target = e.target as HTMLElement | null;
-					if (
-						target?.closest('[data-slot="sheet-content"]') ||
-						target?.closest('[role="dialog"]') ||
-						target?.closest('[role="menu"]') ||
-						target?.closest('[data-radix-portal]') ||
-						target?.closest('[data-radix-popper-content-wrapper]')
-					) {
-						e.preventDefault();
-					}
-				}}
-				onFocusOutside={(e) => e.preventDefault()}
-				className="w-full lg:w-[28vw]! lg:min-w-[20rem]! lg:max-w-[28rem]! lg:left-[calc(60vw+0.75rem)]! lg:right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background z-50 h-[calc(100dvh-1rem)]! max-h-[calc(100dvh-1rem)]! inset-y-2!"
-				dir="rtl"
-			>
-				{/* رأس اللوحة مع زر الرجوع والعنوان واسم الطالب بدون كود الطلب المكدس */}
-				<div className="p-3 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-right bg-white dark:bg-zinc-900 shrink-0">
-					<div className="flex items-center gap-2">
-						<button
-							type="button"
-							onClick={() => onOpenChange(false)}
-							className="size-7 rounded-md flex items-center justify-center text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-							title="رجوع"
-						>
-							<IconArrowRight className="size-4" />
-						</button>
-						<span className="text-xs font-bold text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
-							<IconTrash className="size-3.5" />
-							<span>حذف طلب الطالب</span>
-						</span>
-					</div>
-
-					<div className="flex items-center gap-1.5 text-xs min-w-0">
-						<span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 truncate max-w-[150px]">
-							{request.patientName}
-						</span>
-					</div>
-				</div>
+		<aside
+			data-slot="delete-drawer"
+			onWheel={handleDrawerWheel}
+			className={cn("fixed z-50 w-full lg:w-[28vw]! lg:min-w-[20rem]! lg:max-w-[28rem]!  lg:right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background h-[calc(100dvh-1rem)]! max-h-[calc(100dvh-1rem)]! inset-y-2! rounded-lg animate-in fade-in-0 duration-200 select-text", isExpanded ? "lg:left-[calc(65vw+0.75rem)]!" : "lg:left-[calc(60vw+0.75rem)]!")}
+			dir="rtl"
+		>
+				{/* 1. رأس اللوحة الموحد */}
+				<RegistrationDrawerHeader
+					title="حذف طلب الطالب"
+					patientName={request.patientName}
+					code={request.code}
+					onClose={() => onOpenChange(false)}
+					titleClassName="text-rose-600 dark:text-rose-400"
+				/>
 
 				{/* محتوى اللوحة القابل للتمرير */}
-				<div className="p-3.5 space-y-3 flex-1 min-h-0 overflow-y-auto overscroll-contain scrollbar-thin">
-					{/* كارت ملخص الطالب وولي الأمر */}
-					<div className="rounded-lg border border-rose-100 dark:border-rose-950/60 bg-rose-50/40 dark:bg-rose-950/20 p-2.5 flex items-center justify-between gap-2.5 shadow-2xs">
-						<div className="flex items-center gap-2 min-w-0">
-							<Avatar className="size-8 border border-rose-200 dark:border-rose-900 shrink-0">
-								<AvatarFallback className="bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-bold text-[10px]">
-									{request.patientName.slice(0, 2)}
-								</AvatarFallback>
-							</Avatar>
-							<div className="min-w-0">
-								<p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
-									{request.patientName}
-								</p>
-								<p className="text-[10px] text-muted-foreground truncate">
-									ولي الأمر: {request.guardianName}
-								</p>
-							</div>
-						</div>
-
-						<div className="flex flex-col items-end gap-1 shrink-0">
-							<Badge
-								variant="outline"
-								className="text-[10px] px-1.5 py-0.5 border-rose-200 dark:border-rose-900/70 text-rose-700 dark:text-rose-300 font-semibold flex items-center gap-1"
-							>
-								<IconPhone className="size-2.5 text-rose-500 shrink-0" />
-								<span>{request.guardianPhone || "بدون هاتف"}</span>
-							</Badge>
-							{request.appointmentDate && (
-								<span className="text-[9.5px] text-amber-700 dark:text-amber-400 font-medium flex items-center gap-1">
-									<IconCalendar className="size-2.5 shrink-0" />
-									<span>جلسة محجوزة</span>
-								</span>
-							)}
-						</div>
-					</div>
+				<div
+					ref={scrollContainerRef}
+					className="p-3.5 space-y-3 flex-1 min-h-0 overflow-y-auto scrollbar-thin select-text"
+					style={{ touchAction: "pan-y" }}
+				>
+					{/* بطاقة ولي الأمر الموحدة */}
+					<RegistrationDrawerGuardianCard
+						guardianName={request.guardianName}
+						guardianPhone={request.guardianPhone}
+						guardianEmail={request.guardianEmail}
+						patientName={request.patientName}
+					/>
 
 					{/* صندوق النتائج والتحذير المترتبة على الحذف بأيقونات حقيقية احترافية */}
 					<div className="rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50/80 dark:bg-rose-950/30 p-3 space-y-2.5">
@@ -349,7 +335,6 @@ export function DeleteRequestDialog({
 						</Button>
 					</div>
 				</div>
-			</SheetContent>
-		</Sheet>
+		</aside>
 	);
 }

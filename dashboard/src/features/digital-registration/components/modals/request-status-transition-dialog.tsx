@@ -1,12 +1,16 @@
-import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
+import { useEffect, useState, useRef } from "react";
 import { IconAlertTriangle, IconArrowRight, IconCheck, IconInfoCircle } from "@tabler/icons-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { useUpdateRequestStatus } from "../../hooks/use-digital-registration";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
+import {
+	RegistrationDrawerHeader,
+	RegistrationDrawerGuardianCard,
+} from "./registration-drawer-header";
 
 export type RequestTransitionTarget = "QUEUE" | "SHORTLIST" | "WAITLIST" | "AWAITING_PAYMENT" | "DUPLICATE" | "ACCEPTED";
 
@@ -26,10 +30,22 @@ interface RequestStatusTransitionDialogProps {
 	onOpenChange: (open: boolean) => void;
 	campaignId?: string;
 	onAccept?: (request: CampaignRequestItem) => void;
+	onSuccess?: () => void;
+	isExpanded?: boolean;
 }
 
-export function RequestStatusTransitionDialog({ request, target, open, onOpenChange, campaignId = "", onAccept }: RequestStatusTransitionDialogProps) {
+export function RequestStatusTransitionDialog({
+	request,
+	target,
+	open,
+	onOpenChange,
+	campaignId = "",
+	onAccept,
+	onSuccess,
+	isExpanded = false,
+}: RequestStatusTransitionDialogProps) {
 	const [note, setNote] = useState("");
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const updateStatus = useUpdateRequestStatus(campaignId);
 	const config = target ? TRANSITIONS[target] : null;
 
@@ -37,55 +53,90 @@ export function RequestStatusTransitionDialog({ request, target, open, onOpenCha
 		if (open) setNote("");
 	}, [open, target]);
 
+	// إغلاق اللوحة عند الضغط على مفتاح Escape
+	useEffect(() => {
+		if (!open) return;
+		const handleKeyDown = (e: KeyboardEvent) => {
+			if (e.key === "Escape") {
+				onOpenChange(false);
+			}
+		};
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, [open, onOpenChange]);
+
+	// معالج تمرير الماوس بالـ wheel لضمان التمرير السلس دائماً عبر عجلة الماوس
+	const handleDrawerWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+		const targetEl = e.target as HTMLElement | null;
+		if (targetEl?.tagName === "TEXTAREA") {
+			const isTextareaScrollable = targetEl.scrollHeight > targetEl.clientHeight;
+			if (isTextareaScrollable) return;
+		}
+		if (scrollContainerRef.current) {
+			scrollContainerRef.current.scrollTop += e.deltaY;
+		}
+	};
+
 	const isPending = updateStatus.isPending;
 	const submit = () => {
 		if (!request || !target || !config) return;
 		if (target === "ACCEPTED") {
 			onAccept?.(request);
 			onOpenChange(false);
+			onSuccess?.();
 			return;
 		}
 		updateStatus.mutate({ requestId: request.id, status: target, note: note.trim() || undefined }, {
 			onSuccess: () => {
 				toast.success(`تم ${config.confirm} بنجاح`);
 				onOpenChange(false);
+				onSuccess?.();
 			},
 			onError: (error: Error) => toast.error(error.message || "تعذر تحديث حالة الطلب"),
 		});
 	};
 
-	if (!request || !config) return null;
+	if (!open || !request || !config) return null;
 	return (
-		<Sheet open={open} onOpenChange={onOpenChange}>
-			<SheetContent side="left" showOverlay={false} showCloseButton={false} dir="rtl"
-				onPointerDownOutside={(event) => {
-					const targetElement = event.target as HTMLElement | null;
-					if (targetElement?.closest('[data-slot="sheet-content"]') || targetElement?.closest('[role="dialog"]') || targetElement?.closest('[role="menu"]')) event.preventDefault();
-				}}
-				onFocusOutside={(event) => event.preventDefault()}
-				className="w-full lg:w-[28vw]! lg:min-w-[20rem]! lg:max-w-[28rem]! lg:left-[calc(60vw+0.75rem)]! lg:right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background z-50">
-				<div className="p-3 border-b border-zinc-100 dark:border-zinc-800 flex items-center gap-2 shrink-0">
-					<button type="button" onClick={() => onOpenChange(false)} className="size-7 rounded-md flex items-center justify-center text-zinc-400 hover:bg-zinc-100" title="رجوع"><IconArrowRight className="size-4" /></button>
-					<div className="min-w-0"><p className="text-xs font-bold truncate">{config.title}</p><p className="text-[10px] text-muted-foreground truncate">{request.patientName} · #{request.code}</p></div>
-				</div>
-				<div className="p-4 space-y-3 flex-1">
-					<div className="rounded-lg border border-muted bg-muted/40 p-3 flex gap-2 text-xs leading-5"><IconInfoCircle className="size-4 shrink-0 text-primary mt-0.5" /><p>{config.description}</p></div>
-					{target === "QUEUE" && Boolean(request.assessmentAppointment && request.assessmentAppointment.status !== "CANCELLED") && (
-						<div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-950/30 p-2.5 flex items-start gap-2 text-xs text-amber-800 dark:text-amber-300">
-							<IconAlertTriangle className="size-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
-							<div className="space-y-0.5 leading-snug">
-								<span className="font-bold">تنبيه الموعد:</span>
-								<span> سيتم إلغاء موعد المقابلة المرتبط وتفريغ وقت الأخصائي والقاعة تلقائياً فور النقل للطابور.</span>
-							</div>
+		<aside
+			data-slot="status-transition-drawer"
+			onWheel={handleDrawerWheel}
+			className={cn("fixed z-50 w-full lg:w-[28vw]! lg:min-w-[20rem]! lg:max-w-[28rem]!  lg:right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background h-[calc(100dvh-1rem)]! max-h-[calc(100dvh-1rem)]! inset-y-2! rounded-lg animate-in fade-in-0 duration-200 select-text", isExpanded ? "lg:left-[calc(65vw+0.75rem)]!" : "lg:left-[calc(60vw+0.75rem)]!")}
+			dir="rtl"
+		>
+			<RegistrationDrawerHeader
+				title={config.title}
+				patientName={request.patientName}
+				code={request.code}
+				onClose={() => onOpenChange(false)}
+			/>
+			<div
+				ref={scrollContainerRef}
+				className="p-4 space-y-3.5 flex-1 min-h-0 overflow-y-auto scrollbar-thin select-text"
+				style={{ touchAction: "pan-y" }}
+			>
+				<RegistrationDrawerGuardianCard
+					guardianName={request.guardianName}
+					guardianPhone={request.guardianPhone}
+					guardianEmail={request.guardianEmail}
+					patientName={request.patientName}
+				/>
+				<div className="rounded-lg border border-muted bg-muted/40 p-3 flex gap-2 text-xs leading-5"><IconInfoCircle className="size-4 shrink-0 text-primary mt-0.5" /><p>{config.description}</p></div>
+				{target === "QUEUE" && Boolean(request.assessmentAppointment && request.assessmentAppointment.status !== "CANCELLED") && (
+					<div className="rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-950/30 p-2.5 flex items-start gap-2 text-xs text-amber-800 dark:text-amber-300">
+						<IconAlertTriangle className="size-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+						<div className="space-y-0.5 leading-snug">
+							<span className="font-bold">تنبيه الموعد:</span>
+							<span> سيتم إلغاء موعد المقابلة المرتبط وتفريغ وقت الأخصائي والقاعة تلقائياً فور النقل للطابور.</span>
 						</div>
-					)}
-					<div className="space-y-1.5"><label className="text-[11px] font-bold">ملاحظة داخلية (اختيارية)</label><Textarea value={note} onChange={(event) => setNote(event.target.value)} className="min-h-24 text-xs resize-none" placeholder="سبب النقل أو أي معلومة لفريق العمل..." /></div>
-				</div>
-				<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-end gap-2 shrink-0">
-					<Button variant="outline" size="sm" onClick={() => onOpenChange(false)} disabled={isPending}>إلغاء</Button>
-					<Button size="sm" onClick={submit} disabled={isPending} className={`gap-1 ${config.tone}`}><IconCheck className="size-3.5" />{isPending ? "جارٍ الحفظ..." : config.confirm}</Button>
-				</div>
-			</SheetContent>
-		</Sheet>
+					</div>
+				)}
+				<div className="space-y-1.5"><label className="text-[11px] font-bold">ملاحظة داخلية (اختيارية)</label><Textarea value={note} onChange={(event) => setNote(event.target.value)} className="min-h-24 text-xs resize-none" placeholder="سبب النقل أو أي معلومة لفريق العمل..." /></div>
+			</div>
+			<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-end gap-2 shrink-0">
+				<Button variant="outline" size="sm" onClick={() => onOpenChange(false)} disabled={isPending} className="cursor-pointer">إلغاء</Button>
+				<Button size="sm" onClick={submit} disabled={isPending} className={`gap-1 cursor-pointer ${config.tone}`}><IconCheck className="size-3.5" />{isPending ? "جارٍ الحفظ..." : config.confirm}</Button>
+			</div>
+		</aside>
 	);
 }
