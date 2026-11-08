@@ -401,17 +401,17 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 			dir={dir}
 			{...props}
 		>
-			<SidebarHeader className="py-2.5 px-2">
+			<SidebarHeader className="pt-[7px] pb-2.5 px-2">
 				<SidebarMenu>
 					<SidebarMenuItem>
 						<Link
 							to="/"
 							className="flex items-center gap-2 overflow-hidden rounded-md px-1 py-0.5 transition-opacity hover:opacity-85"
 						>
-							<SanadLogo className="h-8 group-data-[collapsible=icon]:hidden" />
+							<SanadLogo className="h-5 w-auto group-data-[collapsible=icon]:hidden" />
 							<SanadLogo
 								iconOnly
-								className="hidden size-6 shrink-0 group-data-[collapsible=icon]:block"
+								className="hidden size-4 shrink-0 group-data-[collapsible=icon]:block"
 							/>
 						</Link>
 					</SidebarMenuItem>

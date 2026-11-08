@@ -36,7 +36,7 @@ export function useRegistrationReviewers() {
 
 /** The dashboard has one registration board per clinic; the legacy campaign id stays internal. */
 export function useRegistrationWorkspace() {
-	return useQuery<{ id: string }>({
+	return useQuery<{ id: string; code?: string }>({
 		queryKey: WORKSPACE_QUERY_KEY,
 		queryFn: async () => {
 			const res = await backendFetch("/api/digital-registration/workspace");
@@ -515,6 +515,43 @@ export function useMarkNotificationSent(campaignId: string, requestId: string) {
 
 // ─── Phase 1: Action Hooks ───────────────────────────────────────────────────
 
+export function useQueueRequest(campaignId: string) {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			requestId,
+			data,
+		}: {
+			requestId: string;
+			data: {
+				priority?: string | null;
+				assignedStaffId?: string | null;
+				customMessage?: string;
+				internalNote?: string;
+				notifyEmail?: boolean;
+			};
+		}) => {
+			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/queue`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data),
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "فشلت إعادة الطلب إلى الطابور");
+			}
+			return res.json();
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({ queryKey: ["digital-registration", "summary"] });
+			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
+			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
+		},
+	});
+}
+
 export function useShortlistRequest(campaignId: string) {
 	const queryClient = useQueryClient();
 	return useMutation({
@@ -971,6 +1008,64 @@ export function useUpdateGeneralAccess() {
 		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: SHARE_ACCESS_QUERY_KEY });
+		},
+	});
+}
+
+export function useRenewPaymentToken(campaignId: string = "") {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({ requestId, hours = 72 }: { requestId: string; hours?: number }) => {
+			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/renew-payment-token`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ hours }),
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "فشل تجديد رابط السداد");
+			}
+			return res.json();
+		},
+		onSuccess: () => {
+			if (campaignId) {
+				queryClient.invalidateQueries({ queryKey: campaignRequestsQueryKey(campaignId) });
+			}
+			queryClient.invalidateQueries({ queryKey: CAMPAIGN_SUMMARY_QUERY_KEY });
+		},
+	});
+}
+
+export function useConfirmPaymentManually(campaignId: string = "") {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			requestId,
+			amount,
+			reference,
+			notes,
+		}: {
+			requestId: string;
+			amount?: number;
+			reference?: string;
+			notes?: string;
+		}) => {
+			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/confirm-payment`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ amount, reference, notes }),
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "فشل تأكيد عملية السداد");
+			}
+			return res.json();
+		},
+		onSuccess: () => {
+			if (campaignId) {
+				queryClient.invalidateQueries({ queryKey: campaignRequestsQueryKey(campaignId) });
+			}
+			queryClient.invalidateQueries({ queryKey: CAMPAIGN_SUMMARY_QUERY_KEY });
 		},
 	});
 }

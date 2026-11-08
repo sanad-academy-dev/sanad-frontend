@@ -1,7 +1,9 @@
 import { useState, useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { IconBellRinging } from "@tabler/icons-react";
+import { IconBellRinging, IconLock, IconLoader2 } from "@tabler/icons-react";
+import { Button } from "@/components/ui/button";
+import { useDigitalRegistrationCapabilities } from "@/features/digital-registration/hooks/use-digital-registration-capabilities";
 
 import {
 	CampaignDetailsHeader,
@@ -25,6 +27,12 @@ export const Route = createFileRoute("/_pathless-layout/digital-registration")({
 });
 
 function DigitalRegistrationRoute() {
+	const {
+		capabilities,
+		isLoading: isCapabilitiesLoading,
+		isError: isCapabilitiesError,
+	} = useDigitalRegistrationCapabilities();
+
 	const [view, setView] = useState<RegistrationView>("requests");
 	const [searchQuery, setSearchQuery] = useState("");
 	const [genderFilter, setGenderFilter] = useState("ALL");
@@ -244,6 +252,45 @@ function DigitalRegistrationRoute() {
 		toast.success(`تم تصدير بيانات ${filteredRequests.length} متقدم بنجاح إلى ملف CSV`);
 	};
 
+	if (isCapabilitiesLoading) {
+		return (
+			<div className="flex flex-1 items-center justify-center p-12" dir="rtl">
+				<div className="flex items-center gap-2.5 text-xs text-muted-foreground">
+					<IconLoader2 className="size-4 animate-spin text-primary" />
+					<span>جارٍ التحقق من صلاحيات الوصول إلى لوحة التسجيل...</span>
+				</div>
+			</div>
+		);
+	}
+
+	if (!capabilities.canView || isCapabilitiesError) {
+		return (
+			<div className="flex flex-1 items-center justify-center p-6 bg-muted/20" dir="rtl">
+				<div className="max-w-md w-full bg-card border border-border/80 rounded-2xl p-6 text-center shadow-lg flex flex-col items-center gap-4">
+					<div className="size-14 rounded-full bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-200 dark:border-rose-900/60 shadow-xs">
+						<IconLock className="size-7" />
+					</div>
+					<div className="flex flex-col gap-1.5">
+						<h2 className="text-lg font-bold text-foreground">
+							غير مصرح لك بالوصول إلى لوحة التسجيل الرقمي
+						</h2>
+						<p className="text-xs text-muted-foreground leading-relaxed">
+							الوصول إلى هذه اللوحة مقصور حصراً على موظفي الأكاديمية المصرح لهم من قِبل مدير النظام. يُرجى مراجعة مدير النظام لإضافتك إلى فريق التسجيل الرقمي.
+						</p>
+					</div>
+					<Button
+						variant="outline"
+						size="sm"
+						onClick={() => window.history.back()}
+						className="mt-2 text-xs font-medium cursor-pointer"
+					>
+						الرجوع للخلف
+					</Button>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
 			{/* Header with Title and Tabs injected into page-header-slot */}
@@ -277,6 +324,7 @@ function DigitalRegistrationRoute() {
 						onExport={handleExportExcel}
 						onExportCsv={handleExportCsv}
 						campaignId={workspace?.id}
+						campaignCode={workspace?.code}
 					/>
 
 					{/* Polling indicator: this board refreshes periodically, it is not a socket feed. */}

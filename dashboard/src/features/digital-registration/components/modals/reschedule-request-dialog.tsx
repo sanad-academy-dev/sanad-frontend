@@ -82,12 +82,13 @@ export function RescheduleRequestDialog({
 	onSuccess,
 	isExpanded = false,
 }: RescheduleRequestDialogProps) {
-	const hasExistingAppointment = Boolean(
-		request?.appointmentDate ||
-		(request?.assessmentAppointment && request.assessmentAppointment.status !== "CANCELLED") ||
-		request?.appointmentId
+	// لا يعتبر الطلب "إعادة جدولة" إلا إذا كان الطلب في مرحلة المقابلة بالفعل وله موعد نشط غير ملغي
+	const hasActiveAppointment = Boolean(
+		request?.status === "INTERVIEW" &&
+		request?.assessmentAppointment &&
+		request.assessmentAppointment.status !== "CANCELLED"
 	);
-	const isReschedule = hasExistingAppointment;
+	const isReschedule = hasActiveAppointment;
 
 	const [enableMessage, setEnableMessage] = useState(true);
 	const [reason, setReason] = useState<string>("المراجع لم يحضر في الموعد");
@@ -118,9 +119,9 @@ export function RescheduleRequestDialog({
 
 	useEffect(() => {
 		if (open && request) {
-			const rawDate = request?.appointmentDate || request?.assessmentAppointment?.startsAt;
-			if (rawDate) {
-				const d = new Date(rawDate);
+			// فقط في حالة إعادة الجدولة لطلب لديه موعد نشط نقوم بملء التاريخ المسبق، عدا ذلك يبدأ الحقل فارغاً
+			if (isReschedule && request.assessmentAppointment?.startsAt) {
+				const d = new Date(request.assessmentAppointment.startsAt);
 				if (!Number.isNaN(d.getTime()) && d > new Date()) {
 					setNewDate(d.toISOString().slice(0, 16));
 				} else {
@@ -140,7 +141,7 @@ export function RescheduleRequestDialog({
 			setEnableMessage(true);
 			setNotifyEmail(false);
 		}
-	}, [open, request]);
+	}, [open, request, isReschedule]);
 
 	// إغلاق اللوحة عند الضغط على مفتاح Escape
 	useEffect(() => {
@@ -333,13 +334,11 @@ export function RescheduleRequestDialog({
 				{/* قسم سبب إعادة الجدولة (يظهر فقط إذا كان للطلب موعد مسبق) */}
 				{isReschedule && (
 					<div className="space-y-1.5">
-						<div className="flex items-center gap-1.5">
+						<div className="flex items-center gap-1">
 							<label className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200">
 								سبب إعادة الجدولة
 							</label>
-							<span className="text-[9px] font-bold text-rose-600 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 px-1 py-0 rounded">
-								مطلوب
-							</span>
+							<span className="text-destructive font-bold text-xs">*</span>
 						</div>
 						<DropdownMenu dir="rtl">
 							<DropdownMenuTrigger asChild>
@@ -347,20 +346,24 @@ export function RescheduleRequestDialog({
 									variant="outline"
 									className="w-full justify-between h-8 text-xs font-medium border-zinc-200 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 cursor-pointer"
 								>
-									<span className="truncate">{reason}</span>
-									<IconChevronDown className="size-3.5 opacity-60 shrink-0" />
+									<span className="truncate text-right flex-1">{reason}</span>
+									<IconChevronDown className="size-3.5 opacity-60 shrink-0 mr-1.5" />
 								</Button>
 							</DropdownMenuTrigger>
-							<DropdownMenuContent className="w-[--radix-dropdown-menu-trigger-width] p-1" align="start">
+							<DropdownMenuContent
+								style={{ width: "var(--radix-dropdown-menu-trigger-width)" }}
+								className="w-(--radix-dropdown-menu-trigger-width) min-w-(--radix-dropdown-menu-trigger-width) p-1"
+								align="start"
+							>
 								<p className="text-[10px] text-muted-foreground font-semibold px-2 py-1">اختر السبب...</p>
 								{RESCHEDULE_REASONS.map((r) => (
 									<DropdownMenuItem
 										key={r}
 										onClick={() => setReason(r)}
-										className="text-xs cursor-pointer flex items-center justify-between"
+										className="text-xs cursor-pointer flex items-center justify-between w-full"
 									>
 										<span>{r}</span>
-										{reason === r && <IconCheck className="size-3 text-primary" />}
+										{reason === r && <IconCheck className="size-3 text-primary shrink-0" />}
 									</DropdownMenuItem>
 								))}
 							</DropdownMenuContent>
@@ -422,33 +425,6 @@ export function RescheduleRequestDialog({
 					</div>
 				)}
 
-				{/* بانر ملخص الموعد المقارن المعتمد (يظهر فقط في إعادة الجدولة لعرض المقارنة بين الموعد السابق والجديد) */}
-				{isReschedule && formattedOldDate && (
-					<div className="rounded-lg bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200/80 dark:border-purple-800/80 p-2.5 flex items-center justify-between text-xs gap-2">
-						<div className="flex items-center gap-2 min-w-0">
-							<IconClock className="size-4 text-purple-600 dark:text-purple-400 shrink-0" />
-							<div className="min-w-0">
-								<span className="text-[9.5px] text-muted-foreground block truncate">
-									الموعد الحالي والمقترح:
-								</span>
-								<span className="font-bold text-purple-950 dark:text-purple-200 text-[11px] block truncate">
-									<span className="line-through text-zinc-400 dark:text-zinc-500 font-normal">{formattedOldDate}</span>
-									<span className="mx-1 text-purple-600 dark:text-purple-400">←</span>
-									<span>{formattedNewDate}</span>
-								</span>
-							</div>
-						</div>
-						{selectedStaffMember && (
-							<Badge
-								variant="outline"
-								className="text-[9.5px] bg-white dark:bg-zinc-800 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 font-semibold shrink-0"
-							>
-								{selectedStaffMember.name}
-							</Badge>
-						)}
-					</div>
-				)}
-
 			</div>
 
 			{/* 3. شريط أدوات الجدولة السريع المنظم فوق الفوتر */}
@@ -462,7 +438,7 @@ export function RescheduleRequestDialog({
 							onChange={(_label, isoDate) => setNewDate(isoDate || "")}
 							reviewerName={selectedStaffMember?.name || "المراجع"}
 							reviewerId={staffId || undefined}
-							className="w-full h-8 text-xs justify-between font-normal shadow-2xs"
+							className="w-full h-8 text-[10.5px] justify-between font-normal shadow-2xs whitespace-nowrap"
 						/>
 					</div>
 
@@ -471,7 +447,7 @@ export function RescheduleRequestDialog({
 							<RoomPickerPopover
 								value={roomName}
 								appointmentDate={newDate}
-								excludeAppointmentId={request.assessmentAppointment?.id || request.appointmentId || null}
+								excludeAppointmentId={isReschedule ? (request.assessmentAppointment?.id || request.appointmentId || null) : null}
 								onChange={(name, id) => {
 									setRoomName(name);
 									setRoomId(id || null);
@@ -615,7 +591,7 @@ export function RescheduleRequestDialog({
 						size="sm"
 						onClick={handleSubmit}
 						disabled={rescheduleMutation.isPending}
-						className="text-xs h-8 font-semibold px-4 gap-1.5 bg-purple-600 hover:bg-purple-700 text-white shadow-2xs cursor-pointer"
+						className="text-xs h-8 font-semibold px-4 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white shadow-2xs cursor-pointer"
 					>
 						{rescheduleMutation.isPending ? (
 							<IconLoader2 className="size-3.5 animate-spin" />

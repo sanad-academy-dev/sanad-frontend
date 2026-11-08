@@ -66,6 +66,9 @@ export function CampaignDetailsToolbar({
 	onOpenAssistant,
 	onToggleStats,
 	onOpenSettings,
+	campaignId,
+	campaignName,
+	campaignCode,
 }: {
 	searchValue?: string;
 	onSearchChange?: (val: string) => void;
@@ -81,6 +84,7 @@ export function CampaignDetailsToolbar({
 	onOpenSettings?: () => void;
 	campaignId?: string;
 	campaignName?: string;
+	campaignCode?: string;
 }) {
 	const [shareOpen, setShareOpen] = useState(false);
 	const [focusInviteOnOpen, setFocusInviteOnOpen] = useState(false);
@@ -470,6 +474,7 @@ export function CampaignDetailsToolbar({
 					if (!open) setFocusInviteOnOpen(false);
 				}}
 				initialFocusInvite={focusInviteOnOpen}
+				campaignCode={campaignCode}
 			/>
 		</div>
 	);

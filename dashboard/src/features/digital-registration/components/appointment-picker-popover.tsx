@@ -111,7 +111,7 @@ export function AppointmentPickerPopover({
 
 	const isTodaySelected = selectedYear === currentYear && selectedMonth === currentMonth && selectedDay === currentDay;
 	const isAtCurrentMonth = year === currentYear && month === currentMonth;
-	const isCustomSelected = Boolean(value && value !== "تاريخ الموعد");
+	const isCustomSelected = Boolean(isoValue || (value && value !== "تاريخ الموعد" && value !== "تاريخ ووقت الموعد"));
 	const remindersActive = externalReminders ?? internalReminders;
 	const canConfigureReminders = externalReminders !== undefined || onEnableRemindersChange !== undefined;
 	const toggleReminders = (enabled: boolean) => {
@@ -259,15 +259,15 @@ export function AppointmentPickerPopover({
 				<button
 					type="button"
 					className={cn(
-						"h-6.5 px-2.5 rounded-md border text-[10.5px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer select-none",
+						"h-6.5 px-2 rounded-md border text-[10px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer select-none whitespace-nowrap",
 						isCustomSelected
 							? "border-[#5B50E5]/50 bg-[#5B50E5]/10 text-[#5B50E5] font-semibold"
 							: "border-border/80 bg-background hover:bg-muted text-foreground",
 						className,
 					)}
 				>
-					<span>{value || "تاريخ الموعد"}</span>
-					<IconCalendarPlus className="size-3 text-muted-foreground/80" />
+					<span className="truncate whitespace-nowrap">{value || "تاريخ الموعد"}</span>
+					<IconCalendarPlus className="size-3 text-muted-foreground/80 shrink-0" />
 				</button>
 			</PopoverTrigger>
 
@@ -277,7 +277,7 @@ export function AppointmentPickerPopover({
 				sideOffset={6}
 				collisionPadding={8}
 				style={{ maxHeight: "min(560px, var(--radix-popover-content-available-height, 560px))" }}
-				className="z-[99] w-[min(390px,calc(100vw-1rem))] flex flex-col p-0 bg-white dark:bg-zinc-950 text-popover-foreground border border-border/80 shadow-2xl rounded-xl overflow-hidden"
+				className="z-[99] w-[min(335px,calc(100vw-1rem))] flex flex-col p-0 bg-white dark:bg-zinc-950 text-popover-foreground border border-border/80 shadow-2xl rounded-xl overflow-hidden"
 				dir="rtl"
 			>
 				<div className="shrink-0 px-4 py-2.5 border-b border-border/70 flex items-center justify-between bg-white dark:bg-zinc-950">
@@ -348,7 +348,6 @@ export function AppointmentPickerPopover({
 						<div className="mb-2 flex items-center justify-between gap-3">
 							<div>
 								<p className="text-[11.5px] font-bold text-foreground">اختر وقت المقابلة</p>
-								<p className="text-[9.5px] text-muted-foreground">مدة المقابلة ساعة — يبدأ الحجز من 9 ص حتى 8 م (ينتهي الدوام 9 م)</p>
 							</div>
 							<span className="text-[9.5px] text-muted-foreground shrink-0">
 								{reviewerName && reviewerName !== "المراجع" ? reviewerName : `${availableSlotsCount} فترات متاحة`}
@@ -368,18 +367,27 @@ export function AppointmentPickerPopover({
 					</div>
 				</div>
 
-				<div className="shrink-0 px-4 py-2.5 border-t border-border/70 bg-white dark:bg-zinc-950 space-y-2">
-					{canConfigureReminders && (
-						<div className="flex items-center justify-between gap-3">
-							<div className="min-w-0 text-right">
-								<p className="text-[10.5px] font-bold text-foreground">تفعيل التذكيرات</p>
-								<p className="text-[9px] text-muted-foreground">تذكير للطالب عبر الواتساب قبل الموعد بـ 24 ساعة</p>
-							</div>
-							<Switch checked={remindersActive} onCheckedChange={toggleReminders} className="shrink-0 cursor-pointer" aria-label="تفعيل تذكير واتساب قبل الموعد" />
+				<div className="shrink-0 px-3.5 py-2.5 border-t border-border/70 bg-white dark:bg-zinc-950 space-y-2">
+					<div className="flex items-center justify-between gap-3">
+						<div className="min-w-0 text-right">
+							<p className="text-[10.5px] font-bold text-foreground">تفعيل التذكيرات</p>
+							<p className="text-[9px] text-muted-foreground">تذكير المستخدم عبر الواتساب قبل الموعد بـ 24 ساعة</p>
 						</div>
-					)}
-					<div className="text-center">
-						<button type="button" onClick={reset} className="text-[10.5px] font-bold text-foreground/75 hover:text-foreground hover:underline cursor-pointer">إعادة الضبط</button>
+						<Switch
+							checked={remindersActive}
+							onCheckedChange={toggleReminders}
+							className="shrink-0 cursor-pointer"
+							aria-label="تفعيل تذكير واتساب قبل الموعد"
+						/>
+					</div>
+					<div className="border-t border-border/60 pt-2 text-center">
+						<button
+							type="button"
+							onClick={reset}
+							className="text-[10.5px] font-bold text-foreground/75 hover:text-foreground hover:underline cursor-pointer"
+						>
+							إعادة الضبط
+						</button>
 					</div>
 				</div>
 			</PopoverContent>

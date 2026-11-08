@@ -3,6 +3,7 @@
 import type {
 	Announcements,
 	DndContextProps,
+	DragCancelEvent,
 	DragEndEvent,
 	DragOverEvent,
 	DragStartEvent,
@@ -226,6 +227,7 @@ export const KanbanProvider = <
 	children,
 	onDragStart,
 	onDragEnd,
+	onDragCancel,
 	onDragOver,
 	className,
 	columns,
@@ -337,6 +339,12 @@ export const KanbanProvider = <
 		}
 	};
 
+	const handleDragCancel = (event: DragCancelEvent) => {
+		if (disabled) return;
+		setActiveCardId(null);
+		onDragCancel?.(event);
+	};
+
 	const announcements: Announcements = {
 		onDragStart({ active }) {
 			const { name, column } = data.find((item) => item.id === active.id) ?? {};
@@ -368,6 +376,7 @@ export const KanbanProvider = <
 				accessibility={{ announcements }}
 				collisionDetection={closestCenter}
 				onDragEnd={handleDragEnd}
+				onDragCancel={handleDragCancel}
 				onDragOver={handleDragOver}
 				onDragStart={handleDragStart}
 				sensors={sensors}

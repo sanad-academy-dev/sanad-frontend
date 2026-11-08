@@ -404,7 +404,7 @@ export function ReferRequestDialog({
 						size="sm"
 						onClick={handleSubmit}
 						disabled={referMutation.isPending}
-						className="text-xs h-8 font-semibold px-4 gap-1.5 bg-purple-600 hover:bg-purple-700 text-white shadow-2xs cursor-pointer"
+						className="text-xs h-8 font-semibold px-4 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white shadow-2xs cursor-pointer"
 					>
 						<IconArrowsExchange className="size-3.5" />
 						<span>{referMutation.isPending ? "جاري الإسناد..." : "تأكيد الإحالة ونقل المسؤولية"}</span>

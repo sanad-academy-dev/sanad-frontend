@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import {
-	IconArrowRight,
 	IconCheck,
-	IconCoin,
 	IconChevronDown,
+	IconCopy,
+	IconExternalLink,
 	IconLoader2,
+	IconRefresh,
 	IconSparkles,
 	IconUser,
 } from "@tabler/icons-react";
@@ -12,7 +13,6 @@ import { toast } from "sonner";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
 	Popover,
 	PopoverContent,
@@ -28,10 +28,11 @@ import {
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import {
 	useAwaitingPaymentRequest,
+	useRenewPaymentToken,
 	useDigitalRegistrationCapabilities,
 	useRegistrationReviewers,
 } from "../../hooks/use-digital-registration";
-import { generateAwaitingPaymentMessage } from "../../utils/ai-templates";
+import { generateAwaitingPaymentMessage, getPublicPaymentUrl } from "../../utils/ai-templates";
 import { cn } from "@/lib/utils";
 
 interface AwaitingPaymentDialogProps {
@@ -42,12 +43,6 @@ interface AwaitingPaymentDialogProps {
 	onSuccess?: () => void;
 	isExpanded?: boolean;
 }
-
-const SUBSCRIPTION_PLANS = [
-	{ id: "BASIC", name: "الباقة الأساسية (نصف دوام)", price: 800 },
-	{ id: "COMPREHENSIVE", name: "الباقة الشاملة (دوام كامل + أنشطة)", price: 1500 },
-	{ id: "PREMIUM", name: "الباقة المتميزة (VIP ورعاية خاصة)", price: 2200 },
-];
 
 export function AwaitingPaymentDialog({
 	request,
@@ -62,11 +57,6 @@ export function AwaitingPaymentDialog({
 	const [priority, setPriority] = useState<string>("بدون أولوية");
 	const [assignedStaffId, setAssignedStaffId] = useState<string | null>(null);
 	const [notifyEmail, setNotifyEmail] = useState<boolean>(false);
-	const [subscriptionPlanId, setSubscriptionPlanId] = useState<string>("BASIC");
-	const [subscriptionPlanName, setSubscriptionPlanName] = useState<string>("الباقة الأساسية (نصف دوام)");
-	const [subscriptionAmount, setSubscriptionAmount] = useState<number | string>(800);
-	const [includeMeals, setIncludeMeals] = useState<boolean>(false);
-	const [enableDailyStipend, setEnableDailyStipend] = useState<boolean>(false);
 
 	const [staffPopoverOpen, setStaffPopoverOpen] = useState<boolean>(false);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -74,6 +64,7 @@ export function AwaitingPaymentDialog({
 	const { capabilities } = useDigitalRegistrationCapabilities(campaignId);
 	const { data: staff = [], isLoading: isStaffLoading } = useRegistrationReviewers();
 	const awaitingPaymentMutation = useAwaitingPaymentRequest(campaignId);
+	const renewMutation = useRenewPaymentToken(campaignId);
 
 	// استرجاع وضبط بيانات الطلب الحالي فور فتح اللوحة
 	useEffect(() => {
@@ -82,7 +73,14 @@ export function AwaitingPaymentDialog({
 			setAssignedStaffId(request.assignedStaff?.id || request.assignedStaffId || null);
 			setEnableMessage(true);
 			setNotifyEmail(false);
-			setMessageText("");
+			const initialMsg = generateAwaitingPaymentMessage({
+				studentName: request.patientName || request.name || "الطالب",
+				guardianName: request.guardianName,
+				planName: request.subscriptionPlanName,
+				amount: request.subscriptionAmount ? Number(request.subscriptionAmount) : null,
+				paymentToken: request.paymentToken,
+			});
+			setMessageText(initialMsg);
 		}
 	}, [open, request]);
 
@@ -116,9 +114,38 @@ export function AwaitingPaymentDialog({
 		const generated = generateAwaitingPaymentMessage({
 			studentName: request.patientName || request.name || "الطالب",
 			guardianName: request.guardianName,
+			planName: request.subscriptionPlanName,
+			amount: request.subscriptionAmount ? Number(request.subscriptionAmount) : null,
+			paymentToken: request.paymentToken,
 		});
 		setMessageText(generated);
-		toast.success("تم توليد نص الرسالة وقابل للتعديل");
+		toast.success("تم توليد نص الرسالة متضمناً رابط السداد الذكي");
+	};
+
+	const handleRenewLink = () => {
+		renewMutation.mutate(
+			{ requestId: request.id, hours: 72 },
+			{
+				onSuccess: (res: any) => {
+					toast.success("تم تجديد وتمديد صلاحية رابط السداد لـ 72 ساعة إضافية");
+					if (res.paymentToken) {
+						request.paymentToken = res.paymentToken;
+						request.paymentTokenExpiresAt = res.paymentTokenExpiresAt;
+						const updatedMsg = generateAwaitingPaymentMessage({
+							studentName: request.patientName || request.name || "الطالب",
+							guardianName: request.guardianName,
+							planName: request.subscriptionPlanName,
+							amount: request.subscriptionAmount ? Number(request.subscriptionAmount) : null,
+							paymentToken: res.paymentToken,
+						});
+						setMessageText(updatedMsg);
+					}
+				},
+				onError: (err: any) => {
+					toast.error(err?.message || "فشل تجديد رابط السداد");
+				},
+			}
+		);
 	};
 
 	const handleSubmit = () => {
@@ -131,11 +158,11 @@ export function AwaitingPaymentDialog({
 			{
 				requestId: request.id,
 				data: {
-					subscriptionPlanId: subscriptionPlanId || undefined,
-					subscriptionPlanName: subscriptionPlanName || undefined,
-					subscriptionAmount: subscriptionAmount ? Number(subscriptionAmount) : undefined,
-					includeMeals,
-					enableDailyStipend,
+					subscriptionPlanId: request.subscriptionPlanId || undefined,
+					subscriptionPlanName: request.subscriptionPlanName || undefined,
+					subscriptionAmount: request.subscriptionAmount ? Number(request.subscriptionAmount) : undefined,
+					includeMeals: request.includeMeals,
+					enableDailyStipend: request.enableDailyStipend,
 					priority: priority !== "بدون أولوية" ? priority : null,
 					assignedStaffId: assignedStaffId || undefined,
 					subject: `بانتظار سداد الرسوم الأكاديمية - طلب #${request.code || request.id}`,
@@ -184,87 +211,63 @@ export function AwaitingPaymentDialog({
 					guardianEmail={request.guardianEmail}
 					patientName={request.patientName || request.name}
 				/>
-				{/* بطاقة الخطة المالية والرسوم المقررة */}
-				<div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-3 space-y-3 shadow-2xs">
-					<div className="flex items-center justify-between">
-						<span className="text-xs font-bold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5">
-							<IconCoin className="size-3.5 text-amber-500" />
-							<span>الخطة المالية والرسوم المقررة</span>
-						</span>
-						<span className="text-[10px] text-muted-foreground font-medium">سداد مقعد</span>
-					</div>
 
-					{/* اختيار الباقة */}
-					<div className="space-y-1.5">
-						<label className="text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
-							الباقة الأكاديمية
-						</label>
-						<div className="grid grid-cols-1 gap-1.5">
-							{SUBSCRIPTION_PLANS.map((plan) => {
-								const isSelected = subscriptionPlanId === plan.id;
-								return (
-									<button
-										key={plan.id}
-										type="button"
-										onClick={() => {
-											setSubscriptionPlanId(plan.id);
-											setSubscriptionPlanName(plan.name);
-											setSubscriptionAmount(plan.price);
-										}}
-										className={cn(
-											"flex items-center justify-between p-2 rounded-md border text-right transition-all cursor-pointer text-xs",
-											isSelected
-												? "border-primary bg-primary/5 text-primary font-bold shadow-2xs"
-												: "border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 text-zinc-700 dark:text-zinc-300"
-										)}
-									>
-										<span className="truncate">{plan.name}</span>
-										<span className="font-mono text-[11px] shrink-0 font-semibold">{plan.price} ج.م</span>
-									</button>
-								);
-							})}
-						</div>
-					</div>
-
-					{/* المبلغ الفعلي المحدد */}
-					<div className="space-y-1">
-						<label className="text-[11px] font-semibold text-zinc-700 dark:text-zinc-300">
-							المبلغ المطلوب سداده (ج.م)
-						</label>
-						<Input
-							type="number"
-							value={subscriptionAmount}
-							onChange={(e) => setSubscriptionAmount(e.target.value)}
-							className="h-8 text-xs font-mono"
-							placeholder="المبلغ بالجنية المصري"
-						/>
-					</div>
-
-					{/* مفاتيح التفعيل الإضافية: الوجبات والمصروف */}
-					<div className="pt-1 space-y-2 border-t border-zinc-100 dark:border-zinc-800">
+				{/* بطاقة رابط السداد الإلكتروني الذكي */}
+				{request.paymentToken && (
+					<div className="rounded-xl border border-primary/20 bg-primary/5 p-3 space-y-2">
 						<div className="flex items-center justify-between">
-							<label htmlFor="modal-include-meals" className="text-[11px] text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">
-								تشمل الوجبات الغذائية
-							</label>
-							<Switch
-								id="modal-include-meals"
-								checked={includeMeals}
-								onCheckedChange={setIncludeMeals}
-							/>
+							<div className="flex items-center gap-1.5 text-xs font-bold text-primary">
+								<IconSparkles className="h-4 w-4" />
+								<span>رابط سداد الرسوم الإلكتروني المخصص</span>
+							</div>
+							<span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
+								مشفر وصالح
+							</span>
 						</div>
-						<div className="flex items-center justify-between">
-							<label htmlFor="modal-daily-stipend" className="text-[11px] text-zinc-700 dark:text-zinc-300 cursor-pointer select-none">
-								تفعيل المصروف اليومي
-							</label>
-							<Switch
-								id="modal-daily-stipend"
-								checked={enableDailyStipend}
-								onCheckedChange={setEnableDailyStipend}
-							/>
+						<div className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/80 px-2.5 py-1.5 text-xs font-mono text-muted-foreground truncate select-all" dir="ltr">
+							<span className="truncate flex-1">{getPublicPaymentUrl(request.paymentToken)}</span>
+						</div>
+						<div className="flex items-center justify-between gap-2 pt-0.5">
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={() => {
+									navigator.clipboard.writeText(getPublicPaymentUrl(request.paymentToken!));
+									toast.success("تم نسخ رابط الدفع المباشر بنجاح");
+								}}
+								className="h-7 text-xs gap-1.5 flex-1"
+							>
+								<IconCopy className="h-3.5 w-3.5" />
+								<span>نسخ الرابط</span>
+							</Button>
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								disabled={renewMutation.isPending}
+								onClick={handleRenewLink}
+								className="h-7 text-xs gap-1 text-muted-foreground hover:text-foreground"
+							>
+								{renewMutation.isPending ? (
+									<IconLoader2 className="h-3.5 w-3.5 animate-spin" />
+								) : (
+									<IconRefresh className="h-3.5 w-3.5" />
+								)}
+								<span>تجديد الصلاحية</span>
+							</Button>
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								onClick={() => window.open(getPublicPaymentUrl(request.paymentToken!), "_blank")}
+								className="h-7 text-xs gap-1 text-muted-foreground hover:text-foreground px-2"
+							>
+								<IconExternalLink className="h-3.5 w-3.5" />
+							</Button>
 						</div>
 					</div>
-				</div>
-
+				)}
 
 				{/* سويتش تضمين رسالة لولي الأمر */}
 				<div className="flex items-center justify-between pt-1">
@@ -419,7 +422,7 @@ export function AwaitingPaymentDialog({
 						size="sm"
 						onClick={handleSubmit}
 						disabled={awaitingPaymentMutation.isPending}
-						className="h-8 text-xs font-semibold px-4 gap-1.5 bg-purple-600 hover:bg-purple-700 text-white shadow-2xs cursor-pointer"
+						className="h-8 text-xs font-semibold px-4 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white shadow-2xs cursor-pointer"
 					>
 						{awaitingPaymentMutation.isPending ? (
 							<IconLoader2 className="size-3.5 animate-spin" />

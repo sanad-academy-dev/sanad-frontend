@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import {
 	IconCalendar,
 	IconCheck,
+	IconCopy,
+	IconExternalLink,
+	IconLoader2,
 	IconPaperclip,
 	IconPlus,
 	IconSparkles,
@@ -13,6 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
 import { formatAppointmentDate, formatAppointmentTime, DEFAULT_CLINIC_TIMEZONE } from "../../utils/date-format";
+import { getWhatsAppUrl } from "../../utils/phone-format";
+import { getPublicPaymentUrl } from "../../utils/ai-templates";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -27,6 +32,7 @@ import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import {
 	useDigitalRegistrationCapabilities,
 	useQuickUpdateRequest,
+	useConfirmPaymentManually,
 } from "../../hooks/use-digital-registration";
 
 interface RequestChildDataCardProps {
@@ -34,6 +40,7 @@ interface RequestChildDataCardProps {
 	campaignId?: string;
 	onStatusChange?: (request: CampaignRequestItem, status: CampaignRequestItem["status"]) => void;
 	onOpenReschedule?: () => void;
+	onOpenAssignPlan?: () => void;
 }
 
 const SUBSCRIPTION_PLANS = [
@@ -81,9 +88,29 @@ export function RequestChildDataCard({
 	campaignId = "",
 	onStatusChange: _onStatusChange,
 	onOpenReschedule,
+	onOpenAssignPlan,
 }: RequestChildDataCardProps) {
 	const { capabilities } = useDigitalRegistrationCapabilities(campaignId);
 	const quickUpdateMutation = useQuickUpdateRequest(campaignId);
+	const confirmPaymentMutation = useConfirmPaymentManually(campaignId);
+
+	const handleConfirmManualPayment = () => {
+		confirmPaymentMutation.mutate(
+			{
+				requestId: request.id,
+				amount: request.subscriptionAmount ? Number(request.subscriptionAmount) : undefined,
+				notes: "تم التحقق من إيصال السداد واعتماد القبول يدوياً من المشرف",
+			},
+			{
+				onSuccess: () => {
+					toast.success("تم اعتماد سداد الرسوم وقبول الطالب رسمياً في الأكاديمية");
+				},
+				onError: (err: any) => {
+					toast.error(err?.message || "فشل اعتماد السداد");
+				},
+			}
+		);
+	};
 
 	// Notes state
 	const [isEditingNotes, setIsEditingNotes] = useState(false);
@@ -98,9 +125,6 @@ export function RequestChildDataCard({
 	const [allergyPopoverOpen, setAllergyPopoverOpen] = useState(false);
 	const [medicationInput, setMedicationInput] = useState("");
 	const [medicationPopoverOpen, setMedicationPopoverOpen] = useState(false);
-
-	// Subscription state
-	const [planPopoverOpen, setPlanPopoverOpen] = useState(false);
 
 	useEffect(() => {
 		setNoteText(request.notes || "");
@@ -189,10 +213,54 @@ export function RequestChildDataCard({
 			toast.error("لا يوجد رقم هاتف مسجل لولي الأمر");
 			return;
 		}
-		const cleanPhone = request.guardianPhone.replace(/\D/g, "");
-		const message = `مرحباً أستاذ ${request.guardianName || "ولي الأمر"}،\nنود تذكيركم بموعد المقابلة والتقييم للطالب "${request.patientName}" في أكاديمية سند.\nشاكرين حرصكم!`;
-		window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, "_blank");
-		toast.success("تم فتح واتساب لإرسال التذكير");
+
+		const fullDateFormatted = request.appointmentDate
+			? formatAppointmentDate(request.appointmentDate, clinicTimezone, "ar-EG-u-nu-latn", {
+					weekday: "long",
+					day: "numeric",
+					month: "long",
+					year: "numeric",
+			  })
+			: "";
+		const timeFormatted = request.appointmentDate
+			? formatAppointmentTime(request.appointmentDate, clinicTimezone, "ar-EG-u-nu-latn")
+			: "";
+
+		const isRemote = request.interviewMode === "REMOTE";
+		let locationLine = "";
+		if (isRemote) {
+			locationLine = "📍 المقر: عبر اتصال مرئي عن بُعد";
+			if (request.meetingUrl) {
+				locationLine += `\n🔗 رابط الاتصال: ${request.meetingUrl}`;
+			}
+		} else {
+			locationLine = request.roomName
+				? `📍 المقر: حضورياً بمقر الأكاديمية - ${request.roomName}`
+				: "📍 المقر: حضورياً بمقر الأكاديمية";
+		}
+
+		const arrivalAdvice = isRemote
+			? "نرجو التكرم بالانضمام للرابط قبل الموعد بـ 5 دقائق للتأكد من جودة الاتصال والصوت."
+			: "نرجو التكرم بالحضور قبل الموعد بـ 10 دقائق لضمان انتظام الجلسة.";
+
+		const message =
+			`السلام عليكم ورحمة الله وبركاته،\n` +
+			`عزيزي ولي أمر الطالب: ${request.patientName} (${request.guardianName ? `أ/ ${request.guardianName}` : "ولي الأمر الكريم"})،\n\n` +
+			`نود تذكيركم بموعد جلسة المقابلة والتقييم في أكاديمية سند:\n` +
+			(fullDateFormatted ? `📅 اليوم والتاريخ: ${fullDateFormatted}\n` : "") +
+			(timeFormatted ? `⏰ الوقت: ${timeFormatted}\n` : "") +
+			`${locationLine}\n\n` +
+			`${arrivalAdvice}\n` +
+			`شاكرين ومقدرين حسن تعاونكم وحرصكم الدائم!\n` +
+			`— إدارة القبول والتسجيل | أكاديمية سند`;
+
+		const waUrl = getWhatsAppUrl(request.guardianPhone, message);
+		if (!waUrl) {
+			toast.error("رقم هاتف ولي الأمر غير صالح لفتح واتساب");
+			return;
+		}
+		window.open(waUrl, "_blank");
+		toast.success("تم تجهيز رسالة التذكير وفتح واتساب");
 	};
 
 	const handleSaveNotes = () => {
@@ -281,26 +349,6 @@ export function RequestChildDataCard({
 			requestId: request.id,
 			data: { medications: next },
 		});
-	};
-
-	const handleAssignPlan = (plan: typeof SUBSCRIPTION_PLANS[0]) => {
-		if (!capabilities.canEdit) return;
-		quickUpdateMutation.mutate(
-			{
-				requestId: request.id,
-				data: {
-					subscriptionPlanId: plan.id,
-					subscriptionPlanName: plan.name,
-					subscriptionAmount: plan.price,
-				},
-			},
-			{
-				onSuccess: () => {
-					toast.success(`تم تعيين ${plan.name}`);
-					setPlanPopoverOpen(false);
-				},
-			},
-		);
 	};
 
 	const handleToggleMeals = (val: boolean) => {
@@ -481,14 +529,7 @@ export function RequestChildDataCard({
 					{isInterview && (
 						<>
 							<div className="flex items-center justify-between py-1">
-								<div className="flex items-center gap-1.5">
-									<span className="font-medium text-zinc-600 dark:text-zinc-400">موعد المقابلة</span>
-									{request.assessmentAppointment?.code && (
-										<Badge variant="outline" className="text-[10px] font-mono px-1 py-0 bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950 dark:text-purple-300">
-											{request.assessmentAppointment.code}
-										</Badge>
-									)}
-								</div>
+								<span className="font-medium text-zinc-600 dark:text-zinc-400">موعد المقابلة</span>
 								<div className="flex items-center gap-2">
 									{capabilities.canSchedule && onOpenReschedule && (
 										<button
@@ -574,8 +615,8 @@ export function RequestChildDataCard({
 					)}
 				</div>
 
-				{/* 5. المعلومات الطبية: فاصل علوي فقط بين السكاشن */}
-				<div className="space-y-1 border-t border-zinc-100 dark:border-zinc-800/80 pt-3 text-xs">
+				{/* 5. المعلومات الطبية: فاصل علوي واضح بين السكاشن */}
+				<div className="space-y-1 border-t border-zinc-200 dark:border-zinc-700 pt-3 text-xs">
 					<h4 className="font-bold text-xs text-zinc-900 dark:text-zinc-100 pb-0.5">المعلومات الطبية</h4>
 
 					{/* الحساسية */}
@@ -709,7 +750,7 @@ export function RequestChildDataCard({
 				{(isAwaitingPayment || isAccepted || isInterview) && (
 					<div
 						className={cn(
-							"space-y-2 border-t border-zinc-100 dark:border-zinc-800/80 pt-3 text-xs transition-colors",
+							"space-y-2 border-t border-zinc-200 dark:border-zinc-700 pt-3 text-xs transition-colors",
 							isAwaitingPayment &&
 								"p-3 rounded-lg border border-indigo-200/90 dark:border-indigo-900/60 bg-indigo-50/30 dark:bg-indigo-950/20",
 						)}
@@ -729,48 +770,26 @@ export function RequestChildDataCard({
 						<div className="flex items-center justify-between py-1">
 							<span className="font-medium text-zinc-600 dark:text-zinc-400">اختيار الباقة</span>
 							{capabilities.canEdit && !isAccepted ? (
-								<Popover open={planPopoverOpen} onOpenChange={setPlanPopoverOpen}>
-									<PopoverTrigger asChild>
-										{request.subscriptionPlanName ? (
-											<button
-												type="button"
-												className="h-6 px-2 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-950/30 rounded hover:bg-emerald-100 cursor-pointer"
-											>
-												{request.subscriptionPlanName}
-											</button>
-										) : (
-											<button
-												type="button"
-												className="inline-flex items-center gap-1 h-6 px-2 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-											>
-												<IconPlus className="size-3 text-zinc-500" />
-												<span>تعيين إشتراك</span>
-											</button>
-										)}
-									</PopoverTrigger>
-									<PopoverContent align="end" className="w-56 p-1.5" dir="rtl">
-										<p className="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 px-1.5 py-0.5">
-											اختر باقة الاشتراك الأكاديمية
-										</p>
-										<div className="space-y-0.5 mt-0.5">
-											{SUBSCRIPTION_PLANS.map((p) => (
-												<button
-													key={p.id}
-													type="button"
-													onClick={() => handleAssignPlan(p)}
-													className="w-full flex items-center justify-between p-1.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-right transition-colors cursor-pointer"
-												>
-													<span className="text-[10.5px] font-semibold text-zinc-800 dark:text-zinc-200">
-														{p.name}
-													</span>
-													<span className="text-[10.5px] font-bold text-emerald-600 font-mono">
-														{p.price} ج.م
-													</span>
-												</button>
-											))}
-										</div>
-									</PopoverContent>
-								</Popover>
+								request.subscriptionPlanName ? (
+									<button
+										type="button"
+										onClick={onOpenAssignPlan}
+										className="inline-flex items-center gap-1.5 h-6 px-2.5 text-[11px] font-semibold text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200/80 dark:hover:bg-zinc-700 rounded transition-colors cursor-pointer"
+										title="انقر لتعديل باقة الاشتراك"
+									>
+										<span>{request.subscriptionPlanName}</span>
+										<span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-normal">تغيير</span>
+									</button>
+								) : (
+									<button
+										type="button"
+										onClick={onOpenAssignPlan}
+										className="inline-flex items-center gap-1 h-6 px-2 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+									>
+										<IconPlus className="size-3 text-zinc-500" />
+										<span>تعيين إشتراك</span>
+									</button>
+								)
 							) : (
 								<span className="font-semibold text-zinc-900 dark:text-zinc-100">
 									{request.subscriptionPlanName || "غير محدد"}
@@ -807,6 +826,84 @@ export function RequestChildDataCard({
 								className="scale-85"
 							/>
 						</div>
+
+						{/* حالة ورابط سداد الرسوم الأكاديمية */}
+						{(request.paymentToken || request.paidAt || request.paymentReceiptUrl) && (
+							<div className="pt-2 border-t border-zinc-200/80 dark:border-zinc-700/80 space-y-2">
+								<div className="flex items-center justify-between">
+									<span className="font-semibold text-zinc-700 dark:text-zinc-300">سداد الرسوم:</span>
+									{request.paidAt || isAccepted ? (
+										<span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+											<IconCheck className="size-3" />
+											تم السداد بنجاح
+										</span>
+									) : request.paymentReceiptUrl ? (
+										<span className="inline-flex items-center gap-1 rounded bg-amber-500/10 px-2 py-0.5 text-[11px] font-bold text-amber-600 dark:text-amber-400">
+											إيصال مرفوع للمراجعة
+										</span>
+									) : (
+										<span className="inline-flex items-center gap-1 rounded bg-indigo-500/10 px-2 py-0.5 text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
+											بانتظار السداد
+										</span>
+									)}
+								</div>
+
+								{request.paymentToken && !request.paidAt && (
+									<div className="flex items-center justify-between gap-1.5 rounded bg-zinc-50 dark:bg-zinc-800/80 p-1.5 border border-zinc-200 dark:border-zinc-700">
+										<span className="text-[10px] text-muted-foreground truncate font-mono select-all flex-1" dir="ltr">
+											{getPublicPaymentUrl(request.paymentToken)}
+										</span>
+										<button
+											type="button"
+											onClick={() => {
+												navigator.clipboard.writeText(getPublicPaymentUrl(request.paymentToken!));
+												toast.success("تم نسخ رابط سداد الرسوم");
+											}}
+											className="inline-flex items-center gap-1 h-5 px-1.5 text-[10px] font-semibold bg-white dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 rounded hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-colors cursor-pointer"
+											title="نسخ الرابط"
+										>
+											<IconCopy className="size-3" />
+											<span>نسخ</span>
+										</button>
+										<button
+											type="button"
+											onClick={() => window.open(getPublicPaymentUrl(request.paymentToken!), "_blank")}
+											className="inline-flex items-center h-5 px-1 text-[10px] text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer"
+											title="معاينة"
+										>
+											<IconExternalLink className="size-3" />
+										</button>
+									</div>
+								)}
+
+								{/* إيصال السداد المرفوع واعتماده */}
+								{request.paymentReceiptUrl && !request.paidAt && capabilities.canEdit && (
+									<div className="flex items-center justify-between gap-2 pt-1">
+										<button
+											type="button"
+											onClick={() => window.open(request.paymentReceiptUrl!, "_blank")}
+											className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:underline cursor-pointer"
+										>
+											<IconExternalLink className="size-3" />
+											<span>معاينة إيصال التحويل</span>
+										</button>
+										<button
+											type="button"
+											onClick={handleConfirmManualPayment}
+											disabled={confirmPaymentMutation.isPending}
+											className="inline-flex items-center gap-1 h-6 px-2.5 text-[11px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded transition-colors shadow-2xs cursor-pointer"
+										>
+											{confirmPaymentMutation.isPending ? (
+												<IconLoader2 className="size-3 animate-spin" />
+											) : (
+												<IconCheck className="size-3" />
+											)}
+											<span>اعتماد السداد والقبول</span>
+										</button>
+									</div>
+								)}
+							</div>
+						)}
 					</div>
 				)}
 			</div>

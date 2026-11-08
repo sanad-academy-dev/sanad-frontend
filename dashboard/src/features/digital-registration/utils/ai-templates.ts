@@ -1,5 +1,19 @@
 /** قوالب رسائل جاهزة قابلة للتعديل لمنظومة سند. */
 
+export function generateQueueMessage({
+	studentName,
+	guardianName,
+	targetClass,
+}: {
+	studentName: string;
+	guardianName?: string | null;
+	targetClass?: string | null;
+}): string {
+	const className = targetClass || "البرنامج الأكاديمي";
+	const guardianGreeting = guardianName ? ` (${guardianName})` : "";
+	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}${guardianGreeting}،\nنحيطكم علماً بأنه قد تم تحديث ونقل حالة طلبكم إلى طابور مراجعة واستقبال الطلبات في "${className}".\nسيقوم فريق القبول والتسجيل بمتابعة الطلب واستكمال الإجراءات والتواصل معكم قريباً. مع تمنياتنا بالتوفيق.`;
+}
+
 export function generateShortlistMessage({
 	studentName,
 	guardianName,
@@ -80,22 +94,37 @@ export function generateRejectMessage({
 	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName} (${guardianName})،\nنشكركم خالص الشكر على اهتمامكم بالتقديم وثقتكم في أكاديمية سند التعليمية.\nبعد المراجعة الدقيقة لملف التقديم، نعتذر عن عدم إمكانية قبول الطلب في الفصل الحالي نظراً لـ (${reason}).\nسيبقى ملفكم في أرشيفنا للرجوع إليه مستقبلاً، ونتمنى للطالب دوام التوفيق والتميز في مسيرته القادمة.`;
 }
 
+export function getPublicPaymentUrl(token: string): string {
+	if (!token) return "";
+	const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+	const baseUrl = isLocal ? "http://localhost:3000" : "https://sanad-frontend-delta.vercel.app";
+	return `${baseUrl}/pay/${token}`;
+}
+
 export function generateAwaitingPaymentMessage({
 	studentName,
 	guardianName,
 	planName,
 	amount,
+	paymentToken,
+	paymentUrl,
 }: {
 	studentName: string;
 	guardianName?: string | null;
 	planName?: string | null;
 	amount?: number | null;
+	paymentToken?: string | null;
+	paymentUrl?: string | null;
 }): string {
 	const guardianGreeting = guardianName ? ` (${guardianName})` : "";
 	const planText = planName ? ` لـ "${planName}"` : "";
-	const amountText = amount ? ` والبالغة (${amount} ج.م)` : "";
+	const amountText = amount ? ` والبالغة (${amount.toLocaleString("ar-EG")} ج.م)` : "";
+	const finalLink = paymentUrl || (paymentToken ? getPublicPaymentUrl(paymentToken) : "");
+	const linkSection = finalLink
+		? `\n\n💳 لسداد الرسوم مباشرة بالبطاقة البنكية أو إنستاباي وتأكيد الحجز فورياً:\n${finalLink}`
+		: "";
 
-	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}${guardianGreeting}،\nيسعدنا إبلاغكم باجتياز الطالب لمرحلة التقييم والمقابلة الشخصية بنجاح في أكاديمية سند التعليمية.\nلحجز المقعد النهائي وتأكيد القيد، يرجى سداد الرسوم الأكاديمية المقررة${planText}${amountText}.\nسيسعد فريق الحسابات والقبول بمساعدتكم لإتمام السداد، مع تمنياتنا للطالب بمسيرة تعليمية ملهمة ومتميزة.`;
+	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}${guardianGreeting}،\nيسعدنا إبلاغكم باجتياز الطالب لمرحلة التقييم والمقابلة الشخصية بنجاح في أكاديمية سند التعليمية.\nلحجز المقعد النهائي وتأكيد القيد، يرجى سداد الرسوم الأكاديمية المقررة${planText}${amountText}.${linkSection}\n\nسيسعد فريق الحسابات والقبول بمساعدتكم لإتمام السداد، مع تمنياتنا للطالب بمسيرة تعليمية ملهمة ومتميزة.`;
 }
 
 export function generateReferralMessage({

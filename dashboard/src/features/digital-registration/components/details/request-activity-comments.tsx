@@ -2,8 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
 	IconActivity,
 	IconArrowsRightLeft,
-	IconAt,
-	IconArrowUp,
 	IconCornerDownLeft,
 	IconLoader2,
 	IconMoodSmile,
@@ -16,6 +14,11 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 import { useSession } from "@/lib/auth/client";
 import type { CampaignRequestItem, RegistrationCommentItem } from "../../types/campaign-request.types";
 import {
@@ -69,6 +72,66 @@ function getTimelineBadgeStyle(badge?: string | null) {
 	return "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 border-zinc-200/60 dark:border-zinc-700";
 }
 
+const EMOJI_LIST = [
+	"👍", "❤️", "😊", "🙏", "👏", "🎉",
+	"✅", "⚠️", "❌", "⏳", "🎯", "📌",
+	"💡", "📝", "⭐", "🔥", "👌", "🤝",
+	"📞", "📅", "✨", "💪", "💯", "👀",
+];
+
+function renderCommentContent(body: string) {
+	const lines = body.split("\n");
+	const textLines: string[] = [];
+	const attachments: Array<{ name: string; url: string }> = [];
+
+	for (const line of lines) {
+		const match = line.match(/^📎\s*\[(.*?)\](?:\((.*?)\))?$/);
+		if (match) {
+			attachments.push({ name: match[1], url: match[2] || "" });
+		} else {
+			textLines.push(line);
+		}
+	}
+
+	const text = textLines.join("\n").trim();
+
+	return (
+		<div className="space-y-1.5">
+			{text && (
+				<p className="text-[11px] text-zinc-800 dark:text-zinc-200 leading-relaxed font-sans whitespace-pre-wrap break-words">
+					{text}
+				</p>
+			)}
+			{attachments.length > 0 && (
+				<div className="flex flex-wrap gap-1.5 pt-0.5">
+					{attachments.map((att, i) => (
+						att.url ? (
+							<a
+								key={i}
+								href={att.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 border border-zinc-200 dark:border-zinc-700 text-[10.5px] text-primary font-medium transition-colors"
+							>
+								<IconPaperclip className="size-3 shrink-0 text-zinc-500" />
+								<span className="truncate max-w-[180px] underline">{att.name}</span>
+							</a>
+						) : (
+							<span
+								key={i}
+								className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[10.5px] text-zinc-600 dark:text-zinc-400 font-medium"
+							>
+								<IconPaperclip className="size-3 shrink-0 text-zinc-400" />
+								<span className="truncate max-w-[180px]">{att.name}</span>
+							</span>
+						)
+					))}
+				</div>
+			)}
+		</div>
+	);
+}
+
 export function RequestActivityComments({
 	request,
 	campaignId = "",
@@ -77,7 +140,10 @@ export function RequestActivityComments({
 	const [commentsList, setCommentsList] = useState<RegistrationCommentItem[]>(
 		request.comments || [],
 	);
+	const [emojiPopoverOpen, setEmojiPopoverOpen] = useState(false);
+
 	const commentsContainerRef = useRef<HTMLDivElement>(null);
+	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const { data: session } = useSession();
 
 	const addCommentMutation = useAddRequestComment(campaignId, request.id);
@@ -90,6 +156,18 @@ export function RequestActivityComments({
 		> = [];
 
 		for (const c of commentsList) {
+			// إظهار فقط التعليقات الحوارية اليدوية الحقيقية واستبعاد أي نصوص إشعارات أو رسائل تلقائية لولي الأمر
+			if (
+				c.body.startsWith("[") ||
+				c.body.includes("رسالة القائمة المختصرة") ||
+				c.body.includes("إشعار قائمة الانتظار") ||
+				c.body.includes("إشعار بانتظار الدفع") ||
+				c.body.includes("إشعار إعادة الجدولة") ||
+				c.body.includes("إشعار الرفض الرسمي")
+			) {
+				continue;
+			}
+
 			items.push({
 				type: "comment",
 				id: c.id,
@@ -140,6 +218,25 @@ export function RequestActivityComments({
 			setCommentsList(request.comments);
 		}
 	}, [request.comments]);
+
+	const handleInsertEmoji = (emoji: string) => {
+		const textarea = textareaRef.current;
+		if (textarea) {
+			const start = textarea.selectionStart ?? commentDraft.length;
+			const end = textarea.selectionEnd ?? commentDraft.length;
+			const updated = commentDraft.slice(0, start) + emoji + commentDraft.slice(end);
+			setCommentDraft(updated);
+			setEmojiPopoverOpen(false);
+			requestAnimationFrame(() => {
+				textarea.focus();
+				const nextCursor = start + emoji.length;
+				textarea.setSelectionRange(nextCursor, nextCursor);
+			});
+		} else {
+			setCommentDraft((prev) => prev + emoji);
+			setEmojiPopoverOpen(false);
+		}
+	};
 
 	const handleSendComment = () => {
 		const trimmed = commentDraft.trim();
@@ -315,9 +412,7 @@ export function RequestActivityComments({
 
 								{/* نص التعليق المعروض بوضوح تام */}
 								<div className="mt-1.5 pr-8">
-									<p className="text-[11px] text-zinc-800 dark:text-zinc-200 leading-relaxed font-sans whitespace-pre-wrap break-words">
-										{c.body}
-									</p>
+									{renderCommentContent(c.body)}
 								</div>
 							</div>
 						);
@@ -328,6 +423,7 @@ export function RequestActivityComments({
 			{/* صندوق كتابة التعليق الجديد المطابق للصورة تماماً */}
 			<div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-2 space-y-2 focus-within:border-primary/50 focus-within:ring-1 focus-within:ring-primary/20 transition-all shadow-2xs">
 				<Textarea
+					ref={textareaRef}
 					value={commentDraft}
 					onChange={(e) => setCommentDraft(e.target.value)}
 					onKeyDown={(e) => {
@@ -342,44 +438,41 @@ export function RequestActivityComments({
 
 				{/* شريط الأدوات السفلي */}
 				<div className="flex items-center justify-between pt-1.5 border-t border-zinc-100 dark:border-zinc-800/80">
-					{/* أيقونات المرفقات والرموز التعبيرية على اليمين كما بالصورة */}
+					{/* الرموز التعبيرية فقط */}
 					<div className="flex items-center gap-1 text-zinc-400">
-						<button
-							type="button"
-							disabled
-							aria-label="رفع الوسائط غير متاح حالياً"
-							className="size-6 flex items-center justify-center rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
-							title="رفع وسائط"
-						>
-							<IconArrowUp className="size-3.5" />
-						</button>
-						<button
-							type="button"
-							disabled
-							aria-label="الرموز التعبيرية غير متاحة حالياً"
-							className="size-6 flex items-center justify-center rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
-							title="رموز تعبيرية"
-						>
-							<IconMoodSmile className="size-3.5" />
-						</button>
-						<button
-							type="button"
-							disabled
-							aria-label="الإشارة غير متاحة حالياً"
-							className="size-6 flex items-center justify-center rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
-							title="إشارة @"
-						>
-							<IconAt className="size-3.5" />
-						</button>
-						<button
-							type="button"
-							disabled
-							aria-label="إرفاق ملف غير متاح حالياً"
-							className="size-6 flex items-center justify-center rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
-							title="إرفاق ملف"
-						>
-							<IconPaperclip className="size-3.5" />
-						</button>
+						<Popover open={emojiPopoverOpen} onOpenChange={setEmojiPopoverOpen}>
+							<PopoverTrigger asChild>
+								<button
+									type="button"
+									className="size-6 flex items-center justify-center rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer text-zinc-400"
+									title="رموز تعبيرية"
+								>
+									<IconMoodSmile className="size-3.5" />
+								</button>
+							</PopoverTrigger>
+							<PopoverContent
+								side="top"
+								align="start"
+								className="w-60 p-2 z-50 bg-popover shadow-xl rounded-xl border border-border"
+								dir="rtl"
+							>
+								<p className="text-[10px] font-bold text-muted-foreground mb-1.5 px-1">
+									الرموز التعبيرية السريعة
+								</p>
+								<div className="grid grid-cols-6 gap-1 text-center">
+									{EMOJI_LIST.map((emoji) => (
+										<button
+											key={emoji}
+											type="button"
+											onClick={() => handleInsertEmoji(emoji)}
+											className="size-8 flex items-center justify-center text-lg rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-transform active:scale-125 cursor-pointer"
+										>
+											{emoji}
+										</button>
+									))}
+								</div>
+							</PopoverContent>
+						</Popover>
 					</div>
 
 					{/* زر الإرسال على اليسار مع مؤشر التحميل ودعم Enter */}
@@ -390,7 +483,7 @@ export function RequestActivityComments({
 						</span>
 						<Button
 							size="sm"
-							className="h-7 text-xs px-3 gap-1.5 bg-primary text-primary-foreground font-semibold rounded-md shadow-2xs hover:bg-primary/90 transition-colors disabled:opacity-50"
+							className="h-7 text-xs px-3 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md shadow-2xs transition-colors disabled:opacity-50 cursor-pointer"
 							onClick={handleSendComment}
 							disabled={addCommentMutation.isPending || !commentDraft.trim()}
 						>

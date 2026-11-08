@@ -1,12 +1,19 @@
 import {
+	IconArrowRight,
 	IconCheck,
 	IconChevronDown,
+	IconCopy,
+	IconDownload,
 	IconHistory,
+	IconLink,
 	IconLoader2,
 	IconLock,
+	IconQrcode,
+	IconScan,
 	IconTrash,
 	IconX,
 } from "@tabler/icons-react";
+import QRCode from "qrcode";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -93,13 +100,75 @@ interface CampaignShareDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	initialFocusInvite?: boolean;
+	campaignCode?: string;
 }
 
 export function CampaignShareDialog({
 	open,
 	onOpenChange,
 	initialFocusInvite = false,
+	campaignCode,
 }: CampaignShareDialogProps) {
+	const { capabilities, isLoading: isCapabilitiesLoading } = useDigitalRegistrationCapabilities();
+	const canManage = Boolean(capabilities?.canManageTeam);
+
+	const [copiedLink, setCopiedLink] = useState(false);
+	const [showQrModal, setShowQrModal] = useState(false);
+
+	useEffect(() => {
+		if (!open) {
+			setShowQrModal(false);
+		}
+	}, [open]);
+	const [qrDataUrl, setQrDataUrl] = useState<string>("");
+
+	const boardUrl = useMemo(() => {
+		if (typeof window !== "undefined") {
+			return `${window.location.origin}/digital-registration`;
+		}
+		return "https://dashboard.sanad.app/digital-registration";
+	}, []);
+
+	useEffect(() => {
+		if (boardUrl) {
+			QRCode.toDataURL(boardUrl, {
+				width: 320,
+				margin: 2,
+				color: {
+					dark: "#1e1b4b",
+					light: "#ffffff",
+				},
+			})
+				.then((url) => setQrDataUrl(url))
+				.catch((err) => console.error("Failed to generate QR code", err));
+		}
+	}, [boardUrl]);
+
+	const handleCopyLink = () => {
+		if (!canManage) {
+			toast.error("صلاحيتك الحالية تتيح العرض فقط، ولا تملك صلاحية مشاركة اللوحة");
+			return;
+		}
+		navigator.clipboard.writeText(boardUrl);
+		setCopiedLink(true);
+		toast.success("تم نسخ رابط لوحة التسجيل الرقمي بنجاح لمشاركته مع الموظفين");
+		setTimeout(() => setCopiedLink(false), 2000);
+	};
+
+	const handleDownloadQr = () => {
+		if (!canManage) {
+			toast.error("صلاحيتك الحالية تتيح العرض فقط، ولا تملك صلاحية مشاركة رمز QR");
+			return;
+		}
+		if (!qrDataUrl) return;
+		const a = document.createElement("a");
+		a.href = qrDataUrl;
+		a.download = "sanad-registration-board-qr.png";
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		toast.success("تم بدء تحميل رمز QR الخاص بلوحة الموظفين بنجاح");
+	};
 	const inviteInputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
@@ -113,10 +182,8 @@ export function CampaignShareDialog({
 
 	// Queries and mutations
 	const { data: shareData, isLoading: isShareLoading } = useRegistrationShareAccess();
-	const { capabilities, isLoading: isCapabilitiesLoading } = useDigitalRegistrationCapabilities();
 	const inviteMutation = useInviteCollaborator();
 	const updateAccessMutation = useUpdateMemberAccess();
-	const canManage = capabilities.canManageTeam;
 	const isLoading = isShareLoading || isCapabilitiesLoading;
 	const currentUser = shareData?.currentUser;
 	const members = shareData?.members || [];
@@ -231,12 +298,15 @@ export function CampaignShareDialog({
 		<>
 		<Dialog
 			open={open}
-			onOpenChange={onOpenChange}
+			onOpenChange={(isOpen) => {
+				if (!isOpen) setShowQrModal(false);
+				onOpenChange(isOpen);
+			}}
 		>
 			<DialogContent
 				showCloseButton={false}
 				dir="rtl"
-				className="!fixed !left-1/2 !right-auto !top-1/2 !-translate-x-1/2 rtl:!-translate-x-1/2 !-translate-y-1/2 w-[94vw] sm:max-w-[560px] md:max-w-[600px] max-h-[86vh] overflow-y-auto p-4 sm:p-5 rounded-xl gap-3.5 border border-gray-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-900 text-right font-sans"
+				className="flex flex-col w-[94vw] sm:max-w-[560px] md:max-w-[600px] max-h-[86vh] overflow-y-auto p-4 sm:p-5 rounded-2xl gap-3.5 border border-gray-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-900 text-right font-sans"
 			>
 				{/* Header: Title and Close button */}
 				<div className="flex items-center justify-between">
@@ -599,8 +669,45 @@ export function CampaignShareDialog({
 				{/* Divider */}
 				<div className="-mx-4 sm:-mx-5 border-b border-gray-200 dark:border-zinc-800" />
 
-				{/* Footer: إغلاق */}
-				<div className="flex items-center justify-end pt-0.5">
+				{/* Footer: Copy Link & QR Code on the right (start in RTL), and Close button on the left (end in RTL) */}
+				<div className="flex items-center justify-between pt-1 gap-2 flex-wrap">
+					{/* Right Side (start in RTL): Copy link & QR Code for Admins / Managers only */}
+					{canManage ? (
+						<div className="flex items-center gap-2">
+							{/* Copy link */}
+							<button
+								type="button"
+								onClick={handleCopyLink}
+								className="h-8 px-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 hover:bg-gray-50 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-200 text-[12px] font-medium flex items-center gap-1.5 cursor-pointer shadow-none transition-colors"
+								title="نسخ رابط لوحة التسجيل الرقمي لمشاركته مع الموظفين المصرح لهم"
+							>
+								{copiedLink ? (
+									<IconCheck className="size-3.5 text-emerald-600" />
+								) : (
+									<IconLink className="size-3.5 text-gray-500" />
+								)}
+								<span>{copiedLink ? "Copied!" : "Copy link"}</span>
+							</button>
+
+							{/* QR Code */}
+							<button
+								type="button"
+								onClick={() => setShowQrModal(true)}
+								className="h-8 px-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800/80 hover:bg-purple-50/70 dark:hover:bg-purple-950/40 text-gray-800 dark:text-zinc-200 text-[12px] font-medium flex items-center gap-1.5 cursor-pointer shadow-none transition-colors group"
+								title="عرض وتحميل رمز QR للوحة التسجيل لمسحه من قِبل الموظفين"
+							>
+								<IconQrcode className="size-4 text-[#6D28D9] dark:text-[#A78BFA] transition-transform group-hover:scale-110" />
+								<span className="text-[#6D28D9] dark:text-[#A78BFA] font-medium">QR Code</span>
+							</button>
+						</div>
+					) : (
+						<div className="flex items-center gap-1.5 text-[11px] text-gray-400 dark:text-zinc-500 select-none">
+							<IconLock className="size-3.5" />
+							<span>مشاركة اللوحة متاحة لمدير النظام فقط</span>
+						</div>
+					)}
+
+					{/* Left Side (end in RTL): إغلاق */}
 					<Button
 						type="button"
 						size="sm"
@@ -661,6 +768,118 @@ export function CampaignShareDialog({
 				</div>
 			</DialogContent>
 		</Dialog>
+
+		{/* نافذة عرض وتحميل رمز QR للوحة التسجيل الرقمي للموظفين (Modal on top of Share) */}
+		<Dialog open={showQrModal} onOpenChange={setShowQrModal}>
+			<DialogContent
+				showCloseButton={false}
+				dir="rtl"
+				className="flex flex-col w-[92vw] sm:max-w-[370px] p-4 sm:p-4.5 rounded-2xl gap-3 border border-gray-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-900 text-right font-sans overflow-hidden z-70"
+			>
+				{/* Header: Title and single clean close button */}
+				<div className="flex items-center justify-between pb-2 border-b border-gray-100 dark:border-zinc-800/80 w-full min-w-0">
+					<div className="flex items-center gap-2.5 min-w-0">
+						<div className="size-8 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-[#6D28D9] dark:text-[#C4B5FD] flex items-center justify-center border border-purple-100/80 dark:border-purple-900/40 shrink-0">
+							<IconQrcode className="size-4.5" />
+						</div>
+						<div className="flex flex-col text-start min-w-0">
+							<DialogTitle className="text-[14.5px] font-bold text-gray-900 dark:text-zinc-100 truncate">
+								رمز الاستجابة السريعة (QR Code)
+							</DialogTitle>
+							<span className="text-[10.5px] text-gray-400 dark:text-zinc-500 font-normal truncate">
+								لوحة التسجيل الرقمي لفريق العمل
+							</span>
+						</div>
+					</div>
+					<button
+						type="button"
+						onClick={() => setShowQrModal(false)}
+						className="text-gray-400 hover:text-gray-700 dark:text-zinc-400 dark:hover:text-zinc-200 p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer shrink-0"
+						aria-label="إغلاق"
+					>
+						<IconX className="size-4" />
+					</button>
+				</div>
+
+				{/* QR Code Showcase Card */}
+				<div className="flex flex-col items-center justify-center p-3 bg-gray-50/80 dark:bg-zinc-800/50 rounded-xl border border-gray-100 dark:border-zinc-800 gap-2.5 w-full">
+					{qrDataUrl ? (
+						<div className="p-2.5 bg-white dark:bg-white rounded-xl shadow-2xs border border-gray-200/80 dark:border-zinc-200 transition-transform hover:scale-[1.01] shrink-0">
+							<img
+								src={qrDataUrl}
+								alt="Digital Registration Board QR Code"
+								className="size-36 sm:size-40 object-contain select-none"
+							/>
+						</div>
+					) : (
+						<div className="size-40 flex items-center justify-center text-xs text-gray-400">
+							<IconLoader2 className="size-5 animate-spin text-[#6D28D9]" />
+						</div>
+					)}
+
+					<div className="flex items-center gap-1.5 text-[11px] text-gray-500 dark:text-zinc-400 font-medium text-center">
+						<IconScan className="size-3.5 text-[#6D28D9] dark:text-[#A78BFA] shrink-0" />
+						<span>امسح الرمز لفتح اللوحة بحسابك المصرح له</span>
+					</div>
+				</div>
+
+				{/* URL Pill with direct Copy Action */}
+				<div className="flex items-center gap-2 w-full min-w-0 bg-gray-50 dark:bg-zinc-800/80 border border-gray-200 dark:border-zinc-700 rounded-lg px-2.5 py-1.5 shadow-2xs">
+					<IconLink className="size-3.5 text-gray-400 shrink-0" />
+					<span
+						className="text-[11px] font-mono text-gray-700 dark:text-zinc-300 truncate min-w-0 flex-1 text-left select-all"
+						dir="ltr"
+						title={boardUrl}
+					>
+						{boardUrl}
+					</span>
+					<Button
+						type="button"
+						variant="ghost"
+						size="sm"
+						onClick={handleCopyLink}
+						className="h-6.5 px-2 text-[10.5px] font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-md shrink-0 gap-1 cursor-pointer"
+					>
+						{copiedLink ? (
+							<>
+								<IconCheck className="size-3 text-emerald-600" />
+								<span className="text-emerald-600 font-semibold">تم النسخ</span>
+							</>
+						) : (
+							<>
+								<IconCopy className="size-3" />
+								<span>نسخ</span>
+							</>
+						)}
+					</Button>
+				</div>
+
+				{/* Footer Actions */}
+				<div className="flex items-center justify-end gap-2 pt-1 border-t border-gray-100 dark:border-zinc-800 w-full">
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={() => setShowQrModal(false)}
+						className="h-8 px-3.5 text-xs font-medium cursor-pointer rounded-lg border-gray-200 dark:border-zinc-700 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-zinc-300"
+					>
+						إغلاق
+					</Button>
+
+					<Button
+						type="button"
+						size="sm"
+						onClick={handleDownloadQr}
+						disabled={!qrDataUrl}
+						className="h-8 px-4 bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-medium text-xs gap-1.5 rounded-lg cursor-pointer transition-colors shadow-none"
+					>
+						<IconDownload className="size-3.5" />
+						<span>تحميل الرمز (PNG)</span>
+					</Button>
+				</div>
+			</DialogContent>
+		</Dialog>
+
 		</>
 	);
 }

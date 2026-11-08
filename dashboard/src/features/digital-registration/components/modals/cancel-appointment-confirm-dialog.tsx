@@ -137,7 +137,7 @@ export function CancelAppointmentConfirmDialog({
 						size="sm"
 						disabled={isLoading}
 						onClick={onConfirm}
-						className="h-9 px-4 text-xs font-semibold bg-amber-600 hover:bg-amber-700 text-white cursor-pointer transition-colors shadow-xs"
+						className="h-9 px-4 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white cursor-pointer transition-colors shadow-xs"
 					>
 						{isLoading ? "جارٍ الإلغاء والنقل..." : "إلغاء الموعد ونقل الطلب"}
 					</Button>

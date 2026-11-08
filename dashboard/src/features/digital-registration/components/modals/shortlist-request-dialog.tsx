@@ -308,7 +308,7 @@ export function ShortlistRequestDialog({
 							size="sm"
 							onClick={handleSubmit}
 							disabled={shortlistMutation.isPending}
-							className="h-8 text-xs font-semibold px-4 gap-1.5 bg-purple-600 hover:bg-purple-700 text-white shadow-2xs cursor-pointer"
+							className="h-8 text-xs font-semibold px-4 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white shadow-2xs cursor-pointer"
 						>
 							<IconCheck className="size-3.5" />
 							<span>{shortlistMutation.isPending ? "جاري الحفظ..." : "تأكيد الإضافة للمختصرة"}</span>

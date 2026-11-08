@@ -423,8 +423,7 @@ export function RejectRequestDialog({
 						size="sm"
 						onClick={handleSubmit}
 						disabled={rejectMutation.isPending || !capabilities.canAcceptOrReject}
-						variant="destructive"
-						className="h-8 text-xs font-semibold px-4 gap-1.5 cursor-pointer shadow-2xs"
+						className="h-8 text-xs font-semibold px-4 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white cursor-pointer shadow-2xs"
 					>
 						<IconTrash className="size-3.5" />
 						<span>{rejectMutation.isPending ? "جاري الحفظ..." : "تأكيد الرفض"}</span>

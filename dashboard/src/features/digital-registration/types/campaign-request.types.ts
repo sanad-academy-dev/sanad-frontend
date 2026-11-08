@@ -110,6 +110,14 @@ export interface CampaignRequestItem {
 	subscriptionAmount?: number | null;
 	includeMeals?: boolean;
 	enableDailyStipend?: boolean;
+	paymentToken?: string | null;
+	paymentTokenExpiresAt?: string | null;
+	paidAt?: string | null;
+	paymentReference?: string | null;
+	paymentGateway?: string | null;
+	paymentReceiptUrl?: string | null;
+	paymentMethodType?: string | null;
+	paymentNotes?: string | null;
 	medications?: Array<{ id?: string; name: string; dose?: string; timing?: string } | string>;
 	allergiesList?: string[];
 	assignedStaffId?: string | null;

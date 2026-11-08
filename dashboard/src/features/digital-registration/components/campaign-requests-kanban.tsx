@@ -47,9 +47,11 @@ import { cn } from "@/lib/utils";
 import { AppointmentColumnHeader } from "@/features/appointments/components/appointment-column-header";
 import type { AppointmentColumn, AppointmentColumnId } from "@/features/appointments/types/appointment.types";
 import { toast } from "sonner";
-import { CampaignRequestSheet } from "./campaign-request-sheet";
+import { CampaignRequestSheet, type ActiveActionDrawer } from "./campaign-request-sheet";
 import { CancelAppointmentConfirmDialog } from "./modals/cancel-appointment-confirm-dialog";
+import { RequestStatusTransitionDialog } from "./modals/request-status-transition-dialog";
 import { PriorityPickerPopover } from "./priority-picker-popover";
+import { useKanbanAutoScroll } from "../hooks/use-kanban-auto-scroll";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
 import {
 	formatAppointmentDate,
@@ -162,6 +164,25 @@ export function CampaignRequestsKanban({
 	const lastKnownColumns = useRef<Map<string, AppointmentColumnId>>(new Map());
 	const [internalSelectedRequestId, setInternalSelectedRequestId] = useState<string | null>(null);
 	const [scheduleWorkflowRequestId, setScheduleWorkflowRequestId] = useState<string | null>(null);
+	const [targetActionDrawer, setTargetActionDrawer] = useState<ActiveActionDrawer>(null);
+	const [isDraggingCard, setIsDraggingCard] = useState(false);
+	const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+	useKanbanAutoScroll({
+		containerRef: scrollContainerRef,
+		isDragging: isDraggingCard,
+		edgeThreshold: 110,
+		maxSpeed: 24,
+		onDragStop: () => setIsDraggingCard(false),
+	});
+	const openRequestWithDrawer = (requestId: string, drawer: ActiveActionDrawer, toastNotice?: string) => {
+		setSelectedRequestId(requestId);
+		setTargetActionDrawer(drawer);
+		if (toastNotice) {
+			toast.info(toastNotice);
+		}
+	};
+	const [pendingAcceptRequest, setPendingAcceptRequest] = useState<CampaignRequestItem | null>(null);
 	const [pendingCancelAppointmentDrag, setPendingCancelAppointmentDrag] = useState<{
 		request: CampaignRequestItem;
 		targetColumn: string;
@@ -175,6 +196,7 @@ export function CampaignRequestsKanban({
 	const startScheduleWorkflow = (request: CampaignRequestItem) => {
 		setScheduleWorkflowRequestId(request.id);
 		setSelectedRequestId(request.id);
+		setTargetActionDrawer("reschedule");
 		toast.info("ثبّت الموعد والمراجع أولاً؛ سيُنقل الطلب إلى المقابلة تلقائياً بعد الحجز");
 	};
 
@@ -407,6 +429,349 @@ export function CampaignRequestsKanban({
 			const targetColumn = item.column;
 			const meta = COLUMN_STATUS_MAP[targetColumn] || COLUMN_STATUS_MAP.queue;
 
+			// ─── قواعد السحب المشروط والمقيد من عمود «الطابور» (Queue) ───
+			if (prevCol === "queue" && oldItem) {
+				// 1. الوجهات الممنوعة نهائياً: بانتظار الدفع أو القبول النهائي
+				if (targetColumn === "accepted" || meta.status === "ACCEPTED") {
+					toast.error("لا يمكن اعتماد وقبول الطالب مباشرة من الطابور؛ يجب المرور بمسار المقابلة والتقييم وسداد الرسوم أولاً.");
+					committed.push({ ...item, column: prevCol });
+					continue;
+				}
+				if (["awaiting-payment", "awaiting_payment"].includes(targetColumn) || meta.status === "AWAITING_PAYMENT") {
+					toast.error("لا يمكن نقل الطلب من الطابور إلى مرحلة انتظار الدفع مباشرة؛ يجب إجراء المقابلة والتقييم أولاً.");
+					committed.push({ ...item, column: prevCol });
+					continue;
+				}
+
+				// 2. الوجهات المشروطة بفتح الدراور المناسب:
+				if (targetColumn === "shortlist") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"shortlist",
+						"يلزم مراجعة القائمة المختصرة وتحديد الأولوية والمراجع؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				if (targetColumn === "waitlist") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"waitlist",
+						"يلزم تحديد سبب وتفاصيل وضع الطالب في قائمة الانتظار؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				if (targetColumn === "interview" || meta.status === "INTERVIEW") {
+					committed.push({ ...item, column: prevCol });
+					startScheduleWorkflow(oldItem);
+					continue;
+				}
+
+				if (targetColumn === "rejected") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"reject",
+						"يلزم تحديد سبب الاعتذار ورسالة الرفض؛ تم فتح لوحة الرفض.",
+					);
+					continue;
+				}
+			}
+
+			// ─── قواعد السحب المشروط والمقيد من عمود «القائمة المختصرة» (Shortlist) ───
+			if (prevCol === "shortlist" && oldItem) {
+				// 1. الوجهات الممنوعة نهائياً: بانتظار الدفع أو القبول النهائي
+				if (targetColumn === "accepted" || meta.status === "ACCEPTED") {
+					toast.error("لا يمكن اعتماد وقبول الطالب مباشرة من القائمة المختصرة؛ يجب المرور بمسار المقابلة والتقييم وسداد الرسوم أولاً.");
+					committed.push({ ...item, column: prevCol });
+					continue;
+				}
+				if (["awaiting-payment", "awaiting_payment"].includes(targetColumn) || meta.status === "AWAITING_PAYMENT") {
+					toast.error("لا يمكن نقل الطلب من القائمة المختصرة إلى مرحلة انتظار الدفع مباشرة؛ يجب إجراء وتثبيت المقابلة الشخصية والتقييم أولاً.");
+					committed.push({ ...item, column: prevCol });
+					continue;
+				}
+
+				// 2. الوجهات المشروطة بفتح الدراور المناسب:
+				if (targetColumn === "interview" || meta.status === "INTERVIEW") {
+					committed.push({ ...item, column: prevCol });
+					startScheduleWorkflow(oldItem);
+					continue;
+				}
+
+				if (targetColumn === "waitlist") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"waitlist",
+						"يلزم تحديد سبب وتفاصيل وضع الطالب في قائمة الانتظار؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				if (targetColumn === "queue") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"queue",
+						"يلزم مراجعة تفاصيل إعادة الطلب إلى الطابور؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				if (targetColumn === "rejected") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"reject",
+						"يلزم تحديد سبب الاعتذار ورسالة الرفض؛ تم فتح لوحة الرفض.",
+					);
+					continue;
+				}
+			}
+
+			// ─── قواعد السحب المشروط والمقيد من عمود «قائمة الانتظار» (Waitlist) ───
+			if (prevCol === "waitlist" && oldItem) {
+				// 1. الوجهات الممنوعة نهائياً: بانتظار الدفع أو القبول النهائي
+				if (targetColumn === "accepted" || meta.status === "ACCEPTED") {
+					toast.error("لا يمكن اعتماد وقبول الطالب مباشرة من قائمة الانتظار؛ يجب المرور بمسار المقابلة والتقييم وسداد الرسوم أولاً.");
+					committed.push({ ...item, column: prevCol });
+					continue;
+				}
+				if (["awaiting-payment", "awaiting_payment"].includes(targetColumn) || meta.status === "AWAITING_PAYMENT") {
+					toast.error("لا يمكن نقل الطلب من قائمة الانتظار إلى مرحلة انتظار الدفع مباشرة؛ يجب إجراء وتثبيت المقابلة الشخصية والتقييم أولاً.");
+					committed.push({ ...item, column: prevCol });
+					continue;
+				}
+
+				// 2. الوجهات المشروطة بفتح الدراور المناسب:
+				if (targetColumn === "interview" || meta.status === "INTERVIEW") {
+					committed.push({ ...item, column: prevCol });
+					startScheduleWorkflow(oldItem);
+					continue;
+				}
+
+				if (targetColumn === "shortlist") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"shortlist",
+						"يلزم مراجعة القائمة المختصرة وتحديد الأولوية والمراجع؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				if (targetColumn === "queue") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"queue",
+						"يلزم مراجعة تفاصيل إلغاء الانتظار وإعادة الطلب إلى الطابور؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				if (targetColumn === "rejected") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"reject",
+						"يلزم تحديد سبب الاعتذار ورسالة الرفض؛ تم فتح لوحة الرفض.",
+					);
+					continue;
+				}
+			}
+
+			// ─── قواعد السحب المشروط والمقيد من عمود «المقابلة الشخصية» (Interview) ───
+			if (prevCol === "interview" && oldItem) {
+				// 1. الوجهات الممنوعة نهائياً: القبول المباشر دون سداد
+				if (targetColumn === "accepted" || meta.status === "ACCEPTED") {
+					toast.error("لا يمكن اعتماد وقبول الطالب مباشرة من المقابلة الشخصية؛ يجب نقله إلى مرحلة «بانتظار الدفع» لتحديد الباقة وتأكيد سداد الرسوم أولاً.");
+					committed.push({ ...item, column: prevCol });
+					continue;
+				}
+
+				// 2. السحب للأمام إلى بانتظار الدفع:
+				if (["awaiting-payment", "awaiting_payment"].includes(targetColumn) || meta.status === "AWAITING_PAYMENT") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"awaiting-payment",
+						"يلزم تحديد خطة ورسوم السداد وإشعار ولي الأمر؛ تم فتح لوحة الدفع.",
+					);
+					continue;
+				}
+
+				// 3. السحب إلى قائمة الانتظار:
+				if (targetColumn === "waitlist") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"waitlist",
+						"يلزم تحديد سبب وتفاصيل وضع الطالب في قائمة الانتظار؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				// 4. السحب للخلف إلى القائمة المختصرة:
+				if (targetColumn === "shortlist") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"shortlist",
+						"يلزم مراجعة القائمة المختصرة وتحديد الأولوية؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				// 5. السحب للخلف إلى الطابور:
+				if (targetColumn === "queue") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"queue",
+						"يلزم مراجعة تفاصيل إلغاء المقابلة وإعادة الطلب إلى الطابور؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				// 6. السحب إلى الرفض:
+				if (targetColumn === "rejected") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"reject",
+						"يلزم تحديد سبب الاعتذار ورسالة الرفض؛ تم فتح لوحة الرفض.",
+					);
+					continue;
+				}
+			}
+
+			// ─── قواعد السحب المشروط والمقيد من عمود «بانتظار الدفع» (Awaiting Payment) ───
+			if ((prevCol === "awaiting-payment" || prevCol === "awaiting_payment") && oldItem) {
+				// 1. السحب للأمام إلى القبول النهائي: يفتح دياوج تأكيد القبول واعتماد ملف الطالب
+				if (targetColumn === "accepted" || meta.status === "ACCEPTED") {
+					committed.push({ ...item, column: prevCol });
+					setPendingAcceptRequest(oldItem);
+					continue;
+				}
+
+				// 2. الوجهات الممنوعة نهائياً: العودة إلى المقابلة أو القائمة المختصرة
+				if (targetColumn === "interview" || meta.status === "INTERVIEW") {
+					toast.error("لا يمكن إعادة الطلب إلى المقابلة الشخصية بعد الوصول لمرحلة الدفع؛ يمكنك نقله لقائمة الانتظار أو الرفض أو إعادته للطابور.");
+					committed.push({ ...item, column: prevCol });
+					continue;
+				}
+
+				if (targetColumn === "shortlist") {
+					toast.error("لا يمكن نقل الطلب من انتظار الدفع إلى القائمة المختصرة؛ يمكنك نقله لقائمة الانتظار أو الرفض أو إعادته للطابور.");
+					committed.push({ ...item, column: prevCol });
+					continue;
+				}
+
+				// 3. السحب إلى قائمة الانتظار:
+				if (targetColumn === "waitlist") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"waitlist",
+						"يلزم تحديد سبب وتفاصيل وضع الطالب في قائمة الانتظار؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				// 4. السحب للخلف إلى الطابور:
+				if (targetColumn === "queue") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"queue",
+						"يلزم مراجعة تفاصيل إلغاء الدفع وإعادة الطلب إلى الطابور؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				// 5. السحب إلى الرفض:
+				if (targetColumn === "rejected") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"reject",
+						"يلزم تحديد سبب الاعتذار ورسالة الرفض؛ تم فتح لوحة الرفض.",
+					);
+					continue;
+				}
+			}
+
+			// ─── قواعد السحب المشروط والمقيد من عمود «مرفوض» (Rejected) ───
+			if (prevCol === "rejected" && oldItem) {
+				// 1. الوجهات المسموحة المشروطة:
+				if (targetColumn === "queue") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"queue",
+						"يلزم مراجعة تفاصيل إعادة تفعيل الطلب ونقله إلى الطابور؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				if (targetColumn === "shortlist") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"shortlist",
+						"يلزم تحديد أولوية ومراجع الطالب عند إعادته للقائمة المختصرة؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				// 2. سائر الوجهات ممنوعة نهائياً (المقابلة، الانتظار، الدفع، القبول):
+				toast.error("لا يمكن نقل الطلب المرفوض إلى هذه المرحلة مباشرة؛ يمكنك فقط إعادته إلى «الطابور» أو «القائمة المختصرة» لإعادة دراسة طلبه.");
+				committed.push({ ...item, column: prevCol });
+				continue;
+			}
+
+			// ─── قواعد السحب المشروط والمقيد من عمود «مكرر» (Duplicate) ───
+			if (prevCol === "duplicate" && oldItem) {
+				if (targetColumn === "queue") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"queue",
+						"يلزم مراجعة تفاصيل فك التكرار وإعادة الطلب إلى الطابور؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				if (targetColumn === "shortlist") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"shortlist",
+						"يلزم تحديد أولوية ومراجع الطالب عند نقله للقائمة المختصرة؛ تم فتح لوحة الإجراء.",
+					);
+					continue;
+				}
+
+				if (targetColumn === "rejected") {
+					committed.push({ ...item, column: prevCol });
+					openRequestWithDrawer(
+						oldItem.id,
+						"reject",
+						"يلزم تحديد سبب الاعتذار ورسالة الرفض؛ تم فتح لوحة الرفض.",
+					);
+					continue;
+				}
+
+				toast.error("لا يمكن نقل الطلب المكرر إلى هذه المرحلة مباشرة؛ يمكنك نقله إلى «الطابور» أو «القائمة المختصرة» أو «الرفض».");
+				committed.push({ ...item, column: prevCol });
+				continue;
+			}
+
 			// التحقق من السحب للخلف من المقابلة أو المراحل المتقدمة مع وجود موعد فعال
 			const hasActiveAppointment = Boolean(
 				oldItem?.assessmentAppointment && oldItem.assessmentAppointment.status !== "CANCELLED",
@@ -532,7 +897,7 @@ export function CampaignRequestsKanban({
 	};
 
 	return (
-		<div className="min-h-0 flex-1 overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-gutter:stable] px-3 lg:px-4 mt-3 pb-3">
+		<div ref={scrollContainerRef} className="min-h-0 flex-1 overflow-x-auto overscroll-x-contain [scrollbar-gutter:stable] px-3 lg:px-4 mt-3 pb-3">
 			{filteredData.length === 0 && data.length > 0 && (
 				<div className="flex items-center justify-between gap-2 rounded-md border border-amber-200 bg-amber-50/70 px-4 py-2 text-xs text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300 mb-3" dir="rtl">
 					<span>لا توجد طلبات تطابق شروط البحث والفلترة المحددة.</span>
@@ -548,6 +913,10 @@ export function CampaignRequestsKanban({
 				previewCrossColumnOnDragOver={false}
 				onDataChange={capabilities.canChangeStatus ? handleDataChange : undefined}
 				disabled={!capabilities.canChangeStatus}
+				autoScroll={false}
+				onDragStart={() => setIsDraggingCard(true)}
+				onDragEnd={() => setIsDraggingCard(false)}
+				onDragCancel={() => setIsDraggingCard(false)}
 			>
 				{(column) => (
 					<KanbanBoard
@@ -942,9 +1311,11 @@ export function CampaignRequestsKanban({
 					if (!open) {
 						setSelectedRequestId(null);
 						setScheduleWorkflowRequestId(null);
+						setTargetActionDrawer(null);
 					}
 				}}
 				openRescheduleOnOpen={scheduleWorkflowRequestId === selectedRequest?.id}
+				initialDrawer={targetActionDrawer}
 				isUpdating={updateStatusMutation.isPending}
 				onStatusChange={capabilities.canChangeStatus ? handleStatusChange : undefined}
 				onAccept={capabilities.canAcceptOrReject ? (req) => handleStatusChange(req, "ACCEPTED") : undefined}
@@ -965,6 +1336,18 @@ export function CampaignRequestsKanban({
 				onConfirm={handleConfirmCancelAppointmentDrag}
 				onCancel={() => setPendingCancelAppointmentDrag(null)}
 				isLoading={updateStatusMutation.isPending}
+			/>
+			<RequestStatusTransitionDialog
+				request={pendingAcceptRequest}
+				target="ACCEPTED"
+				open={Boolean(pendingAcceptRequest)}
+				onOpenChange={(open) => {
+					if (!open) setPendingAcceptRequest(null);
+				}}
+				campaignId={campaignId}
+				onSuccess={() => {
+					setPendingAcceptRequest(null);
+				}}
 			/>
 		</div>
 	);

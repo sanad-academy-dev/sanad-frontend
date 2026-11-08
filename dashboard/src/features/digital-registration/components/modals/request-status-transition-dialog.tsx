@@ -4,7 +4,6 @@ import { IconAlertTriangle, IconArrowRight, IconCheck, IconInfoCircle } from "@t
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { useUpdateRequestStatus } from "../../hooks/use-digital-registration";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import {
@@ -15,12 +14,12 @@ import {
 export type RequestTransitionTarget = "QUEUE" | "SHORTLIST" | "WAITLIST" | "AWAITING_PAYMENT" | "DUPLICATE" | "ACCEPTED";
 
 const TRANSITIONS: Record<RequestTransitionTarget, { title: string; description: string; confirm: string; tone: string }> = {
-	QUEUE: { title: "إعادة الطلب إلى الطابور", description: "سيعود الطلب إلى مرحلة الاستقبال المبدئي لمتابعته من جديد.", confirm: "نقل إلى الطابور", tone: "bg-zinc-700 hover:bg-zinc-800" },
-	SHORTLIST: { title: "نقل إلى القائمة المختصرة", description: "سيُنقل الطلب إلى القائمة المختصرة للمراجعة والتدقيق.", confirm: "نقل إلى القائمة المختصرة", tone: "bg-slate-700 hover:bg-slate-800" },
-	WAITLIST: { title: "نقل إلى قائمة الانتظار", description: "سيُنقل الطلب إلى قائمة الانتظار لتحديد الأولوية والدور.", confirm: "نقل إلى قائمة الانتظار", tone: "bg-amber-600 hover:bg-amber-700" },
-	AWAITING_PAYMENT: { title: "نقل إلى انتظار الدفع", description: "سيُنقل الطلب إلى مرحلة انتظار سداد الرسوم وتأكيد حجز المقعد.", confirm: "نقل إلى انتظار الدفع", tone: "bg-indigo-600 hover:bg-indigo-700" },
-	DUPLICATE: { title: "تعليم كطلب مكرر", description: "سيُعلّم الطلب كمكرر حتى لا يُتابَع كطلب مستقل قبل مراجعة السجل المرتبط.", confirm: "تعليم كمكرر", tone: "bg-amber-600 hover:bg-amber-700" },
-	ACCEPTED: { title: "قبول واعتماد الطالب", description: "هذا إجراء نهائي ينشئ الاعتماد الدراسي وفق مسار القبول المعتمد في النظام.", confirm: "تأكيد القبول والاعتماد", tone: "bg-emerald-600 hover:bg-emerald-700" },
+	QUEUE: { title: "إعادة الطلب إلى الطابور", description: "سيعود الطلب إلى مرحلة الاستقبال المبدئي لمتابعته من جديد.", confirm: "نقل إلى الطابور", tone: "bg-blue-600 hover:bg-blue-700 text-white" },
+	SHORTLIST: { title: "نقل إلى القائمة المختصرة", description: "سيُنقل الطلب إلى القائمة المختصرة للمراجعة والتدقيق.", confirm: "نقل إلى القائمة المختصرة", tone: "bg-blue-600 hover:bg-blue-700 text-white" },
+	WAITLIST: { title: "نقل إلى قائمة الانتظار", description: "سيُنقل الطلب إلى قائمة الانتظار لتحديد الأولوية والدور.", confirm: "نقل إلى قائمة الانتظار", tone: "bg-blue-600 hover:bg-blue-700 text-white" },
+	AWAITING_PAYMENT: { title: "نقل إلى انتظار الدفع", description: "سيُنقل الطلب إلى مرحلة انتظار سداد الرسوم وتأكيد حجز المقعد.", confirm: "نقل إلى انتظار الدفع", tone: "bg-blue-600 hover:bg-blue-700 text-white" },
+	DUPLICATE: { title: "تعليم كطلب مكرر", description: "سيُعلّم الطلب كمكرر حتى لا يُتابَع كطلب مستقل قبل مراجعة السجل المرتبط.", confirm: "تعليم كمكرر", tone: "bg-blue-600 hover:bg-blue-700 text-white" },
+	ACCEPTED: { title: "قبول واعتماد الطالب", description: "هذا إجراء نهائي ينشئ الاعتماد الدراسي وفق مسار القبول المعتمد في النظام.", confirm: "تأكيد القبول والاعتماد", tone: "bg-blue-600 hover:bg-blue-700 text-white" },
 };
 
 interface RequestStatusTransitionDialogProps {
@@ -44,14 +43,9 @@ export function RequestStatusTransitionDialog({
 	onSuccess,
 	isExpanded = false,
 }: RequestStatusTransitionDialogProps) {
-	const [note, setNote] = useState("");
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 	const updateStatus = useUpdateRequestStatus(campaignId);
 	const config = target ? TRANSITIONS[target] : null;
-
-	useEffect(() => {
-		if (open) setNote("");
-	}, [open, target]);
 
 	// إغلاق اللوحة عند الضغط على مفتاح Escape
 	useEffect(() => {
@@ -86,7 +80,7 @@ export function RequestStatusTransitionDialog({
 			onSuccess?.();
 			return;
 		}
-		updateStatus.mutate({ requestId: request.id, status: target, note: note.trim() || undefined }, {
+		updateStatus.mutate({ requestId: request.id, status: target }, {
 			onSuccess: () => {
 				toast.success(`تم ${config.confirm} بنجاح`);
 				onOpenChange(false);
@@ -131,11 +125,10 @@ export function RequestStatusTransitionDialog({
 						</div>
 					</div>
 				)}
-				<div className="space-y-1.5"><label className="text-[11px] font-bold">ملاحظة داخلية (اختيارية)</label><Textarea value={note} onChange={(event) => setNote(event.target.value)} className="min-h-24 text-xs resize-none" placeholder="سبب النقل أو أي معلومة لفريق العمل..." /></div>
 			</div>
 			<div className="p-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-end gap-2 shrink-0">
 				<Button variant="outline" size="sm" onClick={() => onOpenChange(false)} disabled={isPending} className="cursor-pointer">إلغاء</Button>
-				<Button size="sm" onClick={submit} disabled={isPending} className={`gap-1 cursor-pointer ${config.tone}`}><IconCheck className="size-3.5" />{isPending ? "جارٍ الحفظ..." : config.confirm}</Button>
+				<Button size="sm" onClick={submit} disabled={isPending} className="h-8 text-xs font-semibold px-4 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white shadow-2xs cursor-pointer"><IconCheck className="size-3.5" />{isPending ? "جارٍ الحفظ..." : config.confirm}</Button>
 			</div>
 		</aside>
 	);

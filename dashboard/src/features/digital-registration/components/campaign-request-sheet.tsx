@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, useEffect, useMemo } from "react";
 import {
 	IconCalendar,
 	IconCheck,
@@ -32,6 +32,7 @@ import { RequestActivityComments } from "./details/request-activity-comments";
 import { useDigitalRegistrationCapabilities } from "../hooks/use-digital-registration";
 
 // Phase 4 Action Modals Suite
+import { QueueRequestDialog } from "./modals/queue-request-dialog";
 import { ShortlistRequestDialog } from "./modals/shortlist-request-dialog";
 import { WaitlistRequestDialog } from "./modals/waitlist-request-dialog";
 import { RescheduleRequestDialog } from "./modals/reschedule-request-dialog";
@@ -39,6 +40,7 @@ import { AwaitingPaymentDialog } from "./modals/awaiting-payment-dialog";
 import { RejectRequestDialog } from "./modals/reject-request-dialog";
 import { ReferRequestDialog } from "./modals/refer-request-dialog";
 import { DeleteRequestDialog } from "./modals/delete-request-dialog";
+import { AssignSubscriptionDialog } from "./modals/assign-subscription-dialog";
 import { RequestStatusTransitionDialog, type RequestTransitionTarget } from "./modals/request-status-transition-dialog";
 import { StudentRequestPrintModal } from "./print/student-request-print-modal";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
@@ -61,9 +63,11 @@ interface CampaignRequestSheetProps {
 	onDelete?: (request: CampaignRequestItem) => void;
 	/** يفتح مسار الجدولة عندما يحاول المستخدم نقل بطاقة غير محجوزة إلى المقابلة. */
 	openRescheduleOnOpen?: boolean;
+	/** الدراور الأولي المراد فتحه مباشرة عند فتح اللوحة (مثل: عند السحب والإفلات المشروط). */
+	initialDrawer?: ActiveActionDrawer;
 }
 
-export type ActiveActionDrawer = "shortlist" | "waitlist" | "reschedule" | "awaiting-payment" | "reject" | "refer" | "delete" | "edit" | "status" | null;
+export type ActiveActionDrawer = "queue" | "shortlist" | "waitlist" | "reschedule" | "awaiting-payment" | "reject" | "refer" | "delete" | "edit" | "status" | "subscription" | null;
 
 export function CampaignRequestSheet({
 	request,
@@ -77,6 +81,7 @@ export function CampaignRequestSheet({
 	onReject,
 	onDelete,
 	openRescheduleOnOpen = false,
+	initialDrawer = null,
 }: CampaignRequestSheetProps) {
 	const { capabilities } = useDigitalRegistrationCapabilities(campaignId);
 	const { clinicInfo } = useClinicInfo();
@@ -114,6 +119,17 @@ export function CampaignRequestSheet({
 			return;
 		}
 		if (
+			initialDrawer &&
+			request?.id &&
+			autoOpenedRescheduleForRef.current !== `${request.id}-${initialDrawer}`
+		) {
+			autoOpenedRescheduleForRef.current = `${request.id}-${initialDrawer}`;
+			if (initialDrawer === "reschedule") {
+				openReschedule();
+			} else {
+				setActiveDrawer(initialDrawer);
+			}
+		} else if (
 			openRescheduleOnOpen &&
 			request?.id &&
 			autoOpenedRescheduleForRef.current !== request.id
@@ -121,38 +137,39 @@ export function CampaignRequestSheet({
 			autoOpenedRescheduleForRef.current = request.id;
 			openReschedule();
 		}
-	}, [open, openReschedule, openRescheduleOnOpen, request?.id]);
+	}, [open, openReschedule, openRescheduleOnOpen, initialDrawer, request?.id]);
 
 	const isAnyDrawerOpen = activeDrawer !== null || isPrintDialogOpen;
 
+	const missingMandatoryDocs = useMemo(() => {
+		if (!request) return [];
+		const items = request.documents?.items || [];
+		const missing: string[] = [];
+
+		const hasBirthCert = items.some(
+			(d) => d.type === "BIRTH_CERTIFICATE" || d.title?.includes("ميلاد")
+		);
+		if (!hasBirthCert) {
+			missing.push("شهادة الميلاد");
+		}
+
+		const hasGuardianId = items.some(
+			(d) =>
+				d.type === "GUARDIAN_ID" ||
+				d.title?.includes("هوية") ||
+				d.title?.includes("بطاقة")
+		);
+		if (!hasGuardianId) {
+			missing.push("هوية ولي الأمر");
+		}
+
+		return missing;
+	}, [request]);
+
 	if (!request) return null;
 
-	const handleStatusChange = (newStatus: CampaignRequestItem["status"]) => {
-		onStatusChange?.(request, newStatus);
-	};
-
-	const handleStepClick = (stepId: string) => {
-		if (stepId === "queue") {
-			openStatusTransition("QUEUE");
-		} else if (stepId === "shortlist") {
-			setActiveDrawer("shortlist");
-		} else if (stepId === "waitlist") {
-			setActiveDrawer("waitlist");
-		} else if (stepId === "interview") {
-			openReschedule();
-		} else if (stepId === "payment" || stepId === "awaiting-payment") {
-			setActiveDrawer("awaiting-payment");
-		} else if (stepId === "accepted") {
-			if (onAccept) {
-				onAccept(request);
-			} else {
-				openStatusTransition("ACCEPTED");
-			}
-		} else if (stepId === "rejected") {
-			setActiveDrawer("reject");
-		} else {
-			toast.info(`المحطة المختارة: ${stepId}`);
-		}
+	const handleStatusChange = (req: CampaignRequestItem, newStatus: CampaignRequestItem["status"]) => {
+		onStatusChange?.(req, newStatus);
 	};
 
 	return (
@@ -226,12 +243,11 @@ export function CampaignRequestSheet({
 						onOpenEdit={() => setActiveDrawer("edit")}
 						onOpenRefer={() => setActiveDrawer("refer")}
 						onOpenPrint={() => setIsPrintDialogOpen(true)}
-						onMoveToQueue={() => openStatusTransition("QUEUE")}
+						onMoveToQueue={() => setActiveDrawer("queue")}
 						onMoveToAwaitingPayment={() => setActiveDrawer("awaiting-payment")}
 						onMarkDuplicate={() => openStatusTransition("DUPLICATE")}
 						isExpanded={isExpanded}
 						onToggleExpand={() => setIsExpanded((prev) => !prev)}
-						isReadOnly={!capabilities.canEdit}
 					/>
 
 					{/* الحاوية الرئيسية للتمرير الموحد للعمودين معاً كصفحة واحدة متكاملة */}
@@ -246,6 +262,7 @@ export function CampaignRequestSheet({
 									campaignId={campaignId}
 									onStatusChange={capabilities.canChangeStatus ? handleStatusChange : undefined}
 									onOpenReschedule={capabilities.canSchedule ? openReschedule : undefined}
+									onOpenAssignPlan={() => setActiveDrawer("subscription")}
 								/>
 
 								{/* 1. بانر اعتماد القبول والتحويل للسجلات الرسمية إن تم القبول */}
@@ -299,47 +316,6 @@ export function CampaignRequestSheet({
 														فتح ملف ولي الأمر
 														<IconExternalLink className="size-3" />
 													</Link>
-												</Button>
-											)}
-										</div>
-									</div>
-								)}
-
-								{/* 2. بانر تفاصيل قائمة الانتظار */}
-								{request.status === "WAITLIST" && (
-									<div
-										className="flex flex-col gap-2 rounded-lg border border-amber-200 bg-amber-50/80 dark:bg-amber-950/30 dark:border-amber-800 p-3 shadow-2xs"
-										dir="rtl"
-									>
-										<div className="flex items-center justify-between gap-2">
-											<div className="flex items-center gap-1.5 text-xs font-bold text-amber-900 dark:text-amber-200">
-												<IconHourglass className="size-4 shrink-0 text-amber-600 dark:text-amber-400" />
-												<span>الطلب مُدرج في قائمة الانتظار لعدم توفر شواغر حالياً</span>
-											</div>
-											{request.queueRank !== undefined && request.queueRank !== null && (
-												<Badge
-													variant="outline"
-													className="font-mono text-xs bg-amber-100 text-amber-900 border-amber-300 dark:bg-amber-900/60 dark:text-amber-200 font-bold px-2.5 py-0.5"
-												>
-													الدور الحالي: #{request.queueRank}
-												</Badge>
-											)}
-										</div>
-										<div className="flex items-center justify-between text-xs text-muted-foreground pt-0.5 flex-wrap gap-2">
-											<p className="text-[11px] leading-relaxed">
-												{request.waitlistReason || request.reason
-													? `السبب المسجل: ${request.waitlistReason || request.reason}`
-													: "سيتم إشعار ولي الأمر فور توفر مقعد شاغر في الفصل المطلوب."}
-											</p>
-											{capabilities.canSchedule && (
-												<Button
-													size="sm"
-													variant="outline"
-													onClick={openReschedule}
-													className="h-7 text-xs border-amber-300 dark:border-amber-700 bg-white dark:bg-zinc-800 text-amber-800 dark:text-amber-200 hover:bg-amber-100 font-semibold cursor-pointer gap-1.5"
-												>
-													<IconCalendar className="size-3.5 text-amber-600" />
-													<span>تثبيت موعد عند توفر مقعد</span>
 												</Button>
 											)}
 										</div>
@@ -407,43 +383,6 @@ export function CampaignRequestSheet({
 									</div>
 								)}
 
-								{/* 4. بانر الرفض والاعتذار */}
-								{request.status === "REJECTED" && (
-									<div
-										className="flex flex-col gap-2 rounded-lg border border-rose-200 bg-rose-50/80 dark:bg-rose-950/30 dark:border-rose-800 p-3 shadow-2xs"
-										dir="rtl"
-									>
-										<div className="flex items-center justify-between gap-2">
-											<div className="flex items-center gap-1.5 text-xs font-bold text-rose-900 dark:text-rose-200">
-												<IconX className="size-4 shrink-0 text-rose-600 dark:text-rose-400" />
-												<span>تم تسجيل رفض الطلب والاعتذار لولي الأمر</span>
-											</div>
-											<Badge
-												variant="outline"
-												className="text-xs bg-rose-100 text-rose-900 border-rose-300 dark:bg-rose-900/60 dark:text-rose-200 font-bold px-2 py-0.5"
-											>
-												طلب مغلق
-											</Badge>
-										</div>
-										<p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
-											<span className="font-bold text-rose-800 dark:text-rose-300">سبب الرفض المسجل: </span>
-											<span>{request.rejectionReason || "عدم استيفاء شروط القبول"}</span>
-										</p>
-										{capabilities.canChangeStatus && (
-											<div className="flex items-center justify-end pt-1">
-												<Button
-													size="sm"
-													variant="outline"
-													onClick={() => openStatusTransition("QUEUE")}
-													className="h-7 text-xs border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 font-medium cursor-pointer"
-												>
-													إعادة فتح الطلب وإرجاعه للطابور
-												</Button>
-											</div>
-										)}
-									</div>
-								)}
-
 								{/* 5. بانر الطلب المكرر */}
 								{request.status === "DUPLICATE" && (
 									<div
@@ -467,7 +406,7 @@ export function CampaignRequestSheet({
 												<Button
 													size="sm"
 													variant="outline"
-													onClick={() => openStatusTransition("QUEUE")}
+													onClick={() => setActiveDrawer("queue")}
 													className="h-7 text-xs border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 font-medium cursor-pointer"
 												>
 													إلغاء التكرار وإعادة الطلب للطابور
@@ -480,7 +419,6 @@ export function CampaignRequestSheet({
 								{/* مسار الطلب (بروتوكول القبول الأفقي بـ 5 محطات) */}
 								<RequestLifecycleStepper
 									request={request}
-									onStepClick={handleStepClick}
 								/>
 
 								{/* المستندات والروابط المرفقة */}
@@ -512,6 +450,16 @@ export function CampaignRequestSheet({
 						request={request}
 						open={activeDrawer === "reject"}
 						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("reject") : handleCloseDrawer())}
+						campaignId={campaignId}
+						onSuccess={handleActionCompleted}
+						isExpanded={isExpanded}
+					/>
+
+					<QueueRequestDialog
+						key={`queue-${request.id}`}
+						request={request}
+						open={activeDrawer === "queue"}
+						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("queue") : handleCloseDrawer())}
 						campaignId={campaignId}
 						onSuccess={handleActionCompleted}
 						isExpanded={isExpanded}
@@ -578,6 +526,16 @@ export function CampaignRequestSheet({
 							onOpenChange(false);
 							onDelete?.(request);
 						}}
+						isExpanded={isExpanded}
+					/>
+
+					<AssignSubscriptionDialog
+						key={`subscription-${request.id}`}
+						request={request}
+						open={activeDrawer === "subscription"}
+						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("subscription") : handleCloseDrawer())}
+						campaignId={campaignId}
+						onSuccess={handleActionCompleted}
 						isExpanded={isExpanded}
 					/>
 

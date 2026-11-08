@@ -150,6 +150,11 @@ export function RequestHeaderActions({
 						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenWaitlist,
 					},
+					{
+						label: "تثبيت موعد المقابلة",
+						icon: <IconActivity className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenSchedule,
+					},
 					rejectItem,
 				];
 				break;
@@ -165,6 +170,31 @@ export function RequestHeaderActions({
 						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenWaitlist,
 					},
+					{
+						label: "إعادة إلى الطابور",
+						icon: <IconClock className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onMoveToQueue,
+					},
+					rejectItem,
+				];
+				break;
+			case "WAITLIST":
+				rawItems = [
+					{
+						label: "تثبيت موعد المقابلة",
+						icon: <IconActivity className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenSchedule,
+					},
+					{
+						label: "القائمة المختصرة",
+						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenShortlist,
+					},
+					{
+						label: "إعادة إلى الطابور",
+						icon: <IconClock className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onMoveToQueue,
+					},
 					rejectItem,
 				];
 				break;
@@ -179,6 +209,16 @@ export function RequestHeaderActions({
 						label: "قائمة الإنتظار",
 						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenWaitlist,
+					},
+					{
+						label: "القائمة المختصرة",
+						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onOpenShortlist,
+					},
+					{
+						label: "إعادة إلى الطابور",
+						icon: <IconClock className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onMoveToQueue,
 					},
 					rejectItem,
 				];
@@ -199,6 +239,11 @@ export function RequestHeaderActions({
 						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenWaitlist,
 					},
+					{
+						label: "إعادة إلى الطابور",
+						icon: <IconClock className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: onMoveToQueue,
+					},
 					rejectItem,
 				];
 				break;
@@ -213,11 +258,6 @@ export function RequestHeaderActions({
 						label: "القائمة المختصرة",
 						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenShortlist,
-					},
-					{
-						label: "قائمة الإنتظار",
-						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onOpenWaitlist,
 					},
 				];
 				break;
