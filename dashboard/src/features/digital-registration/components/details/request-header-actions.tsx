@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import {
 	IconActivity,
 	IconArrowsDiagonal,
@@ -15,7 +16,9 @@ import {
 	IconPlus,
 	IconPrinter,
 	IconShare,
+	IconSparkles,
 	IconCopy,
+	IconVideo,
 	IconX,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
@@ -49,6 +52,17 @@ function IconCopyId({ className = "size-3.5" }: { className?: string }) {
 			<path d="M12.5 11.5v4h1.5a2 2 0 0 0 0-4h-1.5z" />
 		</svg>
 	);
+}
+
+function getInitials(name?: string | null): string {
+	if (!name) return "";
+	const clean = name
+		.trim()
+		.replace(/^(د\.|أ\.|م\.|مهندس|دكتور|أستاذ)\s*/i, "")
+		.split(/\s+/);
+	if (clean.length === 0 || !clean[0]) return "";
+	if (clean.length === 1) return clean[0].slice(0, 2);
+	return `${clean[0][0]}${clean[1][0]}`;
 }
 
 interface RequestHeaderActionsProps {
@@ -150,18 +164,13 @@ export function RequestHeaderActions({
 						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenWaitlist,
 					},
-					{
-						label: "تثبيت موعد المقابلة",
-						icon: <IconActivity className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onOpenSchedule,
-					},
 					rejectItem,
 				];
 				break;
 			case "SHORTLIST":
 				rawItems = [
 					{
-						label: "تثبيت موعد المقابلة",
+						label: "جدولة مقابلة",
 						icon: <IconActivity className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenSchedule,
 					},
@@ -170,30 +179,15 @@ export function RequestHeaderActions({
 						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenWaitlist,
 					},
-					{
-						label: "إعادة إلى الطابور",
-						icon: <IconClock className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onMoveToQueue,
-					},
 					rejectItem,
 				];
 				break;
 			case "WAITLIST":
 				rawItems = [
 					{
-						label: "تثبيت موعد المقابلة",
+						label: "جدولة مقابلة",
 						icon: <IconActivity className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onOpenSchedule,
-					},
-					{
-						label: "القائمة المختصرة",
-						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onOpenShortlist,
-					},
-					{
-						label: "إعادة إلى الطابور",
-						icon: <IconClock className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onMoveToQueue,
 					},
 					rejectItem,
 				];
@@ -204,21 +198,6 @@ export function RequestHeaderActions({
 						label: "نقل إلى بانتظار الدفع",
 						icon: <IconCoin className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
 						action: onMoveToAwaitingPayment,
-					},
-					{
-						label: "قائمة الإنتظار",
-						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onOpenWaitlist,
-					},
-					{
-						label: "القائمة المختصرة",
-						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onOpenShortlist,
-					},
-					{
-						label: "إعادة إلى الطابور",
-						icon: <IconClock className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onMoveToQueue,
 					},
 					rejectItem,
 				];
@@ -298,17 +277,43 @@ export function RequestHeaderActions({
 		);
 	};
 
+	const isRemoteInterview = Boolean(
+		request.status === "INTERVIEW" &&
+		(request.interviewMode === "REMOTE" || request.channel === "CALL")
+	);
+
 	return (
 		<div
 			className="border-b border-zinc-200 dark:border-zinc-800 px-3 py-2 flex items-center justify-between gap-2 bg-white dark:bg-zinc-900 shrink-0"
 			dir="rtl"
 		>
 			{/* مسار التنقل (Breadcrumb) */}
-			<div className="flex items-center gap-1.5 text-[11px] min-w-0">
-				<span className="font-semibold text-zinc-500 dark:text-zinc-400">الطلبات</span>
-				<span className="text-zinc-300 dark:text-zinc-600">›</span>
-				<span className="font-bold text-zinc-800 dark:text-zinc-200 truncate">
+			<div className="flex items-center gap-1.5 text-[11.5px] min-w-0">
+				<span className="font-bold text-zinc-900 dark:text-zinc-100">الطلبات</span>
+				<span className="text-zinc-400 dark:text-zinc-500 font-medium">›</span>
+
+				{/* الأفاتار الدائري بالأحرف الأولى */}
+				<div className="size-5 rounded-full bg-[#4f6ae0] text-white flex items-center justify-center text-[9.5px] font-bold shrink-0 select-none shadow-2xs">
+					{getInitials(request.patientName)}
+				</div>
+
+				{/* اسم الطالب */}
+				<span className="font-bold text-zinc-900 dark:text-zinc-100 truncate">
 					{request.patientName}
+				</span>
+
+				{/* أيقونة النجوم / sparkles */}
+				<IconSparkles className="size-3.5 text-zinc-400 dark:text-zinc-500 shrink-0" />
+
+				{/* نقطة فاصلة */}
+				<span className="text-zinc-300 dark:text-zinc-600 font-bold select-none">·</span>
+
+				{/* كود الطلب */}
+				<span
+					className="text-zinc-400 dark:text-zinc-500 font-mono text-[10.5px] font-medium tracking-wide uppercase shrink-0 select-all"
+					dir="ltr"
+				>
+					{request.code || request.id}
 				</span>
 
 				{/* زر الثلاثة نقط بجانب كود الطلب مباشرة */}
@@ -334,42 +339,7 @@ export function RequestHeaderActions({
 							</DropdownMenuItem>
 						)}
 
-						{/* 2. جدولة أو إعادة جدولة */}
-						<DropdownMenuItem
-							onClick={() => triggerSafeOpen(onOpenReschedule)}
-							className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
-						>
-							<IconCalendarPlus className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
-							<span>
-								{request.appointmentDate || request.appointmentId || request.assessmentAppointment
-									? "إعادة جدولة"
-									: "جدولة موعد"}
-							</span>
-						</DropdownMenuItem>
-
-						
-						{/* إحالة الطلب */}
-						{onOpenRefer && (
-							<DropdownMenuItem
-								onClick={() => triggerSafeOpen(onOpenRefer)}
-								className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
-							>
-								<IconShare className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
-								<span>إحالة الطلب</span>
-							</DropdownMenuItem>
-						)}
-
-						{/* تحديد كمكرر */}
-						{onMarkDuplicate && (
-							<DropdownMenuItem
-								onClick={() => triggerSafeOpen(onMarkDuplicate)}
-								className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
-							>
-								<IconCopy className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
-								<span>تحديد كمكرر</span>
-							</DropdownMenuItem>
-						)}
-						{/* 3. حذف التسجيل */}
+						{/* 2. حذف التسجيل */}
 						{onOpenDelete && (
 							<DropdownMenuItem
 								onSelect={() => triggerSafeOpen(onOpenDelete)}
@@ -381,7 +351,7 @@ export function RequestHeaderActions({
 							</DropdownMenuItem>
 						)}
 
-						{/* 4. طباعة */}
+						{/* 3. طباعة */}
 						<DropdownMenuItem
 							onClick={handlePrint}
 							className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
@@ -390,13 +360,13 @@ export function RequestHeaderActions({
 							<span>طباعة</span>
 						</DropdownMenuItem>
 
-						{/* 5. رابط داخلي: الوصول نفسه يظل محروساً بصلاحيات فريق التسجيل. */}
+						{/* 4. مشاركة (نسخ الرابط الداخلي للطلب) */}
 						<DropdownMenuItem
 							onClick={handleCopyInternalLink}
 							className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
 						>
-							<IconLink className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
-							<span>نسخ رابط داخلي</span>
+							<IconShare className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+							<span>مشاركة</span>
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>
@@ -404,7 +374,7 @@ export function RequestHeaderActions({
 
 			{/* الأزرار والإجراءات */}
 			<div className="flex items-center gap-1.5 print:hidden">
-				{/* 1. زر إضافة للقائمة (أو زر تم الاعتماد النهائي إذا كان الطالب معتمداً رسمياً) */}
+				{/* 1. زر إضافة للقائمة وزر بدء المقابلة (أو زر تم الاعتماد النهائي إذا كان الطالب معتمداً رسمياً) */}
 				{request.status === "ACCEPTED" ? (
 					<Button
 						disabled
@@ -416,31 +386,51 @@ export function RequestHeaderActions({
 						<span>تم الاعتماد النهائي</span>
 					</Button>
 				) : (
-					<DropdownMenu dir="rtl">
-						<DropdownMenuTrigger asChild>
+					<div className="flex items-center gap-1.5">
+						{/* زر بدء مقابلة: يظهر عندما تكون المقابلة مكالمة عبر اتصال/تطبيق الويب */}
+						{isRemoteInterview && (
 							<Button
+								asChild
 								size="sm"
-								className="h-7.5 gap-1.5 text-xs font-semibold bg-[#4f6ae0] hover:bg-[#435bc4] text-white shadow-xs px-3 rounded-lg cursor-pointer [&_*]:pointer-events-none select-none transition-all border-none"
+								className="h-7.5 gap-1.5 text-xs font-semibold bg-[#4f6ae0] hover:bg-[#435bc4] text-white shadow-xs px-3 rounded-lg cursor-pointer select-none transition-all border-none"
 							>
-								<IconPlus className="size-3.5 stroke-[2.5]" />
-								<span>إضافة لقائمة</span>
-								<IconChevronDown className="size-3 opacity-90" />
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="w-52 p-1 text-xs z-[100] bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg rounded-xl">
-							{getDynamicListItems().map((item, idx) => (
-								<DropdownMenuItem
-									key={`${item.label}-${idx}`}
-									onSelect={() => triggerSafeOpen(item.action)}
-									disabled={!item.action}
-									className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus:bg-zinc-100 dark:focus:bg-zinc-800 rounded-lg cursor-pointer transition-colors"
+								<Link
+									to="/video-call"
+									search={{ registrationRequestId: request.id }}
+									title="بدء مقابلة عبر مكالمة ويب"
 								>
-									{item.icon}
-									<span>{item.label}</span>
-								</DropdownMenuItem>
-							))}
-						</DropdownMenuContent>
-					</DropdownMenu>
+									<IconVideo className="size-3.5 stroke-[2.2]" />
+									<span>بدء مقابلة</span>
+								</Link>
+							</Button>
+						)}
+
+						<DropdownMenu dir="rtl">
+							<DropdownMenuTrigger asChild>
+								<Button
+									size="sm"
+									className="h-7.5 gap-1.5 text-xs font-semibold bg-[#4f6ae0] hover:bg-[#435bc4] text-white shadow-xs px-3 rounded-lg cursor-pointer [&_*]:pointer-events-none select-none transition-all border-none"
+								>
+									<IconPlus className="size-3.5 stroke-[2.5]" />
+									<span>إضافة لقائمة</span>
+									<IconChevronDown className="size-3 opacity-90" />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end" className="w-52 p-1 text-xs z-[100] bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg rounded-xl">
+								{getDynamicListItems().map((item, idx) => (
+									<DropdownMenuItem
+										key={`${item.label}-${idx}`}
+										onSelect={() => triggerSafeOpen(item.action)}
+										disabled={!item.action}
+										className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus:bg-zinc-100 dark:focus:bg-zinc-800 rounded-lg cursor-pointer transition-colors"
+									>
+										{item.icon}
+										<span>{item.label}</span>
+									</DropdownMenuItem>
+								))}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
 				)}
 
 				{/* 2. نسخ رابط داخلي — لا يعمل إلا ضمن صلاحيات التسجيل المطبقة من الباك إند. */}

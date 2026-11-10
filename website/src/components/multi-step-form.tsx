@@ -218,6 +218,54 @@ export function MultiStepForm({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [requestCode, setRequestCode] = useState<string | null>(null);
 
+  // حالة الرابط المخصص للطالب المسجل مسبقاً (ref=APP-XXXX)
+  const [refCode, setRefCode] = useState<string | null>(null);
+  const [existingStudent, setExistingStudent] = useState<any | null>(null);
+  const [isAlreadyCompleted, setIsAlreadyCompleted] = useState(false);
+  const [isLoadingRef, setIsLoadingRef] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const searchParams = new URLSearchParams(window.location.search);
+    const ref = searchParams.get("ref");
+    if (ref) {
+      setRefCode(ref);
+      setIsLoadingRef(true);
+      fetch(`/api/requests/by-code/${encodeURIComponent(ref)}`)
+        .then(async (res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (data?.success && data?.request) {
+            const req = data.request;
+            setExistingStudent(req);
+            if (req.isCompleted) {
+              setIsAlreadyCompleted(true);
+            } else {
+              if (req.studentName) {
+                setChildrenList([{ name: req.studentName, age: "" }]);
+              }
+              if (req.guardianName) {
+                setParentName(req.guardianName);
+              }
+              if (req.guardianPhone) {
+                setPhone(req.guardianPhone);
+              }
+              if (req.guardianEmail) {
+                setEmail(req.guardianEmail);
+              }
+              // تخطي شاشة البداية والبدء مباشرة بالأسئلة لولي الأمر
+              setPanel(0);
+            }
+          }
+        })
+        .catch((err) => {
+          console.error("[MULTI_STEP_FORM] Error loading student info:", err);
+        })
+        .finally(() => {
+          setIsLoadingRef(false);
+        });
+    }
+  }, []);
+
   const bodyRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const height = useMotionValue(0);
@@ -289,16 +337,41 @@ export function MultiStepForm({
 		}
       const ageVal = student.age ? `${student.age} سنوات` : age ? `${age} سنوات` : null;
 
+      // تحديد الفترة المفضلة بناءً على الوقت المختار (ضمن ساعات عمل الأكاديمية 09:00 ص إلى 08:00 م)
+      const isMorning = bookingTime ? (bookingTime.includes("ص") && !bookingTime.startsWith("12")) : true;
+      const preferredShift = isMorning ? "MORNING" : "EVENING";
+
+      // تجميع إجابات أسئلة التقييم الأولي في هيكل بيانات منظم ومتكامل
+      const answers: { category: string; question: string; answer: string }[] = [];
+      if (c1) answers.push({ category: "المسار المستهدف", question: "المسار الأكاديمي أو التأهيلي المقترح", answer: c1 });
+      if (c2) answers.push({ category: "أهداف ولي الأمر", question: "الهدف الأساسي من التسجيل", answer: c2 });
+      if (c3) answers.push({ category: "التفاعل والتواصل", question: "مستوى التفاعل الاجتماعي مع المحيطين", answer: c3 });
+      if (c4) answers.push({ category: "اللغة والنطق", question: "التعبير اللغوي ووضوح الكلمات", answer: c4 });
+      if (c5 && c5.length > 0) answers.push({ category: "المهارات المستهدفة", question: "أهم المهارات المطلوب تطويرها", answer: c5.join("، ") });
+      if (c6) answers.push({ category: "السلوك والانتباه", question: "القدرة على التركيز والانضباط", answer: c6 });
+      if (c7) answers.push({ category: "الاستيعاب والتعلم", question: "سرعة الاستجابة للتعليمات", answer: c7 });
+      if (c10) answers.push({ category: "ملاحظات إضافية", question: "أي ملاحظات أو احتياجات إضافية", answer: c10 });
+
+      const assessmentData = {
+        submittedAt: new Date().toISOString(),
+        proposedTrack: c1 || "مسار تمهيدي عام",
+        preferredShift,
+        answers,
+      };
+
       const payload = {
+        ref: refCode || undefined,
         source: "WEBSITE",
-			studentName: student.name.trim(),
-			gender: "UNKNOWN",
+        studentName: student.name.trim(),
+        gender: "UNKNOWN",
         ageLabel: ageVal,
         targetClass: c1 ? `مسار تمهيدي (${c1})` : "مسار تمهيدي",
-			guardianName: parentName.trim(),
-			guardianPhone: phone.trim(),
+        guardianName: parentName.trim(),
+        guardianPhone: phone.trim(),
         guardianEmail: email.trim() || null,
-        notes: `الموعد المختار: ${getDayName(bookingDay)} ${bookingDay || ""} أكتوبر - الساعة: ${bookingTime || "غير محدد"}. إجابات التقييم: مسار=${c1 || ""}, هدف=${c2 || ""}, خطوات=${c5?.join(",") || ""}`,
+        preferredShift,
+        assessmentData,
+        notes: `الموعد/الفترة المفضلة: ${getDayName(bookingDay)} ${bookingDay || ""} - ${bookingTime || "غير محدد"} (${isMorning ? "صباحي" : "مسائي"}). إجابات التقييم: مسار=${c1 || ""}, هدف=${c2 || ""}, خطوات=${c5?.join(",") || ""}`,
       };
 
 		const res = await fetch("/api/register", {
@@ -311,12 +384,12 @@ export function MultiStepForm({
 		});
 
 		const data = await res.json().catch(() => ({}));
-		if (!res.ok || !data.requestCode) {
-			setSubmitError(data.message || "تعذر إرسال طلب التسجيل. يرجى المحاولة مرة أخرى.");
+		if (!res.ok || (!data.requestCode && !data.success)) {
+			setSubmitError(data.message || "تعذر إرسال استمارة التقييم. يرجى المحاولة مرة أخرى.");
 			return;
 		}
 
-		setRequestCode(data.requestCode);
+		setRequestCode(data.requestCode || refCode || "تم التحديث بنجاح");
 		go(18, 1);
 	} catch {
 		setSubmitError("تعذر الاتصال بخدمة التسجيل. تحقق من اتصالك ثم أعد المحاولة.");
@@ -326,6 +399,50 @@ export function MultiStepForm({
   };
 
   const stepMeta = getStepMeta(panel);
+
+  if (isLoadingRef) {
+    return (
+      <div className={cn("w-full max-w-[540px] font-sans mx-auto", className)} dir="rtl">
+        <div className="bg-card/95 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center w-full p-8 text-center space-y-3 border border-line shadow-2xl">
+          <Loader2 className="size-8 text-primary animate-spin" />
+          <p className="text-xs sm:text-sm font-semibold text-foreground">
+            جاري استرجاع بيانات الطالب من الأكاديمية...
+          </p>
+          <span className="text-[11px] font-mono text-muted-foreground">كود الطلب: #{refCode}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (isAlreadyCompleted) {
+    return (
+      <div className={cn("w-full max-w-[540px] font-sans mx-auto", className)} dir="rtl">
+        <div className="bg-card/95 backdrop-blur-md rounded-2xl flex flex-col items-center justify-center w-full p-6 sm:p-8 text-center space-y-4 border border-line shadow-2xl">
+          <div className="size-14 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 flex items-center justify-center">
+            <CheckCircle2 className="size-8" />
+          </div>
+          <div className="space-y-1">
+            <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
+              تم استلام التقييم الأولي مسبقاً!
+            </h2>
+            <p className="text-xs sm:text-sm text-primary font-semibold">
+              الطالب: {existingStudent?.studentName || "المسجل"} (#{refCode})
+            </p>
+          </div>
+          <p className="text-xs text-muted-foreground max-w-sm leading-relaxed">
+            استمارة التقييم الأولي لهذا الطالب مسجلة لدينا بالفعل بنجاح وتم إرفاقها بملف المقابلة لدى الأخصائي المتابع. لا داعي لإعادة تعبئتها مجدداً.
+          </p>
+          <Button
+            type="button"
+            onClick={() => onClose?.()}
+            className="w-full rounded-full text-xs font-semibold bg-primary hover:bg-primary/90 text-primary-foreground h-10 cursor-pointer"
+          >
+            إغلاق
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("w-full max-w-[540px] font-sans mx-auto", className)} dir="rtl">
@@ -341,6 +458,16 @@ export function MultiStepForm({
             stepTitle={stepMeta.title}
             onClose={onClose}
           />
+        )}
+
+        {existingStudent && (
+          <div className="bg-primary/10 border-b border-primary/20 px-4 py-2 text-xs font-medium text-primary flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <Sparkles className="size-3.5 shrink-0" />
+              <span className="truncate">استمارة التقييم الأولي للطالب: <strong>{existingStudent.studentName}</strong></span>
+            </div>
+            <span className="font-mono text-[11px] bg-primary/20 px-2 py-0.5 rounded text-primary shrink-0">#{refCode}</span>
+          </div>
         )}
 
         <motion.div
@@ -442,6 +569,8 @@ export function MultiStepForm({
                   onConfirmBooking={handleConfirmBooking}
                   go={go}
                   onCreate={onCreate}
+                  refCode={refCode}
+                  existingStudent={existingStudent}
                 />
               </motion.div>
             </AnimatePresence>
@@ -548,6 +677,8 @@ function PanelContent({
   onConfirmBooking,
   go,
   onCreate,
+  refCode,
+  existingStudent,
 }: {
   panel: Panel;
   age: number | null;
@@ -592,6 +723,8 @@ function PanelContent({
   onConfirmBooking?: () => void;
   go: (next: Panel, dir: 1 | -1) => void;
   onCreate?: () => void;
+  refCode?: string | null;
+  existingStudent?: any | null;
 }) {
   const reduceMotion = useReducedMotion();
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -1480,19 +1613,19 @@ function PanelContent({
     };
 
     const timeslots = [
-      "9:00 ص", "10:00 ص", "12:00 م",
-      "1:00 م", "2:00 م", "3:00 م",
-      "4:00 م", "5:00 م", "6:00 م",
+      "09:00 ص", "10:00 ص", "11:00 ص", "12:00 م",
+      "01:00 م", "02:00 م", "03:00 م", "04:00 م",
+      "05:00 م", "06:00 م", "07:00 م", "08:00 م",
     ];
 
     return (
       <div className="flex flex-col gap-4 pt-1">
         <div className="flex flex-col gap-1 text-center">
           <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
-            احجز حصة تجريبية مجانية
+            {refCode ? "الفترة والموعد المفضل للمقابلة" : "الموعد والفترة المفضلة لجلسة المقابلة"}
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground font-medium">
-            اختر اليوم والوقت الأنسب لحضور طفلك
+            اختر اليوم والوقت الأنسب لحضور طفلك (ساعات عمل الأكاديمية من 09:00 ص إلى 08:00 م)
           </p>
         </div>
 
@@ -1947,15 +2080,17 @@ function PanelContent({
 
         <div className="flex flex-col gap-1">
           <h2 className="text-xl sm:text-2xl font-bold font-heading text-foreground">
-            تم استلام طلب الحجز بنجاح!
+            {refCode ? "تم استكمال استمارة التقييم الأولي بنجاح!" : "تم استلام طلب الحجز والتقييم بنجاح!"}
           </h2>
           <p className="text-xs sm:text-sm font-semibold text-primary font-mono" dir="rtl">
-            موعدك: {getDayName(bookingDay)} {bookingDay} أكتوبر — {bookingTime}
+            الموعد المفضل: {getDayName(bookingDay)} {bookingDay} — {bookingTime}
           </p>
         </div>
 
         <p className="text-xs sm:text-sm text-muted-foreground font-medium max-w-[360px] leading-relaxed">
-          سنرسل تأكيد الحجز على بريدك الإلكتروني وسيتواصل معك فريق سَنَد قبل الموعد.
+          {refCode
+            ? "تم تسجيل وربط إجابات التقييم بملف الطالب مباشرة وسيطلع عليها الأخصائي أثناء جلسة المقابلة."
+            : "تم تسجيل طلبكم في طابور المراجعة بالأكاديمية وسيتواصل معكم فريق القبول والتسجيل قريباً."}
         </p>
 
         {requestCode && (

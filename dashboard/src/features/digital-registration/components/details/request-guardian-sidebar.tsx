@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import {
 	IconCalendar,
+	IconCheck,
 	IconCopy,
+	IconMapPin,
 	IconPhone,
 	IconPlus,
-	IconVideo,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 
@@ -17,6 +17,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import { useRegistrationReviewers, useAssignReviewer } from "../../hooks/use-digital-registration";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
@@ -27,20 +28,56 @@ import {
 } from "../../utils/date-format";
 import { getWhatsAppUrl } from "../../utils/phone-format";
 
+function getInitials(name?: string | null): string {
+	if (!name) return "";
+	const clean = name
+		.trim()
+		.replace(/^(د\.|أ\.|م\.|مهندس|دكتور|أستاذ)\s*/i, "")
+		.split(/\s+/);
+	if (clean.length === 0 || !clean[0]) return "";
+	if (clean.length === 1) return clean[0].slice(0, 2);
+	return `${clean[0][0]}${clean[1][0]}`;
+}
+
 interface RequestGuardianSidebarProps {
 	request: CampaignRequestItem;
 	onOpenReschedule: (staffId?: string) => void;
 	onOpenReferDialog: () => void;
+	onRequestUpdate?: (updated: Partial<CampaignRequestItem> & { id: string }) => void;
 }
 
 export function RequestGuardianSidebar({
 	request,
 	onOpenReschedule,
 	onOpenReferDialog,
+	onRequestUpdate,
 }: RequestGuardianSidebarProps) {
 	const [reviewerPopoverOpen, setReviewerPopoverOpen] = useState(false);
 	const { data: reviewers = [], isLoading: staffLoading } = useRegistrationReviewers();
 	const assignReviewerMutation = useAssignReviewer();
+
+	const [localReviewer, setLocalReviewer] = useState<{
+		id: string;
+		name: string;
+		phone?: string | null;
+		image?: string | null;
+	} | null>(() => {
+		return (
+			request.assignedStaff ||
+			(request.reviewerName
+				? { name: request.reviewerName, id: request.assignedStaffId || "", phone: (request as any).reviewerPhone || null }
+				: null)
+		);
+	});
+
+	useEffect(() => {
+		setLocalReviewer(
+			request.assignedStaff ||
+				(request.reviewerName
+					? { name: request.reviewerName, id: request.assignedStaffId || "", phone: (request as any).reviewerPhone || null }
+					: null)
+		);
+	}, [request.assignedStaff, request.reviewerName, request.assignedStaffId]);
 
 	const handleCopy = async (text: string, label: string) => {
 		try {
@@ -54,13 +91,50 @@ export function RequestGuardianSidebar({
 	const handleAssignReviewer = (staffId: string) => {
 		setReviewerPopoverOpen(false);
 		const targetStaff = reviewers.find((r) => r.staffId === staffId || r.id === staffId);
+		const optimisticStaff = targetStaff
+			? {
+					id: targetStaff.userId || targetStaff.staffId || targetStaff.id,
+					name: targetStaff.name,
+					phone: targetStaff.phone || null,
+					image: targetStaff.image || null,
+			  }
+			: null;
+
+		// 1. تحديث محلي وفوري بنسبة 100% بدون أي تأخير (0ms Optimistic UI)
+		if (optimisticStaff) {
+			setLocalReviewer(optimisticStaff);
+			onRequestUpdate?.({
+				id: request.id,
+				assignedStaffId: optimisticStaff.id,
+				assignedStaff: optimisticStaff,
+				reviewerName: optimisticStaff.name,
+			});
+		}
+
 		assignReviewerMutation.mutate(
 			{ requestId: request.id, staffId },
 			{
-				onSuccess: () => {
+				onSuccess: (resData: any) => {
+					const finalStaff = resData?.assignedStaff || optimisticStaff;
+					if (finalStaff) {
+						setLocalReviewer(finalStaff);
+						onRequestUpdate?.({
+							id: request.id,
+							assignedStaffId: resData?.assignedStaffId || finalStaff.id,
+							assignedStaff: finalStaff,
+							reviewerName: finalStaff.name,
+						});
+					}
 					toast.success(`تم تعيين المراجع: ${targetStaff?.name || ""}`);
 				},
 				onError: (err: any) => {
+					// إرجاع الحالة السابقة فوراً في حال حدوث خطأ
+					setLocalReviewer(
+						request.assignedStaff ||
+							(request.reviewerName
+								? { name: request.reviewerName, id: request.assignedStaffId || "", phone: (request as any).reviewerPhone || null }
+								: null)
+					);
 					toast.error(err.message || "فشل تعيين المراجع");
 				},
 			},
@@ -69,7 +143,7 @@ export function RequestGuardianSidebar({
 
 	const guardianWaUrl = request.guardianPhone ? getWhatsAppUrl(request.guardianPhone) : "";
 
-	const reviewer = request.assignedStaff || (request.reviewerName ? { name: request.reviewerName, id: request.assignedStaffId || "", phone: null } : null);
+	const reviewer = localReviewer || request.assignedStaff || (request.reviewerName ? { name: request.reviewerName, id: request.assignedStaffId || "", phone: null } : null);
 	const matchedReviewer = reviewers.find((r) => r.id === reviewer?.id || r.userId === reviewer?.id);
 	const reviewerPhone = (reviewer as any)?.phone || matchedReviewer?.phone || "";
 	const reviewerWaUrl = reviewerPhone ? getWhatsAppUrl(reviewerPhone) : "";
@@ -80,16 +154,23 @@ export function RequestGuardianSidebar({
 	const submittedAtFormatted = request.submittedAt
 		? `${formatAppointmentDate(request.submittedAt, clinicTimezone, "ar-EG-u-nu-latn", { month: "short", day: "numeric", weekday: undefined, year: undefined })} • ${formatAppointmentTime(request.submittedAt, clinicTimezone, "ar-EG-u-nu-latn")}`
 		: (request.date || "قيد المراجعة");
-	const hasActiveRemoteAppointment = Boolean(
-		request.interviewMode === "REMOTE" &&
-		request.appointmentId &&
-		(!request.assessmentAppointment || request.assessmentAppointment.status !== "CANCELLED"),
-	);
 	const hasInterviewContext = Boolean(
 		request.status === "INTERVIEW" ||
 		request.appointmentDate ||
 		request.assessmentAppointment
 	);
+
+	const isRemote =
+		request.interviewMode === "REMOTE" ||
+		request.channel === "CALL" ||
+		request.learningMode === "ONLINE" ||
+		Boolean(request.learningMode?.includes("عن بعد"));
+
+	const sessionLocationLabel = isRemote
+		? "مكالمة فيديو"
+		: request.roomName
+		? `في المركز (${request.roomName})`
+		: "في المركز";
 
 	return (
 		<aside
@@ -97,39 +178,44 @@ export function RequestGuardianSidebar({
 			dir="rtl"
 		>
 			<div className="space-y-3.5 lg:sticky lg:top-3.5">
-				{/* سكشن 1: تفاصيل ولي الأمر (بمحاذاة بيانات الطالب تماماً) */}
+				{/* سكشن 1: تفاصيل ولي الأمر (مطابق للصورة تماماً) */}
 				<div className="space-y-1.5 font-sans">
 					<h3 className="text-[13.5px] font-bold text-zinc-900 dark:text-zinc-100">
-						تفاصيل ولي الأمر
+						التفاصيل ولي الأمر
 					</h3>
 
 					{/* بيانات وهوية ولي الأمر */}
 					<div className="space-y-2 pt-1">
+						{/* الصف الأول: الدائرة الزرقاء بالأحرف الأولى واسم ولي الأمر + زر إرسال رسالة */}
 						<div className="flex items-center justify-between gap-1.5">
-							<div className="min-w-0 flex-1">
+							<div className="flex items-center gap-1.5 min-w-0 flex-1">
+								<div className="size-5 rounded-full bg-[#4f6ae0] text-white flex items-center justify-center shrink-0 text-[9.5px] font-bold select-none shadow-2xs">
+									{getInitials(request.guardianName)}
+								</div>
 								<p className="text-[12px] font-bold text-zinc-900 dark:text-zinc-100 truncate">
-									{request.guardianName}
+									{request.guardianName || "غير محدد"}
 								</p>
-								<span className="text-[10px] text-zinc-400 dark:text-zinc-500 block truncate">
-									ولي أمر الطالب
-								</span>
 							</div>
 
 							{/* زر إرسال رسالة لولي الأمر */}
-							{guardianWaUrl && (
+							{guardianWaUrl ? (
 								<a
 									href={guardianWaUrl}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="inline-flex items-center justify-center px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-950/40 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-[10px] font-semibold transition-colors shrink-0"
+									className="inline-flex items-center justify-center px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-[9.5px] font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer shrink-0"
 									title="إرسال رسالة لولي الأمر"
 								>
 									<span>إرسال رسالة</span>
 								</a>
+							) : (
+								<span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/40 text-[9.5px] font-medium text-zinc-400 select-none shrink-0">
+									إرسال رسالة
+								</span>
 							)}
 						</div>
 
-						{/* رقم الهاتف مع زر النسخ (بدون خط سفلي) */}
+						{/* الصف الثاني: رقم الهاتف مع زر النسخ */}
 						<div className="flex items-center justify-between gap-2 text-xs pt-0.5">
 							<div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-300 min-w-0">
 								<IconPhone className="size-3 text-zinc-400 shrink-0" />
@@ -149,42 +235,92 @@ export function RequestGuardianSidebar({
 							)}
 						</div>
 
-						{/* مكان الجلسة / طريقة الحضور (يظهر فقط عند وجود مقابلة أو موعد) */}
-						{hasInterviewContext && (
-							<>
-								<div className="flex items-center justify-between gap-2 text-xs pt-0.5">
-									<span className="text-[10px] text-zinc-400 dark:text-zinc-500">مكان الجلسة:</span>
-									<span className="text-[10.5px] font-semibold text-zinc-700 dark:text-zinc-300 flex items-center gap-1">
-										{request.interviewMode === "REMOTE" ? (
-											<>
-												<IconVideo className="size-3 text-blue-500" />
-												<span>عبر اتصال</span>
-											</>
-										) : (
-											<span>في الأكاديمية</span>
-										)}
-									</span>
-								</div>
-								{hasActiveRemoteAppointment && (
-									<Link
-										to="/video-call"
-										search={{ registrationRequestId: request.id }}
-										className="flex h-7 w-full items-center justify-center gap-1 rounded-md bg-emerald-600 px-2 text-[10px] font-semibold text-white transition-colors hover:bg-emerald-700"
-										title="دخول المقابلة عن بُعد"
-									>
-										<IconVideo className="size-3" />
-										<span>دخول المقابلة عن بُعد</span>
-									</Link>
+						{/* الصف الثالث: مكان الجلسة (دائم الظهور مطابقاً للصورة) */}
+						<div className="flex items-center justify-between gap-2 text-xs pt-0.5">
+							<div className="flex items-center gap-1 text-zinc-700 dark:text-zinc-300 min-w-0">
+								<IconMapPin className="size-3 text-zinc-500 shrink-0" />
+								<span className="text-[11px] font-medium text-zinc-800 dark:text-zinc-200">
+									مكان الجلسة
+								</span>
+							</div>
+							<span
+								className={cn(
+									"text-[10px] font-medium px-2 py-0.5 rounded shrink-0",
+									isRemote
+										? "text-blue-600 bg-blue-50 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40"
+										: "text-zinc-700 bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700",
 								)}
-							</>
-						)}
+							>
+								{sessionLocationLabel}
+							</span>
+						</div>
 					</div>
 				</div>
 
-				{/* سكشن 2: قسم المراجع (بدون زر تعيين عند وجود مراجع بالفعل، لأن الإحالة لجهة أخرى تتكفل بإعادة الإسناد) */}
+				{/* سكشن 2: قسم المراجع */}
 				<div className="space-y-2 border-t border-zinc-200/80 dark:border-zinc-800 pt-3">
 					<div className="flex items-center justify-between text-xs font-bold text-zinc-900 dark:text-zinc-100">
 						<span>المراجع</span>
+						{reviewer && (
+							<Popover open={reviewerPopoverOpen} onOpenChange={setReviewerPopoverOpen}>
+								<PopoverTrigger asChild>
+									<button
+										type="button"
+										className="text-[10px] text-primary hover:underline font-normal cursor-pointer"
+									>
+										تغيير
+									</button>
+								</PopoverTrigger>
+								<PopoverContent align="end" className="w-56 p-1.5 z-50 bg-popover border border-border shadow-xl rounded-xl" dir="rtl">
+									<div className="space-y-1">
+										<p className="text-[10.5px] font-bold text-zinc-900 dark:text-zinc-100 px-1.5 py-0.5">
+											تغيير المراجع
+										</p>
+										<div className="max-h-44 overflow-y-auto space-y-0.5">
+											{staffLoading ? (
+												<p className="text-[10px] text-muted-foreground p-1 text-center">جاري التحميل...</p>
+											) : reviewers.length === 0 ? (
+												<p className="text-[10px] text-muted-foreground p-1 text-center">لا يوجد أعضاء متاحين</p>
+											) : (
+												reviewers.map((s) => {
+													const isSelected = s.staffId === localReviewer?.id || s.id === localReviewer?.id;
+													return (
+														<button
+															key={s.id}
+															type="button"
+															onClick={() => handleAssignReviewer(s.staffId)}
+															className={cn(
+																"w-full flex items-center justify-between gap-1.5 p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-right transition-colors cursor-pointer",
+																isSelected && "bg-blue-50/80 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold",
+															)}
+														>
+															<div className="flex items-center gap-1.5 min-w-0 flex-1">
+																<Avatar className="size-5 shrink-0">
+																	<AvatarFallback className="text-[8.5px] bg-primary/10 text-primary font-bold">
+																		{s.name.slice(0, 2)}
+																	</AvatarFallback>
+																</Avatar>
+																<div className="min-w-0 flex-1">
+																	<span className="text-[10.5px] font-medium text-zinc-800 dark:text-zinc-200 truncate block">
+																		{s.name}
+																	</span>
+																	{s.phone && (
+																		<span className="text-[9px] text-muted-foreground font-mono block" dir="ltr">
+																			{s.phone}
+																		</span>
+																	)}
+																</div>
+															</div>
+															{isSelected && <IconCheck className="size-3.5 text-blue-600 dark:text-blue-400 shrink-0" />}
+														</button>
+													);
+												})
+											)}
+										</div>
+									</div>
+								</PopoverContent>
+							</Popover>
+						)}
 					</div>
 
 					{reviewer ? (
@@ -267,30 +403,39 @@ export function RequestGuardianSidebar({
 											) : reviewers.length === 0 ? (
 												<p className="text-[10px] text-muted-foreground p-1 text-center">لا يوجد أعضاء متاحين</p>
 											) : (
-												reviewers.map((s) => (
-													<button
-														key={s.id}
-														type="button"
-														onClick={() => handleAssignReviewer(s.staffId)}
-														className="w-full flex items-center gap-1.5 p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-right transition-colors cursor-pointer"
-													>
-														<Avatar className="size-5">
-															<AvatarFallback className="text-[8.5px] bg-primary/10 text-primary font-bold">
-																{s.name.slice(0, 2)}
-															</AvatarFallback>
-														</Avatar>
-														<div className="min-w-0 flex-1">
-															<span className="text-[10.5px] font-medium text-zinc-800 dark:text-zinc-200 truncate block">
-																{s.name}
-															</span>
-															{s.phone && (
-																<span className="text-[9px] text-muted-foreground font-mono block" dir="ltr">
-																	{s.phone}
-																</span>
+												reviewers.map((s) => {
+													const isSelected = s.staffId === localReviewer?.id || s.id === localReviewer?.id;
+													return (
+														<button
+															key={s.id}
+															type="button"
+															onClick={() => handleAssignReviewer(s.staffId)}
+															className={cn(
+																"w-full flex items-center justify-between gap-1.5 p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-right transition-colors cursor-pointer",
+																isSelected && "bg-blue-50/80 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold",
 															)}
-														</div>
-													</button>
-												))
+														>
+															<div className="flex items-center gap-1.5 min-w-0 flex-1">
+																<Avatar className="size-5 shrink-0">
+																	<AvatarFallback className="text-[8.5px] bg-primary/10 text-primary font-bold">
+																		{s.name.slice(0, 2)}
+																	</AvatarFallback>
+																</Avatar>
+																<div className="min-w-0 flex-1">
+																	<span className="text-[10.5px] font-medium text-zinc-800 dark:text-zinc-200 truncate block">
+																		{s.name}
+																	</span>
+																	{s.phone && (
+																		<span className="text-[9px] text-muted-foreground font-mono block" dir="ltr">
+																			{s.phone}
+																		</span>
+																	)}
+																</div>
+															</div>
+															{isSelected && <IconCheck className="size-3.5 text-blue-600 dark:text-blue-400 shrink-0" />}
+														</button>
+													);
+												})
 											)}
 										</div>
 									</div>

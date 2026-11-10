@@ -165,8 +165,9 @@ export function RoomPickerPopover({
 			<PopoverTrigger asChild>
 				<button
 					type="button"
+					title={value || "الغرفة"}
 					className={cn(
-						"h-6.5 px-2 rounded-md border text-[10.5px] font-medium flex items-center gap-1 transition-colors cursor-pointer",
+						"h-6.5 px-2 rounded-md border text-[10.5px] font-medium flex items-center gap-1 transition-colors cursor-pointer min-w-0 whitespace-nowrap overflow-hidden",
 						isCustomSelected
 							? "border-[#4F6BF5]/40 bg-[#4F6BF5]/10 text-[#4F6BF5] font-semibold"
 							: "border-border/80 bg-background hover:bg-muted text-foreground",
@@ -174,8 +175,10 @@ export function RoomPickerPopover({
 						className,
 					)}
 				>
-					<span>{value || "الغرفة"}</span>
-					<IconMapPin className="size-3 text-muted-foreground/80" />
+					<span className="truncate min-w-0 flex-1 text-right whitespace-nowrap overflow-hidden text-ellipsis">
+						{value || "الغرفة"}
+					</span>
+					<IconMapPin className="size-3 text-muted-foreground/80 shrink-0" />
 				</button>
 			</PopoverTrigger>
 

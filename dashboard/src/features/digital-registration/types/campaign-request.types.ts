@@ -29,6 +29,25 @@ export interface RegistrationTimelineItem {
 	order: number;
 }
 
+export interface AssessmentQuestionAnswer {
+	id: string;
+	category: string;
+	question: string;
+	answer: string;
+	score?: number;
+}
+
+export interface AssessmentDataPayload {
+	submittedAt: string;
+	proposedTrack?: string | null;
+	overallScore?: number;
+	attendanceProbability?: number;
+	answers: AssessmentQuestionAnswer[];
+	guardianGoals?: string[];
+	preferredShift?: string | null;
+	rawNotes?: string | null;
+}
+
 export interface CampaignRequestItem {
 	id: string;
 	code: string;
@@ -93,6 +112,7 @@ export interface CampaignRequestItem {
 	notes?: string | null;
 	notifyWhatsapp?: boolean;
 	links?: { id?: string; title?: string; url: string }[];
+	assessmentData?: AssessmentDataPayload | null;
 	assessmentAppointment?: {
 		id: string;
 		staffId: string;

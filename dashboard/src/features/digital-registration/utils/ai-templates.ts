@@ -54,16 +54,36 @@ export function generateScheduleMessage({
 	guardianName,
 	appointmentDate,
 	interviewMode,
+	meetingUrl,
+	roomName,
+	assessmentUrl,
+	isAssessmentDone,
 }: {
 	studentName: string;
 	guardianName?: string | null;
 	appointmentDate: string;
 	interviewMode?: "IN_CLINIC" | "REMOTE";
+	meetingUrl?: string | null;
+	roomName?: string | null;
+	assessmentUrl?: string | null;
+	isAssessmentDone?: boolean;
 }): string {
-	const modeText =
-		interviewMode === "REMOTE" ? "عبر اتصال مرئي / هاتفي" : "حضورياً بمقر الأكاديمية";
 	const guardianGreeting = guardianName ? ` (${guardianName})` : "";
-	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}${guardianGreeting}،\nيسرنا إبلاغكم بأنه تم تحديد موعد جلسة التقييم والمقابلة الأكاديمية (${modeText}) في: ${appointmentDate}.\nيرجى التكرم بالحضور أو الاستعداد قبل الموعد بـ 10 دقائق لضمان انسيابية الإجراءات. شاكرين ومقدرين ثقتكم في أكاديمية سند.`;
+	const isRemote = interviewMode === "REMOTE";
+
+	// فقرة رابط التقييم الأولي: تظهر حصراً إذا كان التقييم لم يُعبأ بعد (مثل التسجيل اليدوي في الأكاديمية)
+	const assessmentSection =
+		!isAssessmentDone && assessmentUrl
+			? `\n\n📝 استمارة التقييم الأولي المطلوبة قبل المقابلة:\nيرجى التكرم بتعبئة استبيان المهارات والمسار التعليمي للطفل عبر الرابط التالي قبل موعد المقابلة ليتسنى لفريق التقييم مراجعته:\n${assessmentUrl}`
+			: "";
+
+	if (isRemote) {
+		const linkLine = meetingUrl ? `\n• رابط الدخول للمقابلة:\n${meetingUrl}` : "";
+		return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}${guardianGreeting}،\nيسرنا إبلاغكم بأنه تم تحديد موعد جلسة التقييم والمقابلة الأكاديمية (مكالمة عبر تطبيق الويب):\n\n📋 تفاصيل الموعد:\n• الموعد المحدد: ${appointmentDate}\n• نظام المقابلة: مكالمة عبر تطبيق الويب (عن بُعد)${linkLine}${assessmentSection}\n\nيرجى التكرم بالاستعداد والنقر على الرابط قبل الموعد بـ 10 دقائق لضمان انسيابية الجلسة.\nشاكرين ومقدرين ثقتكم في أكاديمية سند.`;
+	}
+
+	const locationText = roomName && roomName !== "الغرفة" ? roomName : "مقر أكاديمية سند - القاعة الرئيسية للاستقبال والتقييم";
+	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}${guardianGreeting}،\nيسرنا إبلاغكم بأنه تم تحديد موعد جلسة التقييم والمقابلة الأكاديمية (حضورياً داخل الأكاديمية):\n\n📋 تفاصيل الموعد:\n• الموعد المحدد: ${appointmentDate}\n• مكان المقابلة: ${locationText}${assessmentSection}\n\nيرجى التكرم بالحضور لمقر الأكاديمية قبل الموعد بـ 10 دقائق لضمان انسيابية الإجراءات.\nشاكرين ومقدرين ثقتكم في أكاديمية سند.`;
 }
 
 export function generateRescheduleMessage({
@@ -71,15 +91,29 @@ export function generateRescheduleMessage({
 	guardianName,
 	reason,
 	newDate,
+	interviewMode,
+	meetingUrl,
+	roomName,
 }: {
 	studentName: string;
 	guardianName?: string | null;
 	reason: string;
 	newDate?: string;
+	interviewMode?: "IN_CLINIC" | "REMOTE";
+	meetingUrl?: string | null;
+	roomName?: string | null;
 }): string {
 	const dateText = newDate || "الموعد الجديد الموضح في رسالة التأكيد";
 	const guardianGreeting = guardianName ? ` (${guardianName})` : "";
-	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}${guardianGreeting}،\nنود إعلامكم بأنه تمت إعادة جدولة موعد جلسة التقييم والمقابلة الأكاديمية، نظراً لـ (${reason})، ليكون الموعد الجديد في: ${dateText}.\nيرجى التكرم بالحضور قبل الموعد بـ 10 دقائق لضمان انسيابية الإجراءات. دمتم بحفظ الله ورعايته.`;
+	const isRemote = interviewMode === "REMOTE";
+
+	if (isRemote) {
+		const linkLine = meetingUrl ? `\n• رابط الدخول للمقابلة:\n${meetingUrl}` : "";
+		return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}${guardianGreeting}،\nنود إعلامكم بأنه تمت إعادة جدولة موعد جلسة التقييم والمقابلة الأكاديمية نظراً لـ (${reason}).\n\n📋 تفاصيل الموعد الجديد:\n• الموعد الجديد: ${dateText}\n• نظام المقابلة: مكالمة عبر تطبيق الويب (عن بُعد)${linkLine}\n\nيرجى التكرم بالاستعداد والنقر على الرابط قبل الموعد بـ 10 دقائق لضمان انسيابية الجلسة.\nدمتم بحفظ الله ورعايته.`;
+	}
+
+	const locationText = roomName && roomName !== "الغرفة" ? roomName : "مقر أكاديمية سند - القاعة الرئيسية للاستقبال والتقييم";
+	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}${guardianGreeting}،\nنود إعلامكم بأنه تمت إعادة جدولة موعد جلسة التقييم والمقابلة الأكاديمية نظراً لـ (${reason}).\n\n📋 تفاصيل الموعد الجديد:\n• الموعد الجديد: ${dateText}\n• مكان المقابلة: ${locationText}\n\nيرجى التكرم بالحضور لمقر الأكاديمية قبل الموعد بـ 10 دقائق لضمان انسيابية الإجراءات.\nدمتم بحفظ الله ورعايته.`;
 }
 
 export function generateRejectMessage({
@@ -92,6 +126,12 @@ export function generateRejectMessage({
 	reason: string;
 }): string {
 	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName} (${guardianName})،\nنشكركم خالص الشكر على اهتمامكم بالتقديم وثقتكم في أكاديمية سند التعليمية.\nبعد المراجعة الدقيقة لملف التقديم، نعتذر عن عدم إمكانية قبول الطلب في الفصل الحالي نظراً لـ (${reason}).\nسيبقى ملفكم في أرشيفنا للرجوع إليه مستقبلاً، ونتمنى للطالب دوام التوفيق والتميز في مسيرته القادمة.`;
+}
+
+export function getChildAssessmentUrl(code?: string): string {
+	const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+	const baseUrl = isLocal ? "http://localhost:3000" : "https://sanad-frontend-delta.vercel.app";
+	return code ? `${baseUrl}/?assessment=true&ref=${encodeURIComponent(code)}` : `${baseUrl}/?assessment=true`;
 }
 
 export function getPublicPaymentUrl(token: string): string {

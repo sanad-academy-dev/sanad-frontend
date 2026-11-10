@@ -136,6 +136,11 @@ export function ReferRequestDialog({
 			return;
 		}
 
+		if (enableMessage && !messageText.trim()) {
+			toast.error("يرجى كتابة نص رسالة الإحالة لولي الأمر أو إلغاء تفعيل خيار التضمين");
+			return;
+		}
+
 		referMutation.mutate(
 			{
 				requestId: request.id,
@@ -340,7 +345,9 @@ export function ReferRequestDialog({
 						{/* مربع نص الرسالة */}
 						<div className="space-y-1">
 							<div className="flex items-center justify-between text-xs">
-								<span className="font-bold text-zinc-800 dark:text-zinc-200">نص رسالة الإحالة</span>
+								<span className="font-bold text-zinc-800 dark:text-zinc-200">
+									نص رسالة الإحالة <span className="text-destructive font-bold">*</span>
+								</span>
 								<button
 									type="button"
 									onClick={() => handleGenerateAI()}
@@ -403,8 +410,8 @@ export function ReferRequestDialog({
 					<Button
 						size="sm"
 						onClick={handleSubmit}
-						disabled={referMutation.isPending}
-						className="text-xs h-8 font-semibold px-4 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white shadow-2xs cursor-pointer"
+						disabled={referMutation.isPending || !referredToStaffId || (enableMessage && !messageText.trim())}
+						className="text-xs h-8 font-semibold px-4 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white shadow-2xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						<IconArrowsExchange className="size-3.5" />
 						<span>{referMutation.isPending ? "جاري الإسناد..." : "تأكيد الإحالة ونقل المسؤولية"}</span>

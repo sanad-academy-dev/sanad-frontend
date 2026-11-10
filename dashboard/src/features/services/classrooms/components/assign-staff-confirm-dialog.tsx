@@ -90,6 +90,11 @@ export function AssignStaffConfirmDialog({
 	};
 
 	const handleFormSubmit = () => {
+		if (enableMessage && !message.trim()) {
+			toast.error("يرجى كتابة نص الرسالة أو إلغاء تفعيل خيار التضمين");
+			return;
+		}
+
 		onConfirm({
 			enableMessage,
 			subject,
@@ -272,8 +277,8 @@ export function AssignStaffConfirmDialog({
 						type="button"
 						size="sm"
 						onClick={handleFormSubmit}
-						disabled={isPending || selectedStaff.length === 0}
-						className="gap-2 px-5 font-semibold text-xs shadow-sm cursor-pointer"
+						disabled={isPending || selectedStaff.length === 0 || (enableMessage && !message.trim())}
+						className="gap-2 px-5 font-semibold text-xs shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						{enableMessage ? (
 							<>

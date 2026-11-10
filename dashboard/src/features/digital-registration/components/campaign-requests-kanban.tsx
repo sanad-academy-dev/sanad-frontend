@@ -1,5 +1,5 @@
 import { type CollisionDetection, pointerWithin, rectIntersection } from "@dnd-kit/core";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
 	IconActivity,
@@ -313,7 +313,24 @@ export function CampaignRequestsKanban({
 		const hasActiveAppointment = Boolean(
 			req.assessmentAppointment && req.assessmentAppointment.status !== "CANCELLED",
 		);
+
+		// الطلبات في قائمة الانتظار يُسمح بنقلها فقط إلى جدولة مقابلة أو قائمة الرفض
+		if (req.status === "WAITLIST" && newStatus !== "INTERVIEW" && newStatus !== "REJECTED") {
+			toast.error("الطلبات في قائمة الانتظار يمكن نقلها فقط لجدولة مقابلة أو قائمة الرفض");
+			return;
+		}
+
+		// الطلبات في المقابلة يُسمح بنقلها فقط إلى انتظار الدفع أو قائمة الرفض
+		if (req.status === "INTERVIEW" && !["AWAITING_PAYMENT", "REJECTED"].includes(newStatus)) {
+			toast.error("الطلبات في مرحلة المقابلة يمكن نقلها فقط إلى انتظار الدفع أو قائمة الرفض");
+			return;
+		}
+
 		if (newStatus === "INTERVIEW" && !hasActiveAppointment) {
+			if (req.status === "QUEUE") {
+				toast.error("لا يمكن جدولة مقابلة للطالب مباشرة من الطابور؛ يجب إدراجه ضمن القائمة المختصرة أولاً.");
+				return;
+			}
 			startScheduleWorkflow(req);
 			return;
 		}
@@ -406,6 +423,15 @@ export function CampaignRequestsKanban({
 		);
 	};
 
+	const handleRequestUpdate = useCallback(
+		(updated: Partial<CampaignRequestItem> & { id: string }) => {
+			setData((prev) =>
+				prev.map((item) => (item.id === updated.id ? { ...item, ...updated } : item)),
+			);
+		},
+		[],
+	);
+
 	const handleDataChange = (nextData: CampaignRequestItem[]) => {
 		const committed: CampaignRequestItem[] = [];
 
@@ -466,7 +492,7 @@ export function CampaignRequestsKanban({
 
 				if (targetColumn === "interview" || meta.status === "INTERVIEW") {
 					committed.push({ ...item, column: prevCol });
-					startScheduleWorkflow(oldItem);
+					toast.error("لا يمكن جدولة مقابلة للطالب مباشرة من الطابور؛ يجب إدراجه ضمن القائمة المختصرة أولاً.");
 					continue;
 				}
 
@@ -483,14 +509,19 @@ export function CampaignRequestsKanban({
 
 			// ─── قواعد السحب المشروط والمقيد من عمود «القائمة المختصرة» (Shortlist) ───
 			if (prevCol === "shortlist" && oldItem) {
-				// 1. الوجهات الممنوعة نهائياً: بانتظار الدفع أو القبول النهائي
+				// 1. الوجهات الممنوعة نهائياً: الطابور أو بانتظار الدفع أو القبول النهائي
+				if (targetColumn === "queue" || meta.status === "QUEUE") {
+					toast.error("لا يمكن إعادة الطلب إلى الطابور من القائمة المختصرة.");
+					committed.push({ ...item, column: prevCol });
+					continue;
+				}
 				if (targetColumn === "accepted" || meta.status === "ACCEPTED") {
 					toast.error("لا يمكن اعتماد وقبول الطالب مباشرة من القائمة المختصرة؛ يجب المرور بمسار المقابلة والتقييم وسداد الرسوم أولاً.");
 					committed.push({ ...item, column: prevCol });
 					continue;
 				}
 				if (["awaiting-payment", "awaiting_payment"].includes(targetColumn) || meta.status === "AWAITING_PAYMENT") {
-					toast.error("لا يمكن نقل الطلب من القائمة المختصرة إلى مرحلة انتظار الدفع مباشرة؛ يجب إجراء وتثبيت المقابلة الشخصية والتقييم أولاً.");
+					toast.error("لا يمكن نقل الطلب من القائمة المختصرة إلى مرحلة انتظار الدفع مباشرة؛ يجب إجراء وجدولة المقابلة الشخصية والتقييم أولاً.");
 					committed.push({ ...item, column: prevCol });
 					continue;
 				}
@@ -508,16 +539,6 @@ export function CampaignRequestsKanban({
 						oldItem.id,
 						"waitlist",
 						"يلزم تحديد سبب وتفاصيل وضع الطالب في قائمة الانتظار؛ تم فتح لوحة الإجراء.",
-					);
-					continue;
-				}
-
-				if (targetColumn === "queue") {
-					committed.push({ ...item, column: prevCol });
-					openRequestWithDrawer(
-						oldItem.id,
-						"queue",
-						"يلزم مراجعة تفاصيل إعادة الطلب إلى الطابور؛ تم فتح لوحة الإجراء.",
 					);
 					continue;
 				}
@@ -542,7 +563,7 @@ export function CampaignRequestsKanban({
 					continue;
 				}
 				if (["awaiting-payment", "awaiting_payment"].includes(targetColumn) || meta.status === "AWAITING_PAYMENT") {
-					toast.error("لا يمكن نقل الطلب من قائمة الانتظار إلى مرحلة انتظار الدفع مباشرة؛ يجب إجراء وتثبيت المقابلة الشخصية والتقييم أولاً.");
+					toast.error("لا يمكن نقل الطلب من قائمة الانتظار إلى مرحلة انتظار الدفع مباشرة؛ يجب إجراء وجدولة المقابلة الشخصية والتقييم أولاً.");
 					committed.push({ ...item, column: prevCol });
 					continue;
 				}
@@ -1178,12 +1199,12 @@ export function CampaignRequestsKanban({
 												<div className="w-full" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
 													<Link
 														to="/video-call"
-												search={{ registrationRequestId: item.id }}
-														className="inline-flex items-center justify-center gap-1.5 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 text-[10px] font-bold shadow-2xs transition-colors w-full cursor-pointer"
-														title="دخول المقابلة الافتراضية الآن"
+														search={{ registrationRequestId: item.id }}
+														className="inline-flex items-center justify-center gap-1.5 rounded-md bg-[#4f6ae0] hover:bg-[#435bc4] text-white px-2 py-1 text-[10px] font-bold shadow-2xs transition-colors w-full cursor-pointer"
+														title="بدء مقابلة عن بُعد"
 													>
 														<IconVideo className="size-3 text-white" />
-														<span>دخول المقابلة الافتراضية</span>
+														<span>بدء مقابلة</span>
 													</Link>
 												</div>
 											)}
@@ -1243,53 +1264,91 @@ export function CampaignRequestsKanban({
 														</button>
 													</DropdownMenuTrigger>
 													<DropdownMenuContent align="start" className="w-44 text-xs z-[99]">
-														<DropdownMenuItem
-															disabled={item.status === "ACCEPTED"}
-															onClick={() => handleStatusChange(item, "SHORTLIST")}
-															className="gap-2 text-xs cursor-pointer"
-														>
-															<IconClipboardCheck className="size-3.5 text-blue-600" />
-															<span>نقل: قائمة مختصرة</span>
-														</DropdownMenuItem>
-														<DropdownMenuItem
-															disabled={item.status === "ACCEPTED"}
-															onClick={() => handleStatusChange(item, "WAITLIST")}
-															className="gap-2 text-xs cursor-pointer"
-														>
-															<IconClock className="size-3.5 text-amber-600" />
-															<span>نقل: قائمة الانتظار</span>
-														</DropdownMenuItem>
-														<DropdownMenuItem
-															disabled={item.status === "ACCEPTED"}
-															onClick={() => handleStatusChange(item, "INTERVIEW")}
-															className="gap-2 text-xs cursor-pointer"
-														>
-															<IconActivity className="size-3.5 text-indigo-600" />
-															<span>نقل: المقابلة الشخصية</span>
-														</DropdownMenuItem>
-														<DropdownMenuItem
-															disabled={item.status === "ACCEPTED"}
-															onClick={() => handleStatusChange(item, "AWAITING_PAYMENT")}
-															className="gap-2 text-xs cursor-pointer"
-														>
-															<IconHourglass className="size-3.5 text-purple-600" />
-															<span>نقل: بانتظار الدفع</span>
-														</DropdownMenuItem>
-														<DropdownMenuItem
-															onClick={() => handleStatusChange(item, "ACCEPTED")}
-															className="gap-2 text-xs cursor-pointer"
-														>
-															<IconCheck className="size-3.5 text-emerald-600" />
-															<span>اعتماد وقبول نهائي</span>
-														</DropdownMenuItem>
-														<DropdownMenuItem
-															disabled={item.status === "ACCEPTED"}
-															onClick={() => handleStatusChange(item, "REJECTED")}
-															className="gap-2 text-xs text-destructive cursor-pointer"
-														>
-															<IconX className="size-3.5" />
-															<span>استبعاد / مرفوض</span>
-														</DropdownMenuItem>
+														{(item.status === "WAITLIST" || item.column === "waitlist") ? (
+															<>
+																<DropdownMenuItem
+																	onClick={() => handleStatusChange(item, "INTERVIEW")}
+																	className="gap-2 text-xs cursor-pointer"
+																>
+																	<IconActivity className="size-3.5 text-indigo-600" />
+																	<span>جدولة مقابلة</span>
+																</DropdownMenuItem>
+																<DropdownMenuItem
+																	onClick={() => handleStatusChange(item, "REJECTED")}
+																	className="gap-2 text-xs text-destructive cursor-pointer"
+																>
+																	<IconX className="size-3.5" />
+																	<span>قائمة الرفض</span>
+																</DropdownMenuItem>
+															</>
+														) : (item.status === "INTERVIEW" || item.column === "interview") ? (
+															<>
+																<DropdownMenuItem
+																	onClick={() => handleStatusChange(item, "AWAITING_PAYMENT")}
+																	className="gap-2 text-xs cursor-pointer"
+																>
+																	<IconHourglass className="size-3.5 text-purple-600" />
+																	<span>نقل: بانتظار الدفع</span>
+																</DropdownMenuItem>
+																<DropdownMenuItem
+																	onClick={() => handleStatusChange(item, "REJECTED")}
+																	className="gap-2 text-xs text-destructive cursor-pointer"
+																>
+																	<IconX className="size-3.5" />
+																	<span>قائمة الرفض</span>
+																</DropdownMenuItem>
+															</>
+														) : (
+															<>
+																<DropdownMenuItem
+																	disabled={item.status === "ACCEPTED"}
+																	onClick={() => handleStatusChange(item, "SHORTLIST")}
+																	className="gap-2 text-xs cursor-pointer"
+																>
+																	<IconClipboardCheck className="size-3.5 text-blue-600" />
+																	<span>نقل: قائمة مختصرة</span>
+																</DropdownMenuItem>
+																<DropdownMenuItem
+																	disabled={item.status === "ACCEPTED"}
+																	onClick={() => handleStatusChange(item, "WAITLIST")}
+																	className="gap-2 text-xs cursor-pointer"
+																>
+																	<IconClock className="size-3.5 text-amber-600" />
+																	<span>نقل: قائمة الانتظار</span>
+																</DropdownMenuItem>
+																<DropdownMenuItem
+																	disabled={item.status === "ACCEPTED"}
+																	onClick={() => handleStatusChange(item, "INTERVIEW")}
+																	className="gap-2 text-xs cursor-pointer"
+																>
+																	<IconActivity className="size-3.5 text-indigo-600" />
+																	<span>نقل: المقابلة الشخصية</span>
+																</DropdownMenuItem>
+																<DropdownMenuItem
+																	disabled={item.status === "ACCEPTED"}
+																	onClick={() => handleStatusChange(item, "AWAITING_PAYMENT")}
+																	className="gap-2 text-xs cursor-pointer"
+																>
+																	<IconHourglass className="size-3.5 text-purple-600" />
+																	<span>نقل: بانتظار الدفع</span>
+																</DropdownMenuItem>
+																<DropdownMenuItem
+																	onClick={() => handleStatusChange(item, "ACCEPTED")}
+																	className="gap-2 text-xs cursor-pointer"
+																>
+																	<IconCheck className="size-3.5 text-emerald-600" />
+																	<span>اعتماد وقبول نهائي</span>
+																</DropdownMenuItem>
+																<DropdownMenuItem
+																	disabled={item.status === "ACCEPTED"}
+																	onClick={() => handleStatusChange(item, "REJECTED")}
+																	className="gap-2 text-xs text-destructive cursor-pointer"
+																>
+																	<IconX className="size-3.5" />
+																	<span>استبعاد / مرفوض</span>
+																</DropdownMenuItem>
+															</>
+														)}
 													</DropdownMenuContent>
 												</DropdownMenu>
 												)}
@@ -1307,6 +1366,7 @@ export function CampaignRequestsKanban({
 				campaignId={campaignId}
 				request={selectedRequest}
 				open={!!selectedRequest}
+				onRequestUpdate={handleRequestUpdate}
 				onOpenChange={(open) => {
 					if (!open) {
 						setSelectedRequestId(null);

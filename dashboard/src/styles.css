@@ -329,3 +329,84 @@
     size: A4 portrait;
   }
 }
+
+/* ==========================================================================
+   نظام الإشعارات الموحد (Unified Toast System - Sonner)
+   ضمان ظهور زر الإغلاق (X) في جميع الإشعارات تلقائيًا وبشكل متناسق بدون تكرار
+   ========================================================================== */
+[data-sonner-toaster] [data-sonner-toast] {
+  min-height: 44px !important;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.08) !important;
+  border-radius: 8px !important;
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* زر الإغلاق الموحد */
+[data-sonner-toaster] [data-sonner-toast] [data-close-button] {
+  position: absolute !important;
+  top: 50% !important;
+  bottom: auto !important;
+  transform: translateY(-50%) !important;
+  height: 24px !important;
+  width: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  border-radius: 6px !important;
+  color: #9ca3af !important; /* zinc-400 */
+  cursor: pointer !important;
+  opacity: 0.75 !important;
+  transition: opacity 150ms ease, background-color 150ms ease, color 150ms ease !important;
+  pointer-events: auto !important;
+  z-index: 50 !important;
+  box-shadow: none !important;
+}
+
+[data-sonner-toaster] [data-sonner-toast] [data-close-button]:hover {
+  opacity: 1 !important;
+  color: #374151 !important; /* zinc-700 */
+  background-color: rgba(0, 0, 0, 0.06) !important;
+}
+
+.dark [data-sonner-toaster] [data-sonner-toast] [data-close-button]:hover {
+  color: #f3f4f6 !important; /* zinc-100 */
+  background-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* منع ابتلاع المؤشر على الأيقونات الداخلية */
+[data-sonner-toaster] [data-sonner-toast] [data-close-button] * {
+  pointer-events: none !important;
+}
+
+/* في الوضع العربي (RTL): زر الإغلاق أقصى اليسار داخل البطاقة */
+[dir="rtl"] [data-sonner-toaster] [data-sonner-toast],
+[data-sonner-toaster][dir="rtl"] [data-sonner-toast] {
+  padding-left: 38px !important;
+  padding-right: 14px !important;
+}
+
+[dir="rtl"] [data-sonner-toaster] [data-sonner-toast] [data-close-button],
+[data-sonner-toaster][dir="rtl"] [data-sonner-toast] [data-close-button] {
+  left: 8px !important;
+  right: auto !important;
+}
+
+/* في الوضع الإنجليزي (LTR): زر الإغلاق أقصى اليمين داخل البطاقة */
+[dir="ltr"] [data-sonner-toaster] [data-sonner-toast],
+[data-sonner-toaster][dir="ltr"] [data-sonner-toast] {
+  padding-right: 38px !important;
+  padding-left: 14px !important;
+}
+
+[dir="ltr"] [data-sonner-toaster] [data-sonner-toast] [data-close-button],
+[data-sonner-toaster][dir="ltr"] [data-sonner-toast] [data-close-button] {
+  right: 8px !important;
+  left: auto !important;
+}
+

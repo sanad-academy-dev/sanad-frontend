@@ -4,6 +4,8 @@ import {
 	IconCheck,
 	IconCopy,
 	IconExternalLink,
+	IconEye,
+	IconFileDescription,
 	IconLoader2,
 	IconPaperclip,
 	IconPlus,
@@ -17,7 +19,8 @@ import { cn } from "@/lib/utils";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
 import { formatAppointmentDate, formatAppointmentTime, DEFAULT_CLINIC_TIMEZONE } from "../../utils/date-format";
 import { getWhatsAppUrl } from "../../utils/phone-format";
-import { getPublicPaymentUrl } from "../../utils/ai-templates";
+import { getChildAssessmentUrl, getPublicPaymentUrl } from "../../utils/ai-templates";
+import { AssessmentDetailsDrawer } from "./assessment-details-drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -116,6 +119,9 @@ export function RequestChildDataCard({
 	const [isEditingNotes, setIsEditingNotes] = useState(false);
 	const [noteText, setNoteText] = useState(request.notes || "");
 
+	// Assessment drawer state
+	const [isAssessmentDrawerOpen, setIsAssessmentDrawerOpen] = useState(false);
+
 	// Classrooms state
 	const [classrooms, setClassrooms] = useState<Array<{ id: string; name: string }>>([]);
 	const [classPopoverOpen, setClassPopoverOpen] = useState(false);
@@ -151,6 +157,36 @@ export function RequestChildDataCard({
 	const isAccepted = status === "ACCEPTED";
 	const isRejected = status === "REJECTED";
 	const isDuplicate = status === "DUPLICATE";
+
+	// قاعدة الحيادية المطلقة: بطاقة نتائج التقييم تظهر حصراً بعد الفرز الأولي (المقابلة، انتظار الدفع، القبول، والرفض)
+	const isPostScreening = isInterview || isAwaitingPayment || isAccepted || isRejected;
+
+	// التحقق من اكتمال التقييم الأولي (سواء عبر الحقل المهيكل الجديد أو النص الموروث)
+	const isAssessmentDone = Boolean(
+		request.assessmentData ||
+		(request.notes && request.notes.includes("إجابات التقييم:"))
+	);
+
+	const assessmentFormattedDate = (() => {
+		const rawDate = request.assessmentData?.submittedAt || request.submittedAt || request.createdAt;
+		if (!rawDate) return "مؤخراً";
+		const d = new Date(rawDate);
+		if (isNaN(d.getTime())) return "مؤخراً";
+		return new Intl.DateTimeFormat("ar-EG", {
+			day: "numeric",
+			month: "long",
+			year: "numeric",
+			hour: "numeric",
+			minute: "numeric",
+			hour12: true,
+		}).format(d);
+	})();
+
+	const handleCopyAssessmentLink = () => {
+		const url = getChildAssessmentUrl(request.code);
+		navigator.clipboard.writeText(url);
+		toast.success("تم نسخ رابط التقييم الأولي المخصص للطالب بنجاح");
+	};
 
 	const hasAppointment = Boolean(
 		request.appointmentDate ||
@@ -417,6 +453,62 @@ export function RequestChildDataCard({
 					</div>
 				)}
 
+				{/* 2.5 بانر التقييم الأولي - يظهر حصراً في مراحل ما بعد الفرز (المقابلة، الدفع، القبول، الرفض) */}
+				{isPostScreening && (
+					<div className="flex items-center justify-between gap-2 pt-0.5 pb-1">
+						{/* الطرف الأيمن: الأيقونة والعنوان وشارة الحالة */}
+						<div className="flex items-center gap-2 min-w-0">
+							<div
+								className={cn(
+									"size-6 rounded-md flex items-center justify-center shrink-0 border",
+									isAssessmentDone
+										? "bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400"
+										: "bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400"
+								)}
+							>
+								<IconFileDescription className="size-4" />
+							</div>
+							<span className="font-bold text-xs text-zinc-900 dark:text-zinc-100 shrink-0">
+								التقييم الأولي
+							</span>
+							<span
+								className={cn(
+									"inline-flex items-center text-[11px] px-2 py-0.5 rounded-md border truncate font-medium",
+									isAssessmentDone
+										? "text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800/80 border-zinc-200/90 dark:border-zinc-700"
+										: "text-amber-700 dark:text-amber-300 bg-amber-50/80 dark:bg-amber-950/40 border-amber-200/80 dark:border-amber-800/60"
+								)}
+							>
+								{isAssessmentDone
+									? `تم تعبئة الإستبيان • ${assessmentFormattedDate}`
+									: "بانتظار تعبئة الإستبيان الأولي"}
+							</span>
+						</div>
+
+						{/* الطرف الأيسر: زر عرض الإجابات أو نسخ الرابط */}
+						{isAssessmentDone ? (
+							<button
+								type="button"
+								onClick={() => setIsAssessmentDrawerOpen(true)}
+								className="inline-flex items-center gap-1.5 h-6.5 px-2.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-[11px] font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-2xs cursor-pointer shrink-0"
+							>
+								<IconEye className="size-3 text-zinc-500" />
+								<span>عرض الإجابات</span>
+							</button>
+						) : (
+							<button
+								type="button"
+								onClick={handleCopyAssessmentLink}
+								className="inline-flex items-center gap-1.5 h-6.5 px-2.5 rounded border border-amber-200 dark:border-amber-800 bg-white dark:bg-zinc-800 text-[11px] font-medium text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/50 transition-colors shadow-2xs cursor-pointer shrink-0"
+								title="نسخ رابط التقييم الأولي المخصص لهذا الطالب"
+							>
+								<IconCopy className="size-3 text-amber-600 dark:text-amber-400" />
+								<span>نسخ الرابط</span>
+							</button>
+						)}
+					</div>
+				)}
+
 				{/* 3. ملاحظات المراجع */}
 				<div className="space-y-1.5">
 					<div className="flex items-center justify-between">
@@ -516,7 +608,7 @@ export function RequestChildDataCard({
 										onClick={onOpenReschedule}
 										className="h-6 px-2.5 text-[11px] font-semibold text-primary border border-primary/30 bg-primary/5 hover:bg-primary/10 rounded transition-colors cursor-pointer"
 									>
-										تثبيت موعد المقابلة
+										جدولة مقابلة
 									</button>
 								)}
 								{!capabilities.canSchedule && (
@@ -564,11 +656,13 @@ export function RequestChildDataCard({
 						</div>
 					)}
 
-					{/* الفصل المقترح - يظهر في المراحل النشطة أو إذا كان الفصل محدداً مسبقاً */}
-					{((isShortlist || isInterview || isAwaitingPayment || isAccepted) || Boolean(request.targetClass)) && (
+					{/* الفصل المقترح (المقابلة/السداد) أو الفصل الدراسي (المقبول) - مخفي تماماً في القائمة المختصرة وقائمة الانتظار */}
+					{(isInterview || isAwaitingPayment || isAccepted) && (
 						<div className="flex items-center justify-between py-1">
-							<span className="font-medium text-zinc-600 dark:text-zinc-400">الفصل المقترح</span>
-							{capabilities.canEdit && !isAccepted && !isRejected && !isDuplicate ? (
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">
+								{isAccepted ? "الفصل الدراسي" : "الفصل المقترح"}
+							</span>
+							{capabilities.canEdit && !isRejected && !isDuplicate ? (
 								<Popover open={classPopoverOpen} onOpenChange={setClassPopoverOpen}>
 									<PopoverTrigger asChild>
 										{request.targetClass ? (
@@ -590,7 +684,7 @@ export function RequestChildDataCard({
 									</PopoverTrigger>
 									<PopoverContent align="end" className="w-52 p-1.5" dir="rtl">
 										<p className="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 px-1.5 py-0.5">
-											اختر الفصل المناسب للطالب
+											{isAccepted ? "تسكين الطالب في فصل" : "اختر الفصل المناسب للطالب"}
 										</p>
 										<div className="space-y-0.5 mt-1 max-h-48 overflow-y-auto">
 											{classrooms.map((cls) => (
@@ -616,133 +710,149 @@ export function RequestChildDataCard({
 				</div>
 
 				{/* 5. المعلومات الطبية: فاصل علوي واضح بين السكاشن */}
-				<div className="space-y-1 border-t border-zinc-200 dark:border-zinc-700 pt-3 text-xs">
+				<div className="space-y-2 border-t border-zinc-200 dark:border-zinc-700 pt-3 text-xs">
 					<h4 className="font-bold text-xs text-zinc-900 dark:text-zinc-100 pb-0.5">المعلومات الطبية</h4>
 
 					{/* الحساسية */}
-					<div className="flex items-center justify-between py-0.5">
-						<span className="font-medium text-zinc-600 dark:text-zinc-400">الحساسية</span>
-						<div className="flex items-center gap-1 flex-wrap justify-end">
-							{allergies.map((item, idx) => (
-								<Badge
-									key={idx}
-									variant="outline"
-									className="gap-0.5 border-rose-200 text-rose-700 bg-rose-50 dark:border-rose-900 dark:bg-rose-950/40 text-[9.5px] px-1.5 py-0 font-semibold"
-								>
-									<span>{item}</span>
-									{capabilities.canEdit && (
-										<button
-											type="button"
-											onClick={() => handleRemoveAllergy(idx)}
-											className="text-rose-400 hover:text-rose-700"
-										>
-											<IconX className="size-2" />
-										</button>
-									)}
-								</Badge>
-							))}
-							{capabilities.canEdit && (
-								<Popover open={allergyPopoverOpen} onOpenChange={setAllergyPopoverOpen}>
-									<PopoverTrigger asChild>
-										<button
-											type="button"
-											className="inline-flex items-center gap-1 h-6 px-2 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-										>
-											<IconPlus className="size-3 text-zinc-500" />
-											<span>إضافة حساسية</span>
-										</button>
-									</PopoverTrigger>
-									<PopoverContent align="end" className="w-56 p-2" dir="rtl">
-										<p className="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 mb-1.5">
-											اسم الحساسية أو المسبب
-										</p>
-										<div className="flex items-center gap-1">
-											<Input
-												value={allergyInput}
-												onChange={(e) => setAllergyInput(e.target.value)}
-												onKeyDown={(e) => {
-													if (e.key === "Enter") {
-														e.preventDefault();
-														handleAddAllergy();
-													}
-												}}
-												placeholder="مثال: الفول السوداني"
-												className="h-6.5 text-[10.5px] flex-1"
-											/>
-											<Button size="sm" className="h-6.5 text-[10.5px] px-2" onClick={handleAddAllergy}>
-												إضافة
-											</Button>
-										</div>
-									</PopoverContent>
-								</Popover>
-							)}
-							{!capabilities.canEdit && allergies.length === 0 && (
-								<span className="text-zinc-400 italic text-[11px]">لا توجد</span>
-							)}
+					<div className="space-y-1.5 py-0.5">
+						<div className="flex items-center justify-between">
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">الحساسية</span>
+							<div className="flex items-center gap-1">
+								{capabilities.canEdit && (
+									<Popover open={allergyPopoverOpen} onOpenChange={setAllergyPopoverOpen}>
+										<PopoverTrigger asChild>
+											<button
+												type="button"
+												className="inline-flex items-center gap-1 h-6 px-2 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+											>
+												<IconPlus className="size-3 text-zinc-500" />
+												<span>إضافة حساسية</span>
+											</button>
+										</PopoverTrigger>
+										<PopoverContent align="end" className="w-56 p-2" dir="rtl">
+											<p className="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 mb-1.5">
+												اسم الحساسية أو المسبب
+											</p>
+											<div className="flex items-center gap-1">
+												<Input
+													value={allergyInput}
+													onChange={(e) => setAllergyInput(e.target.value)}
+													onKeyDown={(e) => {
+														if (e.key === "Enter") {
+															e.preventDefault();
+															handleAddAllergy();
+														}
+													}}
+													placeholder="مثال: الفول السوداني"
+													className="h-6.5 text-[10.5px] flex-1"
+												/>
+												<Button size="sm" className="h-6.5 text-[10.5px] px-2" onClick={handleAddAllergy}>
+													إضافة
+												</Button>
+											</div>
+										</PopoverContent>
+									</Popover>
+								)}
+								{!capabilities.canEdit && allergies.length === 0 && (
+									<span className="text-zinc-400 italic text-[11px]">لا توجد</span>
+								)}
+							</div>
 						</div>
+
+						{/* البوكس الذي يظهر تحته ويحتوي على عناصر الحساسية المضافة مع إكس رمادي */}
+						{allergies.length > 0 && (
+							<div className="w-full rounded-lg border border-zinc-200/90 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 p-2 flex flex-wrap gap-1.5">
+								{allergies.map((item, idx) => (
+									<div
+										key={idx}
+										className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[11px] font-medium text-zinc-800 dark:text-zinc-200 shadow-2xs select-none"
+									>
+										<span>{item}</span>
+										{capabilities.canEdit && (
+											<button
+												type="button"
+												onClick={() => handleRemoveAllergy(idx)}
+												className="text-zinc-400 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-200 p-0.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+												title={`إزالة ${item}`}
+											>
+												<IconX className="size-3 text-zinc-400 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-200" />
+											</button>
+										)}
+									</div>
+								))}
+							</div>
+						)}
 					</div>
 
 					{/* الأدوية */}
-					<div className="flex items-center justify-between py-0.5">
-						<span className="font-medium text-zinc-600 dark:text-zinc-400">الأدوية</span>
-						<div className="flex items-center gap-1 flex-wrap justify-end">
-							{medications.map((item, idx) => (
-								<Badge
-									key={idx}
-									variant="outline"
-									className="gap-0.5 border-blue-200 text-blue-700 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/40 text-[9.5px] px-1.5 py-0 font-semibold"
-								>
-									<span>{item}</span>
-									{capabilities.canEdit && (
-										<button
-											type="button"
-											onClick={() => handleRemoveMedication(idx)}
-											className="text-blue-400 hover:text-blue-700"
-										>
-											<IconX className="size-2" />
-										</button>
-									)}
-								</Badge>
-							))}
-							{capabilities.canEdit && (
-								<Popover open={medicationPopoverOpen} onOpenChange={setMedicationPopoverOpen}>
-									<PopoverTrigger asChild>
-										<button
-											type="button"
-											className="inline-flex items-center gap-1 h-6 px-2 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
-										>
-											<IconPlus className="size-3 text-zinc-500" />
-											<span>إضافة دواء</span>
-										</button>
-									</PopoverTrigger>
-									<PopoverContent align="end" className="w-56 p-2" dir="rtl">
-										<p className="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 mb-1.5">
-											اسم الدواء والجرعة
-										</p>
-										<div className="flex items-center gap-1">
-											<Input
-												value={medicationInput}
-												onChange={(e) => setMedicationInput(e.target.value)}
-												onKeyDown={(e) => {
-													if (e.key === "Enter") {
-														e.preventDefault();
-														handleAddMedication();
-													}
-												}}
-												placeholder="مثال: بخاخ فنتولين"
-												className="h-6.5 text-[10.5px] flex-1"
-											/>
-											<Button size="sm" className="h-6.5 text-[10.5px] px-2" onClick={handleAddMedication}>
-												إضافة
-											</Button>
-										</div>
-									</PopoverContent>
-								</Popover>
-							)}
-							{!capabilities.canEdit && medications.length === 0 && (
-								<span className="text-zinc-400 italic text-[11px]">لا توجد</span>
-							)}
+					<div className="space-y-1.5 py-0.5">
+						<div className="flex items-center justify-between">
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">الأدوية</span>
+							<div className="flex items-center gap-1">
+								{capabilities.canEdit && (
+									<Popover open={medicationPopoverOpen} onOpenChange={setMedicationPopoverOpen}>
+										<PopoverTrigger asChild>
+											<button
+												type="button"
+												className="inline-flex items-center gap-1 h-6 px-2 text-[11px] font-medium text-zinc-700 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700 rounded hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+											>
+												<IconPlus className="size-3 text-zinc-500" />
+												<span>إضافة دواء</span>
+											</button>
+										</PopoverTrigger>
+										<PopoverContent align="end" className="w-56 p-2" dir="rtl">
+											<p className="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 mb-1.5">
+												اسم الدواء والجرعة
+											</p>
+											<div className="flex items-center gap-1">
+												<Input
+													value={medicationInput}
+													onChange={(e) => setMedicationInput(e.target.value)}
+													onKeyDown={(e) => {
+														if (e.key === "Enter") {
+															e.preventDefault();
+															handleAddMedication();
+														}
+													}}
+													placeholder="مثال: بخاخ فنتولين"
+													className="h-6.5 text-[10.5px] flex-1"
+												/>
+												<Button size="sm" className="h-6.5 text-[10.5px] px-2" onClick={handleAddMedication}>
+													إضافة
+												</Button>
+											</div>
+										</PopoverContent>
+									</Popover>
+								)}
+								{!capabilities.canEdit && medications.length === 0 && (
+									<span className="text-zinc-400 italic text-[11px]">لا توجد</span>
+								)}
+							</div>
 						</div>
+
+						{/* البوكس الذي يظهر تحته ويحتوي على عناصر الأدوية المضافة مع إكس رمادي */}
+						{medications.length > 0 && (
+							<div className="w-full rounded-lg border border-zinc-200/90 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 p-2 flex flex-wrap gap-1.5">
+								{medications.map((item, idx) => (
+									<div
+										key={idx}
+										className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[11px] font-medium text-zinc-800 dark:text-zinc-200 shadow-2xs select-none"
+									>
+										<span>{item}</span>
+										{capabilities.canEdit && (
+											<button
+												type="button"
+												onClick={() => handleRemoveMedication(idx)}
+												className="text-zinc-400 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-200 p-0.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+												title={`إزالة ${item}`}
+											>
+												<IconX className="size-3 text-zinc-400 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-200" />
+											</button>
+										)}
+									</div>
+								))}
+							</div>
+						)}
 					</div>
 				</div>
 
@@ -907,6 +1017,13 @@ export function RequestChildDataCard({
 					</div>
 				)}
 			</div>
+
+			{/* دراور تفاصيل وإجابات التقييم الأولي المستوفية للشروط */}
+			<AssessmentDetailsDrawer
+				open={isAssessmentDrawerOpen}
+				onOpenChange={setIsAssessmentDrawerOpen}
+				request={request}
+			/>
 		</div>
 	);
 }

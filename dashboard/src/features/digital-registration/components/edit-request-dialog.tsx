@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { showRegistrationSuccessToast } from "./add-request-sheet";
 import {
 	IconBuilding,
 	IconCalendar,
@@ -123,7 +124,7 @@ export function EditRequestDialog({
 				},
 			});
 
-			toast.success("تم تحديث وتصحيح بيانات الطلب بنجاح");
+			showRegistrationSuccessToast("تم تحديث وتصحيح بيانات الطلب بنجاح");
 			onOpenChange(false);
 		} catch (err: any) {
 			const msg = err?.message || "فشل تعديل بيانات الطلب";
@@ -192,9 +193,8 @@ export function EditRequestDialog({
 											<SelectValue />
 										</SelectTrigger>
 										<SelectContent dir="rtl" position="popper" sideOffset={4} className="w-[--radix-select-trigger-width]">
-											<SelectItem value="MALE">ذكر (بنين)</SelectItem>
-											<SelectItem value="FEMALE">أنثى (بنات)</SelectItem>
-											<SelectItem value="UNKNOWN">غير محدد</SelectItem>
+											<SelectItem value="MALE">ذكر</SelectItem>
+											<SelectItem value="FEMALE">أنثى</SelectItem>
 										</SelectContent>
 									</Select>
 								</div>

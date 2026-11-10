@@ -59,9 +59,6 @@ export function RequestLifecycleStepper({
 		if (step.id === "rejected") {
 			return isRejected ? "active-rejected" : "pending";
 		}
-		if (step.id === "waitlist") {
-			return isWaitlist ? "active-waitlist" : "pending";
-		}
 
 		if (isRejected) {
 			const reachedInterview = Boolean(request.appointmentDate || request.assessmentAppointment);
@@ -76,6 +73,7 @@ export function RequestLifecycleStepper({
 
 		if (isWaitlist) {
 			if (step.id === "queue" || step.id === "shortlist") return "completed";
+			if (step.id === "waitlist") return "active-waitlist";
 			return "pending";
 		}
 
@@ -143,6 +141,7 @@ export function RequestLifecycleStepper({
 		if (visual === "active-payment") return "bg-purple-500 dark:bg-purple-600";
 		if (visual === "active-interview") return "bg-indigo-500 dark:bg-indigo-600";
 		if (visual === "active-primary") return "bg-primary";
+		if (visual === "active-rejected") return "bg-rose-500 dark:bg-rose-600";
 		return "bg-zinc-200 dark:bg-zinc-800";
 	};
 
@@ -200,8 +199,8 @@ export function RequestLifecycleStepper({
 								className="flex-1 flex flex-col items-center relative group min-w-[56px] select-none cursor-default"
 								title={step.title}
 							>
-								{/* الخط الرابط بين المحطات - لا يتم وصل الاعتماد بالرفض */}
-								{idx > 0 && step.id !== "rejected" && (
+								{/* الخط الرابط بين المحطات */}
+								{idx > 0 && (
 									<div
 										className={cn(
 											"absolute top-2.5 right-[-50%] w-full h-[2px] -z-0 transition-colors",

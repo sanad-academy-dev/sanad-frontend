@@ -156,54 +156,56 @@ export function RequestBasicInfoGrid({
 					</span>
 				</div>
 
-				{/* الفصل المقترح */}
-				<div className="flex items-center justify-between py-0.5">
-					<span className="text-zinc-500 dark:text-zinc-400 flex items-center gap-1 text-[10px]">
-						<IconSchool className="size-3 text-zinc-400" />
-						<span>الفصل المقترح</span>
-					</span>
-					<Popover open={classPopoverOpen} onOpenChange={setClassPopoverOpen}>
-						<PopoverTrigger asChild>
-							{request.targetClass ? (
-								<Button
-									variant="outline"
-									size="sm"
-									className="h-5 px-1.5 text-[10px] font-bold text-primary border-primary/30 hover:bg-primary/10 gap-0.5"
-								>
-									<span>{request.targetClass}</span>
-								</Button>
-							) : (
-								<Button
-									variant="outline"
-									size="sm"
-									className="h-5 px-1.5 text-[9.5px] border-dashed border-zinc-300 dark:border-zinc-700 hover:border-primary gap-0.5"
-								>
-									<IconPlus className="size-2.5 text-primary" />
-									<span>تعيين فصل</span>
-								</Button>
-							)}
-						</PopoverTrigger>
-						<PopoverContent align="end" className="w-48 p-1.5" dir="rtl">
-							<p className="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 px-1.5 py-0.5">
-								اختر الفصل المناسب للطالب
-							</p>
-							<div className="space-y-0.5 mt-0.5">
-								{classrooms.length === 0 ? (
-									<p className="px-1.5 py-2 text-[10px] text-muted-foreground">لا توجد فصول مضافة في النظام</p>
-								) : classrooms.map((cls) => (
-									<button
-										key={cls.id}
-										type="button"
-										onClick={() => handleAssignClass(cls)}
-										className="w-full text-right text-[11px] px-1.5 py-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium transition-colors"
+				{/* الفصل المقترح (المقابلة/السداد) أو الفصل الدراسي (المقبول) */}
+				{(request.status === "INTERVIEW" || request.status === "AWAITING_PAYMENT" || request.status === "ACCEPTED") && (
+					<div className="flex items-center justify-between py-0.5">
+						<span className="text-zinc-500 dark:text-zinc-400 flex items-center gap-1 text-[10px]">
+							<IconSchool className="size-3 text-zinc-400" />
+							<span>{request.status === "ACCEPTED" ? "الفصل الدراسي" : "الفصل المقترح"}</span>
+						</span>
+						<Popover open={classPopoverOpen} onOpenChange={setClassPopoverOpen}>
+							<PopoverTrigger asChild>
+								{request.targetClass ? (
+									<Button
+										variant="outline"
+										size="sm"
+										className="h-5 px-1.5 text-[10px] font-bold text-primary border-primary/30 hover:bg-primary/10 gap-0.5"
 									>
-										{cls.name}
-									</button>
-								))}
-							</div>
-						</PopoverContent>
-					</Popover>
-				</div>
+										<span>{request.targetClass}</span>
+									</Button>
+								) : (
+									<Button
+										variant="outline"
+										size="sm"
+										className="h-5 px-1.5 text-[9.5px] border-dashed border-zinc-300 dark:border-zinc-700 hover:border-primary gap-0.5"
+									>
+										<IconPlus className="size-2.5 text-primary" />
+										<span>تعيين فصل</span>
+									</Button>
+								)}
+							</PopoverTrigger>
+							<PopoverContent align="end" className="w-48 p-1.5" dir="rtl">
+								<p className="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 px-1.5 py-0.5">
+									{request.status === "ACCEPTED" ? "تسكين الطالب في فصل" : "اختر الفصل المناسب للطالب"}
+								</p>
+								<div className="space-y-0.5 mt-0.5">
+									{classrooms.length === 0 ? (
+										<p className="px-1.5 py-2 text-[10px] text-muted-foreground">لا توجد فصول مضافة في النظام</p>
+									) : classrooms.map((cls) => (
+										<button
+											key={cls.id}
+											type="button"
+											onClick={() => handleAssignClass(cls)}
+											className="w-full text-right text-[11px] px-1.5 py-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium transition-colors"
+										>
+											{cls.name}
+										</button>
+									))}
+								</div>
+							</PopoverContent>
+						</Popover>
+					</div>
+				)}
 
 				{/* المسار المقترح */}
 				<div className="flex items-center justify-between py-0.5">

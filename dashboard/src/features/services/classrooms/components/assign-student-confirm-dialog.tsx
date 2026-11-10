@@ -93,6 +93,11 @@ export function AssignStudentConfirmDialog({
 	};
 
 	const handleFormSubmit = () => {
+		if (enableMessage && !message.trim()) {
+			toast.error("يرجى كتابة نص الرسالة لولي الأمر أو إلغاء تفعيل خيار التضمين");
+			return;
+		}
+
 		onConfirm({
 			enableMessage,
 			subject,
@@ -285,8 +290,8 @@ export function AssignStudentConfirmDialog({
 						type="button"
 						size="sm"
 						onClick={handleFormSubmit}
-						disabled={isPending || selectedStudents.length === 0}
-						className="gap-2 px-5 font-semibold text-xs shadow-sm cursor-pointer"
+						disabled={isPending || selectedStudents.length === 0 || (enableMessage && !message.trim())}
+						className="gap-2 px-5 font-semibold text-xs shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						{enableMessage ? (
 							<>

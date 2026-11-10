@@ -18,7 +18,7 @@ export function SanadLogo({
 			alt={alt}
 			className={cn(
 				"object-contain shrink-0 select-none",
-				iconOnly ? "size-4" : "h-5 w-auto",
+				iconOnly ? "size-8" : "h-5 w-auto",
 				className
 			)}
 			{...props}

@@ -11,6 +11,7 @@ import {
 	IconArrowUp,
 	IconArrowDown,
 	IconAntennaBars3,
+	IconChevronDown,
 } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 
@@ -72,6 +73,7 @@ interface PriorityPickerPopoverProps {
 	onChange: (priorityName: string) => void;
 	className?: string;
 	iconOnly?: boolean;
+	showChevron?: boolean;
 }
 
 export function PriorityPickerPopover({
@@ -79,6 +81,7 @@ export function PriorityPickerPopover({
 	onChange,
 	className,
 	iconOnly = false,
+	showChevron = false,
 }: PriorityPickerPopoverProps) {
 	const [open, setOpen] = useState(false);
 	const [searchQuery, setSearchQuery] = useState("");
@@ -137,6 +140,7 @@ export function PriorityPickerPopover({
 					className={cn(
 						"h-6.5 px-2 rounded-md border text-[10.5px] font-medium flex items-center gap-1.5 transition-colors cursor-pointer select-none",
 						iconOnly && "size-6 px-0 justify-center",
+						showChevron && "justify-between",
 						currentOption.id !== "none"
 							? "border-border/90 bg-muted/70 text-foreground font-semibold"
 							: "border-border/80 bg-background hover:bg-muted text-foreground",
@@ -145,8 +149,11 @@ export function PriorityPickerPopover({
 					title={`الأولوية: ${currentOption.name}`}
 					aria-label={`الأولوية: ${currentOption.name}`}
 				>
-					{currentOption.pillIcon}
-					{!iconOnly && <span>{currentOption.name}</span>}
+					<span className="flex items-center gap-1.5 truncate">
+						{currentOption.pillIcon}
+						{!iconOnly && <span className="truncate">{currentOption.name}</span>}
+					</span>
+					{showChevron && <IconChevronDown className="size-3 opacity-60 shrink-0" />}
 				</button>
 			</PopoverTrigger>
 

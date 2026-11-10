@@ -65,6 +65,7 @@ interface CampaignRequestSheetProps {
 	openRescheduleOnOpen?: boolean;
 	/** الدراور الأولي المراد فتحه مباشرة عند فتح اللوحة (مثل: عند السحب والإفلات المشروط). */
 	initialDrawer?: ActiveActionDrawer;
+	onRequestUpdate?: (updated: Partial<CampaignRequestItem> & { id: string }) => void;
 }
 
 export type ActiveActionDrawer = "queue" | "shortlist" | "waitlist" | "reschedule" | "awaiting-payment" | "reject" | "refer" | "delete" | "edit" | "status" | "subscription" | null;
@@ -82,6 +83,7 @@ export function CampaignRequestSheet({
 	onDelete,
 	openRescheduleOnOpen = false,
 	initialDrawer = null,
+	onRequestUpdate,
 }: CampaignRequestSheetProps) {
 	const { capabilities } = useDigitalRegistrationCapabilities(campaignId);
 	const { clinicInfo } = useClinicInfo();
@@ -440,6 +442,7 @@ export function CampaignRequestSheet({
 								request={request}
 								onOpenReschedule={openReschedule}
 								onOpenReferDialog={() => setActiveDrawer("refer")}
+								onRequestUpdate={onRequestUpdate}
 							/>
 						</div>
 					</div>

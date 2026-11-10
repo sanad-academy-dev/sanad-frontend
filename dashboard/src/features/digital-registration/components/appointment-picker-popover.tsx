@@ -25,6 +25,12 @@ interface AppointmentPickerPopoverProps {
 	reviewerName?: string;
 	/** Staff ID للمراجع القابل للحجز، وليس User ID. */
 	reviewerId?: string;
+	/** معرّف الموعد المستثنى من الفحص (في حالة إعادة جدولة موعد الطلب نفسه) */
+	excludeAppointmentId?: string | null;
+	/** معرّف الطلب المستثنى من الفحص (في حالة إعادة جدولة موعد الطلب نفسه) */
+	excludeRequestId?: string | null;
+	/** موعد الطالب الحالي المسجل بالفعل (لإبرازه ومنع إعادة اختياره بالخطأ أثناء إعادة الجدولة) */
+	currentAppointmentDate?: string | null;
 	enableReminders?: boolean;
 	onEnableRemindersChange?: (enabled: boolean) => void;
 	className?: string;
@@ -81,6 +87,9 @@ export function AppointmentPickerPopover({
 	onChange,
 	reviewerName,
 	reviewerId,
+	excludeAppointmentId,
+	excludeRequestId,
+	currentAppointmentDate,
 	enableReminders: externalReminders,
 	onEnableRemindersChange,
 	className,
@@ -109,6 +118,18 @@ export function AppointmentPickerPopover({
 	} | null>(null);
 	const [internalReminders, setInternalReminders] = useState(false);
 
+	const currentApptInfo = useMemo(() => {
+		if (!currentAppointmentDate) return null;
+		const date = utcToLocal(currentAppointmentDate, clinicTimezone);
+		if (Number.isNaN(date.getTime())) return null;
+		return {
+			year: date.getFullYear(),
+			month: date.getMonth(),
+			day: date.getDate(),
+			minute: date.getHours() * 60 + date.getMinutes(),
+		};
+	}, [currentAppointmentDate, clinicTimezone]);
+
 	const isTodaySelected = selectedYear === currentYear && selectedMonth === currentMonth && selectedDay === currentDay;
 	const isAtCurrentMonth = year === currentYear && month === currentMonth;
 	const isCustomSelected = Boolean(isoValue || (value && value !== "تاريخ الموعد" && value !== "تاريخ ووقت الموعد"));
@@ -131,10 +152,11 @@ export function AppointmentPickerPopover({
 		return () => window.clearInterval(interval);
 	}, [clinicTimezone, open]);
 
-	// يعيد فتح التقويم على الموعد الفعلي حتى لو كان النص المعروض مختصراً.
+	// يعيد فتح التقويم على الموعد الفعلي حتى لو كان النص المعروض مختصراً، أو على موعد الطالب الحالي أثناء إعادة الجدولة.
 	useEffect(() => {
-		if (!isoValue) return;
-		const date = utcToLocal(isoValue, clinicTimezone);
+		const targetIso = isoValue || currentAppointmentDate;
+		if (!targetIso) return;
+		const date = utcToLocal(targetIso, clinicTimezone);
 		if (Number.isNaN(date.getTime())) return;
 		const minute = date.getHours() * 60 + date.getMinutes();
 		setYear(date.getFullYear());
@@ -142,8 +164,12 @@ export function AppointmentPickerPopover({
 		setSelectedYear(date.getFullYear());
 		setSelectedMonth(date.getMonth());
 		setSelectedDay(date.getDate());
-		setSelectedSlot(formatMinuteToArabic(minute));
-	}, [clinicTimezone, isoValue]);
+		if (isoValue && isoValue !== currentAppointmentDate) {
+			setSelectedSlot(formatMinuteToArabic(minute));
+		} else {
+			setSelectedSlot("");
+		}
+	}, [clinicTimezone, isoValue, currentAppointmentDate]);
 
 	useEffect(() => {
 		const date = `${selectedYear}-${String(selectedMonth + 1).padStart(2, "0")}-${String(selectedDay).padStart(2, "0")}`;
@@ -152,6 +178,8 @@ export function AppointmentPickerPopover({
 		setRecommendation(null);
 		const query = new URLSearchParams({ date });
 		if (reviewerId) query.set("staffId", reviewerId);
+		if (excludeAppointmentId) query.set("excludeAppointmentId", excludeAppointmentId);
+		if (excludeRequestId) query.set("excludeRequestId", excludeRequestId);
 		let cancelled = false;
 
 		backendFetch(`/api/digital-registration/ai-slot-recommendation?${query}`)
@@ -172,10 +200,23 @@ export function AppointmentPickerPopover({
 		return () => {
 			cancelled = true;
 		};
-	}, [clinicDateKey, selectedDay, selectedMonth, selectedYear, reviewerId]);
+	}, [clinicDateKey, selectedDay, selectedMonth, selectedYear, reviewerId, excludeAppointmentId, excludeRequestId]);
+
+	const isCurrentApptDay = Boolean(
+		currentApptInfo &&
+		selectedYear === currentApptInfo.year &&
+		selectedMonth === currentApptInfo.month &&
+		selectedDay === currentApptInfo.day
+	);
+
+	const isSlotCurrentAppt = (slot: TimeSlot) =>
+		slot.badge === "الحالي" ||
+		Boolean(isCurrentApptDay && currentApptInfo && slot.startMinute === currentApptInfo.minute);
 
 	const slotIsTooSoon = (slot: TimeSlot) => isTodaySelected && slot.startMinute <= currentMinute + 20;
-	const availableSlotsCount = timeSlots.filter((slot) => slot.status === "available" && !slotIsTooSoon(slot)).length;
+	const availableSlotsCount = timeSlots.filter(
+		(slot) => slot.status === "available" && !slotIsTooSoon(slot) && !isSlotCurrentAppt(slot)
+	).length;
 
 	const syncValue = (day: number, monthIndex: number, selectedYearValue: number, slot?: TimeSlot) => {
 		const dateLabel = selectedYearValue === currentYear && monthIndex === currentMonth && day === currentDay
@@ -355,11 +396,48 @@ export function AppointmentPickerPopover({
 						</div>
 						<div className="grid grid-cols-3 gap-1.5">
 							{timeSlots.map((slot) => {
-								const available = slot.status === "available" && !slotIsTooSoon(slot);
+								const isCurrentAppt = isSlotCurrentAppt(slot);
+								const available = slot.status === "available" && !slotIsTooSoon(slot) && !isCurrentAppt;
 								const selected = selectedSlot === slot.time;
+								const isBooked = slot.badge === "محجوز";
 								return (
-									<button key={slot.id} type="button" disabled={!available} onClick={() => handleSelectSlot(slot)} title={available ? `حجز ${slot.time}` : slot.badge === "محجوز" ? "هذا الموعد محجوز" : "هذا الموعد غير متاح"} className={cn("h-8 rounded-md border text-[10px] font-semibold transition-colors", available ? selected ? "border-[#5B50E5] bg-[#5B50E5]/10 text-[#5B50E5] ring-1 ring-[#5B50E5]" : "border-border/80 bg-background hover:bg-muted text-foreground cursor-pointer" : "border-border/40 bg-muted/20 text-muted-foreground/40 cursor-not-allowed opacity-60")}>
-										{slot.time.replace(" صباحاً", " ص").replace(" مساءً", " م")}
+									<button
+										key={slot.id}
+										type="button"
+										disabled={!available}
+										onClick={() => handleSelectSlot(slot)}
+										title={
+											isCurrentAppt
+												? "هذا هو موعد الطالب الحالي بالفعل (اختر وقتاً جديداً لإعادة الجدولة)"
+												: available
+													? `حجز ${slot.time}`
+													: isBooked
+														? "هذا الموعد محجوز مسبقاً"
+														: "هذا الموعد غير متاح"
+										}
+										className={cn(
+											"h-8 rounded-md border text-[10px] font-semibold transition-colors flex items-center justify-center gap-1 px-1",
+											isCurrentAppt
+												? "border-amber-400 dark:border-amber-600 bg-amber-50/90 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 ring-1 ring-amber-400/50 cursor-not-allowed opacity-95 shadow-xs"
+												: available
+													? selected
+														? "border-[#5B50E5] bg-[#5B50E5]/10 text-[#5B50E5] ring-1 ring-[#5B50E5]"
+														: "border-border/80 bg-background hover:bg-muted text-foreground cursor-pointer"
+													: isBooked
+														? "border-rose-200 dark:border-rose-900/50 bg-rose-50/60 dark:bg-rose-950/20 text-rose-600 dark:text-rose-400 cursor-not-allowed opacity-90"
+														: "border-border/40 bg-muted/20 text-muted-foreground/40 cursor-not-allowed opacity-60"
+										)}
+									>
+										<span>{slot.time.replace(" صباحاً", " ص").replace(" مساءً", " م")}</span>
+										{isCurrentAppt ? (
+											<span className="text-[8px] px-1 py-0.2 rounded bg-amber-200 dark:bg-amber-800 text-amber-950 dark:text-amber-100 font-bold shrink-0">
+												الحالي
+											</span>
+										) : isBooked ? (
+											<span className="text-[8px] px-1 py-0.2 rounded bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-bold shrink-0">
+												محجوز
+											</span>
+										) : null}
 									</button>
 								);
 							})}

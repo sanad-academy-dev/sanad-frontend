@@ -62,7 +62,7 @@ export default function CampaignRegisterPage({
 
   // Form State - Student
   const [studentName, setStudentName] = useState("");
-  const [gender, setGender] = useState<"MALE" | "FEMALE" | "UNKNOWN">("UNKNOWN");
+  const [gender, setGender] = useState<"MALE" | "FEMALE">("MALE");
   const [birthDate, setBirthDate] = useState("");
   const [ageLabel, setAgeLabel] = useState("");
   const [targetClass, setTargetClass] = useState("المسار التمهيدي للبرمجة");
@@ -464,11 +464,10 @@ export default function CampaignRegisterPage({
               <select
                 value={gender}
                 onChange={(e) =>
-                  setGender(e.target.value as "MALE" | "FEMALE" | "UNKNOWN")
+                  setGender(e.target.value as "MALE" | "FEMALE")
                 }
                 className="w-full h-12 rounded-xl border border-input bg-background px-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
               >
-                <option value="UNKNOWN">غير محدد</option>
                 <option value="MALE">ذكر</option>
                 <option value="FEMALE">أنثى</option>
               </select>

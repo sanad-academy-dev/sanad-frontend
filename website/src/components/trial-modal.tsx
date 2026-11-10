@@ -31,6 +31,13 @@ export function TrialModal() {
     window.addEventListener(OPEN_TRIAL_MODAL_EVENT, handleOpen);
     window.addEventListener("close-trial-modal", handleClose);
 
+    if (typeof window !== "undefined") {
+      const searchParams = new URLSearchParams(window.location.search);
+      if (searchParams.get("assessment") === "true" || searchParams.get("trial") === "true") {
+        setOpen(true);
+      }
+    }
+
     return () => {
       window.removeEventListener(OPEN_TRIAL_MODAL_EVENT, handleOpen);
       window.removeEventListener("close-trial-modal", handleClose);

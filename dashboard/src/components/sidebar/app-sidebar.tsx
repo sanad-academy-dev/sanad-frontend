@@ -406,12 +406,12 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 					<SidebarMenuItem>
 						<Link
 							to="/"
-							className="flex items-center gap-2 overflow-hidden rounded-md px-1 py-0.5 transition-opacity hover:opacity-85"
+							className="flex items-center gap-2 overflow-hidden rounded-md px-1 py-0.5 transition-opacity hover:opacity-85 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0"
 						>
 							<SanadLogo className="h-5 w-auto group-data-[collapsible=icon]:hidden" />
 							<SanadLogo
 								iconOnly
-								className="hidden size-4 shrink-0 group-data-[collapsible=icon]:block"
+								className="hidden size-8 shrink-0 group-data-[collapsible=icon]:block"
 							/>
 						</Link>
 					</SidebarMenuItem>

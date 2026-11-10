@@ -68,7 +68,7 @@ export interface StaffCandidate {
 
 export interface UpdateMemberAccessResult {
 	success: boolean;
-	accessLevel?: "can_edit" | "can_view";
+	accessLevel?: "full" | "can_edit" | "can_view";
 	removedType?: "active_member" | "pending_invitation" | "legacy_pending_collaborator";
 	inviteRevoked?: boolean;
 	warning?: string;

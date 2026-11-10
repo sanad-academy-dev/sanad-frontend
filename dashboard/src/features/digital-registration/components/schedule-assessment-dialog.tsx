@@ -117,11 +117,11 @@ export function ScheduleAssessmentDialog({
 			});
 
 			toast.success(
-				`تم حجز وتثبيت موعد جلسة التقييم (${date} الساعة ${time}) بنجاح ونقل الطلب لمرحلة التقييم`,
+				`تم حجز وجدولة موعد جلسة التقييم (${date} الساعة ${time}) بنجاح ونقل الطلب لمرحلة التقييم`,
 			);
 			onOpenChange(false);
 		} catch (err: any) {
-			const msg = err?.message || "فشل تثبيت موعد جلسة التقييم";
+			const msg = err?.message || "فشل جدولة موعد جلسة التقييم";
 			setError(msg);
 			toast.error(msg);
 		}
@@ -137,7 +137,7 @@ export function ScheduleAssessmentDialog({
 					</div>
 					<div className="min-w-0">
 						<DialogTitle className="text-base font-bold text-foreground">
-							تثبيت موعد الفحص والتقييم بالتقويم
+							جدولة موعد الفحص والتقييم بالتقويم
 						</DialogTitle>
 						<DialogDescription className="text-xs text-muted-foreground mt-0.5 truncate">
 							جدولة جلسة تقييم حضورية رسمية وتعيين الأخصائي المسؤول
@@ -298,7 +298,7 @@ export function ScheduleAssessmentDialog({
 							className="h-9 text-xs font-semibold px-4 gap-1.5 bg-purple-600 hover:bg-purple-700 text-white shadow-xs"
 						>
 							<IconCalendarPlus className="size-4" />
-							{scheduleMutation.isPending ? "جاري التثبيت بالتقويم..." : "تثبيت الموعد ونقل للتقييم"}
+							{scheduleMutation.isPending ? "جاري التثبيت بالتقويم..." : "جدولة المقابلة ونقل للتقييم"}
 						</Button>
 					</DialogFooter>
 				</form>

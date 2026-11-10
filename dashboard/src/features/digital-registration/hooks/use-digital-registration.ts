@@ -459,7 +459,7 @@ export function useScheduleAssessmentAppointment(campaignId: string) {
 			});
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
-				throw new Error(err.message || "فشل تثبيت وحجز موعد الفحص والتقييم");
+				throw new Error(err.message || "فشل جدولة وحجز موعد الفحص والتقييم");
 			}
 			return res.json();
 		},
@@ -869,8 +869,29 @@ export function useAssignReviewer(campaignId: string = "") {
 			}
 			return res.json();
 		},
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+		onSuccess: (data: any, variables) => {
+			// 1. تحديث الكاش فوراً لجميع طلبات الحملة المطابقة في React Query
+			queryClient.setQueriesData(
+				{ queryKey: ["digital-registration", "requests"] },
+				(oldData: any) => {
+					if (!Array.isArray(oldData)) return oldData;
+					return oldData.map((item: any) => {
+						if (item.id === variables.requestId) {
+							const updatedStaff = data?.assignedStaff || item.assignedStaff;
+							return {
+								...item,
+								assignedStaffId: data?.assignedStaffId || variables.staffId,
+								assignedStaff: updatedStaff,
+								reviewerName: updatedStaff?.name || item.reviewerName,
+							};
+						}
+						return item;
+					});
+				},
+			);
+			// 2. إبطال الكاش بشكل عام لضمان إعادة الجلب والمزامنة
+			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
+			queryClient.invalidateQueries({ queryKey: ["digital-registration", "request", variables.requestId] });
 		},
 	});
 }
@@ -936,7 +957,7 @@ export function useRegistrationShareAccessAudit(enabled = true) {
 export function useInviteCollaborator() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: async (payload: { staffId: string; accessLevel: "can_edit" | "can_view" }) => {
+		mutationFn: async (payload: { staffId: string; accessLevel: "full" | "can_edit" | "can_view" }) => {
 			const res = await backendFetch("/api/digital-registration/share-access/invite", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -960,14 +981,14 @@ export function useUpdateMemberAccess() {
 	return useMutation<
 		import("../types/campaign-share.types").UpdateMemberAccessResult,
 		Error,
-		{ memberId: string; accessLevel: "can_edit" | "can_view" | "remove" }
+		{ memberId: string; accessLevel: "full" | "can_edit" | "can_view" | "remove" }
 	>({
 		mutationFn: async ({
 			memberId,
 			accessLevel,
 		}: {
 			memberId: string;
-			accessLevel: "can_edit" | "can_view" | "remove";
+			accessLevel: "full" | "can_edit" | "can_view" | "remove";
 		}) => {
 			const res = await backendFetch(`/api/digital-registration/share-access/${memberId}`, {
 				method: "PATCH",

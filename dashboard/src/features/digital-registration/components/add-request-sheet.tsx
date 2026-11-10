@@ -46,6 +46,7 @@ import {
 	IconChevronDown,
 	IconChevronLeft,
 	IconCircleCheckFilled,
+	IconClock,
 	IconDots,
 	IconHeadset,
 	IconInfoCircle,
@@ -58,9 +59,6 @@ import {
 	IconFileFilled,
 } from "@tabler/icons-react";
 import { BirthDatePicker } from "./birth-date-picker";
-import { AppointmentPickerPopover } from "./appointment-picker-popover";
-import { RoomPickerPopover } from "./room-picker-popover";
-import { ColumnStatusPicker } from "./column-status-picker";
 import { PriorityPickerPopover } from "./priority-picker-popover";
 import { REGISTRATION_TRACKS } from "../utils/registration-tracks";
 import { useCreateRequest, useRegistrationReviewers, useScheduleAssessmentAppointment, useUpdateRequest } from "../hooks/use-digital-registration";
@@ -146,39 +144,13 @@ function statusToEnum(
 }
 
 /**
- * دالة إشعار حفظ التسجيل بنجاح (مطابقة بنسبة 100% لصورة المستخدم d184a7fb)
- * تظهر في أسفل الشاشة على اليسار مع أيقونة صح خضراء داخل دائرة وزر إغلاق ×
- * وتستمر لمدة 25 ثانية حتى لا تختفي سريعاً وتبقى واضحة للمستخدم
+ * دالة إشعار حفظ التسجيل بنجاح الموحدة.
+ * تظهر أسفل الشاشة على اليسار وتستخدم تلقائيًا نظام التوست الموحد مع زر الإغلاق (X) والأيقونة المعتمدة دون تكرار للكود.
  */
 export function showRegistrationSuccessToast(message = "تم تسجيل الطلب بنجاح") {
-	toast.custom(
-		(t) => (
-			<div
-				className="flex items-center justify-between gap-4 min-w-[280px] max-w-[380px] px-4 py-3 bg-background text-foreground border border-border/90 shadow-2xl rounded-xl select-none z-[99999]"
-				dir="rtl"
-			>
-				<div className="flex items-center gap-2.5 min-w-0">
-					<IconCircleCheckFilled className="size-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-					<span className="text-[13px] font-semibold text-foreground truncate">
-						{message}
-					</span>
-				</div>
-				<button
-					type="button"
-					onClick={() => toast.dismiss(t)}
-					className="text-muted-foreground/70 hover:text-foreground p-1 rounded-md hover:bg-muted transition-colors cursor-pointer shrink-0"
-					title="إغلاق الإشعار"
-				>
-					<IconX className="size-3.5" />
-				</button>
-			</div>
-		),
-		{
-			unstyled: true,
-			duration: 25000,
-			position: "bottom-left",
-		},
-	);
+	return toast.success(message, {
+		duration: 15000,
+	});
 }
 
 export function AddRequestDialog({
@@ -194,7 +166,7 @@ export function AddRequestDialog({
 	const [isExpanded, setIsExpanded] = useState(false);
 
 	// ─── Interview mode (عبر اتصال أو في الأكاديمية، مستقل عن مصدر التسجيل) ───
-	const [channel, setChannel] = useState<"CALL" | "ACADEMY">("ACADEMY");
+	const [channel, setChannel] = useState<"CALL" | "ACADEMY" | "">("");
 
 	// ─── Form Fields matching Screenshot ────────────────────────────────────────
 	const [studentName, setStudentName] = useState("");
@@ -555,7 +527,7 @@ export function AddRequestDialog({
 	// Reset form
 	const resetForm = () => {
 		setStep(1);
-		setChannel("ACADEMY");
+		setChannel("");
 		setStudentName("");
 		setBirthDate("");
 		setGender("");
@@ -598,6 +570,11 @@ export function AddRequestDialog({
 
 	// Validation
 	const validateForm = () => {
+		if (!channel) {
+			setError("نوع المقابلة مطلوب");
+			toast.error("يرجى اختيار نوع المقابلة (في الأكاديمية أو عبر اتصال)");
+			return false;
+		}
 		if (!studentName.trim()) {
 			setError("اسم الطالب مطلوب");
 			toast.error("يرجى إدخال اسم الطالب");
@@ -664,7 +641,7 @@ export function AddRequestDialog({
 		const backendSource = "OTHER" as const;
 		const interviewMode = channel === "CALL" ? "REMOTE" : "IN_CLINIC";
 		if (appointmentIsoDate && interviewMode === "IN_CLINIC" && !selectedRoomId) {
-			setError("يجب اختيار الغرفة قبل تثبيت موعد المقابلة الحضورية");
+			setError("يجب اختيار الغرفة قبل جدولة المقابلة الحضورية");
 			toast.error("اختر الغرفة قبل حفظ موعد المقابلة في الأكاديمية");
 			return;
 		}
@@ -795,11 +772,11 @@ export function AddRequestDialog({
 					});
 					toast.success(
 						interviewMode === "REMOTE"
-							? "تم تثبيت موعد المقابلة عن بُعد بنجاح"
-							: "تم تثبيت موعد التقييم والغرفة المطلوبة بنجاح",
+							? "تمت جدولة المقابلة عن بُعد بنجاح"
+							: "تمت جدولة موعد التقييم والغرفة المطلوبة بنجاح",
 					);
 				} catch (scheduleError: any) {
-					toast.error(`تم إنشاء الطلب لكن تعذر تثبيت الموعد: ${scheduleError?.message || "خطأ غير متوقع"}`);
+					toast.error(`تم إنشاء الطلب لكن تعذر جدولة المقابلة: ${scheduleError?.message || "خطأ غير متوقع"}`);
 				}
 			}
 			onSuccess?.(created);
@@ -854,6 +831,7 @@ export function AddRequestDialog({
 	const isSubmitting = createMutation.isPending || updateMutation.isPending;
 
 	const isFormFilled =
+		Boolean(channel) &&
 		Boolean(studentName.trim()) &&
 		Boolean(guardian.trim()) &&
 		(!isNewGuardian || (Boolean(guardianPhone.trim()) && Boolean(guardianEmail.trim()))) &&
@@ -878,8 +856,9 @@ export function AddRequestDialog({
 					{step === 1 ? (
 						/* Step 1 Title + Channel Dropdown */
 						<div className="flex items-center gap-2">
-							<span className="text-[13px] font-bold text-foreground">
+							<span className="text-[13px] font-bold text-foreground flex items-center gap-1">
 								{initialData ? `تعديل بيانات طلب الطالب - #${initialData.code}` : "تسجيل طلب جديد — المقابلة:"}
+								{!initialData && <span className="text-destructive font-bold text-sm leading-none">*</span>}
 							</span>
 							<DropdownMenu dir="rtl">
 								<DropdownMenuTrigger asChild>
@@ -887,34 +866,60 @@ export function AddRequestDialog({
 										type="button"
 										disabled={Boolean(initialData)}
 										title={initialData ? "يُغيَّر نوع المقابلة من إجراء إعادة الجدولة" : "نوع المقابلة"}
-										className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-border/70 bg-background text-xs font-semibold text-foreground hover:bg-muted/60 transition-colors cursor-pointer shadow-2xs disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-background"
+										className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-border/80 bg-background hover:bg-muted/60 text-foreground text-xs font-medium transition-all cursor-pointer shadow-2xs disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-background"
 									>
 										{channel === "CALL" ? (
-											<IconPhone className="size-3 text-emerald-600" />
-										) : (
-											<IconBuildingCommunity className="size-3 text-blue-600" />
-										)}
-										<span>{channel === "CALL" ? "عبر اتصال" : "في الأكاديمية"}</span>
-										<IconChevronDown className="size-3 text-muted-foreground ms-0.5" />
+											<IconPhone className="size-3 text-emerald-600 shrink-0" />
+										) : channel === "ACADEMY" ? (
+											<IconBuildingCommunity className="size-3 text-blue-600 shrink-0" />
+										) : null}
+										<span className={cn(!channel ? "text-muted-foreground" : "text-foreground font-semibold")}>
+											{channel === "CALL" ? "عبر اتصال" : channel === "ACADEMY" ? "في الأكاديمية" : "اختر نوع المقابلة"}
+										</span>
+										<IconChevronDown className="size-3 text-muted-foreground ms-0.5 shrink-0" />
 									</button>
 								</DropdownMenuTrigger>
-								<DropdownMenuContent align="start" className="w-44 text-xs z-[99]">
+								<DropdownMenuContent align="start" className="w-52 text-xs z-[99]">
 									<DropdownMenuLabel className="text-[10px] text-muted-foreground">
-										نوع المقابلة
+										نوع المقابلة (مطلوب)
 									</DropdownMenuLabel>
 									<DropdownMenuItem
-										onClick={() => setChannel("CALL")}
-										className="cursor-pointer gap-2 py-1.5"
+										onClick={() => {
+											setChannel("ACADEMY");
+											setError(null);
+										}}
+										className={cn(
+											"cursor-pointer gap-2 py-2 text-xs justify-between",
+											channel === "ACADEMY" && "bg-muted font-bold text-blue-600 dark:text-blue-400"
+										)}
 									>
-										<IconPhone className="size-3.5 text-emerald-600" />
-										<span className="font-medium">عبر اتصال</span>
+										<div className="flex items-center gap-2">
+											<IconBuildingCommunity className="size-3.5 text-blue-600 shrink-0" />
+											<div className="flex flex-col text-right">
+												<span className="font-semibold">في الأكاديمية</span>
+												<span className="text-[10px] text-muted-foreground font-normal">مقابلة حضورية في المركز</span>
+											</div>
+										</div>
+										{channel === "ACADEMY" && <IconCheck className="size-3 text-blue-600" />}
 									</DropdownMenuItem>
 									<DropdownMenuItem
-										onClick={() => setChannel("ACADEMY")}
-										className="cursor-pointer gap-2 py-1.5"
+										onClick={() => {
+											setChannel("CALL");
+											setError(null);
+										}}
+										className={cn(
+											"cursor-pointer gap-2 py-2 text-xs justify-between",
+											channel === "CALL" && "bg-muted font-bold text-emerald-600 dark:text-emerald-400"
+										)}
 									>
-										<IconBuildingCommunity className="size-3.5 text-blue-600" />
-										<span className="font-medium">في الأكاديمية</span>
+										<div className="flex items-center gap-2">
+											<IconPhone className="size-3.5 text-emerald-600 shrink-0" />
+											<div className="flex flex-col text-right">
+												<span className="font-semibold">عبر اتصال</span>
+												<span className="text-[10px] text-muted-foreground font-normal">مقابلة هاتفية / أونلاين</span>
+											</div>
+										</div>
+										{channel === "CALL" && <IconCheck className="size-3 text-emerald-600" />}
 									</DropdownMenuItem>
 								</DropdownMenuContent>
 							</DropdownMenu>
@@ -1202,9 +1207,6 @@ export function AddRequestDialog({
 											<SelectItem value="FEMALE" className="text-right text-xs cursor-pointer py-1.5">
 												أنثى
 											</SelectItem>
-											<SelectItem value="UNKNOWN" className="text-right text-xs cursor-pointer py-1.5">
-												غير محدد
-											</SelectItem>
 										</SelectContent>
 									</Select>
 								</div>
@@ -1396,23 +1398,16 @@ export function AddRequestDialog({
 									</div>
 
 									<div className="flex items-center justify-between pt-1.5">
-										<span className="text-muted-foreground text-[11px] font-normal">موعد مقترح</span>
-										<span className="font-semibold text-foreground text-[11.5px] font-mono">
-											{appointmentDate && appointmentDate !== "تاريخ الموعد" ? `${appointmentDate} (يتطلب تثبيتاً)` : "يُثبت بعد إنشاء الطلب"}
+										<span className="text-muted-foreground text-[11px] font-normal">الأولوية</span>
+										<span className="font-semibold text-foreground text-[11.5px]">
+											{priority || "بدون أولوية"}
 										</span>
 									</div>
 
 									<div className="flex items-center justify-between pt-1.5">
-										<span className="text-muted-foreground text-[11px] font-normal">المدة</span>
-										<span className="font-semibold text-foreground text-[11.5px]">
-											30 دقيقة
-										</span>
-									</div>
-
-									<div className="flex items-center justify-between pt-1.5">
-										<span className="text-muted-foreground text-[11px] font-normal">الغرفة</span>
-										<span className="font-semibold text-foreground text-[11.5px]">
-											{channel === "CALL" ? "جلسة افتراضية" : (selectedRoom !== "الغرفة" ? selectedRoom : "لم تُحدد")}
+										<span className="text-muted-foreground text-[11px] font-normal">المرحلة الحالية</span>
+										<span className="font-semibold text-blue-600 dark:text-blue-400 text-[11.5px]">
+											{initialData ? (selectedColumn || "طابور") : "طابور (الموعد والقاعة يُحددان في مرحلة المقابلة)"}
 										</span>
 									</div>
 
@@ -1678,42 +1673,14 @@ export function AddRequestDialog({
 						</PopoverContent>
 					</Popover>
 
+					{/* شارة مرحلة الطابور (Badge ثابت بدون اختيارات لأن أي طلب جديد يبدأ دائماً من مرحلة الطابور) */}
 					<div
-						className={initialData ? "pointer-events-none opacity-60" : undefined}
-						title={initialData ? "يُعدّل الموعد من إجراء إعادة الجدولة" : undefined}
+						className="h-6.5 px-2.5 rounded-md border border-blue-200/90 bg-blue-50/80 dark:border-blue-900/60 dark:bg-blue-950/40 text-[10.5px] font-semibold text-blue-700 dark:text-blue-300 flex items-center gap-1.5 select-none shrink-0"
+						title="مرحلة الطلب: طابور (يبدأ أي طلب جديد تلقائياً في مرحلة الطابور)"
 					>
-						<AppointmentPickerPopover
-							value={appointmentDate}
-							isoValue={appointmentIsoDate}
-							onChange={(value, iso) => {
-								setAppointmentDate(value);
-								setAppointmentIsoDate(iso || null);
-								// تغيير اليوم يلغي الغرفة السابقة حتى لا يبدو أنها متاحة للوقت الجديد بلا فحص.
-								if (!iso) {
-									setSelectedRoom("الغرفة");
-									setSelectedRoomId(null);
-									setSelectedRoomBranchId(null);
-								}
-							}}
-							reviewerName={reviewer}
-							reviewerId={reviewerStaffId || undefined}
-							enableReminders={notifyWhatsapp}
-							onEnableRemindersChange={setNotifyWhatsapp}
-						/>
+						<IconClock className="size-3 text-blue-600 dark:text-blue-400 shrink-0" />
+						<span>{initialData ? (selectedColumn || "طابور") : "طابور"}</span>
 					</div>
-					<div
-						className={initialData ? "pointer-events-none opacity-60" : undefined}
-						title={initialData ? "تُعدّل الغرفة من إجراء إعادة الجدولة" : undefined}
-					>
-						<RoomPickerPopover value={selectedRoom} onChange={(name, id, branchId) => { setSelectedRoom(name); setSelectedRoomId(id || null); setSelectedRoomBranchId(branchId || null); }} appointmentDate={appointmentIsoDate || ""} />
-					</div>
-					<ColumnStatusPicker
-						value={selectedColumn}
-						onChange={setSelectedColumn}
-						allowedIds={["queue", "shortlist", "waitlist", "interview", "awaiting-payment", "duplicate"]}
-						// تعديل بيانات الطلب لا يغيّر مرحلته؛ الحالة تُنقل من Kanban/إجراءات الطلب
-						disabled={Boolean(initialData)}
-					/>
 
 					{/* 5. [ ... بدون أولوية ] - منسدلة اختيار الأولوية المطابقة للتصميم (الصورة b52ca17c) مع الأيقونات واختصارات 0-4 */}
 					<PriorityPickerPopover

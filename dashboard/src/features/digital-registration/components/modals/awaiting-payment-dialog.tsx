@@ -154,6 +154,11 @@ export function AwaitingPaymentDialog({
 			return;
 		}
 
+		if (enableMessage && !messageText.trim()) {
+			toast.error("يرجى كتابة نص الرسالة لولي الأمر أو إلغاء تفعيل خيار التضمين");
+			return;
+		}
+
 		awaitingPaymentMutation.mutate(
 			{
 				requestId: request.id,
@@ -294,7 +299,7 @@ export function AwaitingPaymentDialog({
 						<div className="space-y-1.5">
 							<div className="flex items-center justify-between">
 								<label className="text-[11px] font-bold text-zinc-800 dark:text-zinc-200">
-									نص رسالة
+									نص رسالة <span className="text-destructive font-bold">*</span>
 								</label>
 								<button
 									type="button"
@@ -318,13 +323,18 @@ export function AwaitingPaymentDialog({
 
 			{/* 3. شريط أدوات التعيين والخيارات السريعة فوق الفوتر */}
 			<div className="p-2.5 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
-				<div className="flex items-center gap-1.5 flex-wrap">
-					<div className="flex-1 min-w-0">
+				<div className="grid grid-cols-4 gap-2 w-full">
+					<div className="min-w-0">
 						<Popover open={staffPopoverOpen} onOpenChange={setStaffPopoverOpen}>
 							<PopoverTrigger asChild>
 								<Button
 									variant="outline"
 									size="sm"
+									title={
+										staff.find((s) => s.id === assignedStaffId || s.staffId === assignedStaffId)?.name
+											? `إسناد: ${staff.find((s) => s.id === assignedStaffId || s.staffId === assignedStaffId)?.name}`
+											: "تعيين مراجع..."
+									}
 									className="w-full h-8 text-xs border-zinc-200 dark:border-zinc-800 gap-1.5 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 font-normal cursor-pointer shadow-2xs justify-between"
 								>
 									<span className="flex items-center gap-1.5 truncate">
@@ -355,26 +365,46 @@ export function AwaitingPaymentDialog({
 													setAssignedStaffId(null);
 													setStaffPopoverOpen(false);
 												}}
-												className="w-full text-right text-xs p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-muted-foreground transition-colors cursor-pointer"
+												className={cn(
+													"w-full text-right text-xs p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-muted-foreground flex items-center justify-between transition-colors cursor-pointer",
+													!assignedStaffId && "bg-zinc-100 dark:bg-zinc-800 font-semibold text-foreground",
+												)}
 											>
-												بدون مراجع (إلغاء التعيين)
+												<span>بدون مراجع (إلغاء التعيين)</span>
+												{!assignedStaffId && <IconCheck className="size-3.5 text-zinc-600 dark:text-zinc-400 shrink-0" />}
 											</button>
-											{staff.map((s) => (
-												<button
-													key={s.id || s.staffId}
-													type="button"
-													onClick={() => {
-														setAssignedStaffId(s.id || s.staffId);
-														setStaffPopoverOpen(false);
-													}}
-													className="w-full text-right text-xs p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center gap-2 transition-colors cursor-pointer"
-												>
-													<div className="size-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0 shadow-2xs">
-														{s.name.slice(0, 1)}
-													</div>
-													<span className="truncate font-medium text-[11px]">{s.name}</span>
-												</button>
-											))}
+											{staff.map((s) => {
+												const isSelected = (s.id && s.id === assignedStaffId) || (s.staffId && s.staffId === assignedStaffId);
+												return (
+													<button
+														key={s.id || s.staffId}
+														type="button"
+														onClick={() => {
+															setAssignedStaffId(s.id || s.staffId);
+															setStaffPopoverOpen(false);
+														}}
+														className={cn(
+															"w-full text-right text-xs p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between gap-2 transition-colors cursor-pointer",
+															isSelected && "bg-blue-50/80 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold",
+														)}
+													>
+														<div className="flex items-center gap-2 min-w-0 flex-1">
+															<div
+																className={cn(
+																	"size-6 rounded-full text-white flex items-center justify-center text-[10px] font-bold shrink-0 shadow-2xs",
+																	isSelected ? "bg-blue-600" : "bg-blue-600/80",
+																)}
+															>
+																{s.name.slice(0, 1)}
+															</div>
+															<span className="truncate text-[11px]">{s.name}</span>
+														</div>
+														{isSelected && (
+															<IconCheck className="size-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+														)}
+													</button>
+												);
+											})}
 										</>
 									)}
 								</div>
@@ -382,11 +412,12 @@ export function AwaitingPaymentDialog({
 						</Popover>
 					</div>
 
-					<div className="shrink-0">
+					<div className="min-w-0">
 						<PriorityPickerPopover
 							value={priority}
 							onChange={setPriority}
-							className="h-8 text-xs border-zinc-200 dark:border-zinc-800 font-normal shadow-2xs"
+							showChevron
+							className="w-full h-8 text-xs border-zinc-200 dark:border-zinc-800 font-normal shadow-2xs justify-between bg-white dark:bg-zinc-900"
 						/>
 					</div>
 				</div>
@@ -421,8 +452,8 @@ export function AwaitingPaymentDialog({
 					<Button
 						size="sm"
 						onClick={handleSubmit}
-						disabled={awaitingPaymentMutation.isPending}
-						className="h-8 text-xs font-semibold px-4 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white shadow-2xs cursor-pointer"
+						disabled={awaitingPaymentMutation.isPending || (enableMessage && !messageText.trim())}
+						className="h-8 text-xs font-semibold px-4 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white shadow-2xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						{awaitingPaymentMutation.isPending ? (
 							<IconLoader2 className="size-3.5 animate-spin" />

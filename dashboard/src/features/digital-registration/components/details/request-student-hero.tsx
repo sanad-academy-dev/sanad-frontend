@@ -151,15 +151,15 @@ export function RequestStudentHero({
 				<div className="flex items-center gap-2 shrink-0">
 					{!hasAppointment ? (
 						<div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-							<span>التذكير متاح بعد تثبيت الموعد</span>
-							{onOpenSchedule && (
+							<span>التذكير متاح بعد جدولة المقابلة</span>
+							{onOpenSchedule && request.status !== "QUEUE" && (
 								<button
 									type="button"
 									onClick={onOpenSchedule}
 									className="text-primary hover:underline font-bold text-[10px] flex items-center gap-0.5 cursor-pointer bg-primary/10 hover:bg-primary/20 text-primary px-1.5 py-0.5 rounded transition-colors"
 								>
 									<IconCalendar className="size-2.5" />
-									<span>تثبيت الموعد</span>
+									<span>جدولة مقابلة</span>
 								</button>
 							)}
 						</div>
