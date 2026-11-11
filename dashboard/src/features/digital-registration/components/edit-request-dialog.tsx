@@ -36,6 +36,8 @@ import {
 import { Switch } from "@/components/ui/switch";
 import type { CampaignRequestItem } from "../types/campaign-request.types";
 import { useUpdateRequest } from "../hooks/use-digital-registration";
+import { REGISTRATION_TRACKS } from "../utils/registration-tracks";
+import { computeAgeLabel } from "../utils/date-format";
 
 export function EditRequestDialog({
 	open,
@@ -52,6 +54,7 @@ export function EditRequestDialog({
 	const [gender, setGender] = useState<"MALE" | "FEMALE" | "UNKNOWN">("MALE");
 	const [birthDate, setBirthDate] = useState("");
 	const [ageLabel, setAgeLabel] = useState("");
+	const [experienceLevel, setExperienceLevel] = useState("");
 	const [targetClass, setTargetClass] = useState("");
 	const [bloodType, setBloodType] = useState("");
 	const [allergies, setAllergies] = useState("");
@@ -62,6 +65,7 @@ export function EditRequestDialog({
 	const [guardianPhone, setGuardianPhone] = useState("");
 	const [guardianEmail, setGuardianEmail] = useState("");
 	const [guardianNationalId, setGuardianNationalId] = useState("");
+	const [interviewMode, setInterviewMode] = useState<"IN_CLINIC" | "REMOTE">("IN_CLINIC");
 
 	const [error, setError] = useState<string | null>(null);
 
@@ -72,9 +76,15 @@ export function EditRequestDialog({
 		if (request && open) {
 			setStudentName(request.patientName || request.name || "");
 			setGender(request.gender || "MALE");
-			setBirthDate(request.birthDate ? request.birthDate.split("T")[0] : "");
-			setAgeLabel(request.ageLabel || "");
-			setTargetClass(request.targetClass || "");
+			const cleanBirth = request.birthDate ? request.birthDate.split("T")[0] : "";
+			setBirthDate(cleanBirth);
+			setAgeLabel(cleanBirth ? computeAgeLabel(cleanBirth) : (request.ageLabel || ""));
+			setExperienceLevel(
+				request.experienceLevel ||
+				(["مبتدئ", "متوسط", "متقدم", "غير متأكد"].includes(request.ageLabel?.trim() || "") ? request.ageLabel?.trim() : "") ||
+				""
+			);
+			setTargetClass(request.targetClass || request.proposedTrack || "");
 			setBloodType(request.bloodType || "");
 			setAllergies(request.allergies || "");
 			setHasChronic(request.hasChronicDiseases ?? Boolean(request.chronicDiseases));
@@ -83,6 +93,7 @@ export function EditRequestDialog({
 			setGuardianPhone(request.guardianPhone || "");
 			setGuardianEmail(request.guardianEmail || "");
 			setGuardianNationalId(request.guardianNationalId || "");
+			setInterviewMode(request.interviewMode === "REMOTE" ? "REMOTE" : "IN_CLINIC");
 			setError(null);
 		}
 	}, [request, open]);
@@ -111,8 +122,10 @@ export function EditRequestDialog({
 					studentName: studentName.trim(),
 					gender,
 					birthDate: birthDate || null,
-					ageLabel: ageLabel.trim() || null,
+					ageLabel: (birthDate ? computeAgeLabel(birthDate) : ageLabel.trim()) || null,
+					experienceLevel: experienceLevel || null,
 					targetClass: targetClass.trim() || null,
+					proposedTrack: targetClass.trim() || null,
 					bloodType: bloodType.trim() || null,
 					allergies: allergies.trim() || null,
 					hasChronicDiseases: hasChronic,
@@ -121,6 +134,7 @@ export function EditRequestDialog({
 					guardianPhone: guardianPhone.trim(),
 					guardianEmail: guardianEmail.trim() || null,
 					guardianNationalId: guardianNationalId.trim() || null,
+					interviewMode,
 				},
 			});
 
@@ -187,6 +201,50 @@ export function EditRequestDialog({
 
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 								<div className="space-y-1.5">
+									<Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+										<IconCalendar className="size-3.5 text-muted-foreground" />
+										<span>تاريخ ميلاد الطفل</span>
+									</Label>
+									<Input
+										type="date"
+										value={birthDate}
+										onChange={(e) => {
+											const val = e.target.value;
+											setBirthDate(val);
+											if (val) {
+												setAgeLabel(computeAgeLabel(val));
+											}
+										}}
+										className="h-9 text-xs bg-background"
+									/>
+								</div>
+
+								<div className="space-y-1.5">
+									<Label className="text-xs font-semibold text-foreground">العمر (محسوب من تاريخ الميلاد)</Label>
+									<Input
+										value={ageLabel}
+										onChange={(e) => setAgeLabel(e.target.value)}
+										placeholder="مثال: 7 سنوات"
+										className="h-9 text-xs bg-background"
+									/>
+								</div>
+							</div>
+
+							<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+								<div className="space-y-1.5">
+									<Label className="text-xs font-semibold text-foreground">نوع المقابلة</Label>
+									<Select value={interviewMode} onValueChange={(val: any) => setInterviewMode(val)}>
+										<SelectTrigger className="w-full h-9 text-xs bg-background">
+											<SelectValue />
+										</SelectTrigger>
+										<SelectContent dir="rtl" position="popper" sideOffset={4} className="w-[--radix-select-trigger-width]">
+											<SelectItem value="IN_CLINIC">في الأكاديمية</SelectItem>
+											<SelectItem value="REMOTE">عبر اتصال</SelectItem>
+										</SelectContent>
+									</Select>
+								</div>
+
+								<div className="space-y-1.5">
 									<Label className="text-xs font-semibold text-foreground">الجنس</Label>
 									<Select value={gender} onValueChange={(val: any) => setGender(val)}>
 										<SelectTrigger className="w-full h-9 text-xs bg-background">
@@ -200,41 +258,42 @@ export function EditRequestDialog({
 								</div>
 
 								<div className="space-y-1.5">
-									<Label className="text-xs font-semibold text-foreground">الفئة العمرية / العمر</Label>
-									<Input
-										value={ageLabel}
-										onChange={(e) => setAgeLabel(e.target.value)}
-										placeholder="مثال: 7 سنوات"
-										className="h-9 text-xs bg-background"
-									/>
-								</div>
-							</div>
-
-							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-								<div className="space-y-1.5">
-									<Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-										<IconCalendar className="size-3.5 text-muted-foreground" />
-										<span>تاريخ الميلاد</span>
-									</Label>
-									<Input
-										type="date"
-										value={birthDate}
-										onChange={(e) => setBirthDate(e.target.value)}
-										className="h-9 text-xs bg-background"
-									/>
-								</div>
-
-								<div className="space-y-1.5">
 									<Label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
 										<IconBuilding className="size-3.5 text-muted-foreground" />
-										<span>المسار / الفصل المطلوب</span>
+										<span>المسار المطلوب</span>
 									</Label>
-									<Input
-										value={targetClass}
-										onChange={(e) => setTargetClass(e.target.value)}
-										placeholder="المسار التمهيدي"
-										className="h-9 text-xs bg-background"
-									/>
+									<Select value={targetClass} onValueChange={setTargetClass}>
+										<SelectTrigger className="w-full h-9 text-xs bg-background">
+											<SelectValue placeholder="اختر المسار الأكاديمي" />
+										</SelectTrigger>
+										<SelectContent dir="rtl" position="popper" sideOffset={4} className="w-[--radix-select-trigger-width]">
+											{REGISTRATION_TRACKS.map((t) => (
+												<SelectItem key={t} value={t} className="text-xs cursor-pointer">
+													{t}
+												</SelectItem>
+											))}
+											{targetClass && !REGISTRATION_TRACKS.includes(targetClass as any) && (
+												<SelectItem value={targetClass} className="text-xs">
+													{targetClass}
+												</SelectItem>
+											)}
+										</SelectContent>
+									</Select>
+								</div>
+
+								<div className="space-y-1.5">
+									<Label className="text-xs font-semibold text-foreground">مستوى الطالب (الخبرة)</Label>
+									<Select value={experienceLevel} onValueChange={setExperienceLevel}>
+										<SelectTrigger className="w-full h-9 text-xs bg-background">
+											<SelectValue placeholder="حدد المستوى" />
+										</SelectTrigger>
+										<SelectContent dir="rtl" position="popper" sideOffset={4} className="w-[--radix-select-trigger-width]">
+											<SelectItem value="مبتدئ" className="text-xs cursor-pointer">مبتدئ</SelectItem>
+											<SelectItem value="متوسط" className="text-xs cursor-pointer">متوسط</SelectItem>
+											<SelectItem value="متقدم" className="text-xs cursor-pointer">متقدم</SelectItem>
+											<SelectItem value="غير متأكد" className="text-xs cursor-pointer">غير متأكد</SelectItem>
+										</SelectContent>
+									</Select>
 								</div>
 							</div>
 						</div>

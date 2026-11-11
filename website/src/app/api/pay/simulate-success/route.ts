@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
 	try {
 		const body = await req.json();
 
-		const response = await fetch(`${getSanadBackendUrl()}/public/registration/payment/webhook`, {
+		const response = await fetch(`${getSanadBackendUrl()}/public/registration/payment/simulate`, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(body),

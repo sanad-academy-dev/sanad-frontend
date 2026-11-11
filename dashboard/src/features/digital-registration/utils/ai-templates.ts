@@ -146,6 +146,10 @@ export function generateAwaitingPaymentMessage({
 	guardianName,
 	planName,
 	amount,
+	includeMeals,
+	enableDailyStipend,
+	code,
+	currency = "ج.م",
 	paymentToken,
 	paymentUrl,
 }: {
@@ -153,18 +157,43 @@ export function generateAwaitingPaymentMessage({
 	guardianName?: string | null;
 	planName?: string | null;
 	amount?: number | null;
+	includeMeals?: boolean;
+	enableDailyStipend?: boolean;
+	code?: string | null;
+	currency?: string;
 	paymentToken?: string | null;
 	paymentUrl?: string | null;
 }): string {
 	const guardianGreeting = guardianName ? ` (${guardianName})` : "";
-	const planText = planName ? ` لـ "${planName}"` : "";
-	const amountText = amount ? ` والبالغة (${amount.toLocaleString("ar-EG")} ج.م)` : "";
 	const finalLink = paymentUrl || (paymentToken ? getPublicPaymentUrl(paymentToken) : "");
-	const linkSection = finalLink
-		? `\n\n💳 لسداد الرسوم مباشرة بالبطاقة البنكية أو إنستاباي وتأكيد الحجز فورياً:\n${finalLink}`
+	const formattedAmount = amount ? `${amount.toLocaleString("en-US")} ${currency}` : null;
+
+	const subscriptionDetailsLines = [
+		planName ? `• الباقة المختارة: ${planName}` : null,
+		formattedAmount ? `• قيمة الباقة: ${formattedAmount}` : null,
+		typeof includeMeals === "boolean"
+			? `• تضمين الوجبات (ضمن مشمولات الباقة): ${includeMeals ? "مشمولة ضمن الباقة" : "غير مشمولة"}`
+			: null,
+		typeof enableDailyStipend === "boolean"
+			? `• تفعيل المصروف اليومي (ضمن مشمولات الباقة): ${enableDailyStipend ? "مفعّل ضمن الباقة" : "غير مفعّل"}`
+			: null,
+	]
+		.filter(Boolean)
+		.join("\n");
+
+	const detailsSection = subscriptionDetailsLines
+		? `\n\n📋 تفاصيل الباقة والاشتراك المعتمد:\n${subscriptionDetailsLines}`
 		: "";
 
-	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}${guardianGreeting}،\nيسعدنا إبلاغكم باجتياز الطالب لمرحلة التقييم والمقابلة الشخصية بنجاح في أكاديمية سند التعليمية.\nلحجز المقعد النهائي وتأكيد القيد، يرجى سداد الرسوم الأكاديمية المقررة${planText}${amountText}.${linkSection}\n\nسيسعد فريق الحسابات والقبول بمساعدتكم لإتمام السداد، مع تمنياتنا للطالب بمسيرة تعليمية ملهمة ومتميزة.`;
+	const linkSection = finalLink
+		? `\n\n💳 لسداد الرسوم إلكترونياً (بطاقة بنكية أو محفظة إلكترونية) وتأكيد حجز المقعد فورياً:\n${finalLink}`
+		: "";
+
+	const cashHint = code
+		? `\n\nكما يمكنكم السداد نقداً في مقر الأكاديمية باستخدام كود الطلب (#${code}).`
+		: "\n\nكما يسعد فريق الحسابات والقبول باستقبالكم للسداد نقداً في مقر الأكاديمية.";
+
+	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}${guardianGreeting}،\nيسعدنا إبلاغكم باجتياز الطالب لمرحلة التقييم والمقابلة الشخصية بنجاح في أكاديمية سند التعليمية.\nيرجى استكمال سداد الرسوم الأكاديمية خلال 72 ساعة لتأكيد القيد وحجز المقعد النهائي للطالب.${detailsSection}${linkSection}${cashHint}\n\nمع تمنياتنا للطالب بمسيرة تعليمية ملهمة ومتميزة.`;
 }
 
 export function generateReferralMessage({

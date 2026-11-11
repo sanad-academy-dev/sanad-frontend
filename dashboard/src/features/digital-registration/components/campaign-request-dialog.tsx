@@ -1,4 +1,4 @@
 export {
 	CampaignRequestSheet,
-	CampaignRequestDialog,
+	CampaignRequestSheet as CampaignRequestDialog,
 } from "./campaign-request-sheet";

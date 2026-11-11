@@ -1,10 +1,6 @@
-import { useState, useRef, useCallback, useEffect, useMemo } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import {
 	IconCalendar,
-	IconCheck,
-	IconAlertTriangle,
-	IconCoin,
-	IconPlus,
 	IconCopy,
 	IconExternalLink,
 	IconHourglass,
@@ -21,6 +17,8 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 import type { CampaignRequestItem } from "../types/campaign-request.types";
 import { AddRequestDialog } from "./add-request-sheet";
+import { FillAssessmentDrawer } from "./details/fill-assessment-drawer";
+import { AssessmentDetailsDrawer } from "./details/assessment-details-drawer";
 
 // Phase 2 Detail Components
 import { RequestGuardianSidebar } from "./details/request-guardian-sidebar";
@@ -29,7 +27,10 @@ import { RequestChildDataCard } from "./details/request-child-data-card";
 import { RequestLifecycleStepper } from "./details/request-lifecycle-stepper";
 import { RequestDocumentsSection } from "./details/request-documents-section";
 import { RequestActivityComments } from "./details/request-activity-comments";
-import { useDigitalRegistrationCapabilities } from "../hooks/use-digital-registration";
+import {
+	useDigitalRegistrationCapabilities,
+	useEnrollAcceptedStudent,
+} from "../hooks/use-digital-registration";
 
 // Phase 4 Action Modals Suite
 import { QueueRequestDialog } from "./modals/queue-request-dialog";
@@ -41,9 +42,16 @@ import { RejectRequestDialog } from "./modals/reject-request-dialog";
 import { ReferRequestDialog } from "./modals/refer-request-dialog";
 import { DeleteRequestDialog } from "./modals/delete-request-dialog";
 import { AssignSubscriptionDialog } from "./modals/assign-subscription-dialog";
+import { CashPaymentDrawer } from "./modals/cash-payment-drawer";
+import { PaymentReceiptDrawer } from "./modals/payment-receipt-drawer";
 import { RequestStatusTransitionDialog, type RequestTransitionTarget } from "./modals/request-status-transition-dialog";
 import { StudentRequestPrintModal } from "./print/student-request-print-modal";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
+import type { RegistrationPaymentReceiptData } from "../types/campaign-request.types";
+import {
+	buildReceiptFromRequest,
+	resolveClinicCurrencySymbol,
+} from "../utils/payment-helpers";
 import {
 	formatAppointmentDate,
 	formatAppointmentTime,
@@ -68,7 +76,24 @@ interface CampaignRequestSheetProps {
 	onRequestUpdate?: (updated: Partial<CampaignRequestItem> & { id: string }) => void;
 }
 
-export type ActiveActionDrawer = "queue" | "shortlist" | "waitlist" | "reschedule" | "awaiting-payment" | "reject" | "refer" | "delete" | "edit" | "status" | "subscription" | null;
+export type ActiveActionDrawer = "queue" | "shortlist" | "waitlist" | "reschedule" | "awaiting-payment" | "cash-payment" | "payment-receipt" | "reject" | "refer" | "delete" | "edit" | "status" | "subscription" | "fill-assessment" | "view-assessment" | null;
+
+function isNestedDrawerOrOverlayTarget(target: HTMLElement | null): boolean {
+	return Boolean(
+		target?.closest('[data-slot="sheet-content"]') ||
+			target?.closest('[data-slot="reschedule-drawer"]') ||
+			target?.closest('[data-slot="awaiting-payment-drawer"]') ||
+			target?.closest('[data-slot="cash-payment-drawer"]') ||
+			target?.closest('[data-slot="payment-receipt-drawer"]') ||
+			target?.closest('[data-slot="subscription-drawer"]') ||
+			target?.closest('[data-slot="fill-assessment-drawer"]') ||
+			target?.closest('[data-slot="assessment-details-drawer"]') ||
+			target?.closest('[role="dialog"]') ||
+			target?.closest('[role="menu"]') ||
+			target?.closest('[data-radix-portal]') ||
+			target?.closest('[data-radix-popper-content-wrapper]'),
+	);
+}
 
 export function CampaignRequestSheet({
 	request,
@@ -86,18 +111,24 @@ export function CampaignRequestSheet({
 	onRequestUpdate,
 }: CampaignRequestSheetProps) {
 	const { capabilities } = useDigitalRegistrationCapabilities(campaignId);
+	const enrollStudentMutation = useEnrollAcceptedStudent(campaignId);
 	const { clinicInfo } = useClinicInfo();
 	const clinicTimezone = clinicInfo?.timezone || DEFAULT_CLINIC_TIMEZONE;
 	// Active drawer state - guarantees only ONE action modal/drawer is ever open at a time
 	const [activeDrawer, setActiveDrawer] = useState<ActiveActionDrawer>(null);
+	const [activeReceipt, setActiveReceipt] = useState<RegistrationPaymentReceiptData | null>(null);
 	const [statusTransitionTarget, setStatusTransitionTarget] = useState<RequestTransitionTarget | null>(null);
 	const [rescheduleInitialStaffId, setRescheduleInitialStaffId] = useState<string | null>(null);
 	const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
 	const [isExpanded, setIsExpanded] = useState(false);
 	const lastDrawerClosedAtRef = useRef<number>(0);
+	const returnToAwaitingPaymentRef = useRef<boolean>(false);
+
+	const currencySymbol = resolveClinicCurrencySymbol(clinicInfo?.currencyCode);
 
 	const handleCloseDrawer = useCallback(() => {
 		lastDrawerClosedAtRef.current = Date.now();
+		returnToAwaitingPaymentRef.current = false;
 		setActiveDrawer(null);
 		setRescheduleInitialStaffId(null);
 	}, []);
@@ -143,35 +174,36 @@ export function CampaignRequestSheet({
 
 	const isAnyDrawerOpen = activeDrawer !== null || isPrintDialogOpen;
 
-	const missingMandatoryDocs = useMemo(() => {
-		if (!request) return [];
-		const items = request.documents?.items || [];
-		const missing: string[] = [];
-
-		const hasBirthCert = items.some(
-			(d) => d.type === "BIRTH_CERTIFICATE" || d.title?.includes("ميلاد")
-		);
-		if (!hasBirthCert) {
-			missing.push("شهادة الميلاد");
-		}
-
-		const hasGuardianId = items.some(
-			(d) =>
-				d.type === "GUARDIAN_ID" ||
-				d.title?.includes("هوية") ||
-				d.title?.includes("بطاقة")
-		);
-		if (!hasGuardianId) {
-			missing.push("هوية ولي الأمر");
-		}
-
-		return missing;
-	}, [request]);
-
 	if (!request) return null;
 
 	const handleStatusChange = (req: CampaignRequestItem, newStatus: CampaignRequestItem["status"]) => {
 		onStatusChange?.(req, newStatus);
+	};
+
+	const handleEnrollStudent = () => {
+		if (!request || enrollStudentMutation.isPending) return;
+		enrollStudentMutation.mutate(
+			{ requestId: request.id },
+			{
+				onSuccess: (res: any) => {
+					onRequestUpdate?.({
+						id: request.id,
+						convertedPatientId: res.patientId,
+						convertedPatientCode: res.studentCode,
+						convertedOwnerId: res.ownerId,
+						convertedOwnerCode: res.ownerCode,
+					});
+					toast.success(
+						res.alreadyEnrolled
+							? "الطالب مضاف بالفعل إلى قائمة الطلاب"
+							: `تمت إضافة الطالب لقائمة الطلاب بنجاح (${res.studentCode})`,
+					);
+				},
+				onError: (err: any) => {
+					toast.error(err?.message || "تعذر إضافة الطالب لقائمة الطلاب");
+				},
+			},
+		);
 	};
 
 	return (
@@ -185,15 +217,8 @@ export function CampaignRequestSheet({
 					showCloseButton={false}
 					onPointerDownOutside={(e) => {
 						const target = e.target as HTMLElement | null;
-						const isNestedOverlay = Boolean(
-							target?.closest('[data-slot="sheet-content"]') ||
-							target?.closest('[role="dialog"]') ||
-							target?.closest('[role="menu"]') ||
-							target?.closest('[data-radix-portal]') ||
-							target?.closest('[data-radix-popper-content-wrapper]'),
-						);
 						// قوائم الإسناد والموعد واللوحات الفرعية تُعرض في Portal؛ لا تعاملها كخروج من التفاصيل.
-						if (isNestedOverlay) {
+						if (isNestedDrawerOrOverlayTarget(target)) {
 							e.preventDefault();
 							return;
 						}
@@ -207,14 +232,7 @@ export function CampaignRequestSheet({
 					onFocusOutside={(e) => e.preventDefault()}
 					onInteractOutside={(e) => {
 						const target = e.target as HTMLElement | null;
-						const isNestedOverlay = Boolean(
-							target?.closest('[data-slot="sheet-content"]') ||
-							target?.closest('[role="dialog"]') ||
-							target?.closest('[role="menu"]') ||
-							target?.closest('[data-radix-portal]') ||
-							target?.closest('[data-radix-popper-content-wrapper]'),
-						);
-						if (isNestedOverlay) {
+						if (isNestedDrawerOrOverlayTarget(target)) {
 							e.preventDefault();
 							return;
 						}
@@ -242,6 +260,10 @@ export function CampaignRequestSheet({
 						onOpenReject={() => setActiveDrawer("reject")}
 						onOpenDelete={() => setActiveDrawer("delete")}
 						onAcceptDirect={onAccept ? () => openStatusTransition("ACCEPTED") : undefined}
+						onOpenCashPayment={() => setActiveDrawer("cash-payment")}
+						onEnrollStudent={handleEnrollStudent}
+						isEnrollingStudent={enrollStudentMutation.isPending}
+						capabilities={capabilities}
 						onOpenEdit={() => setActiveDrawer("edit")}
 						onOpenRefer={() => setActiveDrawer("refer")}
 						onOpenPrint={() => setIsPrintDialogOpen(true)}
@@ -265,125 +287,25 @@ export function CampaignRequestSheet({
 									onStatusChange={capabilities.canChangeStatus ? handleStatusChange : undefined}
 									onOpenReschedule={capabilities.canSchedule ? openReschedule : undefined}
 									onOpenAssignPlan={() => setActiveDrawer("subscription")}
+									onOpenCashPayment={() => setActiveDrawer("cash-payment")}
+									onOpenViewReceipt={() => {
+										const receipt =
+											activeReceipt && activeReceipt.requestId === request.id
+												? activeReceipt
+												: buildReceiptFromRequest(
+														request,
+														currencySymbol,
+														clinicInfo?.name,
+												  );
+										if (receipt) {
+											setActiveReceipt(receipt);
+											setActiveDrawer("payment-receipt");
+										}
+									}}
+									onOpenFillAssessment={() => setActiveDrawer("fill-assessment")}
+									onOpenViewAssessment={() => setActiveDrawer("view-assessment")}
+									isExpanded={isExpanded}
 								/>
-
-								{/* 1. بانر اعتماد القبول والتحويل للسجلات الرسمية إن تم القبول */}
-								{(request.convertedPatientId || request.status === "ACCEPTED") && (
-									<div
-										className="flex flex-col gap-2 rounded-lg border border-emerald-200 bg-emerald-50/80 dark:bg-emerald-950/30 dark:border-emerald-800 p-3 shadow-2xs"
-										dir="rtl"
-									>
-										<div className="flex items-center justify-between gap-2">
-											<div className="flex items-center gap-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-300">
-												<IconCheck className="size-4 shrink-0 text-emerald-600" />
-												<span>تم اعتماد الطالب رسمياً وإنشاء السجلات في المنظومة الأكاديمية</span>
-											</div>
-											{request.convertedPatientCode && (
-												<Badge
-													variant="outline"
-													className="font-mono text-[11px] bg-emerald-100 text-emerald-800 border-emerald-300 dark:bg-emerald-900/50 dark:text-emerald-200 font-bold px-2"
-												>
-													{request.convertedPatientCode}
-												</Badge>
-											)}
-										</div>
-
-										<p className="text-[11px] text-muted-foreground leading-relaxed">
-											تم ترحيل بيانات الطالب وولي الأمر تلقائياً. يمكنك الانتقال المباشر لملفاتهما في الأقسام الرسمية:
-										</p>
-
-										<div className="flex items-center gap-2 pt-1 flex-wrap">
-											<Button
-												asChild
-												size="sm"
-												variant="outline"
-												className="h-7 text-xs bg-white dark:bg-card border-emerald-300 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-700 dark:text-emerald-300 gap-1.5 font-semibold cursor-pointer"
-											>
-												<Link to="/services/patients">
-													<IconUser className="size-3.5" />
-													فتح ملف الطالب الأكاديمي
-													<IconExternalLink className="size-3" />
-												</Link>
-											</Button>
-
-											{request.convertedOwnerId && (
-												<Button
-													asChild
-													size="sm"
-													variant="outline"
-													className="h-7 text-xs bg-white dark:bg-card border-emerald-300 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-700 dark:text-emerald-300 gap-1.5 font-semibold cursor-pointer"
-												>
-													<Link to="/services/owners">
-														<IconUserCircle className="size-3.5" />
-														فتح ملف ولي الأمر
-														<IconExternalLink className="size-3" />
-													</Link>
-												</Button>
-											)}
-										</div>
-									</div>
-								)}
-
-								{/* 3. بانر مرحلة انتظار الدفع */}
-								{request.status === "AWAITING_PAYMENT" && (
-									<div
-										className="flex flex-col gap-2.5 rounded-lg border border-indigo-200 bg-indigo-50/80 dark:bg-indigo-950/30 dark:border-indigo-800 p-3.5 shadow-2xs"
-										dir="rtl"
-									>
-										<div className="flex items-center justify-between gap-2">
-											<div className="flex items-center gap-1.5 text-xs font-bold text-indigo-950 dark:text-indigo-200">
-												<IconCoin className="size-4 shrink-0 text-indigo-600 dark:text-indigo-400" />
-												<span>مرحلة سداد الرسوم الأكاديمية وحجز المقعد</span>
-											</div>
-											<Badge
-												variant="outline"
-												className="text-xs bg-indigo-100 text-indigo-900 border-indigo-300 dark:bg-indigo-900/60 dark:text-indigo-200 font-bold px-2.5 py-0.5"
-											>
-												{request.subscriptionAmount ? `المطلوب: ${request.subscriptionAmount} ج.م` : "بانتظار تحديد الباقة"}
-											</Badge>
-										</div>
-										<p className="text-[11px] text-muted-foreground leading-relaxed">
-											اجتاز الطالب المقابلة الشخصية بنجاح. يلزم تأكيد سداد الرسوم الأكاديمية لحجز المقعد بشكل نهائي والاعتماد الرسمي.
-										</p>
-
-										{/* فحص النواقص الاستباقي قبل القبول النهائي */}
-										{missingMandatoryDocs.length > 0 && (
-											<div className="flex items-start gap-2 rounded-lg bg-amber-500/10 border border-amber-500/25 p-2.5 text-xs text-amber-900 dark:text-amber-200">
-												<IconAlertTriangle className="size-4 shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
-												<div className="space-y-0.5 min-w-0 flex-1">
-													<span className="font-bold block text-[11.5px]">مستندات أساسية غير مكتملة قبل الاعتماد النهائي:</span>
-													<span className="text-[11px] leading-relaxed block text-amber-800 dark:text-amber-300">
-														لم يتم إرفاق ({missingMandatoryDocs.join("، ")}). يُرجى رفعها لتجنب تعذر الاعتماد في النظام.
-													</span>
-												</div>
-											</div>
-										)}
-
-										{capabilities.canAcceptOrReject && onAccept && (
-											<div className="flex items-center justify-end gap-2 pt-1 flex-wrap">
-												{capabilities.canEdit && missingMandatoryDocs.length > 0 && (
-													<Button
-														size="sm"
-														variant="outline"
-														onClick={() => setActiveDrawer("edit")}
-														className="h-7 text-xs border-amber-300 dark:border-amber-700 text-amber-800 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-950/40 cursor-pointer gap-1"
-													>
-														<IconPlus className="size-3 text-amber-600 dark:text-amber-400" />
-														<span>إرفاق المستندات المفقودة</span>
-													</Button>
-												)}
-												<Button
-													size="sm"
-													onClick={() => onAccept(request)}
-													className="h-7 text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold cursor-pointer gap-1.5 shadow-2xs"
-												>
-													<IconCheck className="size-3.5" />
-													<span>تأكيد السداد والاعتماد النهائي للطالب</span>
-												</Button>
-											</div>
-										)}
-									</div>
-								)}
 
 								{/* 5. بانر الطلب المكرر */}
 								{request.status === "DUPLICATE" && (
@@ -506,6 +428,11 @@ export function CampaignRequestSheet({
 						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("awaiting-payment") : handleCloseDrawer())}
 						campaignId={campaignId}
 						onSuccess={handleActionCompleted}
+						onRequestUpdate={onRequestUpdate}
+						onOpenAssignPlan={() => {
+							returnToAwaitingPaymentRef.current = true;
+							setActiveDrawer("subscription");
+						}}
 						isExpanded={isExpanded}
 					/>
 
@@ -538,7 +465,80 @@ export function CampaignRequestSheet({
 						open={activeDrawer === "subscription"}
 						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("subscription") : handleCloseDrawer())}
 						campaignId={campaignId}
-						onSuccess={handleActionCompleted}
+						onSuccess={(assignedPlan, updatedReq) => {
+							if (assignedPlan && onRequestUpdate) {
+								onRequestUpdate({
+									id: request.id,
+									subscriptionPlanId: assignedPlan.id,
+									subscriptionPlanName: assignedPlan.name,
+									subscriptionAmount: assignedPlan.price,
+									...(updatedReq?.paymentToken
+										? {
+												paymentToken: updatedReq.paymentToken,
+												paymentTokenExpiresAt: updatedReq.paymentTokenExpiresAt,
+										  }
+										: {}),
+								});
+							}
+							if (returnToAwaitingPaymentRef.current) {
+								returnToAwaitingPaymentRef.current = false;
+								setActiveDrawer("awaiting-payment");
+							} else {
+								handleCloseDrawer();
+							}
+						}}
+						isExpanded={isExpanded}
+					/>
+
+					<CashPaymentDrawer
+						key={`cash-payment-${request.id}`}
+						request={request}
+						open={activeDrawer === "cash-payment"}
+						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("cash-payment") : handleCloseDrawer())}
+						campaignId={campaignId}
+						isExpanded={isExpanded}
+						onOpenAssignPlan={() => setActiveDrawer("subscription")}
+						onPaymentSuccess={(receipt) => {
+							setActiveReceipt(receipt);
+							onRequestUpdate?.({
+								id: request.id,
+								status: "ACCEPTED",
+								statusLabel: "مقبول",
+								statusVariant: "default",
+								column: "accepted",
+								paidAt: receipt.paidAt,
+								paymentReference: receipt.paymentReference,
+								paymentGateway: receipt.paymentGateway,
+								paymentMethodType: receipt.paymentMethodType,
+								paymentNotes: JSON.stringify({
+									expectedAmount: receipt.amount,
+									cashReceived: receipt.cashReceived,
+									changeAmount: receipt.changeAmount,
+									discountAmount: receipt.discountAmount,
+									collectedBy: receipt.collectedBy,
+									notes: receipt.notes,
+								}),
+								convertedPatientCode: receipt.studentCode || request.convertedPatientCode,
+							});
+							setActiveDrawer("payment-receipt");
+						}}
+					/>
+
+					<PaymentReceiptDrawer
+						key={`payment-receipt-${request.id}`}
+						receipt={
+							activeReceipt && activeReceipt.requestId === request.id
+								? activeReceipt
+								: buildReceiptFromRequest(request, currencySymbol, clinicInfo?.name)
+						}
+						open={activeDrawer === "payment-receipt"}
+						onOpenChange={(isOpen) => {
+							if (isOpen) {
+								setActiveDrawer("payment-receipt");
+							} else {
+								handleCloseDrawer();
+							}
+						}}
 						isExpanded={isExpanded}
 					/>
 
@@ -560,6 +560,27 @@ export function CampaignRequestSheet({
 						onSuccess={handleActionCompleted}
 						isExpanded={isExpanded}
 					/>
+
+					{/* لوحة التقييم الأولي الجانبية (28vw) المفتوحة بجانب تفاصيل الطلب */}
+					<FillAssessmentDrawer
+						key={`fill-assessment-${request.id}`}
+						request={request}
+						open={activeDrawer === "fill-assessment"}
+						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("fill-assessment") : handleCloseDrawer())}
+						campaignId={campaignId}
+						isExpanded={isExpanded}
+						onSuccess={handleActionCompleted}
+					/>
+
+					{/* دراور تقرير ونتائج التقييم الأولي (28vw) المفتوح بجانب تفاصيل الطلب */}
+					<AssessmentDetailsDrawer
+						key={`view-assessment-${request.id}`}
+						request={request}
+						open={activeDrawer === "view-assessment"}
+						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("view-assessment") : handleCloseDrawer())}
+						campaignId={campaignId}
+						isExpanded={isExpanded}
+					/>
 				</SheetContent>
 			</Sheet>
 
@@ -569,6 +590,12 @@ export function CampaignRequestSheet({
 				open={activeDrawer === "edit"}
 				onClose={handleCloseDrawer}
 				campaignId={campaignId}
+				onSuccess={(updated) => {
+					if (updated && onRequestUpdate) {
+						onRequestUpdate(updated);
+					}
+					handleCloseDrawer();
+				}}
 			/>
 
 			{/* نافذة معاينة وطباعة استمارة الطالب الرسمية الشاملة */}

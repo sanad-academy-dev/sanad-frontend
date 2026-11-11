@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
 	IconCalendar,
 	IconCalendarEvent,
+	IconCertificate,
 	IconClock,
 	IconCompass,
 	IconMapPin,
@@ -11,15 +12,24 @@ import {
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
-import { useQuickUpdateRequest } from "../../hooks/use-digital-registration";
+import { useCurrentTimeMs, useQuickUpdateRequest } from "../../hooks/use-digital-registration";
 import { backendFetch } from "@/lib/backend-fetch";
 import { REGISTRATION_TRACKS } from "../../utils/registration-tracks";
+import {
+	formatAppointmentDate,
+	formatAppointmentTime,
+	DEFAULT_CLINIC_TIMEZONE,
+	computeAgeLabel,
+	getStudentLevel,
+	isInterviewOngoing,
+} from "../../utils/date-format";
 
 interface RequestBasicInfoGridProps {
 	request: CampaignRequestItem;
@@ -81,19 +91,34 @@ export function RequestBasicInfoGrid({
 		);
 	};
 
+	const nowMs = useCurrentTimeMs();
 	const { clinicInfo } = useClinicInfo();
 	const clinicTimezone = clinicInfo?.timezone || DEFAULT_CLINIC_TIMEZONE;
 
+	const displayAge = computeAgeLabel(request.birthDate, request.ageLabel);
+	const displayLevel = getStudentLevel(request);
+
+	const effectiveAppointmentDate = request.appointmentDate || request.assessmentAppointment?.startsAt;
+	const effectiveDurationMinutes =
+		request.assessmentAppointment?.durationMinutes ?? request.interviewDurationMinutes ?? 60;
+	const isInterviewStage = ["INTERVIEW", "IN_EVALUATION", "EVALUATION"].includes(request.status);
+	const isOngoing = isInterviewOngoing({
+		isInterviewStage,
+		appointmentDate: effectiveAppointmentDate,
+		durationMinutes: effectiveDurationMinutes,
+		nowMs,
+	});
+
 	const birthDateFormatted = request.birthDate
-		? new Date(request.birthDate).toLocaleDateString("ar-EG", {
+		? `${new Date(request.birthDate).toLocaleDateString("ar-EG", {
 				year: "numeric",
 				month: "long",
 				day: "numeric",
-		  })
-		: (request.ageLabel || "غير محدد");
+		  })} (${displayAge})`
+		: (displayAge !== "غير محدد" ? displayAge : "غير محدد");
 
-	const appointmentTimeFormatted = request.appointmentDate
-		? `${formatAppointmentDate(request.appointmentDate, clinicTimezone, "ar-EG", { month: "short", day: "numeric", weekday: undefined, year: undefined })} • ${formatAppointmentTime(request.appointmentDate, clinicTimezone, "ar-EG")}`
+	const appointmentTimeFormatted = effectiveAppointmentDate
+		? `${formatAppointmentDate(effectiveAppointmentDate, clinicTimezone, "ar-EG", { month: "short", day: "numeric", weekday: undefined, year: undefined })} • ${formatAppointmentTime(effectiveAppointmentDate, clinicTimezone, "ar-EG")}`
 		: "قيد التحديد";
 
 	return (
@@ -124,6 +149,19 @@ export function RequestBasicInfoGrid({
 					</span>
 				</div>
 
+				{/* المستوى المهارى */}
+				{displayLevel && (
+					<div className="flex items-center justify-between py-0.5 border-b border-zinc-100 dark:border-zinc-800/60">
+						<span className="text-zinc-500 dark:text-zinc-400 flex items-center gap-1 text-[10px]">
+							<IconCertificate className="size-3 text-zinc-400" />
+							<span>المستوى</span>
+						</span>
+						<span className="font-bold text-zinc-900 dark:text-zinc-100 text-[10.5px]">
+							{displayLevel}
+						</span>
+					</div>
+				)}
+
 				{/* موعد المقابلة مع وسم إعادة الجدولة */}
 				<div className="flex items-center justify-between py-0.5 border-b border-zinc-100 dark:border-zinc-800/60">
 					<span className="text-zinc-500 dark:text-zinc-400 flex items-center gap-1 text-[10px]">
@@ -131,7 +169,14 @@ export function RequestBasicInfoGrid({
 						<span>موعد المقابلة</span>
 					</span>
 					<div className="flex items-center gap-1">
-						<span className="font-bold text-zinc-900 dark:text-zinc-100 text-[10.5px]">
+						<span
+							className={cn(
+								"font-bold text-[10.5px] transition-colors",
+								isOngoing
+									? "text-red-600 dark:text-red-400"
+									: "text-zinc-900 dark:text-zinc-100",
+							)}
+						>
 							{appointmentTimeFormatted}
 						</span>
 						<button

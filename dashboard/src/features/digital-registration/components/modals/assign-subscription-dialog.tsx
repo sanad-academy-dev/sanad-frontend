@@ -23,111 +23,28 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
-import { useCarePlans } from "@/features/finance/care-plans/hooks/use-care-plans";
 import {
 	useDigitalRegistrationCapabilities,
 	useQuickUpdateRequest,
 } from "../../hooks/use-digital-registration";
+import {
+	useRegistrationSubscriptionPlans,
+	type SubscriptionPlanCardItem,
+} from "../../hooks/use-registration-plans";
+import { resolveClinicCurrencySymbol } from "../../utils/payment-helpers";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import { RegistrationDrawerHeader } from "./registration-drawer-header";
+
+export type { SubscriptionPlanCardItem };
 
 interface AssignSubscriptionDialogProps {
 	request: CampaignRequestItem | null;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	campaignId?: string;
-	onSuccess?: () => void;
+	onSuccess?: (plan?: SubscriptionPlanCardItem, updatedRequest?: any) => void;
 	isExpanded?: boolean;
 }
-
-export interface SubscriptionPlanCardItem {
-	id: string;
-	name: string;
-	code?: string;
-	description: string;
-	type: string; // e.g. "شهري" | "فصلي" | "سنوي"
-	price: number;
-	durationLabel: string;
-	levelsLabel: string;
-	rating: number;
-	reviewsCount: number;
-}
-
-// الباقات المعتمدة لأكاديمية سند (تطابق تصميم النظام ونموذج العرض المعتمد)
-const DEFAULT_ACADEMY_PLANS: SubscriptionPlanCardItem[] = [
-	{
-		id: "SANAD_START",
-		name: "سند استارت",
-		code: "START-01",
-		description: "برنامج التأسيس والتقييم الشامل والتهيئة الأكاديمية",
-		type: "شهري",
-		price: 300,
-		durationLabel: "24 جلسة",
-		levelsLabel: "4 مستويات",
-		rating: 4.9,
-		reviewsCount: 234,
-	},
-	{
-		id: "BASIC",
-		name: "الباقة الأساسية (نصف دوام)",
-		code: "BASIC-02",
-		description: "برنامج التعليم والتأهيل نصف دوام مع جلسات تنمية المهارات",
-		type: "شهري",
-		price: 800,
-		durationLabel: "20 جلسة",
-		levelsLabel: "3 مستويات",
-		rating: 4.8,
-		reviewsCount: 182,
-	},
-	{
-		id: "COMPREHENSIVE",
-		name: "الباقة الشاملة (دوام كامل + أنشطة)",
-		code: "COMP-03",
-		description: "برنامج الدوام الكامل الشامل مع الأنشطة التفاعلية والدمج",
-		type: "شهري",
-		price: 1500,
-		durationLabel: "32 جلسة",
-		levelsLabel: "5 مستويات",
-		rating: 4.95,
-		reviewsCount: 310,
-	},
-	{
-		id: "PREMIUM",
-		name: "الباقة المتميزة (VIP ورعاية خاصة)",
-		code: "VIP-04",
-		description: "جلسات فردية مكثفة ورعاية خاصة ومتابعة أسبوعية دقيقة",
-		type: "شهري",
-		price: 2200,
-		durationLabel: "40 جلسة",
-		levelsLabel: "6 مستويات",
-		rating: 5.0,
-		reviewsCount: 95,
-	},
-	{
-		id: "SANAD_PLUS",
-		name: "سند بلس (فصلي)",
-		code: "PLUS-05",
-		description: "برنامج التدخل المتقدم وتنمية المهارات المتكاملة لفصل دراسي كامل",
-		type: "فصلي",
-		price: 3900,
-		durationLabel: "72 جلسة",
-		levelsLabel: "4 مستويات",
-		rating: 4.9,
-		reviewsCount: 140,
-	},
-	{
-		id: "SANAD_EXCELLENCE",
-		name: "سند التميز (سنوي)",
-		code: "EXC-06",
-		description: "عضوية سنوية كاملة للتأهيل الأكاديمي والمهاري مع كافة الأنشطة",
-		type: "سنوي",
-		price: 9500,
-		durationLabel: "180 جلسة",
-		levelsLabel: "8 مستويات",
-		rating: 4.98,
-		reviewsCount: 88,
-	},
-];
 
 export function AssignSubscriptionDialog({
 	request,
@@ -146,9 +63,9 @@ export function AssignSubscriptionDialog({
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
 
 	const { clinicInfo } = useClinicInfo();
-	const currency = clinicInfo?.currencySymbol || "ج.م";
+	const currency = resolveClinicCurrencySymbol(clinicInfo?.currencyCode);
 	const { capabilities } = useDigitalRegistrationCapabilities(campaignId);
-	const { plans: carePlans, isLoading: isCarePlansLoading } = useCarePlans();
+	const { plans: allPlans, isLoading: isCarePlansLoading } = useRegistrationSubscriptionPlans();
 	const quickUpdateMutation = useQuickUpdateRequest(campaignId);
 
 	// مزامنة الخطة المحددة عند فتح اللوحة
@@ -160,32 +77,6 @@ export function AssignSubscriptionDialog({
 			setSortBy("DEFAULT");
 		}
 	}, [open, request]);
-
-	// دمج خطط قاعدة البيانات مع خطط الأكاديمية
-	const allPlans = useMemo<SubscriptionPlanCardItem[]>(() => {
-		if (carePlans && carePlans.length > 0) {
-			const dbMapped: SubscriptionPlanCardItem[] = carePlans.map((cp) => ({
-				id: cp.id,
-				name: cp.name,
-				code: cp.code || "",
-				description: cp.notes || "خطة اشتراك وتأهيل أكاديمي معتمدة",
-				type: cp.type || "شهري",
-				price: Number(cp.price) || 0,
-				durationLabel: cp.visitDurationMins ? `${cp.visitDurationMins} دقيقة` : "24 جلسة",
-				levelsLabel: "4 مستويات",
-				rating: cp.ratingCount > 0 ? Number((cp.ratingSum / cp.ratingCount).toFixed(1)) : 4.9,
-				reviewsCount: cp.ratingCount || 234,
-			}));
-
-			// دمج مع الافتراضي لمنع التكرار بالـ id أو الاسم
-			const seenNames = new Set(dbMapped.map((p) => p.name.trim().toLowerCase()));
-			const remainingDefaults = DEFAULT_ACADEMY_PLANS.filter(
-				(dp) => !seenNames.has(dp.name.trim().toLowerCase()),
-			);
-			return [...dbMapped, ...remainingDefaults];
-		}
-		return DEFAULT_ACADEMY_PLANS;
-	}, [carePlans]);
 
 	// تصفية وترتيب الخطط
 	const filteredPlans = useMemo(() => {
@@ -259,10 +150,10 @@ export function AssignSubscriptionDialog({
 				},
 			},
 			{
-				onSuccess: () => {
+				onSuccess: (updatedReq: any) => {
 					toast.success(`تم تعيين خطة "${selectedPlan.name}" بنجاح`);
 					onOpenChange(false);
-					onSuccess?.();
+					onSuccess?.(selectedPlan, updatedReq);
 				},
 				onError: (err: any) => {
 					toast.error(err.message || "فشل تعيين خطة الاشتراك");

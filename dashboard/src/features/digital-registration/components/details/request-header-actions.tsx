@@ -5,6 +5,7 @@ import {
 	IconArrowsDiagonalMinimize,
 	IconCalendarPlus,
 	IconCalendarX,
+	IconCash,
 	IconCheck,
 	IconChevronDown,
 	IconClipboardCheck,
@@ -13,6 +14,7 @@ import {
 	IconDots,
 	IconHourglass,
 	IconLink,
+	IconLoader2,
 	IconPlus,
 	IconPrinter,
 	IconShare,
@@ -32,6 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
+import type { DigitalRegistrationCapabilities } from "../../types/campaign-share.types";
 import { useDigitalRegistrationCapabilities } from "../../hooks/use-digital-registration";
 
 /** أيقونة نسخ معرّف الطلب (بطاقتين متراكبتين مع رمز ID) مطابقة للشاشات المنظومية */
@@ -76,6 +79,10 @@ interface RequestHeaderActionsProps {
 	onOpenReject: () => void;
 	onOpenDelete: () => void;
 	onAcceptDirect?: () => void;
+	onOpenCashPayment?: () => void;
+	onEnrollStudent?: () => void;
+	isEnrollingStudent?: boolean;
+	capabilities?: DigitalRegistrationCapabilities;
 	onOpenEdit?: () => void;
 	onOpenRefer?: () => void;
 	onOpenPrint?: () => void;
@@ -96,6 +103,10 @@ export function RequestHeaderActions({
 	onOpenReject,
 	onOpenDelete,
 	onAcceptDirect,
+	onOpenCashPayment,
+	onEnrollStudent,
+	isEnrollingStudent,
+	capabilities: capabilitiesProp,
 	onOpenEdit,
 	onOpenRefer,
 	onOpenPrint,
@@ -105,7 +116,8 @@ export function RequestHeaderActions({
 	isExpanded,
 	onToggleExpand,
 }: RequestHeaderActionsProps) {
-	const { capabilities } = useDigitalRegistrationCapabilities();
+	const { capabilities: hookCapabilities } = useDigitalRegistrationCapabilities();
+	const capabilities = capabilitiesProp ?? hookCapabilities;
 	const handlePrint = () => {
 		if (onOpenPrint) {
 			onOpenPrint();
@@ -202,30 +214,6 @@ export function RequestHeaderActions({
 					rejectItem,
 				];
 				break;
-			case "AWAITING_PAYMENT":
-				rawItems = [
-					...(capabilities.canAcceptOrReject && onAcceptDirect
-						? [
-								{
-									label: "اعتماد وقبول نهائي",
-									icon: <IconCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-									action: onAcceptDirect,
-								},
-						  ]
-						: []),
-					{
-						label: "قائمة الإنتظار",
-						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onOpenWaitlist,
-					},
-					{
-						label: "إعادة إلى الطابور",
-						icon: <IconClock className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onMoveToQueue,
-					},
-					rejectItem,
-				];
-				break;
 			case "REJECTED":
 				rawItems = [
 					{
@@ -279,8 +267,19 @@ export function RequestHeaderActions({
 
 	const isRemoteInterview = Boolean(
 		request.status === "INTERVIEW" &&
-		(request.interviewMode === "REMOTE" || request.channel === "CALL")
+		(request.interviewMode ? request.interviewMode === "REMOTE" : request.channel === "CALL")
 	);
+
+	const lacksEnrollPermission = !capabilities.canEdit && !capabilities.canAcceptOrReject;
+	const isEnrollDisabled =
+		Boolean(isEnrollingStudent) || lacksEnrollPermission || !onEnrollStudent;
+	const enrollTitle = isEnrollingStudent
+		? "جاري إضافة الطالب لقائمة الطلاب..."
+		: lacksEnrollPermission
+		? "صلاحيات حسابك الحالية للعرض فقط ولا تسمح بإضافة الطالب"
+		: !onEnrollStudent
+		? "يرجى تحديث الصفحة (F5) لتفعيل زر إضافة الطالب"
+		: "إضافة الطالب لقائمة الطلاب وإنشاء أو ربط ملف ولي الأمر";
 
 	return (
 		<div
@@ -374,17 +373,39 @@ export function RequestHeaderActions({
 
 			{/* الأزرار والإجراءات */}
 			<div className="flex items-center gap-1.5 print:hidden">
-				{/* 1. زر إضافة للقائمة وزر بدء المقابلة (أو زر تم الاعتماد النهائي إذا كان الطالب معتمداً رسمياً) */}
+				{/* 1. عند القبول: زر «إضافة لقائمة الطلاب» ويتعطّل فور إتمام الإضافة */}
 				{request.status === "ACCEPTED" ? (
-					<Button
-						disabled
-						size="sm"
-						className="h-7.5 gap-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 shadow-none px-3 rounded-lg cursor-not-allowed select-none opacity-90"
-						title="تم اعتماد الطالب رسمياً في السجلات الأكاديمية"
-					>
-						<IconCheck className="size-3.5 stroke-[2.5]" />
-						<span>تم الاعتماد النهائي</span>
-					</Button>
+					Boolean(request.convertedPatientId) ? (
+						<Button
+							disabled
+							size="sm"
+							className="h-7.5 gap-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 shadow-none px-3 rounded-lg cursor-not-allowed select-none opacity-90"
+							title={
+								request.convertedPatientCode
+									? `تمت إضافة الطالب لقائمة الطلاب (${request.convertedPatientCode})`
+									: "تمت إضافة الطالب لقائمة الطلاب"
+							}
+						>
+							<IconCheck className="size-3.5 stroke-[2.5]" />
+							<span>تمت الإضافة لقائمة الطلاب</span>
+						</Button>
+					) : (
+						<Button
+							type="button"
+							size="sm"
+							disabled={isEnrollDisabled}
+							onClick={onEnrollStudent}
+							className="h-7.5 gap-1.5 text-xs font-semibold bg-[#4f6ae0] hover:bg-[#435bc4] text-white shadow-xs px-3 rounded-lg cursor-pointer select-none transition-all border-none disabled:opacity-60 disabled:cursor-not-allowed"
+							title={enrollTitle}
+						>
+							{isEnrollingStudent ? (
+								<IconLoader2 className="size-3.5 animate-spin" />
+							) : (
+								<IconPlus className="size-3.5 stroke-[2.5]" />
+							)}
+							<span>{isEnrollingStudent ? "جاري الإضافة..." : "إضافة لقائمة الطلاب"}</span>
+						</Button>
+					)
 				) : (
 					<div className="flex items-center gap-1.5">
 						{/* زر بدء مقابلة: يظهر عندما تكون المقابلة مكالمة عبر اتصال/تطبيق الويب */}
@@ -405,31 +426,59 @@ export function RequestHeaderActions({
 							</Button>
 						)}
 
-						<DropdownMenu dir="rtl">
-							<DropdownMenuTrigger asChild>
-								<Button
-									size="sm"
-									className="h-7.5 gap-1.5 text-xs font-semibold bg-[#4f6ae0] hover:bg-[#435bc4] text-white shadow-xs px-3 rounded-lg cursor-pointer [&_*]:pointer-events-none select-none transition-all border-none"
-								>
-									<IconPlus className="size-3.5 stroke-[2.5]" />
-									<span>إضافة لقائمة</span>
-									<IconChevronDown className="size-3 opacity-90" />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end" className="w-52 p-1 text-xs z-[100] bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg rounded-xl">
-								{getDynamicListItems().map((item, idx) => (
-									<DropdownMenuItem
-										key={`${item.label}-${idx}`}
-										onSelect={() => triggerSafeOpen(item.action)}
-										disabled={!item.action}
-										className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus:bg-zinc-100 dark:focus:bg-zinc-800 rounded-lg cursor-pointer transition-colors"
+						{/* في مرحلة بانتظار الدفع: يظهر الدفع كاش + زر رفض مباشرة بدلاً من إضافة لقائمة */}
+						{request.status === "AWAITING_PAYMENT" ? (
+							<>
+								{!request.paidAt && capabilities.canEdit && onOpenCashPayment && (
+									<Button
+										type="button"
+										size="sm"
+										onClick={() => triggerSafeOpen(onOpenCashPayment)}
+										className="h-7.5 gap-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs px-3 rounded-lg cursor-pointer select-none transition-all border-none"
 									>
-										{item.icon}
-										<span>{item.label}</span>
-									</DropdownMenuItem>
-								))}
-							</DropdownMenuContent>
-						</DropdownMenu>
+										<IconCash className="size-3.5 stroke-[2.2]" />
+										<span>الدفع كاش</span>
+									</Button>
+								)}
+								{capabilities.canAcceptOrReject && onOpenReject && (
+									<Button
+										type="button"
+										size="sm"
+										onClick={() => triggerSafeOpen(onOpenReject)}
+										className="h-7.5 gap-1.5 text-xs font-semibold bg-rose-50 hover:bg-rose-100/90 text-rose-500 dark:bg-rose-950/40 dark:hover:bg-rose-950/60 dark:text-rose-400 shadow-none px-3 rounded-lg cursor-pointer select-none transition-colors border-none"
+									>
+										<IconX className="size-3.5 stroke-[2.2]" />
+										<span>رفض</span>
+									</Button>
+								)}
+							</>
+						) : (
+							<DropdownMenu dir="rtl">
+								<DropdownMenuTrigger asChild>
+									<Button
+										size="sm"
+										className="h-7.5 gap-1.5 text-xs font-semibold bg-[#4f6ae0] hover:bg-[#435bc4] text-white shadow-xs px-3 rounded-lg cursor-pointer [&_*]:pointer-events-none select-none transition-all border-none"
+									>
+										<IconPlus className="size-3.5 stroke-[2.5]" />
+										<span>إضافة لقائمة</span>
+										<IconChevronDown className="size-3 opacity-90" />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align="end" className="w-52 p-1 text-xs z-[100] bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg rounded-xl">
+									{getDynamicListItems().map((item, idx) => (
+										<DropdownMenuItem
+											key={`${item.label}-${idx}`}
+											onSelect={() => triggerSafeOpen(item.action)}
+											disabled={!item.action}
+											className="gap-2.5 py-1.5 px-2.5 text-xs font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 focus:bg-zinc-100 dark:focus:bg-zinc-800 rounded-lg cursor-pointer transition-colors"
+										>
+											{item.icon}
+											<span>{item.label}</span>
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
+						)}
 					</div>
 				)}
 

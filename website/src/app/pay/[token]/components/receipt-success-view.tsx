@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { CheckCircle2, Printer, ArrowRight, ShieldCheck, Download } from "lucide-react";
+import { CheckCircle2, Printer, ArrowLeft } from "lucide-react";
 import type { PaymentViewData } from "../types";
 
 export function ReceiptSuccessView({
@@ -14,19 +14,35 @@ export function ReceiptSuccessView({
 	const studentCode = confirmationResult?.studentCode || data.code;
 	const ref = confirmationResult?.paymentReference || data.paymentReference || "PAY-CONFIRMED";
 	const amount = confirmationResult?.amount || data.pricing.totalAmount;
-	const paidDate = data.paidAt ? new Date(data.paidAt).toLocaleDateString("ar-EG", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-		hour: "2-digit",
-		minute: "2-digit",
-	}) : new Date().toLocaleDateString("ar-EG", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-		hour: "2-digit",
-		minute: "2-digit",
+	const methodType = (confirmationResult?.paymentMethodType || data.paymentMethodType || "").toUpperCase();
+	const methodLabel =
+		methodType === "CASH"
+			? "كاش (خزينة الأكاديمية)"
+			: methodType === "CARD"
+			? "بطاقة بنكية"
+			: methodType === "WALLET"
+			? "محفظة إلكترونية"
+			: "الدفع الإلكتروني المباشر";
+	const currency = confirmationResult?.currency || data.pricing.currency || "ج.م";
+	const formattedAmount = Number(amount || 0).toLocaleString("en-US", {
+		maximumFractionDigits: 2,
 	});
+	const paidDateSource = confirmationResult?.paidAt || data.paidAt;
+	const paidDate = paidDateSource
+		? new Date(paidDateSource).toLocaleDateString("ar-EG-u-nu-latn", {
+				year: "numeric",
+				month: "long",
+				day: "numeric",
+				hour: "2-digit",
+				minute: "2-digit",
+		  })
+		: new Date().toLocaleDateString("ar-EG-u-nu-latn", {
+				year: "numeric",
+				month: "long",
+				day: "numeric",
+				hour: "2-digit",
+				minute: "2-digit",
+		  });
 
 	const handlePrint = () => {
 		if (typeof window !== "undefined") {
@@ -50,67 +66,76 @@ export function ReceiptSuccessView({
 			</div>
 
 			{/* Official Printable Voucher */}
-			<div id="payment-voucher" className="rounded-3xl border border-border/80 bg-card p-6 shadow-sm">
-				<div className="flex items-center justify-between border-b border-border/60 pb-4">
-					<div>
-						<span className="text-xs font-semibold text-primary">{data.clinic.name}</span>
+			<div id="payment-voucher" className="rounded-3xl border border-border/80 bg-card p-5 sm:p-6 shadow-sm">
+				<div className="flex flex-col gap-3 border-b border-border/60 pb-4 sm:flex-row sm:items-start sm:justify-between">
+					<div className="min-w-0 space-y-0.5">
+						<span className="block text-xs font-semibold text-primary">{data.clinic.name}</span>
 						<h3 className="text-base font-bold text-foreground">إيصال سداد رسوم أكاديمية رسمي</h3>
 					</div>
-					<div className="text-left font-mono">
-						<span className="block text-[10px] text-muted-foreground">مرجع العملية</span>
-						<span className="text-xs font-bold text-foreground" dir="ltr">{ref}</span>
+					<div className="min-w-0 shrink-0 rounded-xl bg-muted/35 px-3 py-2 sm:bg-transparent sm:p-0 sm:text-left">
+						<span className="block text-[11px] text-muted-foreground">مرجع العملية</span>
+						<bdi dir="ltr" className="font-mono text-xs font-bold text-foreground break-all">
+							{ref}
+						</bdi>
 					</div>
 				</div>
 
-				<div className="mt-5 grid grid-cols-2 gap-4 text-xs sm:grid-cols-4 border-b border-border/60 pb-5">
-					<div className="rounded-xl bg-muted/30 p-3">
-						<span className="block text-[10px] text-muted-foreground">اسم الطالب</span>
-						<span className="font-bold text-foreground truncate block">{data.studentName}</span>
+				<div className="mt-5 grid grid-cols-2 gap-3 text-xs sm:grid-cols-4 sm:gap-4 border-b border-border/60 pb-5">
+					<div className="min-w-0 rounded-xl bg-muted/30 p-3">
+						<span className="block text-[11px] text-muted-foreground">اسم الطالب</span>
+						<span className="mt-0.5 block font-bold text-foreground truncate">{data.studentName}</span>
 					</div>
 
-					<div className="rounded-xl bg-muted/30 p-3">
-						<span className="block text-[10px] text-muted-foreground">رقم القيد الأكاديمي</span>
-						<span className="font-mono font-bold text-primary block" dir="ltr">{studentCode}</span>
+					<div className="min-w-0 rounded-xl bg-muted/30 p-3">
+						<span className="block text-[11px] text-muted-foreground">رقم القيد الأكاديمي</span>
+						<bdi dir="ltr" className="mt-0.5 block font-mono font-bold text-primary truncate">
+							{studentCode}
+						</bdi>
 					</div>
 
-					<div className="rounded-xl bg-muted/30 p-3">
-						<span className="block text-[10px] text-muted-foreground">ولي الأمر</span>
-						<span className="font-semibold text-foreground truncate block">{data.guardianName}</span>
+					<div className="min-w-0 rounded-xl bg-muted/30 p-3">
+						<span className="block text-[11px] text-muted-foreground">ولي الأمر</span>
+						<span className="mt-0.5 block font-semibold text-foreground truncate">{data.guardianName}</span>
 					</div>
 
-					<div className="rounded-xl bg-muted/30 p-3">
-						<span className="block text-[10px] text-muted-foreground">تاريخ السداد</span>
-						<span className="font-medium text-foreground block">{paidDate}</span>
+					<div className="min-w-0 rounded-xl bg-muted/30 p-3">
+						<span className="block text-[11px] text-muted-foreground">تاريخ السداد</span>
+						<span className="mt-0.5 block font-medium text-foreground leading-snug break-words">{paidDate}</span>
 					</div>
 				</div>
 
 				<div className="mt-5 space-y-2.5 text-xs">
-					<div className="flex justify-between py-1">
+					<div className="flex items-center justify-between gap-3 py-1">
 						<span className="text-muted-foreground">الباقة المختارة:</span>
-						<span className="font-semibold text-foreground">{data.pricing.planName}</span>
+						<span className="min-w-0 text-left font-semibold text-foreground">{data.pricing.planName}</span>
+					</div>
+					<div className="flex items-center justify-between gap-3 py-1">
+						<span className="text-muted-foreground">وسيلة الدفع:</span>
+						<span className="min-w-0 text-left font-semibold text-foreground">{methodLabel}</span>
 					</div>
 					{data.pricing.includeMeals && (
-						<div className="flex justify-between py-1">
+						<div className="flex items-center justify-between gap-3 py-1">
 							<span className="text-muted-foreground">خدمة الوجبات:</span>
-							<span className="font-semibold text-foreground">مشمولة في الاشتراك</span>
+							<span className="font-semibold text-emerald-600 dark:text-emerald-400">مشمولة ضمن الباقة</span>
 						</div>
 					)}
 					{data.pricing.enableDailyStipend && (
-						<div className="flex justify-between py-1">
+						<div className="flex items-center justify-between gap-3 py-1">
 							<span className="text-muted-foreground">المصروف اليومي:</span>
-							<span className="font-semibold text-foreground">مفعل</span>
+							<span className="font-semibold text-blue-600 dark:text-blue-400">مشمول ضمن الباقة</span>
 						</div>
 					)}
-					<div className="flex justify-between border-t border-dashed border-border pt-3">
+					<div className="flex items-center justify-between gap-3 border-t border-dashed border-border pt-3">
 						<span className="text-sm font-bold text-foreground">المبلغ الإجمالي المسدد:</span>
-						<span className="text-base font-extrabold text-primary font-mono">
-							{amount.toLocaleString("ar-EG")} {data.pricing.currency}
+						<span className="inline-flex items-baseline gap-1.5 font-mono text-base font-extrabold text-primary tabular-nums whitespace-nowrap">
+							<span>{formattedAmount}</span>
+							<span>{currency}</span>
 						</span>
 					</div>
 				</div>
 
-				<div className="mt-6 rounded-2xl bg-muted/20 p-4 text-[11px] text-muted-foreground leading-relaxed">
-					<p className="font-semibold text-foreground mb-1">الخطوات التالية:</p>
+				<div className="mt-6 rounded-2xl bg-muted/20 p-4 text-xs text-muted-foreground leading-relaxed">
+					<p className="font-semibold text-foreground mb-1.5">الخطوات التالية:</p>
 					<ul className="list-disc list-inside space-y-1">
 						<li>تم تفعيل السجل الرسمي للطالب وولي الأمر بنجاح.</li>
 						<li>تم إرسال نسخة من إشعار السداد إلى بريدكم الإلكتروني المسجل.</li>
@@ -120,22 +145,22 @@ export function ReceiptSuccessView({
 			</div>
 
 			{/* Action Buttons */}
-			<div className="flex flex-col gap-3 sm:flex-row print:hidden">
+			<div className="flex flex-col-reverse gap-3 sm:flex-row print:hidden">
 				<button
 					type="button"
 					onClick={handlePrint}
-					className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-border bg-card py-3 text-xs font-bold text-foreground hover:bg-muted/50 transition-colors shadow-sm"
+					className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-2xl border border-border bg-card px-4 py-3 text-xs font-bold text-foreground hover:bg-muted/50 transition-colors shadow-sm"
 				>
-					<Printer className="h-4 w-4 text-muted-foreground" />
+					<Printer className="h-4 w-4 shrink-0 text-muted-foreground" />
 					<span>طباعة / حفظ الإيصال كـ PDF</span>
 				</button>
 
 				<Link
 					href="/"
-					className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-xs font-bold text-primary-foreground hover:opacity-95 transition-opacity shadow-md shadow-primary/20"
+					className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-xs font-bold text-primary-foreground hover:opacity-95 transition-opacity shadow-md shadow-primary/20"
 				>
 					<span>العودة لصفحة الأكاديمية</span>
-					<ArrowRight className="h-4 w-4" />
+					<ArrowLeft className="h-4 w-4 shrink-0" />
 				</Link>
 			</div>
 		</div>

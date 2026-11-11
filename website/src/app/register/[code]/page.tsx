@@ -24,6 +24,7 @@ import {
   ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { REGISTRATION_TRACKS } from "@/lib/registration-tracks";
 
 interface CampaignData {
   id: string;
@@ -65,7 +66,7 @@ export default function CampaignRegisterPage({
   const [gender, setGender] = useState<"MALE" | "FEMALE">("MALE");
   const [birthDate, setBirthDate] = useState("");
   const [ageLabel, setAgeLabel] = useState("");
-  const [targetClass, setTargetClass] = useState("المسار التمهيدي للبرمجة");
+  const [targetClass, setTargetClass] = useState<string>("البرمجة والمنطق");
   const [bloodType, setBloodType] = useState("");
   const [allergies, setAllergies] = useState("");
   const [hasChronicDiseases, setHasChronicDiseases] = useState(false);
@@ -265,9 +266,10 @@ export default function CampaignRegisterPage({
         source: "DIRECT_LINK",
         studentName: studentName.trim(),
         gender,
-        birthDate: birthDate || null,
+        birthDate: birthDate ? new Date(birthDate).toISOString() : null,
         ageLabel: ageLabel.trim() || null,
         targetClass: targetClass.trim() || null,
+        proposedTrack: targetClass.trim() || null,
         bloodType: bloodType.trim() || null,
         allergies: allergies.trim() || null,
         hasChronicDiseases,
@@ -474,12 +476,26 @@ export default function CampaignRegisterPage({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground">تاريخ الميلاد</label>
+              <label className="text-sm font-bold text-foreground">
+                تاريخ الميلاد <span className="text-destructive">*</span>
+              </label>
               <input
                 type="date"
+                required
+                max={new Date().toISOString().split("T")[0]}
                 value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
-                className="w-full h-12 rounded-xl border border-input bg-background px-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setBirthDate(val);
+                  if (val) {
+                    const d = new Date(val);
+                    if (!isNaN(d.getTime())) {
+                      const years = new Date().getFullYear() - d.getFullYear();
+                      if (years > 0) setAgeLabel(`${years} سنوات`);
+                    }
+                  }
+                }}
+                className="w-full h-12 rounded-xl border border-input bg-background px-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-sans"
               />
             </div>
 
@@ -495,17 +511,17 @@ export default function CampaignRegisterPage({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-foreground">المسار / البرنامج المطلوب</label>
+              <label className="text-sm font-bold text-foreground">المسار المطلوب</label>
               <select
                 value={targetClass}
                 onChange={(e) => setTargetClass(e.target.value)}
-                className="w-full h-12 rounded-xl border border-input bg-background px-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                className="w-full h-12 rounded-xl border border-input bg-background px-4 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-sans"
               >
-                <option value="المسار التمهيدي للبرمجة">المسار التمهيدي للبرمجة</option>
-                <option value="مسار الروبوت والذكاء الاصطناعي">مسار الروبوت والذكاء الاصطناعي</option>
-                <option value="مسار تصميم وبرمجة الألعاب">مسار تصميم وبرمجة الألعاب</option>
-                <option value="مسار ريادة الأعمال التقنية">مسار ريادة الأعمال التقنية</option>
-                <option value="برنامج التأسيس الشامل">برنامج التأسيس الشامل</option>
+                {REGISTRATION_TRACKS.map((track) => (
+                  <option key={track} value={track}>
+                    {track}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

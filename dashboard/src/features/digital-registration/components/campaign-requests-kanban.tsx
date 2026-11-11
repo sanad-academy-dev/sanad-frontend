@@ -3,11 +3,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import {
 	IconActivity,
+	IconAward,
 	IconBriefcase,
 	IconBuildingCommunity,
 	IconCalendar,
 	IconCalendarEvent,
 	IconCalendarTime,
+	IconCash,
 	IconCheck,
 	IconClipboardCheck,
 	IconClock,
@@ -49,7 +51,6 @@ import type { AppointmentColumn, AppointmentColumnId } from "@/features/appointm
 import { toast } from "sonner";
 import { CampaignRequestSheet, type ActiveActionDrawer } from "./campaign-request-sheet";
 import { CancelAppointmentConfirmDialog } from "./modals/cancel-appointment-confirm-dialog";
-import { RequestStatusTransitionDialog } from "./modals/request-status-transition-dialog";
 import { PriorityPickerPopover } from "./priority-picker-popover";
 import { useKanbanAutoScroll } from "../hooks/use-kanban-auto-scroll";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
@@ -57,14 +58,22 @@ import {
 	formatAppointmentDate,
 	formatAppointmentTime,
 	DEFAULT_CLINIC_TIMEZONE,
+	computeAgeLabel,
+	getStudentLevel,
+	isInterviewOngoing,
 } from "../utils/date-format";
-import { getWhatsAppUrl } from "../utils/phone-format";
+import { getAttendanceProbability } from "../utils/attendance-probability";
 import {
-} from "../utils/date-format";
+	formatMoneyNumber,
+	formatPaymentMethodLabelArabic,
+	resolveClinicCurrencySymbol,
+} from "../utils/payment-helpers";
+import { getWhatsAppUrl } from "../utils/phone-format";
 import type { CampaignSortOption } from "./campaign-details-toolbar";
 import type { CampaignRequestItem } from "../types/campaign-request.types";
 import {
 	useCampaignRequests,
+	useCurrentTimeMs,
 	useUpdateRequest,
 	useUpdateRequestStatus,
 	useDigitalRegistrationCapabilities,
@@ -153,9 +162,11 @@ export function CampaignRequestsKanban({
 	selectedRequestId?: string | null;
 	onSelectRequest?: (id: string | null) => void;
 }) {
+	const nowMs = useCurrentTimeMs();
 	const { capabilities } = useDigitalRegistrationCapabilities(campaignId);
 	const { clinicInfo } = useClinicInfo();
 	const clinicTimezone = clinicInfo?.timezone || DEFAULT_CLINIC_TIMEZONE;
+	const currencySymbol = resolveClinicCurrencySymbol(clinicInfo?.currencyCode);
 	const { data: serverRequests = EMPTY_REQUESTS, isLoading } = useCampaignRequests(campaignId);
 	const updateStatusMutation = useUpdateRequestStatus(campaignId);
 	const updateRequestMutation = useUpdateRequest(campaignId);
@@ -182,7 +193,6 @@ export function CampaignRequestsKanban({
 			toast.info(toastNotice);
 		}
 	};
-	const [pendingAcceptRequest, setPendingAcceptRequest] = useState<CampaignRequestItem | null>(null);
 	const [pendingCancelAppointmentDrag, setPendingCancelAppointmentDrag] = useState<{
 		request: CampaignRequestItem;
 		targetColumn: string;
@@ -332,6 +342,26 @@ export function CampaignRequestsKanban({
 				return;
 			}
 			startScheduleWorkflow(req);
+			return;
+		}
+		if (newStatus === "AWAITING_PAYMENT" && req.status !== "AWAITING_PAYMENT") {
+			openRequestWithDrawer(
+				req.id,
+				"awaiting-payment",
+				"يرجى اختيار باقة الاشتراك وتأكيد النقل إلى مرحلة بانتظار الدفع.",
+			);
+			return;
+		}
+		if (newStatus === "ACCEPTED" && !req.paidAt) {
+			if (req.status === "AWAITING_PAYMENT") {
+				openRequestWithDrawer(
+					req.id,
+					"cash-payment",
+					"يرجى إتمام التحصيل الكاش قبل اعتماد القبول النهائي.",
+				);
+			} else {
+				toast.error("لا يمكن اعتماد وقبول الطالب قبل الانتقال لمرحلة بانتظار الدفع وتوثيق السداد.");
+			}
 			return;
 		}
 		const statusToColumnMap: Record<string, string> = {
@@ -673,10 +703,16 @@ export function CampaignRequestsKanban({
 
 			// ─── قواعد السحب المشروط والمقيد من عمود «بانتظار الدفع» (Awaiting Payment) ───
 			if ((prevCol === "awaiting-payment" || prevCol === "awaiting_payment") && oldItem) {
-				// 1. السحب للأمام إلى القبول النهائي: يفتح دياوج تأكيد القبول واعتماد ملف الطالب
+				// 1. السحب للأمام إلى القبول النهائي: يفتح لوحة الدفع كاش لتوثيق التحصيل أولاً
 				if (targetColumn === "accepted" || meta.status === "ACCEPTED") {
 					committed.push({ ...item, column: prevCol });
-					setPendingAcceptRequest(oldItem);
+					if (!oldItem.paidAt) {
+						openRequestWithDrawer(
+							oldItem.id,
+							"cash-payment",
+							"يلزم تحصيل رسوم الباقة كاش قبل الاعتماد والقبول؛ تم فتح لوحة الدفع كاش.",
+						);
+					}
 					continue;
 				}
 
@@ -961,6 +997,12 @@ export function CampaignRequestsKanban({
 								const isInterviewStage =
 									item.column === "interview" ||
 									["INTERVIEW", "IN_EVALUATION", "EVALUATION"].includes(item.status);
+								const isAppointmentOngoing = isInterviewOngoing({
+									isInterviewStage,
+									appointmentDate: appointmentAt || item.appointmentDate,
+									durationMinutes: item.assessmentAppointment?.durationMinutes ?? item.interviewDurationMinutes ?? 60,
+									nowMs,
+								});
 
 								return (
 									<KanbanCard
@@ -1022,51 +1064,69 @@ export function CampaignRequestsKanban({
 											</div>
 
 											{/* 2. جدول الحقول المنظم (Key - Value Rows) المطابق للصورة 651ca278 بأحجام متناسقة تماماً */}
-											<div className="space-y-1 text-[10.5px] pt-0.5 w-full">
-												{/* الصف 1: ولي الأمر */}
-												<div className="flex items-center justify-between gap-1 w-full">
-													<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
-														<IconIdBadge2 className="size-3 shrink-0" />
-														<span>ولي الأمر</span>
-													</div>
-													<div className="flex items-center gap-1.5">
-														{/* أفاتار ولي الأمر الأزرق (أم) */}
-														<div className="size-4.5 rounded-full bg-[#3B82F6] text-white flex items-center justify-center text-[8.5px] font-bold shrink-0">
-															{guardianInitials}
-														</div>
-																	<span className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100 truncate max-w-[110px]" title={item.guardianName || undefined}>
-																		{item.guardianName || "غير محدد"}
-														</span>
-														{/* زر مراسلة ولي الأمر عبر الواتساب بإطار مربع دائري ناعم كما بالصورة */}
-														<button
-															type="button"
-															onClick={(e) => {
-																e.stopPropagation();
-																const waUrl = getWhatsAppUrl(item.guardianPhone);
-																if (waUrl) {
-																	window.open(waUrl, "_blank");
-																} else {
-																	setSelectedRequestId(item.id);
-																}
-															}}
-															className="size-5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-emerald-600 hover:border-emerald-200 transition-colors cursor-pointer shrink-0"
-															title="مراسلة ولي الأمر عبر الواتساب"
-														>
-															<IconMessage2 className="size-2.5" />
-														</button>
-													</div>
-												</div>
+											{(() => {
+												const displayAge = computeAgeLabel(item.birthDate, item.ageLabel);
+												const displayLevel = getStudentLevel(item);
 
-												{/* الصف 2: العمر */}
-												<div className="flex items-center justify-between gap-1 w-full">
-													<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
-														<IconBriefcase className="size-3 shrink-0" />
-														<span>العمر</span>
-													</div>
-													<span className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100">
-														{item.ageLabel || "غير محدد"}
-													</span>
-												</div>
+												return (
+													<div className="space-y-1 text-[10.5px] pt-0.5 w-full">
+														{/* الصف 1: ولي الأمر */}
+														<div className="flex items-center justify-between gap-1 w-full">
+															<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
+																<IconIdBadge2 className="size-3 shrink-0" />
+																<span>ولي الأمر</span>
+															</div>
+															<div className="flex items-center gap-1.5">
+																{/* أفاتار ولي الأمر الأزرق (أم) */}
+																<div className="size-4.5 rounded-full bg-[#3B82F6] text-white flex items-center justify-center text-[8.5px] font-bold shrink-0">
+																	{guardianInitials}
+																</div>
+																<span className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100 truncate max-w-[110px]" title={item.guardianName || undefined}>
+																	{item.guardianName || "غير محدد"}
+																</span>
+																{/* زر مراسلة ولي الأمر عبر الواتساب بإطار مربع دائري ناعم كما بالصورة */}
+																<button
+																	type="button"
+																	onClick={(e) => {
+																		e.stopPropagation();
+																		const waUrl = getWhatsAppUrl(item.guardianPhone);
+																		if (waUrl) {
+																			window.open(waUrl, "_blank");
+																		} else {
+																			setSelectedRequestId(item.id);
+																		}
+																	}}
+																	className="size-5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-emerald-600 hover:border-emerald-200 transition-colors cursor-pointer shrink-0"
+																	title="مراسلة ولي الأمر عبر الواتساب"
+																>
+																	<IconMessage2 className="size-2.5" />
+																</button>
+															</div>
+														</div>
+
+														{/* الصف 2: العمر */}
+														<div className="flex items-center justify-between gap-1 w-full">
+															<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
+																<IconBriefcase className="size-3 shrink-0" />
+																<span>العمر</span>
+															</div>
+															<span className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100">
+																{displayAge}
+															</span>
+														</div>
+
+														{/* الصف 2.5: المستوى المهارى */}
+														{displayLevel && (
+															<div className="flex items-center justify-between gap-1 w-full">
+																<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
+																	<IconAward className="size-3 shrink-0 text-zinc-400 dark:text-zinc-500" />
+																	<span>المستوى</span>
+																</div>
+																<span className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100">
+																	{displayLevel}
+																</span>
+															</div>
+														)}
 
 												{/* الصف 3: تاريخ التقديم */}
 												<div className="flex items-center justify-between gap-1 w-full">
@@ -1086,9 +1146,17 @@ export function CampaignRequestsKanban({
 														<IconCalendarEvent className="size-3 shrink-0" />
 														<span>موعد الحضور</span>
 													</div>
-													<div className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-900 dark:text-zinc-100" dir="rtl">
+													<div
+														className={cn(
+															"flex items-center gap-1.5 text-[10px] font-bold transition-colors",
+															isAppointmentOngoing
+																? "text-red-600 dark:text-red-400"
+																: "text-zinc-900 dark:text-zinc-100",
+														)}
+														dir="rtl"
+													>
 														<span>{appointmentAt ? formatAppointmentDate(appointmentAt, clinicTimezone, "ar-EG", { month: "numeric", day: "numeric", weekday: undefined, year: undefined }) : "غير محدد"}</span>
-														{appointmentAt && <><span className="text-zinc-300 dark:text-zinc-600 font-normal">•</span><IconClock className="size-2.5 text-zinc-400 shrink-0" /><span className="font-mono text-[9.5px]">{formatAppointmentTime(appointmentAt, clinicTimezone, "ar-EG")}</span></>}
+														{appointmentAt && <><span className={cn("font-normal", isAppointmentOngoing ? "text-red-400 dark:text-red-500" : "text-zinc-300 dark:text-zinc-600")}>•</span><IconClock className={cn("size-2.5 shrink-0", isAppointmentOngoing ? "text-red-500" : "text-zinc-400")} /><span className="font-mono text-[9.5px]">{formatAppointmentTime(appointmentAt, clinicTimezone, "ar-EG")}</span></>}
 													</div>
 												</div>
 
@@ -1114,6 +1182,8 @@ export function CampaignRequestsKanban({
 													</span>
 												</div>
 											</div>
+										);
+									})()}
 
 											{/* خط فاصل ناعم */}
 											<div className="border-t border-zinc-100 dark:border-zinc-800 my-0.5 w-full" />
@@ -1170,30 +1240,69 @@ export function CampaignRequestsKanban({
 												</span>
 											</div>
 
-											{/* 5. بانر حالة الرفض الصريح (مطابق للصورة 11) أو احتمالية الحضور أو الترتيب في الانتظار */}
-											{item.column === "rejected" || item.status === "REJECTED" ? (
-												<div className="w-full rounded-md bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 py-1 px-2.5 flex items-center justify-center gap-1.5 text-[10px] font-bold text-rose-600 dark:text-rose-400 select-none shadow-2xs">
-													<IconX className="size-3 text-rose-600 shrink-0" />
-													<span>{item.rejectionReason || "لم يُسجل سبب الرفض"}</span>
-												</div>
-											) : item.column === "waitlist" || item.status === "WAITLIST" ? (
-												<div className="w-full rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/40 py-1 px-2.5 flex items-center justify-between text-[10px] font-semibold text-amber-700 dark:text-amber-400 select-none shadow-2xs">
-													<div className="flex items-center gap-1.5">
-														<IconClock className="size-3 text-amber-600 shrink-0" />
-														<span>قائمة الانتظار {item.queueRank ? `(#${item.queueRank})` : ""}</span>
-													</div>
-													{item.estimatedWait && (
-														<span className="text-[9px] font-medium text-amber-600/80 dark:text-amber-400/80">
-															متوقع: {item.estimatedWait}
-														</span>
-													)}
-												</div>
-											) : (
-												<div className="w-full rounded-md bg-[#EFF6FF] dark:bg-blue-950/30 border border-[#DBEAFE]/80 dark:border-blue-900/40 py-1 px-2.5 flex items-center justify-center gap-1.5 text-[10px] font-semibold text-[#3B82F6] dark:text-blue-400 select-none shadow-2xs">
-													<IconSparkles className="size-3 text-[#3B82F6] shrink-0" />
-													<span>{item.attendanceProbability === undefined || item.attendanceProbability === null ? "لا يوجد تقدير للحضور" : `احتمالية الحضور: ${item.attendanceProbability}%`}</span>
-												</div>
-											)}
+											{/* 5. بانر حالة الرفض الصريح أو احتمالية الحضور الذكية أو الترتيب في الانتظار */}
+											{(() => {
+												const attendanceProb = getAttendanceProbability(item);
+
+												if (item.column === "rejected" || item.status === "REJECTED") {
+													return (
+														<div className="w-full flex flex-col gap-1">
+															<div className="w-full rounded-md bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 py-1 px-2.5 flex items-center justify-center gap-1.5 text-[10px] font-bold text-rose-600 dark:text-rose-400 select-none shadow-2xs">
+																<IconX className="size-3 text-rose-600 shrink-0" />
+																<span>{item.rejectionReason || "لم يُسجل سبب الرفض"}</span>
+															</div>
+															<div className="w-full rounded-md bg-rose-50/60 dark:bg-rose-950/20 border border-rose-200/60 dark:border-rose-900/30 py-0.5 px-2 flex items-center justify-center gap-1 text-[9.5px] font-semibold text-rose-600 dark:text-rose-400 select-none">
+																<IconSparkles className="size-2.5 text-rose-500 shrink-0" />
+																<span>احتمالية الحضور: 0%</span>
+															</div>
+														</div>
+													);
+												}
+
+												if (item.column === "waitlist" || item.status === "WAITLIST") {
+													return (
+														<div className="w-full rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/40 py-1 px-2.5 flex items-center justify-between text-[10px] font-semibold text-amber-700 dark:text-amber-400 select-none shadow-2xs">
+															<div className="flex items-center gap-1.5">
+																<IconClock className="size-3 text-amber-600 shrink-0" />
+																<span>قائمة الانتظار {item.queueRank ? `(#${item.queueRank})` : ""}</span>
+															</div>
+															{item.estimatedWait && (
+																<span className="text-[9px] font-medium text-amber-600/80 dark:text-amber-400/80">
+																	متوقع: {item.estimatedWait}
+																</span>
+															)}
+														</div>
+													);
+												}
+
+												if (attendanceProb.shouldShow) {
+													return (
+														<div
+															className={cn(
+																"w-full rounded-md py-1 px-2.5 flex items-center justify-center gap-1.5 text-[10px] font-semibold select-none shadow-2xs transition-colors",
+																attendanceProb.variant === "emerald" && "bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/40 text-emerald-700 dark:text-emerald-400",
+																attendanceProb.variant === "blue" && "bg-[#EFF6FF] dark:bg-blue-950/30 border border-[#DBEAFE]/80 dark:border-blue-900/40 text-[#3B82F6] dark:text-blue-400",
+																attendanceProb.variant === "amber" && "bg-amber-50 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/40 text-amber-700 dark:text-amber-400",
+																attendanceProb.variant === "rose" && "bg-rose-50 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/40 text-rose-600 dark:text-rose-400",
+															)}
+															title={attendanceProb.reason}
+														>
+															<IconSparkles
+																className={cn(
+																	"size-3 shrink-0",
+																	attendanceProb.variant === "emerald" && "text-emerald-600",
+																	attendanceProb.variant === "blue" && "text-[#3B82F6]",
+																	attendanceProb.variant === "amber" && "text-amber-600",
+																	attendanceProb.variant === "rose" && "text-rose-500",
+																)}
+															/>
+															<span>{attendanceProb.label}</span>
+														</div>
+													);
+												}
+
+												return null;
+											})()}
 
 											{isInterviewStage && isRemoteInterview && (
 												<div className="w-full" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
@@ -1208,6 +1317,33 @@ export function CampaignRequestsKanban({
 													</Link>
 												</div>
 											)}
+
+											{/* ملخص الباقة والسداد في مراحل بانتظار الدفع والقبول */}
+											{(item.status === "AWAITING_PAYMENT" || item.status === "ACCEPTED") &&
+												(item.subscriptionPlanName || item.subscriptionAmount || item.paidAt) && (
+													<div
+														className={cn(
+															"w-full rounded-md py-1 px-2 flex items-center justify-between gap-1.5 text-[9.5px] font-semibold border",
+															item.status === "ACCEPTED" || item.paidAt
+																? "bg-emerald-50/70 dark:bg-emerald-950/30 border-emerald-200/80 dark:border-emerald-900/50 text-emerald-700 dark:text-emerald-300"
+																: "bg-indigo-50/70 dark:bg-indigo-950/30 border-indigo-200/80 dark:border-indigo-900/50 text-indigo-700 dark:text-indigo-300",
+														)}
+													>
+														<span className="truncate flex items-center gap-1 min-w-0">
+															<IconCash className="size-3 shrink-0" />
+															<span className="truncate">
+																{item.status === "ACCEPTED" || item.paidAt
+																	? `تم السداد · ${formatPaymentMethodLabelArabic(item.paymentMethodType, item.paymentGateway)}`
+																	: item.subscriptionPlanName || "بانتظار السداد"}
+															</span>
+														</span>
+														{item.subscriptionAmount && (
+															<span className="font-mono font-bold shrink-0">
+																{formatMoneyNumber(item.subscriptionAmount)} {currencySymbol}
+															</span>
+														)}
+													</div>
+												)}
 
 											{/* 6. شريط الإجراءات السفلي: جميع الأزرار مصفوفة على اليمين مباشرة دون فراغ فاصل */}
 											<div className="flex items-center justify-start gap-1 pt-0.5 w-full overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" dir="rtl" onClick={(e) => e.stopPropagation()}>
@@ -1333,11 +1469,12 @@ export function CampaignRequestsKanban({
 																	<span>نقل: بانتظار الدفع</span>
 																</DropdownMenuItem>
 																<DropdownMenuItem
+																	disabled={item.status !== "AWAITING_PAYMENT" || Boolean(item.paidAt)}
 																	onClick={() => handleStatusChange(item, "ACCEPTED")}
 																	className="gap-2 text-xs cursor-pointer"
 																>
-																	<IconCheck className="size-3.5 text-emerald-600" />
-																	<span>اعتماد وقبول نهائي</span>
+																	<IconCash className="size-3.5 text-emerald-600" />
+																	<span>تحصيل كاش وقبول نهائي</span>
 																</DropdownMenuItem>
 																<DropdownMenuItem
 																	disabled={item.status === "ACCEPTED"}
@@ -1396,18 +1533,6 @@ export function CampaignRequestsKanban({
 				onConfirm={handleConfirmCancelAppointmentDrag}
 				onCancel={() => setPendingCancelAppointmentDrag(null)}
 				isLoading={updateStatusMutation.isPending}
-			/>
-			<RequestStatusTransitionDialog
-				request={pendingAcceptRequest}
-				target="ACCEPTED"
-				open={Boolean(pendingAcceptRequest)}
-				onOpenChange={(open) => {
-					if (!open) setPendingAcceptRequest(null);
-				}}
-				campaignId={campaignId}
-				onSuccess={() => {
-					setPendingAcceptRequest(null);
-				}}
 			/>
 		</div>
 	);

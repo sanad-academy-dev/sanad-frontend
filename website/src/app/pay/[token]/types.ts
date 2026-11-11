@@ -25,6 +25,7 @@ export interface PaymentViewData {
 		stipendAmount: number;
 		totalAmount: number;
 		currency: string;
+		currencyCode?: string;
 	};
 	clinic: {
 		id: string;

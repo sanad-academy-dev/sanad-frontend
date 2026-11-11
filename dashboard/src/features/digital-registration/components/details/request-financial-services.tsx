@@ -17,26 +17,29 @@ import {
 import { Switch } from "@/components/ui/switch";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import { useQuickUpdateRequest } from "../../hooks/use-digital-registration";
+import {
+	useRegistrationSubscriptionPlans,
+	type SubscriptionPlanCardItem,
+} from "../../hooks/use-registration-plans";
+import { resolveClinicCurrencySymbol } from "../../utils/payment-helpers";
+import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
 
 interface RequestFinancialServicesProps {
 	request: CampaignRequestItem;
 	campaignId?: string;
 }
 
-const PLANS = [
-	{ id: "BASIC", name: "الباقة الأساسية (نصف دوام)", price: 800 },
-	{ id: "COMPREHENSIVE", name: "الباقة الشاملة (دوام كامل + أنشطة)", price: 1500 },
-	{ id: "PREMIUM", name: "الباقة المتميزة (VIP ورعاية خاصة)", price: 2200 },
-];
-
 export function RequestFinancialServices({
 	request,
 	campaignId = "",
 }: RequestFinancialServicesProps) {
 	const [planPopoverOpen, setPlanPopoverOpen] = useState(false);
+	const { plans } = useRegistrationSubscriptionPlans();
+	const { clinicInfo } = useClinicInfo();
+	const currency = resolveClinicCurrencySymbol(clinicInfo?.currencyCode);
 	const quickUpdateMutation = useQuickUpdateRequest(campaignId);
 
-	const handleAssignPlan = (plan: typeof PLANS[0]) => {
+	const handleAssignPlan = (plan: SubscriptionPlanCardItem) => {
 		quickUpdateMutation.mutate(
 			{
 				requestId: request.id,
@@ -48,7 +51,7 @@ export function RequestFinancialServices({
 			},
 			{
 				onSuccess: () => {
-					toast.success(`تم تعيين ${plan.name} بمبلغ ${plan.price} ج.م`);
+					toast.success(`تم تعيين ${plan.name} بمبلغ ${plan.price} ${currency}`);
 					setPlanPopoverOpen(false);
 				},
 				onError: (err: any) => {
@@ -87,8 +90,8 @@ export function RequestFinancialServices({
 	};
 
 	const currentAmountFormatted = request.subscriptionAmount
-		? `${request.subscriptionAmount} ج.م`
-		: "00 ج.م";
+		? `${request.subscriptionAmount} ${currency}`
+		: `0 ${currency}`;
 
 	return (
 		<div
@@ -129,8 +132,8 @@ export function RequestFinancialServices({
 							<p className="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 px-1.5 py-0.5">
 								اختر باقة الاشتراك الأكاديمية
 							</p>
-							<div className="space-y-0.5 mt-0.5">
-								{PLANS.map((p) => (
+							<div className="space-y-0.5 mt-0.5 max-h-48 overflow-y-auto">
+								{plans.map((p) => (
 									<button
 										key={p.id}
 										type="button"
@@ -141,7 +144,7 @@ export function RequestFinancialServices({
 											{p.name}
 										</span>
 										<span className="text-[10.5px] font-bold text-emerald-600 font-mono">
-											{p.price} ج.م
+											{p.price} {currency}
 										</span>
 									</button>
 								))}

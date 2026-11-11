@@ -7,7 +7,7 @@ import { MultiStepForm } from "@/components/multi-step-form";
 export default function RegisterPage() {
 	return (
 		<main className="min-h-screen bg-muted/30 px-4 py-10" dir="rtl">
-			<div className="mx-auto mb-5 max-w-[540px] text-center">
+			<div className="mx-auto mb-5 max-w-2xl text-center">
 				<Link href="/" className="text-sm font-semibold text-primary hover:underline">سند</Link>
 				<h1 className="mt-2 text-2xl font-bold text-foreground">طلب التسجيل الرقمي</h1>
 				<p className="mt-1 text-sm text-muted-foreground">أكمل البيانات وسيتواصل معك فريق القبول.</p>

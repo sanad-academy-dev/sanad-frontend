@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { AlertCircle, MessageCircle, Phone, ArrowRight } from "lucide-react";
+import { AlertCircle, MessageCircle, Phone, ArrowLeft } from "lucide-react";
 import type { PaymentViewData } from "../types";
 
 export function ExpiredView({ data }: { data: PaymentViewData }) {
@@ -36,17 +36,17 @@ export function ExpiredView({ data }: { data: PaymentViewData }) {
 						href={whatsappUrl}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-emerald-600 py-3 text-xs font-bold text-white hover:bg-emerald-700 transition-colors shadow-md shadow-emerald-600/20"
+						className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-2xl bg-emerald-600 px-4 py-3 text-xs font-bold text-white hover:bg-emerald-700 transition-colors shadow-md shadow-emerald-600/20"
 					>
-						<MessageCircle className="h-4 w-4" />
+						<MessageCircle className="h-4 w-4 shrink-0" />
 						<span>طلب تجديد الرابط عبر واتساب</span>
 					</a>
 
 					<a
 						href={`tel:${clinicPhone}`}
-						className="flex flex-1 items-center justify-center gap-2 rounded-2xl border border-border bg-muted/40 py-3 text-xs font-bold text-foreground hover:bg-muted/70 transition-colors shadow-sm"
+						className="flex min-h-[44px] flex-1 items-center justify-center gap-2 rounded-2xl border border-border bg-muted/40 px-4 py-3 text-xs font-bold text-foreground hover:bg-muted/70 transition-colors shadow-sm"
 					>
-						<Phone className="h-4 w-4 text-muted-foreground" />
+						<Phone className="h-4 w-4 shrink-0 text-muted-foreground" />
 						<span>الاتصال بالأكاديمية</span>
 					</a>
 				</div>
@@ -55,10 +55,10 @@ export function ExpiredView({ data }: { data: PaymentViewData }) {
 			<div>
 				<Link
 					href="/"
-					className="inline-flex items-center gap-2 text-xs font-semibold text-primary hover:underline"
+					className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-4 text-xs font-semibold text-primary hover:underline"
 				>
 					<span>العودة لصفحة الأكاديمية الرئيسية</span>
-					<ArrowRight className="h-3.5 w-3.5" />
+					<ArrowLeft className="h-3.5 w-3.5 shrink-0" />
 				</Link>
 			</div>
 		</div>

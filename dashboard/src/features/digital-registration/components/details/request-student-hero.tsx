@@ -9,34 +9,12 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
+import { computeAgeLabel, getStudentLevel } from "../../utils/date-format";
 
 interface RequestStudentHeroProps {
 	request: CampaignRequestItem;
 	onStatusChange?: (status: CampaignRequestItem["status"]) => void;
 	onOpenSchedule?: () => void;
-}
-
-function computeAgeLabel(birthDate?: string | null, fallbackAge?: string | null): string {
-	if (fallbackAge && fallbackAge.trim()) {
-		return fallbackAge;
-	}
-	if (birthDate) {
-		const birth = new Date(birthDate);
-		if (!isNaN(birth.getTime())) {
-			const now = new Date();
-			let years = now.getFullYear() - birth.getFullYear();
-			const m = now.getMonth() - birth.getMonth();
-			if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) {
-				years--;
-			}
-			if (years > 0) {
-				return `${years} ${years <= 10 ? "سنوات" : "سنة"}`;
-			}
-			const months = Math.max(1, (now.getFullYear() - birth.getFullYear()) * 12 + now.getMonth() - birth.getMonth());
-			return `${months} شهر`;
-		}
-	}
-	return "غير محدد";
 }
 
 function formatAppointmentDate(dateStr?: string | null): string {
@@ -59,6 +37,7 @@ export function RequestStudentHero({
 	onOpenSchedule,
 }: RequestStudentHeroProps) {
 	const displayAge = computeAgeLabel(request.birthDate, request.ageLabel);
+	const displayLevel = getStudentLevel(request);
 	const hasAppointment = Boolean(
 		request.appointmentDate ||
 		request.assessmentAppointment?.startsAt ||
@@ -117,6 +96,7 @@ export function RequestStudentHero({
 					</h2>
 					<span className="text-[10.5px] text-muted-foreground font-medium shrink-0">
 						• {request.gender === "MALE" ? "ذكر" : "أنثى"} • {displayAge}
+						{displayLevel && ` • المستوى: ${displayLevel}`}
 					</span>
 				</div>
 

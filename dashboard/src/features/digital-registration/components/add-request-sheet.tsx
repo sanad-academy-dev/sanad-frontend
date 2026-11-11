@@ -61,6 +61,7 @@ import {
 import { BirthDatePicker } from "./birth-date-picker";
 import { PriorityPickerPopover } from "./priority-picker-popover";
 import { REGISTRATION_TRACKS } from "../utils/registration-tracks";
+import { computeAgeLabel } from "../utils/date-format";
 import { useCreateRequest, useRegistrationReviewers, useScheduleAssessmentAppointment, useUpdateRequest } from "../hooks/use-digital-registration";
 import type { CampaignRequestItem } from "../types/campaign-request.types";
 import { backendFetch } from "@/lib/backend-fetch";
@@ -398,7 +399,11 @@ export function AddRequestDialog({
 			setStudentName(initialData.patientName || initialData.name || "");
 			setGender((initialData.gender as any) || "MALE");
 			setBirthDate(initialData.birthDate ? initialData.birthDate.split("T")[0] : "");
-			setExperienceLevel(initialData.experienceLevel || initialData.ageLabel || "");
+			setExperienceLevel(
+				initialData.experienceLevel ||
+				(["مبتدئ", "متوسط", "متقدم", "غير متأكد"].includes(initialData.ageLabel?.trim() || "") ? initialData.ageLabel?.trim() : "") ||
+				""
+			);
 
 			// تطبيع طريقة التعلم لمطابقة خيارات القائمة
 			let lm = initialData.learningMode || "";
@@ -674,7 +679,7 @@ export function AddRequestDialog({
 						studentName: studentName.trim(),
 						gender: (gender as "MALE" | "FEMALE" | "UNKNOWN") || "UNKNOWN",
 						birthDate: isoBirthDate,
-						ageLabel: experienceLevel || null,
+						ageLabel: isoBirthDate ? computeAgeLabel(isoBirthDate) : null,
 						proposedTrack: suggestedTrack || null,
 						guardianName: guardian.trim(),
 						guardianPhone: validPhone,
@@ -683,8 +688,7 @@ export function AddRequestDialog({
 						preferredShift: preferredShift || null,
 						experienceLevel: experienceLevel || null,
 						priority: priority || "بدون أولوية",
-						// الموعد والمراجع والغرفة ونوع المقابلة تعدّل من «إعادة الجدولة»
-						// فقط؛ لا نحدّث نسخة الطلب من دون تحديث Appointment الفعلي.
+						interviewMode: channel === "CALL" ? "REMOTE" : "IN_CLINIC",
 						notifyWhatsapp,
 						links: attachedLinks.length > 0 ? attachedLinks : [],
 						documents: attachedDocuments.length > 0
@@ -720,7 +724,7 @@ export function AddRequestDialog({
 				studentName: studentName.trim(),
 				gender: (gender as "MALE" | "FEMALE" | "UNKNOWN") || "UNKNOWN",
 				birthDate: isoBirthDate,
-				ageLabel: experienceLevel || null,
+				ageLabel: isoBirthDate ? computeAgeLabel(isoBirthDate) : null,
 				proposedTrack: suggestedTrack || null,
 				guardianName: guardian.trim(),
 				guardianPhone: validPhone,
@@ -864,9 +868,8 @@ export function AddRequestDialog({
 								<DropdownMenuTrigger asChild>
 									<button
 										type="button"
-										disabled={Boolean(initialData)}
-										title={initialData ? "يُغيَّر نوع المقابلة من إجراء إعادة الجدولة" : "نوع المقابلة"}
-										className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-border/80 bg-background hover:bg-muted/60 text-foreground text-xs font-medium transition-all cursor-pointer shadow-2xs disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-background"
+										title="نوع المقابلة"
+										className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-border/80 bg-background hover:bg-muted/60 text-foreground text-xs font-medium transition-all cursor-pointer shadow-2xs"
 									>
 										{channel === "CALL" ? (
 											<IconPhone className="size-3 text-emerald-600 shrink-0" />

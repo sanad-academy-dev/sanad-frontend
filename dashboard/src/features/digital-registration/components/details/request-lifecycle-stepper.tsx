@@ -154,15 +154,6 @@ export function RequestLifecycleStepper({
 					</h3>
 					<span className="text-[10px] text-zinc-400 font-medium">(7 مراحل)</span>
 
-					{isAccepted && (
-						<Badge
-							variant="outline"
-							className="text-[10px] font-bold bg-emerald-50 text-emerald-800 border-emerald-300 dark:bg-emerald-950/40 dark:text-emerald-300 gap-1"
-						>
-							<IconCheck className="size-3 text-emerald-600" />
-							<span>معتمد ومقبول رسمياً</span>
-						</Badge>
-					)}
 					{isDuplicate && (
 						<Badge
 							variant="outline"
@@ -179,14 +170,7 @@ export function RequestLifecycleStepper({
 				</div>
 			</div>
 
-			<div
-				className={cn(
-					"rounded-lg border p-3 shadow-2xs transition-colors",
-					isAccepted
-						? "border-emerald-200 bg-emerald-50/20 dark:border-emerald-900/40 dark:bg-emerald-950/15"
-						: "border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900",
-				)}
-			>
+			<div className="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-3 shadow-2xs transition-colors">
 				{/* شريط المسار الأفقي بالمراحل السبع */}
 				<div className="relative flex items-center justify-between gap-1 pt-1 pb-1 overflow-x-auto [scrollbar-gutter:stable]">
 					{SEVEN_LIFECYCLE_STEPS.map((step, idx) => {

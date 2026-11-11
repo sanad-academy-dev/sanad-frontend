@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
 	IconCalendar,
+	IconCash,
 	IconCheck,
 	IconCopy,
 	IconExternalLink,
@@ -9,6 +10,7 @@ import {
 	IconLoader2,
 	IconPaperclip,
 	IconPlus,
+	IconReceipt,
 	IconSparkles,
 	IconX,
 } from "@tabler/icons-react";
@@ -17,10 +19,25 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
-import { formatAppointmentDate, formatAppointmentTime, DEFAULT_CLINIC_TIMEZONE } from "../../utils/date-format";
+import {
+	formatAppointmentDate,
+	formatAppointmentTime,
+	DEFAULT_CLINIC_TIMEZONE,
+	computeAgeLabel,
+	getStudentLevel,
+	isInterviewOngoing,
+} from "../../utils/date-format";
 import { getWhatsAppUrl } from "../../utils/phone-format";
 import { getChildAssessmentUrl, getPublicPaymentUrl } from "../../utils/ai-templates";
+import { getAttendanceProbability } from "../../utils/attendance-probability";
+import {
+	formatMoneyNumber,
+	formatPaymentMethodLabelArabic,
+	parseRegistrationPaymentMetadata,
+	resolveClinicCurrencySymbol,
+} from "../../utils/payment-helpers";
 import { AssessmentDetailsDrawer } from "./assessment-details-drawer";
+import { FillAssessmentDrawer } from "./fill-assessment-drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -33,6 +50,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { backendFetch } from "@/lib/backend-fetch";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import {
+	useCurrentTimeMs,
 	useDigitalRegistrationCapabilities,
 	useQuickUpdateRequest,
 	useConfirmPaymentManually,
@@ -44,13 +62,12 @@ interface RequestChildDataCardProps {
 	onStatusChange?: (request: CampaignRequestItem, status: CampaignRequestItem["status"]) => void;
 	onOpenReschedule?: () => void;
 	onOpenAssignPlan?: () => void;
+	onOpenCashPayment?: () => void;
+	onOpenViewReceipt?: () => void;
+	onOpenFillAssessment?: () => void;
+	onOpenViewAssessment?: () => void;
+	isExpanded?: boolean;
 }
-
-const SUBSCRIPTION_PLANS = [
-	{ id: "BASIC", name: "الباقة الأساسية (نصف دوام)", price: 800 },
-	{ id: "COMPREHENSIVE", name: "الباقة الشاملة (دوام كامل + أنشطة)", price: 1500 },
-	{ id: "PREMIUM", name: "الباقة المتميزة (VIP ورعاية خاصة)", price: 2200 },
-];
 
 function getInitials(name?: string | null): string {
 	if (!name) return "م";
@@ -63,35 +80,17 @@ function getInitials(name?: string | null): string {
 	return `${clean[0][0]}${clean[1][0]}`;
 }
 
-function computeAgeLabel(birthDate?: string | null, fallbackAge?: string | null): string {
-	if (fallbackAge && fallbackAge.trim()) {
-		return fallbackAge;
-	}
-	if (birthDate) {
-		const birth = new Date(birthDate);
-		if (!isNaN(birth.getTime())) {
-			const now = new Date();
-			let years = now.getFullYear() - birth.getFullYear();
-			const m = now.getMonth() - birth.getMonth();
-			if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) {
-				years--;
-			}
-			if (years > 0) {
-				return `${years} ${years <= 10 ? "سنوات" : "سنة"}`;
-			}
-			const months = Math.max(1, (now.getFullYear() - birth.getFullYear()) * 12 + now.getMonth() - birth.getMonth());
-			return `${months} شهر`;
-		}
-	}
-	return "غير محدد";
-}
-
 export function RequestChildDataCard({
 	request,
 	campaignId = "",
 	onStatusChange: _onStatusChange,
 	onOpenReschedule,
 	onOpenAssignPlan,
+	onOpenCashPayment,
+	onOpenViewReceipt,
+	onOpenFillAssessment,
+	onOpenViewAssessment,
+	isExpanded,
 }: RequestChildDataCardProps) {
 	const { capabilities } = useDigitalRegistrationCapabilities(campaignId);
 	const quickUpdateMutation = useQuickUpdateRequest(campaignId);
@@ -101,6 +100,7 @@ export function RequestChildDataCard({
 		confirmPaymentMutation.mutate(
 			{
 				requestId: request.id,
+				method: request.paymentReceiptUrl ? "BANK_TRANSFER" : "CASH",
 				amount: request.subscriptionAmount ? Number(request.subscriptionAmount) : undefined,
 				notes: "تم التحقق من إيصال السداد واعتماد القبول يدوياً من المشرف",
 			},
@@ -121,6 +121,7 @@ export function RequestChildDataCard({
 
 	// Assessment drawer state
 	const [isAssessmentDrawerOpen, setIsAssessmentDrawerOpen] = useState(false);
+	const [isFillAssessmentOpen, setIsFillAssessmentOpen] = useState(false);
 
 	// Classrooms state
 	const [classrooms, setClassrooms] = useState<Array<{ id: string; name: string }>>([]);
@@ -144,8 +145,10 @@ export function RequestChildDataCard({
 	}, []);
 
 	const displayAge = computeAgeLabel(request.birthDate, request.ageLabel);
+	const displayLevel = getStudentLevel(request);
 
-	const attendanceProbability = request.attendanceProbability ?? 92;
+	const attendanceProb = getAttendanceProbability(request);
+	const attendanceProbability = attendanceProb.percentage;
 
 	// مؤشرات الحالة المنطقية
 	const status = request.status;
@@ -163,8 +166,14 @@ export function RequestChildDataCard({
 
 	// التحقق من اكتمال التقييم الأولي (سواء عبر الحقل المهيكل الجديد أو النص الموروث)
 	const isAssessmentDone = Boolean(
-		request.assessmentData ||
-		(request.notes && request.notes.includes("إجابات التقييم:"))
+		(request.assessmentData &&
+			((Array.isArray(request.assessmentData.answers) && request.assessmentData.answers.length > 0) ||
+				request.assessmentData.score !== undefined ||
+				request.assessmentData.candidate)) ||
+		(request.notes &&
+			(request.notes.includes("إجابات التقييم:") ||
+				request.notes.includes("تم التقييم حضورياً") ||
+				request.notes.includes("استبيان التقييم الأولي")))
 	);
 
 	const assessmentFormattedDate = (() => {
@@ -186,6 +195,28 @@ export function RequestChildDataCard({
 		const url = getChildAssessmentUrl(request.code);
 		navigator.clipboard.writeText(url);
 		toast.success("تم نسخ رابط التقييم الأولي المخصص للطالب بنجاح");
+	};
+
+	const handleSendAssessmentLink = () => {
+		const url = getChildAssessmentUrl(request.code);
+		navigator.clipboard.writeText(url);
+
+		if (!request.guardianPhone) {
+			toast.info("تم نسخ رابط التقييم الأولي (لم يتوفر رقم هاتف لولي الأمر)");
+			return;
+		}
+
+		const cleanPhone = request.guardianPhone.replace(/\D/g, "");
+		const childDisplayName = request.patientName || request.childName || "الطفل";
+		const guardianDisplayName = request.guardianName ? `أ/ ${request.guardianName}` : "ولي الأمر";
+		const message = `السلام عليكم ورحمة الله وبركاته،\nأهلاً بحضرتك ${guardianDisplayName}،\nنرجو منكم التكرم بتعبئة التقييم الأولي للطالب (${childDisplayName}) لاستكمال إجراءات القبول في الأكاديمية:\n${url}\n\nشاكرين ومقدرين حسن تعاونكم.`;
+		const waUrl = getWhatsAppUrl(cleanPhone, message);
+		if (waUrl) {
+			window.open(waUrl, "_blank");
+			toast.success("تم نسخ الرابط وفتح محادثة واتساب لإرسال رابط التقييم لولي الأمر");
+		} else {
+			toast.success("تم نسخ رابط التقييم الأولي المخصص للطالب بنجاح");
+		}
 	};
 
 	const hasAppointment = Boolean(
@@ -224,11 +255,26 @@ export function RequestChildDataCard({
 	const studyPeriodDisplay =
 		[shiftLabel, learningModeLabel].filter(Boolean).join(" • ") || "غير محدد";
 
+	const nowMs = useCurrentTimeMs();
 	const { clinicInfo } = useClinicInfo();
 	const clinicTimezone = clinicInfo?.timezone || DEFAULT_CLINIC_TIMEZONE;
 
-	const appointmentTimeFormatted = request.appointmentDate
-		? `${formatAppointmentDate(request.appointmentDate, clinicTimezone, "ar-EG-u-nu-latn", { month: "short", day: "numeric", weekday: undefined, year: undefined })} • ${formatAppointmentTime(request.appointmentDate, clinicTimezone, "ar-EG-u-nu-latn")}`
+	const effectiveAppointmentDate =
+		request.appointmentDate || request.assessmentAppointment?.startsAt;
+	const effectiveDurationMinutes =
+		request.assessmentAppointment?.durationMinutes ?? request.interviewDurationMinutes ?? 60;
+	const isRemoteInterview = request.interviewMode
+		? request.interviewMode === "REMOTE"
+		: request.channel === "CALL";
+	const isAppointmentOngoing = isInterviewOngoing({
+		isInterviewStage: isInterview,
+		appointmentDate: effectiveAppointmentDate,
+		durationMinutes: effectiveDurationMinutes,
+		nowMs,
+	});
+
+	const appointmentTimeFormatted = effectiveAppointmentDate
+		? `${formatAppointmentDate(effectiveAppointmentDate, clinicTimezone, "ar-EG-u-nu-latn", { month: "short", day: "numeric", weekday: undefined, year: undefined })} • ${formatAppointmentTime(effectiveAppointmentDate, clinicTimezone, "ar-EG-u-nu-latn")}`
 		: "لم يُحدد بعد";
 
 	// Allergies list
@@ -432,20 +478,44 @@ export function RequestChildDataCard({
 					<span className="text-zinc-500 text-xs shrink-0">
 						{displayAge}
 					</span>
+					{displayLevel && (
+						<>
+							<span className="text-zinc-300 dark:text-zinc-600 font-bold">•</span>
+							<span className="text-zinc-500 dark:text-zinc-400 font-medium text-xs shrink-0">
+								المستوى: {displayLevel}
+							</span>
+						</>
+					)}
 				</div>
 
-				{/* 2. بانر احتمال حضور المقابلة - يظهر فقط في مرحلة المقابلة إذا كان هناك موعد محدد */}
-				{isInterview && hasAppointment && (
-					<div className="flex items-center justify-between gap-2 rounded-md bg-[#EEF2FF] dark:bg-indigo-950/40 border border-[#E0E7FF] dark:border-indigo-900/40 px-3 py-1.5 text-xs">
-						<div className="flex items-center gap-1.5 font-medium text-[#4F46E5] dark:text-indigo-300">
-							<IconSparkles className="size-3.5 text-[#6366F1] shrink-0" />
-							<span>احتمال حضور المقابلة: {attendanceProbability}% (تقدير آلي).</span>
+				{/* 2. بانر احتمالية الحضور الذكية - مخفي في الطابور والقائمة المختصرة والانتظار، ويظهر في المقابلة وانتظار الدفع والقبول والرفض */}
+				{attendanceProb.shouldShow && (
+					<div
+						className={cn(
+							"flex items-center justify-between gap-2 rounded-md border px-3 py-1.5 text-xs transition-colors",
+							attendanceProb.variant === "emerald" && "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/40 text-emerald-800 dark:text-emerald-300",
+							attendanceProb.variant === "blue" && "bg-[#EEF2FF] dark:bg-indigo-950/40 border-[#E0E7FF] dark:border-indigo-900/40 text-[#4F46E5] dark:text-indigo-300",
+							attendanceProb.variant === "amber" && "bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/40 text-amber-800 dark:text-amber-300",
+							attendanceProb.variant === "rose" && "bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/40 text-rose-800 dark:text-rose-300",
+						)}
+					>
+						<div className="flex items-center gap-1.5 font-medium">
+							<IconSparkles
+								className={cn(
+									"size-3.5 shrink-0",
+									attendanceProb.variant === "emerald" && "text-emerald-600",
+									attendanceProb.variant === "blue" && "text-[#6366F1]",
+									attendanceProb.variant === "amber" && "text-amber-600",
+									attendanceProb.variant === "rose" && "text-rose-600",
+								)}
+							/>
+							<span>{attendanceProb.label}{attendanceProb.reason ? ` (${attendanceProb.reason})` : ""}</span>
 						</div>
-						{request.guardianPhone && (
+						{isInterview && hasAppointment && request.guardianPhone && (
 							<button
 								type="button"
 								onClick={handleSendWhatsappReminder}
-								className="h-6 px-2.5 rounded border border-[#C7D2FE] dark:border-indigo-800 bg-white dark:bg-zinc-800 text-[11px] font-medium text-[#4F46E5] dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-zinc-700 transition-colors shadow-2xs cursor-pointer shrink-0"
+								className="h-6 px-2.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-[11px] font-medium hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-2xs cursor-pointer shrink-0"
 							>
 								إرسال تذكير
 							</button>
@@ -453,60 +523,71 @@ export function RequestChildDataCard({
 					</div>
 				)}
 
-				{/* 2.5 بانر التقييم الأولي - يظهر حصراً في مراحل ما بعد الفرز (المقابلة، الدفع، القبول، الرفض) */}
-				{isPostScreening && (
-					<div className="flex items-center justify-between gap-2 pt-0.5 pb-1">
-						{/* الطرف الأيمن: الأيقونة والعنوان وشارة الحالة */}
-						<div className="flex items-center gap-2 min-w-0">
-							<div
-								className={cn(
-									"size-6 rounded-md flex items-center justify-center shrink-0 border",
-									isAssessmentDone
-										? "bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400"
-										: "bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400"
-								)}
-							>
-								<IconFileDescription className="size-4" />
+				{/* 2.5 قسم التقييم الأولي - لا يظهر في الطابور ولا القائمة المختصرة ولا قائمة الانتظار، ويظهر فقط في المقابلة وانتظار الدفع والقبول والرفض */}
+				{!isDuplicate && !(["QUEUE", "SHORTLIST", "WAITLIST"].includes(request.status) || ["queue", "shortlist", "waitlist"].includes((request as any).column)) && (
+					isAssessmentDone ? (
+						<div className="flex items-center justify-between gap-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 px-3 py-2 shadow-2xs">
+							{/* الطرف الأيمن: الأيقونة والعنوان وشارة الحالة */}
+							<div className="flex items-center gap-2 min-w-0">
+								<div className="size-6 rounded-md flex items-center justify-center shrink-0 border bg-emerald-50 dark:bg-emerald-950/50 border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400">
+									<IconFileDescription className="size-4" />
+								</div>
+								<span className="font-bold text-xs text-zinc-900 dark:text-zinc-100 shrink-0">
+									التقييم الأولي
+								</span>
+								<span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-md border truncate font-medium text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800/80 border-zinc-200/90 dark:border-zinc-700">
+									تم تعبئة التقييم • {assessmentFormattedDate}
+								</span>
 							</div>
-							<span className="font-bold text-xs text-zinc-900 dark:text-zinc-100 shrink-0">
-								التقييم الأولي
-							</span>
-							<span
-								className={cn(
-									"inline-flex items-center text-[11px] px-2 py-0.5 rounded-md border truncate font-medium",
-									isAssessmentDone
-										? "text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800/80 border-zinc-200/90 dark:border-zinc-700"
-										: "text-amber-700 dark:text-amber-300 bg-amber-50/80 dark:bg-amber-950/40 border-amber-200/80 dark:border-amber-800/60"
-								)}
-							>
-								{isAssessmentDone
-									? `تم تعبئة الإستبيان • ${assessmentFormattedDate}`
-									: "بانتظار تعبئة الإستبيان الأولي"}
-							</span>
-						</div>
 
-						{/* الطرف الأيسر: زر عرض الإجابات أو نسخ الرابط */}
-						{isAssessmentDone ? (
+							{/* الطرف الأيسر: زر عرض الإجابات */}
 							<button
 								type="button"
-								onClick={() => setIsAssessmentDrawerOpen(true)}
+								onClick={() => {
+									if (onOpenViewAssessment) {
+										onOpenViewAssessment();
+									} else {
+										setIsAssessmentDrawerOpen(true);
+									}
+								}}
 								className="inline-flex items-center gap-1.5 h-6.5 px-2.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-[11px] font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-50 dark:hover:bg-zinc-700 transition-colors shadow-2xs cursor-pointer shrink-0"
 							>
 								<IconEye className="size-3 text-zinc-500" />
 								<span>عرض الإجابات</span>
 							</button>
-						) : (
-							<button
-								type="button"
-								onClick={handleCopyAssessmentLink}
-								className="inline-flex items-center gap-1.5 h-6.5 px-2.5 rounded border border-amber-200 dark:border-amber-800 bg-white dark:bg-zinc-800 text-[11px] font-medium text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/50 transition-colors shadow-2xs cursor-pointer shrink-0"
-								title="نسخ رابط التقييم الأولي المخصص لهذا الطالب"
-							>
-								<IconCopy className="size-3 text-amber-600 dark:text-amber-400" />
-								<span>نسخ الرابط</span>
-							</button>
-						)}
-					</div>
+						</div>
+					) : (
+						<div
+							className="w-full rounded-md bg-[#FFFDF0] dark:bg-amber-950/25 border border-[#FDE68A]/80 dark:border-amber-900/40 px-3 py-2 flex items-center justify-between gap-2 shadow-2xs"
+							dir="rtl"
+						>
+							<span className="text-xs text-[#92400E] dark:text-amber-200 font-medium">
+								لم يتم تعبئة التقييم الأولي.
+							</span>
+							<div className="flex items-center gap-3 shrink-0">
+								<button
+									type="button"
+									onClick={() => {
+										if (onOpenFillAssessment) {
+											onOpenFillAssessment();
+										} else {
+											setIsFillAssessmentOpen(true);
+										}
+									}}
+									className="text-xs font-bold text-[#4F46E5] dark:text-indigo-400 hover:underline cursor-pointer transition-colors"
+								>
+									تعبئة
+								</button>
+								<button
+									type="button"
+									onClick={handleSendAssessmentLink}
+									className="text-xs font-bold text-[#D97706] dark:text-amber-400 hover:underline cursor-pointer transition-colors"
+								>
+									إرسال
+								</button>
+							</div>
+						</div>
+					)
 				)}
 
 				{/* 3. ملاحظات المراجع */}
@@ -585,7 +666,7 @@ export function RequestChildDataCard({
 					<div className="flex items-center justify-between py-1">
 						<span className="font-medium text-zinc-600 dark:text-zinc-400">المسار المطلوب</span>
 						<span className="font-semibold text-zinc-900 dark:text-zinc-100">
-							{request.proposedTrack || "مسار عام"}
+							{request.proposedTrack || request.targetClass || "مسار عام"}
 						</span>
 					</div>
 
@@ -632,28 +713,57 @@ export function RequestChildDataCard({
 											{hasAppointment ? "إعادة الجدولة" : "جدولة موعد"}
 										</button>
 									)}
-									<span className="font-semibold text-zinc-900 dark:text-zinc-100">
+									<span
+										className={cn(
+											"font-semibold transition-colors",
+											isAppointmentOngoing
+												? "text-red-600 dark:text-red-400"
+												: "text-zinc-900 dark:text-zinc-100",
+										)}
+									>
 										{appointmentTimeFormatted}
 									</span>
 								</div>
 							</div>
 
+							{!isRemoteInterview && (
+								<div className="flex items-center justify-between py-1">
+									<span className="font-medium text-zinc-600 dark:text-zinc-400">الغرفة</span>
+									<span className="font-semibold text-zinc-900 dark:text-zinc-100">
+										{request.roomName && request.roomName !== "الغرفة"
+											? request.roomName
+											: "غير محددة"}
+									</span>
+								</div>
+							)}
+
 							<div className="flex items-center justify-between py-1">
 								<span className="font-medium text-zinc-600 dark:text-zinc-400">مدة المقابلة</span>
 								<span className="font-semibold text-zinc-900 dark:text-zinc-100">
-									{request.assessmentAppointment?.durationMinutes ?? request.interviewDurationMinutes ?? 60} دقيقة
+									{effectiveDurationMinutes} دقيقة
 								</span>
 							</div>
 						</>
 					)}
 
 					{(isAwaitingPayment || isAccepted) && hasAppointment && (
-						<div className="flex items-center justify-between py-1">
-							<span className="font-medium text-zinc-600 dark:text-zinc-400">تاريخ المقابلة</span>
-							<span className="font-semibold text-emerald-700 dark:text-emerald-400">
-								{appointmentTimeFormatted} (تمت المقابلة)
-							</span>
-						</div>
+						<>
+							<div className="flex items-center justify-between py-1">
+								<span className="font-medium text-zinc-600 dark:text-zinc-400">تاريخ المقابلة</span>
+								<span className="font-semibold text-emerald-700 dark:text-emerald-400">
+									{appointmentTimeFormatted} (تمت المقابلة)
+								</span>
+							</div>
+
+							{!isRemoteInterview && request.roomName && request.roomName !== "الغرفة" && (
+								<div className="flex items-center justify-between py-1">
+									<span className="font-medium text-zinc-600 dark:text-zinc-400">الغرفة</span>
+									<span className="font-semibold text-zinc-900 dark:text-zinc-100">
+										{request.roomName}
+									</span>
+								</div>
+							)}
+						</>
 					)}
 
 					{/* الفصل المقترح (المقابلة/السداد) أو الفصل الدراسي (المقبول) - مخفي تماماً في القائمة المختصرة وقائمة الانتظار */}
@@ -858,23 +968,10 @@ export function RequestChildDataCard({
 
 				{/* 6. الاشتراك: يظهر في مراحل الدفع والاعتماد والتقييم فقط */}
 				{(isAwaitingPayment || isAccepted || isInterview) && (
-					<div
-						className={cn(
-							"space-y-2 border-t border-zinc-200 dark:border-zinc-700 pt-3 text-xs transition-colors",
-							isAwaitingPayment &&
-								"p-3 rounded-lg border border-indigo-200/90 dark:border-indigo-900/60 bg-indigo-50/30 dark:bg-indigo-950/20",
-						)}
-					>
-						<div className="flex items-center justify-between pb-0.5">
-							<h4 className="font-bold text-xs text-zinc-900 dark:text-zinc-100">
-								{isAwaitingPayment ? "باقة الرسوم الأكاديمية والاشتراك المقترح للسداد" : "الاشتراك"}
-							</h4>
-							{isAwaitingPayment && (
-								<span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-300">
-									مرحلة السداد المالي
-								</span>
-							)}
-						</div>
+					<div className="space-y-2 border-t border-zinc-200 dark:border-zinc-700 pt-3 text-xs">
+						<h4 className="font-bold text-xs text-zinc-900 dark:text-zinc-100 pb-0.5">
+							{isAwaitingPayment ? "باقة الرسوم الأكاديمية والاشتراك" : "الاشتراك"}
+						</h4>
 
 						{/* اختيار الباقة */}
 						<div className="flex items-center justify-between py-1">
@@ -909,108 +1006,198 @@ export function RequestChildDataCard({
 
 						{/* المبلغ */}
 						<div className="flex items-center justify-between py-1">
-							<span className="font-medium text-zinc-600 dark:text-zinc-400">المبلغ (يُحسب بعد اختيار الباقة)</span>
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">قيمة الباقة</span>
 							<span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-bold bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700">
-								{request.subscriptionAmount ? `${request.subscriptionAmount} ج.م` : "00 ج.م"}
+								{(() => {
+									const cur = resolveClinicCurrencySymbol(clinicInfo?.currencyCode);
+									return request.subscriptionAmount
+										? `${formatMoneyNumber(request.subscriptionAmount)} ${cur}`
+										: `0 ${cur}`;
+								})()}
 							</span>
 						</div>
 
 						{/* تضمين الوجبات */}
 						<div className="flex items-center justify-between py-1">
-							<span className="font-medium text-zinc-600 dark:text-zinc-400">تضمين الوجبات (تُضاف تكلفتها للاشتراك)</span>
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">تضمين الوجبات (ضمن مشمولات الباقة)</span>
 							<Switch
 								checked={request.includeMeals ?? false}
 								onCheckedChange={handleToggleMeals}
-								disabled={!capabilities.canEdit || isAccepted || quickUpdateMutation.isPending}
+								disabled={!capabilities.canEdit || isAccepted || Boolean(request.paidAt) || quickUpdateMutation.isPending}
 								className="scale-85"
 							/>
 						</div>
 
 						{/* تفعيل المصروف اليومي */}
 						<div className="flex items-center justify-between py-1">
-							<span className="font-medium text-zinc-600 dark:text-zinc-400">تفعيل المصروف اليومي</span>
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">تفعيل المصروف اليومي (ضمن مشمولات الباقة)</span>
 							<Switch
 								checked={request.enableDailyStipend ?? false}
 								onCheckedChange={handleToggleStipend}
-								disabled={!capabilities.canEdit || isAccepted || quickUpdateMutation.isPending}
+								disabled={!capabilities.canEdit || isAccepted || Boolean(request.paidAt) || quickUpdateMutation.isPending}
 								className="scale-85"
 							/>
 						</div>
 
-						{/* حالة ورابط سداد الرسوم الأكاديمية */}
-						{(request.paymentToken || request.paidAt || request.paymentReceiptUrl) && (
-							<div className="pt-2 border-t border-zinc-200/80 dark:border-zinc-700/80 space-y-2">
-								<div className="flex items-center justify-between">
+						{/* حالة السداد والفاتورة (يبقى ظاهراً بعد القبول لعرض الوسيلة وطباعة الإيصال) */}
+						{(isAwaitingPayment || isAccepted || Boolean(request.paymentToken) || Boolean(request.paidAt) || Boolean(request.paymentReceiptUrl)) && (
+							<div className="pt-2 border-t border-zinc-200/80 dark:border-zinc-700/80 space-y-2.5">
+								<div className="flex items-center justify-between gap-2">
 									<span className="font-semibold text-zinc-700 dark:text-zinc-300">سداد الرسوم:</span>
-									{request.paidAt || isAccepted ? (
-										<span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
-											<IconCheck className="size-3" />
-											تم السداد بنجاح
-										</span>
-									) : request.paymentReceiptUrl ? (
-										<span className="inline-flex items-center gap-1 rounded bg-amber-500/10 px-2 py-0.5 text-[11px] font-bold text-amber-600 dark:text-amber-400">
-											إيصال مرفوع للمراجعة
-										</span>
-									) : (
-										<span className="inline-flex items-center gap-1 rounded bg-indigo-500/10 px-2 py-0.5 text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
-											بانتظار السداد
-										</span>
-									)}
+									<div className="flex items-center gap-1.5 flex-wrap">
+										{(request.paidAt || isAccepted) && (
+											<span className="inline-flex items-center gap-1 rounded bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/70 px-2 py-0.5 text-[10.5px] font-bold text-blue-700 dark:text-blue-300">
+												{formatPaymentMethodLabelArabic(request.paymentMethodType, request.paymentGateway)}
+											</span>
+										)}
+										{request.paidAt || isAccepted ? (
+											<span className="inline-flex items-center gap-1 rounded bg-emerald-500/10 px-2 py-0.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+												<IconCheck className="size-3" />
+												تم السداد بنجاح
+											</span>
+										) : request.paymentReceiptUrl ? (
+											<span className="inline-flex items-center gap-1 rounded bg-amber-500/10 px-2 py-0.5 text-[11px] font-bold text-amber-600 dark:text-amber-400">
+												إيصال مرفوع للمراجعة
+											</span>
+										) : (
+											<span className="inline-flex items-center gap-1 rounded bg-indigo-500/10 px-2 py-0.5 text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
+												بانتظار السداد
+											</span>
+										)}
+									</div>
 								</div>
 
-								{request.paymentToken && !request.paidAt && (
-									<div className="flex items-center justify-between gap-1.5 rounded bg-zinc-50 dark:bg-zinc-800/80 p-1.5 border border-zinc-200 dark:border-zinc-700">
-										<span className="text-[10px] text-muted-foreground truncate font-mono select-all flex-1" dir="ltr">
-											{getPublicPaymentUrl(request.paymentToken)}
-										</span>
-										<button
-											type="button"
-											onClick={() => {
-												navigator.clipboard.writeText(getPublicPaymentUrl(request.paymentToken!));
-												toast.success("تم نسخ رابط سداد الرسوم");
-											}}
-											className="inline-flex items-center gap-1 h-5 px-1.5 text-[10px] font-semibold bg-white dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 rounded hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-colors cursor-pointer"
-											title="نسخ الرابط"
-										>
-											<IconCopy className="size-3" />
-											<span>نسخ</span>
-										</button>
-										<button
-											type="button"
-											onClick={() => window.open(getPublicPaymentUrl(request.paymentToken!), "_blank")}
-											className="inline-flex items-center h-5 px-1 text-[10px] text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer"
-											title="معاينة"
-										>
-											<IconExternalLink className="size-3" />
-										</button>
-									</div>
-								)}
+								{/* ملخص الإيصال الدائم بعد السداد وزر فتح/طباعة الفاتورة */}
+								{(request.paidAt || isAccepted) && (() => {
+									const cur = resolveClinicCurrencySymbol(clinicInfo?.currencyCode);
+									const meta = parseRegistrationPaymentMetadata(request.paymentNotes);
+									const paidDateText = request.paidAt
+										? new Intl.DateTimeFormat("ar-EG-u-nu-latn", {
+												day: "numeric",
+												month: "long",
+												year: "numeric",
+										  }).format(new Date(request.paidAt))
+										: null;
+									return (
+										<div className="rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 p-2.5 space-y-2">
+											<div className="flex items-center justify-between gap-3 flex-wrap text-[11px]">
+												<div className="flex items-center gap-5 flex-wrap">
+													{request.paymentReference && (
+														<div>
+															<span className="text-muted-foreground block text-[10px]">معرف الإيصال</span>
+															<span className="font-semibold text-zinc-900 dark:text-zinc-100" dir="ltr">
+																{request.paymentReference}
+															</span>
+														</div>
+													)}
+													{paidDateText && (
+														<div>
+															<span className="text-muted-foreground block text-[10px]">تاريخ السداد</span>
+															<span className="font-semibold text-zinc-900 dark:text-zinc-100">{paidDateText}</span>
+														</div>
+													)}
+												</div>
 
-								{/* إيصال السداد المرفوع واعتماده */}
-								{request.paymentReceiptUrl && !request.paidAt && capabilities.canEdit && (
-									<div className="flex items-center justify-between gap-2 pt-1">
-										<button
-											type="button"
-											onClick={() => window.open(request.paymentReceiptUrl!, "_blank")}
-											className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:underline cursor-pointer"
-										>
-											<IconExternalLink className="size-3" />
-											<span>معاينة إيصال التحويل</span>
-										</button>
-										<button
-											type="button"
-											onClick={handleConfirmManualPayment}
-											disabled={confirmPaymentMutation.isPending}
-											className="inline-flex items-center gap-1 h-6 px-2.5 text-[11px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded transition-colors shadow-2xs cursor-pointer"
-										>
-											{confirmPaymentMutation.isPending ? (
-												<IconLoader2 className="size-3 animate-spin" />
-											) : (
-												<IconCheck className="size-3" />
+												{onOpenViewReceipt && (
+													<Button
+														type="button"
+														size="sm"
+														variant="outline"
+														onClick={onOpenViewReceipt}
+														className="h-7 px-2.5 text-[11px] font-semibold gap-1.5 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 shrink-0 cursor-pointer"
+													>
+														<IconReceipt className="size-3.5 text-zinc-500" />
+														<span>عرض / طباعة الفاتورة</span>
+													</Button>
+												)}
+											</div>
+
+											{meta.changeAmount !== undefined && meta.changeAmount > 0 && (
+												<div className="flex items-center justify-between pt-1.5 border-t border-zinc-200/70 dark:border-zinc-800 text-[10.5px]">
+													<span className="text-muted-foreground">
+														المستلم نقداً: {formatMoneyNumber(meta.cashReceived)} {cur}
+													</span>
+													<span className="font-semibold text-zinc-700 dark:text-zinc-300">
+														الباقي المرتجع: {formatMoneyNumber(meta.changeAmount)} {cur}
+													</span>
+												</div>
 											)}
-											<span>اعتماد السداد والقبول</span>
-										</button>
-									</div>
+										</div>
+									);
+								})()}
+
+								{/* رابط الدفع الإلكتروني وزر الدفع كاش في مرحلة بانتظار الدفع */}
+								{!isAccepted && !request.paidAt && (
+									<>
+										{request.paymentToken && (
+											<div className="flex items-center justify-between gap-1.5 rounded bg-zinc-50 dark:bg-zinc-800/80 p-1.5 border border-zinc-200 dark:border-zinc-700">
+												<span className="text-[10px] text-muted-foreground truncate font-mono select-all flex-1" dir="ltr">
+													{getPublicPaymentUrl(request.paymentToken)}
+												</span>
+												<button
+													type="button"
+													onClick={() => {
+														navigator.clipboard.writeText(getPublicPaymentUrl(request.paymentToken!));
+														toast.success("تم نسخ رابط سداد الرسوم");
+													}}
+													className="inline-flex items-center gap-1 h-5 px-1.5 text-[10px] font-semibold bg-white dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 rounded hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-colors cursor-pointer"
+													title="نسخ الرابط"
+												>
+													<IconCopy className="size-3" />
+													<span>نسخ</span>
+												</button>
+												<button
+													type="button"
+													onClick={() => window.open(getPublicPaymentUrl(request.paymentToken!), "_blank")}
+													className="inline-flex items-center h-5 px-1 text-[10px] text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer"
+													title="معاينة"
+												>
+													<IconExternalLink className="size-3" />
+												</button>
+											</div>
+										)}
+
+										{isAwaitingPayment && capabilities.canEdit && onOpenCashPayment && (
+											<div className="flex items-center justify-end pt-0.5">
+												<Button
+													type="button"
+													size="sm"
+													onClick={onOpenCashPayment}
+													className="h-7 px-3 text-[11px] font-bold gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs cursor-pointer"
+												>
+													<IconCash className="size-3.5" />
+													<span>الدفع كاش</span>
+												</Button>
+											</div>
+										)}
+
+										{/* إيصال السداد المرفوع واعتماده (للسجلات التراثية فقط إن وُجدت) */}
+										{request.paymentReceiptUrl && capabilities.canEdit && (
+											<div className="flex items-center justify-between gap-2 pt-1">
+												<button
+													type="button"
+													onClick={() => window.open(request.paymentReceiptUrl!, "_blank")}
+													className="inline-flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:underline cursor-pointer"
+												>
+													<IconExternalLink className="size-3" />
+													<span>معاينة إيصال التحويل</span>
+												</button>
+												<button
+													type="button"
+													onClick={handleConfirmManualPayment}
+													disabled={confirmPaymentMutation.isPending}
+													className="inline-flex items-center gap-1 h-6 px-2.5 text-[11px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded transition-colors shadow-2xs cursor-pointer"
+												>
+													{confirmPaymentMutation.isPending ? (
+														<IconLoader2 className="size-3 animate-spin" />
+													) : (
+														<IconCheck className="size-3" />
+													)}
+													<span>اعتماد السداد والقبول</span>
+												</button>
+											</div>
+										)}
+									</>
 								)}
 							</div>
 						)}
@@ -1018,11 +1205,23 @@ export function RequestChildDataCard({
 				)}
 			</div>
 
+			{/* دراور تعبئة التقييم الأولي كاحتياط في حال استُخدم المكون خارج الحملة */}
+			{!onOpenFillAssessment && (
+				<FillAssessmentDrawer
+					open={isFillAssessmentOpen}
+					onOpenChange={setIsFillAssessmentOpen}
+					request={request}
+					campaignId={campaignId}
+				/>
+			)}
+
 			{/* دراور تفاصيل وإجابات التقييم الأولي المستوفية للشروط */}
 			<AssessmentDetailsDrawer
 				open={isAssessmentDrawerOpen}
 				onOpenChange={setIsAssessmentDrawerOpen}
 				request={request}
+				campaignId={campaignId}
+				isExpanded={isExpanded}
 			/>
 		</div>
 	);

@@ -4,6 +4,7 @@ import {
 	IconChevronDown,
 	IconCopy,
 	IconExternalLink,
+	IconInfoCircle,
 	IconLoader2,
 	IconRefresh,
 	IconSparkles,
@@ -11,7 +12,6 @@ import {
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
 	Popover,
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
 import { PriorityPickerPopover } from "../priority-picker-popover";
 import {
 	RegistrationDrawerHeader,
@@ -28,11 +29,13 @@ import {
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import {
 	useAwaitingPaymentRequest,
+	usePreparePaymentToken,
 	useRenewPaymentToken,
 	useDigitalRegistrationCapabilities,
 	useRegistrationReviewers,
 } from "../../hooks/use-digital-registration";
 import { generateAwaitingPaymentMessage, getPublicPaymentUrl } from "../../utils/ai-templates";
+import { formatMoneyNumber, resolveClinicCurrencySymbol } from "../../utils/payment-helpers";
 import { cn } from "@/lib/utils";
 
 interface AwaitingPaymentDialogProps {
@@ -41,6 +44,8 @@ interface AwaitingPaymentDialogProps {
 	onOpenChange: (open: boolean) => void;
 	campaignId?: string;
 	onSuccess?: () => void;
+	onOpenAssignPlan?: () => void;
+	onRequestUpdate?: (updated: Partial<CampaignRequestItem> & { id: string }) => void;
 	isExpanded?: boolean;
 }
 
@@ -50,39 +55,110 @@ export function AwaitingPaymentDialog({
 	onOpenChange,
 	campaignId = "",
 	onSuccess,
+	onOpenAssignPlan,
+	onRequestUpdate,
 	isExpanded = false,
 }: AwaitingPaymentDialogProps) {
 	const [enableMessage, setEnableMessage] = useState<boolean>(true);
 	const [messageText, setMessageText] = useState<string>("");
+	const [messageEditedManually, setMessageEditedManually] = useState<boolean>(false);
 	const [priority, setPriority] = useState<string>("بدون أولوية");
 	const [assignedStaffId, setAssignedStaffId] = useState<string | null>(null);
 	const [notifyEmail, setNotifyEmail] = useState<boolean>(false);
+	const [preparedTokenState, setPreparedTokenState] = useState<{
+		requestId: string;
+		token: string;
+	} | null>(null);
 
 	const [staffPopoverOpen, setStaffPopoverOpen] = useState<boolean>(false);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
+	const prepareAttemptedForRef = useRef<string | null>(null);
 
+	const { clinicInfo } = useClinicInfo();
+	const currency = resolveClinicCurrencySymbol(clinicInfo?.currencyCode);
 	const { capabilities } = useDigitalRegistrationCapabilities(campaignId);
 	const { data: staff = [], isLoading: isStaffLoading } = useRegistrationReviewers();
 	const awaitingPaymentMutation = useAwaitingPaymentRequest(campaignId);
+	const prepareTokenMutation = usePreparePaymentToken(campaignId);
 	const renewMutation = useRenewPaymentToken(campaignId);
 
-	// استرجاع وضبط بيانات الطلب الحالي فور فتح اللوحة
+	const assignedPlanName = (request?.subscriptionPlanName || "").trim();
+	const assignedPlanAmount = Number(request?.subscriptionAmount ?? 0);
+	const hasAssignedPlan = Boolean(
+		assignedPlanName && Number.isFinite(assignedPlanAmount) && assignedPlanAmount > 0,
+	);
+	const activePaymentToken =
+		request?.paymentToken ||
+		(preparedTokenState && preparedTokenState.requestId === request?.id
+			? preparedTokenState.token
+			: null);
+
+	// تجهيز رابط الدفع مسبقاً إذا كان للطلب باقة محددة ولكن لم يُولَّد له رابط بعد
+	useEffect(() => {
+		if (!open || !request) {
+			prepareAttemptedForRef.current = null;
+			return;
+		}
+		if (!hasAssignedPlan || activePaymentToken) return;
+		if (prepareAttemptedForRef.current === request.id) return;
+
+		prepareAttemptedForRef.current = request.id;
+		prepareTokenMutation.mutate(
+			{ requestId: request.id },
+			{
+				onSuccess: (res: any) => {
+					if (res?.paymentToken) {
+						setPreparedTokenState({ requestId: request.id, token: res.paymentToken });
+						onRequestUpdate?.({
+							id: request.id,
+							paymentToken: res.paymentToken,
+							paymentTokenExpiresAt: res.paymentTokenExpiresAt,
+						});
+					}
+				},
+			},
+		);
+	}, [open, request?.id, hasAssignedPlan, activePaymentToken]);
+
+	// استرجاع وضبط بيانات الطلب عند الفتح
 	useEffect(() => {
 		if (open && request) {
 			setPriority(request.priority || "بدون أولوية");
 			setAssignedStaffId(request.assignedStaff?.id || request.assignedStaffId || null);
 			setEnableMessage(true);
 			setNotifyEmail(false);
-			const initialMsg = generateAwaitingPaymentMessage({
-				studentName: request.patientName || request.name || "الطالب",
-				guardianName: request.guardianName,
-				planName: request.subscriptionPlanName,
-				amount: request.subscriptionAmount ? Number(request.subscriptionAmount) : null,
-				paymentToken: request.paymentToken,
-			});
-			setMessageText(initialMsg);
+			setMessageEditedManually(false);
 		}
-	}, [open, request]);
+	}, [open, request?.id]);
+
+	// توليد الرسالة وتحديثها تلقائياً عند توفر الرابط أو تغيّر تفاصيل الاشتراك ما لم يعدلها الموظف يدوياً
+	useEffect(() => {
+		if (!open || !request || messageEditedManually) return;
+		const planAmount = Number(request.subscriptionAmount ?? 0);
+		const generated = generateAwaitingPaymentMessage({
+			studentName: request.patientName || request.name || "الطالب",
+			guardianName: request.guardianName,
+			planName: request.subscriptionPlanName,
+			amount: Number.isFinite(planAmount) && planAmount > 0 ? planAmount : null,
+			includeMeals: Boolean(request.includeMeals),
+			enableDailyStipend: Boolean(request.enableDailyStipend),
+			code: request.code,
+			currency,
+			paymentToken: activePaymentToken,
+		});
+		setMessageText(generated);
+	}, [
+		open,
+		request?.id,
+		request?.subscriptionPlanName,
+		request?.subscriptionAmount,
+		request?.includeMeals,
+		request?.enableDailyStipend,
+		request?.code,
+		activePaymentToken,
+		currency,
+		messageEditedManually,
+	]);
 
 	// إغلاق اللوحة عند الضغط على مفتاح Escape
 	useEffect(() => {
@@ -115,11 +191,16 @@ export function AwaitingPaymentDialog({
 			studentName: request.patientName || request.name || "الطالب",
 			guardianName: request.guardianName,
 			planName: request.subscriptionPlanName,
-			amount: request.subscriptionAmount ? Number(request.subscriptionAmount) : null,
-			paymentToken: request.paymentToken,
+			amount: hasAssignedPlan ? assignedPlanAmount : null,
+			includeMeals: Boolean(request.includeMeals),
+			enableDailyStipend: Boolean(request.enableDailyStipend),
+			code: request.code,
+			currency,
+			paymentToken: activePaymentToken,
 		});
 		setMessageText(generated);
-		toast.success("تم توليد نص الرسالة متضمناً رابط السداد الذكي");
+		setMessageEditedManually(false);
+		toast.success("تم توليد نص الرسالة متضمناً تفاصيل الاشتراك ورابط السداد");
 	};
 
 	const handleRenewLink = () => {
@@ -129,13 +210,21 @@ export function AwaitingPaymentDialog({
 				onSuccess: (res: any) => {
 					toast.success("تم تجديد وتمديد صلاحية رابط السداد لـ 72 ساعة إضافية");
 					if (res.paymentToken) {
-						request.paymentToken = res.paymentToken;
-						request.paymentTokenExpiresAt = res.paymentTokenExpiresAt;
+						setPreparedTokenState({ requestId: request.id, token: res.paymentToken });
+						onRequestUpdate?.({
+							id: request.id,
+							paymentToken: res.paymentToken,
+							paymentTokenExpiresAt: res.paymentTokenExpiresAt,
+						});
 						const updatedMsg = generateAwaitingPaymentMessage({
 							studentName: request.patientName || request.name || "الطالب",
 							guardianName: request.guardianName,
 							planName: request.subscriptionPlanName,
-							amount: request.subscriptionAmount ? Number(request.subscriptionAmount) : null,
+							amount: hasAssignedPlan ? assignedPlanAmount : null,
+							includeMeals: Boolean(request.includeMeals),
+							enableDailyStipend: Boolean(request.enableDailyStipend),
+							code: request.code,
+							currency,
 							paymentToken: res.paymentToken,
 						});
 						setMessageText(updatedMsg);
@@ -154,6 +243,11 @@ export function AwaitingPaymentDialog({
 			return;
 		}
 
+		if (!hasAssignedPlan) {
+			toast.error("يجب تحديد الباقة الأكاديمية للطالب أولاً قبل النقل إلى بانتظار الدفع");
+			return;
+		}
+
 		if (enableMessage && !messageText.trim()) {
 			toast.error("يرجى كتابة نص الرسالة لولي الأمر أو إلغاء تفعيل خيار التضمين");
 			return;
@@ -163,11 +257,6 @@ export function AwaitingPaymentDialog({
 			{
 				requestId: request.id,
 				data: {
-					subscriptionPlanId: request.subscriptionPlanId || undefined,
-					subscriptionPlanName: request.subscriptionPlanName || undefined,
-					subscriptionAmount: request.subscriptionAmount ? Number(request.subscriptionAmount) : undefined,
-					includeMeals: request.includeMeals,
-					enableDailyStipend: request.enableDailyStipend,
 					priority: priority !== "بدون أولوية" ? priority : null,
 					assignedStaffId: assignedStaffId || undefined,
 					subject: `بانتظار سداد الرسوم الأكاديمية - طلب #${request.code || request.id}`,
@@ -218,7 +307,7 @@ export function AwaitingPaymentDialog({
 				/>
 
 				{/* بطاقة رابط السداد الإلكتروني الذكي */}
-				{request.paymentToken && (
+				{activePaymentToken && (
 					<div className="rounded-xl border border-primary/20 bg-primary/5 p-3 space-y-2">
 						<div className="flex items-center justify-between">
 							<div className="flex items-center gap-1.5 text-xs font-bold text-primary">
@@ -230,7 +319,7 @@ export function AwaitingPaymentDialog({
 							</span>
 						</div>
 						<div className="flex items-center gap-2 rounded-lg border border-border/60 bg-background/80 px-2.5 py-1.5 text-xs font-mono text-muted-foreground truncate select-all" dir="ltr">
-							<span className="truncate flex-1">{getPublicPaymentUrl(request.paymentToken)}</span>
+							<span className="truncate flex-1">{getPublicPaymentUrl(activePaymentToken)}</span>
 						</div>
 						<div className="flex items-center justify-between gap-2 pt-0.5">
 							<Button
@@ -238,7 +327,7 @@ export function AwaitingPaymentDialog({
 								variant="outline"
 								size="sm"
 								onClick={() => {
-									navigator.clipboard.writeText(getPublicPaymentUrl(request.paymentToken!));
+									navigator.clipboard.writeText(getPublicPaymentUrl(activePaymentToken));
 									toast.success("تم نسخ رابط الدفع المباشر بنجاح");
 								}}
 								className="h-7 text-xs gap-1.5 flex-1"
@@ -246,26 +335,28 @@ export function AwaitingPaymentDialog({
 								<IconCopy className="h-3.5 w-3.5" />
 								<span>نسخ الرابط</span>
 							</Button>
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								disabled={renewMutation.isPending}
-								onClick={handleRenewLink}
-								className="h-7 text-xs gap-1 text-muted-foreground hover:text-foreground"
-							>
-								{renewMutation.isPending ? (
-									<IconLoader2 className="h-3.5 w-3.5 animate-spin" />
-								) : (
-									<IconRefresh className="h-3.5 w-3.5" />
-								)}
-								<span>تجديد الصلاحية</span>
-							</Button>
+							{request.status === "AWAITING_PAYMENT" && (
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									disabled={renewMutation.isPending}
+									onClick={handleRenewLink}
+									className="h-7 text-xs gap-1 text-muted-foreground hover:text-foreground"
+								>
+									{renewMutation.isPending ? (
+										<IconLoader2 className="h-3.5 w-3.5 animate-spin" />
+									) : (
+										<IconRefresh className="h-3.5 w-3.5" />
+									)}
+									<span>تجديد الصلاحية</span>
+								</Button>
+							)}
 							<Button
 								type="button"
 								variant="ghost"
 								size="sm"
-								onClick={() => window.open(getPublicPaymentUrl(request.paymentToken!), "_blank")}
+								onClick={() => window.open(getPublicPaymentUrl(activePaymentToken), "_blank")}
 								className="h-7 text-xs gap-1 text-muted-foreground hover:text-foreground px-2"
 							>
 								<IconExternalLink className="h-3.5 w-3.5" />
@@ -275,23 +366,54 @@ export function AwaitingPaymentDialog({
 				)}
 
 				{/* سويتش تضمين رسالة لولي الأمر */}
-				<div className="flex items-center justify-between pt-1">
-					<div className="flex flex-col gap-0.5">
-						<label
-							htmlFor="enable-msg-awaiting-payment"
-							className="text-xs font-bold text-zinc-800 dark:text-zinc-200 cursor-pointer"
-						>
-							تضمين رسالة لولي الأمر
-						</label>
-						<span className="text-[10px] text-muted-foreground">
-							{enableMessage ? "سيتم حفظ الرسالة وإشعار ولي الأمر" : "لن يتم إرسال أي نص مكتوب"}
-						</span>
+				<div className="space-y-2 pt-1">
+					<div className="flex items-center justify-between">
+						<div className="flex flex-col gap-0.5">
+							<label
+								htmlFor="enable-msg-awaiting-payment"
+								className="text-xs font-bold text-zinc-800 dark:text-zinc-200 cursor-pointer"
+							>
+								تضمين رسالة لولي الأمر
+							</label>
+							<span className="text-[10px] text-muted-foreground">
+								{enableMessage ? "سيتم حفظ الرسالة وإشعار ولي الأمر" : "لن يتم إرسال أي نص مكتوب"}
+							</span>
+						</div>
+						<Switch
+							id="enable-msg-awaiting-payment"
+							checked={enableMessage}
+							onCheckedChange={setEnableMessage}
+						/>
 					</div>
-					<Switch
-						id="enable-msg-awaiting-payment"
-						checked={enableMessage}
-						onCheckedChange={setEnableMessage}
-					/>
+
+					{/* سطر بسيط للتنبيه بتحديد الباقة أولاً أو عرض الباقة المعتمدة للرسالة */}
+					{!hasAssignedPlan ? (
+						<div className="flex items-center justify-between gap-2 rounded-lg border border-amber-200/90 dark:border-amber-800/70 bg-amber-50/70 dark:bg-amber-950/30 px-2.5 py-2 text-[11px]">
+							<div className="flex items-center gap-1.5 text-amber-800 dark:text-amber-200 font-medium min-w-0">
+								<IconInfoCircle className="size-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
+								<span>يجب تحديد الباقة الأكاديمية للطالب أولاً قبل النقل إلى بانتظار الدفع.</span>
+							</div>
+							{onOpenAssignPlan && (
+								<button
+									type="button"
+									onClick={onOpenAssignPlan}
+									className="font-bold text-primary hover:underline shrink-0 cursor-pointer"
+								>
+									تحديد الباقة
+								</button>
+							)}
+						</div>
+					) : (
+						<div className="flex items-center justify-between gap-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/50 px-2.5 py-1.5 text-[11px]">
+							<span className="text-muted-foreground truncate">
+								الباقة المعتمدة:{" "}
+								<strong className="text-zinc-900 dark:text-zinc-100">{assignedPlanName}</strong>
+							</span>
+							<span className="font-mono font-bold text-zinc-900 dark:text-zinc-100 shrink-0">
+								{formatMoneyNumber(assignedPlanAmount)} {currency}
+							</span>
+						</div>
+					)}
 				</div>
 
 				{enableMessage && (
@@ -312,7 +434,10 @@ export function AwaitingPaymentDialog({
 							</div>
 							<Textarea
 								value={messageText}
-								onChange={(e) => setMessageText(e.target.value)}
+								onChange={(e) => {
+									setMessageEditedManually(true);
+									setMessageText(e.target.value);
+								}}
 								placeholder="مرحباً، يسعدنا إبلاغكم باجتياز الطالب مرحلة المقابلة..."
 								className="min-h-36 text-xs leading-relaxed resize-none font-sans"
 							/>
@@ -452,7 +577,11 @@ export function AwaitingPaymentDialog({
 					<Button
 						size="sm"
 						onClick={handleSubmit}
-						disabled={awaitingPaymentMutation.isPending || (enableMessage && !messageText.trim())}
+						disabled={
+							awaitingPaymentMutation.isPending ||
+							!hasAssignedPlan ||
+							(enableMessage && !messageText.trim())
+						}
 						className="h-8 text-xs font-semibold px-4 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white shadow-2xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						{awaitingPaymentMutation.isPending ? (

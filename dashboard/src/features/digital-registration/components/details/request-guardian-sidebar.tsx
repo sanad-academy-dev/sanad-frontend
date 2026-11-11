@@ -160,17 +160,11 @@ export function RequestGuardianSidebar({
 		request.assessmentAppointment
 	);
 
-	const isRemote =
-		request.interviewMode === "REMOTE" ||
-		request.channel === "CALL" ||
-		request.learningMode === "ONLINE" ||
-		Boolean(request.learningMode?.includes("عن بعد"));
+	const isRemote = request.interviewMode
+		? request.interviewMode === "REMOTE"
+		: request.channel === "CALL";
 
-	const sessionLocationLabel = isRemote
-		? "مكالمة فيديو"
-		: request.roomName
-		? `في المركز (${request.roomName})`
-		: "في المركز";
+	const sessionLocationLabel = isRemote ? "عبر اتصال" : "في الأكاديمية";
 
 	return (
 		<aside
@@ -247,8 +241,8 @@ export function RequestGuardianSidebar({
 								className={cn(
 									"text-[10px] font-medium px-2 py-0.5 rounded shrink-0",
 									isRemote
-										? "text-blue-600 bg-blue-50 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40"
-										: "text-zinc-700 bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-700",
+										? "text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/70 dark:border-emerald-800/40"
+										: "text-blue-700 bg-blue-50 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/70 dark:border-blue-900/40",
 								)}
 							>
 								{sessionLocationLabel}

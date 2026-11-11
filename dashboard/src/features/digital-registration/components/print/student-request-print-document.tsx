@@ -1,5 +1,6 @@
 import React from "react";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
+import { computeAgeLabel } from "../../utils/date-format";
 
 interface StudentRequestPrintDocumentProps {
 	request: CampaignRequestItem;
@@ -42,21 +43,8 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 		timeZone: "Africa/Cairo",
 	}).format(new Date());
 
-	// Compute student age from birthDate or fallback to ageLabel
-	const computeAge = () => {
-		if (request.ageLabel) return request.ageLabel;
-		if (!request.birthDate) return "غير مسجل";
-		try {
-			const b = new Date(request.birthDate);
-			if (isNaN(b.getTime())) return request.birthDate;
-			const ageDiff = Date.now() - b.getTime();
-			const ageDate = new Date(ageDiff);
-			const years = Math.abs(ageDate.getUTCFullYear() - 1970);
-			return `${years} سنوات`;
-		} catch {
-			return "غير مسجل";
-		}
-	};
+	// حساب عمر الطالب بدقة من تاريخ الميلاد
+	const computeAge = () => computeAgeLabel(request.birthDate, request.ageLabel);
 
 	return (
 		<div

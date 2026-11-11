@@ -34,6 +34,20 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { REGISTRATION_TRACKS } from "@/lib/registration-tracks";
+
+function computeAge(dateStr?: string | null): number | null {
+  if (!dateStr) return null;
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return null;
+  const now = new Date();
+  let years = now.getFullYear() - d.getFullYear();
+  const m = now.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < d.getDate())) {
+    years--;
+  }
+  return years > 0 ? years : null;
+}
 
 const useIsomorphicLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
@@ -182,6 +196,40 @@ function IntroHeader({ onClose }: { onClose?: () => void }) {
   );
 }
 
+function computeWebsiteQuizStats(params: {
+  c1: string | null;
+  c2: string | null;
+  c3: string | null;
+  c4: string | null;
+  c5: string[];
+  c6: string | null;
+  c7: string | null;
+  c10: string | null;
+}) {
+  const c5Labels: Record<string, string> = { idea: "فكرة", execute: "تنفيذ", test: "اختبار" };
+  const c5Formatted =
+    params.c5 && params.c5.length > 0
+      ? params.c5.map((step) => c5Labels[step] || step).join(" -> ")
+      : "";
+
+  const quizCorrectCount = [
+    params.c1 === "30",
+    params.c2 === "1",
+    params.c3 === "16",
+    params.c4 === "1",
+    c5Formatted === "فكرة -> تنفيذ -> اختبار",
+    params.c6 === "10",
+    params.c7 === "1",
+    params.c10 === "1",
+  ].filter(Boolean).length;
+
+  return {
+    c5Formatted,
+    quizCorrectCount,
+    score: Math.round((quizCorrectCount / 8) * 100),
+  };
+}
+
 export function MultiStepForm({
   className,
   onCreate,
@@ -196,6 +244,8 @@ export function MultiStepForm({
   const [direction, setDirection] = useState<1 | -1>(1);
 
   // Form State
+  const [birthDate, setBirthDate] = useState<string>("");
+  const [selectedTrack, setSelectedTrack] = useState<string>("البرمجة والمنطق");
   const [age, setAge] = useState<number | null>(null);
   const [q1, setQ1] = useState<string | null>(null);
   const [q2, setQ2] = useState<string | null>(null);
@@ -242,6 +292,18 @@ export function MultiStepForm({
             } else {
               if (req.studentName) {
                 setChildrenList([{ name: req.studentName, age: "" }]);
+              }
+              if (req.birthDate) {
+                const bStr = req.birthDate.split("T")[0];
+                setBirthDate(bStr);
+                const computed = computeAge(bStr);
+                if (computed) {
+                  setAge(computed);
+                  setChildrenList([{ name: req.studentName || "", age: `${computed}` }]);
+                }
+              }
+              if (req.proposedTrack || req.targetClass) {
+                setSelectedTrack(req.proposedTrack || req.targetClass);
               }
               if (req.guardianName) {
                 setParentName(req.guardianName);
@@ -321,10 +383,39 @@ export function MultiStepForm({
 
   const handleSetAge = (chosenAge: number) => {
     setAge(chosenAge);
+    const currentYear = new Date().getFullYear();
+    const approxYear = currentYear - chosenAge;
+    const monthDay = birthDate && birthDate.length >= 10 ? birthDate.slice(4) : "-01-01";
+    const newDate = `${approxYear}${monthDay.length === 6 ? monthDay : "-01-01"}`;
+    setBirthDate(newDate);
     setChildrenList((prev) => [
       { name: prev[0]?.name || "", age: `${chosenAge}` },
     ]);
   };
+
+  const handleBirthDateChange = (dateVal: string) => {
+    setBirthDate(dateVal);
+    if (dateVal) {
+      const calculated = computeAge(dateVal);
+      if (calculated !== null) {
+        setAge(calculated);
+        setChildrenList((prev) => [
+          { name: prev[0]?.name || "", age: `${calculated}` },
+        ]);
+      }
+    }
+  };
+
+  const { c5Formatted, score } = computeWebsiteQuizStats({
+    c1,
+    c2,
+    c3,
+    c4,
+    c5,
+    c6,
+    c7,
+    c10,
+  });
 
   const handleConfirmBooking = async () => {
     setIsSubmitting(true);
@@ -335,27 +426,167 @@ export function MultiStepForm({
 			setSubmitError("يرجى إدخال اسم الطفل واسم ولي الأمر ورقم الهاتف قبل الإرسال.");
 			return;
 		}
-      const ageVal = student.age ? `${student.age} سنوات` : age ? `${age} سنوات` : null;
+      const computedAge = age || (birthDate ? computeAge(birthDate) : null);
+      const ageVal = computedAge ? `${computedAge} سنوات` : null;
 
       // تحديد الفترة المفضلة بناءً على الوقت المختار (ضمن ساعات عمل الأكاديمية 09:00 ص إلى 08:00 م)
       const isMorning = bookingTime ? (bookingTime.includes("ص") && !bookingTime.startsWith("12")) : true;
       const preferredShift = isMorning ? "MORNING" : "EVENING";
 
-      // تجميع إجابات أسئلة التقييم الأولي في هيكل بيانات منظم ومتكامل
-      const answers: { category: string; question: string; answer: string }[] = [];
-      if (c1) answers.push({ category: "المسار المستهدف", question: "المسار الأكاديمي أو التأهيلي المقترح", answer: c1 });
-      if (c2) answers.push({ category: "أهداف ولي الأمر", question: "الهدف الأساسي من التسجيل", answer: c2 });
-      if (c3) answers.push({ category: "التفاعل والتواصل", question: "مستوى التفاعل الاجتماعي مع المحيطين", answer: c3 });
-      if (c4) answers.push({ category: "اللغة والنطق", question: "التعبير اللغوي ووضوح الكلمات", answer: c4 });
-      if (c5 && c5.length > 0) answers.push({ category: "المهارات المستهدفة", question: "أهم المهارات المطلوب تطويرها", answer: c5.join("، ") });
-      if (c6) answers.push({ category: "السلوك والانتباه", question: "القدرة على التركيز والانضباط", answer: c6 });
-      if (c7) answers.push({ category: "الاستيعاب والتعلم", question: "سرعة الاستجابة للتعليمات", answer: c7 });
-      if (c10) answers.push({ category: "ملاحظات إضافية", question: "أي ملاحظات أو احتياجات إضافية", answer: c10 });
+      // تحديد المستوى المهارى بدقة من إجابة ولي الأمر على سؤال الخبرة السابقة (q2)
+      // 1: لا يوجد بعد -> مبتدئ | 2: خبرة بسيطة -> متوسط | 3: خبرة جيدة -> متقدم
+      const experienceLevel = q2 === "3" ? "متقدم" : q2 === "2" ? "متوسط" : "مبتدئ";
+
+      // تجميع إجابات الأسئلة الـ 11 كاملةً بنصوصها الفعلية ونتائجها الدقيقة
+      const q1Labels: Record<string, string> = { "1": "الألعاب والقصص", "2": "الرسم والتصميم", "3": "الروبوتات والآلات", "4": "الأرقام والألغاز" };
+      const q2Labels: Record<string, string> = { "1": "لا يوجد بعد", "2": "خبرة بسيطة", "3": "خبرة جيدة" };
+      const q3Labels: Record<string, string> = { "1": "مهارات المستقبل", "2": "الإبداع والثقة", "3": "التفوق الدراسي", "4": "استثمار وقته بفائدة" };
+      const c2Labels: Record<string, string> = { "1": "A أكبر من C", "2": "A أصغر من C", "3": "متساويان" };
+      const c4Labels: Record<string, string> = { "1": "نموذج بسيط يعمل", "2": "شرح نظري طويل", "3": "تصميم الشعار" };
+      const c7Labels: Record<string, string> = { "1": "الصور والأمثلة", "2": "الألوان فقط", "3": "الحظ" };
+      const c10Labels: Record<string, string> = { "1": "بناء نموذج مصغر", "2": "الانتظار سنة", "3": "عدم المحاولة" };
+
+      const answers: {
+        id: number;
+        category: string;
+        question: string;
+        answer: string;
+        options?: string[];
+        correctAnswer?: string;
+        isCorrect?: boolean;
+      }[] = [];
+
+      if (q1) {
+        answers.push({
+          id: 1,
+          category: "اهتمامات الطفل",
+          question: "ما أكثر ما يجذب ابنك؟",
+          answer: q1Labels[q1] || q1,
+          options: ["الألعاب والقصص", "الرسم والتصميم", "الروبوتات والآلات", "الأرقام والألغاز"],
+        });
+      }
+      if (q2) {
+        answers.push({
+          id: 2,
+          category: "الخبرة السابقة",
+          question: "هل لديه خبرة سابقة في البرمجة أو الروبوتات؟",
+          answer: q2Labels[q2] || q2,
+          options: ["لا يوجد بعد", "خبرة بسيطة", "خبرة جيدة"],
+        });
+      }
+      if (q3) {
+        answers.push({
+          id: 3,
+          category: "أهداف ولي الأمر",
+          question: "ما هو هدفك الأساسي من انضمامه للأكاديمية؟",
+          answer: q3Labels[q3] || q3,
+          options: ["مهارات المستقبل", "الإبداع والثقة", "التفوق الدراسي", "استثمار وقته بفائدة"],
+        });
+      }
+      if (c1) {
+        answers.push({
+          id: 4,
+          category: "التسلسل والمنطق",
+          question: "أكمل المتتالية: 2، 6، 12، 20، ...",
+          answer: c1,
+          options: ["24", "28", "30"],
+          correctAnswer: "30",
+          isCorrect: c1 === "30",
+        });
+      }
+      if (c2) {
+        const c2Text = c2Labels[c2] || c2;
+        answers.push({
+          id: 5,
+          category: "التفكير التحليلي",
+          question: "إذا كان A أكبر من B، و B أكبر من C — فما علاقة A بـ C؟",
+          answer: c2Text,
+          options: ["A أكبر من C", "A أصغر من C", "متساويان"],
+          correctAnswer: "A أكبر من C",
+          isCorrect: c2 === "1",
+        });
+      }
+      if (c3) {
+        answers.push({
+          id: 6,
+          category: "الأنماط الحسابية",
+          question: "كل رقم ضعف الذي قبله: 1، 2، 4، 8، ... ما التالي؟",
+          answer: c3,
+          options: ["10", "12", "16"],
+          correctAnswer: "16",
+          isCorrect: c3 === "16",
+        });
+      }
+      if (c4) {
+        const c4Text = c4Labels[c4] || c4;
+        answers.push({
+          id: 7,
+          category: "عرض الفكرة والتواصل",
+          question: "لديك 5 دقائق لعرض فكرتك — بمَ تبدأ؟",
+          answer: c4Text,
+          options: ["نموذج بسيط يعمل", "شرح نظري طويل", "تصميم الشعار"],
+          correctAnswer: "نموذج بسيط يعمل",
+          isCorrect: c4 === "1",
+        });
+      }
+      if (c5Formatted) {
+        answers.push({
+          id: 8,
+          category: "التخطيط المنطقي",
+          question: "رتّب خطوات بناء مشروع بالترتيب الصحيح (1 ثم 2 ثم 3):",
+          answer: c5Formatted,
+          options: ["فكرة -> تنفيذ -> اختبار", "تنفيذ -> فكرة -> اختبار", "اختبار -> تنفيذ -> فكرة"],
+          correctAnswer: "فكرة -> تنفيذ -> اختبار",
+          isCorrect: c5Formatted === "فكرة -> تنفيذ -> اختبار",
+        });
+      }
+      if (c6) {
+        answers.push({
+          id: 9,
+          category: "حل المشكلات والحساب",
+          question: "أي رقم لا يقبل القسمة على 3؟",
+          answer: c6,
+          options: ["12", "10", "9"],
+          correctAnswer: "10",
+          isCorrect: c6 === "10",
+        });
+      }
+      if (c7) {
+        const c7Text = c7Labels[c7] || c7;
+        answers.push({
+          id: 10,
+          category: "الاستنتاج والذكاء الاصطناعي",
+          question: "لتعليم الحاسوب تمييز القطط، نعطيه كثيرًا من...؟",
+          answer: c7Text,
+          options: ["الصور والأمثلة", "الألوان فقط", "الحظ"],
+          correctAnswer: "الصور والأمثلة",
+          isCorrect: c7 === "1",
+        });
+      }
+      if (c10) {
+        const c10Text = c10Labels[c10] || c10;
+        answers.push({
+          id: 11,
+          category: "التطبيق العملي",
+          question: "أفضل طريقة لاختبار فكرة جديدة بسرعة؟",
+          answer: c10Text,
+          options: ["بناء نموذج مصغر", "الانتظار سنة", "عدم المحاولة"],
+          correctAnswer: "بناء نموذج مصغر",
+          isCorrect: c10 === "1",
+        });
+      }
 
       const assessmentData = {
         submittedAt: new Date().toISOString(),
-        proposedTrack: c1 || "مسار تمهيدي عام",
+        proposedTrack: selectedTrack,
         preferredShift,
+        score,
+        candidate: {
+          score,
+          confidence: score >= 80 ? "HIGH" : score >= 60 ? "MEDIUM" : "LOW",
+          track: selectedTrack,
+          recommendation: `تم إجراء التقييم الأولي عبر الموقع بنسبة إتقان ${score}%.`,
+        },
         answers,
       };
 
@@ -364,14 +595,17 @@ export function MultiStepForm({
         source: "WEBSITE",
         studentName: student.name.trim(),
         gender: "UNKNOWN",
+        birthDate: birthDate ? new Date(birthDate).toISOString() : null,
         ageLabel: ageVal,
-        targetClass: c1 ? `مسار تمهيدي (${c1})` : "مسار تمهيدي",
+        experienceLevel,
+        targetClass: selectedTrack,
+        proposedTrack: selectedTrack,
         guardianName: parentName.trim(),
         guardianPhone: phone.trim(),
         guardianEmail: email.trim() || null,
         preferredShift,
         assessmentData,
-        notes: `الموعد/الفترة المفضلة: ${getDayName(bookingDay)} ${bookingDay || ""} - ${bookingTime || "غير محدد"} (${isMorning ? "صباحي" : "مسائي"}). إجابات التقييم: مسار=${c1 || ""}, هدف=${c2 || ""}, خطوات=${c5?.join(",") || ""}`,
+        notes: `الموعد/الفترة المفضلة: ${getDayName(bookingDay)} ${bookingDay || ""} - ${bookingTime || "غير محدد"} (${isMorning ? "صباحي" : "مسائي"})`,
       };
 
 		const res = await fetch("/api/register", {
@@ -491,6 +725,10 @@ export function MultiStepForm({
                   panel={panel}
                   age={age}
                   setAge={handleSetAge}
+                  birthDate={birthDate}
+                  setBirthDate={handleBirthDateChange}
+                  selectedTrack={selectedTrack}
+                  setSelectedTrack={setSelectedTrack}
                   q1={q1}
                   setQ1={(val) => {
                     setQ1(val);
@@ -637,6 +875,10 @@ function PanelContent({
   panel,
   age,
   setAge,
+  birthDate,
+  setBirthDate,
+  selectedTrack,
+  setSelectedTrack,
   q1,
   setQ1,
   q2,
@@ -683,6 +925,10 @@ function PanelContent({
   panel: Panel;
   age: number | null;
   setAge: (age: number) => void;
+  birthDate: string;
+  setBirthDate: (d: string) => void;
+  selectedTrack: string;
+  setSelectedTrack: (t: string) => void;
   q1: string | null;
   setQ1: (q: string) => void;
   q2: string | null;
@@ -808,6 +1054,10 @@ function PanelContent({
               type="button"
               onClick={() => {
                 setAge(a);
+                const currentYear = new Date().getFullYear();
+                const approxYear = currentYear - a;
+                const newDate = `${approxYear}-01-01`;
+                setBirthDate(newDate);
                 setAgePrompt(false);
               }}
               className={cn(
@@ -1466,7 +1716,7 @@ function PanelContent({
         </div>
 
         <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
-          لتعليم الحاسوب تمييز القطط 🐱، نعطيه كثيرًا من...؟
+          لتعليم الحاسوب تمييز القطط، نعطيه كثيرًا من...؟
         </h2>
 
         <div className="flex flex-col gap-2 mt-1">
@@ -1544,6 +1794,7 @@ function PanelContent({
 
   // Panel 14: Results & Acceptance
   if (panel === 14) {
+    const { quizCorrectCount } = computeWebsiteQuizStats({ c1, c2, c3, c4, c5, c6, c7, c10 });
     return (
       <div className="flex flex-col gap-4 text-center items-center pt-1">
         <div className="flex size-12 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-2xl">
@@ -1563,12 +1814,12 @@ function PanelContent({
 
         <div className="flex items-center gap-2 sm:gap-3 w-full mt-1 justify-center">
           <div className="flex flex-col items-center justify-center gap-1 rounded-xl bg-secondary/25 py-2.5 px-3 border border-line flex-1">
-            <span className="text-xl sm:text-2xl font-bold font-mono text-primary">EN2</span>
-            <span className="text-[11px] font-medium text-muted-foreground text-center">المستوى المقترح</span>
+            <span className="text-sm sm:text-base font-bold font-heading text-primary truncate max-w-full px-1">{selectedTrack}</span>
+            <span className="text-[11px] font-medium text-muted-foreground text-center">المسار المقترح</span>
           </div>
           <div className="flex flex-col items-center justify-center gap-1 rounded-xl bg-secondary/25 py-2.5 px-3 border border-line flex-1">
             <div className="flex items-baseline gap-0.5">
-              <span className="text-xl sm:text-2xl font-bold font-mono text-primary">8</span>
+              <span className="text-xl sm:text-2xl font-bold font-mono text-primary">{quizCorrectCount}</span>
               <span className="text-xs sm:text-sm font-bold font-mono text-muted-foreground">/8</span>
             </div>
             <span className="text-[11px] font-medium text-muted-foreground text-center">نتيجتك</span>
@@ -1765,6 +2016,9 @@ function PanelContent({
       if (!childrenList[0]?.name.trim()) {
         errs.studentName = "يرجى كتابة اسم الطفل";
       }
+      if (!birthDate.trim()) {
+        errs.birthDate = "يرجى تحديد تاريخ ميلاد الطفل";
+      }
 
       setFormErrors(errs);
       if (Object.keys(errs).length === 0) {
@@ -1783,10 +2037,10 @@ function PanelContent({
           </p>
         </div>
 
-        {/* Form Fields */}
-        <div className="flex flex-col gap-3" dir="rtl">
-          {/* Parent Name */}
-          <div className="flex flex-col gap-1">
+        {/* Form Fields - 2 inputs per row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5" dir="rtl">
+          {/* 1. Parent Name */}
+          <div className="flex flex-col gap-1 min-w-0">
             <label className="text-xs font-semibold text-foreground">
               اسم ولي الأمر <span className="text-destructive">*</span>
             </label>
@@ -1801,7 +2055,12 @@ function PanelContent({
                     setFormErrors((prev) => ({ ...prev, parentName: "" }));
                   }
                 }}
-                className={cn( "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors text-right pl-3 pr-9", formErrors.parentName ? "border-destructive focus:border-destructive ring-1 ring-destructive/30" : "border-line focus:border-primary" )}
+                className={cn(
+                  "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors text-right pl-3 pr-9",
+                  formErrors.parentName
+                    ? "border-destructive focus:border-destructive ring-1 ring-destructive/30"
+                    : "border-line focus:border-primary"
+                )}
               />
               <User className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
             </div>
@@ -1812,13 +2071,18 @@ function PanelContent({
             )}
           </div>
 
-          {/* Phone Number */}
-          <div className="flex flex-col gap-1">
+          {/* 2. Phone Number */}
+          <div className="flex flex-col gap-1 min-w-0">
             <label className="text-xs font-semibold text-foreground">
               رقم الجوال <span className="text-destructive">*</span>
             </label>
             <div
-              className={cn( "relative flex items-center h-10 w-full rounded-xl border bg-secondary/20 overflow-hidden transition-colors", formErrors.phone ? "border-destructive focus-within:border-destructive ring-1 ring-destructive/30" : "border-line focus-within:border-primary" )}
+              className={cn(
+                "relative flex items-center h-10 w-full rounded-xl border bg-secondary/20 overflow-hidden transition-colors",
+                formErrors.phone
+                  ? "border-destructive focus-within:border-destructive ring-1 ring-destructive/30"
+                  : "border-line focus-within:border-primary"
+              )}
             >
               <input
                 type="tel"
@@ -1849,8 +2113,8 @@ function PanelContent({
             )}
           </div>
 
-          {/* Email */}
-          <div className="flex flex-col gap-1">
+          {/* 3. Email */}
+          <div className="flex flex-col gap-1 min-w-0">
             <label className="text-xs font-semibold text-foreground">
               البريد الإلكتروني <span className="text-destructive">*</span>
             </label>
@@ -1865,7 +2129,12 @@ function PanelContent({
                     setFormErrors((prev) => ({ ...prev, email: "" }));
                   }
                 }}
-                className={cn( "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors text-left pl-3 pr-9 font-mono", formErrors.email ? "border-destructive focus:border-destructive ring-1 ring-destructive/30" : "border-line focus:border-primary" )}
+                className={cn(
+                  "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors text-left pl-3 pr-9 font-mono",
+                  formErrors.email
+                    ? "border-destructive focus:border-destructive ring-1 ring-destructive/30"
+                    : "border-line focus:border-primary"
+                )}
                 dir="ltr"
               />
               <Mail className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
@@ -1877,53 +2146,111 @@ function PanelContent({
             )}
           </div>
 
-          {/* Children Info */}
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex flex-col gap-1 min-w-0">
-              <label className="text-xs font-semibold text-foreground">
-                اسم الطفل <span className="text-destructive">*</span>
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="اسم الطفل"
-                  value={childrenList[0]?.name || ""}
-                  onChange={(e) => {
-                    const newList = [...childrenList];
-                    if (newList[0]) newList[0].name = e.target.value;
-                    setChildrenList(newList);
-                    if (formErrors.studentName) {
-                      setFormErrors((prev) => ({ ...prev, studentName: "" }));
-                    }
-                  }}
-                  className={cn( "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors pr-9", formErrors.studentName ? "border-destructive focus:border-destructive ring-1 ring-destructive/30" : "border-line focus:border-primary" )}
-                />
-                <Smile className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
-              </div>
-              {formErrors.studentName && (
-                <span className="text-[11px] font-medium text-destructive px-1">
-                  {formErrors.studentName}
-                </span>
-              )}
+          {/* 4. Target Track */}
+          <div className="flex flex-col gap-1 min-w-0">
+            <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+              <Compass className="size-3.5 text-primary" />
+              <span>المسار الأكاديمي المطلوب</span>
+              <span className="text-destructive">*</span>
+            </label>
+            <div className="relative">
+              <select
+                value={selectedTrack}
+                onChange={(e) => setSelectedTrack(e.target.value)}
+                className="h-10 w-full rounded-xl border border-line bg-secondary/20 px-3 text-xs sm:text-sm outline-none focus:border-primary transition-colors text-right font-sans cursor-pointer"
+              >
+                {REGISTRATION_TRACKS.map((t) => (
+                  <option key={t} value={t} className="bg-card text-foreground">
+                    {t}
+                  </option>
+                ))}
+              </select>
             </div>
+          </div>
 
-            <div className="flex flex-col gap-1 min-w-0">
-              <label className="text-xs font-semibold text-foreground">عمر الطفل</label>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="مثال: 10"
-                  value={childrenList[0]?.age || (age ? `${age}` : "")}
-                  onChange={(e) => {
-                    const newList = [...childrenList];
-                    if (newList[0]) newList[0].age = e.target.value;
-                    setChildrenList(newList);
-                  }}
-                  className="h-10 w-full rounded-xl border border-line bg-secondary/20 px-3 text-xs sm:text-sm outline-none focus:border-primary transition-colors pr-9 font-mono"
-                />
-                <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
-              </div>
+          {/* 5. Child Name */}
+          <div className="flex flex-col gap-1 min-w-0">
+            <label className="text-xs font-semibold text-foreground">
+              اسم الطفل الكامل <span className="text-destructive">*</span>
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="اسم الطفل الكامل"
+                value={childrenList[0]?.name || ""}
+                onChange={(e) => {
+                  const newList = [...childrenList];
+                  if (newList[0]) newList[0].name = e.target.value;
+                  setChildrenList(newList);
+                  if (formErrors.studentName) {
+                    setFormErrors((prev) => ({ ...prev, studentName: "" }));
+                  }
+                }}
+                className={cn(
+                  "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors pr-9",
+                  formErrors.studentName
+                    ? "border-destructive focus:border-destructive ring-1 ring-destructive/30"
+                    : "border-line focus:border-primary"
+                )}
+              />
+              <Smile className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
             </div>
+            {formErrors.studentName && (
+              <span className="text-[11px] font-medium text-destructive px-1">
+                {formErrors.studentName}
+              </span>
+            )}
+          </div>
+
+          {/* 6. Child Birth Date */}
+          <div className="flex flex-col gap-1 min-w-0">
+            <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+              <span className="flex items-center gap-1">
+                <Calendar className="size-3.5 text-primary" />
+                <span>تاريخ ميلاد الطفل</span>
+                <span className="text-destructive">*</span>
+              </span>
+              {age ? (
+                <span className="text-[10px] font-bold text-primary font-mono bg-primary/10 px-1.5 py-0.5 rounded">
+                  ({age} سنوات)
+                </span>
+              ) : null}
+            </label>
+            <div className="relative">
+              <input
+                type="date"
+                max={new Date().toISOString().split("T")[0]}
+                min="2005-01-01"
+                value={birthDate}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setBirthDate(val);
+                  if (val) {
+                    const calculated = computeAge(val);
+                    if (calculated) {
+                      setAge(calculated);
+                      const newList = [...childrenList];
+                      if (newList[0]) newList[0].age = `${calculated}`;
+                      setChildrenList(newList);
+                    }
+                  }
+                  if (formErrors.birthDate) {
+                    setFormErrors((prev) => ({ ...prev, birthDate: "" }));
+                  }
+                }}
+                className={cn(
+                  "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs outline-none transition-colors font-sans text-right",
+                  formErrors.birthDate
+                    ? "border-destructive focus:border-destructive ring-1 ring-destructive/30"
+                    : "border-line focus:border-primary"
+                )}
+              />
+            </div>
+            {formErrors.birthDate && (
+              <span className="text-[11px] font-medium text-destructive px-1">
+                {formErrors.birthDate}
+              </span>
+            )}
           </div>
         </div>
 
@@ -2001,13 +2328,19 @@ function PanelContent({
           <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
             <span className="text-xs sm:text-sm font-medium text-muted-foreground">الطفل</span>
             <span className="text-xs sm:text-sm font-semibold text-foreground">
-              {childrenList[0]?.name || "-"} ({childrenList[0]?.age || age || "-"} سنوات)
+              {childrenList[0]?.name || "-"}
             </span>
           </div>
           <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground">المسار المقترح</span>
-            <span className="text-xs sm:text-sm font-semibold text-primary font-mono">
-              EN2 — مسار تمهيدي
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground">تاريخ الميلاد</span>
+            <span className="text-xs sm:text-sm font-semibold text-foreground font-mono" dir="ltr">
+              {birthDate || "-"} {age ? `(${age} سنوات)` : ""}
+            </span>
+          </div>
+          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground">المسار المطلوب</span>
+            <span className="text-xs sm:text-sm font-semibold text-primary font-bold">
+              {selectedTrack}
             </span>
           </div>
         </div>

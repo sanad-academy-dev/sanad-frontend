@@ -82,7 +82,7 @@ export function TrialModal() {
             exit={{ opacity: 0, scale: 0.96, y: 10 }}
             transition={{ duration: 0.2 }}
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-[540px] mx-auto my-auto"
+            className="w-full max-w-2xl mx-auto my-auto"
           >
             <MultiStepForm
               onCreate={() => {

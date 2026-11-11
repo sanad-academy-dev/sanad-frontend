@@ -169,3 +169,27 @@ export interface RequestNotificationItem {
 	metadata?: any;
 }
 
+export interface RegistrationPaymentReceiptData {
+	requestId: string;
+	code: string;
+	studentName: string;
+	studentCode?: string | null;
+	guardianName: string;
+	planId?: string | null;
+	planName: string;
+	includeMeals: boolean;
+	enableDailyStipend: boolean;
+	paidAt: string;
+	paymentReference: string;
+	paymentGateway: string;
+	paymentMethodType: string;
+	amount: number;
+	cashReceived: number;
+	changeAmount: number;
+	discountAmount: number;
+	currency: string;
+	collectedBy?: string | null;
+	notes?: string | null;
+	clinicName?: string | null;
+}
+

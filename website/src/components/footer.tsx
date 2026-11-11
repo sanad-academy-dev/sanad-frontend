@@ -145,9 +145,9 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="flex flex-col h-full">
+          <div className="flex min-w-0 flex-col h-full">
             <div className="grid grid-cols-2 h-full">
-              <div className="flex flex-col border-e border-line">
+              <div className="flex min-w-0 flex-col border-e border-line">
                 <div className="h-11 sm:h-12 px-3 sm:px-3.5 lg:px-6 flex items-center border-b border-line text-xs sm:text-sm font-bold text-foreground select-none">
                   استكشف
                 </div>
@@ -157,7 +157,7 @@ export default function Footer() {
                     <Link
                       key={item.label}
                       href={item.href}
-                      className="h-11 sm:h-12 px-3 sm:px-3.5 lg:px-6 flex items-center justify-between text-xs sm:text-[13px] text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary/35 group"
+                      className="h-11 sm:h-12 px-3 sm:px-3.5 lg:px-6 flex min-w-0 items-center justify-between text-xs sm:text-[13px] text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary/35 group"
                     >
                       <span className="transition-transform duration-200 group-hover:-translate-x-1 truncate">
                         {item.label}
@@ -168,7 +168,7 @@ export default function Footer() {
                 </div>
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex min-w-0 flex-col">
                 <div className="h-11 sm:h-12 px-3 sm:px-3.5 lg:px-6 flex items-center border-b border-line text-xs sm:text-sm font-bold text-foreground select-none">
                   تواصل معنا
                 </div>
@@ -177,13 +177,13 @@ export default function Footer() {
                   {CONTACT_ITEMS.map((item, idx) => {
                     const Icon = item.icon;
                     const content = (
-                      <div className="flex items-center gap-2 lg:gap-3 text-[11px] sm:text-xs lg:text-[13px] text-muted-foreground group-hover:text-foreground transition-colors min-w-0">
+                      <div className="flex items-center gap-2 lg:gap-3 text-[11px] sm:text-xs lg:text-[13px] text-muted-foreground group-hover:text-foreground transition-colors min-w-0 w-full">
                         <div
                           className={`size-6 sm:size-6.5 lg:size-7.5 rounded-lg border border-line bg-card/60 flex items-center justify-center shrink-0 text-foreground/80 transition-all duration-200 group-hover:scale-105 ${item.hoverColor}`}
                         >
                           <Icon className="size-3 sm:size-3.5 lg:size-4 transition-colors" />
                         </div>
-                        <span dir={item.dir} className="truncate">
+                        <span dir={item.dir} className="truncate min-w-0">
                           {item.label}
                         </span>
                       </div>
@@ -195,14 +195,14 @@ export default function Footer() {
                         href={item.href}
                         target={item.isExternal ? "_blank" : undefined}
                         rel={item.isExternal ? "noopener noreferrer" : undefined}
-                        className="h-11 sm:h-12 px-3 sm:px-3.5 lg:px-6 flex items-center transition-colors hover:bg-secondary/35 group"
+                        className="h-11 sm:h-12 px-3 sm:px-3.5 lg:px-6 flex min-w-0 items-center transition-colors hover:bg-secondary/35 group overflow-hidden"
                       >
                         {content}
                       </a>
                     ) : (
                       <div
                         key={idx}
-                        className="h-11 sm:h-12 px-3 sm:px-3.5 lg:px-6 flex items-center select-none"
+                        className="h-11 sm:h-12 px-3 sm:px-3.5 lg:px-6 flex min-w-0 items-center select-none overflow-hidden"
                       >
                         {content}
                       </div>
