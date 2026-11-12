@@ -145,6 +145,8 @@ export const LoyaltyLedgerEntryRelations = t.Object(
         country: __nullable__(t.String()),
         city: __nullable__(t.String()),
         address: __nullable__(t.String()),
+        emergencyContactName: __nullable__(t.String()),
+        emergencyContactPhone: __nullable__(t.String()),
         notes: __nullable__(t.String()),
         active: t.Boolean(),
         isDeleted: t.Boolean(),

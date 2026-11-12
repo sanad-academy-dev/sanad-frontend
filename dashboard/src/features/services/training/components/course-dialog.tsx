@@ -69,10 +69,15 @@ import type { CourseLocationMode, CourseType } from "@/server/training/training.
 import { useAssignTime } from "../hooks/use-assign-time";
 import {
 	useCourse,
+	useCourses,
 	useCreateCourse,
 	useSetTrainers,
 	useUpdateCourse,
 } from "../hooks/use-courses";
+import {
+	readCourseDialogSession,
+	writeCourseDialogSession,
+} from "../utils/lesson-draft";
 import { AiCourseSheet } from "./ai-course-sheet";
 import { AssignLearnersStep } from "./assign-learners-step";
 import { AssignTrackStaffSheet } from "./assign-track-staff-sheet";
@@ -85,6 +90,7 @@ import {
 	isCourseTimeValid,
 	LOCAL_TZ,
 } from "./course-time-section";
+import { DurationPickerPopover } from "./duration-picker-popover";
 
 // تجريد الملاحظات من أي وسوم داخلية لحفظ المرحلة أو البيانات لكي لا تظهر للمستخدم كنص مشوه
 const stripSystemTags = (text?: string | null): string => {
@@ -171,16 +177,6 @@ const DEFAULT_CLASSIFICATIONS = [
 	"البرمجة والمنطق",
 	"طبي وتأهيلي",
 	"تدريب تربوي",
-];
-
-const DURATION_PRESETS = [
-	"4 أسابيع",
-	"6 أسابيع",
-	"8 أسابيع",
-	"10 أسابيع",
-	"12 أسبوع",
-	"16 أسبوع",
-	"6 أشهر",
 ];
 
 const COURSE_TEMPLATES = [
@@ -294,6 +290,7 @@ const COURSE_FIELD_LABELS: Record<string, string> = {
 	duration: "المدة المقدرة",
 	selectedTrainer: "المدرب",
 	price: "السعر",
+	lessonDraft: "محتوى الدرس / الصفحة",
 };
 
 type Step = 1 | 2 | 3 | 4;
@@ -303,7 +300,7 @@ export interface CourseDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	editCourseId?: string | null;
-	onSuccess?: () => void;
+	onSuccess?: (createdId?: string) => void;
 }
 
 export function CourseDialog({
@@ -321,6 +318,7 @@ export function CourseDialog({
 
 	// جلب بيانات الدورة عند التعديل
 	const { course, isLoading: isCourseLoading } = useCourse(activeCourseId || null);
+	const { courses } = useCourses();
 
 	// الإجراءات البرمجية من الـ hooks
 	const { createCourse, isPending: isCreatingCourse } = useCreateCourse();
@@ -341,7 +339,6 @@ export function CourseDialog({
 		classifications: trackClassifications,
 		isLoading: isClassificationsLoading,
 		addClassification: addClassificationMutation,
-		deleteClassification: deleteClassificationMutation,
 		isAdding: isAddingClassification,
 	} = useTrackClassifications();
 
@@ -352,6 +349,16 @@ export function CourseDialog({
 	const [name, setName] = useState("");
 	const [code, setCode] = useState("");
 	const [description, setDescription] = useState("");
+
+	const isDuplicateName = useMemo(() => {
+		const trimmed = name.trim().toLowerCase();
+		if (!trimmed) return false;
+		return (
+			courses?.some(
+				(c) => c.name.trim().toLowerCase() === trimmed && c.id !== activeCourseId,
+			) ?? false
+		);
+	}, [courses, name, activeCourseId]);
 	const [notes, setNotes] = useState("");
 	const [category, setCategory] = useState("");
 	const [academicStage, setAcademicStage] = useState("");
@@ -400,6 +407,7 @@ export function CourseDialog({
 	const [createAnother, setCreateAnother] = useState(false);
 	const [isDiscardOpen, setIsDiscardOpen] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [hasBuilderUnsaved, setHasBuilderUnsaved] = useState(false);
 
 	// توليد كود تلقائي
 	const generateAutoCode = useCallback(() => {
@@ -424,8 +432,35 @@ export function CourseDialog({
 			setIsSubmitting(false);
 			setTimeError(undefined);
 			setPublishError(null);
+			setHasBuilderUnsaved(false);
 
-			if (editCourseId) {
+			const savedSession = readCourseDialogSession();
+			const matchesSession =
+				savedSession &&
+				(!editCourseId ||
+					savedSession.editCourseId === editCourseId ||
+					savedSession.activeCourseId === editCourseId);
+
+			if (matchesSession && savedSession) {
+				setActiveCourseId(savedSession.activeCourseId ?? editCourseId ?? null);
+				setStep(savedSession.step || 1);
+				setFurthest(savedSession.furthest || 1);
+				if (!savedSession.activeCourseId) {
+					setName(savedSession.name ?? "");
+					setCode(savedSession.code ?? generateAutoCode());
+					setDescription(savedSession.description ?? "");
+					setNotes(savedSession.notes ?? "");
+					setCategory(savedSession.category ?? "");
+					setAcademicStage(savedSession.academicStage ?? "");
+					setDuration(savedSession.duration ?? "");
+					setPrice(savedSession.price);
+					setInstitution(savedSession.institution ?? "");
+					setLocationMode(savedSession.locationMode ?? "ONLINE");
+					setCourseType(savedSession.courseType ?? "ONLINE");
+					setSelectedIcon(savedSession.selectedIcon ?? "cube");
+					setSelectedColor(savedSession.selectedColor ?? "blue");
+				}
+			} else if (editCourseId) {
 				setActiveCourseId(editCourseId);
 				setStep(1);
 				setFurthest(4);
@@ -454,8 +489,53 @@ export function CourseDialog({
 		} else if (!open) {
 			prevOpenRef.current = false;
 			initializedForEditRef.current = null;
+			setHasBuilderUnsaved(false);
 		}
 	}, [open, editCourseId, generateAutoCode]);
+
+	// حفظ جلسة النافذة في sessionStorage لاستعادة الخطوة والمحتوى عند إعادة تحميل المتصفح بالخطأ
+	useEffect(() => {
+		if (!open) return;
+		writeCourseDialogSession({
+			editCourseId: editCourseId ?? null,
+			activeCourseId,
+			step,
+			furthest,
+			name,
+			code,
+			description,
+			notes,
+			category,
+			academicStage,
+			duration,
+			price,
+			institution,
+			locationMode,
+			courseType,
+			selectedIcon,
+			selectedColor,
+			updatedAt: Date.now(),
+		});
+	}, [
+		open,
+		editCourseId,
+		activeCourseId,
+		step,
+		furthest,
+		name,
+		code,
+		description,
+		notes,
+		category,
+		academicStage,
+		duration,
+		price,
+		institution,
+		locationMode,
+		courseType,
+		selectedIcon,
+		selectedColor,
+	]);
 
 	// تعبئة البيانات عند جلب الدورة في وضع التعديل
 	useEffect(() => {
@@ -614,9 +694,10 @@ export function CourseDialog({
 		};
 	}, [name]);
 
-	// فحص التعديلات غير المحفوظة في الخطوة الأولى
+	// فحص التعديلات غير المحفوظة (الخطوة الأولى أو محرر المحتوى في الخطوة الثانية)
 	const isDirty = useMemo(() => {
-		if (step > 1) return false;
+		if (step === 2) return hasBuilderUnsaved;
+		if (step > 2) return false;
 		if (isEdit && course) {
 			const originalStaffKey = (course.trainers || [])
 				.map((t) => (t as unknown as { staffId?: string; id?: string }).staffId || t.id)
@@ -644,6 +725,7 @@ export function CourseDialog({
 		);
 	}, [
 		step,
+		hasBuilderUnsaved,
 		name,
 		description,
 		notes,
@@ -703,13 +785,18 @@ export function CourseDialog({
 		toast.success(`تم تطبيق قالب "${tpl.title}"`);
 	};
 
+	const closeDialogCleanly = useCallback(() => {
+		writeCourseDialogSession(null);
+		onOpenChange(false);
+	}, [onOpenChange]);
+
 	const handleCloseAttempt = useCallback(() => {
 		if (isDirty) {
 			setIsDiscardOpen(true);
 		} else {
-			onOpenChange(false);
+			closeDialogCleanly();
 		}
-	}, [isDirty, onOpenChange]);
+	}, [isDirty, closeDialogCleanly]);
 
 	// إضافة تصنيف مخصص
 	const handleAddCustomClassification = (
@@ -770,6 +857,9 @@ export function CourseDialog({
 
 	// إنشاء الدورة في قاعدة البيانات بصورة كسولة (فقط عند حفظ محتوى أو حفظ كمسودة أو النشر)
 	const ensureCourseCreated = async (): Promise<string> => {
+		if (isDuplicateName) {
+			throw new Error("اسم الدورة التدريبية مسجّل مسبقاً، يرجى اختيار اسم آخر");
+		}
 		let estimatedWeeks: number | undefined;
 		if (duration) {
 			const match = duration.match(/(\d+)/);
@@ -844,13 +934,18 @@ export function CourseDialog({
 			return;
 		}
 
+		if (isDuplicateName) {
+			toast.error("اسم الدورة التدريبية مسجّل مسبقاً، يرجى اختيار اسم آخر");
+			return;
+		}
+
 		if (directSaveOnly) {
 			setIsSubmitting(true);
 			try {
-				await ensureCourseCreated();
+				const createdId = await ensureCourseCreated();
 				toast.success("تم حفظ بيانات الدورة بنجاح");
-				onSuccess?.();
-				onOpenChange(false);
+				onSuccess?.(createdId);
+				closeDialogCleanly();
 			} catch (err: unknown) {
 				const errorMsg =
 					err instanceof Error ? err.message : "حدث خطأ أثناء حفظ الدورة التدريبية";
@@ -907,7 +1002,7 @@ export function CourseDialog({
 			if (step === 3 && isCourseTimeValid(time)) persistTime();
 			toast.success("تم نشر الدورة التدريبية بنجاح");
 			onSuccess?.();
-			onOpenChange(false);
+			closeDialogCleanly();
 		} catch (err: unknown) {
 			const msg = err instanceof Error ? err.message : "تعذّر نشر الدورة";
 			toast.error(msg);
@@ -924,7 +1019,7 @@ export function CourseDialog({
 			if (currentId && step === 3 && isCourseTimeValid(time)) persistTime();
 			toast.success("تم حفظ المسودة بنجاح");
 			onSuccess?.();
-			onOpenChange(false);
+			closeDialogCleanly();
 		} catch (err: unknown) {
 			const errorMsg =
 				err instanceof Error ? err.message : "حدث خطأ أثناء حفظ المسودة";
@@ -945,6 +1040,7 @@ export function CourseDialog({
 			>
 				<DialogContent
 					showCloseButton={false}
+					aria-describedby={undefined}
 					className={cn(
 						"p-0 gap-0 overflow-hidden border border-border shadow-2xl transition-all duration-300 flex flex-col",
 						// يتمدد إلى العرض والارتفاع الكامل في الخطوة الثانية (باني المحتوى الكبير)
@@ -971,6 +1067,12 @@ export function CourseDialog({
 					onEscapeKeyDown={(e) => {
 						if (isStaffSheetOpen || isAiSheetOpen) {
 							e.preventDefault();
+							return;
+						}
+						// في الخطوة 2 قد يضغط المستخدم Esc لإغلاق قائمة BlockNote — لا نخرجه قسرًا للخطوة 1
+						if (step === 2) {
+							e.preventDefault();
+							if (hasBuilderUnsaved) setIsDiscardOpen(true);
 							return;
 						}
 						if (step > 1) {
@@ -1307,10 +1409,19 @@ export function CourseDialog({
 													value={name}
 													onChange={(e) => setName(e.target.value)}
 													placeholder="مثال: البرمجه للأطفال"
-													className="w-full h-10 text-xs text-right font-medium"
+													className={cn(
+														"w-full h-10 text-xs text-right font-medium",
+														isDuplicateName && "border-destructive focus-visible:ring-destructive",
+													)}
 													required
 													autoFocus
 												/>
+												{isDuplicateName && (
+													<p className="text-[11px] text-destructive font-medium mt-1 flex items-center gap-1">
+														<IconAlertCircle className="size-3 shrink-0" />
+														<span>اسم الدورة مسجّل مسبقاً، يرجى اختيار اسم آخر فريد</span>
+													</p>
+												)}
 											</div>
 										</div>
 									</div>
@@ -1550,48 +1661,25 @@ export function CourseDialog({
 															جاري التحميل...
 														</div>
 													) : (
-														activeTrackClassifications.map((item) => {
-															const trackObj = (trackClassifications || []).find(
-																(t) => t.name === item,
-															);
-															const isCustom = trackObj ? !trackObj.isDefault : true;
-															return (
-																<div
-																	key={item}
-																	onClick={() => setCategory(item)}
-																	className={cn(
-																		"relative flex cursor-pointer select-none items-center justify-between rounded-sm px-2 py-1.5 text-xs outline-none transition-colors hover:bg-accent hover:text-accent-foreground group",
-																		category === item && "bg-accent/60 font-medium",
-																	)}
-																>
-																	<div className="flex items-center gap-1.5 min-w-0">
-																		<span>{item}</span>
-																		{category === item && (
-																			<IconCheck className="size-3.5 text-primary shrink-0" />
-																		)}
-																	</div>
-
-																	{isCustom && (
-																		<button
-																			type="button"
-																			title="حذف هذا التصنيف"
-																			onClick={(e) => {
-																				e.preventDefault();
-																				e.stopPropagation();
-																				if (category === item) setCategory("");
-																				setClassificationsList((prev) =>
-																					prev.filter((c) => c !== item),
-																				);
-																				deleteClassificationMutation(item);
-																			}}
-																			className="opacity-50 hover:opacity-100 hover:text-destructive p-0.5 rounded transition-opacity"
-																		>
-																			<IconX className="size-3.5" />
-																		</button>
+														activeTrackClassifications.map((item) => (
+															// biome-ignore lint/a11y/noStaticElementInteractions: dropdown option
+															// biome-ignore lint/a11y/useKeyWithClickEvents: dropdown option
+															<div
+																key={item}
+																onClick={() => setCategory(item)}
+																className={cn(
+																	"relative flex cursor-pointer select-none items-center justify-between rounded-sm px-2 py-1.5 text-xs outline-none transition-colors hover:bg-accent hover:text-accent-foreground group",
+																	category === item && "bg-accent/60 font-medium",
+																)}
+															>
+																<div className="flex items-center gap-1.5 min-w-0">
+																	<span>{item}</span>
+																	{category === item && (
+																		<IconCheck className="size-3.5 text-primary shrink-0" />
 																	)}
 																</div>
-															);
-														})
+															</div>
+														))
 													)}
 												</div>
 											</DropdownMenuContent>
@@ -1615,56 +1703,13 @@ export function CourseDialog({
 											</span>
 										</Button>
 
-										{/* 4. المدة المقدرة */}
-										<DropdownMenu dir="rtl" modal={false}>
-											<DropdownMenuTrigger asChild>
-												<Button
-													type="button"
-													variant={duration ? "secondary" : "outline"}
-													size="sm"
-													className="gap-1.5 h-8 text-xs font-normal"
-												>
-													<IconClock className="size-3.5 shrink-0 text-muted-foreground" />
-													<span>{duration ? `... ${duration}` : "... المدة المقدرة"}</span>
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent align="end" className="w-44! min-w-44 p-1.5">
-												<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
-													المدة المقدرة للدورة
-												</DropdownMenuLabel>
-												<DropdownMenuSeparator className="my-1" />
-
-												<DropdownMenuItem
-													onClick={() => setDuration("")}
-													className={cn(
-														"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md",
-														!duration && "bg-muted font-medium text-foreground",
-													)}
-												>
-													<span>بدون مدة</span>
-													{!duration && <IconCheck className="size-3.5 text-primary" />}
-												</DropdownMenuItem>
-												<DropdownMenuSeparator className="my-1" />
-
-												<div className="max-h-48 overflow-y-auto space-y-0.5">
-													{DURATION_PRESETS.map((d) => (
-														<DropdownMenuItem
-															key={d}
-															onClick={() => setDuration(d)}
-															className={cn(
-																"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md",
-																duration === d && "bg-muted font-medium text-foreground",
-															)}
-														>
-															<span>{d}</span>
-															{duration === d && (
-																<IconCheck className="size-3.5 text-primary" />
-															)}
-														</DropdownMenuItem>
-													))}
-												</div>
-											</DropdownMenuContent>
-										</DropdownMenu>
+										{/* 4. المدة المقدرة بحقلين منظمين (العدد + الوحدة) */}
+										<DurationPickerPopover
+											value={duration}
+											onChange={setDuration}
+											placeholder="... المدة المقدرة"
+											title="فترة الدورة التدريبية"
+										/>
 
 										{/* 5. زر الخيارات الإضافية (...) */}
 										<DropdownMenu dir="rtl" modal={false}>
@@ -1840,6 +1885,7 @@ export function CourseDialog({
 										courseId={activeCourseId}
 										onGenerateAI={() => setIsAiSheetOpen(true)}
 										onEnsureCourseCreated={ensureCourseCreated}
+										onDirtyChange={setHasBuilderUnsaved}
 									/>
 								</div>
 
@@ -1880,7 +1926,7 @@ export function CourseDialog({
 											type="button"
 											variant="outline"
 											size="sm"
-											onClick={() => onOpenChange(false)}
+											onClick={handleCloseAttempt}
 											className="text-xs font-medium"
 										>
 											إلغاء
@@ -2030,15 +2076,21 @@ export function CourseDialog({
 				</DialogContent>
 			</Dialog>
 
-			{/* نافذة تأكيد الخروج مع وجود بيانات غير محفوظة في الخطوة الأولى */}
+			{/* نافذة تأكيد الخروج مع وجود بيانات أو مسودة غير محفوظة */}
 			<DiscardConfirmDialog
 				open={isDiscardOpen}
-				filledFields={filledFields}
+				filledFields={step === 2 ? ["lessonDraft"] : filledFields}
 				fieldLabels={COURSE_FIELD_LABELS}
-				resumeLabel="متابعة إنشاء الدورة"
+				title={step === 2 ? "توجد صفحة / مسودة قيد الكتابة" : "بيانات غير محفوظة"}
+				description={
+					step === 2
+						? "تم حفظ ما كتبته كمسودة محلية لتتمكن من إكماله عند العودة، هل تريد الخروج من نافذة الدورة الآن؟"
+						: "ستفقد البيانات المدخلة إذا خرجت الآن"
+				}
+				resumeLabel={step === 2 ? "متابعة تحرير الصفحة" : "متابعة إنشاء الدورة"}
 				onDiscard={() => {
 					setIsDiscardOpen(false);
-					onOpenChange(false);
+					closeDialogCleanly();
 				}}
 				onResume={() => setIsDiscardOpen(false)}
 			/>

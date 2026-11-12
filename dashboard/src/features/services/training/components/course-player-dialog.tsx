@@ -16,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { AssignmentResponse } from "@/server/course-assignments/course-assignments.type";
 import type { CourseDetailResponse, UnitResponse } from "@/server/training/training.type";
+import { LessonContentsPreview } from "./lesson-preview";
 
 type Lesson = UnitResponse["lessons"][number];
 
@@ -270,19 +271,7 @@ export function CoursePlayerDialog({
 									<h3 className="text-[14px] font-bold text-[#08090A]">{selected.title}</h3>
 								</div>
 								<div className="min-h-[200px] rounded-[4px] border-[0.75px] border-[#E5E5E5] p-4">
-									{selected.content?.trim() ? (
-										<p className="whitespace-pre-wrap text-right text-[12px] leading-[22px] text-[#08090A]">
-											{selected.content}
-										</p>
-									) : selected.description?.trim() ? (
-										<p className="text-right text-[12px] leading-[22px] text-[#08090A]">
-											{selected.description}
-										</p>
-									) : (
-										<p className="text-right text-[12px] text-muted-foreground">
-											محتوى هذا الدرس من نوع «{lessonTypeLabel(selected.type)}».
-										</p>
-									)}
+									<LessonContentsPreview lesson={selected} />
 								</div>
 							</div>
 						) : (

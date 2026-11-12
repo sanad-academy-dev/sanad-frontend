@@ -226,17 +226,8 @@ function RouteComponent() {
 			<div className="flex flex-1 flex-col overflow-hidden">
 				{tab === "invoices" && (
 					<>
-						{/* [P5-UI-fix] «الفواتير» and «فواتير المبيعات» now sit one tab apart; each
-						    screen states its own scope so the two are never mistaken for one list.
-						    Contract C3: this is the OPERATIONAL doc — it does not post to the ledger. */}
-						<div className="px-[9px] pt-3">
-							<h1 className="font-medium text-lg">الفواتير</h1>
-							<p className="text-muted-foreground text-sm">
-								فواتير الحجوزات والدورات — التشغيل اليومي للأكاديمية.
-							</p>
-						</div>
 						<Stats
-							className="px-[9px]"
+							className="px-[9px] pt-2"
 							stats={financeStats}
 							variant="inventory"
 						/>
@@ -258,42 +249,11 @@ function RouteComponent() {
 
 				{tab === "discounts" && <DiscountsTab />}
 
-				{tab === "care-plans" && (
-					<>
-						<div className="px-[9px] pt-3">
-							<h1 className="font-medium text-lg">الخطط التعليمية</h1>
-							<p className="text-muted-foreground text-sm">
-								إدارة باقات وخطط الرعاية والتعليم ومتابعة تفاصيلها.
-							</p>
-						</div>
-						<CarePlansTab />
-					</>
-				)}
+				{tab === "care-plans" && <CarePlansTab />}
 
-				{tab === "enrollments" && (
-					<>
-						<div className="px-[9px] pt-3">
-							<h1 className="font-medium text-lg">الاشتراكات</h1>
-							<p className="text-muted-foreground text-sm">
-								متابعة اشتراكات الطلاب في الخطط التعليمية ومعدل التقدم.
-							</p>
-						</div>
-						<hr className="my-2" />
-						<EnrollmentsTab />
-					</>
-				)}
+				{tab === "enrollments" && <EnrollmentsTab />}
 
-				{tab === "expenses" && (
-					<>
-						<div className="px-[9px] pt-3">
-							<h1 className="font-medium text-lg">المصروفات</h1>
-							<p className="text-muted-foreground text-sm">
-								إدارة وتتبع طلبات الصرف والمصروفات التشغيلية.
-							</p>
-						</div>
-						<ExpensesTab />
-					</>
-				)}
+				{tab === "expenses" && <ExpensesTab />}
 
 				{/* Full invoice pay modal */}
 				{payTarget && !successInvoice && (

@@ -81,14 +81,6 @@ export const BankReportsPage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">تقارير البنوك</h1>
-				<p className="text-muted-foreground text-sm">
-					FR-14.5 — كشف التسوية البنكية (رصيد الدفاتر مقابل رصيد البنك مع تفسير الفرق)، وملخص
-					المقاصة لكل سندات الحساب البنكي.
-				</p>
-			</div>
-
 			{/* toolbar — pills + bank account + dates */}
 			<div className="flex flex-wrap items-center gap-2 border-t px-4 py-3">
 				<div className="flex items-center gap-1">

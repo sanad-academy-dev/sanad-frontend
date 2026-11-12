@@ -97,7 +97,7 @@ export declare const trainingModel: Elysia<"", {
             status: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"DRAFT">, import("@sinclair/typebox").TLiteral<"PUBLISHED">]>>;
             lessons: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TArray<import("@sinclair/typebox").TObject<{
                 title: import("@sinclair/typebox").TString;
-                type: import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"TEXT">, import("@sinclair/typebox").TLiteral<"VIDEO">, import("@sinclair/typebox").TLiteral<"DOCUMENT">, import("@sinclair/typebox").TLiteral<"QUIZ">, import("@sinclair/typebox").TLiteral<"SURVEY">, import("@sinclair/typebox").TLiteral<"AUDIO">]>;
+                type: import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"TEXT">, import("@sinclair/typebox").TLiteral<"PAGE">, import("@sinclair/typebox").TLiteral<"VIDEO">, import("@sinclair/typebox").TLiteral<"DOCUMENT">, import("@sinclair/typebox").TLiteral<"QUIZ">, import("@sinclair/typebox").TLiteral<"SURVEY">, import("@sinclair/typebox").TLiteral<"AUDIO">]>;
                 description: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
                 mediaSource: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"DEVICE">, import("@sinclair/typebox").TLiteral<"URL">]>]>>;
                 mediaKey: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
@@ -122,7 +122,7 @@ export declare const trainingModel: Elysia<"", {
         readonly "training.createLesson": import("@sinclair/typebox").TObject<{
             unitId: import("@sinclair/typebox").TString;
             title: import("@sinclair/typebox").TString;
-            type: import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"TEXT">, import("@sinclair/typebox").TLiteral<"VIDEO">, import("@sinclair/typebox").TLiteral<"DOCUMENT">, import("@sinclair/typebox").TLiteral<"QUIZ">, import("@sinclair/typebox").TLiteral<"SURVEY">, import("@sinclair/typebox").TLiteral<"AUDIO">]>;
+            type: import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"TEXT">, import("@sinclair/typebox").TLiteral<"PAGE">, import("@sinclair/typebox").TLiteral<"VIDEO">, import("@sinclair/typebox").TLiteral<"DOCUMENT">, import("@sinclair/typebox").TLiteral<"QUIZ">, import("@sinclair/typebox").TLiteral<"SURVEY">, import("@sinclair/typebox").TLiteral<"AUDIO">]>;
             description: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
             mediaSource: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"DEVICE">, import("@sinclair/typebox").TLiteral<"URL">]>]>>;
             mediaKey: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
@@ -132,7 +132,7 @@ export declare const trainingModel: Elysia<"", {
         }>;
         readonly "training.updateLesson": import("@sinclair/typebox").TObject<{
             title: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TString>;
-            type: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"TEXT">, import("@sinclair/typebox").TLiteral<"VIDEO">, import("@sinclair/typebox").TLiteral<"DOCUMENT">, import("@sinclair/typebox").TLiteral<"QUIZ">, import("@sinclair/typebox").TLiteral<"SURVEY">, import("@sinclair/typebox").TLiteral<"AUDIO">]>>;
+            type: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"TEXT">, import("@sinclair/typebox").TLiteral<"PAGE">, import("@sinclair/typebox").TLiteral<"VIDEO">, import("@sinclair/typebox").TLiteral<"DOCUMENT">, import("@sinclair/typebox").TLiteral<"QUIZ">, import("@sinclair/typebox").TLiteral<"SURVEY">, import("@sinclair/typebox").TLiteral<"AUDIO">]>>;
             description: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;
             mediaSource: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TLiteral<"DEVICE">, import("@sinclair/typebox").TLiteral<"URL">]>]>>;
             mediaKey: import("@sinclair/typebox").TOptional<import("@sinclair/typebox").TUnion<[import("@sinclair/typebox").TNull, import("@sinclair/typebox").TString]>>;

@@ -16,8 +16,6 @@ export const PatientPlain = t.Object(
       [t.Literal("MALE"), t.Literal("FEMALE"), t.Literal("UNKNOWN")],
       { additionalProperties: false },
     ),
-    animalTypeId: t.String(),
-    animalStrainId: __nullable__(t.String()),
     age: __nullable__(t.Number()),
     birthDate: __nullable__(t.Date()),
     weight: __nullable__(t.Number()),
@@ -25,6 +23,26 @@ export const PatientPlain = t.Object(
     coat: __nullable__(t.String()),
     notes: __nullable__(t.String()),
     active: t.Boolean(),
+    status: t.String(),
+    nationalId: __nullable__(t.String()),
+    ageGroup: __nullable__(t.String()),
+    academicStage: __nullable__(t.String()),
+    classroom: __nullable__(t.String()),
+    bloodType: __nullable__(t.String()),
+    developmentStatus: __nullable__(t.String()),
+    allergies: __nullable__(t.String()),
+    pocketMoneyEnabled: t.Boolean(),
+    transportation: __nullable__(t.String()),
+    feeType: __nullable__(t.String()),
+    healthConditions: __nullable__(t.String()),
+    previousNursery: __nullable__(t.String()),
+    guardianRelationship: __nullable__(t.String()),
+    emergencyContactPhone: __nullable__(t.String()),
+    emergencyContactName: __nullable__(t.String()),
+    level: __nullable__(t.String()),
+    learningMethod: __nullable__(t.String()),
+    preferredShift: __nullable__(t.String()),
+    address: __nullable__(t.String()),
     isDeleted: t.Boolean(),
     deletedAt: __nullable__(t.Date()),
     editsCount: t.Integer(),
@@ -96,6 +114,8 @@ export const PatientRelations = t.Object(
           country: __nullable__(t.String()),
           city: __nullable__(t.String()),
           address: __nullable__(t.String()),
+          emergencyContactName: __nullable__(t.String()),
+          emergencyContactPhone: __nullable__(t.String()),
           notes: __nullable__(t.String()),
           active: t.Boolean(),
           isDeleted: t.Boolean(),
@@ -107,84 +127,44 @@ export const PatientRelations = t.Object(
         { additionalProperties: false },
       ),
     ),
-    animalType: t.Object(
-      {
-        id: t.String(),
-        code: __nullable__(t.String()),
-        arName: t.String(),
-        enName: t.String(),
-        isDefault: t.Boolean(),
-        clinicId: __nullable__(t.String()),
-        createdAt: t.Date(),
-        species: __nullable__(
-          t.Union(
-            [
-              t.Literal("DOG"),
-              t.Literal("CAT"),
-              t.Literal("HORSE"),
-              t.Literal("CATTLE"),
-              t.Literal("SHEEP"),
-              t.Literal("GOAT"),
-              t.Literal("CAMEL"),
-              t.Literal("POULTRY"),
-              t.Literal("RABBIT"),
-              t.Literal("SWINE"),
-              t.Literal("FISH"),
-              t.Literal("BEE"),
-            ],
-            { additionalProperties: false },
-          ),
-        ),
-      },
-      { additionalProperties: false },
-    ),
-    animalStrain: __nullable__(
+    guardians: t.Array(
       t.Object(
         {
           id: t.String(),
-          code: __nullable__(t.String()),
-          arName: t.String(),
-          enName: t.String(),
-          animalTypeId: t.String(),
-          avgWeightMin: __nullable__(t.Integer()),
-          avgWeightMax: __nullable__(t.Integer()),
-          avgAgeMin: __nullable__(t.Integer()),
-          avgAgeMax: __nullable__(t.Integer()),
-          originCountry: __nullable__(t.String()),
-          hairType: __nullable__(
-            t.Union(
-              [
-                t.Literal("LONG_THICK"),
-                t.Literal("SHORT_THICK"),
-                t.Literal("LIGHT"),
-                t.Literal("MEDIUM"),
-                t.Literal("DOUBLE_COAT"),
-                t.Literal("NONE"),
-              ],
-              { additionalProperties: false },
-            ),
-          ),
-          activityLevel: __nullable__(
-            t.Union(
-              [t.Literal("LOW"), t.Literal("MEDIUM"), t.Literal("HIGH")],
-              { additionalProperties: false },
-            ),
-          ),
-          groomingNeeds: __nullable__(
-            t.Union(
-              [t.Literal("LOW"), t.Literal("MEDIUM"), t.Literal("HIGH")],
-              { additionalProperties: false },
-            ),
-          ),
-          isBrachycephalic: t.Boolean(),
-          commonDiseases: t.Array(t.String(), { additionalProperties: false }),
-          isDefault: t.Boolean(),
-          clinicId: __nullable__(t.String()),
+          clinicId: t.String(),
+          patientId: t.String(),
+          ownerId: t.String(),
+          relationship: __nullable__(t.String()),
           createdAt: t.Date(),
-          updatedAt: t.Date(),
         },
         { additionalProperties: false },
       ),
+      { additionalProperties: false },
+    ),
+    classroomAssignments: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          classroomId: t.String(),
+          patientId: t.String(),
+          enrolledAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    trackAssignments: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          trackId: t.String(),
+          patientId: t.String(),
+          notes: __nullable__(t.String()),
+          assignedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
     ),
     appointments: t.Array(
       t.Object(
@@ -1850,6 +1830,119 @@ D2: الفراغ هنا مسموح، أمّا التحويل إلى زيارة �
       ),
       { additionalProperties: false },
     ),
+    registrationRequests: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          code: t.String(),
+          clinicId: t.String(),
+          campaignId: t.String(),
+          status: t.Union(
+            [
+              t.Literal("QUEUE"),
+              t.Literal("SHORTLIST"),
+              t.Literal("INTERVIEW"),
+              t.Literal("ACCEPTED"),
+              t.Literal("AWAITING_PAYMENT"),
+              t.Literal("REJECTED"),
+              t.Literal("DUPLICATE"),
+              t.Literal("IN_EVALUATION"),
+              t.Literal("WAITLIST"),
+              t.Literal("EVALUATION"),
+              t.Literal("REVIEW"),
+              t.Literal("AWAITING_REPLY"),
+            ],
+            { additionalProperties: false },
+          ),
+          source: t.Union(
+            [
+              t.Literal("WEBSITE"),
+              t.Literal("DIRECT_LINK"),
+              t.Literal("REFERRAL"),
+              t.Literal("SOCIAL"),
+              t.Literal("OTHER"),
+            ],
+            { additionalProperties: false },
+          ),
+          studentName: t.String(),
+          gender: t.Union(
+            [t.Literal("MALE"), t.Literal("FEMALE"), t.Literal("UNKNOWN")],
+            { additionalProperties: false },
+          ),
+          birthDate: __nullable__(t.Date()),
+          ageLabel: __nullable__(t.String()),
+          targetClass: __nullable__(t.String()),
+          bloodType: __nullable__(t.String()),
+          allergies: __nullable__(t.String()),
+          hasChronicDiseases: t.Boolean(),
+          chronicDiseases: __nullable__(t.String()),
+          learningMode: __nullable__(t.String()),
+          preferredShift: __nullable__(t.String()),
+          experienceLevel: __nullable__(t.String()),
+          priority: __nullable__(t.String()),
+          appointmentDate: __nullable__(t.Date()),
+          appointmentId: __nullable__(t.String()),
+          roomId: __nullable__(t.String()),
+          roomName: __nullable__(t.String()),
+          notes: __nullable__(t.String()),
+          notifyWhatsapp: t.Boolean(),
+          links: __nullable__(t.Any()),
+          proposedTrack: __nullable__(t.String()),
+          interviewDurationMinutes: t.Integer(),
+          attendanceProbability: t.Integer(),
+          subscriptionPlanId: __nullable__(t.String()),
+          subscriptionPlanName: __nullable__(t.String()),
+          subscriptionAmount: __nullable__(t.Number()),
+          includeMeals: t.Boolean(),
+          enableDailyStipend: t.Boolean(),
+          medications: __nullable__(t.Any()),
+          allergiesList: __nullable__(t.Any()),
+          referredToStaffId: __nullable__(t.String()),
+          referralReason: __nullable__(t.String()),
+          rejectionReason: __nullable__(t.String()),
+          rejectionNotes: __nullable__(t.String()),
+          deletionReason: __nullable__(t.String()),
+          deletionNotes: __nullable__(t.String()),
+          guardianName: t.String(),
+          guardianPhone: t.String(),
+          guardianEmail: __nullable__(t.String()),
+          guardianNationalId: __nullable__(t.String()),
+          convertedPatientId: __nullable__(t.String()),
+          convertedOwnerId: __nullable__(t.String()),
+          assignedStaffId: __nullable__(t.String()),
+          submittedAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    patientDocuments: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          patientId: t.String(),
+          type: t.Union(
+            [
+              t.Literal("BIRTH_CERTIFICATE"),
+              t.Literal("VACCINATION_CARD"),
+              t.Literal("GUARDIAN_ID"),
+              t.Literal("MEDICAL_REPORT"),
+              t.Literal("OTHER"),
+            ],
+            { additionalProperties: false },
+          ),
+          title: t.String(),
+          fileUrl: t.String(),
+          fileSize: __nullable__(t.String()),
+          mimeType: __nullable__(t.String()),
+          source: __nullable__(t.String()),
+          uploadedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
     notificationOutbox: t.Array(
       t.Object(
         {
@@ -2048,6 +2141,25 @@ export const PatientPlainInputCreate = t.Object(
     coat: t.Optional(__nullable__(t.String())),
     notes: t.Optional(__nullable__(t.String())),
     active: t.Optional(t.Boolean()),
+    status: t.Optional(t.String()),
+    ageGroup: t.Optional(__nullable__(t.String())),
+    academicStage: t.Optional(__nullable__(t.String())),
+    classroom: t.Optional(__nullable__(t.String())),
+    bloodType: t.Optional(__nullable__(t.String())),
+    developmentStatus: t.Optional(__nullable__(t.String())),
+    allergies: t.Optional(__nullable__(t.String())),
+    pocketMoneyEnabled: t.Optional(t.Boolean()),
+    transportation: t.Optional(__nullable__(t.String())),
+    feeType: t.Optional(__nullable__(t.String())),
+    healthConditions: t.Optional(__nullable__(t.String())),
+    previousNursery: t.Optional(__nullable__(t.String())),
+    guardianRelationship: t.Optional(__nullable__(t.String())),
+    emergencyContactPhone: t.Optional(__nullable__(t.String())),
+    emergencyContactName: t.Optional(__nullable__(t.String())),
+    level: t.Optional(__nullable__(t.String())),
+    learningMethod: t.Optional(__nullable__(t.String())),
+    preferredShift: t.Optional(__nullable__(t.String())),
+    address: t.Optional(__nullable__(t.String())),
     isDeleted: t.Optional(t.Boolean()),
     deletedAt: t.Optional(__nullable__(t.Date())),
     editsCount: t.Optional(t.Integer()),
@@ -2072,6 +2184,25 @@ export const PatientPlainInputUpdate = t.Object(
     coat: t.Optional(__nullable__(t.String())),
     notes: t.Optional(__nullable__(t.String())),
     active: t.Optional(t.Boolean()),
+    status: t.Optional(t.String()),
+    ageGroup: t.Optional(__nullable__(t.String())),
+    academicStage: t.Optional(__nullable__(t.String())),
+    classroom: t.Optional(__nullable__(t.String())),
+    bloodType: t.Optional(__nullable__(t.String())),
+    developmentStatus: t.Optional(__nullable__(t.String())),
+    allergies: t.Optional(__nullable__(t.String())),
+    pocketMoneyEnabled: t.Optional(t.Boolean()),
+    transportation: t.Optional(__nullable__(t.String())),
+    feeType: t.Optional(__nullable__(t.String())),
+    healthConditions: t.Optional(__nullable__(t.String())),
+    previousNursery: t.Optional(__nullable__(t.String())),
+    guardianRelationship: t.Optional(__nullable__(t.String())),
+    emergencyContactPhone: t.Optional(__nullable__(t.String())),
+    emergencyContactName: t.Optional(__nullable__(t.String())),
+    level: t.Optional(__nullable__(t.String())),
+    learningMethod: t.Optional(__nullable__(t.String())),
+    preferredShift: t.Optional(__nullable__(t.String())),
+    address: t.Optional(__nullable__(t.String())),
     isDeleted: t.Optional(t.Boolean()),
     deletedAt: t.Optional(__nullable__(t.Date())),
     editsCount: t.Optional(t.Integer()),
@@ -2105,24 +2236,48 @@ export const PatientRelationsInputCreate = t.Object(
         { additionalProperties: false },
       ),
     ),
-    animalType: t.Object(
-      {
-        connect: t.Object(
-          {
-            id: t.String({ additionalProperties: false }),
-          },
-          { additionalProperties: false },
-        ),
-      },
-      { additionalProperties: false },
-    ),
-    animalStrain: t.Optional(
+    guardians: t.Optional(
       t.Object(
         {
-          connect: t.Object(
-            {
-              id: t.String({ additionalProperties: false }),
-            },
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    classroomAssignments: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    trackAssignments: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
             { additionalProperties: false },
           ),
         },
@@ -2510,6 +2665,38 @@ export const PatientRelationsInputCreate = t.Object(
         { additionalProperties: false },
       ),
     ),
+    registrationRequests: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    patientDocuments: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
     notificationOutbox: t.Optional(
       t.Object(
         {
@@ -2574,27 +2761,77 @@ export const PatientRelationsInputUpdate = t.Partial(
           { additionalProperties: false },
         ),
       ),
-      animalType: t.Object(
-        {
-          connect: t.Object(
-            {
-              id: t.String({ additionalProperties: false }),
-            },
-            { additionalProperties: false },
-          ),
-        },
-        { additionalProperties: false },
-      ),
-      animalStrain: t.Partial(
+      guardians: t.Partial(
         t.Object(
           {
-            connect: t.Object(
-              {
-                id: t.String({ additionalProperties: false }),
-              },
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
               { additionalProperties: false },
             ),
-            disconnect: t.Boolean(),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      classroomAssignments: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      trackAssignments: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
           },
           { additionalProperties: false },
         ),
@@ -3188,6 +3425,56 @@ export const PatientRelationsInputUpdate = t.Partial(
           { additionalProperties: false },
         ),
       ),
+      registrationRequests: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      patientDocuments: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
       notificationOutbox: t.Partial(
         t.Object(
           {
@@ -3261,8 +3548,6 @@ export const PatientWhere = t.Partial(
             [t.Literal("MALE"), t.Literal("FEMALE"), t.Literal("UNKNOWN")],
             { additionalProperties: false },
           ),
-          animalTypeId: t.String(),
-          animalStrainId: t.String(),
           age: t.Number(),
           birthDate: t.Date(),
           weight: t.Number(),
@@ -3270,6 +3555,26 @@ export const PatientWhere = t.Partial(
           coat: t.String(),
           notes: t.String(),
           active: t.Boolean(),
+          status: t.String(),
+          nationalId: t.String(),
+          ageGroup: t.String(),
+          academicStage: t.String(),
+          classroom: t.String(),
+          bloodType: t.String(),
+          developmentStatus: t.String(),
+          allergies: t.String(),
+          pocketMoneyEnabled: t.Boolean(),
+          transportation: t.String(),
+          feeType: t.String(),
+          healthConditions: t.String(),
+          previousNursery: t.String(),
+          guardianRelationship: t.String(),
+          emergencyContactPhone: t.String(),
+          emergencyContactName: t.String(),
+          level: t.String(),
+          learningMethod: t.String(),
+          preferredShift: t.String(),
+          address: t.String(),
           isDeleted: t.Boolean(),
           deletedAt: t.Date(),
           editsCount: t.Integer(),
@@ -3340,8 +3645,6 @@ export const PatientWhereUnique = t.Recursive(
                 [t.Literal("MALE"), t.Literal("FEMALE"), t.Literal("UNKNOWN")],
                 { additionalProperties: false },
               ),
-              animalTypeId: t.String(),
-              animalStrainId: t.String(),
               age: t.Number(),
               birthDate: t.Date(),
               weight: t.Number(),
@@ -3349,6 +3652,26 @@ export const PatientWhereUnique = t.Recursive(
               coat: t.String(),
               notes: t.String(),
               active: t.Boolean(),
+              status: t.String(),
+              nationalId: t.String(),
+              ageGroup: t.String(),
+              academicStage: t.String(),
+              classroom: t.String(),
+              bloodType: t.String(),
+              developmentStatus: t.String(),
+              allergies: t.String(),
+              pocketMoneyEnabled: t.Boolean(),
+              transportation: t.String(),
+              feeType: t.String(),
+              healthConditions: t.String(),
+              previousNursery: t.String(),
+              guardianRelationship: t.String(),
+              emergencyContactPhone: t.String(),
+              emergencyContactName: t.String(),
+              level: t.String(),
+              learningMethod: t.String(),
+              preferredShift: t.String(),
+              address: t.String(),
               isDeleted: t.Boolean(),
               deletedAt: t.Date(),
               editsCount: t.Integer(),
@@ -3374,8 +3697,6 @@ export const PatientSelect = t.Partial(
       name: t.Boolean(),
       nameNormalized: t.Boolean(),
       gender: t.Boolean(),
-      animalTypeId: t.Boolean(),
-      animalStrainId: t.Boolean(),
       age: t.Boolean(),
       birthDate: t.Boolean(),
       weight: t.Boolean(),
@@ -3383,6 +3704,26 @@ export const PatientSelect = t.Partial(
       coat: t.Boolean(),
       notes: t.Boolean(),
       active: t.Boolean(),
+      status: t.Boolean(),
+      nationalId: t.Boolean(),
+      ageGroup: t.Boolean(),
+      academicStage: t.Boolean(),
+      classroom: t.Boolean(),
+      bloodType: t.Boolean(),
+      developmentStatus: t.Boolean(),
+      allergies: t.Boolean(),
+      pocketMoneyEnabled: t.Boolean(),
+      transportation: t.Boolean(),
+      feeType: t.Boolean(),
+      healthConditions: t.Boolean(),
+      previousNursery: t.Boolean(),
+      guardianRelationship: t.Boolean(),
+      emergencyContactPhone: t.Boolean(),
+      emergencyContactName: t.Boolean(),
+      level: t.Boolean(),
+      learningMethod: t.Boolean(),
+      preferredShift: t.Boolean(),
+      address: t.Boolean(),
       isDeleted: t.Boolean(),
       deletedAt: t.Boolean(),
       editsCount: t.Boolean(),
@@ -3390,8 +3731,9 @@ export const PatientSelect = t.Partial(
       updatedAt: t.Boolean(),
       clinic: t.Boolean(),
       owner: t.Boolean(),
-      animalType: t.Boolean(),
-      animalStrain: t.Boolean(),
+      guardians: t.Boolean(),
+      classroomAssignments: t.Boolean(),
+      trackAssignments: t.Boolean(),
       appointments: t.Boolean(),
       carePlanEnrollments: t.Boolean(),
       activity: t.Boolean(),
@@ -3416,6 +3758,8 @@ export const PatientSelect = t.Partial(
       triageAssessments: t.Boolean(),
       alerts: t.Boolean(),
       clinicalNotes: t.Boolean(),
+      registrationRequests: t.Boolean(),
+      patientDocuments: t.Boolean(),
       notificationOutbox: t.Boolean(),
       recallContacts: t.Boolean(),
       _count: t.Boolean(),
@@ -3430,8 +3774,9 @@ export const PatientInclude = t.Partial(
       gender: t.Boolean(),
       clinic: t.Boolean(),
       owner: t.Boolean(),
-      animalType: t.Boolean(),
-      animalStrain: t.Boolean(),
+      guardians: t.Boolean(),
+      classroomAssignments: t.Boolean(),
+      trackAssignments: t.Boolean(),
       appointments: t.Boolean(),
       carePlanEnrollments: t.Boolean(),
       activity: t.Boolean(),
@@ -3456,6 +3801,8 @@ export const PatientInclude = t.Partial(
       triageAssessments: t.Boolean(),
       alerts: t.Boolean(),
       clinicalNotes: t.Boolean(),
+      registrationRequests: t.Boolean(),
+      patientDocuments: t.Boolean(),
       notificationOutbox: t.Boolean(),
       recallContacts: t.Boolean(),
       _count: t.Boolean(),
@@ -3485,12 +3832,6 @@ export const PatientOrderBy = t.Partial(
       nameNormalized: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
-      animalTypeId: t.Union([t.Literal("asc"), t.Literal("desc")], {
-        additionalProperties: false,
-      }),
-      animalStrainId: t.Union([t.Literal("asc"), t.Literal("desc")], {
-        additionalProperties: false,
-      }),
       age: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
@@ -3510,6 +3851,66 @@ export const PatientOrderBy = t.Partial(
         additionalProperties: false,
       }),
       active: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      status: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      nationalId: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      ageGroup: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      academicStage: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      classroom: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      bloodType: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      developmentStatus: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      allergies: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      pocketMoneyEnabled: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      transportation: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      feeType: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      healthConditions: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      previousNursery: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      guardianRelationship: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      emergencyContactPhone: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      emergencyContactName: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      level: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      learningMethod: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      preferredShift: t.Union([t.Literal("asc"), t.Literal("desc")], {
+        additionalProperties: false,
+      }),
+      address: t.Union([t.Literal("asc"), t.Literal("desc")], {
         additionalProperties: false,
       }),
       isDeleted: t.Union([t.Literal("asc"), t.Literal("desc")], {

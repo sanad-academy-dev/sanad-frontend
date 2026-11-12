@@ -36,18 +36,9 @@ export const MembershipsPage = ({
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			{/* العنوان يأتي من رأس التخطيط (sidebar.items.memberships)؛ الوصف يبقى لأنّه يشرح
-			    آلية مالية غير بديهية — المرجع معيار للبنية لا ذريعة لحذف محتوى مفيد */}
-			<div className="px-4 pt-3">
-				<p className="text-muted-foreground text-sm">
-					خطط عضويات أولياء الأمور ورسومها الدورية: التسجيل يُصدر فاتورة عبر محرك الاشتراكات، والسداد
-					هو ما يُفعّل العضوية — المزايا تُطبَّق على التسعير في المرحلة القادمة.
-				</p>
-			</div>
-
 			{/* the hub's in-page tab strip (§7.8 hub rule) — the same pill treatment */}
 			<nav
-				className="flex flex-wrap items-center gap-[3.49px] border-t px-4 py-2"
+				className="flex flex-wrap items-center gap-[3.49px] border-b px-4 py-2"
 				dir="rtl"
 			>
 				{MEMBERSHIP_TABS.map((entry) => (

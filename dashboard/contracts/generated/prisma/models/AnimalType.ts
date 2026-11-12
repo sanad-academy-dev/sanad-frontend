@@ -208,7 +208,6 @@ export type AnimalTypeWhereInput = {
   species?: Prisma.EnumCatalogSpeciesNullableFilter<"AnimalType"> | $Enums.CatalogSpecies | null
   clinic?: Prisma.XOR<Prisma.ClinicNullableScalarRelationFilter, Prisma.ClinicWhereInput> | null
   strains?: Prisma.AnimalStrainListRelationFilter
-  patients?: Prisma.PatientListRelationFilter
   carePlans?: Prisma.CarePlanListRelationFilter
   vaccinationProtocols?: Prisma.VaccinationProtocolListRelationFilter
   groomingPriceRules?: Prisma.GroomingPriceRuleListRelationFilter
@@ -227,7 +226,6 @@ export type AnimalTypeOrderByWithRelationInput = {
   species?: Prisma.SortOrderInput | Prisma.SortOrder
   clinic?: Prisma.ClinicOrderByWithRelationInput
   strains?: Prisma.AnimalStrainOrderByRelationAggregateInput
-  patients?: Prisma.PatientOrderByRelationAggregateInput
   carePlans?: Prisma.CarePlanOrderByRelationAggregateInput
   vaccinationProtocols?: Prisma.VaccinationProtocolOrderByRelationAggregateInput
   groomingPriceRules?: Prisma.GroomingPriceRuleOrderByRelationAggregateInput
@@ -249,7 +247,6 @@ export type AnimalTypeWhereUniqueInput = Prisma.AtLeast<{
   species?: Prisma.EnumCatalogSpeciesNullableFilter<"AnimalType"> | $Enums.CatalogSpecies | null
   clinic?: Prisma.XOR<Prisma.ClinicNullableScalarRelationFilter, Prisma.ClinicWhereInput> | null
   strains?: Prisma.AnimalStrainListRelationFilter
-  patients?: Prisma.PatientListRelationFilter
   carePlans?: Prisma.CarePlanListRelationFilter
   vaccinationProtocols?: Prisma.VaccinationProtocolListRelationFilter
   groomingPriceRules?: Prisma.GroomingPriceRuleListRelationFilter
@@ -295,7 +292,6 @@ export type AnimalTypeCreateInput = {
   species?: $Enums.CatalogSpecies | null
   clinic?: Prisma.ClinicCreateNestedOneWithoutAnimalTypesInput
   strains?: Prisma.AnimalStrainCreateNestedManyWithoutAnimalTypeInput
-  patients?: Prisma.PatientCreateNestedManyWithoutAnimalTypeInput
   carePlans?: Prisma.CarePlanCreateNestedManyWithoutAnimalTypeInput
   vaccinationProtocols?: Prisma.VaccinationProtocolCreateNestedManyWithoutAnimalTypeInput
   groomingPriceRules?: Prisma.GroomingPriceRuleCreateNestedManyWithoutAnimalTypeInput
@@ -313,7 +309,6 @@ export type AnimalTypeUncheckedCreateInput = {
   createdAt?: Date | string
   species?: $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUncheckedCreateNestedManyWithoutAnimalTypeInput
-  patients?: Prisma.PatientUncheckedCreateNestedManyWithoutAnimalTypeInput
   carePlans?: Prisma.CarePlanUncheckedCreateNestedManyWithoutAnimalTypeInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedCreateNestedManyWithoutAnimalTypeInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedCreateNestedManyWithoutAnimalTypeInput
@@ -331,7 +326,6 @@ export type AnimalTypeUpdateInput = {
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   clinic?: Prisma.ClinicUpdateOneWithoutAnimalTypesNestedInput
   strains?: Prisma.AnimalStrainUpdateManyWithoutAnimalTypeNestedInput
-  patients?: Prisma.PatientUpdateManyWithoutAnimalTypeNestedInput
   carePlans?: Prisma.CarePlanUpdateManyWithoutAnimalTypeNestedInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUpdateManyWithoutAnimalTypeNestedInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUpdateManyWithoutAnimalTypeNestedInput
@@ -349,7 +343,6 @@ export type AnimalTypeUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUncheckedUpdateManyWithoutAnimalTypeNestedInput
-  patients?: Prisma.PatientUncheckedUpdateManyWithoutAnimalTypeNestedInput
   carePlans?: Prisma.CarePlanUncheckedUpdateManyWithoutAnimalTypeNestedInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedUpdateManyWithoutAnimalTypeNestedInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedUpdateManyWithoutAnimalTypeNestedInput
@@ -502,20 +495,6 @@ export type AnimalTypeUpdateOneRequiredWithoutStrainsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AnimalTypeUpdateToOneWithWhereWithoutStrainsInput, Prisma.AnimalTypeUpdateWithoutStrainsInput>, Prisma.AnimalTypeUncheckedUpdateWithoutStrainsInput>
 }
 
-export type AnimalTypeCreateNestedOneWithoutPatientsInput = {
-  create?: Prisma.XOR<Prisma.AnimalTypeCreateWithoutPatientsInput, Prisma.AnimalTypeUncheckedCreateWithoutPatientsInput>
-  connectOrCreate?: Prisma.AnimalTypeCreateOrConnectWithoutPatientsInput
-  connect?: Prisma.AnimalTypeWhereUniqueInput
-}
-
-export type AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput = {
-  create?: Prisma.XOR<Prisma.AnimalTypeCreateWithoutPatientsInput, Prisma.AnimalTypeUncheckedCreateWithoutPatientsInput>
-  connectOrCreate?: Prisma.AnimalTypeCreateOrConnectWithoutPatientsInput
-  upsert?: Prisma.AnimalTypeUpsertWithoutPatientsInput
-  connect?: Prisma.AnimalTypeWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.AnimalTypeUpdateToOneWithWhereWithoutPatientsInput, Prisma.AnimalTypeUpdateWithoutPatientsInput>, Prisma.AnimalTypeUncheckedUpdateWithoutPatientsInput>
-}
-
 export type AnimalTypeCreateNestedOneWithoutExamTemplatesInput = {
   create?: Prisma.XOR<Prisma.AnimalTypeCreateWithoutExamTemplatesInput, Prisma.AnimalTypeUncheckedCreateWithoutExamTemplatesInput>
   connectOrCreate?: Prisma.AnimalTypeCreateOrConnectWithoutExamTemplatesInput
@@ -603,7 +582,6 @@ export type AnimalTypeCreateWithoutClinicInput = {
   createdAt?: Date | string
   species?: $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainCreateNestedManyWithoutAnimalTypeInput
-  patients?: Prisma.PatientCreateNestedManyWithoutAnimalTypeInput
   carePlans?: Prisma.CarePlanCreateNestedManyWithoutAnimalTypeInput
   vaccinationProtocols?: Prisma.VaccinationProtocolCreateNestedManyWithoutAnimalTypeInput
   groomingPriceRules?: Prisma.GroomingPriceRuleCreateNestedManyWithoutAnimalTypeInput
@@ -620,7 +598,6 @@ export type AnimalTypeUncheckedCreateWithoutClinicInput = {
   createdAt?: Date | string
   species?: $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUncheckedCreateNestedManyWithoutAnimalTypeInput
-  patients?: Prisma.PatientUncheckedCreateNestedManyWithoutAnimalTypeInput
   carePlans?: Prisma.CarePlanUncheckedCreateNestedManyWithoutAnimalTypeInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedCreateNestedManyWithoutAnimalTypeInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedCreateNestedManyWithoutAnimalTypeInput
@@ -677,7 +654,6 @@ export type AnimalTypeCreateWithoutStrainsInput = {
   createdAt?: Date | string
   species?: $Enums.CatalogSpecies | null
   clinic?: Prisma.ClinicCreateNestedOneWithoutAnimalTypesInput
-  patients?: Prisma.PatientCreateNestedManyWithoutAnimalTypeInput
   carePlans?: Prisma.CarePlanCreateNestedManyWithoutAnimalTypeInput
   vaccinationProtocols?: Prisma.VaccinationProtocolCreateNestedManyWithoutAnimalTypeInput
   groomingPriceRules?: Prisma.GroomingPriceRuleCreateNestedManyWithoutAnimalTypeInput
@@ -694,7 +670,6 @@ export type AnimalTypeUncheckedCreateWithoutStrainsInput = {
   clinicId?: string | null
   createdAt?: Date | string
   species?: $Enums.CatalogSpecies | null
-  patients?: Prisma.PatientUncheckedCreateNestedManyWithoutAnimalTypeInput
   carePlans?: Prisma.CarePlanUncheckedCreateNestedManyWithoutAnimalTypeInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedCreateNestedManyWithoutAnimalTypeInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedCreateNestedManyWithoutAnimalTypeInput
@@ -727,7 +702,6 @@ export type AnimalTypeUpdateWithoutStrainsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   clinic?: Prisma.ClinicUpdateOneWithoutAnimalTypesNestedInput
-  patients?: Prisma.PatientUpdateManyWithoutAnimalTypeNestedInput
   carePlans?: Prisma.CarePlanUpdateManyWithoutAnimalTypeNestedInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUpdateManyWithoutAnimalTypeNestedInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUpdateManyWithoutAnimalTypeNestedInput
@@ -744,91 +718,6 @@ export type AnimalTypeUncheckedUpdateWithoutStrainsInput = {
   clinicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
-  patients?: Prisma.PatientUncheckedUpdateManyWithoutAnimalTypeNestedInput
-  carePlans?: Prisma.CarePlanUncheckedUpdateManyWithoutAnimalTypeNestedInput
-  vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedUpdateManyWithoutAnimalTypeNestedInput
-  groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedUpdateManyWithoutAnimalTypeNestedInput
-  mobileBookingRequests?: Prisma.MobileBookingRequestUncheckedUpdateManyWithoutAnimalTypeNestedInput
-  examTemplates?: Prisma.ExamTemplateUncheckedUpdateManyWithoutAnimalTypeNestedInput
-}
-
-export type AnimalTypeCreateWithoutPatientsInput = {
-  id?: string
-  code?: string | null
-  arName: string
-  enName: string
-  isDefault?: boolean
-  createdAt?: Date | string
-  species?: $Enums.CatalogSpecies | null
-  clinic?: Prisma.ClinicCreateNestedOneWithoutAnimalTypesInput
-  strains?: Prisma.AnimalStrainCreateNestedManyWithoutAnimalTypeInput
-  carePlans?: Prisma.CarePlanCreateNestedManyWithoutAnimalTypeInput
-  vaccinationProtocols?: Prisma.VaccinationProtocolCreateNestedManyWithoutAnimalTypeInput
-  groomingPriceRules?: Prisma.GroomingPriceRuleCreateNestedManyWithoutAnimalTypeInput
-  mobileBookingRequests?: Prisma.MobileBookingRequestCreateNestedManyWithoutAnimalTypeInput
-  examTemplates?: Prisma.ExamTemplateCreateNestedManyWithoutAnimalTypeInput
-}
-
-export type AnimalTypeUncheckedCreateWithoutPatientsInput = {
-  id?: string
-  code?: string | null
-  arName: string
-  enName: string
-  isDefault?: boolean
-  clinicId?: string | null
-  createdAt?: Date | string
-  species?: $Enums.CatalogSpecies | null
-  strains?: Prisma.AnimalStrainUncheckedCreateNestedManyWithoutAnimalTypeInput
-  carePlans?: Prisma.CarePlanUncheckedCreateNestedManyWithoutAnimalTypeInput
-  vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedCreateNestedManyWithoutAnimalTypeInput
-  groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedCreateNestedManyWithoutAnimalTypeInput
-  mobileBookingRequests?: Prisma.MobileBookingRequestUncheckedCreateNestedManyWithoutAnimalTypeInput
-  examTemplates?: Prisma.ExamTemplateUncheckedCreateNestedManyWithoutAnimalTypeInput
-}
-
-export type AnimalTypeCreateOrConnectWithoutPatientsInput = {
-  where: Prisma.AnimalTypeWhereUniqueInput
-  create: Prisma.XOR<Prisma.AnimalTypeCreateWithoutPatientsInput, Prisma.AnimalTypeUncheckedCreateWithoutPatientsInput>
-}
-
-export type AnimalTypeUpsertWithoutPatientsInput = {
-  update: Prisma.XOR<Prisma.AnimalTypeUpdateWithoutPatientsInput, Prisma.AnimalTypeUncheckedUpdateWithoutPatientsInput>
-  create: Prisma.XOR<Prisma.AnimalTypeCreateWithoutPatientsInput, Prisma.AnimalTypeUncheckedCreateWithoutPatientsInput>
-  where?: Prisma.AnimalTypeWhereInput
-}
-
-export type AnimalTypeUpdateToOneWithWhereWithoutPatientsInput = {
-  where?: Prisma.AnimalTypeWhereInput
-  data: Prisma.XOR<Prisma.AnimalTypeUpdateWithoutPatientsInput, Prisma.AnimalTypeUncheckedUpdateWithoutPatientsInput>
-}
-
-export type AnimalTypeUpdateWithoutPatientsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  arName?: Prisma.StringFieldUpdateOperationsInput | string
-  enName?: Prisma.StringFieldUpdateOperationsInput | string
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
-  clinic?: Prisma.ClinicUpdateOneWithoutAnimalTypesNestedInput
-  strains?: Prisma.AnimalStrainUpdateManyWithoutAnimalTypeNestedInput
-  carePlans?: Prisma.CarePlanUpdateManyWithoutAnimalTypeNestedInput
-  vaccinationProtocols?: Prisma.VaccinationProtocolUpdateManyWithoutAnimalTypeNestedInput
-  groomingPriceRules?: Prisma.GroomingPriceRuleUpdateManyWithoutAnimalTypeNestedInput
-  mobileBookingRequests?: Prisma.MobileBookingRequestUpdateManyWithoutAnimalTypeNestedInput
-  examTemplates?: Prisma.ExamTemplateUpdateManyWithoutAnimalTypeNestedInput
-}
-
-export type AnimalTypeUncheckedUpdateWithoutPatientsInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  arName?: Prisma.StringFieldUpdateOperationsInput | string
-  enName?: Prisma.StringFieldUpdateOperationsInput | string
-  isDefault?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  clinicId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
-  strains?: Prisma.AnimalStrainUncheckedUpdateManyWithoutAnimalTypeNestedInput
   carePlans?: Prisma.CarePlanUncheckedUpdateManyWithoutAnimalTypeNestedInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedUpdateManyWithoutAnimalTypeNestedInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedUpdateManyWithoutAnimalTypeNestedInput
@@ -846,7 +735,6 @@ export type AnimalTypeCreateWithoutExamTemplatesInput = {
   species?: $Enums.CatalogSpecies | null
   clinic?: Prisma.ClinicCreateNestedOneWithoutAnimalTypesInput
   strains?: Prisma.AnimalStrainCreateNestedManyWithoutAnimalTypeInput
-  patients?: Prisma.PatientCreateNestedManyWithoutAnimalTypeInput
   carePlans?: Prisma.CarePlanCreateNestedManyWithoutAnimalTypeInput
   vaccinationProtocols?: Prisma.VaccinationProtocolCreateNestedManyWithoutAnimalTypeInput
   groomingPriceRules?: Prisma.GroomingPriceRuleCreateNestedManyWithoutAnimalTypeInput
@@ -863,7 +751,6 @@ export type AnimalTypeUncheckedCreateWithoutExamTemplatesInput = {
   createdAt?: Date | string
   species?: $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUncheckedCreateNestedManyWithoutAnimalTypeInput
-  patients?: Prisma.PatientUncheckedCreateNestedManyWithoutAnimalTypeInput
   carePlans?: Prisma.CarePlanUncheckedCreateNestedManyWithoutAnimalTypeInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedCreateNestedManyWithoutAnimalTypeInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedCreateNestedManyWithoutAnimalTypeInput
@@ -896,7 +783,6 @@ export type AnimalTypeUpdateWithoutExamTemplatesInput = {
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   clinic?: Prisma.ClinicUpdateOneWithoutAnimalTypesNestedInput
   strains?: Prisma.AnimalStrainUpdateManyWithoutAnimalTypeNestedInput
-  patients?: Prisma.PatientUpdateManyWithoutAnimalTypeNestedInput
   carePlans?: Prisma.CarePlanUpdateManyWithoutAnimalTypeNestedInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUpdateManyWithoutAnimalTypeNestedInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUpdateManyWithoutAnimalTypeNestedInput
@@ -913,7 +799,6 @@ export type AnimalTypeUncheckedUpdateWithoutExamTemplatesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUncheckedUpdateManyWithoutAnimalTypeNestedInput
-  patients?: Prisma.PatientUncheckedUpdateManyWithoutAnimalTypeNestedInput
   carePlans?: Prisma.CarePlanUncheckedUpdateManyWithoutAnimalTypeNestedInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedUpdateManyWithoutAnimalTypeNestedInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedUpdateManyWithoutAnimalTypeNestedInput
@@ -930,7 +815,6 @@ export type AnimalTypeCreateWithoutCarePlansInput = {
   species?: $Enums.CatalogSpecies | null
   clinic?: Prisma.ClinicCreateNestedOneWithoutAnimalTypesInput
   strains?: Prisma.AnimalStrainCreateNestedManyWithoutAnimalTypeInput
-  patients?: Prisma.PatientCreateNestedManyWithoutAnimalTypeInput
   vaccinationProtocols?: Prisma.VaccinationProtocolCreateNestedManyWithoutAnimalTypeInput
   groomingPriceRules?: Prisma.GroomingPriceRuleCreateNestedManyWithoutAnimalTypeInput
   mobileBookingRequests?: Prisma.MobileBookingRequestCreateNestedManyWithoutAnimalTypeInput
@@ -947,7 +831,6 @@ export type AnimalTypeUncheckedCreateWithoutCarePlansInput = {
   createdAt?: Date | string
   species?: $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUncheckedCreateNestedManyWithoutAnimalTypeInput
-  patients?: Prisma.PatientUncheckedCreateNestedManyWithoutAnimalTypeInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedCreateNestedManyWithoutAnimalTypeInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedCreateNestedManyWithoutAnimalTypeInput
   mobileBookingRequests?: Prisma.MobileBookingRequestUncheckedCreateNestedManyWithoutAnimalTypeInput
@@ -980,7 +863,6 @@ export type AnimalTypeUpdateWithoutCarePlansInput = {
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   clinic?: Prisma.ClinicUpdateOneWithoutAnimalTypesNestedInput
   strains?: Prisma.AnimalStrainUpdateManyWithoutAnimalTypeNestedInput
-  patients?: Prisma.PatientUpdateManyWithoutAnimalTypeNestedInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUpdateManyWithoutAnimalTypeNestedInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUpdateManyWithoutAnimalTypeNestedInput
   mobileBookingRequests?: Prisma.MobileBookingRequestUpdateManyWithoutAnimalTypeNestedInput
@@ -997,7 +879,6 @@ export type AnimalTypeUncheckedUpdateWithoutCarePlansInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUncheckedUpdateManyWithoutAnimalTypeNestedInput
-  patients?: Prisma.PatientUncheckedUpdateManyWithoutAnimalTypeNestedInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedUpdateManyWithoutAnimalTypeNestedInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedUpdateManyWithoutAnimalTypeNestedInput
   mobileBookingRequests?: Prisma.MobileBookingRequestUncheckedUpdateManyWithoutAnimalTypeNestedInput
@@ -1014,7 +895,6 @@ export type AnimalTypeCreateWithoutVaccinationProtocolsInput = {
   species?: $Enums.CatalogSpecies | null
   clinic?: Prisma.ClinicCreateNestedOneWithoutAnimalTypesInput
   strains?: Prisma.AnimalStrainCreateNestedManyWithoutAnimalTypeInput
-  patients?: Prisma.PatientCreateNestedManyWithoutAnimalTypeInput
   carePlans?: Prisma.CarePlanCreateNestedManyWithoutAnimalTypeInput
   groomingPriceRules?: Prisma.GroomingPriceRuleCreateNestedManyWithoutAnimalTypeInput
   mobileBookingRequests?: Prisma.MobileBookingRequestCreateNestedManyWithoutAnimalTypeInput
@@ -1031,7 +911,6 @@ export type AnimalTypeUncheckedCreateWithoutVaccinationProtocolsInput = {
   createdAt?: Date | string
   species?: $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUncheckedCreateNestedManyWithoutAnimalTypeInput
-  patients?: Prisma.PatientUncheckedCreateNestedManyWithoutAnimalTypeInput
   carePlans?: Prisma.CarePlanUncheckedCreateNestedManyWithoutAnimalTypeInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedCreateNestedManyWithoutAnimalTypeInput
   mobileBookingRequests?: Prisma.MobileBookingRequestUncheckedCreateNestedManyWithoutAnimalTypeInput
@@ -1064,7 +943,6 @@ export type AnimalTypeUpdateWithoutVaccinationProtocolsInput = {
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   clinic?: Prisma.ClinicUpdateOneWithoutAnimalTypesNestedInput
   strains?: Prisma.AnimalStrainUpdateManyWithoutAnimalTypeNestedInput
-  patients?: Prisma.PatientUpdateManyWithoutAnimalTypeNestedInput
   carePlans?: Prisma.CarePlanUpdateManyWithoutAnimalTypeNestedInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUpdateManyWithoutAnimalTypeNestedInput
   mobileBookingRequests?: Prisma.MobileBookingRequestUpdateManyWithoutAnimalTypeNestedInput
@@ -1081,7 +959,6 @@ export type AnimalTypeUncheckedUpdateWithoutVaccinationProtocolsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUncheckedUpdateManyWithoutAnimalTypeNestedInput
-  patients?: Prisma.PatientUncheckedUpdateManyWithoutAnimalTypeNestedInput
   carePlans?: Prisma.CarePlanUncheckedUpdateManyWithoutAnimalTypeNestedInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedUpdateManyWithoutAnimalTypeNestedInput
   mobileBookingRequests?: Prisma.MobileBookingRequestUncheckedUpdateManyWithoutAnimalTypeNestedInput
@@ -1098,7 +975,6 @@ export type AnimalTypeCreateWithoutMobileBookingRequestsInput = {
   species?: $Enums.CatalogSpecies | null
   clinic?: Prisma.ClinicCreateNestedOneWithoutAnimalTypesInput
   strains?: Prisma.AnimalStrainCreateNestedManyWithoutAnimalTypeInput
-  patients?: Prisma.PatientCreateNestedManyWithoutAnimalTypeInput
   carePlans?: Prisma.CarePlanCreateNestedManyWithoutAnimalTypeInput
   vaccinationProtocols?: Prisma.VaccinationProtocolCreateNestedManyWithoutAnimalTypeInput
   groomingPriceRules?: Prisma.GroomingPriceRuleCreateNestedManyWithoutAnimalTypeInput
@@ -1115,7 +991,6 @@ export type AnimalTypeUncheckedCreateWithoutMobileBookingRequestsInput = {
   createdAt?: Date | string
   species?: $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUncheckedCreateNestedManyWithoutAnimalTypeInput
-  patients?: Prisma.PatientUncheckedCreateNestedManyWithoutAnimalTypeInput
   carePlans?: Prisma.CarePlanUncheckedCreateNestedManyWithoutAnimalTypeInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedCreateNestedManyWithoutAnimalTypeInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedCreateNestedManyWithoutAnimalTypeInput
@@ -1148,7 +1023,6 @@ export type AnimalTypeUpdateWithoutMobileBookingRequestsInput = {
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   clinic?: Prisma.ClinicUpdateOneWithoutAnimalTypesNestedInput
   strains?: Prisma.AnimalStrainUpdateManyWithoutAnimalTypeNestedInput
-  patients?: Prisma.PatientUpdateManyWithoutAnimalTypeNestedInput
   carePlans?: Prisma.CarePlanUpdateManyWithoutAnimalTypeNestedInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUpdateManyWithoutAnimalTypeNestedInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUpdateManyWithoutAnimalTypeNestedInput
@@ -1165,7 +1039,6 @@ export type AnimalTypeUncheckedUpdateWithoutMobileBookingRequestsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUncheckedUpdateManyWithoutAnimalTypeNestedInput
-  patients?: Prisma.PatientUncheckedUpdateManyWithoutAnimalTypeNestedInput
   carePlans?: Prisma.CarePlanUncheckedUpdateManyWithoutAnimalTypeNestedInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedUpdateManyWithoutAnimalTypeNestedInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedUpdateManyWithoutAnimalTypeNestedInput
@@ -1182,7 +1055,6 @@ export type AnimalTypeCreateWithoutGroomingPriceRulesInput = {
   species?: $Enums.CatalogSpecies | null
   clinic?: Prisma.ClinicCreateNestedOneWithoutAnimalTypesInput
   strains?: Prisma.AnimalStrainCreateNestedManyWithoutAnimalTypeInput
-  patients?: Prisma.PatientCreateNestedManyWithoutAnimalTypeInput
   carePlans?: Prisma.CarePlanCreateNestedManyWithoutAnimalTypeInput
   vaccinationProtocols?: Prisma.VaccinationProtocolCreateNestedManyWithoutAnimalTypeInput
   mobileBookingRequests?: Prisma.MobileBookingRequestCreateNestedManyWithoutAnimalTypeInput
@@ -1199,7 +1071,6 @@ export type AnimalTypeUncheckedCreateWithoutGroomingPriceRulesInput = {
   createdAt?: Date | string
   species?: $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUncheckedCreateNestedManyWithoutAnimalTypeInput
-  patients?: Prisma.PatientUncheckedCreateNestedManyWithoutAnimalTypeInput
   carePlans?: Prisma.CarePlanUncheckedCreateNestedManyWithoutAnimalTypeInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedCreateNestedManyWithoutAnimalTypeInput
   mobileBookingRequests?: Prisma.MobileBookingRequestUncheckedCreateNestedManyWithoutAnimalTypeInput
@@ -1232,7 +1103,6 @@ export type AnimalTypeUpdateWithoutGroomingPriceRulesInput = {
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   clinic?: Prisma.ClinicUpdateOneWithoutAnimalTypesNestedInput
   strains?: Prisma.AnimalStrainUpdateManyWithoutAnimalTypeNestedInput
-  patients?: Prisma.PatientUpdateManyWithoutAnimalTypeNestedInput
   carePlans?: Prisma.CarePlanUpdateManyWithoutAnimalTypeNestedInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUpdateManyWithoutAnimalTypeNestedInput
   mobileBookingRequests?: Prisma.MobileBookingRequestUpdateManyWithoutAnimalTypeNestedInput
@@ -1249,7 +1119,6 @@ export type AnimalTypeUncheckedUpdateWithoutGroomingPriceRulesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUncheckedUpdateManyWithoutAnimalTypeNestedInput
-  patients?: Prisma.PatientUncheckedUpdateManyWithoutAnimalTypeNestedInput
   carePlans?: Prisma.CarePlanUncheckedUpdateManyWithoutAnimalTypeNestedInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedUpdateManyWithoutAnimalTypeNestedInput
   mobileBookingRequests?: Prisma.MobileBookingRequestUncheckedUpdateManyWithoutAnimalTypeNestedInput
@@ -1275,7 +1144,6 @@ export type AnimalTypeUpdateWithoutClinicInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUpdateManyWithoutAnimalTypeNestedInput
-  patients?: Prisma.PatientUpdateManyWithoutAnimalTypeNestedInput
   carePlans?: Prisma.CarePlanUpdateManyWithoutAnimalTypeNestedInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUpdateManyWithoutAnimalTypeNestedInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUpdateManyWithoutAnimalTypeNestedInput
@@ -1292,7 +1160,6 @@ export type AnimalTypeUncheckedUpdateWithoutClinicInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   species?: Prisma.NullableEnumCatalogSpeciesFieldUpdateOperationsInput | $Enums.CatalogSpecies | null
   strains?: Prisma.AnimalStrainUncheckedUpdateManyWithoutAnimalTypeNestedInput
-  patients?: Prisma.PatientUncheckedUpdateManyWithoutAnimalTypeNestedInput
   carePlans?: Prisma.CarePlanUncheckedUpdateManyWithoutAnimalTypeNestedInput
   vaccinationProtocols?: Prisma.VaccinationProtocolUncheckedUpdateManyWithoutAnimalTypeNestedInput
   groomingPriceRules?: Prisma.GroomingPriceRuleUncheckedUpdateManyWithoutAnimalTypeNestedInput
@@ -1317,7 +1184,6 @@ export type AnimalTypeUncheckedUpdateManyWithoutClinicInput = {
 
 export type AnimalTypeCountOutputType = {
   strains: number
-  patients: number
   carePlans: number
   vaccinationProtocols: number
   groomingPriceRules: number
@@ -1327,7 +1193,6 @@ export type AnimalTypeCountOutputType = {
 
 export type AnimalTypeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   strains?: boolean | AnimalTypeCountOutputTypeCountStrainsArgs
-  patients?: boolean | AnimalTypeCountOutputTypeCountPatientsArgs
   carePlans?: boolean | AnimalTypeCountOutputTypeCountCarePlansArgs
   vaccinationProtocols?: boolean | AnimalTypeCountOutputTypeCountVaccinationProtocolsArgs
   groomingPriceRules?: boolean | AnimalTypeCountOutputTypeCountGroomingPriceRulesArgs
@@ -1350,13 +1215,6 @@ export type AnimalTypeCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.E
  */
 export type AnimalTypeCountOutputTypeCountStrainsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.AnimalStrainWhereInput
-}
-
-/**
- * AnimalTypeCountOutputType without action
- */
-export type AnimalTypeCountOutputTypeCountPatientsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.PatientWhereInput
 }
 
 /**
@@ -1406,7 +1264,6 @@ export type AnimalTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   species?: boolean
   clinic?: boolean | Prisma.AnimalType$clinicArgs<ExtArgs>
   strains?: boolean | Prisma.AnimalType$strainsArgs<ExtArgs>
-  patients?: boolean | Prisma.AnimalType$patientsArgs<ExtArgs>
   carePlans?: boolean | Prisma.AnimalType$carePlansArgs<ExtArgs>
   vaccinationProtocols?: boolean | Prisma.AnimalType$vaccinationProtocolsArgs<ExtArgs>
   groomingPriceRules?: boolean | Prisma.AnimalType$groomingPriceRulesArgs<ExtArgs>
@@ -1454,7 +1311,6 @@ export type AnimalTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type AnimalTypeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   clinic?: boolean | Prisma.AnimalType$clinicArgs<ExtArgs>
   strains?: boolean | Prisma.AnimalType$strainsArgs<ExtArgs>
-  patients?: boolean | Prisma.AnimalType$patientsArgs<ExtArgs>
   carePlans?: boolean | Prisma.AnimalType$carePlansArgs<ExtArgs>
   vaccinationProtocols?: boolean | Prisma.AnimalType$vaccinationProtocolsArgs<ExtArgs>
   groomingPriceRules?: boolean | Prisma.AnimalType$groomingPriceRulesArgs<ExtArgs>
@@ -1474,7 +1330,6 @@ export type $AnimalTypePayload<ExtArgs extends runtime.Types.Extensions.Internal
   objects: {
     clinic: Prisma.$ClinicPayload<ExtArgs> | null
     strains: Prisma.$AnimalStrainPayload<ExtArgs>[]
-    patients: Prisma.$PatientPayload<ExtArgs>[]
     carePlans: Prisma.$CarePlanPayload<ExtArgs>[]
     vaccinationProtocols: Prisma.$VaccinationProtocolPayload<ExtArgs>[]
     groomingPriceRules: Prisma.$GroomingPriceRulePayload<ExtArgs>[]
@@ -1886,7 +1741,6 @@ export interface Prisma__AnimalTypeClient<T, Null = never, ExtArgs extends runti
   readonly [Symbol.toStringTag]: "PrismaPromise"
   clinic<T extends Prisma.AnimalType$clinicArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AnimalType$clinicArgs<ExtArgs>>): Prisma.Prisma__ClinicClient<runtime.Types.Result.GetResult<Prisma.$ClinicPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   strains<T extends Prisma.AnimalType$strainsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AnimalType$strainsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AnimalStrainPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  patients<T extends Prisma.AnimalType$patientsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AnimalType$patientsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   carePlans<T extends Prisma.AnimalType$carePlansArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AnimalType$carePlansArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CarePlanPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   vaccinationProtocols<T extends Prisma.AnimalType$vaccinationProtocolsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AnimalType$vaccinationProtocolsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$VaccinationProtocolPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   groomingPriceRules<T extends Prisma.AnimalType$groomingPriceRulesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AnimalType$groomingPriceRulesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GroomingPriceRulePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -2370,30 +2224,6 @@ export type AnimalType$strainsArgs<ExtArgs extends runtime.Types.Extensions.Inte
   take?: number
   skip?: number
   distinct?: Prisma.AnimalStrainScalarFieldEnum | Prisma.AnimalStrainScalarFieldEnum[]
-}
-
-/**
- * AnimalType.patients
- */
-export type AnimalType$patientsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the Patient
-   */
-  select?: Prisma.PatientSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the Patient
-   */
-  omit?: Prisma.PatientOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.PatientInclude<ExtArgs> | null
-  where?: Prisma.PatientWhereInput
-  orderBy?: Prisma.PatientOrderByWithRelationInput | Prisma.PatientOrderByWithRelationInput[]
-  cursor?: Prisma.PatientWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.PatientScalarFieldEnum | Prisma.PatientScalarFieldEnum[]
 }
 
 /**

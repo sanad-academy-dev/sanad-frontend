@@ -64,14 +64,6 @@ export const AdapterReconciliationPage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">تقرير المطابقة (المحولات)</h1>
-				<p className="text-muted-foreground text-sm">
-					§C3 — التشغيل المتوازي: إجمالي الوحدة التشغيلية مقابل المرحّل مقابل دفتر الأستاذ، مع
-					المستندات غير المرحّلة والترحيلات اليتيمة. صفر فرق هو شرط اكتمال المحول.
-				</p>
-			</div>
-
 			{/* toolbar — adapter + date range */}
 			<div className="flex flex-wrap items-center gap-2 border-t px-4 py-3">
 				<div className="w-56">

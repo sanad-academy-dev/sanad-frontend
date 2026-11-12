@@ -101,6 +101,19 @@ export const quizContentSchema = z.object({ questions: z.array(quizQuestionSchem
 export type QuizContent = z.infer<typeof quizContentSchema>;
 export type QuizQuestionInput = z.input<typeof quizQuestionSchema>;
 
+export const lessonContentItemSchema = z.object({
+	id: z.string().min(1),
+	type: z.enum(LessonType),
+	title: z.string().min(1),
+	description: z.string().nullable().optional(),
+	mediaSource: z.enum(LessonMediaSource).nullable().optional(),
+	mediaKey: z.string().nullable().optional(),
+	mediaUrl: z.string().nullable().optional(),
+	durationSeconds: z.number().int().min(0).nullable().optional(),
+	content: z.string().nullable().optional(),
+});
+export type LessonContentItem = z.infer<typeof lessonContentItemSchema>;
+
 // يقرأ أسئلة الاختبار من حقل content بأمان (يعيد [] لأي محتوى غير صالح)
 export function parseQuizContent(
 	content: string | null | undefined,
@@ -141,9 +154,10 @@ export const createLessonSchema = z
 			),
 		// أسئلة الاختبار — تُستخدم لنوع QUIZ فقط وتُسلسَل إلى content عند الحفظ
 		questions: z.array(quizQuestionSchema).optional().default([]),
+		contents: z.array(lessonContentItemSchema).optional().default([]),
 	})
 	// الوسيط مطلوب للأنواع التي تعتمد على ملف (معطّل مؤقتًا عبر REQUIRE_LESSON_MEDIA)؛
-	// والنص مطلوب لنوع TEXT
+	// والمحتوى مطلوب لنوعَي TEXT و PAGE
 	.refine(
 		(v) =>
 			!REQUIRE_LESSON_MEDIA ||
@@ -151,12 +165,33 @@ export const createLessonSchema = z
 			!!(v.mediaKey || v.mediaUrl),
 		{ error: "الملف مطلوب", path: ["mediaKey"] },
 	)
-	.refine((v) => v.type !== "TEXT" || !!v.content?.trim(), {
+	.refine((v) => (v.type !== "TEXT" && v.type !== "PAGE") || !!v.content?.trim(), {
 		error: "محتوى الدرس مطلوب",
 		path: ["content"],
 	})
 	// أسئلة وخيارات الاختبار لا تُلزَم إلا حين يكون الدرس من نوع QUIZ
 	.superRefine((v, ctx) => {
+		v.contents?.forEach((item, index) => {
+			if ((item.type === "TEXT" || item.type === "PAGE") && !item.content?.trim()) {
+				ctx.addIssue({
+					code: "custom",
+					message: item.type === "PAGE" ? "محتوى الصفحة مطلوب" : "محتوى النص مطلوب",
+					path: ["contents", index, "content"],
+				});
+			}
+			if (
+				REQUIRE_LESSON_MEDIA &&
+				MEDIA_LESSON_TYPES.includes(item.type) &&
+				!item.mediaKey &&
+				!item.mediaUrl
+			) {
+				ctx.addIssue({
+					code: "custom",
+					message: "الملف أو الرابط مطلوب",
+					path: ["contents", index, "mediaKey"],
+				});
+			}
+		});
 		if (v.type !== "QUIZ") return;
 		if (!v.questions || v.questions.length === 0) {
 			ctx.addIssue({
@@ -275,14 +310,16 @@ export type CompletionSettingsInput = Partial<
 
 export type RestoredLessonInput = Pick<Prisma.CourseLessonUncheckedCreateInput, "title"> &
 	Required<Pick<Prisma.CourseLessonUncheckedCreateInput, "type">> &
-	LessonOptionalFields;
+	LessonOptionalFields & { contents?: LessonContentItem[] };
 
 type LessonOptionalFields = Partial<
 	Pick<
 		Prisma.CourseLessonUncheckedCreateInput,
 		"description" | "mediaSource" | "mediaKey" | "mediaUrl" | "durationSeconds" | "content"
 	>
->;
+> & {
+	contents?: LessonContentItem[];
+};
 
 export type CreateLessonInput = Pick<
 	Prisma.CourseLessonUncheckedCreateInput,
@@ -299,10 +336,16 @@ export type CreateLessonPayload = Pick<
 	Required<Pick<Prisma.CourseLessonUncheckedCreateInput, "type">> &
 	LessonOptionalFields;
 
-export type UpdateLessonInput = Partial<Omit<CreateLessonInput, "unitId">>;
+export type UpdateLessonInput = Partial<Omit<CreateLessonInput, "unitId">> & {
+	unitId?: string;
+	order?: number;
+};
 
 // حمولة التعديل من العميل — نفس حقول الإنشاء عدا unitId، وكلها اختيارية
-export type UpdateLessonPayload = Partial<Omit<CreateLessonPayload, "unitId">>;
+export type UpdateLessonPayload = Partial<Omit<CreateLessonPayload, "unitId">> & {
+	unitId?: string;
+	order?: number;
+};
 
 // ===== أنواع الاستجابة (Prisma payloads) =====
 
@@ -382,14 +425,16 @@ const completionSettingsSelect = {
 	reviewEnabled: true,
 } as const;
 
-export type LessonResponse = Prisma.CourseLessonGetPayload<{ select: typeof lessonSelect }>;
-export type UnitResponse = Prisma.CourseUnitGetPayload<{ select: typeof unitSelect }>;
+type LessonDbResponse = Prisma.CourseLessonGetPayload<{ select: typeof lessonSelect }>;
+export type LessonResponse = LessonDbResponse & { contents: LessonContentItem[] | null };
+type UnitDbResponse = Prisma.CourseUnitGetPayload<{ select: typeof unitSelect }>;
+export type UnitResponse = Omit<UnitDbResponse, "lessons"> & { lessons: LessonResponse[] };
 export type LevelResponse = Prisma.CourseLevelGetPayload<{ select: typeof levelSelect }>;
 export type CourseResponse = Prisma.CourseGetPayload<{ select: typeof courseSelect }>;
 export type CompletionSettingsResponse = Prisma.CourseCompletionSettingsGetPayload<{
 	select: typeof completionSettingsSelect;
 }>;
-export type CourseDetailResponse = Prisma.CourseGetPayload<{
+type CourseDetailDbResponse = Prisma.CourseGetPayload<{
 	select: typeof courseSelect & {
 		units: { select: typeof unitSelect };
 		levels: { select: typeof levelSelect };
@@ -397,6 +442,14 @@ export type CourseDetailResponse = Prisma.CourseGetPayload<{
 		trainers: { select: { staffId: true; staff: { select: { name: true } } } };
 	};
 }>;
+export type CourseDetailResponse = Omit<CourseDetailDbResponse, "units"> & { units: UnitResponse[] };
+
+export type ReorderLessonInput = {
+	lessonId: string;
+	unitId: string;
+	position: number;
+	contents?: LessonContentItem[];
+};
 
 // طاقم مختصر لمكدّس صور المتدربين/المدربين في بطاقة القائمة
 export type CourseAssigneePreview = { id: string; name: string; avatar: string | null };

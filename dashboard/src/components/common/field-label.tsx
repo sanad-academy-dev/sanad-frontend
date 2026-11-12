@@ -1,7 +1,12 @@
 import { IconInfoCircle } from "@tabler/icons-react";
 import type { ReactNode } from "react";
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 export function FieldLabel({
@@ -29,10 +34,12 @@ export function FieldLabel({
 			{info ? (
 				<TooltipProvider delayDuration={150}>
 					<Tooltip>
-						<TooltipTrigger asChild>
-							<span className="inline-flex cursor-help">
-								<IconInfoCircle className="size-3.5 text-muted-foreground/50 shrink-0 hover:text-muted-foreground transition-colors" />
-							</span>
+						<TooltipTrigger
+							type="button"
+							className="inline-flex cursor-help items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+							aria-label="معلومات الحقل"
+						>
+							<IconInfoCircle className="size-3.5 text-muted-foreground/50 shrink-0 hover:text-muted-foreground transition-colors" />
 						</TooltipTrigger>
 						<TooltipContent side="top">
 							<p className="text-xs max-w-xs">{info}</p>

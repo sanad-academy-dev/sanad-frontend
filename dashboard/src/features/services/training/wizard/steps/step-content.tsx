@@ -2,13 +2,14 @@ import {
 	IconBolt,
 	IconChevronDown,
 	IconClock,
+	IconEye,
 	IconLayoutSidebarLeftCollapse,
 	IconPlus,
 	IconSchool,
 	IconSparkles,
 	IconWorld,
 } from "@tabler/icons-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -22,8 +23,13 @@ import { cn } from "@/lib/utils";
 import type {
 	CourseContentType,
 	CourseDetailResponse,
+	CreateLessonFormInput,
+	LessonResponse,
+	LessonType,
 	RestoredLessonInput,
 } from "@/server/training/training.type";
+import { createInitialPageContent } from "../../components/course-page-inline-editor";
+import { LessonPreview } from "../../components/lesson-preview";
 import { COURSE_TYPE_OPTIONS } from "../../data/training";
 import { useCourseContent } from "../../hooks/use-course-content";
 import { useCourseLevels } from "../../hooks/use-course-levels";
@@ -42,14 +48,13 @@ const DEFAULT_TITLE: Record<CourseContentType, string> = {
 	QUIZ: "تقييم جديد",
 };
 
-// فصل مبدئي يُنشأ مع البطاقة حسب النوع — الصفحة نصّ، والتقييم تقييم فارغ.
+// فصل مبدئي يُنشأ مع البطاقة حسب النوع — الصفحة محرر بلوكات تفاعلي، والتقييم تقييم فارغ.
 // الدرس بلا فصل مبدئي (يختار المستخدم نوع المادة في نموذج الفصل).
 function seedLessons(type: CourseContentType): RestoredLessonInput[] | undefined {
-	if (type === "PAGE") return [{ title: "صفحة جديدة", type: "TEXT", content: "" }];
+	if (type === "PAGE")
+		return [{ title: "صفحة جديدة", type: "PAGE", content: createInitialPageContent() }];
 	if (type === "QUIZ")
-		return [
-			{ title: "تقييم جديد", type: "QUIZ", content: JSON.stringify({ questions: [] }) },
-		];
+		return [{ title: "تقييم جديد", type: "QUIZ", content: JSON.stringify({ questions: [] }) }];
 	return undefined;
 }
 
@@ -76,15 +81,81 @@ export function StepContent({
 	} | null>(null);
 	// آخر بطاقة أُنشئت — تُفتح موسّعة تلقائيًا للتحرير مباشرة بعد الإنشاء
 	const [justCreatedId, setJustCreatedId] = useState<string | null>(null);
-	const { addContent } = useCourseContent(courseId);
+	const [previewSelection, setPreviewSelection] = useState<{
+		unitId: string;
+		lessonId: string;
+	} | null>(null);
+	const [livePreviewDraft, setLivePreviewDraft] = useState<{
+		unitId: string;
+		lessonId: string | null;
+		values: CreateLessonFormInput;
+	} | null>(null);
+	const contentActions = useCourseContent(courseId);
+	const { addContent } = contentActions;
 	const { addLevel, renameLevel, removeLevel } = useCourseLevels(courseId);
 	const { updateCourse } = useUpdateCourse(courseId);
 	const { reorderContents } = useReorderContents(courseId);
 
+	const levels = course?.levels ?? [];
+	const units = course?.units ?? [];
+	const previewLessons = useMemo(
+		() => units.flatMap((unit) => unit.lessons.map((lesson) => ({ unit, lesson }))),
+		[units],
+	);
+	const selectedPreview =
+		previewLessons.find(
+			(item) =>
+				item.unit.id === previewSelection?.unitId &&
+				item.lesson.id === previewSelection.lessonId,
+		) ?? previewLessons[0];
+	const draftIsSelected = Boolean(
+		livePreviewDraft &&
+			previewSelection?.unitId === livePreviewDraft.unitId &&
+			previewSelection.lessonId === (livePreviewDraft.lessonId ?? "__draft__"),
+	);
+	const draftUnit = draftIsSelected
+		? units.find((unit) => unit.id === livePreviewDraft?.unitId)
+		: undefined;
+	const previewDraftLesson: LessonResponse | null =
+		draftIsSelected && livePreviewDraft && draftUnit
+			? {
+					id: livePreviewDraft.lessonId ?? "live-draft",
+					unitId: draftUnit.id,
+					title: livePreviewDraft.values.title?.trim() || "درس بدون عنوان",
+					type: livePreviewDraft.values.type as LessonType,
+					description: livePreviewDraft.values.description || null,
+					mediaSource:
+						(livePreviewDraft.values.mediaSource as "DEVICE" | "URL" | null) ?? null,
+					mediaKey: livePreviewDraft.values.mediaKey || null,
+					mediaUrl: livePreviewDraft.values.mediaUrl || null,
+					content:
+						livePreviewDraft.values.type === "QUIZ"
+							? JSON.stringify({ questions: livePreviewDraft.values.questions ?? [] })
+							: livePreviewDraft.values.content || null,
+					durationSeconds: (() => {
+						const { hours, minutes, seconds } = livePreviewDraft.values;
+						const total =
+							(Number(hours) || 0) * 3600 +
+							(Number(minutes) || 0) * 60 +
+							(Number(seconds) || 0);
+						return total > 0 ? total : null;
+					})(),
+					order: livePreviewDraft.lessonId
+						? (draftUnit.lessons.find((lesson) => lesson.id === livePreviewDraft.lessonId)
+								?.order ?? 0)
+						: draftUnit.lessons.length,
+					editsCount: 0,
+					createdAt: new Date(),
+				}
+			: null;
+	const previewLesson = previewDraftLesson ?? selectedPreview?.lesson;
+	const previewUnit = draftIsSelected ? draftUnit : selectedPreview?.unit;
+	const previewIndex = previewDraftLesson
+		? previewDraftLesson.order + 1
+		: (selectedPreview?.lesson.order ?? 0) + 1;
+
 	if (!course) return null;
 
-	const levels = course.levels ?? [];
-	const units = course.units ?? [];
 	const typeLabel =
 		COURSE_TYPE_OPTIONS.find((t) => t.value === course.type)?.label ?? course.type;
 
@@ -110,7 +181,7 @@ export function StepContent({
 	};
 
 	return (
-		<div className="mx-auto flex w-full max-w-[1280px] gap-5 px-4 py-6">
+		<div className="mx-auto flex w-full max-w-[1280px] flex-col gap-5 px-4 py-6 lg:flex-row">
 			{/* ===== المُنشئ (يمين في RTL) ===== */}
 			<div className="flex min-w-0 flex-1 flex-col gap-5">
 				{/* ترويسة الدورة + الوسوم */}
@@ -221,13 +292,24 @@ export function StepContent({
 				) : (
 					<ContentDnd
 						course={course}
-						courseId={courseId}
 						levels={levels}
 						autoOpenUnitId={justCreatedId}
 						onAddContent={handleAddContent}
 						onRenameLevel={renameLevel}
 						onRemoveLevel={removeLevel}
 						reorderContents={reorderContents}
+						onPreviewLesson={(unitId, lessonId) => setPreviewSelection({ unitId, lessonId })}
+						onLessonDraftChange={(unitId, lessonId, values) => {
+							if (!values) {
+								setLivePreviewDraft((current) =>
+									current?.unitId === unitId && current.lessonId === lessonId ? null : current,
+								);
+								return;
+							}
+							setLivePreviewDraft({ unitId, lessonId, values });
+							setPreviewSelection({ unitId, lessonId: lessonId ?? "__draft__" });
+						}}
+						actions={contentActions}
 					/>
 				)}
 			</div>
@@ -247,9 +329,12 @@ export function StepContent({
 
 			{/* ===== المعاينة (يسار في RTL) — قابلة للطي ===== */}
 			{previewOpen ? (
-				<div className="hidden w-[340px] shrink-0 flex-col gap-3 lg:flex">
+				<div className="flex w-full shrink-0 flex-col gap-3 lg:w-[340px]">
 					<div className="flex items-center justify-between">
-						<span className="text-[12px] font-bold text-[#08090A]">معاينة الدورة</span>
+						<span className="flex items-center gap-1.5 text-[12px] font-bold text-[#08090A]">
+							<IconEye className="size-3.5 text-primary" />
+							معاينة المتدرب
+						</span>
 						<button
 							type="button"
 							onClick={() => setPreviewOpen(false)}
@@ -261,34 +346,55 @@ export function StepContent({
 					</div>
 					<div className="flex flex-col overflow-hidden rounded-2xl border border-[#E7E7EE] bg-white shadow-[0_1px_2px_rgba(16,16,24,0.04)]">
 						<div className="flex h-24 items-end bg-primary/25 p-3">
-							<span className="text-[13px] font-bold primarydrop-shadow">
-								{course.name}
-							</span>
+							<span className="text-[13px] font-bold primarydrop-shadow">{course.name}</span>
 						</div>
-						<div className="flex flex-col gap-3 p-4">
-							{units.some((u) => u.lessons.length > 0) ? (
-								units.map((u) => (
-									<div
-										key={u.id}
-										className="flex flex-col gap-1"
-									>
-										<span className="text-[12px] font-semibold text-[#08090A]">{u.title}</span>
-										<ol className="flex flex-col gap-1">
-											{u.lessons.map((l, i) => (
-												<li
-													key={l.id}
-													className="flex items-center gap-2 rounded-lg bg-[#FAFAFC] px-2.5 py-1.5 text-[11px] text-[#08090A]"
-												>
-													<span className="tabular-nums text-[#9B9B9D]">{i + 1}.</span>
-													{l.title}
-												</li>
-											))}
-										</ol>
+						<div className="flex flex-col gap-3 p-3">
+							<p className="text-[10px] leading-4 text-[#737373]">
+								اختر أي درس من القائمة لعرضه كما سيظهر للمتدرب.
+							</p>
+							{previewLesson && previewUnit ? (
+								<>
+									<div className="rounded-lg bg-[#FAFAFC] px-3 py-2">
+										<p className="text-[10px] text-muted-foreground">{previewUnit.title}</p>
+										<p className="mt-0.5 text-[12px] font-semibold text-[#08090A]">
+											{previewLesson.title}
+										</p>
 									</div>
-								))
+									<LessonPreview
+										lesson={previewLesson}
+										index={previewIndex}
+									/>
+									<div className="flex flex-col gap-1.5 border-t border-[#E7E7EE] pt-3">
+										<span className="text-[10px] font-semibold text-[#6B6B67]">
+											محتوى الدورة
+										</span>
+										{previewLessons.map(({ unit, lesson }, index) => (
+											<button
+												key={lesson.id}
+												type="button"
+												onClick={() => {
+													setPreviewSelection({ unitId: unit.id, lessonId: lesson.id });
+													setLivePreviewDraft(null);
+												}}
+												className={cn(
+													"flex items-center gap-2 rounded-md px-2 py-1.5 text-right text-[10px]",
+													lesson.id === previewLesson.id
+														? "bg-primary/10 font-semibold text-primary"
+														: "text-[#6B6B67] hover:bg-[#FAFAFC]",
+												)}
+											>
+												<span className="tabular-nums text-[#9B9B9D]">{index + 1}.</span>
+												<span className="min-w-0 flex-1 truncate">{lesson.title}</span>
+												<span className="shrink-0 text-[9px] text-muted-foreground">
+													{unit.title}
+												</span>
+											</button>
+										))}
+									</div>
+								</>
 							) : (
 								<p className="py-6 text-center text-[11px] leading-5 text-[#9B9B9D]">
-									بعد إضافة أول محتوى ستظهر هنا معاينة مباشرة لطريقة عرض الدورة للموظفين.
+									بعد إضافة أول درس ستظهر معاينته هنا.
 								</p>
 							)}
 						</div>
@@ -298,7 +404,7 @@ export function StepContent({
 				<button
 					type="button"
 					onClick={() => setPreviewOpen(true)}
-					className="hidden h-9 shrink-0 items-center gap-1.5 self-start rounded-lg border border-[#E7E7EE] bg-white px-3 text-[12px] text-[#6B6B67] lg:flex"
+					className="flex h-9 shrink-0 items-center gap-1.5 self-start rounded-lg border border-[#E7E7EE] bg-white px-3 text-[12px] text-[#6B6B67]"
 				>
 					<IconChevronDown className="size-4 rotate-90" />
 					إظهار المعاينة

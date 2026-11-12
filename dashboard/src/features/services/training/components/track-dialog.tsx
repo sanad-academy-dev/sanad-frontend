@@ -1,4 +1,5 @@
 import {
+	IconAlertCircle,
 	IconArrowsDiagonal,
 	IconArrowsDiagonalMinimize2,
 	IconAtom,
@@ -7,9 +8,7 @@ import {
 	IconBooks,
 	IconBrain,
 	IconBrandWhatsapp,
-	IconCalendarPlus,
 	IconCheck,
-	IconCircle,
 	IconClock,
 	IconCode,
 	IconCopy,
@@ -19,6 +18,7 @@ import {
 	IconFileDescription,
 	IconGlobe,
 	IconHeart,
+	IconLayoutGrid,
 	IconPlus,
 	IconRobot,
 	IconRocket,
@@ -62,17 +62,94 @@ import { useAcademicStageOptions } from "@/features/services/classrooms/hooks/us
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import { useAcademicStages } from "@/features/settings/academic-stages/hooks/use-academic-stages";
 import { useTrackClassifications } from "@/features/settings/tracks/hooks/use-track-classifications";
+import type { FormProgress } from "@/hooks/use-form-progress";
 import { cn } from "@/lib/utils";
-import { useCreateTrack, useUpdateTrack } from "../hooks/use-tracks";
+import { useCreateTrack, useTracks, useUpdateTrack } from "../hooks/use-tracks";
 import { AssignTrackStaffSheet } from "./assign-track-staff-sheet";
+import { CourseDialog } from "./course-dialog";
+import { DurationPickerPopover } from "./duration-picker-popover";
+import { SheetStepper } from "./sheet-stepper";
 import { TrackAgentPanel } from "./track-agent-panel";
 import { TrackCoursesStep } from "./track-courses-step";
+import {
+	parseTrackStructure,
+	type TrackStage,
+	TrackStructureStep,
+} from "./track-structure-step";
 import type { TrackRow } from "./tracks-view";
 
-// تجريد الملاحظات والوصف من أي وسوم داخلية لحفظ الدورات أو المرحلة لكي لا تظهر للمستخدم أبداً
-const stripSystemTags = (text?: string | null): string => {
+const TRACK_STEP_META = [
+	{ step: 1, title: "المعلومات الأساسية", icon: IconLayoutGrid },
+	{ step: 2, title: "اختيار المحتوى", icon: IconBooks },
+	{ step: 3, title: "هيكل ومراحل المسار", icon: IconRoute },
+] as const;
+
+// إزالة وسم [track_structure:...] بالكامل وبدقة مع مراعاة السلاسل النصية والأقواس المتداخلة داخل JSON
+const stripTrackStructureTag = (text: string): string => {
+	const prefix = "[track_structure:";
+	let result = text;
+	let startIdx = result.indexOf(prefix);
+	while (startIdx !== -1) {
+		const jsonStart = startIdx + prefix.length;
+		let depth = 0;
+		let inString = false;
+		let escaped = false;
+		let endIdx = -1;
+
+		for (let i = jsonStart; i < result.length; i++) {
+			const char = result[i];
+			if (escaped) {
+				escaped = false;
+				continue;
+			}
+			if (char === "\\") {
+				escaped = true;
+				continue;
+			}
+			if (char === '"') {
+				inString = !inString;
+				continue;
+			}
+			if (!inString) {
+				if (char === "{" || char === "[") {
+					depth++;
+				} else if (char === "}" || char === "]") {
+					depth--;
+					if (depth === 0) {
+						const closingBracket = result.indexOf("]", i);
+						endIdx = closingBracket !== -1 ? closingBracket + 1 : i + 1;
+						break;
+					}
+				}
+			}
+		}
+
+		if (endIdx !== -1) {
+			result = result.slice(0, startIdx) + result.slice(endIdx);
+		} else {
+			const fallbackEnd = result.lastIndexOf("}]");
+			if (fallbackEnd > jsonStart) {
+				result = result.slice(0, startIdx) + result.slice(fallbackEnd + 2);
+			} else {
+				result = result.slice(0, startIdx);
+				break;
+			}
+		}
+		startIdx = result.indexOf(prefix);
+	}
+	return result;
+};
+
+// تنظيف وتجريد وصف المسار والملاحظات من أي وسوم داخلية أو شظايا JSON مسربة
+const cleanTrackDescription = (text?: string | null): string => {
 	if (!text) return "";
-	return text
+	let cleaned = text;
+
+	// 1. إزالة وسم [track_structure:...] بالكامل
+	cleaned = stripTrackStructureTag(cleaned);
+
+	// 2. إزالة وسوم التراك والدورات والمراحل المعروفة
+	cleaned = cleaned
 		.replace(/<p>\s*\[courses:[^\]]*\]\s*<\/p>/gi, "")
 		.replace(/<div>\s*\[courses:[^\]]*\]\s*<\/div>/gi, "")
 		.replace(/\[courses:[^\]]*\]/gi, "")
@@ -80,8 +157,32 @@ const stripSystemTags = (text?: string | null): string => {
 		.replace(/(?:\[icon:[^\]]+\])/gi, "")
 		.replace(/(?:\[color:[^\]]+\])/gi, "")
 		.replace(/(?:\[notes:[^\]]+\])/gi, "")
-		.replace(/&#91;courses:[^&]*&#93;/gi, "")
+		.replace(/&#91;courses:[^&]*&#93;/gi, "");
+
+	// 3. كشف وحذف أي شظايا JSON مسربة أو يتيمة حتى لو بدون وسم البداية
+	const leakRegex =
+		/(?:\[?\{?"?stages"?\s*:\s*\[|id\s*:\s*"item-|"?courseId"?\s*:|"?iconColor"?\s*:|"?durationHours"?\s*:|"?lessonsCount"?\s*:|"?chaptersCount"?\s*:|"?updatedDate"?\s*:|"?coverKey"?\s*:|"?priorityPath"?\s*:|item-cmw[a-z0-9]+|item-crs[a-z0-9]+|cmw2[a-z0-9]{15,}|cmvy[a-z0-9]{15,})/i;
+
+	const match = cleaned.match(leakRegex);
+	if (match && match.index !== undefined) {
+		cleaned = cleaned.slice(0, match.index);
+	}
+
+	// 4. إزالة أي أقواس أو علامات تنصيص مشوهة متبقية
+	cleaned = cleaned
+		.replace(/[{}[\]"]+/g, " ")
+		.replace(/\s+/g, " ")
 		.trim();
+
+	if (!cleaned || /^[{}[\]":,\s]+$/.test(cleaned)) {
+		return "";
+	}
+
+	return cleaned;
+};
+
+const stripSystemTags = (text?: string | null): string => {
+	return cleanTrackDescription(text);
 };
 
 const DEFAULT_ACADEMIC_STAGES = [
@@ -280,10 +381,10 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 		isLoading: isClassificationsLoading,
 		isAdding: isAddingClassification,
 		addClassification: addClassificationMutation,
-		deleteClassification: deleteClassificationMutation,
 	} = useTrackClassifications();
 	const { mutate: createTrackMutation, isPending: isCreatingTrack } = useCreateTrack();
 	const { mutate: updateTrackMutation, isPending: isUpdatingTrack } = useUpdateTrack();
+	const { tracks } = useTracks();
 
 	// الحقول الأساسية
 	const [name, setName] = useState("");
@@ -295,6 +396,16 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 	const [iconPickerOpen, setIconPickerOpen] = useState(false);
 	const [iconSearch, setIconSearch] = useState("");
 
+	// التحقق من عدم تكرار اسم المسار
+	const isDuplicateTrackName = useMemo(() => {
+		const trimmed = name.trim().toLowerCase();
+		if (!trimmed) return false;
+		return (
+			tracks?.some((t) => t.name.trim().toLowerCase() === trimmed && t.id !== track?.id) ??
+			false
+		);
+	}, [tracks, name, track?.id]);
+
 	// الخيارات الإضافية (الشرائح/الخطوات)
 	const [academicStage, setAcademicStage] = useState("");
 	const [newStageInput, setNewStageInput] = useState("");
@@ -302,7 +413,8 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 	const { academicStages: optionsStages } = useAcademicStageOptions();
 	const { stages, isLoading: isStagesLoading, addStage } = useAcademicStages();
 	const [category, setCategory] = useState("");
-	const [classificationsList, setClassificationsList] = useState<string[]>([]);
+	const [classificationsList, setClassificationsList] =
+		useState<string[]>(DEFAULT_CLASSIFICATIONS);
 	const [newClassificationInput, setNewClassificationInput] = useState("");
 	const [selectedTrainer, setSelectedTrainer] = useState("");
 	const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
@@ -322,7 +434,9 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 		const set = new Set<string>();
 
 		// دائماً تضمين المراحل الدراسية الأساسية لضمان عدم ظهور القائمة فارغة نهائياً
-		DEFAULT_ACADEMIC_STAGES.forEach((st) => set.add(st));
+		DEFAULT_ACADEMIC_STAGES.forEach((st) => {
+			set.add(st);
+		});
 
 		if (Array.isArray(optionsStages)) {
 			for (const st of optionsStages) {
@@ -369,8 +483,13 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 	};
 
 	// خيارات الفوتر والتحكم والقوالب والخطوات
-	const [isCoursesStep, setIsCoursesStep] = useState(false);
+	const [activeStep, setActiveStep] = useState<1 | 2 | 3>(1);
 	const [selectedCourseIds, setSelectedCourseIds] = useState<string[]>([]);
+	const [trackStages, setTrackStages] = useState<TrackStage[] | null>(null);
+	const [trackPriorityPath, setTrackPriorityPath] = useState<"SEQUENTIAL" | "FLEXIBLE">(
+		"SEQUENTIAL",
+	);
+	const [isCreateCourseOpen, setIsCreateCourseOpen] = useState(false);
 	const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>("none");
 	const [templateSearch, setTemplateSearch] = useState("");
 	const [templateMenuOpen, setTemplateMenuOpen] = useState(false);
@@ -385,7 +504,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 	// تعبئة البيانات عند الفتح أو التعديل
 	useEffect(() => {
 		if (open) {
-			setIsCoursesStep(false);
+			setActiveStep(1);
 			if (track) {
 				setName(track.name);
 				setCode(track.code);
@@ -410,7 +529,53 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 				setSelectedColor(track.selectedColor || "blue");
 
 				// استخراج معرفات الدورات المحددة سابقاً من الملاحظات
-				setSelectedCourseIds(extractCourseIds(track.notes));
+				let initialCourseIds = extractCourseIds(track.notes);
+
+				// استخراج مراحل وهيكل المسار المحفوظ بدقة وتنقيته من أي دورات وهمية
+				const parsedStructure = parseTrackStructure(track.notes);
+				if (parsedStructure?.stages && parsedStructure.stages.length > 0) {
+					// تجميع المعرفات الحقيقية من الهيكل إذا كان وسم courses غير موجود
+					const structureCourseIds = parsedStructure.stages
+						.flatMap((s) => s.items)
+						.filter(
+							(it) =>
+								it.type === "COURSE" &&
+								it.courseId &&
+								!it.courseId.startsWith("fake-") &&
+								!it.id?.includes("fake") &&
+								!it.title?.includes("دورة تدريبية #") &&
+								it.title !== "دورة تدريبية جديدة",
+						)
+						.map((it) => it.courseId as string);
+
+					if (initialCourseIds.length === 0 && structureCourseIds.length > 0) {
+						initialCourseIds = Array.from(new Set(structureCourseIds));
+					}
+
+					// تنقية المراحل بحيث تحتوي حصراً على الدورات المحددة بدون أي تكرار
+					const validCourseIdSet = new Set(initialCourseIds);
+					const seenCourseIds = new Set<string>();
+					const sanitizedStages = parsedStructure.stages.map((st) => ({
+						...st,
+						items: st.items.filter((it) => {
+							if (it.type === "COURSE") {
+								if (!it.courseId || !validCourseIdSet.has(it.courseId)) return false;
+								if (seenCourseIds.has(it.courseId)) return false;
+								seenCourseIds.add(it.courseId);
+							}
+							return true;
+						}),
+					}));
+
+					setSelectedCourseIds(initialCourseIds);
+					setTrackStages(sanitizedStages);
+				} else {
+					setSelectedCourseIds(initialCourseIds);
+					setTrackStages(null);
+				}
+				if (parsedStructure?.priorityPath) {
+					setTrackPriorityPath(parsedStructure.priorityPath);
+				}
 			} else {
 				setName("");
 				setCode(`PR-${Math.floor(10 + Math.random() * 90)}`);
@@ -429,12 +594,15 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 				setSelectedIcon("cube");
 				setSelectedColor("blue");
 				setSelectedCourseIds([]);
+				setTrackStages(null);
+				setTrackPriorityPath("SEQUENTIAL");
 			}
 			setSelectedTemplateId("none");
 			setTemplateSearch("");
 			setShowNotice(true);
 			setIsDiscardOpen(false);
 			setIsExpanded(false);
+			setActiveStep(1);
 		}
 	}, [open, track]);
 
@@ -498,12 +666,36 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 		};
 	}, [name]);
 
+	// مؤشر إنجاز النموذج والخطوات لترويسة FormHeader
+	const stepProgress = useMemo<FormProgress>(() => {
+		if (activeStep === 3) {
+			return {
+				filledCount: 3,
+				requiredCount: 3,
+				progress: 100,
+				isComplete: true,
+			};
+		}
+		if (activeStep === 2) {
+			const hasCourses =
+				selectedCourseIds.length > 0 ||
+				(trackStages && trackStages.some((s) => s.items.length > 0));
+			return {
+				filledCount: hasCourses ? 2 : 1,
+				requiredCount: 3,
+				progress: hasCourses ? 66 : 33,
+				isComplete: false,
+			};
+		}
+		return formProgress;
+	}, [activeStep, formProgress, selectedCourseIds.length]);
+
 	// تبديل اختيار دورة معينة
 	const handleToggleCourse = (courseId: string) => {
 		setSelectedCourseIds((prev) =>
 			prev.includes(courseId)
 				? prev.filter((id) => id !== courseId)
-				: [...prev, courseId],
+				: Array.from(new Set([...prev, courseId])),
 		);
 	};
 
@@ -564,7 +756,16 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 		if (duration) list.push("duration");
 		if (selectedCourseIds.length > 0) list.push("coursesCount");
 		return list;
-	}, [name, description, notes, category, academicStage, selectedTrainer, duration, selectedCourseIds]);
+	}, [
+		name,
+		description,
+		notes,
+		category,
+		academicStage,
+		selectedTrainer,
+		duration,
+		selectedCourseIds,
+	]);
 
 	const handleSelectTemplate = (tpl: (typeof TRACK_TEMPLATES)[0] | null) => {
 		if (!tpl) {
@@ -637,17 +838,31 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 			toast.error("يرجى إدخال اسم المسار التدريبي");
 			return;
 		}
-		setIsCoursesStep(true);
+		setActiveStep(2);
 	};
 
-	// إرسال النموذج وحفظه بالباك إند وقاعدة البيانات مع الدورات المحددة
-	const handleFinalSubmit = (e?: React.FormEvent | React.MouseEvent) => {
+	// إرسال النموذج وحفظه بالباك إند وقاعدة البيانات مع الدورات المحددة وهيكل المراحل والوقت
+	const handleFinalSubmit = (
+		e?: React.FormEvent | React.MouseEvent,
+		structureData?: {
+			stages: TrackStage[];
+			priorityPath: "SEQUENTIAL" | "FLEXIBLE";
+			coverKey?: string | null;
+			calculatedDuration?: string;
+			status?: "ACTIVE" | "DRAFT";
+		},
+	) => {
 		if (e) {
 			e.preventDefault();
 		}
 		if (!name.trim()) {
 			toast.error("يرجى إدخال اسم المسار التدريبي");
-			setIsCoursesStep(false);
+			setActiveStep(1);
+			return;
+		}
+		if (isDuplicateTrackName) {
+			toast.error("اسم المسار التدريبي مسجّل مسبقاً، يرجى اختيار اسم آخر");
+			setActiveStep(1);
 			return;
 		}
 
@@ -659,16 +874,68 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 			HYBRID: "مدمج",
 		};
 
+		// ضمان عدم تكرار أي دورة داخل المسار نهائياً
+		const uniqueSelectedIds = Array.from(new Set(selectedCourseIds));
 		const effectiveCoursesCount =
-			selectedCourseIds.length > 0 ? selectedCourseIds.length : (coursesCount || 4);
+			uniqueSelectedIds.length > 0 ? uniqueSelectedIds.length : coursesCount || 4;
 
-		// تضمين وسوم الدورات المختارة في الملاحظات لحفظها ومزامنتها برمجياً
+		// تضمين وسوم الدورات المختارة وهيكل المراحل والوقت في الملاحظات لحفظها برمجياً
 		const courseTag =
-			selectedCourseIds.length > 0 ? `[courses:${selectedCourseIds.join(",")}]` : "";
+			uniqueSelectedIds.length > 0 ? `[courses:${uniqueSelectedIds.join(",")}]` : "";
+
+		let stagesToSave = structureData?.stages || (trackStages && trackStages.length > 0 ? trackStages : undefined);
+		if (stagesToSave && Array.isArray(stagesToSave)) {
+			const validCourseSet = new Set(uniqueSelectedIds);
+			const seenCourseIds = new Set<string>();
+			stagesToSave = stagesToSave.map((st) => ({
+				...st,
+				items: st.items
+					.filter((it) => {
+						if (it.type === "COURSE") {
+							const cid = it.courseId || (it as any).refId;
+							if (!cid || !validCourseSet.has(cid)) return false;
+							if (seenCourseIds.has(cid)) return false;
+							seenCourseIds.add(cid);
+						}
+						return true;
+					})
+					.map((it) => {
+						const refId =
+							(it as any).refId ||
+							it.courseId ||
+							(it.type === "QUIZ"
+								? it.id.replace(/^item-quiz-/, "")
+								: it.type === "PAGE"
+									? it.id.replace(/^item-page-/, "").replace(/^item-lib-/, "")
+									: it.id.replace(/^item-/, ""));
+						return {
+							...it,
+							refId,
+							courseId: it.type === "COURSE" ? it.courseId || refId : undefined,
+							durationWeeks: it.durationWeeks ?? 0,
+						};
+					}),
+			}));
+		}
+
+		const structureTag =
+			stagesToSave && stagesToSave.length > 0
+				? `[track_structure:${JSON.stringify({
+						stages: stagesToSave,
+						priorityPath: structureData?.priorityPath || trackPriorityPath || "SEQUENTIAL",
+						coverKey: structureData?.coverKey ?? null,
+					})}]`
+				: "";
+
 		const cleanUserNotes = stripSystemTags(notes);
-		const finalNotes = courseTag
-			? (cleanUserNotes ? `${cleanUserNotes}\n${courseTag}` : courseTag)
+		const tags = [courseTag, structureTag].filter(Boolean).join("\n");
+		const finalNotes = tags
+			? cleanUserNotes
+				? `${cleanUserNotes}\n${tags}`
+				: tags
 			: cleanUserNotes;
+
+		const effectiveDuration = structureData?.calculatedDuration || duration.trim();
 
 		const payload = {
 			name: name.trim(),
@@ -679,9 +946,9 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 			locationMode,
 			locationLabel: locLabelMap[locationMode],
 			staffIds: selectedStaffIds,
-			duration: duration.trim(),
+			duration: effectiveDuration,
 			price,
-			status: track?.status ?? "ACTIVE",
+			status: structureData?.status ?? track?.status ?? "ACTIVE",
 			description: description.trim(),
 			notes: finalNotes,
 			selectedIcon,
@@ -713,7 +980,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 						setDescription("");
 						setNotes("");
 						setSelectedCourseIds([]);
-						setIsCoursesStep(false);
+						setActiveStep(1);
 					} else {
 						onOpenChange(false);
 					}
@@ -738,14 +1005,16 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 					dir="rtl"
 					showCloseButton={false}
 					className={cn(
-						"p-0 gap-0 overflow-hidden rounded-xl bg-card border border-border/80 shadow-2xl transition-all duration-300 ease-out",
-						isCoursesStep
-							? "sm:max-w-4xl md:max-w-5xl max-w-[96vw] h-[90vh] max-h-[92vh]"
-							: isAgentOpen
-								? "sm:max-w-5xl xl:max-w-6xl max-w-[96vw]"
-								: isExpanded
-									? "sm:max-w-4xl max-w-[96vw]"
-									: "sm:max-w-[560px] max-w-[94vw]",
+						"p-0 gap-0 overflow-hidden rounded-xl bg-card border border-border shadow-2xl transition-all duration-300 flex flex-col",
+						isExpanded
+							? "w-[99vw] max-w-[99vw] sm:max-w-[99vw] h-[98vh] max-h-[98vh]"
+							: activeStep === 3
+								? "w-[98vw] max-w-[98vw] sm:max-w-[98vw] md:max-w-[1720px] h-[96vh] max-h-[97vh]"
+								: activeStep === 2
+									? "w-[92vw] sm:max-w-4xl md:max-w-5xl lg:max-w-[1100px] h-[84vh] max-h-[88vh]"
+									: isAgentOpen
+										? "w-[96vw] max-w-6xl h-[92vh] max-h-[94vh]"
+										: "w-[94vw] sm:max-w-3xl md:max-w-4xl h-[90vh] max-h-[92vh]",
 					)}
 					onInteractOutside={(e) => {
 						if (isDiscardOpen || isStaffSheetOpen) {
@@ -762,9 +1031,14 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 							e.preventDefault();
 							return;
 						}
-						if (isCoursesStep) {
+						if (activeStep === 3) {
 							e.preventDefault();
-							setIsCoursesStep(false);
+							setActiveStep(2);
+							return;
+						}
+						if (activeStep === 2) {
+							e.preventDefault();
+							setActiveStep(1);
 							return;
 						}
 						if (!isEdit && isDirty) {
@@ -773,769 +1047,769 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 						}
 					}}
 				>
-					{isCoursesStep ? (
-						<TrackCoursesStep
-							isEdit={isEdit}
-							trackName={name}
-							trackCode={code}
-							selectedIcon={selectedIcon}
-							selectedColor={selectedColor}
-							selectedCourseIds={selectedCourseIds}
-							onToggleCourse={handleToggleCourse}
-							onSelectAll={(ids) => setSelectedCourseIds(ids)}
-							onClearAll={() => setSelectedCourseIds([])}
-							onBackToForm={() => setIsCoursesStep(false)}
-							onSubmit={handleFinalSubmit}
-							isSubmitting={isSubmitting || isCreatingTrack || isUpdatingTrack}
-							notifyWhatsApp={notifyWhatsApp}
-							onNotifyWhatsAppChange={setNotifyWhatsApp}
-							createAnother={createAnother}
-							onCreateAnotherChange={setCreateAnother}
-							onClose={handleCloseAttempt}
-						/>
-					) : (
-						<div className="flex flex-col md:flex-row w-full items-stretch overflow-hidden max-h-[88vh]">
-						{/* الجانب الأساسي: نموذج إنشاء المسار */}
-						<div
-							className={cn(
-								"flex flex-col min-h-0 bg-background transition-all duration-300 ease-out",
-								isAgentOpen ? "w-full md:w-1/2 flex-1 min-w-0" : "w-full flex-1 min-w-0",
-							)}
-						>
-							{/* 1. الترويسة الموحدة مع أزرار القالب والإنشاء مع سند والتوسيع ومؤشر الإنجاز */}
-							<FormHeader
-								variant="dialog"
-								size="sm"
-								title={isEdit ? "تعديل المسار" : "أنشئ مسار جديد"}
-								identity={isEdit && track ? { name: track.name, code: track.code } : null}
-								progress={formProgress}
-								onClose={isAgentOpen ? undefined : handleCloseAttempt}
-								actions={
+					{/* 1. الترويسة الموحدة مع أزرار القالب والإنشاء مع سند والتوسيع ومؤشر الإنجاز */}
+					<FormHeader
+						variant="dialog"
+						size="sm"
+						title={
+							activeStep === 3
+								? "هيكل ومراحل المسار التدريبي"
+								: activeStep === 2
+									? isEdit
+										? "تعديل محتوى المسار"
+										: "اختيار محتوى المسار"
+									: isEdit
+										? "تعديل المسار"
+										: "أنشئ مسار جديد"
+						}
+						identity={
+							name || code
+								? { name: name || "مسار جديد", code }
+								: isEdit && track
+									? { name: track.name, code: track.code }
+									: null
+						}
+						progress={stepProgress}
+						onClose={isAgentOpen ? undefined : handleCloseAttempt}
+						actions={
+							<Button
+								type="button"
+								variant="ghost"
+								size="icon-xs"
+								className="size-7 text-muted-foreground hover:text-foreground hidden sm:flex cursor-pointer rounded-md transition-colors"
+								onClick={() => setIsExpanded((prev) => !prev)}
+								title={isExpanded ? "تصغير النافذة" : "توسيع النافذة"}
+							>
+								{isExpanded ? (
+									<IconArrowsDiagonalMinimize2 className="size-3.5" />
+								) : (
+									<IconArrowsDiagonal className="size-3.5" />
+								)}
+							</Button>
+						}
+						titleActions={
+							activeStep === 1 ? (
+								<div className="flex items-center gap-1.5 ms-2">
+									{/* زر القوالب الجاهزة */}
+									<DropdownMenu
+										dir="rtl"
+										open={templateMenuOpen}
+										onOpenChange={setTemplateMenuOpen}
+										modal={false}
+									>
+										<DropdownMenuTrigger asChild>
+											<Button
+												type="button"
+												variant="outline"
+												size="sm"
+												className="h-6 px-2 text-[11px] gap-1 rounded-full border border-border bg-white dark:bg-card hover:bg-muted font-medium cursor-pointer"
+											>
+												<IconCopy className="size-3" />
+												<span>قالب</span>
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent
+											align="start"
+											className="w-64! min-w-64 p-1.5 rounded-xl border border-border shadow-md bg-popover"
+											onCloseAutoFocus={(e) => e.preventDefault()}
+										>
+											{/* حقل البحث العلوي */}
+											<div className="flex items-center justify-between gap-1.5 px-2 py-1 mb-1 border-b border-border/60">
+												<input
+													value={templateSearch}
+													onChange={(e) => setTemplateSearch(e.target.value)}
+													placeholder="تطبيق قالب مشروع..."
+													className="w-full text-xs bg-transparent outline-none placeholder:text-muted-foreground/60 text-right"
+													onClick={(e) => e.stopPropagation()}
+													onKeyDown={(e) => e.stopPropagation()}
+												/>
+											</div>
+
+											{/* قائمة الخيارات */}
+											<div className="space-y-0.5">
+												{/* خيار بدون قالب */}
+												<DropdownMenuItem
+													onClick={() => handleSelectTemplate(null)}
+													className={cn(
+														"w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs cursor-pointer transition-colors text-right",
+														selectedTemplateId === "none" || !selectedTemplateId
+															? "bg-muted font-medium text-foreground"
+															: "text-foreground",
+													)}
+												>
+													<div className="flex items-center gap-2">
+														<IconScan className="size-4 text-foreground/80 shrink-0" />
+														<span className="text-xs">بدون قالب</span>
+													</div>
+													{(selectedTemplateId === "none" || !selectedTemplateId) && (
+														<IconCheck className="size-3.5 text-foreground shrink-0" />
+													)}
+												</DropdownMenuItem>
+
+												{/* قائمة القوالب */}
+												{filteredTemplates.map((tpl) => {
+													const isSelected = selectedTemplateId === tpl.id;
+													const IconComp = tpl.Icon;
+													return (
+														<DropdownMenuItem
+															key={tpl.id}
+															onClick={() => handleSelectTemplate(tpl)}
+															className={cn(
+																"w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs cursor-pointer transition-colors text-right",
+																isSelected
+																	? "bg-muted font-medium text-foreground"
+																	: "text-foreground",
+															)}
+														>
+															<div className="flex items-center gap-2">
+																{IconComp ? (
+																	<IconComp className="size-4 text-foreground/80 shrink-0" />
+																) : (
+																	<span className="size-4 shrink-0" />
+																)}
+																<span className="text-xs">{tpl.title}</span>
+															</div>
+															{isSelected && (
+																<IconCheck className="size-3.5 text-foreground shrink-0" />
+															)}
+														</DropdownMenuItem>
+													);
+												})}
+											</div>
+										</DropdownMenuContent>
+									</DropdownMenu>
+
+									{/* زر أنشئ مع سند */}
 									<Button
 										type="button"
-										variant="ghost"
-										size="icon-xs"
-										className="size-7 text-muted-foreground hover:text-foreground hidden sm:flex cursor-pointer rounded-md transition-colors"
-										onClick={() => setIsExpanded((prev) => !prev)}
-										title={isExpanded ? "تصغير النافذة" : "توسيع النافذة"}
-									>
-										{isExpanded ? (
-											<IconArrowsDiagonalMinimize2 className="size-3.5" />
-										) : (
-											<IconArrowsDiagonal className="size-3.5" />
+										variant="outline"
+										size="sm"
+										onClick={() => setIsAgentOpen((prev) => !prev)}
+										className={cn(
+											"h-6 px-2 text-[11px] gap-1 rounded-full border border-border bg-white dark:bg-card hover:bg-muted font-medium cursor-pointer flex items-center shrink-0 transition-all",
+											isAgentOpen &&
+												"bg-primary/10 border-primary/40 text-primary font-semibold shadow-2xs",
 										)}
+										title="أنشئ مع سند"
+										aria-label="أنشئ مع سند"
+									>
+										<SanadLogo
+											iconOnly
+											className="h-3 w-auto shrink-0"
+										/>
+										<span className="whitespace-nowrap">أنشئ مع سند</span>
 									</Button>
-								}
-								titleActions={
-									<div className="flex items-center gap-1.5 ms-2">
-										{/* زر القوالب الجاهزة */}
-										<DropdownMenu
-											dir="rtl"
-											open={templateMenuOpen}
-											onOpenChange={setTemplateMenuOpen}
-											modal={false}
-										>
-											<DropdownMenuTrigger asChild>
-												<Button
-													type="button"
-													variant="outline"
-													size="sm"
-													className="h-6 px-2 text-[11px] gap-1 rounded-full border border-border bg-white dark:bg-card hover:bg-muted font-medium cursor-pointer"
-												>
-													<IconCopy className="size-3" />
-													<span>قالب</span>
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent
-												align="start"
-												className="w-64! min-w-64 p-1.5 rounded-xl border border-border shadow-md bg-popover"
-												onCloseAutoFocus={(e) => e.preventDefault()}
-											>
-												{/* حقل البحث العلوي */}
-												<div className="flex items-center justify-between gap-1.5 px-2 py-1 mb-1 border-b border-border/60">
-													<input
-														value={templateSearch}
-														onChange={(e) => setTemplateSearch(e.target.value)}
-														placeholder="تطبيق قالب مشروع..."
-														className="w-full text-xs bg-transparent outline-none placeholder:text-muted-foreground/60 text-right"
-														onClick={(e) => e.stopPropagation()}
-														onKeyDown={(e) => e.stopPropagation()}
-													/>
-												</div>
+								</div>
+							) : undefined
+						}
+					/>
 
-												{/* قائمة الخيارات */}
-												<div className="space-y-0.5">
-													{/* خيار بدون قالب */}
-													<DropdownMenuItem
-														onClick={() => handleSelectTemplate(null)}
-														className={cn(
-															"w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs cursor-pointer transition-colors text-right",
-															selectedTemplateId === "none" || !selectedTemplateId
-																? "bg-muted font-medium text-foreground"
-																: "text-foreground",
-														)}
-													>
-														<div className="flex items-center gap-2">
-															<IconScan className="size-4 text-foreground/80 shrink-0" />
-															<span className="text-xs">بدون قالب</span>
-														</div>
-														{(selectedTemplateId === "none" || !selectedTemplateId) && (
-															<IconCheck className="size-3.5 text-foreground shrink-0" />
-														)}
-													</DropdownMenuItem>
+					{/* 2. شريط خطوات المعالج الموحد (الستيبّر) */}
+					<SheetStepper
+						steps={TRACK_STEP_META}
+						step={activeStep}
+						furthest={isEdit ? 3 : Math.max(activeStep, 1)}
+						onStepChange={(s) => {
+							if (s === 1) setActiveStep(1);
+							else if (s === 2 && name.trim()) setActiveStep(2);
+							else if (s === 3 && name.trim()) setActiveStep(3);
+						}}
+					/>
 
-													{/* قائمة القوالب */}
-													{filteredTemplates.map((tpl) => {
-														const isSelected = selectedTemplateId === tpl.id;
-														const IconComp = tpl.Icon;
-														return (
-															<DropdownMenuItem
-																key={tpl.id}
-																onClick={() => handleSelectTemplate(tpl)}
-																className={cn(
-																	"w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs cursor-pointer transition-colors text-right",
-																	isSelected
-																		? "bg-muted font-medium text-foreground"
-																		: "text-foreground",
-																)}
-															>
-																<div className="flex items-center gap-2">
-																	{IconComp ? (
-																		<IconComp className="size-4 text-foreground/80 shrink-0" />
-																	) : (
-																		<span className="size-4 shrink-0" />
-																	)}
-																	<span className="text-xs">{tpl.title}</span>
-																</div>
-																{isSelected && (
-																	<IconCheck className="size-3.5 text-foreground shrink-0" />
-																)}
-															</DropdownMenuItem>
-														);
-													})}
-												</div>
-											</DropdownMenuContent>
-										</DropdownMenu>
-
-										{/* زر أنشئ مع سند */}
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											onClick={() => setIsAgentOpen((prev) => !prev)}
-											className={cn(
-												"h-6 px-2 text-[11px] gap-1 rounded-full border border-border bg-white dark:bg-card hover:bg-muted font-medium cursor-pointer flex items-center shrink-0 transition-all",
-												isAgentOpen &&
-													"bg-primary/10 border-primary/40 text-primary font-semibold shadow-2xs",
-											)}
-											title="أنشئ مع سند"
-											aria-label="أنشئ مع سند"
-										>
-											<SanadLogo
-												iconOnly
-												className="h-3 w-auto shrink-0"
-											/>
-											<span className="whitespace-nowrap">أنشئ مع سند</span>
-										</Button>
-									</div>
-								}
+					{/* 3. محتوى الخطوة */}
+					<div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+						{activeStep === 3 ? (
+							<TrackStructureStep
+								isEdit={isEdit}
+								trackName={name}
+								trackCode={code}
+								trackCategory={category}
+								trackStage={academicStage}
+								selectedCourseIds={selectedCourseIds}
+								onSelectedCourseIdsChange={setSelectedCourseIds}
+								stages={trackStages ?? undefined}
+								onStagesChange={setTrackStages}
+								priorityPath={trackPriorityPath}
+								onPriorityPathChange={setTrackPriorityPath}
+								notes={track?.notes || notes}
+								initialDuration={duration}
+								trackDuration={duration}
+								onTrackDurationChange={setDuration}
+								onBackToCourses={() => setActiveStep(2)}
+								onSubmit={(data) => handleFinalSubmit(undefined, data)}
+								isSubmitting={isSubmitting || isCreatingTrack || isUpdatingTrack}
+								onClose={handleCloseAttempt}
 							/>
+						) : activeStep === 2 ? (
+							<TrackCoursesStep
+								isEdit={isEdit}
+								trackName={name}
+								trackCode={code}
+								trackCategory={category}
+								trackAcademicStage={academicStage}
+								trackDuration={duration}
+								onTrackDurationChange={setDuration}
+								selectedIcon={selectedIcon}
+								selectedColor={selectedColor}
+								selectedCourseIds={selectedCourseIds}
+								onToggleCourse={handleToggleCourse}
+								onSelectAll={(ids) => setSelectedCourseIds(ids)}
+								onClearAll={() => {
+									setSelectedCourseIds([]);
+									setTrackStages(null);
+								}}
+								stages={trackStages}
+								onStagesChange={setTrackStages}
+								onBackToForm={() => setActiveStep(1)}
+								onNextToStructure={() => setActiveStep(3)}
+								onOpenCreateCourse={() => setIsCreateCourseOpen(true)}
+								onSubmit={() => handleFinalSubmit()}
+								isSubmitting={isSubmitting || isCreatingTrack || isUpdatingTrack}
+								notifyWhatsApp={notifyWhatsApp}
+								onNotifyWhatsAppChange={setNotifyWhatsApp}
+								createAnother={createAnother}
+								onCreateAnotherChange={setCreateAnother}
+								onClose={handleCloseAttempt}
+							/>
+						) : (
+							<div className="flex flex-col md:flex-row w-full items-stretch overflow-hidden flex-1 min-h-0">
+								{/* الجانب الأساسي: نموذج إنشاء المسار */}
+								<div
+									className={cn(
+										"flex flex-col min-h-0 bg-background transition-all duration-300 ease-out",
+										isAgentOpen ? "w-full md:w-1/2 flex-1 min-w-0" : "w-full flex-1 min-w-0",
+									)}
+								>
+									{/* 2. جسم النموذج القابل للتمرير */}
+									<form
+										onSubmit={handleFormSubmitToCourses}
+										className="flex flex-col flex-1 min-h-0 overflow-hidden"
+									>
+										<div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+											{/* السطر الأول: المعرّف (يمين) واسم الدورة/المسار مع أيقونة المكعب (يسار) */}
+											<div className="space-y-1.5">
+												{/* تسميات الحقول جنباً إلى جنب */}
+												<div className="flex items-center gap-2.5 w-full">
+													{/* المعرف يميناً */}
+													<div className="w-36 sm:w-44 shrink-0">
+														<FieldLabel info="يُولد تلقائياً بتسلسل نظامي ويمكنك تعديله">
+															<Label
+																htmlFor="trk-code"
+																className="text-xs font-semibold text-muted-foreground"
+															>
+																المعرّف{" "}
+																<span className="font-normal text-[11px]">يُولد تلقائياً</span>
+															</Label>
+														</FieldLabel>
+													</div>
 
-							{/* 2. جسم النموذج القابل للتمرير */}
-							<form
-								onSubmit={handleFormSubmitToCourses}
-								className="flex flex-col flex-1 min-h-0 overflow-hidden"
-							>
-								<div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-									{/* السطر الأول: المعرّف (يمين) واسم الدورة/المسار مع أيقونة المكعب (يسار) */}
-									<div className="space-y-1.5">
-										{/* تسميات الحقول جنباً إلى جنب */}
-										<div className="flex items-center gap-2.5 w-full">
-											{/* المعرف يميناً */}
-											<div className="w-36 sm:w-44 shrink-0">
-												<FieldLabel info="يُولد تلقائياً بتسلسل نظامي ويمكنك تعديله">
-													<Label
-														htmlFor="trk-code"
-														className="text-xs font-semibold text-muted-foreground"
-													>
-														المعرّف{" "}
-														<span className="font-normal text-[11px]">يُولد تلقائياً</span>
-													</Label>
-												</FieldLabel>
-											</div>
+													{/* فراغ محاذاة للأيقونة */}
+													<div
+														className="w-10 shrink-0"
+														aria-hidden="true"
+													/>
 
-											{/* فراغ محاذاة للأيقونة */}
-											<div
-												className="w-10 shrink-0"
-												aria-hidden="true"
-											/>
-
-											{/* تسمية اسم الدورة / المسار يساراً */}
-											<div className="flex-1 min-w-0">
-												<FieldLabel
-													required
-													info="اسم المسار التعليمي أو التدريبي"
-												>
-													<Label
-														htmlFor="trk-name"
-														className="text-xs font-semibold"
-													>
-														اسم المسار
-													</Label>
-												</FieldLabel>
-											</div>
-										</div>
-
-										{/* حقول الإدخال جنباً إلى جنب مع زر الأيقونة المنبثق */}
-										<div className="flex items-center gap-2.5 w-full">
-											{/* حقل المعرف */}
-											<div className="w-36 sm:w-44 shrink-0">
-												<Input
-													id="trk-code"
-													value={code}
-													onChange={(e) => setCode(e.target.value)}
-													placeholder="مثال: PR-02"
-													className="w-full h-10 text-xs font-mono text-center sm:text-right bg-muted/40"
-												/>
-											</div>
-
-											{/* زر الأيقونة المنبثق لاختيار رمز ولون المسار */}
-											<div className="shrink-0 w-10 flex items-center justify-center">
-												<Popover
-													open={iconPickerOpen}
-													onOpenChange={setIconPickerOpen}
-												>
-													<PopoverTrigger asChild>
-														<button
-															type="button"
-															className={cn(
-																"size-10 rounded-xl border flex items-center justify-center transition-all cursor-pointer shadow-2xs hover:scale-105 active:scale-95",
-																currentColorConfig.bg,
-															)}
-															title="اختر رمز ولون المسار"
+													{/* تسمية اسم الدورة / المسار يساراً */}
+													<div className="flex-1 min-w-0">
+														<FieldLabel
+															required
+															info="اسم المسار التعليمي أو التدريبي"
 														>
-															<ActiveIcon className="size-5" />
-														</button>
-													</PopoverTrigger>
+															<Label
+																htmlFor="trk-name"
+																className="text-xs font-semibold"
+															>
+																اسم المسار
+															</Label>
+														</FieldLabel>
+													</div>
+												</div>
 
-													<PopoverContent
-														className="w-[340px] p-3 shadow-xl rounded-xl border bg-popover"
-														align="start"
-														side="bottom"
-														sideOffset={6}
-														dir="rtl"
-													>
-														{/* اختيار اللون */}
-														<div className="mb-3">
-															<span className="text-[11px] font-semibold text-muted-foreground block mb-1.5">
-																لون الأيقونة
-															</span>
-															<div className="flex items-center gap-2">
-																{COLOR_OPTIONS.map((col) => (
-																	<button
-																		key={col.id}
-																		type="button"
-																		onClick={() => setSelectedColor(col.id)}
-																		className={cn(
-																			"size-6 rounded-full border-2 transition-transform hover:scale-110",
-																			col.bg,
-																			selectedColor === col.id &&
-																				"ring-2 ring-primary ring-offset-2",
-																		)}
-																		title={col.label}
-																	/>
-																))}
-															</div>
-														</div>
+												{/* حقول الإدخال جنباً إلى جنب مع زر الأيقونة المنبثق */}
+												<div className="flex items-center gap-2.5 w-full">
+													{/* حقل المعرف */}
+													<div className="w-36 sm:w-44 shrink-0">
+														<Input
+															id="trk-code"
+															value={code}
+															onChange={(e) => setCode(e.target.value)}
+															placeholder="مثال: PR-02"
+															className="w-full h-10 text-xs font-mono text-center sm:text-right bg-muted/40"
+														/>
+													</div>
 
-														{/* حقل بحث الأيقونات */}
-														<div className="relative mb-2">
-															<Input
-																value={iconSearch}
-																onChange={(e) => setIconSearch(e.target.value)}
-																placeholder="ابحث في الأيقونات..."
-																className="h-8 text-xs text-right pr-7 pl-7 bg-muted/20"
-															/>
-															<IconSearch className="size-3.5 text-muted-foreground absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
-															{iconSearch && (
+													{/* زر الأيقونة المنبثق لاختيار رمز ولون المسار */}
+													<div className="shrink-0 w-10 flex items-center justify-center">
+														<Popover
+															open={iconPickerOpen}
+															onOpenChange={setIconPickerOpen}
+														>
+															<PopoverTrigger asChild>
 																<button
 																	type="button"
-																	onClick={() => setIconSearch("")}
-																	className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+																	className={cn(
+																		"size-10 rounded-xl border flex items-center justify-center transition-all cursor-pointer shadow-2xs hover:scale-105 active:scale-95",
+																		currentColorConfig.bg,
+																	)}
+																	title="اختر رمز ولون المسار"
 																>
-																	<IconX className="size-3" />
+																	<ActiveIcon className="size-5" />
 																</button>
-															)}
-														</div>
+															</PopoverTrigger>
 
-														{/* شبكة الأيقونات */}
-														<div className="max-h-48 overflow-y-auto p-1.5 border rounded-lg bg-muted/20">
-															<div className="grid grid-cols-6 gap-1.5">
-																{filteredIcons.map((item) => {
-																	const IconComp = item.icon;
-																	const isSelected = selectedIcon === item.id;
-																	return (
+															<PopoverContent
+																className="w-[340px] p-3 shadow-xl rounded-xl border bg-popover"
+																align="start"
+																side="bottom"
+																sideOffset={6}
+																dir="rtl"
+															>
+																{/* اختيار اللون */}
+																<div className="mb-3">
+																	<span className="text-[11px] font-semibold text-muted-foreground block mb-1.5">
+																		لون الأيقونة
+																	</span>
+																	<div className="flex items-center gap-2">
+																		{COLOR_OPTIONS.map((col) => (
+																			<button
+																				key={col.id}
+																				type="button"
+																				onClick={() => setSelectedColor(col.id)}
+																				className={cn(
+																					"size-6 rounded-full border-2 transition-transform hover:scale-110",
+																					col.bg,
+																					selectedColor === col.id &&
+																						"ring-2 ring-primary ring-offset-2",
+																				)}
+																				title={col.label}
+																			/>
+																		))}
+																	</div>
+																</div>
+
+																{/* حقل بحث الأيقونات */}
+																<div className="relative mb-2">
+																	<Input
+																		value={iconSearch}
+																		onChange={(e) => setIconSearch(e.target.value)}
+																		placeholder="ابحث في الأيقونات..."
+																		className="h-8 text-xs text-right pr-7 pl-7 bg-muted/20"
+																	/>
+																	<IconSearch className="size-3.5 text-muted-foreground absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+																	{iconSearch && (
 																		<button
-																			key={item.id}
 																			type="button"
-																			onClick={() => {
-																				setSelectedIcon(item.id);
-																				setIconPickerOpen(false);
-																			}}
-																			className={cn(
-																				"size-8 rounded-md flex items-center justify-center transition-all text-muted-foreground hover:text-foreground hover:bg-background shadow-2xs",
-																				isSelected &&
-																					"bg-primary/10 text-primary border border-primary/30",
-																			)}
-																			title={item.name}
+																			onClick={() => setIconSearch("")}
+																			className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
 																		>
-																			<IconComp className="size-4" />
+																			<IconX className="size-3" />
 																		</button>
-																	);
-																})}
-															</div>
-														</div>
-													</PopoverContent>
-												</Popover>
+																	)}
+																</div>
+
+																{/* شبكة الأيقونات */}
+																<div className="max-h-48 overflow-y-auto p-1.5 border rounded-lg bg-muted/20">
+																	<div className="grid grid-cols-6 gap-1.5">
+																		{filteredIcons.map((item) => {
+																			const IconComp = item.icon;
+																			const isSelected = selectedIcon === item.id;
+																			return (
+																				<button
+																					key={item.id}
+																					type="button"
+																					onClick={() => {
+																						setSelectedIcon(item.id);
+																						setIconPickerOpen(false);
+																					}}
+																					className={cn(
+																						"size-8 rounded-md flex items-center justify-center transition-all text-muted-foreground hover:text-foreground hover:bg-background shadow-2xs",
+																						isSelected &&
+																							"bg-primary/10 text-primary border border-primary/30",
+																					)}
+																					title={item.name}
+																				>
+																					<IconComp className="size-4" />
+																				</button>
+																			);
+																		})}
+																	</div>
+																</div>
+															</PopoverContent>
+														</Popover>
+													</div>
+
+													{/* حقل اسم المسار */}
+													<div className="flex-1 min-w-0">
+														<Input
+															id="trk-name"
+															value={name}
+															onChange={(e) => setName(e.target.value)}
+															placeholder="مثال: البرمجه للأطفال"
+															className={cn(
+																"w-full h-10 text-xs text-right font-medium",
+																isDuplicateTrackName &&
+																	"border-destructive focus-visible:ring-destructive",
+															)}
+															required
+														/>
+														{isDuplicateTrackName && (
+															<p className="text-[11px] text-destructive font-medium mt-1 flex items-center gap-1">
+																<IconAlertCircle className="size-3 shrink-0" />
+																<span>
+																	اسم المسار التدريبي مسجّل مسبقاً، يرجى اختيار اسم آخر فريد
+																</span>
+															</p>
+														)}
+													</div>
+												</div>
 											</div>
 
-											{/* حقل اسم المسار / الدورة */}
-											<div className="flex-1 min-w-0">
-												<Input
-													id="trk-name"
-													value={name}
-													onChange={(e) => setName(e.target.value)}
-													placeholder="مثال: البرمجه للأطفال"
-													className="w-full h-10 text-xs text-right font-medium"
-													required
+											{/* السطر الثاني: وصف المسار */}
+											<Field className="space-y-1.5">
+												<FieldLabel info="وصف شامل لأهداف المسار التدريبي ومخرجاته">
+													<Label
+														htmlFor="trk-desc"
+														className="text-xs font-semibold"
+													>
+														وصف المسار
+													</Label>
+												</FieldLabel>
+												<div className="rounded-lg border border-border/80 bg-background overflow-hidden focus-within:ring-1 focus-within:ring-primary">
+													<Textarea
+														id="trk-desc"
+														value={description}
+														onChange={(e) => setDescription(e.target.value)}
+														placeholder="أضف وصف..."
+														rows={4}
+														className="w-full text-xs text-right resize-none border-0 focus-visible:ring-0 p-3 shadow-none bg-transparent"
+													/>
+												</div>
+											</Field>
+
+											{/* محرر الملاحظات والأفكار التفاعلي الموحد (RichNotesEditor) — بوردر علوي فقط مطابق للتصميم */}
+											<div className="mt-2">
+												<RichNotesEditor
+													id="trk-notes"
+													value={notes}
+													onChange={setNotes}
+													placeholder="أضف أفكار أو أهداف لهذا المسار..."
+													variant="border-top-only"
+													minHeight={50}
 												/>
 											</div>
 										</div>
-									</div>
 
-									{/* السطر الثاني: وصف المسار */}
-									<Field className="space-y-1.5">
-										<FieldLabel info="وصف شامل لأهداف المسار التدريبي ومخرجاته">
-											<Label
-												htmlFor="trk-desc"
-												className="text-xs font-semibold"
-											>
-												وصف المسار
-											</Label>
-										</FieldLabel>
-										<div className="rounded-lg border border-border/80 bg-background overflow-hidden focus-within:ring-1 focus-within:ring-primary">
-											<Textarea
-												id="trk-desc"
-												value={description}
-												onChange={(e) => setDescription(e.target.value)}
-												placeholder="أضف وصف..."
-												rows={4}
-												className="w-full text-xs text-right resize-none border-0 focus-visible:ring-0 p-3 shadow-none bg-transparent"
-											/>
-										</div>
-									</Field>
+										{/* 3. شريط التحكم والإجراءات السفلي الثابت */}
+										<div className="shrink-0 bg-background border-t border-border flex flex-col z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+											{/* أ) رسالة التنبيه الصفراء المطابقة للصورة تماماً مع زر الإغلاق */}
+											{showNotice && (
+												<div className="w-full bg-[#FFFBEB] dark:bg-amber-950/40 border-b border-amber-200/80 dark:border-amber-900/40 px-5 py-2.5 flex items-center justify-between text-xs text-amber-800 dark:text-amber-300">
+													<div className="flex items-center gap-1.5 font-medium">
+														<span className="font-bold">تنبيه:</span>
+														<span>يمكنك تخطي الخطوات التالية وإضافتها بعد إنشاء المسار</span>
+													</div>
+													<button
+														type="button"
+														onClick={() => setShowNotice(false)}
+														className="text-amber-700/80 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-200 p-0.5 rounded transition-colors cursor-pointer"
+														title="إغلاق التنبيه"
+													>
+														<IconX className="size-4" />
+													</button>
+												</div>
+											)}
 
-									{/* محرر الملاحظات والأفكار التفاعلي الموحد (RichNotesEditor) — بوردر علوي فقط مطابق للتصميم */}
-									<div className="mt-2">
-										<RichNotesEditor
-											id="trk-notes"
-											value={notes}
-											onChange={setNotes}
-											placeholder="أضف أفكار أو أهداف لهذا المسار..."
-											variant="border-top-only"
-											minHeight={50}
-										/>
-									</div>
-								</div>
-
-								{/* 3. شريط التحكم والإجراءات السفلي الثابت */}
-								<div className="shrink-0 bg-background border-t border-border flex flex-col z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
-									{/* أ) رسالة التنبيه الصفراء المطابقة للصورة تماماً مع زر الإغلاق */}
-									{showNotice && (
-										<div className="w-full bg-[#FFFBEB] dark:bg-amber-950/40 border-b border-amber-200/80 dark:border-amber-900/40 px-5 py-2.5 flex items-center justify-between text-xs text-amber-800 dark:text-amber-300">
-											<div className="flex items-center gap-1.5 font-medium">
-												<span className="font-bold">تنبيه:</span>
-												<span>يمكنك تخطي الخطوات التالية وإضافتها بعد إنشاء المسار</span>
-											</div>
-											<button
-												type="button"
-												onClick={() => setShowNotice(false)}
-												className="text-amber-700/80 hover:text-amber-900 dark:text-amber-400 dark:hover:text-amber-200 p-0.5 rounded transition-colors cursor-pointer"
-												title="إغلاق التنبيه"
-											>
-												<IconX className="size-4" />
-											</button>
-										</div>
-									)}
-
-									{/* ب) شريط شرائح الخطوات الإضافية (المرحلة الدراسية، التصنيف، المدرب، المدة، والخيارات) */}
-									<div className="flex items-center gap-2 flex-wrap justify-start px-5 py-2.5 bg-background">
-										{/* 1. المرحلة الدراسية المربوطة بإعدادات المراحل الدراسية والـ API */}
-										<DropdownMenu
-											dir="rtl"
-											modal={false}
-										>
-											<DropdownMenuTrigger asChild>
-												<Button
-													type="button"
-													variant={academicStage ? "secondary" : "outline"}
-													size="sm"
-													className="gap-1.5 h-8 text-xs font-normal"
+											{/* ب) شريط شرائح الخطوات الإضافية (المرحلة الدراسية، التصنيف، المدرب، المدة، والخيارات) */}
+											<div className="flex items-center gap-2 flex-wrap justify-start px-5 py-2.5 bg-background">
+												{/* 1. المرحلة الدراسية المربوطة بإعدادات المراحل الدراسية والـ API */}
+												<DropdownMenu
+													dir="rtl"
+													modal={false}
 												>
-													<IconSchool className="size-3.5 text-muted-foreground/70 shrink-0" />
-													<span>{academicStage || "المرحلة الدراسية"}</span>
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent
-												align="end"
-												className="w-56! min-w-56 p-1.5"
-											>
-												<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
-													المرحلة الدراسية
-												</DropdownMenuLabel>
-
-												{/* حقل تخصيص وإضافة مرحلة دراسية جديدة */}
-												{/* biome-ignore lint/a11y/noStaticElementInteractions: stops dropdown closing on click */}
-												<div
-													className="p-1 mb-1.5 border-b"
-													onClickCapture={(e) => e.stopPropagation()}
-													onKeyDownCapture={(e) => e.stopPropagation()}
-													onPointerDownCapture={(e) => e.stopPropagation()}
-													onMouseDown={(e) => e.stopPropagation()}
-												>
-													<div className="flex items-center gap-1.5">
-														<Input
-															value={newStageInput}
-															onChange={(e) => setNewStageInput(e.target.value)}
-															onKeyDown={(e) => {
-																e.stopPropagation();
-																if (e.key === "Enter") {
-																	e.preventDefault();
-																	handleAddCustomStage(e);
-																}
-															}}
-															placeholder="مرحلة دراسية جديدة..."
-															className="h-7 text-xs px-2 flex-1"
-														/>
+													<DropdownMenuTrigger asChild>
 														<Button
 															type="button"
+															variant={academicStage ? "secondary" : "outline"}
 															size="sm"
-															variant="secondary"
-															onPointerDown={(e) => {
-																e.preventDefault();
-																e.stopPropagation();
-															}}
-															onMouseDown={(e) => {
-																e.preventDefault();
-																e.stopPropagation();
-																handleAddCustomStage(e);
-															}}
-															onClick={handleAddCustomStage}
-															disabled={!newStageInput.trim() || isAddingStage}
-															className="h-7 px-2 text-xs shrink-0 gap-1 cursor-pointer"
+															className="gap-1.5 h-8 text-xs font-normal"
 														>
-															{isAddingStage ? (
-																<Spinner className="size-3" />
-															) : (
-																<IconPlus className="size-3" />
-															)}
-															<span>إضافة</span>
+															<IconSchool className="size-3.5 text-muted-foreground/70 shrink-0" />
+															<span>{academicStage || "المرحلة الدراسية"}</span>
 														</Button>
-													</div>
-												</div>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent
+														align="end"
+														className="w-56! min-w-56 p-1.5"
+													>
+														<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
+															المرحلة الدراسية
+														</DropdownMenuLabel>
 
-												{/* خيار بدون مرحلة دراسية في الأعلى */}
-												<DropdownMenuItem
-													onClick={() => setAcademicStage("")}
-													className={cn(
-														"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md mb-1",
-														!academicStage && "bg-muted font-medium text-foreground",
-													)}
-												>
-													<span>بدون مرحلة دراسية</span>
-													{!academicStage && <IconCheck className="size-3.5 text-primary" />}
-												</DropdownMenuItem>
-												<DropdownMenuSeparator className="my-1" />
-
-												{/* قائمة المراحل المتاحة */}
-												<div className="max-h-48 overflow-y-auto space-y-0.5">
-													{isStagesLoading && activeAcademicStages.length === 0 ? (
-														<div className="py-2 text-center text-xs text-muted-foreground">
-															جاري التحميل...
-														</div>
-													) : (
-														activeAcademicStages.map((item) => (
-															// biome-ignore lint/a11y/noStaticElementInteractions: stage option
-															// biome-ignore lint/a11y/useKeyWithClickEvents: stage option
-															<div
-																key={item}
-																onClick={() => setAcademicStage(item)}
-																className={cn(
-																	"relative flex cursor-pointer select-none items-center justify-between rounded-sm px-2 py-1.5 text-xs outline-none transition-colors hover:bg-accent hover:text-accent-foreground group",
-																	academicStage === item && "bg-accent/60 font-medium",
-																)}
-															>
-																<div className="flex items-center gap-1.5 min-w-0">
-																	<span>{item}</span>
-																	{academicStage === item && (
-																		<IconCheck className="size-3.5 text-primary shrink-0" />
-																	)}
-																</div>
-															</div>
-														))
-													)}
-												</div>
-											</DropdownMenuContent>
-										</DropdownMenu>
-
-										{/* 2. المسار المربوط بإعدادات المسارات والـ API */}
-										<DropdownMenu
-											dir="rtl"
-											modal={false}
-										>
-											<DropdownMenuTrigger asChild>
-												<Button
-													type="button"
-													variant={category ? "secondary" : "outline"}
-													size="sm"
-													className="gap-1.5 h-8 text-xs font-normal"
-												>
-													<IconRoute className="size-3.5 text-muted-foreground/70 shrink-0" />
-													<span>{category || "التصنيف"}</span>
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent
-												align="end"
-												className="w-56! min-w-56 p-1.5"
-											>
-												<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
-													التصنيف
-												</DropdownMenuLabel>
-
-												{/* حقل تخصيص وإضافة مسار جديد */}
-												{/* biome-ignore lint/a11y/noStaticElementInteractions: stops dropdown closing on click */}
-												<div
-													className="p-1 mb-1.5 border-b"
-													onClickCapture={(e) => e.stopPropagation()}
-													onKeyDownCapture={(e) => e.stopPropagation()}
-													onPointerDownCapture={(e) => e.stopPropagation()}
-													onMouseDown={(e) => e.stopPropagation()}
-												>
-													<div className="flex items-center gap-1.5">
-														<Input
-															value={newClassificationInput}
-															onChange={(e) => setNewClassificationInput(e.target.value)}
-															onKeyDown={(e) => {
-																e.stopPropagation();
-																if (e.key === "Enter") {
-																	e.preventDefault();
-																	handleAddCustomClassification(e);
-																}
-															}}
-															placeholder="التصنيف جديد..."
-															className="h-7 text-xs px-2 flex-1"
-														/>
-														<Button
-															type="button"
-															size="sm"
-															variant="secondary"
-															onPointerDown={(e) => {
-																e.preventDefault();
-																e.stopPropagation();
-															}}
-															onMouseDown={(e) => {
-																e.preventDefault();
-																e.stopPropagation();
-																handleAddCustomClassification(e);
-															}}
-															onClick={handleAddCustomClassification}
-															disabled={
-																!newClassificationInput.trim() || isAddingClassification
-															}
-															className="h-7 px-2 text-xs shrink-0 gap-1 cursor-pointer"
+														{/* حقل تخصيص وإضافة مرحلة دراسية جديدة */}
+														{/* biome-ignore lint/a11y/noStaticElementInteractions: stops dropdown closing on click */}
+														<div
+															className="p-1 mb-1.5 border-b"
+															onClickCapture={(e) => e.stopPropagation()}
+															onKeyDownCapture={(e) => e.stopPropagation()}
+															onPointerDownCapture={(e) => e.stopPropagation()}
+															onMouseDown={(e) => e.stopPropagation()}
 														>
-															{isAddingClassification ? (
-																<Spinner className="size-3" />
-															) : (
-																<IconPlus className="size-3" />
-															)}
-															<span>إضافة</span>
-														</Button>
-													</div>
-												</div>
-
-												{/* خيار بدون مسار في الأعلى */}
-												<DropdownMenuItem
-													onClick={() => setCategory("")}
-													className={cn(
-														"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md mb-1",
-														!category && "bg-muted font-medium text-foreground",
-													)}
-												>
-													<span>بدون تصنيف</span>
-													{!category && <IconCheck className="size-3.5 text-primary" />}
-												</DropdownMenuItem>
-												<DropdownMenuSeparator className="my-1" />
-
-												{/* قائمة المسارات المتاحة */}
-												<div className="max-h-48 overflow-y-auto space-y-0.5">
-													{isClassificationsLoading && activeTrackClassifications.length === 0 ? (
-														<div className="py-2 text-center text-xs text-muted-foreground">
-															جاري التحميل...
-														</div>
-													) : (
-														activeTrackClassifications.map((item) => {
-															const trackObj = (trackClassifications || []).find((t) => t.name === item);
-															const isCustom = trackObj ? !trackObj.isDefault : true;
-															return (
-																// biome-ignore lint/a11y/noStaticElementInteractions: dropdown option
-																// biome-ignore lint/a11y/useKeyWithClickEvents: dropdown option
-																<div
-																	key={item}
-																	onClick={() => setCategory(item)}
-																	className={cn(
-																		"relative flex cursor-pointer select-none items-center justify-between rounded-sm px-2 py-1.5 text-xs outline-none transition-colors hover:bg-accent hover:text-accent-foreground group",
-																		category === item && "bg-accent/60 font-medium",
-																	)}
+															<div className="flex items-center gap-1.5">
+																<Input
+																	value={newStageInput}
+																	onChange={(e) => setNewStageInput(e.target.value)}
+																	onKeyDown={(e) => {
+																		e.stopPropagation();
+																		if (e.key === "Enter") {
+																			e.preventDefault();
+																			handleAddCustomStage(e);
+																		}
+																	}}
+																	placeholder="مرحلة دراسية جديدة..."
+																	className="h-7 text-xs px-2 flex-1"
+																/>
+																<Button
+																	type="button"
+																	size="sm"
+																	variant="secondary"
+																	onPointerDown={(e) => {
+																		e.preventDefault();
+																		e.stopPropagation();
+																	}}
+																	onMouseDown={(e) => {
+																		e.preventDefault();
+																		e.stopPropagation();
+																		handleAddCustomStage(e);
+																	}}
+																	onClick={handleAddCustomStage}
+																	disabled={!newStageInput.trim() || isAddingStage}
+																	className="h-7 px-2 text-xs shrink-0 gap-1 cursor-pointer"
 																>
-																	<div className="flex items-center gap-1.5 min-w-0">
-																		<span>{item}</span>
-																		{category === item && (
-																			<IconCheck className="size-3.5 text-primary shrink-0" />
-																		)}
-																	</div>
-
-																	{isCustom && (
-																		<button
-																			type="button"
-																			title="حذف هذا المسار"
-																			onPointerDown={(e) => {
-																				e.preventDefault();
-																				e.stopPropagation();
-																			}}
-																			onMouseDown={(e) => {
-																				e.preventDefault();
-																				e.stopPropagation();
-																			}}
-																			onClick={(e) => {
-																				e.preventDefault();
-																				e.stopPropagation();
-																				if (category === item) setCategory("");
-																				setClassificationsList((prev) =>
-																					prev.filter((c) => c !== item),
-																				);
-																				deleteClassificationMutation(item);
-																			}}
-																			className="opacity-50 hover:opacity-100 hover:text-destructive p-0.5 rounded transition-opacity"
-																		>
-																			<IconX className="size-3.5" />
-																		</button>
+																	{isAddingStage ? (
+																		<Spinner className="size-3" />
+																	) : (
+																		<IconPlus className="size-3" />
 																	)}
-																</div>
-															);
-														})
-													)}
-												</div>
-											</DropdownMenuContent>
-										</DropdownMenu>
+																	<span>إضافة</span>
+																</Button>
+															</div>
+														</div>
 
-										{/* 3. تعيين الموظف/المدرب عبر السايد شيت المطابق للفصول */}
-										<Button
-											type="button"
-											variant={selectedStaffIds.length > 0 ? "secondary" : "outline"}
-											size="sm"
-											className="gap-1.5 h-8 text-xs font-normal cursor-pointer"
-											onClick={() => setIsStaffSheetOpen(true)}
-										>
-											<IconSun className="size-3.5 shrink-0 text-muted-foreground" />
-											<span>
-												{selectedStaffMembers.length === 0
-													? "بدون مدرب"
-													: selectedStaffMembers.length === 1
-														? selectedStaffMembers[0].name
-														: `${selectedStaffMembers.length} مدربين`}
-											</span>
-										</Button>
-
-										{/* 4. المدة للفترة */}
-										<DropdownMenu
-											dir="rtl"
-											modal={false}
-										>
-											<DropdownMenuTrigger asChild>
-												<Button
-													type="button"
-													variant={duration ? "secondary" : "outline"}
-													size="sm"
-													className="gap-1.5 h-8 text-xs font-normal"
-												>
-													<IconClock className="size-3.5 shrink-0 text-muted-foreground" />
-													<span>{duration ? `... ${duration}` : "... بدون مدة"}</span>
-												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent
-												align="end"
-												className="w-44! min-w-44 p-1.5"
-											>
-												<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
-													فترة المسار التدريبي
-												</DropdownMenuLabel>
-												<DropdownMenuSeparator className="my-1" />
-
-												{/* خيار بدون مدة في الأعلى */}
-												<DropdownMenuItem
-													onClick={() => setDuration("")}
-													className={cn(
-														"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md",
-														!duration && "bg-muted font-medium text-foreground",
-													)}
-												>
-													<span>بدون مدة</span>
-													{!duration && <IconCheck className="size-3.5 text-primary" />}
-												</DropdownMenuItem>
-												<DropdownMenuSeparator className="my-1" />
-
-												<div className="max-h-48 overflow-y-auto space-y-0.5">
-													{DURATION_PRESETS.map((d) => (
+														{/* خيار بدون مرحلة دراسية في الأعلى */}
 														<DropdownMenuItem
-															key={d}
-															onClick={() => setDuration(d)}
+															onClick={() => setAcademicStage("")}
 															className={cn(
-																"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md",
-																duration === d && "bg-muted font-medium text-foreground",
+																"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md mb-1",
+																!academicStage && "bg-muted font-medium text-foreground",
 															)}
 														>
-															<span>{d}</span>
-															{duration === d && (
+															<span>بدون مرحلة دراسية</span>
+															{!academicStage && (
 																<IconCheck className="size-3.5 text-primary" />
 															)}
 														</DropdownMenuItem>
-													))}
-												</div>
-											</DropdownMenuContent>
-										</DropdownMenu>
+														<DropdownMenuSeparator className="my-1" />
 
-										{/* 5. زر النقاط الإضافية (...) */}
-										<DropdownMenu
-											dir="rtl"
-											modal={false}
-										>
-											<DropdownMenuTrigger asChild>
+														{/* قائمة المراحل المتاحة */}
+														<div className="max-h-48 overflow-y-auto space-y-0.5">
+															{isStagesLoading && activeAcademicStages.length === 0 ? (
+																<div className="py-2 text-center text-xs text-muted-foreground">
+																	جاري التحميل...
+																</div>
+															) : (
+																activeAcademicStages.map((item) => (
+																	// biome-ignore lint/a11y/noStaticElementInteractions: stage option
+																	// biome-ignore lint/a11y/useKeyWithClickEvents: stage option
+																	<div
+																		key={item}
+																		onClick={() => setAcademicStage(item)}
+																		className={cn(
+																			"relative flex cursor-pointer select-none items-center justify-between rounded-sm px-2 py-1.5 text-xs outline-none transition-colors hover:bg-accent hover:text-accent-foreground group",
+																			academicStage === item && "bg-accent/60 font-medium",
+																		)}
+																	>
+																		<div className="flex items-center gap-1.5 min-w-0">
+																			<span>{item}</span>
+																			{academicStage === item && (
+																				<IconCheck className="size-3.5 text-primary shrink-0" />
+																			)}
+																		</div>
+																	</div>
+																))
+															)}
+														</div>
+													</DropdownMenuContent>
+												</DropdownMenu>
+
+												{/* 2. المسار المربوط بإعدادات المسارات والـ API */}
+												<DropdownMenu
+													dir="rtl"
+													modal={false}
+												>
+													<DropdownMenuTrigger asChild>
+														<Button
+															type="button"
+															variant={category ? "secondary" : "outline"}
+															size="sm"
+															className="gap-1.5 h-8 text-xs font-normal"
+														>
+															<IconRoute className="size-3.5 text-muted-foreground/70 shrink-0" />
+															<span>{category || "التصنيف"}</span>
+														</Button>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent
+														align="end"
+														className="w-56! min-w-56 p-1.5"
+													>
+														<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
+															التصنيف
+														</DropdownMenuLabel>
+
+														{/* حقل تخصيص وإضافة مسار جديد */}
+														{/* biome-ignore lint/a11y/noStaticElementInteractions: stops dropdown closing on click */}
+														<div
+															className="p-1 mb-1.5 border-b"
+															onClickCapture={(e) => e.stopPropagation()}
+															onKeyDownCapture={(e) => e.stopPropagation()}
+															onPointerDownCapture={(e) => e.stopPropagation()}
+															onMouseDown={(e) => e.stopPropagation()}
+														>
+															<div className="flex items-center gap-1.5">
+																<Input
+																	value={newClassificationInput}
+																	onChange={(e) => setNewClassificationInput(e.target.value)}
+																	onKeyDown={(e) => {
+																		e.stopPropagation();
+																		if (e.key === "Enter") {
+																			e.preventDefault();
+																			handleAddCustomClassification(e);
+																		}
+																	}}
+																	placeholder="التصنيف جديد..."
+																	className="h-7 text-xs px-2 flex-1"
+																/>
+																<Button
+																	type="button"
+																	size="sm"
+																	variant="secondary"
+																	onPointerDown={(e) => {
+																		e.preventDefault();
+																		e.stopPropagation();
+																	}}
+																	onMouseDown={(e) => {
+																		e.preventDefault();
+																		e.stopPropagation();
+																		handleAddCustomClassification(e);
+																	}}
+																	onClick={handleAddCustomClassification}
+																	disabled={
+																		!newClassificationInput.trim() || isAddingClassification
+																	}
+																	className="h-7 px-2 text-xs shrink-0 gap-1 cursor-pointer"
+																>
+																	{isAddingClassification ? (
+																		<Spinner className="size-3" />
+																	) : (
+																		<IconPlus className="size-3" />
+																	)}
+																	<span>إضافة</span>
+																</Button>
+															</div>
+														</div>
+
+														{/* خيار بدون مسار في الأعلى */}
+														<DropdownMenuItem
+															onClick={() => setCategory("")}
+															className={cn(
+																"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md mb-1",
+																!category && "bg-muted font-medium text-foreground",
+															)}
+														>
+															<span>بدون تصنيف</span>
+															{!category && <IconCheck className="size-3.5 text-primary" />}
+														</DropdownMenuItem>
+														<DropdownMenuSeparator className="my-1" />
+
+														{/* قائمة المسارات المتاحة */}
+														<div className="max-h-48 overflow-y-auto space-y-0.5">
+															{isClassificationsLoading &&
+															activeTrackClassifications.length === 0 ? (
+																<div className="py-2 text-center text-xs text-muted-foreground">
+																	جاري التحميل...
+																</div>
+															) : (
+																activeTrackClassifications.map((item) => (
+																	// biome-ignore lint/a11y/noStaticElementInteractions: dropdown option
+																	// biome-ignore lint/a11y/useKeyWithClickEvents: dropdown option
+																	<div
+																		key={item}
+																		onClick={() => setCategory(item)}
+																		className={cn(
+																			"relative flex cursor-pointer select-none items-center justify-between rounded-sm px-2 py-1.5 text-xs outline-none transition-colors hover:bg-accent hover:text-accent-foreground group",
+																			category === item && "bg-accent/60 font-medium",
+																		)}
+																	>
+																		<div className="flex items-center gap-1.5 min-w-0">
+																			<span>{item}</span>
+																			{category === item && (
+																				<IconCheck className="size-3.5 text-primary shrink-0" />
+																			)}
+																		</div>
+																	</div>
+																))
+															)}
+														</div>
+													</DropdownMenuContent>
+												</DropdownMenu>
+
+												{/* 3. تعيين الموظف/المدرب عبر السايد شيت المطابق للفصول */}
 												<Button
 													type="button"
-													variant="outline"
-													size="icon-sm"
-													className="size-8"
-													title="خيارات إضافية للمسار"
+													variant={selectedStaffIds.length > 0 ? "secondary" : "outline"}
+													size="sm"
+													className="gap-1.5 h-8 text-xs font-normal cursor-pointer"
+													onClick={() => setIsStaffSheetOpen(true)}
 												>
-													<IconDots className="size-4 text-muted-foreground" />
+													<IconSun className="size-3.5 shrink-0 text-muted-foreground" />
+													<span>
+														{selectedStaffMembers.length === 0
+															? "بدون مدرب"
+															: selectedStaffMembers.length === 1
+																? selectedStaffMembers[0].name
+																: `${selectedStaffMembers.length} مدربين`}
+													</span>
 												</Button>
-											</DropdownMenuTrigger>
-											<DropdownMenuContent
-												align="start"
-												className="w-52! min-w-52 p-2 space-y-2"
-											>
-												{/* <div className="space-y-1">
+
+												{/* 4. المدة للفترة بحقلين منظمين (العدد + الوحدة) */}
+												<DurationPickerPopover
+													value={duration}
+													onChange={setDuration}
+													label="مدة المسار"
+													placeholder="تحديد مدة المسار..."
+													title="فترة المسار التدريبي"
+												/>
+
+												{/* 5. زر النقاط الإضافية (...) */}
+												<DropdownMenu
+													dir="rtl"
+													modal={false}
+												>
+													<DropdownMenuTrigger asChild>
+														<Button
+															type="button"
+															variant="outline"
+															size="icon-sm"
+															className="size-8"
+															title="خيارات إضافية للمسار"
+														>
+															<IconDots className="size-4 text-muted-foreground" />
+														</Button>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent
+														align="start"
+														className="w-52! min-w-52 p-2 space-y-2"
+													>
+														{/* <div className="space-y-1">
 											<span className="text-[11px] font-semibold text-muted-foreground block">
 												مكان المسار
 											</span>
@@ -1571,7 +1845,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 											/>
 										</div> */}
 
-												{/* <div className="space-y-1 pt-1 border-t">
+														{/* <div className="space-y-1 pt-1 border-t">
 													<span className="text-[11px] font-semibold text-muted-foreground block">
 														السعر (ج.م)
 													</span>
@@ -1586,125 +1860,134 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 													/>
 												</div> */}
 
-												<div className="pt-1 border-t">
-													<button
-														type="button"
-														onClick={() => setIsStaffSheetOpen(true)}
-														className="w-full flex items-center justify-between text-xs py-1.5 px-2 rounded hover:bg-accent text-right cursor-pointer"
-													>
-														<span className="font-semibold text-foreground">تعيين موظف</span>
-														{selectedStaffIds.length > 0 ? (
-															<span className="text-[10px] bg-primary/10 text-primary font-medium px-1.5 py-0.5 rounded">
-																{selectedStaffIds.length} محدد
-															</span>
-														) : (
-															<span className="text-[10px] text-muted-foreground">0 محدد</span>
-														)}
-													</button>
-												</div>
-											</DropdownMenuContent>
-										</DropdownMenu>
-									</div>
-								</div>
-
-								{/* 3. شريط الإجراءات والفوتر الموحد (FormFooter) */}
-								<div className="p-3 border-t bg-muted/20 shrink-0">
-									<FormFooter
-										continueAdding={createAnother}
-										onContinueAddingChange={!isEdit ? setCreateAnother : undefined}
-										disabled={isSubmitting || isCreatingTrack || isUpdatingTrack}
-										showShortcut={true}
-										extra={
-											<div className="flex items-center gap-2 text-xs text-muted-foreground">
-												<IconBrandWhatsapp className="size-4 text-emerald-600" />
-												<span>إشعار عبر الواتساب</span>
-												<Switch
-													checked={notifyWhatsApp}
-													onCheckedChange={setNotifyWhatsApp}
-													disabled={isSubmitting || isCreatingTrack || isUpdatingTrack}
-												/>
+														<div className="pt-1 border-t">
+															<button
+																type="button"
+																onClick={() => setIsStaffSheetOpen(true)}
+																className="w-full flex items-center justify-between text-xs py-1.5 px-2 rounded hover:bg-accent text-right cursor-pointer"
+															>
+																<span className="font-semibold text-foreground">
+																	تعيين موظف
+																</span>
+																{selectedStaffIds.length > 0 ? (
+																	<span className="text-[10px] bg-primary/10 text-primary font-medium px-1.5 py-0.5 rounded">
+																		{selectedStaffIds.length} محدد
+																	</span>
+																) : (
+																	<span className="text-[10px] text-muted-foreground">
+																		0 محدد
+																	</span>
+																)}
+															</button>
+														</div>
+													</DropdownMenuContent>
+												</DropdownMenu>
 											</div>
-										}
-									>
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											onClick={handleCloseAttempt}
-											disabled={isSubmitting || isCreatingTrack || isUpdatingTrack}
-										>
-											إلغاء
-										</Button>
+										</div>
 
-										{isEdit && (
-											<Button
-												type="button"
-												variant="outline"
-												size="sm"
-												onClick={handleFinalSubmit}
-												disabled={
-													isSubmitting || isCreatingTrack || isUpdatingTrack || !name.trim()
+										{/* 3. شريط الإجراءات والفوتر الموحد (FormFooter) */}
+										<div className="p-3 border-t bg-muted/20 shrink-0">
+											<FormFooter
+												continueAdding={createAnother}
+												onContinueAddingChange={!isEdit ? setCreateAnother : undefined}
+												disabled={isSubmitting || isCreatingTrack || isUpdatingTrack}
+												showShortcut={true}
+												extra={
+													<div className="flex items-center gap-2 text-xs text-muted-foreground">
+														<IconBrandWhatsapp className="size-4 text-emerald-600" />
+														<span>إشعار عبر الواتساب</span>
+														<Switch
+															checked={notifyWhatsApp}
+															onCheckedChange={setNotifyWhatsApp}
+															disabled={isSubmitting || isCreatingTrack || isUpdatingTrack}
+														/>
+													</div>
 												}
-												className="text-xs font-medium cursor-pointer"
 											>
-												حفظ مباشر
-											</Button>
-										)}
+												<Button
+													type="button"
+													variant="outline"
+													size="sm"
+													onClick={handleCloseAttempt}
+													disabled={isSubmitting || isCreatingTrack || isUpdatingTrack}
+												>
+													إلغاء
+												</Button>
 
-										<Button
-											type="submit"
-											size="sm"
-											disabled={
-												isSubmitting || isCreatingTrack || isUpdatingTrack || !name.trim()
-											}
-											className={cn(
-												"gap-1.5 font-semibold transition-all shadow-xs cursor-pointer",
-												!name.trim() && "opacity-50 cursor-not-allowed",
-											)}
-										>
-											<span>التالي: اختيار الدورات ←</span>
-										</Button>
-									</FormFooter>
+												{isEdit && (
+													<Button
+														type="button"
+														variant="outline"
+														size="sm"
+														onClick={handleFinalSubmit}
+														disabled={
+															isSubmitting ||
+															isCreatingTrack ||
+															isUpdatingTrack ||
+															!name.trim()
+														}
+														className="text-xs font-medium cursor-pointer"
+													>
+														حفظ مباشر
+													</Button>
+												)}
+
+												<Button
+													type="submit"
+													size="sm"
+													disabled={
+														isSubmitting || isCreatingTrack || isUpdatingTrack || !name.trim()
+													}
+													className={cn(
+														"gap-1.5 font-semibold transition-all shadow-xs cursor-pointer",
+														!name.trim() && "opacity-50 cursor-not-allowed",
+													)}
+												>
+													<span>التالي: اختيار الدورات ←</span>
+												</Button>
+											</FormFooter>
+										</div>
+									</form>
 								</div>
-							</form>
-						</div>
 
-						{/* لوحة المساعد الذكي سند (AI Agent Panel) */}
-						{isAgentOpen && (
-							<TrackAgentPanel
-								onClose={() => setIsAgentOpen(false)}
-								onCloseDialog={handleCloseAttempt}
-								onApplyData={(data) => {
-									if (data.name !== undefined) setName(data.name);
-									if (data.code !== undefined) setCode(data.code);
-									if (data.description !== undefined) setDescription(data.description);
-									if (data.notes !== undefined) setNotes(data.notes);
-									if (data.category !== undefined) setCategory(data.category);
-									if (data.academicStage !== undefined) setAcademicStage(data.academicStage);
-									if (data.duration !== undefined) setDuration(data.duration);
-									if (data.coursesCount !== undefined) setCoursesCount(data.coursesCount);
-									if (data.price !== undefined) setPrice(data.price);
-									if (data.selectedTrainer !== undefined)
-										setSelectedTrainer(data.selectedTrainer);
-									if (data.locationMode !== undefined) setLocationMode(data.locationMode);
-								}}
-								currentValues={{
-									name,
-									code,
-									description,
-									notes,
-									category,
-									academicStage,
-									duration,
-									coursesCount,
-									price,
-									selectedTrainer,
-									locationMode,
-								}}
-							/>
+								{/* لوحة المساعد الذكي سند (AI Agent Panel) */}
+								{isAgentOpen && (
+									<TrackAgentPanel
+										onClose={() => setIsAgentOpen(false)}
+										onCloseDialog={handleCloseAttempt}
+										onApplyData={(data) => {
+											if (data.name !== undefined) setName(data.name);
+											if (data.code !== undefined) setCode(data.code);
+											if (data.description !== undefined) setDescription(data.description);
+											if (data.notes !== undefined) setNotes(data.notes);
+											if (data.category !== undefined) setCategory(data.category);
+											if (data.academicStage !== undefined)
+												setAcademicStage(data.academicStage);
+											if (data.duration !== undefined) setDuration(data.duration);
+											if (data.coursesCount !== undefined) setCoursesCount(data.coursesCount);
+											if (data.price !== undefined) setPrice(data.price);
+											if (data.selectedTrainer !== undefined)
+												setSelectedTrainer(data.selectedTrainer);
+											if (data.locationMode !== undefined) setLocationMode(data.locationMode);
+										}}
+										currentValues={{
+											name,
+											code,
+											description,
+											notes,
+											category,
+											academicStage,
+											duration,
+											coursesCount,
+											price,
+											selectedTrainer,
+											locationMode,
+										}}
+									/>
+								)}
+							</div>
 						)}
 					</div>
-				)}
 				</DialogContent>
 			</Dialog>
 
@@ -1735,6 +2018,27 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 					setIsStaffSheetOpen(false);
 				}}
 			/>
+
+			{/* نافذة إنشاء دورة حقيقية بالكامل من داخل خطوات المسار */}
+			{isCreateCourseOpen && (
+				<CourseDialog
+					open={isCreateCourseOpen}
+					onOpenChange={setIsCreateCourseOpen}
+					onSuccess={(createdId) => {
+						setIsCreateCourseOpen(false);
+						if (createdId) {
+							setSelectedCourseIds((prev) =>
+								prev.includes(createdId) ? prev : [...prev, createdId],
+							);
+							toast.success("تم إنشاء الدورة وإضافتها للمسار تلقائياً بنجاح! ✨");
+						} else {
+							toast.success(
+								"تم إنشاء الدورة بنجاح! يمكنك الآن اختيارها وإضافتها للمسار مباشرة.",
+							);
+						}
+					}}
+				/>
+			)}
 		</>
 	);
 }

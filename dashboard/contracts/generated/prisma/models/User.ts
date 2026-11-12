@@ -313,6 +313,11 @@ export type UserWhereInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumListRelationFilter
   reminderOutbox?: Prisma.NotificationOutboxListRelationFilter
   recallContacts?: Prisma.RecallContactListRelationFilter
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignListRelationFilter
+  authoredRegistrationComments?: Prisma.RegistrationCommentListRelationFilter
+  assignedRegistrationRequests?: Prisma.RegistrationRequestListRelationFilter
+  referredRegistrationRequests?: Prisma.RegistrationRequestListRelationFilter
+  registrationCollaborations?: Prisma.RegistrationCollaboratorListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -431,6 +436,11 @@ export type UserOrderByWithRelationInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumOrderByRelationAggregateInput
   reminderOutbox?: Prisma.NotificationOutboxOrderByRelationAggregateInput
   recallContacts?: Prisma.RecallContactOrderByRelationAggregateInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignOrderByRelationAggregateInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentOrderByRelationAggregateInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestOrderByRelationAggregateInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestOrderByRelationAggregateInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -552,6 +562,11 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumListRelationFilter
   reminderOutbox?: Prisma.NotificationOutboxListRelationFilter
   recallContacts?: Prisma.RecallContactListRelationFilter
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignListRelationFilter
+  authoredRegistrationComments?: Prisma.RegistrationCommentListRelationFilter
+  assignedRegistrationRequests?: Prisma.RegistrationRequestListRelationFilter
+  referredRegistrationRequests?: Prisma.RegistrationRequestListRelationFilter
+  registrationCollaborations?: Prisma.RegistrationCollaboratorListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -698,6 +713,11 @@ export type UserCreateInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -816,6 +836,11 @@ export type UserUncheckedCreateInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -934,6 +959,11 @@ export type UserUpdateInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -1052,6 +1082,11 @@ export type UserUncheckedUpdateInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -2830,6 +2865,84 @@ export type UserUpdateOneWithoutRecallContactsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRecallContactsInput, Prisma.UserUpdateWithoutRecallContactsInput>, Prisma.UserUncheckedUpdateWithoutRecallContactsInput>
 }
 
+export type UserCreateNestedOneWithoutCreatedRegistrationCampaignsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedRegistrationCampaignsInput, Prisma.UserUncheckedCreateWithoutCreatedRegistrationCampaignsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedRegistrationCampaignsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutCreatedRegistrationCampaignsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreatedRegistrationCampaignsInput, Prisma.UserUncheckedCreateWithoutCreatedRegistrationCampaignsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreatedRegistrationCampaignsInput
+  upsert?: Prisma.UserUpsertWithoutCreatedRegistrationCampaignsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreatedRegistrationCampaignsInput, Prisma.UserUpdateWithoutCreatedRegistrationCampaignsInput>, Prisma.UserUncheckedUpdateWithoutCreatedRegistrationCampaignsInput>
+}
+
+export type UserCreateNestedOneWithoutRegistrationCollaborationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRegistrationCollaborationsInput, Prisma.UserUncheckedCreateWithoutRegistrationCollaborationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRegistrationCollaborationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutRegistrationCollaborationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRegistrationCollaborationsInput, Prisma.UserUncheckedCreateWithoutRegistrationCollaborationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRegistrationCollaborationsInput
+  upsert?: Prisma.UserUpsertWithoutRegistrationCollaborationsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRegistrationCollaborationsInput, Prisma.UserUpdateWithoutRegistrationCollaborationsInput>, Prisma.UserUncheckedUpdateWithoutRegistrationCollaborationsInput>
+}
+
+export type UserCreateNestedOneWithoutAssignedRegistrationRequestsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedRegistrationRequestsInput, Prisma.UserUncheckedCreateWithoutAssignedRegistrationRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedRegistrationRequestsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutReferredRegistrationRequestsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferredRegistrationRequestsInput, Prisma.UserUncheckedCreateWithoutReferredRegistrationRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferredRegistrationRequestsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneWithoutAssignedRegistrationRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAssignedRegistrationRequestsInput, Prisma.UserUncheckedCreateWithoutAssignedRegistrationRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAssignedRegistrationRequestsInput
+  upsert?: Prisma.UserUpsertWithoutAssignedRegistrationRequestsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAssignedRegistrationRequestsInput, Prisma.UserUpdateWithoutAssignedRegistrationRequestsInput>, Prisma.UserUncheckedUpdateWithoutAssignedRegistrationRequestsInput>
+}
+
+export type UserUpdateOneWithoutReferredRegistrationRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutReferredRegistrationRequestsInput, Prisma.UserUncheckedCreateWithoutReferredRegistrationRequestsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutReferredRegistrationRequestsInput
+  upsert?: Prisma.UserUpsertWithoutReferredRegistrationRequestsInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutReferredRegistrationRequestsInput, Prisma.UserUpdateWithoutReferredRegistrationRequestsInput>, Prisma.UserUncheckedUpdateWithoutReferredRegistrationRequestsInput>
+}
+
+export type UserCreateNestedOneWithoutAuthoredRegistrationCommentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuthoredRegistrationCommentsInput, Prisma.UserUncheckedCreateWithoutAuthoredRegistrationCommentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuthoredRegistrationCommentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAuthoredRegistrationCommentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAuthoredRegistrationCommentsInput, Prisma.UserUncheckedCreateWithoutAuthoredRegistrationCommentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAuthoredRegistrationCommentsInput
+  upsert?: Prisma.UserUpsertWithoutAuthoredRegistrationCommentsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAuthoredRegistrationCommentsInput, Prisma.UserUpdateWithoutAuthoredRegistrationCommentsInput>, Prisma.UserUncheckedUpdateWithoutAuthoredRegistrationCommentsInput>
+}
+
 export type UserCreateWithoutHandledPetOwnerRequestsInput = {
   id: string
   name: string
@@ -2945,6 +3058,11 @@ export type UserCreateWithoutHandledPetOwnerRequestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutHandledPetOwnerRequestsInput = {
@@ -3062,6 +3180,11 @@ export type UserUncheckedCreateWithoutHandledPetOwnerRequestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutHandledPetOwnerRequestsInput = {
@@ -3195,6 +3318,11 @@ export type UserUpdateWithoutHandledPetOwnerRequestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHandledPetOwnerRequestsInput = {
@@ -3312,6 +3440,11 @@ export type UserUncheckedUpdateWithoutHandledPetOwnerRequestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAgentConversationsInput = {
@@ -3429,6 +3562,11 @@ export type UserCreateWithoutAgentConversationsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAgentConversationsInput = {
@@ -3546,6 +3684,11 @@ export type UserUncheckedCreateWithoutAgentConversationsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAgentConversationsInput = {
@@ -3679,6 +3822,11 @@ export type UserUpdateWithoutAgentConversationsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAgentConversationsInput = {
@@ -3796,6 +3944,11 @@ export type UserUncheckedUpdateWithoutAgentConversationsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutClinicUsersInput = {
@@ -3913,6 +4066,11 @@ export type UserCreateWithoutClinicUsersInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutClinicUsersInput = {
@@ -4030,6 +4188,11 @@ export type UserUncheckedCreateWithoutClinicUsersInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutClinicUsersInput = {
@@ -4163,6 +4326,11 @@ export type UserUpdateWithoutClinicUsersInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClinicUsersInput = {
@@ -4280,6 +4448,11 @@ export type UserUncheckedUpdateWithoutClinicUsersInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutInvitesSentInput = {
@@ -4397,6 +4570,11 @@ export type UserCreateWithoutInvitesSentInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInvitesSentInput = {
@@ -4514,6 +4692,11 @@ export type UserUncheckedCreateWithoutInvitesSentInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutInvitesSentInput = {
@@ -4647,6 +4830,11 @@ export type UserUpdateWithoutInvitesSentInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInvitesSentInput = {
@@ -4764,6 +4952,11 @@ export type UserUncheckedUpdateWithoutInvitesSentInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAssignedTasksInput = {
@@ -4881,6 +5074,11 @@ export type UserCreateWithoutAssignedTasksInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignedTasksInput = {
@@ -4998,6 +5196,11 @@ export type UserUncheckedCreateWithoutAssignedTasksInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignedTasksInput = {
@@ -5120,6 +5323,11 @@ export type UserCreateWithoutCreatedTasksInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedTasksInput = {
@@ -5237,6 +5445,11 @@ export type UserUncheckedCreateWithoutCreatedTasksInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedTasksInput = {
@@ -5400,6 +5613,11 @@ export type UserUpdateWithoutCreatedTasksInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedTasksInput = {
@@ -5517,6 +5735,11 @@ export type UserUncheckedUpdateWithoutCreatedTasksInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredTaskActivityInput = {
@@ -5634,6 +5857,11 @@ export type UserCreateWithoutAuthoredTaskActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredTaskActivityInput = {
@@ -5751,6 +5979,11 @@ export type UserUncheckedCreateWithoutAuthoredTaskActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredTaskActivityInput = {
@@ -5884,6 +6117,11 @@ export type UserUpdateWithoutAuthoredTaskActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredTaskActivityInput = {
@@ -6001,6 +6239,11 @@ export type UserUncheckedUpdateWithoutAuthoredTaskActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCreatedInboxItemsInput = {
@@ -6118,6 +6361,11 @@ export type UserCreateWithoutCreatedInboxItemsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedInboxItemsInput = {
@@ -6235,6 +6483,11 @@ export type UserUncheckedCreateWithoutCreatedInboxItemsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedInboxItemsInput = {
@@ -6368,6 +6621,11 @@ export type UserUpdateWithoutCreatedInboxItemsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedInboxItemsInput = {
@@ -6485,6 +6743,11 @@ export type UserUncheckedUpdateWithoutCreatedInboxItemsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutInboxReadsInput = {
@@ -6602,6 +6865,11 @@ export type UserCreateWithoutInboxReadsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInboxReadsInput = {
@@ -6719,6 +6987,11 @@ export type UserUncheckedCreateWithoutInboxReadsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutInboxReadsInput = {
@@ -6852,6 +7125,11 @@ export type UserUpdateWithoutInboxReadsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInboxReadsInput = {
@@ -6969,6 +7247,11 @@ export type UserUncheckedUpdateWithoutInboxReadsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredInboxActivityInput = {
@@ -7086,6 +7369,11 @@ export type UserCreateWithoutAuthoredInboxActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredInboxActivityInput = {
@@ -7203,6 +7491,11 @@ export type UserUncheckedCreateWithoutAuthoredInboxActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredInboxActivityInput = {
@@ -7336,6 +7629,11 @@ export type UserUpdateWithoutAuthoredInboxActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredInboxActivityInput = {
@@ -7453,6 +7751,11 @@ export type UserUncheckedUpdateWithoutAuthoredInboxActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutInboxSettingsInput = {
@@ -7570,6 +7873,11 @@ export type UserCreateWithoutInboxSettingsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInboxSettingsInput = {
@@ -7687,6 +7995,11 @@ export type UserUncheckedCreateWithoutInboxSettingsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutInboxSettingsInput = {
@@ -7820,6 +8133,11 @@ export type UserUpdateWithoutInboxSettingsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInboxSettingsInput = {
@@ -7937,6 +8255,11 @@ export type UserUncheckedUpdateWithoutInboxSettingsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutStartedSopRunsInput = {
@@ -8054,6 +8377,11 @@ export type UserCreateWithoutStartedSopRunsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutStartedSopRunsInput = {
@@ -8171,6 +8499,11 @@ export type UserUncheckedCreateWithoutStartedSopRunsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutStartedSopRunsInput = {
@@ -8293,6 +8626,11 @@ export type UserCreateWithoutCompletedSopRunsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCompletedSopRunsInput = {
@@ -8410,6 +8748,11 @@ export type UserUncheckedCreateWithoutCompletedSopRunsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCompletedSopRunsInput = {
@@ -8543,6 +8886,11 @@ export type UserUpdateWithoutStartedSopRunsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStartedSopRunsInput = {
@@ -8660,6 +9008,11 @@ export type UserUncheckedUpdateWithoutStartedSopRunsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutCompletedSopRunsInput = {
@@ -8788,6 +9141,11 @@ export type UserUpdateWithoutCompletedSopRunsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCompletedSopRunsInput = {
@@ -8905,6 +9263,11 @@ export type UserUncheckedUpdateWithoutCompletedSopRunsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRespondedSopStepsInput = {
@@ -9022,6 +9385,11 @@ export type UserCreateWithoutRespondedSopStepsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRespondedSopStepsInput = {
@@ -9139,6 +9507,11 @@ export type UserUncheckedCreateWithoutRespondedSopStepsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRespondedSopStepsInput = {
@@ -9272,6 +9645,11 @@ export type UserUpdateWithoutRespondedSopStepsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRespondedSopStepsInput = {
@@ -9389,6 +9767,11 @@ export type UserUncheckedUpdateWithoutRespondedSopStepsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRequestedLabTestsInput = {
@@ -9506,6 +9889,11 @@ export type UserCreateWithoutRequestedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRequestedLabTestsInput = {
@@ -9623,6 +10011,11 @@ export type UserUncheckedCreateWithoutRequestedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRequestedLabTestsInput = {
@@ -9745,6 +10138,11 @@ export type UserCreateWithoutQcReviewedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutQcReviewedLabTestsInput = {
@@ -9862,6 +10260,11 @@ export type UserUncheckedCreateWithoutQcReviewedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutQcReviewedLabTestsInput = {
@@ -9995,6 +10398,11 @@ export type UserUpdateWithoutRequestedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRequestedLabTestsInput = {
@@ -10112,6 +10520,11 @@ export type UserUncheckedUpdateWithoutRequestedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutQcReviewedLabTestsInput = {
@@ -10240,6 +10653,11 @@ export type UserUpdateWithoutQcReviewedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutQcReviewedLabTestsInput = {
@@ -10357,6 +10775,11 @@ export type UserUncheckedUpdateWithoutQcReviewedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAssignedLabTestsInput = {
@@ -10474,6 +10897,11 @@ export type UserCreateWithoutAssignedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignedLabTestsInput = {
@@ -10591,6 +11019,11 @@ export type UserUncheckedCreateWithoutAssignedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignedLabTestsInput = {
@@ -10713,6 +11146,11 @@ export type UserCreateWithoutReviewedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewedLabTestsInput = {
@@ -10830,6 +11268,11 @@ export type UserUncheckedCreateWithoutReviewedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewedLabTestsInput = {
@@ -10952,6 +11395,11 @@ export type UserCreateWithoutRejectedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRejectedLabTestsInput = {
@@ -11069,6 +11517,11 @@ export type UserUncheckedCreateWithoutRejectedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRejectedLabTestsInput = {
@@ -11202,6 +11655,11 @@ export type UserUpdateWithoutAssignedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedLabTestsInput = {
@@ -11319,6 +11777,11 @@ export type UserUncheckedUpdateWithoutAssignedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReviewedLabTestsInput = {
@@ -11447,6 +11910,11 @@ export type UserUpdateWithoutReviewedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewedLabTestsInput = {
@@ -11564,6 +12032,11 @@ export type UserUncheckedUpdateWithoutReviewedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutRejectedLabTestsInput = {
@@ -11692,6 +12165,11 @@ export type UserUpdateWithoutRejectedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRejectedLabTestsInput = {
@@ -11809,6 +12287,11 @@ export type UserUncheckedUpdateWithoutRejectedLabTestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredLabActivityInput = {
@@ -11926,6 +12409,11 @@ export type UserCreateWithoutAuthoredLabActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredLabActivityInput = {
@@ -12043,6 +12531,11 @@ export type UserUncheckedCreateWithoutAuthoredLabActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredLabActivityInput = {
@@ -12176,6 +12669,11 @@ export type UserUpdateWithoutAuthoredLabActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredLabActivityInput = {
@@ -12293,6 +12791,11 @@ export type UserUncheckedUpdateWithoutAuthoredLabActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredLabCommentsInput = {
@@ -12410,6 +12913,11 @@ export type UserCreateWithoutAuthoredLabCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredLabCommentsInput = {
@@ -12527,6 +13035,11 @@ export type UserUncheckedCreateWithoutAuthoredLabCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredLabCommentsInput = {
@@ -12660,6 +13173,11 @@ export type UserUpdateWithoutAuthoredLabCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredLabCommentsInput = {
@@ -12777,6 +13295,11 @@ export type UserUncheckedUpdateWithoutAuthoredLabCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCollectedLabSamplesInput = {
@@ -12894,6 +13417,11 @@ export type UserCreateWithoutCollectedLabSamplesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCollectedLabSamplesInput = {
@@ -13011,6 +13539,11 @@ export type UserUncheckedCreateWithoutCollectedLabSamplesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCollectedLabSamplesInput = {
@@ -13144,6 +13677,11 @@ export type UserUpdateWithoutCollectedLabSamplesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCollectedLabSamplesInput = {
@@ -13261,6 +13799,11 @@ export type UserUncheckedUpdateWithoutCollectedLabSamplesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRequestedRadiologyOrdersInput = {
@@ -13378,6 +13921,11 @@ export type UserCreateWithoutRequestedRadiologyOrdersInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRequestedRadiologyOrdersInput = {
@@ -13495,6 +14043,11 @@ export type UserUncheckedCreateWithoutRequestedRadiologyOrdersInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRequestedRadiologyOrdersInput = {
@@ -13628,6 +14181,11 @@ export type UserUpdateWithoutRequestedRadiologyOrdersInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRequestedRadiologyOrdersInput = {
@@ -13745,6 +14303,11 @@ export type UserUncheckedUpdateWithoutRequestedRadiologyOrdersInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAssignedRadiologyExamsInput = {
@@ -13862,6 +14425,11 @@ export type UserCreateWithoutAssignedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAssignedRadiologyExamsInput = {
@@ -13979,6 +14547,11 @@ export type UserUncheckedCreateWithoutAssignedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAssignedRadiologyExamsInput = {
@@ -14101,6 +14674,11 @@ export type UserCreateWithoutReviewedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReviewedRadiologyExamsInput = {
@@ -14218,6 +14796,11 @@ export type UserUncheckedCreateWithoutReviewedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReviewedRadiologyExamsInput = {
@@ -14340,6 +14923,11 @@ export type UserCreateWithoutRejectedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRejectedRadiologyExamsInput = {
@@ -14457,6 +15045,11 @@ export type UserUncheckedCreateWithoutRejectedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRejectedRadiologyExamsInput = {
@@ -14590,6 +15183,11 @@ export type UserUpdateWithoutAssignedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedRadiologyExamsInput = {
@@ -14707,6 +15305,11 @@ export type UserUncheckedUpdateWithoutAssignedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutReviewedRadiologyExamsInput = {
@@ -14835,6 +15438,11 @@ export type UserUpdateWithoutReviewedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReviewedRadiologyExamsInput = {
@@ -14952,6 +15560,11 @@ export type UserUncheckedUpdateWithoutReviewedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutRejectedRadiologyExamsInput = {
@@ -15080,6 +15693,11 @@ export type UserUpdateWithoutRejectedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRejectedRadiologyExamsInput = {
@@ -15197,6 +15815,11 @@ export type UserUncheckedUpdateWithoutRejectedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPerformedRadiologyExamsInput = {
@@ -15314,6 +15937,11 @@ export type UserCreateWithoutPerformedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPerformedRadiologyExamsInput = {
@@ -15431,6 +16059,11 @@ export type UserUncheckedCreateWithoutPerformedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPerformedRadiologyExamsInput = {
@@ -15564,6 +16197,11 @@ export type UserUpdateWithoutPerformedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPerformedRadiologyExamsInput = {
@@ -15681,6 +16319,11 @@ export type UserUncheckedUpdateWithoutPerformedRadiologyExamsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutUploadedRadiologyStudiesInput = {
@@ -15798,6 +16441,11 @@ export type UserCreateWithoutUploadedRadiologyStudiesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutUploadedRadiologyStudiesInput = {
@@ -15915,6 +16563,11 @@ export type UserUncheckedCreateWithoutUploadedRadiologyStudiesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutUploadedRadiologyStudiesInput = {
@@ -16048,6 +16701,11 @@ export type UserUpdateWithoutUploadedRadiologyStudiesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutUploadedRadiologyStudiesInput = {
@@ -16165,6 +16823,11 @@ export type UserUncheckedUpdateWithoutUploadedRadiologyStudiesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredRadiologyReportsInput = {
@@ -16282,6 +16945,11 @@ export type UserCreateWithoutAuthoredRadiologyReportsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredRadiologyReportsInput = {
@@ -16399,6 +17067,11 @@ export type UserUncheckedCreateWithoutAuthoredRadiologyReportsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredRadiologyReportsInput = {
@@ -16521,6 +17194,11 @@ export type UserCreateWithoutCriticalRadiologyNoticesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCriticalRadiologyNoticesInput = {
@@ -16638,6 +17316,11 @@ export type UserUncheckedCreateWithoutCriticalRadiologyNoticesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCriticalRadiologyNoticesInput = {
@@ -16771,6 +17454,11 @@ export type UserUpdateWithoutAuthoredRadiologyReportsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredRadiologyReportsInput = {
@@ -16888,6 +17576,11 @@ export type UserUncheckedUpdateWithoutAuthoredRadiologyReportsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutCriticalRadiologyNoticesInput = {
@@ -17016,6 +17709,11 @@ export type UserUpdateWithoutCriticalRadiologyNoticesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCriticalRadiologyNoticesInput = {
@@ -17133,6 +17831,11 @@ export type UserUncheckedUpdateWithoutCriticalRadiologyNoticesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredRadiologyAddendaInput = {
@@ -17250,6 +17953,11 @@ export type UserCreateWithoutAuthoredRadiologyAddendaInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredRadiologyAddendaInput = {
@@ -17367,6 +18075,11 @@ export type UserUncheckedCreateWithoutAuthoredRadiologyAddendaInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredRadiologyAddendaInput = {
@@ -17500,6 +18213,11 @@ export type UserUpdateWithoutAuthoredRadiologyAddendaInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredRadiologyAddendaInput = {
@@ -17617,6 +18335,11 @@ export type UserUncheckedUpdateWithoutAuthoredRadiologyAddendaInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredRadiologyCommentsInput = {
@@ -17734,6 +18457,11 @@ export type UserCreateWithoutAuthoredRadiologyCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredRadiologyCommentsInput = {
@@ -17851,6 +18579,11 @@ export type UserUncheckedCreateWithoutAuthoredRadiologyCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredRadiologyCommentsInput = {
@@ -17984,6 +18717,11 @@ export type UserUpdateWithoutAuthoredRadiologyCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredRadiologyCommentsInput = {
@@ -18101,6 +18839,11 @@ export type UserUncheckedUpdateWithoutAuthoredRadiologyCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredRadiologyActivityInput = {
@@ -18218,6 +18961,11 @@ export type UserCreateWithoutAuthoredRadiologyActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredRadiologyActivityInput = {
@@ -18335,6 +19083,11 @@ export type UserUncheckedCreateWithoutAuthoredRadiologyActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredRadiologyActivityInput = {
@@ -18468,6 +19221,11 @@ export type UserUpdateWithoutAuthoredRadiologyActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredRadiologyActivityInput = {
@@ -18585,6 +19343,11 @@ export type UserUncheckedUpdateWithoutAuthoredRadiologyActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRecordedAnesthesiaEventsInput = {
@@ -18702,6 +19465,11 @@ export type UserCreateWithoutRecordedAnesthesiaEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRecordedAnesthesiaEventsInput = {
@@ -18819,6 +19587,11 @@ export type UserUncheckedCreateWithoutRecordedAnesthesiaEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRecordedAnesthesiaEventsInput = {
@@ -18952,6 +19725,11 @@ export type UserUpdateWithoutRecordedAnesthesiaEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRecordedAnesthesiaEventsInput = {
@@ -19069,6 +19847,11 @@ export type UserUncheckedUpdateWithoutRecordedAnesthesiaEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRecoveryAssessmentsInput = {
@@ -19186,6 +19969,11 @@ export type UserCreateWithoutRecoveryAssessmentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRecoveryAssessmentsInput = {
@@ -19303,6 +20091,11 @@ export type UserUncheckedCreateWithoutRecoveryAssessmentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRecoveryAssessmentsInput = {
@@ -19436,6 +20229,11 @@ export type UserUpdateWithoutRecoveryAssessmentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRecoveryAssessmentsInput = {
@@ -19553,6 +20351,11 @@ export type UserUncheckedUpdateWithoutRecoveryAssessmentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReportedComplicationsInput = {
@@ -19670,6 +20473,11 @@ export type UserCreateWithoutReportedComplicationsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReportedComplicationsInput = {
@@ -19787,6 +20595,11 @@ export type UserUncheckedCreateWithoutReportedComplicationsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReportedComplicationsInput = {
@@ -19920,6 +20733,11 @@ export type UserUpdateWithoutReportedComplicationsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReportedComplicationsInput = {
@@ -20037,6 +20855,11 @@ export type UserUncheckedUpdateWithoutReportedComplicationsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredOperationCommentsInput = {
@@ -20154,6 +20977,11 @@ export type UserCreateWithoutAuthoredOperationCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredOperationCommentsInput = {
@@ -20271,6 +21099,11 @@ export type UserUncheckedCreateWithoutAuthoredOperationCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredOperationCommentsInput = {
@@ -20404,6 +21237,11 @@ export type UserUpdateWithoutAuthoredOperationCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredOperationCommentsInput = {
@@ -20521,6 +21359,11 @@ export type UserUncheckedUpdateWithoutAuthoredOperationCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredOperationActivityInput = {
@@ -20638,6 +21481,11 @@ export type UserCreateWithoutAuthoredOperationActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredOperationActivityInput = {
@@ -20755,6 +21603,11 @@ export type UserUncheckedCreateWithoutAuthoredOperationActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredOperationActivityInput = {
@@ -20888,6 +21741,11 @@ export type UserUpdateWithoutAuthoredOperationActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredOperationActivityInput = {
@@ -21005,6 +21863,11 @@ export type UserUncheckedUpdateWithoutAuthoredOperationActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutManagedBranchesInput = {
@@ -21122,6 +21985,11 @@ export type UserCreateWithoutManagedBranchesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutManagedBranchesInput = {
@@ -21239,6 +22107,11 @@ export type UserUncheckedCreateWithoutManagedBranchesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutManagedBranchesInput = {
@@ -21361,6 +22234,11 @@ export type UserCreateWithoutManagerOfBranchesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutManagerOfBranchesInput = {
@@ -21478,6 +22356,11 @@ export type UserUncheckedCreateWithoutManagerOfBranchesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutManagerOfBranchesInput = {
@@ -21611,6 +22494,11 @@ export type UserUpdateWithoutManagedBranchesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutManagedBranchesInput = {
@@ -21728,6 +22616,11 @@ export type UserUncheckedUpdateWithoutManagedBranchesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithWhereUniqueWithoutManagerOfBranchesInput = {
@@ -21861,6 +22754,11 @@ export type UserCreateWithoutManagedRoomsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutManagedRoomsInput = {
@@ -21978,6 +22876,11 @@ export type UserUncheckedCreateWithoutManagedRoomsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutManagedRoomsInput = {
@@ -22111,6 +23014,11 @@ export type UserUpdateWithoutManagedRoomsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutManagedRoomsInput = {
@@ -22228,6 +23136,11 @@ export type UserUncheckedUpdateWithoutManagedRoomsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBranchMembershipsInput = {
@@ -22345,6 +23258,11 @@ export type UserCreateWithoutBranchMembershipsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBranchMembershipsInput = {
@@ -22462,6 +23380,11 @@ export type UserUncheckedCreateWithoutBranchMembershipsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBranchMembershipsInput = {
@@ -22595,6 +23518,11 @@ export type UserUpdateWithoutBranchMembershipsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBranchMembershipsInput = {
@@ -22712,6 +23640,11 @@ export type UserUncheckedUpdateWithoutBranchMembershipsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutStaffProfilesInput = {
@@ -22829,6 +23762,11 @@ export type UserCreateWithoutStaffProfilesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutStaffProfilesInput = {
@@ -22946,6 +23884,11 @@ export type UserUncheckedCreateWithoutStaffProfilesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutStaffProfilesInput = {
@@ -23079,6 +24022,11 @@ export type UserUpdateWithoutStaffProfilesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStaffProfilesInput = {
@@ -23196,6 +24144,11 @@ export type UserUncheckedUpdateWithoutStaffProfilesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredStaffDocumentsInput = {
@@ -23313,6 +24266,11 @@ export type UserCreateWithoutAuthoredStaffDocumentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredStaffDocumentsInput = {
@@ -23430,6 +24388,11 @@ export type UserUncheckedCreateWithoutAuthoredStaffDocumentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredStaffDocumentsInput = {
@@ -23563,6 +24526,11 @@ export type UserUpdateWithoutAuthoredStaffDocumentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredStaffDocumentsInput = {
@@ -23680,6 +24648,11 @@ export type UserUncheckedUpdateWithoutAuthoredStaffDocumentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredClinicDocumentsInput = {
@@ -23797,6 +24770,11 @@ export type UserCreateWithoutAuthoredClinicDocumentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredClinicDocumentsInput = {
@@ -23914,6 +24892,11 @@ export type UserUncheckedCreateWithoutAuthoredClinicDocumentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredClinicDocumentsInput = {
@@ -24047,6 +25030,11 @@ export type UserUpdateWithoutAuthoredClinicDocumentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredClinicDocumentsInput = {
@@ -24164,6 +25152,11 @@ export type UserUncheckedUpdateWithoutAuthoredClinicDocumentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPayrollRunsCreatedInput = {
@@ -24281,6 +25274,11 @@ export type UserCreateWithoutPayrollRunsCreatedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPayrollRunsCreatedInput = {
@@ -24398,6 +25396,11 @@ export type UserUncheckedCreateWithoutPayrollRunsCreatedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPayrollRunsCreatedInput = {
@@ -24531,6 +25534,11 @@ export type UserUpdateWithoutPayrollRunsCreatedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPayrollRunsCreatedInput = {
@@ -24648,6 +25656,11 @@ export type UserUncheckedUpdateWithoutPayrollRunsCreatedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutEosSettlementsCreatedInput = {
@@ -24765,6 +25778,11 @@ export type UserCreateWithoutEosSettlementsCreatedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEosSettlementsCreatedInput = {
@@ -24882,6 +25900,11 @@ export type UserUncheckedCreateWithoutEosSettlementsCreatedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEosSettlementsCreatedInput = {
@@ -25015,6 +26038,11 @@ export type UserUpdateWithoutEosSettlementsCreatedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEosSettlementsCreatedInput = {
@@ -25132,6 +26160,11 @@ export type UserUncheckedUpdateWithoutEosSettlementsCreatedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPayrollApprovalsInput = {
@@ -25249,6 +26282,11 @@ export type UserCreateWithoutPayrollApprovalsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPayrollApprovalsInput = {
@@ -25366,6 +26404,11 @@ export type UserUncheckedCreateWithoutPayrollApprovalsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPayrollApprovalsInput = {
@@ -25499,6 +26542,11 @@ export type UserUpdateWithoutPayrollApprovalsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPayrollApprovalsInput = {
@@ -25616,6 +26664,11 @@ export type UserUncheckedUpdateWithoutPayrollApprovalsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredPatientEventsInput = {
@@ -25733,6 +26786,11 @@ export type UserCreateWithoutAuthoredPatientEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredPatientEventsInput = {
@@ -25850,6 +26908,11 @@ export type UserUncheckedCreateWithoutAuthoredPatientEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredPatientEventsInput = {
@@ -25983,6 +27046,11 @@ export type UserUpdateWithoutAuthoredPatientEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredPatientEventsInput = {
@@ -26100,6 +27168,11 @@ export type UserUncheckedUpdateWithoutAuthoredPatientEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRecordedVitalSignsInput = {
@@ -26217,6 +27290,11 @@ export type UserCreateWithoutRecordedVitalSignsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRecordedVitalSignsInput = {
@@ -26334,6 +27412,11 @@ export type UserUncheckedCreateWithoutRecordedVitalSignsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRecordedVitalSignsInput = {
@@ -26467,6 +27550,11 @@ export type UserUpdateWithoutRecordedVitalSignsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRecordedVitalSignsInput = {
@@ -26584,6 +27672,11 @@ export type UserUncheckedUpdateWithoutRecordedVitalSignsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredInternalNotesInput = {
@@ -26701,6 +27794,11 @@ export type UserCreateWithoutAuthoredInternalNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredInternalNotesInput = {
@@ -26818,6 +27916,11 @@ export type UserUncheckedCreateWithoutAuthoredInternalNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredInternalNotesInput = {
@@ -26951,6 +28054,11 @@ export type UserUpdateWithoutAuthoredInternalNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredInternalNotesInput = {
@@ -27068,6 +28176,11 @@ export type UserUncheckedUpdateWithoutAuthoredInternalNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredAppointmentEventsInput = {
@@ -27185,6 +28298,11 @@ export type UserCreateWithoutAuthoredAppointmentEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredAppointmentEventsInput = {
@@ -27302,6 +28420,11 @@ export type UserUncheckedCreateWithoutAuthoredAppointmentEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredAppointmentEventsInput = {
@@ -27435,6 +28558,11 @@ export type UserUpdateWithoutAuthoredAppointmentEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredAppointmentEventsInput = {
@@ -27552,6 +28680,11 @@ export type UserUncheckedUpdateWithoutAuthoredAppointmentEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredClinicalNotesInput = {
@@ -27669,6 +28802,11 @@ export type UserCreateWithoutAuthoredClinicalNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredClinicalNotesInput = {
@@ -27786,6 +28924,11 @@ export type UserUncheckedCreateWithoutAuthoredClinicalNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredClinicalNotesInput = {
@@ -27908,6 +29051,11 @@ export type UserCreateWithoutFinalizedClinicalNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFinalizedClinicalNotesInput = {
@@ -28025,6 +29173,11 @@ export type UserUncheckedCreateWithoutFinalizedClinicalNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFinalizedClinicalNotesInput = {
@@ -28158,6 +29311,11 @@ export type UserUpdateWithoutAuthoredClinicalNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredClinicalNotesInput = {
@@ -28275,6 +29433,11 @@ export type UserUncheckedUpdateWithoutAuthoredClinicalNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutFinalizedClinicalNotesInput = {
@@ -28403,6 +29566,11 @@ export type UserUpdateWithoutFinalizedClinicalNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFinalizedClinicalNotesInput = {
@@ -28520,6 +29688,11 @@ export type UserUncheckedUpdateWithoutFinalizedClinicalNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutClinicalNoteAddendaInput = {
@@ -28637,6 +29810,11 @@ export type UserCreateWithoutClinicalNoteAddendaInput = {
   finalizedClinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutFinalizedByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutClinicalNoteAddendaInput = {
@@ -28754,6 +29932,11 @@ export type UserUncheckedCreateWithoutClinicalNoteAddendaInput = {
   finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutFinalizedByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutClinicalNoteAddendaInput = {
@@ -28887,6 +30070,11 @@ export type UserUpdateWithoutClinicalNoteAddendaInput = {
   finalizedClinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutFinalizedByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutClinicalNoteAddendaInput = {
@@ -29004,6 +30192,11 @@ export type UserUncheckedUpdateWithoutClinicalNoteAddendaInput = {
   finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutFinalizedByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRefundedInvoicesInput = {
@@ -29121,6 +30314,11 @@ export type UserCreateWithoutRefundedInvoicesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRefundedInvoicesInput = {
@@ -29238,6 +30436,11 @@ export type UserUncheckedCreateWithoutRefundedInvoicesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRefundedInvoicesInput = {
@@ -29371,6 +30574,11 @@ export type UserUpdateWithoutRefundedInvoicesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRefundedInvoicesInput = {
@@ -29488,6 +30696,11 @@ export type UserUncheckedUpdateWithoutRefundedInvoicesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredAppointmentDocumentsInput = {
@@ -29605,6 +30818,11 @@ export type UserCreateWithoutAuthoredAppointmentDocumentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredAppointmentDocumentsInput = {
@@ -29722,6 +30940,11 @@ export type UserUncheckedCreateWithoutAuthoredAppointmentDocumentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredAppointmentDocumentsInput = {
@@ -29855,6 +31078,11 @@ export type UserUpdateWithoutAuthoredAppointmentDocumentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredAppointmentDocumentsInput = {
@@ -29972,6 +31200,11 @@ export type UserUncheckedUpdateWithoutAuthoredAppointmentDocumentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredProductCommentsInput = {
@@ -30089,6 +31322,11 @@ export type UserCreateWithoutAuthoredProductCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredProductCommentsInput = {
@@ -30206,6 +31444,11 @@ export type UserUncheckedCreateWithoutAuthoredProductCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredProductCommentsInput = {
@@ -30339,6 +31582,11 @@ export type UserUpdateWithoutAuthoredProductCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredProductCommentsInput = {
@@ -30456,6 +31704,11 @@ export type UserUncheckedUpdateWithoutAuthoredProductCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPosSalesInput = {
@@ -30573,6 +31826,11 @@ export type UserCreateWithoutPosSalesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPosSalesInput = {
@@ -30690,6 +31948,11 @@ export type UserUncheckedCreateWithoutPosSalesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPosSalesInput = {
@@ -30812,6 +32075,11 @@ export type UserCreateWithoutRefundedSalesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRefundedSalesInput = {
@@ -30929,6 +32197,11 @@ export type UserUncheckedCreateWithoutRefundedSalesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRefundedSalesInput = {
@@ -31062,6 +32335,11 @@ export type UserUpdateWithoutPosSalesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPosSalesInput = {
@@ -31179,6 +32457,11 @@ export type UserUncheckedUpdateWithoutPosSalesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutRefundedSalesInput = {
@@ -31307,6 +32590,11 @@ export type UserUpdateWithoutRefundedSalesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRefundedSalesInput = {
@@ -31424,6 +32712,11 @@ export type UserUncheckedUpdateWithoutRefundedSalesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPosProfileAccessInput = {
@@ -31541,6 +32834,11 @@ export type UserCreateWithoutPosProfileAccessInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPosProfileAccessInput = {
@@ -31658,6 +32956,11 @@ export type UserUncheckedCreateWithoutPosProfileAccessInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPosProfileAccessInput = {
@@ -31791,6 +33094,11 @@ export type UserUpdateWithoutPosProfileAccessInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPosProfileAccessInput = {
@@ -31908,6 +33216,11 @@ export type UserUncheckedUpdateWithoutPosProfileAccessInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPosShiftsOpenedInput = {
@@ -32025,6 +33338,11 @@ export type UserCreateWithoutPosShiftsOpenedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPosShiftsOpenedInput = {
@@ -32142,6 +33460,11 @@ export type UserUncheckedCreateWithoutPosShiftsOpenedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPosShiftsOpenedInput = {
@@ -32275,6 +33598,11 @@ export type UserUpdateWithoutPosShiftsOpenedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPosShiftsOpenedInput = {
@@ -32392,6 +33720,11 @@ export type UserUncheckedUpdateWithoutPosShiftsOpenedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPosShiftsClosedInput = {
@@ -32509,6 +33842,11 @@ export type UserCreateWithoutPosShiftsClosedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPosShiftsClosedInput = {
@@ -32626,6 +33964,11 @@ export type UserUncheckedCreateWithoutPosShiftsClosedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPosShiftsClosedInput = {
@@ -32759,6 +34102,11 @@ export type UserUpdateWithoutPosShiftsClosedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPosShiftsClosedInput = {
@@ -32876,6 +34224,11 @@ export type UserUncheckedUpdateWithoutPosShiftsClosedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutStockLedgerEntriesInput = {
@@ -32993,6 +34346,11 @@ export type UserCreateWithoutStockLedgerEntriesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutStockLedgerEntriesInput = {
@@ -33110,6 +34468,11 @@ export type UserUncheckedCreateWithoutStockLedgerEntriesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutStockLedgerEntriesInput = {
@@ -33243,6 +34606,11 @@ export type UserUpdateWithoutStockLedgerEntriesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStockLedgerEntriesInput = {
@@ -33360,6 +34728,11 @@ export type UserUncheckedUpdateWithoutStockLedgerEntriesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPurchaseOrdersInput = {
@@ -33477,6 +34850,11 @@ export type UserCreateWithoutPurchaseOrdersInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPurchaseOrdersInput = {
@@ -33594,6 +34972,11 @@ export type UserUncheckedCreateWithoutPurchaseOrdersInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPurchaseOrdersInput = {
@@ -33727,6 +35110,11 @@ export type UserUpdateWithoutPurchaseOrdersInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPurchaseOrdersInput = {
@@ -33844,6 +35232,11 @@ export type UserUncheckedUpdateWithoutPurchaseOrdersInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRequestedExpensesInput = {
@@ -33961,6 +35354,11 @@ export type UserCreateWithoutRequestedExpensesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRequestedExpensesInput = {
@@ -34078,6 +35476,11 @@ export type UserUncheckedCreateWithoutRequestedExpensesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRequestedExpensesInput = {
@@ -34200,6 +35603,11 @@ export type UserCreateWithoutDecidedExpensesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDecidedExpensesInput = {
@@ -34317,6 +35725,11 @@ export type UserUncheckedCreateWithoutDecidedExpensesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDecidedExpensesInput = {
@@ -34450,6 +35863,11 @@ export type UserUpdateWithoutRequestedExpensesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRequestedExpensesInput = {
@@ -34567,6 +35985,11 @@ export type UserUncheckedUpdateWithoutRequestedExpensesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutDecidedExpensesInput = {
@@ -34695,6 +36118,11 @@ export type UserUpdateWithoutDecidedExpensesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDecidedExpensesInput = {
@@ -34812,6 +36240,11 @@ export type UserUncheckedUpdateWithoutDecidedExpensesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutExpenseStepActionsInput = {
@@ -34929,6 +36362,11 @@ export type UserCreateWithoutExpenseStepActionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutExpenseStepActionsInput = {
@@ -35046,6 +36484,11 @@ export type UserUncheckedCreateWithoutExpenseStepActionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutExpenseStepActionsInput = {
@@ -35179,6 +36622,11 @@ export type UserUpdateWithoutExpenseStepActionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutExpenseStepActionsInput = {
@@ -35296,6 +36744,11 @@ export type UserUncheckedUpdateWithoutExpenseStepActionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
@@ -35413,6 +36866,11 @@ export type UserCreateWithoutSessionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -35530,6 +36988,11 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -35663,6 +37126,11 @@ export type UserUpdateWithoutSessionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -35780,6 +37248,11 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAccountsInput = {
@@ -35897,6 +37370,11 @@ export type UserCreateWithoutAccountsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
@@ -36014,6 +37492,11 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -36147,6 +37630,11 @@ export type UserUpdateWithoutAccountsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
@@ -36264,6 +37752,11 @@ export type UserUncheckedUpdateWithoutAccountsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutConversationMembershipsInput = {
@@ -36381,6 +37874,11 @@ export type UserCreateWithoutConversationMembershipsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutConversationMembershipsInput = {
@@ -36498,6 +37996,11 @@ export type UserUncheckedCreateWithoutConversationMembershipsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutConversationMembershipsInput = {
@@ -36631,6 +38134,11 @@ export type UserUpdateWithoutConversationMembershipsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
@@ -36748,6 +38256,11 @@ export type UserUncheckedUpdateWithoutConversationMembershipsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredChatMessagesInput = {
@@ -36865,6 +38378,11 @@ export type UserCreateWithoutAuthoredChatMessagesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredChatMessagesInput = {
@@ -36982,6 +38500,11 @@ export type UserUncheckedCreateWithoutAuthoredChatMessagesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredChatMessagesInput = {
@@ -37115,6 +38638,11 @@ export type UserUpdateWithoutAuthoredChatMessagesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredChatMessagesInput = {
@@ -37232,6 +38760,11 @@ export type UserUncheckedUpdateWithoutAuthoredChatMessagesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCreatedVaccinationRecordsInput = {
@@ -37349,6 +38882,11 @@ export type UserCreateWithoutCreatedVaccinationRecordsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedVaccinationRecordsInput = {
@@ -37466,6 +39004,11 @@ export type UserUncheckedCreateWithoutCreatedVaccinationRecordsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedVaccinationRecordsInput = {
@@ -37588,6 +39131,11 @@ export type UserCreateWithoutVoidedVaccinationRecordsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutVoidedVaccinationRecordsInput = {
@@ -37705,6 +39253,11 @@ export type UserUncheckedCreateWithoutVoidedVaccinationRecordsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutVoidedVaccinationRecordsInput = {
@@ -37838,6 +39391,11 @@ export type UserUpdateWithoutCreatedVaccinationRecordsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedVaccinationRecordsInput = {
@@ -37955,6 +39513,11 @@ export type UserUncheckedUpdateWithoutCreatedVaccinationRecordsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutVoidedVaccinationRecordsInput = {
@@ -38083,6 +39646,11 @@ export type UserUpdateWithoutVoidedVaccinationRecordsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutVoidedVaccinationRecordsInput = {
@@ -38200,6 +39768,11 @@ export type UserUncheckedUpdateWithoutVoidedVaccinationRecordsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredMobileUnitEventsInput = {
@@ -38317,6 +39890,11 @@ export type UserCreateWithoutAuthoredMobileUnitEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredMobileUnitEventsInput = {
@@ -38434,6 +40012,11 @@ export type UserUncheckedCreateWithoutAuthoredMobileUnitEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredMobileUnitEventsInput = {
@@ -38567,6 +40150,11 @@ export type UserUpdateWithoutAuthoredMobileUnitEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredMobileUnitEventsInput = {
@@ -38684,6 +40272,11 @@ export type UserUncheckedUpdateWithoutAuthoredMobileUnitEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPairedMobileUnitDevicesInput = {
@@ -38801,6 +40394,11 @@ export type UserCreateWithoutPairedMobileUnitDevicesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPairedMobileUnitDevicesInput = {
@@ -38918,6 +40516,11 @@ export type UserUncheckedCreateWithoutPairedMobileUnitDevicesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPairedMobileUnitDevicesInput = {
@@ -39040,6 +40643,11 @@ export type UserCreateWithoutRevokedMobileUnitDevicesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRevokedMobileUnitDevicesInput = {
@@ -39157,6 +40765,11 @@ export type UserUncheckedCreateWithoutRevokedMobileUnitDevicesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRevokedMobileUnitDevicesInput = {
@@ -39290,6 +40903,11 @@ export type UserUpdateWithoutPairedMobileUnitDevicesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPairedMobileUnitDevicesInput = {
@@ -39407,6 +41025,11 @@ export type UserUncheckedUpdateWithoutPairedMobileUnitDevicesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutRevokedMobileUnitDevicesInput = {
@@ -39535,6 +41158,11 @@ export type UserUpdateWithoutRevokedMobileUnitDevicesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRevokedMobileUnitDevicesInput = {
@@ -39652,6 +41280,11 @@ export type UserUncheckedUpdateWithoutRevokedMobileUnitDevicesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutHandledMobileRequestsInput = {
@@ -39769,6 +41402,11 @@ export type UserCreateWithoutHandledMobileRequestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutHandledMobileRequestsInput = {
@@ -39886,6 +41524,11 @@ export type UserUncheckedCreateWithoutHandledMobileRequestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutHandledMobileRequestsInput = {
@@ -40019,6 +41662,11 @@ export type UserUpdateWithoutHandledMobileRequestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutHandledMobileRequestsInput = {
@@ -40136,6 +41784,11 @@ export type UserUncheckedUpdateWithoutHandledMobileRequestsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCrmOwnedLeadsInput = {
@@ -40253,6 +41906,11 @@ export type UserCreateWithoutCrmOwnedLeadsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCrmOwnedLeadsInput = {
@@ -40370,6 +42028,11 @@ export type UserUncheckedCreateWithoutCrmOwnedLeadsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCrmOwnedLeadsInput = {
@@ -40503,6 +42166,11 @@ export type UserUpdateWithoutCrmOwnedLeadsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCrmOwnedLeadsInput = {
@@ -40620,6 +42288,11 @@ export type UserUncheckedUpdateWithoutCrmOwnedLeadsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCrmStatusChangesInput = {
@@ -40737,6 +42410,11 @@ export type UserCreateWithoutCrmStatusChangesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCrmStatusChangesInput = {
@@ -40854,6 +42532,11 @@ export type UserUncheckedCreateWithoutCrmStatusChangesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCrmStatusChangesInput = {
@@ -40987,6 +42670,11 @@ export type UserUpdateWithoutCrmStatusChangesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCrmStatusChangesInput = {
@@ -41104,6 +42792,11 @@ export type UserUncheckedUpdateWithoutCrmStatusChangesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCrmSavedViewsInput = {
@@ -41221,6 +42914,11 @@ export type UserCreateWithoutCrmSavedViewsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCrmSavedViewsInput = {
@@ -41338,6 +43036,11 @@ export type UserUncheckedCreateWithoutCrmSavedViewsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCrmSavedViewsInput = {
@@ -41471,6 +43174,11 @@ export type UserUpdateWithoutCrmSavedViewsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCrmSavedViewsInput = {
@@ -41588,6 +43296,11 @@ export type UserUncheckedUpdateWithoutCrmSavedViewsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCrmOwnedDealsInput = {
@@ -41705,6 +43418,11 @@ export type UserCreateWithoutCrmOwnedDealsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCrmOwnedDealsInput = {
@@ -41822,6 +43540,11 @@ export type UserUncheckedCreateWithoutCrmOwnedDealsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCrmOwnedDealsInput = {
@@ -41955,6 +43678,11 @@ export type UserUpdateWithoutCrmOwnedDealsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCrmOwnedDealsInput = {
@@ -42072,6 +43800,11 @@ export type UserUncheckedUpdateWithoutCrmOwnedDealsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCrmEmailsSentInput = {
@@ -42189,6 +43922,11 @@ export type UserCreateWithoutCrmEmailsSentInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCrmEmailsSentInput = {
@@ -42306,6 +44044,11 @@ export type UserUncheckedCreateWithoutCrmEmailsSentInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCrmEmailsSentInput = {
@@ -42439,6 +44182,11 @@ export type UserUpdateWithoutCrmEmailsSentInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCrmEmailsSentInput = {
@@ -42556,6 +44304,11 @@ export type UserUncheckedUpdateWithoutCrmEmailsSentInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCrmWhatsappSentInput = {
@@ -42673,6 +44426,11 @@ export type UserCreateWithoutCrmWhatsappSentInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCrmWhatsappSentInput = {
@@ -42790,6 +44548,11 @@ export type UserUncheckedCreateWithoutCrmWhatsappSentInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCrmWhatsappSentInput = {
@@ -42923,6 +44686,11 @@ export type UserUpdateWithoutCrmWhatsappSentInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCrmWhatsappSentInput = {
@@ -43040,6 +44808,11 @@ export type UserUncheckedUpdateWithoutCrmWhatsappSentInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCrmAuthoredNotesInput = {
@@ -43157,6 +44930,11 @@ export type UserCreateWithoutCrmAuthoredNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCrmAuthoredNotesInput = {
@@ -43274,6 +45052,11 @@ export type UserUncheckedCreateWithoutCrmAuthoredNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCrmAuthoredNotesInput = {
@@ -43407,6 +45190,11 @@ export type UserUpdateWithoutCrmAuthoredNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCrmAuthoredNotesInput = {
@@ -43524,6 +45312,11 @@ export type UserUncheckedUpdateWithoutCrmAuthoredNotesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCrmAssignedTasksInput = {
@@ -43641,6 +45434,11 @@ export type UserCreateWithoutCrmAssignedTasksInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCrmAssignedTasksInput = {
@@ -43758,6 +45556,11 @@ export type UserUncheckedCreateWithoutCrmAssignedTasksInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCrmAssignedTasksInput = {
@@ -43891,6 +45694,11 @@ export type UserUpdateWithoutCrmAssignedTasksInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCrmAssignedTasksInput = {
@@ -44008,6 +45816,11 @@ export type UserUncheckedUpdateWithoutCrmAssignedTasksInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCrmAuthoredCommentsInput = {
@@ -44125,6 +45938,11 @@ export type UserCreateWithoutCrmAuthoredCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCrmAuthoredCommentsInput = {
@@ -44242,6 +46060,11 @@ export type UserUncheckedCreateWithoutCrmAuthoredCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCrmAuthoredCommentsInput = {
@@ -44375,6 +46198,11 @@ export type UserUpdateWithoutCrmAuthoredCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCrmAuthoredCommentsInput = {
@@ -44492,6 +46320,11 @@ export type UserUncheckedUpdateWithoutCrmAuthoredCommentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPrescriptionsWrittenInput = {
@@ -44609,6 +46442,11 @@ export type UserCreateWithoutPrescriptionsWrittenInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPrescriptionsWrittenInput = {
@@ -44726,6 +46564,11 @@ export type UserUncheckedCreateWithoutPrescriptionsWrittenInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPrescriptionsWrittenInput = {
@@ -44859,6 +46702,11 @@ export type UserUpdateWithoutPrescriptionsWrittenInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPrescriptionsWrittenInput = {
@@ -44976,6 +46824,11 @@ export type UserUncheckedUpdateWithoutPrescriptionsWrittenInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutDispensedEventsInput = {
@@ -45093,6 +46946,11 @@ export type UserCreateWithoutDispensedEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutDispensedEventsInput = {
@@ -45210,6 +47068,11 @@ export type UserUncheckedCreateWithoutDispensedEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutDispensedEventsInput = {
@@ -45343,6 +47206,11 @@ export type UserUpdateWithoutDispensedEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutDispensedEventsInput = {
@@ -45460,6 +47328,11 @@ export type UserUncheckedUpdateWithoutDispensedEventsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutControlledPerformedInput = {
@@ -45577,6 +47450,11 @@ export type UserCreateWithoutControlledPerformedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutControlledPerformedInput = {
@@ -45694,6 +47572,11 @@ export type UserUncheckedCreateWithoutControlledPerformedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutControlledPerformedInput = {
@@ -45816,6 +47699,11 @@ export type UserCreateWithoutControlledWitnessedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutControlledWitnessedInput = {
@@ -45933,6 +47821,11 @@ export type UserUncheckedCreateWithoutControlledWitnessedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutControlledWitnessedInput = {
@@ -46066,6 +47959,11 @@ export type UserUpdateWithoutControlledPerformedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutControlledPerformedInput = {
@@ -46183,6 +48081,11 @@ export type UserUncheckedUpdateWithoutControlledPerformedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutControlledWitnessedInput = {
@@ -46311,6 +48214,11 @@ export type UserUpdateWithoutControlledWitnessedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutControlledWitnessedInput = {
@@ -46428,6 +48336,11 @@ export type UserUncheckedUpdateWithoutControlledWitnessedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBatchDisposalsPerformedInput = {
@@ -46545,6 +48458,11 @@ export type UserCreateWithoutBatchDisposalsPerformedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBatchDisposalsPerformedInput = {
@@ -46662,6 +48580,11 @@ export type UserUncheckedCreateWithoutBatchDisposalsPerformedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBatchDisposalsPerformedInput = {
@@ -46795,6 +48718,11 @@ export type UserUpdateWithoutBatchDisposalsPerformedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBatchDisposalsPerformedInput = {
@@ -46912,6 +48840,11 @@ export type UserUncheckedUpdateWithoutBatchDisposalsPerformedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutBatchDisposalsWitnessedInput = {
@@ -47029,6 +48962,11 @@ export type UserCreateWithoutBatchDisposalsWitnessedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBatchDisposalsWitnessedInput = {
@@ -47146,6 +49084,11 @@ export type UserUncheckedCreateWithoutBatchDisposalsWitnessedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBatchDisposalsWitnessedInput = {
@@ -47279,6 +49222,11 @@ export type UserUpdateWithoutBatchDisposalsWitnessedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBatchDisposalsWitnessedInput = {
@@ -47396,6 +49344,11 @@ export type UserUncheckedUpdateWithoutBatchDisposalsWitnessedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCageMovesInput = {
@@ -47513,6 +49466,11 @@ export type UserCreateWithoutCageMovesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCageMovesInput = {
@@ -47630,6 +49588,11 @@ export type UserUncheckedCreateWithoutCageMovesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCageMovesInput = {
@@ -47763,6 +49726,11 @@ export type UserUpdateWithoutCageMovesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCageMovesInput = {
@@ -47880,6 +49848,11 @@ export type UserUncheckedUpdateWithoutCageMovesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutInpatientAdmissionsInput = {
@@ -47997,6 +49970,11 @@ export type UserCreateWithoutInpatientAdmissionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInpatientAdmissionsInput = {
@@ -48114,6 +50092,11 @@ export type UserUncheckedCreateWithoutInpatientAdmissionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutInpatientAdmissionsInput = {
@@ -48236,6 +50219,11 @@ export type UserCreateWithoutInpatientDischargesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInpatientDischargesInput = {
@@ -48353,6 +50341,11 @@ export type UserUncheckedCreateWithoutInpatientDischargesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutInpatientDischargesInput = {
@@ -48486,6 +50479,11 @@ export type UserUpdateWithoutInpatientAdmissionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInpatientAdmissionsInput = {
@@ -48603,6 +50601,11 @@ export type UserUncheckedUpdateWithoutInpatientAdmissionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutInpatientDischargesInput = {
@@ -48731,6 +50734,11 @@ export type UserUpdateWithoutInpatientDischargesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInpatientDischargesInput = {
@@ -48848,6 +50856,11 @@ export type UserUncheckedUpdateWithoutInpatientDischargesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutInpatientOrdersPrescribedInput = {
@@ -48965,6 +50978,11 @@ export type UserCreateWithoutInpatientOrdersPrescribedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInpatientOrdersPrescribedInput = {
@@ -49082,6 +51100,11 @@ export type UserUncheckedCreateWithoutInpatientOrdersPrescribedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutInpatientOrdersPrescribedInput = {
@@ -49204,6 +51227,11 @@ export type UserCreateWithoutInpatientOrdersDiscontinuedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInpatientOrdersDiscontinuedInput = {
@@ -49321,6 +51349,11 @@ export type UserUncheckedCreateWithoutInpatientOrdersDiscontinuedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutInpatientOrdersDiscontinuedInput = {
@@ -49454,6 +51487,11 @@ export type UserUpdateWithoutInpatientOrdersPrescribedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInpatientOrdersPrescribedInput = {
@@ -49571,6 +51609,11 @@ export type UserUncheckedUpdateWithoutInpatientOrdersPrescribedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutInpatientOrdersDiscontinuedInput = {
@@ -49699,6 +51742,11 @@ export type UserUpdateWithoutInpatientOrdersDiscontinuedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInpatientOrdersDiscontinuedInput = {
@@ -49816,6 +51864,11 @@ export type UserUncheckedUpdateWithoutInpatientOrdersDiscontinuedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutInpatientAdministrationsGivenInput = {
@@ -49933,6 +51986,11 @@ export type UserCreateWithoutInpatientAdministrationsGivenInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInpatientAdministrationsGivenInput = {
@@ -50050,6 +52108,11 @@ export type UserUncheckedCreateWithoutInpatientAdministrationsGivenInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutInpatientAdministrationsGivenInput = {
@@ -50172,6 +52235,11 @@ export type UserCreateWithoutInpatientAdministrationsWitnessedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutInpatientAdministrationsWitnessedInput = {
@@ -50289,6 +52357,11 @@ export type UserUncheckedCreateWithoutInpatientAdministrationsWitnessedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutInpatientAdministrationsWitnessedInput = {
@@ -50422,6 +52495,11 @@ export type UserUpdateWithoutInpatientAdministrationsGivenInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInpatientAdministrationsGivenInput = {
@@ -50539,6 +52617,11 @@ export type UserUncheckedUpdateWithoutInpatientAdministrationsGivenInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutInpatientAdministrationsWitnessedInput = {
@@ -50667,6 +52750,11 @@ export type UserUpdateWithoutInpatientAdministrationsWitnessedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutInpatientAdministrationsWitnessedInput = {
@@ -50784,6 +52872,11 @@ export type UserUncheckedUpdateWithoutInpatientAdministrationsWitnessedInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAuthoredInpatientActivityInput = {
@@ -50901,6 +52994,11 @@ export type UserCreateWithoutAuthoredInpatientActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAuthoredInpatientActivityInput = {
@@ -51018,6 +53116,11 @@ export type UserUncheckedCreateWithoutAuthoredInpatientActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAuthoredInpatientActivityInput = {
@@ -51151,6 +53254,11 @@ export type UserUpdateWithoutAuthoredInpatientActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAuthoredInpatientActivityInput = {
@@ -51268,6 +53376,11 @@ export type UserUncheckedUpdateWithoutAuthoredInpatientActivityInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCreatedEmergencyArrivalsInput = {
@@ -51385,6 +53498,11 @@ export type UserCreateWithoutCreatedEmergencyArrivalsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCreatedEmergencyArrivalsInput = {
@@ -51502,6 +53620,11 @@ export type UserUncheckedCreateWithoutCreatedEmergencyArrivalsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCreatedEmergencyArrivalsInput = {
@@ -51624,6 +53747,11 @@ export type UserCreateWithoutEmergencyDispositionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutEmergencyDispositionsInput = {
@@ -51741,6 +53869,11 @@ export type UserUncheckedCreateWithoutEmergencyDispositionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutEmergencyDispositionsInput = {
@@ -51874,6 +54007,11 @@ export type UserUpdateWithoutCreatedEmergencyArrivalsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCreatedEmergencyArrivalsInput = {
@@ -51991,6 +54129,11 @@ export type UserUncheckedUpdateWithoutCreatedEmergencyArrivalsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpsertWithoutEmergencyDispositionsInput = {
@@ -52119,6 +54262,11 @@ export type UserUpdateWithoutEmergencyDispositionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutEmergencyDispositionsInput = {
@@ -52236,6 +54384,11 @@ export type UserUncheckedUpdateWithoutEmergencyDispositionsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTriageAssessmentsInput = {
@@ -52353,6 +54506,11 @@ export type UserCreateWithoutTriageAssessmentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTriageAssessmentsInput = {
@@ -52470,6 +54628,11 @@ export type UserUncheckedCreateWithoutTriageAssessmentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTriageAssessmentsInput = {
@@ -52603,6 +54766,11 @@ export type UserUpdateWithoutTriageAssessmentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTriageAssessmentsInput = {
@@ -52720,6 +54888,11 @@ export type UserUncheckedUpdateWithoutTriageAssessmentsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRecordedPatientAlertsInput = {
@@ -52837,6 +55010,11 @@ export type UserCreateWithoutRecordedPatientAlertsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRecordedPatientAlertsInput = {
@@ -52954,6 +55132,11 @@ export type UserUncheckedCreateWithoutRecordedPatientAlertsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRecordedPatientAlertsInput = {
@@ -53087,6 +55270,11 @@ export type UserUpdateWithoutRecordedPatientAlertsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRecordedPatientAlertsInput = {
@@ -53204,6 +55392,11 @@ export type UserUncheckedUpdateWithoutRecordedPatientAlertsInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutReminderOutboxInput = {
@@ -53321,6 +55514,11 @@ export type UserCreateWithoutReminderOutboxInput = {
   finalizedClinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutFinalizedByInput
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutReminderOutboxInput = {
@@ -53438,6 +55636,11 @@ export type UserUncheckedCreateWithoutReminderOutboxInput = {
   finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutFinalizedByInput
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutReminderOutboxInput = {
@@ -53571,6 +55774,11 @@ export type UserUpdateWithoutReminderOutboxInput = {
   finalizedClinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutFinalizedByNestedInput
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutReminderOutboxInput = {
@@ -53688,6 +55896,11 @@ export type UserUncheckedUpdateWithoutReminderOutboxInput = {
   finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutFinalizedByNestedInput
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRecallContactsInput = {
@@ -53805,6 +56018,11 @@ export type UserCreateWithoutRecallContactsInput = {
   finalizedClinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutFinalizedByInput
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRecallContactsInput = {
@@ -53922,6 +56140,11 @@ export type UserUncheckedCreateWithoutRecallContactsInput = {
   finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutFinalizedByInput
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRecallContactsInput = {
@@ -54055,6 +56278,11 @@ export type UserUpdateWithoutRecallContactsInput = {
   finalizedClinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutFinalizedByNestedInput
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRecallContactsInput = {
@@ -54172,6 +56400,2531 @@ export type UserUncheckedUpdateWithoutRecallContactsInput = {
   finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutFinalizedByNestedInput
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutCreatedRegistrationCampaignsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  image?: string | null
+  phone?: string | null
+  createdAt: Date | string
+  updatedAt: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  clinicUsers?: Prisma.ClinicUserCreateNestedManyWithoutUserInput
+  invitesSent?: Prisma.InviteCreateNestedManyWithoutInvitedByInput
+  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneesInput
+  createdTasks?: Prisma.TaskCreateNestedManyWithoutCreatedByInput
+  crmOwnedLeads?: Prisma.CrmLeadCreateNestedManyWithoutOwnerUserInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogCreateNestedManyWithoutByUserInput
+  crmAuthoredNotes?: Prisma.CrmNoteCreateNestedManyWithoutAuthorInput
+  crmEmailsSent?: Prisma.CrmEmailMessageCreateNestedManyWithoutSentByInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageCreateNestedManyWithoutSentByInput
+  crmSavedViews?: Prisma.CrmSavedViewCreateNestedManyWithoutUserInput
+  crmAssignedTasks?: Prisma.CrmTaskCreateNestedManyWithoutAssignedToInput
+  crmAuthoredComments?: Prisma.CrmCommentCreateNestedManyWithoutAuthorInput
+  crmOwnedDeals?: Prisma.CrmDealCreateNestedManyWithoutOwnerUserInput
+  managedBranches?: Prisma.BranchCreateNestedManyWithoutManagerInput
+  managerOfBranches?: Prisma.BranchCreateNestedManyWithoutManagersInput
+  managedRooms?: Prisma.RoomCreateNestedManyWithoutManagerInput
+  branchMemberships?: Prisma.BranchUserCreateNestedManyWithoutUserInput
+  staffProfiles?: Prisma.StaffCreateNestedManyWithoutUserInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteCreateNestedManyWithoutAuthorInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityCreateNestedManyWithoutAuthorInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityCreateNestedManyWithoutAuthorInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceCreateNestedManyWithoutCreatedByInput
+  handledMobileRequests?: Prisma.MobileBookingRequestCreateNestedManyWithoutHandledByInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceCreateNestedManyWithoutRevokedByInput
+  authoredPatientEvents?: Prisma.PatientActivityCreateNestedManyWithoutAuthorInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentCreateNestedManyWithoutAuthorInput
+  authoredStaffDocuments?: Prisma.StaffDocumentCreateNestedManyWithoutAuthorInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentCreateNestedManyWithoutAuthorInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryCreateNestedManyWithoutCreatedByInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutCreatedByInput
+  authoredProductComments?: Prisma.ProductCommentCreateNestedManyWithoutAuthorInput
+  authoredTaskActivity?: Prisma.TaskActivityCreateNestedManyWithoutAuthorInput
+  createdInboxItems?: Prisma.InboxItemCreateNestedManyWithoutCreatedByInput
+  authoredInboxActivity?: Prisma.InboxActivityCreateNestedManyWithoutAuthorInput
+  inboxReads?: Prisma.InboxItemReadCreateNestedManyWithoutUserInput
+  inboxSettings?: Prisma.UserInboxSettingsCreateNestedManyWithoutUserInput
+  requestedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRequesterInput
+  decidedExpenses?: Prisma.ExpenseCreateNestedManyWithoutDecidedByInput
+  refundedInvoices?: Prisma.InvoiceCreateNestedManyWithoutRefundedByInput
+  refundedSales?: Prisma.SaleCreateNestedManyWithoutRefundedByInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepCreateNestedManyWithoutActorInput
+  payrollRunsCreated?: Prisma.PayrollRunCreateNestedManyWithoutCreatedByInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementCreateNestedManyWithoutCreatedByInput
+  payrollApprovals?: Prisma.PayrollApprovalStepCreateNestedManyWithoutApproverInput
+  agentConversations?: Prisma.AgentConversationCreateNestedManyWithoutUserInput
+  requestedLabTests?: Prisma.LabTestOrderCreateNestedManyWithoutRequestedByInput
+  qcReviewedLabTests?: Prisma.LabTestOrderCreateNestedManyWithoutQcReviewedByInput
+  assignedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutAssignedToInput
+  reviewedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutReviewedByInput
+  rejectedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutRejectedByInput
+  collectedLabSamples?: Prisma.LabSampleCollectionCreateNestedManyWithoutCollectedByInput
+  authoredLabActivity?: Prisma.LabTestActivityCreateNestedManyWithoutAuthorInput
+  authoredLabComments?: Prisma.LabTestCommentCreateNestedManyWithoutAuthorInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderCreateNestedManyWithoutRequestedByInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutAssignedToInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutReviewedByInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutRejectedByInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionCreateNestedManyWithoutPerformedByInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyCreateNestedManyWithoutUploadedByInput
+  authoredRadiologyReports?: Prisma.RadiologyReportCreateNestedManyWithoutAuthoredByInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportCreateNestedManyWithoutCriticalNotifiedUserInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumCreateNestedManyWithoutAuthoredByInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentCreateNestedManyWithoutAuthorInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityCreateNestedManyWithoutAuthorInput
+  authoredOperationActivity?: Prisma.OperationActivityCreateNestedManyWithoutAuthorInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventCreateNestedManyWithoutRecordedByInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentCreateNestedManyWithoutAssessedByInput
+  reportedComplications?: Prisma.OperationComplicationCreateNestedManyWithoutReportedByInput
+  authoredOperationComments?: Prisma.OperationCommentCreateNestedManyWithoutAuthorInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordCreateNestedManyWithoutRecordedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  authoredChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutAuthorInput
+  startedSopRuns?: Prisma.SopRunCreateNestedManyWithoutStartedByInput
+  completedSopRuns?: Prisma.SopRunCreateNestedManyWithoutCompletedByInput
+  respondedSopSteps?: Prisma.SopRunStepCreateNestedManyWithoutRespondedByInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutCreatedByInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutVoidedByInput
+  posSales?: Prisma.SaleCreateNestedManyWithoutCreatedByInput
+  posProfileAccess?: Prisma.PosProfileUserCreateNestedManyWithoutUserInput
+  posShiftsOpened?: Prisma.PosOpeningEntryCreateNestedManyWithoutCashierInput
+  posShiftsClosed?: Prisma.PosClosingEntryCreateNestedManyWithoutClosedByInput
+  prescriptionsWritten?: Prisma.PrescriptionCreateNestedManyWithoutPrescriberInput
+  dispensedEvents?: Prisma.DispenseEventCreateNestedManyWithoutDispensedByInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutPerformedByInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutWitnessInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalCreateNestedManyWithoutPerformedByInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessCreateNestedManyWithoutUserInput
+  cageMoves?: Prisma.CageAssignmentCreateNestedManyWithoutMovedByInput
+  inpatientAdmissions?: Prisma.InpatientStayCreateNestedManyWithoutAdmittedByInput
+  inpatientDischarges?: Prisma.InpatientStayCreateNestedManyWithoutDischargedByInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderCreateNestedManyWithoutOrderedByInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderCreateNestedManyWithoutDiscontinuedByInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationCreateNestedManyWithoutPerformedByInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationCreateNestedManyWithoutWitnessInput
+  authoredInpatientActivity?: Prisma.InpatientActivityCreateNestedManyWithoutAuthorInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutCreatedByInput
+  emergencyDispositions?: Prisma.EmergencyArrivalCreateNestedManyWithoutDispositionByInput
+  triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutAssessedByInput
+  recordedPatientAlerts?: Prisma.PatientAlertCreateNestedManyWithoutRecordedByInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestCreateNestedManyWithoutHandledByInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutAuthorInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutFinalizedByInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
+  reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
+  recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCreatedRegistrationCampaignsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  image?: string | null
+  phone?: string | null
+  createdAt: Date | string
+  updatedAt: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  clinicUsers?: Prisma.ClinicUserUncheckedCreateNestedManyWithoutUserInput
+  invitesSent?: Prisma.InviteUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneesInput
+  createdTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatedByInput
+  crmOwnedLeads?: Prisma.CrmLeadUncheckedCreateNestedManyWithoutOwnerUserInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUncheckedCreateNestedManyWithoutByUserInput
+  crmAuthoredNotes?: Prisma.CrmNoteUncheckedCreateNestedManyWithoutAuthorInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUncheckedCreateNestedManyWithoutSentByInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUncheckedCreateNestedManyWithoutSentByInput
+  crmSavedViews?: Prisma.CrmSavedViewUncheckedCreateNestedManyWithoutUserInput
+  crmAssignedTasks?: Prisma.CrmTaskUncheckedCreateNestedManyWithoutAssignedToInput
+  crmAuthoredComments?: Prisma.CrmCommentUncheckedCreateNestedManyWithoutAuthorInput
+  crmOwnedDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerUserInput
+  managedBranches?: Prisma.BranchUncheckedCreateNestedManyWithoutManagerInput
+  managerOfBranches?: Prisma.BranchUncheckedCreateNestedManyWithoutManagersInput
+  managedRooms?: Prisma.RoomUncheckedCreateNestedManyWithoutManagerInput
+  branchMemberships?: Prisma.BranchUserUncheckedCreateNestedManyWithoutUserInput
+  staffProfiles?: Prisma.StaffUncheckedCreateNestedManyWithoutUserInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUncheckedCreateNestedManyWithoutAuthorInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedCreateNestedManyWithoutCreatedByInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUncheckedCreateNestedManyWithoutHandledByInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedCreateNestedManyWithoutRevokedByInput
+  authoredPatientEvents?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUncheckedCreateNestedManyWithoutCreatedByInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredProductComments?: Prisma.ProductCommentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredTaskActivity?: Prisma.TaskActivityUncheckedCreateNestedManyWithoutAuthorInput
+  createdInboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredInboxActivity?: Prisma.InboxActivityUncheckedCreateNestedManyWithoutAuthorInput
+  inboxReads?: Prisma.InboxItemReadUncheckedCreateNestedManyWithoutUserInput
+  inboxSettings?: Prisma.UserInboxSettingsUncheckedCreateNestedManyWithoutUserInput
+  requestedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRequesterInput
+  decidedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutDecidedByInput
+  refundedInvoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutRefundedByInput
+  refundedSales?: Prisma.SaleUncheckedCreateNestedManyWithoutRefundedByInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUncheckedCreateNestedManyWithoutActorInput
+  payrollRunsCreated?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutCreatedByInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUncheckedCreateNestedManyWithoutCreatedByInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUncheckedCreateNestedManyWithoutApproverInput
+  agentConversations?: Prisma.AgentConversationUncheckedCreateNestedManyWithoutUserInput
+  requestedLabTests?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutRequestedByInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutQcReviewedByInput
+  assignedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutAssignedToInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutReviewedByInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutRejectedByInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUncheckedCreateNestedManyWithoutCollectedByInput
+  authoredLabActivity?: Prisma.LabTestActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredLabComments?: Prisma.LabTestCommentUncheckedCreateNestedManyWithoutAuthorInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUncheckedCreateNestedManyWithoutRequestedByInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutAssignedToInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutReviewedByInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutRejectedByInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUncheckedCreateNestedManyWithoutPerformedByInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUncheckedCreateNestedManyWithoutUploadedByInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUncheckedCreateNestedManyWithoutAuthoredByInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUncheckedCreateNestedManyWithoutCriticalNotifiedUserInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredOperationActivity?: Prisma.OperationActivityUncheckedCreateNestedManyWithoutAuthorInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUncheckedCreateNestedManyWithoutRecordedByInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUncheckedCreateNestedManyWithoutAssessedByInput
+  reportedComplications?: Prisma.OperationComplicationUncheckedCreateNestedManyWithoutReportedByInput
+  authoredOperationComments?: Prisma.OperationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUncheckedCreateNestedManyWithoutRecordedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  authoredChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  startedSopRuns?: Prisma.SopRunUncheckedCreateNestedManyWithoutStartedByInput
+  completedSopRuns?: Prisma.SopRunUncheckedCreateNestedManyWithoutCompletedByInput
+  respondedSopSteps?: Prisma.SopRunStepUncheckedCreateNestedManyWithoutRespondedByInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutCreatedByInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutVoidedByInput
+  posSales?: Prisma.SaleUncheckedCreateNestedManyWithoutCreatedByInput
+  posProfileAccess?: Prisma.PosProfileUserUncheckedCreateNestedManyWithoutUserInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUncheckedCreateNestedManyWithoutCashierInput
+  posShiftsClosed?: Prisma.PosClosingEntryUncheckedCreateNestedManyWithoutClosedByInput
+  prescriptionsWritten?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPrescriberInput
+  dispensedEvents?: Prisma.DispenseEventUncheckedCreateNestedManyWithoutDispensedByInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutPerformedByInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutWitnessInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUncheckedCreateNestedManyWithoutPerformedByInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUncheckedCreateNestedManyWithoutUserInput
+  cageMoves?: Prisma.CageAssignmentUncheckedCreateNestedManyWithoutMovedByInput
+  inpatientAdmissions?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutAdmittedByInput
+  inpatientDischarges?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutDischargedByInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUncheckedCreateNestedManyWithoutOrderedByInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUncheckedCreateNestedManyWithoutDiscontinuedByInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUncheckedCreateNestedManyWithoutPerformedByInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUncheckedCreateNestedManyWithoutWitnessInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUncheckedCreateNestedManyWithoutAuthorInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutDispositionByInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutAssessedByInput
+  recordedPatientAlerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutRecordedByInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUncheckedCreateNestedManyWithoutHandledByInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutAuthorInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutFinalizedByInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
+  reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
+  recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCreatedRegistrationCampaignsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedRegistrationCampaignsInput, Prisma.UserUncheckedCreateWithoutCreatedRegistrationCampaignsInput>
+}
+
+export type UserUpsertWithoutCreatedRegistrationCampaignsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreatedRegistrationCampaignsInput, Prisma.UserUncheckedUpdateWithoutCreatedRegistrationCampaignsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreatedRegistrationCampaignsInput, Prisma.UserUncheckedCreateWithoutCreatedRegistrationCampaignsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreatedRegistrationCampaignsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreatedRegistrationCampaignsInput, Prisma.UserUncheckedUpdateWithoutCreatedRegistrationCampaignsInput>
+}
+
+export type UserUpdateWithoutCreatedRegistrationCampaignsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  clinicUsers?: Prisma.ClinicUserUpdateManyWithoutUserNestedInput
+  invitesSent?: Prisma.InviteUpdateManyWithoutInvitedByNestedInput
+  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneesNestedInput
+  createdTasks?: Prisma.TaskUpdateManyWithoutCreatedByNestedInput
+  crmOwnedLeads?: Prisma.CrmLeadUpdateManyWithoutOwnerUserNestedInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUpdateManyWithoutByUserNestedInput
+  crmAuthoredNotes?: Prisma.CrmNoteUpdateManyWithoutAuthorNestedInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUpdateManyWithoutSentByNestedInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUpdateManyWithoutSentByNestedInput
+  crmSavedViews?: Prisma.CrmSavedViewUpdateManyWithoutUserNestedInput
+  crmAssignedTasks?: Prisma.CrmTaskUpdateManyWithoutAssignedToNestedInput
+  crmAuthoredComments?: Prisma.CrmCommentUpdateManyWithoutAuthorNestedInput
+  crmOwnedDeals?: Prisma.CrmDealUpdateManyWithoutOwnerUserNestedInput
+  managedBranches?: Prisma.BranchUpdateManyWithoutManagerNestedInput
+  managerOfBranches?: Prisma.BranchUpdateManyWithoutManagersNestedInput
+  managedRooms?: Prisma.RoomUpdateManyWithoutManagerNestedInput
+  branchMemberships?: Prisma.BranchUserUpdateManyWithoutUserNestedInput
+  staffProfiles?: Prisma.StaffUpdateManyWithoutUserNestedInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUpdateManyWithoutAuthorNestedInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUpdateManyWithoutAuthorNestedInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUpdateManyWithoutCreatedByNestedInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUpdateManyWithoutHandledByNestedInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUpdateManyWithoutRevokedByNestedInput
+  authoredPatientEvents?: Prisma.PatientActivityUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUpdateManyWithoutAuthorNestedInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUpdateManyWithoutAuthorNestedInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUpdateManyWithoutAuthorNestedInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUpdateManyWithoutCreatedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutCreatedByNestedInput
+  authoredProductComments?: Prisma.ProductCommentUpdateManyWithoutAuthorNestedInput
+  authoredTaskActivity?: Prisma.TaskActivityUpdateManyWithoutAuthorNestedInput
+  createdInboxItems?: Prisma.InboxItemUpdateManyWithoutCreatedByNestedInput
+  authoredInboxActivity?: Prisma.InboxActivityUpdateManyWithoutAuthorNestedInput
+  inboxReads?: Prisma.InboxItemReadUpdateManyWithoutUserNestedInput
+  inboxSettings?: Prisma.UserInboxSettingsUpdateManyWithoutUserNestedInput
+  requestedExpenses?: Prisma.ExpenseUpdateManyWithoutRequesterNestedInput
+  decidedExpenses?: Prisma.ExpenseUpdateManyWithoutDecidedByNestedInput
+  refundedInvoices?: Prisma.InvoiceUpdateManyWithoutRefundedByNestedInput
+  refundedSales?: Prisma.SaleUpdateManyWithoutRefundedByNestedInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUpdateManyWithoutActorNestedInput
+  payrollRunsCreated?: Prisma.PayrollRunUpdateManyWithoutCreatedByNestedInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUpdateManyWithoutCreatedByNestedInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUpdateManyWithoutApproverNestedInput
+  agentConversations?: Prisma.AgentConversationUpdateManyWithoutUserNestedInput
+  requestedLabTests?: Prisma.LabTestOrderUpdateManyWithoutRequestedByNestedInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUpdateManyWithoutQcReviewedByNestedInput
+  assignedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutAssignedToNestedInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutReviewedByNestedInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutRejectedByNestedInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUpdateManyWithoutCollectedByNestedInput
+  authoredLabActivity?: Prisma.LabTestActivityUpdateManyWithoutAuthorNestedInput
+  authoredLabComments?: Prisma.LabTestCommentUpdateManyWithoutAuthorNestedInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUpdateManyWithoutRequestedByNestedInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutAssignedToNestedInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutReviewedByNestedInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutRejectedByNestedInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUpdateManyWithoutPerformedByNestedInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUpdateManyWithoutUploadedByNestedInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUpdateManyWithoutAuthoredByNestedInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUpdateManyWithoutCriticalNotifiedUserNestedInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUpdateManyWithoutAuthoredByNestedInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUpdateManyWithoutAuthorNestedInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUpdateManyWithoutAuthorNestedInput
+  authoredOperationActivity?: Prisma.OperationActivityUpdateManyWithoutAuthorNestedInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUpdateManyWithoutRecordedByNestedInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUpdateManyWithoutAssessedByNestedInput
+  reportedComplications?: Prisma.OperationComplicationUpdateManyWithoutReportedByNestedInput
+  authoredOperationComments?: Prisma.OperationCommentUpdateManyWithoutAuthorNestedInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUpdateManyWithoutRecordedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  authoredChatMessages?: Prisma.ChatMessageUpdateManyWithoutAuthorNestedInput
+  startedSopRuns?: Prisma.SopRunUpdateManyWithoutStartedByNestedInput
+  completedSopRuns?: Prisma.SopRunUpdateManyWithoutCompletedByNestedInput
+  respondedSopSteps?: Prisma.SopRunStepUpdateManyWithoutRespondedByNestedInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutCreatedByNestedInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutVoidedByNestedInput
+  posSales?: Prisma.SaleUpdateManyWithoutCreatedByNestedInput
+  posProfileAccess?: Prisma.PosProfileUserUpdateManyWithoutUserNestedInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUpdateManyWithoutCashierNestedInput
+  posShiftsClosed?: Prisma.PosClosingEntryUpdateManyWithoutClosedByNestedInput
+  prescriptionsWritten?: Prisma.PrescriptionUpdateManyWithoutPrescriberNestedInput
+  dispensedEvents?: Prisma.DispenseEventUpdateManyWithoutDispensedByNestedInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUpdateManyWithoutPerformedByNestedInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUpdateManyWithoutWitnessNestedInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUpdateManyWithoutPerformedByNestedInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUpdateManyWithoutUserNestedInput
+  cageMoves?: Prisma.CageAssignmentUpdateManyWithoutMovedByNestedInput
+  inpatientAdmissions?: Prisma.InpatientStayUpdateManyWithoutAdmittedByNestedInput
+  inpatientDischarges?: Prisma.InpatientStayUpdateManyWithoutDischargedByNestedInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUpdateManyWithoutOrderedByNestedInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUpdateManyWithoutDiscontinuedByNestedInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUpdateManyWithoutPerformedByNestedInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUpdateManyWithoutWitnessNestedInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUpdateManyWithoutAuthorNestedInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutCreatedByNestedInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUpdateManyWithoutDispositionByNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutAssessedByNestedInput
+  recordedPatientAlerts?: Prisma.PatientAlertUpdateManyWithoutRecordedByNestedInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUpdateManyWithoutHandledByNestedInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutAuthorNestedInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutFinalizedByNestedInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
+  reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
+  recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreatedRegistrationCampaignsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  clinicUsers?: Prisma.ClinicUserUncheckedUpdateManyWithoutUserNestedInput
+  invitesSent?: Prisma.InviteUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneesNestedInput
+  createdTasks?: Prisma.TaskUncheckedUpdateManyWithoutCreatedByNestedInput
+  crmOwnedLeads?: Prisma.CrmLeadUncheckedUpdateManyWithoutOwnerUserNestedInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUncheckedUpdateManyWithoutByUserNestedInput
+  crmAuthoredNotes?: Prisma.CrmNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUncheckedUpdateManyWithoutSentByNestedInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUncheckedUpdateManyWithoutSentByNestedInput
+  crmSavedViews?: Prisma.CrmSavedViewUncheckedUpdateManyWithoutUserNestedInput
+  crmAssignedTasks?: Prisma.CrmTaskUncheckedUpdateManyWithoutAssignedToNestedInput
+  crmAuthoredComments?: Prisma.CrmCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  crmOwnedDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerUserNestedInput
+  managedBranches?: Prisma.BranchUncheckedUpdateManyWithoutManagerNestedInput
+  managerOfBranches?: Prisma.BranchUncheckedUpdateManyWithoutManagersNestedInput
+  managedRooms?: Prisma.RoomUncheckedUpdateManyWithoutManagerNestedInput
+  branchMemberships?: Prisma.BranchUserUncheckedUpdateManyWithoutUserNestedInput
+  staffProfiles?: Prisma.StaffUncheckedUpdateManyWithoutUserNestedInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedUpdateManyWithoutCreatedByNestedInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUncheckedUpdateManyWithoutHandledByNestedInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedUpdateManyWithoutRevokedByNestedInput
+  authoredPatientEvents?: Prisma.PatientActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUncheckedUpdateManyWithoutCreatedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredProductComments?: Prisma.ProductCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredTaskActivity?: Prisma.TaskActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  createdInboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredInboxActivity?: Prisma.InboxActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  inboxReads?: Prisma.InboxItemReadUncheckedUpdateManyWithoutUserNestedInput
+  inboxSettings?: Prisma.UserInboxSettingsUncheckedUpdateManyWithoutUserNestedInput
+  requestedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRequesterNestedInput
+  decidedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutDecidedByNestedInput
+  refundedInvoices?: Prisma.InvoiceUncheckedUpdateManyWithoutRefundedByNestedInput
+  refundedSales?: Prisma.SaleUncheckedUpdateManyWithoutRefundedByNestedInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUncheckedUpdateManyWithoutActorNestedInput
+  payrollRunsCreated?: Prisma.PayrollRunUncheckedUpdateManyWithoutCreatedByNestedInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUncheckedUpdateManyWithoutCreatedByNestedInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUncheckedUpdateManyWithoutApproverNestedInput
+  agentConversations?: Prisma.AgentConversationUncheckedUpdateManyWithoutUserNestedInput
+  requestedLabTests?: Prisma.LabTestOrderUncheckedUpdateManyWithoutRequestedByNestedInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUncheckedUpdateManyWithoutQcReviewedByNestedInput
+  assignedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutAssignedToNestedInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutReviewedByNestedInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutRejectedByNestedInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUncheckedUpdateManyWithoutCollectedByNestedInput
+  authoredLabActivity?: Prisma.LabTestActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredLabComments?: Prisma.LabTestCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUncheckedUpdateManyWithoutRequestedByNestedInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutAssignedToNestedInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutReviewedByNestedInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutRejectedByNestedInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUncheckedUpdateManyWithoutPerformedByNestedInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUncheckedUpdateManyWithoutUploadedByNestedInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUncheckedUpdateManyWithoutAuthoredByNestedInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUncheckedUpdateManyWithoutCriticalNotifiedUserNestedInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredOperationActivity?: Prisma.OperationActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUncheckedUpdateManyWithoutRecordedByNestedInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUncheckedUpdateManyWithoutAssessedByNestedInput
+  reportedComplications?: Prisma.OperationComplicationUncheckedUpdateManyWithoutReportedByNestedInput
+  authoredOperationComments?: Prisma.OperationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUncheckedUpdateManyWithoutRecordedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  authoredChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  startedSopRuns?: Prisma.SopRunUncheckedUpdateManyWithoutStartedByNestedInput
+  completedSopRuns?: Prisma.SopRunUncheckedUpdateManyWithoutCompletedByNestedInput
+  respondedSopSteps?: Prisma.SopRunStepUncheckedUpdateManyWithoutRespondedByNestedInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutCreatedByNestedInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutVoidedByNestedInput
+  posSales?: Prisma.SaleUncheckedUpdateManyWithoutCreatedByNestedInput
+  posProfileAccess?: Prisma.PosProfileUserUncheckedUpdateManyWithoutUserNestedInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUncheckedUpdateManyWithoutCashierNestedInput
+  posShiftsClosed?: Prisma.PosClosingEntryUncheckedUpdateManyWithoutClosedByNestedInput
+  prescriptionsWritten?: Prisma.PrescriptionUncheckedUpdateManyWithoutPrescriberNestedInput
+  dispensedEvents?: Prisma.DispenseEventUncheckedUpdateManyWithoutDispensedByNestedInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutPerformedByNestedInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutWitnessNestedInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUncheckedUpdateManyWithoutPerformedByNestedInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUncheckedUpdateManyWithoutUserNestedInput
+  cageMoves?: Prisma.CageAssignmentUncheckedUpdateManyWithoutMovedByNestedInput
+  inpatientAdmissions?: Prisma.InpatientStayUncheckedUpdateManyWithoutAdmittedByNestedInput
+  inpatientDischarges?: Prisma.InpatientStayUncheckedUpdateManyWithoutDischargedByNestedInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUncheckedUpdateManyWithoutOrderedByNestedInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUncheckedUpdateManyWithoutDiscontinuedByNestedInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUncheckedUpdateManyWithoutPerformedByNestedInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUncheckedUpdateManyWithoutWitnessNestedInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutDispositionByNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutAssessedByNestedInput
+  recordedPatientAlerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutRecordedByNestedInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUncheckedUpdateManyWithoutHandledByNestedInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutFinalizedByNestedInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
+  reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
+  recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutRegistrationCollaborationsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  image?: string | null
+  phone?: string | null
+  createdAt: Date | string
+  updatedAt: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  clinicUsers?: Prisma.ClinicUserCreateNestedManyWithoutUserInput
+  invitesSent?: Prisma.InviteCreateNestedManyWithoutInvitedByInput
+  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneesInput
+  createdTasks?: Prisma.TaskCreateNestedManyWithoutCreatedByInput
+  crmOwnedLeads?: Prisma.CrmLeadCreateNestedManyWithoutOwnerUserInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogCreateNestedManyWithoutByUserInput
+  crmAuthoredNotes?: Prisma.CrmNoteCreateNestedManyWithoutAuthorInput
+  crmEmailsSent?: Prisma.CrmEmailMessageCreateNestedManyWithoutSentByInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageCreateNestedManyWithoutSentByInput
+  crmSavedViews?: Prisma.CrmSavedViewCreateNestedManyWithoutUserInput
+  crmAssignedTasks?: Prisma.CrmTaskCreateNestedManyWithoutAssignedToInput
+  crmAuthoredComments?: Prisma.CrmCommentCreateNestedManyWithoutAuthorInput
+  crmOwnedDeals?: Prisma.CrmDealCreateNestedManyWithoutOwnerUserInput
+  managedBranches?: Prisma.BranchCreateNestedManyWithoutManagerInput
+  managerOfBranches?: Prisma.BranchCreateNestedManyWithoutManagersInput
+  managedRooms?: Prisma.RoomCreateNestedManyWithoutManagerInput
+  branchMemberships?: Prisma.BranchUserCreateNestedManyWithoutUserInput
+  staffProfiles?: Prisma.StaffCreateNestedManyWithoutUserInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteCreateNestedManyWithoutAuthorInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityCreateNestedManyWithoutAuthorInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityCreateNestedManyWithoutAuthorInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceCreateNestedManyWithoutCreatedByInput
+  handledMobileRequests?: Prisma.MobileBookingRequestCreateNestedManyWithoutHandledByInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceCreateNestedManyWithoutRevokedByInput
+  authoredPatientEvents?: Prisma.PatientActivityCreateNestedManyWithoutAuthorInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentCreateNestedManyWithoutAuthorInput
+  authoredStaffDocuments?: Prisma.StaffDocumentCreateNestedManyWithoutAuthorInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentCreateNestedManyWithoutAuthorInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryCreateNestedManyWithoutCreatedByInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutCreatedByInput
+  authoredProductComments?: Prisma.ProductCommentCreateNestedManyWithoutAuthorInput
+  authoredTaskActivity?: Prisma.TaskActivityCreateNestedManyWithoutAuthorInput
+  createdInboxItems?: Prisma.InboxItemCreateNestedManyWithoutCreatedByInput
+  authoredInboxActivity?: Prisma.InboxActivityCreateNestedManyWithoutAuthorInput
+  inboxReads?: Prisma.InboxItemReadCreateNestedManyWithoutUserInput
+  inboxSettings?: Prisma.UserInboxSettingsCreateNestedManyWithoutUserInput
+  requestedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRequesterInput
+  decidedExpenses?: Prisma.ExpenseCreateNestedManyWithoutDecidedByInput
+  refundedInvoices?: Prisma.InvoiceCreateNestedManyWithoutRefundedByInput
+  refundedSales?: Prisma.SaleCreateNestedManyWithoutRefundedByInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepCreateNestedManyWithoutActorInput
+  payrollRunsCreated?: Prisma.PayrollRunCreateNestedManyWithoutCreatedByInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementCreateNestedManyWithoutCreatedByInput
+  payrollApprovals?: Prisma.PayrollApprovalStepCreateNestedManyWithoutApproverInput
+  agentConversations?: Prisma.AgentConversationCreateNestedManyWithoutUserInput
+  requestedLabTests?: Prisma.LabTestOrderCreateNestedManyWithoutRequestedByInput
+  qcReviewedLabTests?: Prisma.LabTestOrderCreateNestedManyWithoutQcReviewedByInput
+  assignedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutAssignedToInput
+  reviewedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutReviewedByInput
+  rejectedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutRejectedByInput
+  collectedLabSamples?: Prisma.LabSampleCollectionCreateNestedManyWithoutCollectedByInput
+  authoredLabActivity?: Prisma.LabTestActivityCreateNestedManyWithoutAuthorInput
+  authoredLabComments?: Prisma.LabTestCommentCreateNestedManyWithoutAuthorInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderCreateNestedManyWithoutRequestedByInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutAssignedToInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutReviewedByInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutRejectedByInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionCreateNestedManyWithoutPerformedByInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyCreateNestedManyWithoutUploadedByInput
+  authoredRadiologyReports?: Prisma.RadiologyReportCreateNestedManyWithoutAuthoredByInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportCreateNestedManyWithoutCriticalNotifiedUserInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumCreateNestedManyWithoutAuthoredByInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentCreateNestedManyWithoutAuthorInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityCreateNestedManyWithoutAuthorInput
+  authoredOperationActivity?: Prisma.OperationActivityCreateNestedManyWithoutAuthorInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventCreateNestedManyWithoutRecordedByInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentCreateNestedManyWithoutAssessedByInput
+  reportedComplications?: Prisma.OperationComplicationCreateNestedManyWithoutReportedByInput
+  authoredOperationComments?: Prisma.OperationCommentCreateNestedManyWithoutAuthorInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordCreateNestedManyWithoutRecordedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  authoredChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutAuthorInput
+  startedSopRuns?: Prisma.SopRunCreateNestedManyWithoutStartedByInput
+  completedSopRuns?: Prisma.SopRunCreateNestedManyWithoutCompletedByInput
+  respondedSopSteps?: Prisma.SopRunStepCreateNestedManyWithoutRespondedByInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutCreatedByInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutVoidedByInput
+  posSales?: Prisma.SaleCreateNestedManyWithoutCreatedByInput
+  posProfileAccess?: Prisma.PosProfileUserCreateNestedManyWithoutUserInput
+  posShiftsOpened?: Prisma.PosOpeningEntryCreateNestedManyWithoutCashierInput
+  posShiftsClosed?: Prisma.PosClosingEntryCreateNestedManyWithoutClosedByInput
+  prescriptionsWritten?: Prisma.PrescriptionCreateNestedManyWithoutPrescriberInput
+  dispensedEvents?: Prisma.DispenseEventCreateNestedManyWithoutDispensedByInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutPerformedByInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutWitnessInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalCreateNestedManyWithoutPerformedByInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessCreateNestedManyWithoutUserInput
+  cageMoves?: Prisma.CageAssignmentCreateNestedManyWithoutMovedByInput
+  inpatientAdmissions?: Prisma.InpatientStayCreateNestedManyWithoutAdmittedByInput
+  inpatientDischarges?: Prisma.InpatientStayCreateNestedManyWithoutDischargedByInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderCreateNestedManyWithoutOrderedByInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderCreateNestedManyWithoutDiscontinuedByInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationCreateNestedManyWithoutPerformedByInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationCreateNestedManyWithoutWitnessInput
+  authoredInpatientActivity?: Prisma.InpatientActivityCreateNestedManyWithoutAuthorInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutCreatedByInput
+  emergencyDispositions?: Prisma.EmergencyArrivalCreateNestedManyWithoutDispositionByInput
+  triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutAssessedByInput
+  recordedPatientAlerts?: Prisma.PatientAlertCreateNestedManyWithoutRecordedByInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestCreateNestedManyWithoutHandledByInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutAuthorInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutFinalizedByInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
+  reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
+  recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+}
+
+export type UserUncheckedCreateWithoutRegistrationCollaborationsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  image?: string | null
+  phone?: string | null
+  createdAt: Date | string
+  updatedAt: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  clinicUsers?: Prisma.ClinicUserUncheckedCreateNestedManyWithoutUserInput
+  invitesSent?: Prisma.InviteUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneesInput
+  createdTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatedByInput
+  crmOwnedLeads?: Prisma.CrmLeadUncheckedCreateNestedManyWithoutOwnerUserInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUncheckedCreateNestedManyWithoutByUserInput
+  crmAuthoredNotes?: Prisma.CrmNoteUncheckedCreateNestedManyWithoutAuthorInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUncheckedCreateNestedManyWithoutSentByInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUncheckedCreateNestedManyWithoutSentByInput
+  crmSavedViews?: Prisma.CrmSavedViewUncheckedCreateNestedManyWithoutUserInput
+  crmAssignedTasks?: Prisma.CrmTaskUncheckedCreateNestedManyWithoutAssignedToInput
+  crmAuthoredComments?: Prisma.CrmCommentUncheckedCreateNestedManyWithoutAuthorInput
+  crmOwnedDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerUserInput
+  managedBranches?: Prisma.BranchUncheckedCreateNestedManyWithoutManagerInput
+  managerOfBranches?: Prisma.BranchUncheckedCreateNestedManyWithoutManagersInput
+  managedRooms?: Prisma.RoomUncheckedCreateNestedManyWithoutManagerInput
+  branchMemberships?: Prisma.BranchUserUncheckedCreateNestedManyWithoutUserInput
+  staffProfiles?: Prisma.StaffUncheckedCreateNestedManyWithoutUserInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUncheckedCreateNestedManyWithoutAuthorInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedCreateNestedManyWithoutCreatedByInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUncheckedCreateNestedManyWithoutHandledByInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedCreateNestedManyWithoutRevokedByInput
+  authoredPatientEvents?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUncheckedCreateNestedManyWithoutCreatedByInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredProductComments?: Prisma.ProductCommentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredTaskActivity?: Prisma.TaskActivityUncheckedCreateNestedManyWithoutAuthorInput
+  createdInboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredInboxActivity?: Prisma.InboxActivityUncheckedCreateNestedManyWithoutAuthorInput
+  inboxReads?: Prisma.InboxItemReadUncheckedCreateNestedManyWithoutUserInput
+  inboxSettings?: Prisma.UserInboxSettingsUncheckedCreateNestedManyWithoutUserInput
+  requestedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRequesterInput
+  decidedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutDecidedByInput
+  refundedInvoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutRefundedByInput
+  refundedSales?: Prisma.SaleUncheckedCreateNestedManyWithoutRefundedByInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUncheckedCreateNestedManyWithoutActorInput
+  payrollRunsCreated?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutCreatedByInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUncheckedCreateNestedManyWithoutCreatedByInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUncheckedCreateNestedManyWithoutApproverInput
+  agentConversations?: Prisma.AgentConversationUncheckedCreateNestedManyWithoutUserInput
+  requestedLabTests?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutRequestedByInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutQcReviewedByInput
+  assignedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutAssignedToInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutReviewedByInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutRejectedByInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUncheckedCreateNestedManyWithoutCollectedByInput
+  authoredLabActivity?: Prisma.LabTestActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredLabComments?: Prisma.LabTestCommentUncheckedCreateNestedManyWithoutAuthorInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUncheckedCreateNestedManyWithoutRequestedByInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutAssignedToInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutReviewedByInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutRejectedByInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUncheckedCreateNestedManyWithoutPerformedByInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUncheckedCreateNestedManyWithoutUploadedByInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUncheckedCreateNestedManyWithoutAuthoredByInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUncheckedCreateNestedManyWithoutCriticalNotifiedUserInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredOperationActivity?: Prisma.OperationActivityUncheckedCreateNestedManyWithoutAuthorInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUncheckedCreateNestedManyWithoutRecordedByInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUncheckedCreateNestedManyWithoutAssessedByInput
+  reportedComplications?: Prisma.OperationComplicationUncheckedCreateNestedManyWithoutReportedByInput
+  authoredOperationComments?: Prisma.OperationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUncheckedCreateNestedManyWithoutRecordedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  authoredChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  startedSopRuns?: Prisma.SopRunUncheckedCreateNestedManyWithoutStartedByInput
+  completedSopRuns?: Prisma.SopRunUncheckedCreateNestedManyWithoutCompletedByInput
+  respondedSopSteps?: Prisma.SopRunStepUncheckedCreateNestedManyWithoutRespondedByInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutCreatedByInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutVoidedByInput
+  posSales?: Prisma.SaleUncheckedCreateNestedManyWithoutCreatedByInput
+  posProfileAccess?: Prisma.PosProfileUserUncheckedCreateNestedManyWithoutUserInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUncheckedCreateNestedManyWithoutCashierInput
+  posShiftsClosed?: Prisma.PosClosingEntryUncheckedCreateNestedManyWithoutClosedByInput
+  prescriptionsWritten?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPrescriberInput
+  dispensedEvents?: Prisma.DispenseEventUncheckedCreateNestedManyWithoutDispensedByInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutPerformedByInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutWitnessInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUncheckedCreateNestedManyWithoutPerformedByInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUncheckedCreateNestedManyWithoutUserInput
+  cageMoves?: Prisma.CageAssignmentUncheckedCreateNestedManyWithoutMovedByInput
+  inpatientAdmissions?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutAdmittedByInput
+  inpatientDischarges?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutDischargedByInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUncheckedCreateNestedManyWithoutOrderedByInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUncheckedCreateNestedManyWithoutDiscontinuedByInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUncheckedCreateNestedManyWithoutPerformedByInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUncheckedCreateNestedManyWithoutWitnessInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUncheckedCreateNestedManyWithoutAuthorInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutDispositionByInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutAssessedByInput
+  recordedPatientAlerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutRecordedByInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUncheckedCreateNestedManyWithoutHandledByInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutAuthorInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutFinalizedByInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
+  reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
+  recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+}
+
+export type UserCreateOrConnectWithoutRegistrationCollaborationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutRegistrationCollaborationsInput, Prisma.UserUncheckedCreateWithoutRegistrationCollaborationsInput>
+}
+
+export type UserUpsertWithoutRegistrationCollaborationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutRegistrationCollaborationsInput, Prisma.UserUncheckedUpdateWithoutRegistrationCollaborationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutRegistrationCollaborationsInput, Prisma.UserUncheckedCreateWithoutRegistrationCollaborationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutRegistrationCollaborationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutRegistrationCollaborationsInput, Prisma.UserUncheckedUpdateWithoutRegistrationCollaborationsInput>
+}
+
+export type UserUpdateWithoutRegistrationCollaborationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  clinicUsers?: Prisma.ClinicUserUpdateManyWithoutUserNestedInput
+  invitesSent?: Prisma.InviteUpdateManyWithoutInvitedByNestedInput
+  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneesNestedInput
+  createdTasks?: Prisma.TaskUpdateManyWithoutCreatedByNestedInput
+  crmOwnedLeads?: Prisma.CrmLeadUpdateManyWithoutOwnerUserNestedInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUpdateManyWithoutByUserNestedInput
+  crmAuthoredNotes?: Prisma.CrmNoteUpdateManyWithoutAuthorNestedInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUpdateManyWithoutSentByNestedInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUpdateManyWithoutSentByNestedInput
+  crmSavedViews?: Prisma.CrmSavedViewUpdateManyWithoutUserNestedInput
+  crmAssignedTasks?: Prisma.CrmTaskUpdateManyWithoutAssignedToNestedInput
+  crmAuthoredComments?: Prisma.CrmCommentUpdateManyWithoutAuthorNestedInput
+  crmOwnedDeals?: Prisma.CrmDealUpdateManyWithoutOwnerUserNestedInput
+  managedBranches?: Prisma.BranchUpdateManyWithoutManagerNestedInput
+  managerOfBranches?: Prisma.BranchUpdateManyWithoutManagersNestedInput
+  managedRooms?: Prisma.RoomUpdateManyWithoutManagerNestedInput
+  branchMemberships?: Prisma.BranchUserUpdateManyWithoutUserNestedInput
+  staffProfiles?: Prisma.StaffUpdateManyWithoutUserNestedInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUpdateManyWithoutAuthorNestedInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUpdateManyWithoutAuthorNestedInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUpdateManyWithoutCreatedByNestedInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUpdateManyWithoutHandledByNestedInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUpdateManyWithoutRevokedByNestedInput
+  authoredPatientEvents?: Prisma.PatientActivityUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUpdateManyWithoutAuthorNestedInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUpdateManyWithoutAuthorNestedInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUpdateManyWithoutAuthorNestedInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUpdateManyWithoutCreatedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutCreatedByNestedInput
+  authoredProductComments?: Prisma.ProductCommentUpdateManyWithoutAuthorNestedInput
+  authoredTaskActivity?: Prisma.TaskActivityUpdateManyWithoutAuthorNestedInput
+  createdInboxItems?: Prisma.InboxItemUpdateManyWithoutCreatedByNestedInput
+  authoredInboxActivity?: Prisma.InboxActivityUpdateManyWithoutAuthorNestedInput
+  inboxReads?: Prisma.InboxItemReadUpdateManyWithoutUserNestedInput
+  inboxSettings?: Prisma.UserInboxSettingsUpdateManyWithoutUserNestedInput
+  requestedExpenses?: Prisma.ExpenseUpdateManyWithoutRequesterNestedInput
+  decidedExpenses?: Prisma.ExpenseUpdateManyWithoutDecidedByNestedInput
+  refundedInvoices?: Prisma.InvoiceUpdateManyWithoutRefundedByNestedInput
+  refundedSales?: Prisma.SaleUpdateManyWithoutRefundedByNestedInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUpdateManyWithoutActorNestedInput
+  payrollRunsCreated?: Prisma.PayrollRunUpdateManyWithoutCreatedByNestedInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUpdateManyWithoutCreatedByNestedInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUpdateManyWithoutApproverNestedInput
+  agentConversations?: Prisma.AgentConversationUpdateManyWithoutUserNestedInput
+  requestedLabTests?: Prisma.LabTestOrderUpdateManyWithoutRequestedByNestedInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUpdateManyWithoutQcReviewedByNestedInput
+  assignedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutAssignedToNestedInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutReviewedByNestedInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutRejectedByNestedInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUpdateManyWithoutCollectedByNestedInput
+  authoredLabActivity?: Prisma.LabTestActivityUpdateManyWithoutAuthorNestedInput
+  authoredLabComments?: Prisma.LabTestCommentUpdateManyWithoutAuthorNestedInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUpdateManyWithoutRequestedByNestedInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutAssignedToNestedInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutReviewedByNestedInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutRejectedByNestedInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUpdateManyWithoutPerformedByNestedInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUpdateManyWithoutUploadedByNestedInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUpdateManyWithoutAuthoredByNestedInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUpdateManyWithoutCriticalNotifiedUserNestedInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUpdateManyWithoutAuthoredByNestedInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUpdateManyWithoutAuthorNestedInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUpdateManyWithoutAuthorNestedInput
+  authoredOperationActivity?: Prisma.OperationActivityUpdateManyWithoutAuthorNestedInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUpdateManyWithoutRecordedByNestedInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUpdateManyWithoutAssessedByNestedInput
+  reportedComplications?: Prisma.OperationComplicationUpdateManyWithoutReportedByNestedInput
+  authoredOperationComments?: Prisma.OperationCommentUpdateManyWithoutAuthorNestedInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUpdateManyWithoutRecordedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  authoredChatMessages?: Prisma.ChatMessageUpdateManyWithoutAuthorNestedInput
+  startedSopRuns?: Prisma.SopRunUpdateManyWithoutStartedByNestedInput
+  completedSopRuns?: Prisma.SopRunUpdateManyWithoutCompletedByNestedInput
+  respondedSopSteps?: Prisma.SopRunStepUpdateManyWithoutRespondedByNestedInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutCreatedByNestedInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutVoidedByNestedInput
+  posSales?: Prisma.SaleUpdateManyWithoutCreatedByNestedInput
+  posProfileAccess?: Prisma.PosProfileUserUpdateManyWithoutUserNestedInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUpdateManyWithoutCashierNestedInput
+  posShiftsClosed?: Prisma.PosClosingEntryUpdateManyWithoutClosedByNestedInput
+  prescriptionsWritten?: Prisma.PrescriptionUpdateManyWithoutPrescriberNestedInput
+  dispensedEvents?: Prisma.DispenseEventUpdateManyWithoutDispensedByNestedInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUpdateManyWithoutPerformedByNestedInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUpdateManyWithoutWitnessNestedInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUpdateManyWithoutPerformedByNestedInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUpdateManyWithoutUserNestedInput
+  cageMoves?: Prisma.CageAssignmentUpdateManyWithoutMovedByNestedInput
+  inpatientAdmissions?: Prisma.InpatientStayUpdateManyWithoutAdmittedByNestedInput
+  inpatientDischarges?: Prisma.InpatientStayUpdateManyWithoutDischargedByNestedInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUpdateManyWithoutOrderedByNestedInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUpdateManyWithoutDiscontinuedByNestedInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUpdateManyWithoutPerformedByNestedInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUpdateManyWithoutWitnessNestedInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUpdateManyWithoutAuthorNestedInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutCreatedByNestedInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUpdateManyWithoutDispositionByNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutAssessedByNestedInput
+  recordedPatientAlerts?: Prisma.PatientAlertUpdateManyWithoutRecordedByNestedInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUpdateManyWithoutHandledByNestedInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutAuthorNestedInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutFinalizedByNestedInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
+  reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
+  recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+}
+
+export type UserUncheckedUpdateWithoutRegistrationCollaborationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  clinicUsers?: Prisma.ClinicUserUncheckedUpdateManyWithoutUserNestedInput
+  invitesSent?: Prisma.InviteUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneesNestedInput
+  createdTasks?: Prisma.TaskUncheckedUpdateManyWithoutCreatedByNestedInput
+  crmOwnedLeads?: Prisma.CrmLeadUncheckedUpdateManyWithoutOwnerUserNestedInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUncheckedUpdateManyWithoutByUserNestedInput
+  crmAuthoredNotes?: Prisma.CrmNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUncheckedUpdateManyWithoutSentByNestedInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUncheckedUpdateManyWithoutSentByNestedInput
+  crmSavedViews?: Prisma.CrmSavedViewUncheckedUpdateManyWithoutUserNestedInput
+  crmAssignedTasks?: Prisma.CrmTaskUncheckedUpdateManyWithoutAssignedToNestedInput
+  crmAuthoredComments?: Prisma.CrmCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  crmOwnedDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerUserNestedInput
+  managedBranches?: Prisma.BranchUncheckedUpdateManyWithoutManagerNestedInput
+  managerOfBranches?: Prisma.BranchUncheckedUpdateManyWithoutManagersNestedInput
+  managedRooms?: Prisma.RoomUncheckedUpdateManyWithoutManagerNestedInput
+  branchMemberships?: Prisma.BranchUserUncheckedUpdateManyWithoutUserNestedInput
+  staffProfiles?: Prisma.StaffUncheckedUpdateManyWithoutUserNestedInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedUpdateManyWithoutCreatedByNestedInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUncheckedUpdateManyWithoutHandledByNestedInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedUpdateManyWithoutRevokedByNestedInput
+  authoredPatientEvents?: Prisma.PatientActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUncheckedUpdateManyWithoutCreatedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredProductComments?: Prisma.ProductCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredTaskActivity?: Prisma.TaskActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  createdInboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredInboxActivity?: Prisma.InboxActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  inboxReads?: Prisma.InboxItemReadUncheckedUpdateManyWithoutUserNestedInput
+  inboxSettings?: Prisma.UserInboxSettingsUncheckedUpdateManyWithoutUserNestedInput
+  requestedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRequesterNestedInput
+  decidedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutDecidedByNestedInput
+  refundedInvoices?: Prisma.InvoiceUncheckedUpdateManyWithoutRefundedByNestedInput
+  refundedSales?: Prisma.SaleUncheckedUpdateManyWithoutRefundedByNestedInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUncheckedUpdateManyWithoutActorNestedInput
+  payrollRunsCreated?: Prisma.PayrollRunUncheckedUpdateManyWithoutCreatedByNestedInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUncheckedUpdateManyWithoutCreatedByNestedInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUncheckedUpdateManyWithoutApproverNestedInput
+  agentConversations?: Prisma.AgentConversationUncheckedUpdateManyWithoutUserNestedInput
+  requestedLabTests?: Prisma.LabTestOrderUncheckedUpdateManyWithoutRequestedByNestedInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUncheckedUpdateManyWithoutQcReviewedByNestedInput
+  assignedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutAssignedToNestedInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutReviewedByNestedInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutRejectedByNestedInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUncheckedUpdateManyWithoutCollectedByNestedInput
+  authoredLabActivity?: Prisma.LabTestActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredLabComments?: Prisma.LabTestCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUncheckedUpdateManyWithoutRequestedByNestedInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutAssignedToNestedInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutReviewedByNestedInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutRejectedByNestedInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUncheckedUpdateManyWithoutPerformedByNestedInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUncheckedUpdateManyWithoutUploadedByNestedInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUncheckedUpdateManyWithoutAuthoredByNestedInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUncheckedUpdateManyWithoutCriticalNotifiedUserNestedInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredOperationActivity?: Prisma.OperationActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUncheckedUpdateManyWithoutRecordedByNestedInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUncheckedUpdateManyWithoutAssessedByNestedInput
+  reportedComplications?: Prisma.OperationComplicationUncheckedUpdateManyWithoutReportedByNestedInput
+  authoredOperationComments?: Prisma.OperationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUncheckedUpdateManyWithoutRecordedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  authoredChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  startedSopRuns?: Prisma.SopRunUncheckedUpdateManyWithoutStartedByNestedInput
+  completedSopRuns?: Prisma.SopRunUncheckedUpdateManyWithoutCompletedByNestedInput
+  respondedSopSteps?: Prisma.SopRunStepUncheckedUpdateManyWithoutRespondedByNestedInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutCreatedByNestedInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutVoidedByNestedInput
+  posSales?: Prisma.SaleUncheckedUpdateManyWithoutCreatedByNestedInput
+  posProfileAccess?: Prisma.PosProfileUserUncheckedUpdateManyWithoutUserNestedInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUncheckedUpdateManyWithoutCashierNestedInput
+  posShiftsClosed?: Prisma.PosClosingEntryUncheckedUpdateManyWithoutClosedByNestedInput
+  prescriptionsWritten?: Prisma.PrescriptionUncheckedUpdateManyWithoutPrescriberNestedInput
+  dispensedEvents?: Prisma.DispenseEventUncheckedUpdateManyWithoutDispensedByNestedInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutPerformedByNestedInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutWitnessNestedInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUncheckedUpdateManyWithoutPerformedByNestedInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUncheckedUpdateManyWithoutUserNestedInput
+  cageMoves?: Prisma.CageAssignmentUncheckedUpdateManyWithoutMovedByNestedInput
+  inpatientAdmissions?: Prisma.InpatientStayUncheckedUpdateManyWithoutAdmittedByNestedInput
+  inpatientDischarges?: Prisma.InpatientStayUncheckedUpdateManyWithoutDischargedByNestedInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUncheckedUpdateManyWithoutOrderedByNestedInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUncheckedUpdateManyWithoutDiscontinuedByNestedInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUncheckedUpdateManyWithoutPerformedByNestedInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUncheckedUpdateManyWithoutWitnessNestedInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutDispositionByNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutAssessedByNestedInput
+  recordedPatientAlerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutRecordedByNestedInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUncheckedUpdateManyWithoutHandledByNestedInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutFinalizedByNestedInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
+  reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
+  recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+}
+
+export type UserCreateWithoutAssignedRegistrationRequestsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  image?: string | null
+  phone?: string | null
+  createdAt: Date | string
+  updatedAt: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  clinicUsers?: Prisma.ClinicUserCreateNestedManyWithoutUserInput
+  invitesSent?: Prisma.InviteCreateNestedManyWithoutInvitedByInput
+  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneesInput
+  createdTasks?: Prisma.TaskCreateNestedManyWithoutCreatedByInput
+  crmOwnedLeads?: Prisma.CrmLeadCreateNestedManyWithoutOwnerUserInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogCreateNestedManyWithoutByUserInput
+  crmAuthoredNotes?: Prisma.CrmNoteCreateNestedManyWithoutAuthorInput
+  crmEmailsSent?: Prisma.CrmEmailMessageCreateNestedManyWithoutSentByInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageCreateNestedManyWithoutSentByInput
+  crmSavedViews?: Prisma.CrmSavedViewCreateNestedManyWithoutUserInput
+  crmAssignedTasks?: Prisma.CrmTaskCreateNestedManyWithoutAssignedToInput
+  crmAuthoredComments?: Prisma.CrmCommentCreateNestedManyWithoutAuthorInput
+  crmOwnedDeals?: Prisma.CrmDealCreateNestedManyWithoutOwnerUserInput
+  managedBranches?: Prisma.BranchCreateNestedManyWithoutManagerInput
+  managerOfBranches?: Prisma.BranchCreateNestedManyWithoutManagersInput
+  managedRooms?: Prisma.RoomCreateNestedManyWithoutManagerInput
+  branchMemberships?: Prisma.BranchUserCreateNestedManyWithoutUserInput
+  staffProfiles?: Prisma.StaffCreateNestedManyWithoutUserInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteCreateNestedManyWithoutAuthorInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityCreateNestedManyWithoutAuthorInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityCreateNestedManyWithoutAuthorInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceCreateNestedManyWithoutCreatedByInput
+  handledMobileRequests?: Prisma.MobileBookingRequestCreateNestedManyWithoutHandledByInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceCreateNestedManyWithoutRevokedByInput
+  authoredPatientEvents?: Prisma.PatientActivityCreateNestedManyWithoutAuthorInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentCreateNestedManyWithoutAuthorInput
+  authoredStaffDocuments?: Prisma.StaffDocumentCreateNestedManyWithoutAuthorInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentCreateNestedManyWithoutAuthorInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryCreateNestedManyWithoutCreatedByInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutCreatedByInput
+  authoredProductComments?: Prisma.ProductCommentCreateNestedManyWithoutAuthorInput
+  authoredTaskActivity?: Prisma.TaskActivityCreateNestedManyWithoutAuthorInput
+  createdInboxItems?: Prisma.InboxItemCreateNestedManyWithoutCreatedByInput
+  authoredInboxActivity?: Prisma.InboxActivityCreateNestedManyWithoutAuthorInput
+  inboxReads?: Prisma.InboxItemReadCreateNestedManyWithoutUserInput
+  inboxSettings?: Prisma.UserInboxSettingsCreateNestedManyWithoutUserInput
+  requestedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRequesterInput
+  decidedExpenses?: Prisma.ExpenseCreateNestedManyWithoutDecidedByInput
+  refundedInvoices?: Prisma.InvoiceCreateNestedManyWithoutRefundedByInput
+  refundedSales?: Prisma.SaleCreateNestedManyWithoutRefundedByInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepCreateNestedManyWithoutActorInput
+  payrollRunsCreated?: Prisma.PayrollRunCreateNestedManyWithoutCreatedByInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementCreateNestedManyWithoutCreatedByInput
+  payrollApprovals?: Prisma.PayrollApprovalStepCreateNestedManyWithoutApproverInput
+  agentConversations?: Prisma.AgentConversationCreateNestedManyWithoutUserInput
+  requestedLabTests?: Prisma.LabTestOrderCreateNestedManyWithoutRequestedByInput
+  qcReviewedLabTests?: Prisma.LabTestOrderCreateNestedManyWithoutQcReviewedByInput
+  assignedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutAssignedToInput
+  reviewedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutReviewedByInput
+  rejectedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutRejectedByInput
+  collectedLabSamples?: Prisma.LabSampleCollectionCreateNestedManyWithoutCollectedByInput
+  authoredLabActivity?: Prisma.LabTestActivityCreateNestedManyWithoutAuthorInput
+  authoredLabComments?: Prisma.LabTestCommentCreateNestedManyWithoutAuthorInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderCreateNestedManyWithoutRequestedByInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutAssignedToInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutReviewedByInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutRejectedByInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionCreateNestedManyWithoutPerformedByInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyCreateNestedManyWithoutUploadedByInput
+  authoredRadiologyReports?: Prisma.RadiologyReportCreateNestedManyWithoutAuthoredByInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportCreateNestedManyWithoutCriticalNotifiedUserInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumCreateNestedManyWithoutAuthoredByInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentCreateNestedManyWithoutAuthorInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityCreateNestedManyWithoutAuthorInput
+  authoredOperationActivity?: Prisma.OperationActivityCreateNestedManyWithoutAuthorInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventCreateNestedManyWithoutRecordedByInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentCreateNestedManyWithoutAssessedByInput
+  reportedComplications?: Prisma.OperationComplicationCreateNestedManyWithoutReportedByInput
+  authoredOperationComments?: Prisma.OperationCommentCreateNestedManyWithoutAuthorInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordCreateNestedManyWithoutRecordedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  authoredChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutAuthorInput
+  startedSopRuns?: Prisma.SopRunCreateNestedManyWithoutStartedByInput
+  completedSopRuns?: Prisma.SopRunCreateNestedManyWithoutCompletedByInput
+  respondedSopSteps?: Prisma.SopRunStepCreateNestedManyWithoutRespondedByInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutCreatedByInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutVoidedByInput
+  posSales?: Prisma.SaleCreateNestedManyWithoutCreatedByInput
+  posProfileAccess?: Prisma.PosProfileUserCreateNestedManyWithoutUserInput
+  posShiftsOpened?: Prisma.PosOpeningEntryCreateNestedManyWithoutCashierInput
+  posShiftsClosed?: Prisma.PosClosingEntryCreateNestedManyWithoutClosedByInput
+  prescriptionsWritten?: Prisma.PrescriptionCreateNestedManyWithoutPrescriberInput
+  dispensedEvents?: Prisma.DispenseEventCreateNestedManyWithoutDispensedByInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutPerformedByInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutWitnessInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalCreateNestedManyWithoutPerformedByInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessCreateNestedManyWithoutUserInput
+  cageMoves?: Prisma.CageAssignmentCreateNestedManyWithoutMovedByInput
+  inpatientAdmissions?: Prisma.InpatientStayCreateNestedManyWithoutAdmittedByInput
+  inpatientDischarges?: Prisma.InpatientStayCreateNestedManyWithoutDischargedByInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderCreateNestedManyWithoutOrderedByInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderCreateNestedManyWithoutDiscontinuedByInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationCreateNestedManyWithoutPerformedByInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationCreateNestedManyWithoutWitnessInput
+  authoredInpatientActivity?: Prisma.InpatientActivityCreateNestedManyWithoutAuthorInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutCreatedByInput
+  emergencyDispositions?: Prisma.EmergencyArrivalCreateNestedManyWithoutDispositionByInput
+  triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutAssessedByInput
+  recordedPatientAlerts?: Prisma.PatientAlertCreateNestedManyWithoutRecordedByInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestCreateNestedManyWithoutHandledByInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutAuthorInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutFinalizedByInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
+  reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
+  recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAssignedRegistrationRequestsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  image?: string | null
+  phone?: string | null
+  createdAt: Date | string
+  updatedAt: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  clinicUsers?: Prisma.ClinicUserUncheckedCreateNestedManyWithoutUserInput
+  invitesSent?: Prisma.InviteUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneesInput
+  createdTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatedByInput
+  crmOwnedLeads?: Prisma.CrmLeadUncheckedCreateNestedManyWithoutOwnerUserInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUncheckedCreateNestedManyWithoutByUserInput
+  crmAuthoredNotes?: Prisma.CrmNoteUncheckedCreateNestedManyWithoutAuthorInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUncheckedCreateNestedManyWithoutSentByInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUncheckedCreateNestedManyWithoutSentByInput
+  crmSavedViews?: Prisma.CrmSavedViewUncheckedCreateNestedManyWithoutUserInput
+  crmAssignedTasks?: Prisma.CrmTaskUncheckedCreateNestedManyWithoutAssignedToInput
+  crmAuthoredComments?: Prisma.CrmCommentUncheckedCreateNestedManyWithoutAuthorInput
+  crmOwnedDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerUserInput
+  managedBranches?: Prisma.BranchUncheckedCreateNestedManyWithoutManagerInput
+  managerOfBranches?: Prisma.BranchUncheckedCreateNestedManyWithoutManagersInput
+  managedRooms?: Prisma.RoomUncheckedCreateNestedManyWithoutManagerInput
+  branchMemberships?: Prisma.BranchUserUncheckedCreateNestedManyWithoutUserInput
+  staffProfiles?: Prisma.StaffUncheckedCreateNestedManyWithoutUserInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUncheckedCreateNestedManyWithoutAuthorInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedCreateNestedManyWithoutCreatedByInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUncheckedCreateNestedManyWithoutHandledByInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedCreateNestedManyWithoutRevokedByInput
+  authoredPatientEvents?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUncheckedCreateNestedManyWithoutCreatedByInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredProductComments?: Prisma.ProductCommentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredTaskActivity?: Prisma.TaskActivityUncheckedCreateNestedManyWithoutAuthorInput
+  createdInboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredInboxActivity?: Prisma.InboxActivityUncheckedCreateNestedManyWithoutAuthorInput
+  inboxReads?: Prisma.InboxItemReadUncheckedCreateNestedManyWithoutUserInput
+  inboxSettings?: Prisma.UserInboxSettingsUncheckedCreateNestedManyWithoutUserInput
+  requestedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRequesterInput
+  decidedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutDecidedByInput
+  refundedInvoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutRefundedByInput
+  refundedSales?: Prisma.SaleUncheckedCreateNestedManyWithoutRefundedByInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUncheckedCreateNestedManyWithoutActorInput
+  payrollRunsCreated?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutCreatedByInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUncheckedCreateNestedManyWithoutCreatedByInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUncheckedCreateNestedManyWithoutApproverInput
+  agentConversations?: Prisma.AgentConversationUncheckedCreateNestedManyWithoutUserInput
+  requestedLabTests?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutRequestedByInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutQcReviewedByInput
+  assignedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutAssignedToInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutReviewedByInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutRejectedByInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUncheckedCreateNestedManyWithoutCollectedByInput
+  authoredLabActivity?: Prisma.LabTestActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredLabComments?: Prisma.LabTestCommentUncheckedCreateNestedManyWithoutAuthorInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUncheckedCreateNestedManyWithoutRequestedByInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutAssignedToInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutReviewedByInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutRejectedByInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUncheckedCreateNestedManyWithoutPerformedByInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUncheckedCreateNestedManyWithoutUploadedByInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUncheckedCreateNestedManyWithoutAuthoredByInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUncheckedCreateNestedManyWithoutCriticalNotifiedUserInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredOperationActivity?: Prisma.OperationActivityUncheckedCreateNestedManyWithoutAuthorInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUncheckedCreateNestedManyWithoutRecordedByInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUncheckedCreateNestedManyWithoutAssessedByInput
+  reportedComplications?: Prisma.OperationComplicationUncheckedCreateNestedManyWithoutReportedByInput
+  authoredOperationComments?: Prisma.OperationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUncheckedCreateNestedManyWithoutRecordedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  authoredChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  startedSopRuns?: Prisma.SopRunUncheckedCreateNestedManyWithoutStartedByInput
+  completedSopRuns?: Prisma.SopRunUncheckedCreateNestedManyWithoutCompletedByInput
+  respondedSopSteps?: Prisma.SopRunStepUncheckedCreateNestedManyWithoutRespondedByInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutCreatedByInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutVoidedByInput
+  posSales?: Prisma.SaleUncheckedCreateNestedManyWithoutCreatedByInput
+  posProfileAccess?: Prisma.PosProfileUserUncheckedCreateNestedManyWithoutUserInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUncheckedCreateNestedManyWithoutCashierInput
+  posShiftsClosed?: Prisma.PosClosingEntryUncheckedCreateNestedManyWithoutClosedByInput
+  prescriptionsWritten?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPrescriberInput
+  dispensedEvents?: Prisma.DispenseEventUncheckedCreateNestedManyWithoutDispensedByInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutPerformedByInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutWitnessInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUncheckedCreateNestedManyWithoutPerformedByInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUncheckedCreateNestedManyWithoutUserInput
+  cageMoves?: Prisma.CageAssignmentUncheckedCreateNestedManyWithoutMovedByInput
+  inpatientAdmissions?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutAdmittedByInput
+  inpatientDischarges?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutDischargedByInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUncheckedCreateNestedManyWithoutOrderedByInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUncheckedCreateNestedManyWithoutDiscontinuedByInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUncheckedCreateNestedManyWithoutPerformedByInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUncheckedCreateNestedManyWithoutWitnessInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUncheckedCreateNestedManyWithoutAuthorInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutDispositionByInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutAssessedByInput
+  recordedPatientAlerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutRecordedByInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUncheckedCreateNestedManyWithoutHandledByInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutAuthorInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutFinalizedByInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
+  reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
+  recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAssignedRegistrationRequestsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedRegistrationRequestsInput, Prisma.UserUncheckedCreateWithoutAssignedRegistrationRequestsInput>
+}
+
+export type UserCreateWithoutReferredRegistrationRequestsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  image?: string | null
+  phone?: string | null
+  createdAt: Date | string
+  updatedAt: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  clinicUsers?: Prisma.ClinicUserCreateNestedManyWithoutUserInput
+  invitesSent?: Prisma.InviteCreateNestedManyWithoutInvitedByInput
+  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneesInput
+  createdTasks?: Prisma.TaskCreateNestedManyWithoutCreatedByInput
+  crmOwnedLeads?: Prisma.CrmLeadCreateNestedManyWithoutOwnerUserInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogCreateNestedManyWithoutByUserInput
+  crmAuthoredNotes?: Prisma.CrmNoteCreateNestedManyWithoutAuthorInput
+  crmEmailsSent?: Prisma.CrmEmailMessageCreateNestedManyWithoutSentByInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageCreateNestedManyWithoutSentByInput
+  crmSavedViews?: Prisma.CrmSavedViewCreateNestedManyWithoutUserInput
+  crmAssignedTasks?: Prisma.CrmTaskCreateNestedManyWithoutAssignedToInput
+  crmAuthoredComments?: Prisma.CrmCommentCreateNestedManyWithoutAuthorInput
+  crmOwnedDeals?: Prisma.CrmDealCreateNestedManyWithoutOwnerUserInput
+  managedBranches?: Prisma.BranchCreateNestedManyWithoutManagerInput
+  managerOfBranches?: Prisma.BranchCreateNestedManyWithoutManagersInput
+  managedRooms?: Prisma.RoomCreateNestedManyWithoutManagerInput
+  branchMemberships?: Prisma.BranchUserCreateNestedManyWithoutUserInput
+  staffProfiles?: Prisma.StaffCreateNestedManyWithoutUserInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteCreateNestedManyWithoutAuthorInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityCreateNestedManyWithoutAuthorInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityCreateNestedManyWithoutAuthorInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceCreateNestedManyWithoutCreatedByInput
+  handledMobileRequests?: Prisma.MobileBookingRequestCreateNestedManyWithoutHandledByInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceCreateNestedManyWithoutRevokedByInput
+  authoredPatientEvents?: Prisma.PatientActivityCreateNestedManyWithoutAuthorInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentCreateNestedManyWithoutAuthorInput
+  authoredStaffDocuments?: Prisma.StaffDocumentCreateNestedManyWithoutAuthorInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentCreateNestedManyWithoutAuthorInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryCreateNestedManyWithoutCreatedByInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutCreatedByInput
+  authoredProductComments?: Prisma.ProductCommentCreateNestedManyWithoutAuthorInput
+  authoredTaskActivity?: Prisma.TaskActivityCreateNestedManyWithoutAuthorInput
+  createdInboxItems?: Prisma.InboxItemCreateNestedManyWithoutCreatedByInput
+  authoredInboxActivity?: Prisma.InboxActivityCreateNestedManyWithoutAuthorInput
+  inboxReads?: Prisma.InboxItemReadCreateNestedManyWithoutUserInput
+  inboxSettings?: Prisma.UserInboxSettingsCreateNestedManyWithoutUserInput
+  requestedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRequesterInput
+  decidedExpenses?: Prisma.ExpenseCreateNestedManyWithoutDecidedByInput
+  refundedInvoices?: Prisma.InvoiceCreateNestedManyWithoutRefundedByInput
+  refundedSales?: Prisma.SaleCreateNestedManyWithoutRefundedByInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepCreateNestedManyWithoutActorInput
+  payrollRunsCreated?: Prisma.PayrollRunCreateNestedManyWithoutCreatedByInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementCreateNestedManyWithoutCreatedByInput
+  payrollApprovals?: Prisma.PayrollApprovalStepCreateNestedManyWithoutApproverInput
+  agentConversations?: Prisma.AgentConversationCreateNestedManyWithoutUserInput
+  requestedLabTests?: Prisma.LabTestOrderCreateNestedManyWithoutRequestedByInput
+  qcReviewedLabTests?: Prisma.LabTestOrderCreateNestedManyWithoutQcReviewedByInput
+  assignedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutAssignedToInput
+  reviewedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutReviewedByInput
+  rejectedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutRejectedByInput
+  collectedLabSamples?: Prisma.LabSampleCollectionCreateNestedManyWithoutCollectedByInput
+  authoredLabActivity?: Prisma.LabTestActivityCreateNestedManyWithoutAuthorInput
+  authoredLabComments?: Prisma.LabTestCommentCreateNestedManyWithoutAuthorInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderCreateNestedManyWithoutRequestedByInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutAssignedToInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutReviewedByInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutRejectedByInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionCreateNestedManyWithoutPerformedByInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyCreateNestedManyWithoutUploadedByInput
+  authoredRadiologyReports?: Prisma.RadiologyReportCreateNestedManyWithoutAuthoredByInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportCreateNestedManyWithoutCriticalNotifiedUserInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumCreateNestedManyWithoutAuthoredByInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentCreateNestedManyWithoutAuthorInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityCreateNestedManyWithoutAuthorInput
+  authoredOperationActivity?: Prisma.OperationActivityCreateNestedManyWithoutAuthorInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventCreateNestedManyWithoutRecordedByInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentCreateNestedManyWithoutAssessedByInput
+  reportedComplications?: Prisma.OperationComplicationCreateNestedManyWithoutReportedByInput
+  authoredOperationComments?: Prisma.OperationCommentCreateNestedManyWithoutAuthorInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordCreateNestedManyWithoutRecordedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  authoredChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutAuthorInput
+  startedSopRuns?: Prisma.SopRunCreateNestedManyWithoutStartedByInput
+  completedSopRuns?: Prisma.SopRunCreateNestedManyWithoutCompletedByInput
+  respondedSopSteps?: Prisma.SopRunStepCreateNestedManyWithoutRespondedByInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutCreatedByInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutVoidedByInput
+  posSales?: Prisma.SaleCreateNestedManyWithoutCreatedByInput
+  posProfileAccess?: Prisma.PosProfileUserCreateNestedManyWithoutUserInput
+  posShiftsOpened?: Prisma.PosOpeningEntryCreateNestedManyWithoutCashierInput
+  posShiftsClosed?: Prisma.PosClosingEntryCreateNestedManyWithoutClosedByInput
+  prescriptionsWritten?: Prisma.PrescriptionCreateNestedManyWithoutPrescriberInput
+  dispensedEvents?: Prisma.DispenseEventCreateNestedManyWithoutDispensedByInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutPerformedByInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutWitnessInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalCreateNestedManyWithoutPerformedByInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessCreateNestedManyWithoutUserInput
+  cageMoves?: Prisma.CageAssignmentCreateNestedManyWithoutMovedByInput
+  inpatientAdmissions?: Prisma.InpatientStayCreateNestedManyWithoutAdmittedByInput
+  inpatientDischarges?: Prisma.InpatientStayCreateNestedManyWithoutDischargedByInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderCreateNestedManyWithoutOrderedByInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderCreateNestedManyWithoutDiscontinuedByInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationCreateNestedManyWithoutPerformedByInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationCreateNestedManyWithoutWitnessInput
+  authoredInpatientActivity?: Prisma.InpatientActivityCreateNestedManyWithoutAuthorInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutCreatedByInput
+  emergencyDispositions?: Prisma.EmergencyArrivalCreateNestedManyWithoutDispositionByInput
+  triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutAssessedByInput
+  recordedPatientAlerts?: Prisma.PatientAlertCreateNestedManyWithoutRecordedByInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestCreateNestedManyWithoutHandledByInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutAuthorInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutFinalizedByInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
+  reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
+  recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutReferredRegistrationRequestsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  image?: string | null
+  phone?: string | null
+  createdAt: Date | string
+  updatedAt: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  clinicUsers?: Prisma.ClinicUserUncheckedCreateNestedManyWithoutUserInput
+  invitesSent?: Prisma.InviteUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneesInput
+  createdTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatedByInput
+  crmOwnedLeads?: Prisma.CrmLeadUncheckedCreateNestedManyWithoutOwnerUserInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUncheckedCreateNestedManyWithoutByUserInput
+  crmAuthoredNotes?: Prisma.CrmNoteUncheckedCreateNestedManyWithoutAuthorInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUncheckedCreateNestedManyWithoutSentByInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUncheckedCreateNestedManyWithoutSentByInput
+  crmSavedViews?: Prisma.CrmSavedViewUncheckedCreateNestedManyWithoutUserInput
+  crmAssignedTasks?: Prisma.CrmTaskUncheckedCreateNestedManyWithoutAssignedToInput
+  crmAuthoredComments?: Prisma.CrmCommentUncheckedCreateNestedManyWithoutAuthorInput
+  crmOwnedDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerUserInput
+  managedBranches?: Prisma.BranchUncheckedCreateNestedManyWithoutManagerInput
+  managerOfBranches?: Prisma.BranchUncheckedCreateNestedManyWithoutManagersInput
+  managedRooms?: Prisma.RoomUncheckedCreateNestedManyWithoutManagerInput
+  branchMemberships?: Prisma.BranchUserUncheckedCreateNestedManyWithoutUserInput
+  staffProfiles?: Prisma.StaffUncheckedCreateNestedManyWithoutUserInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUncheckedCreateNestedManyWithoutAuthorInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedCreateNestedManyWithoutCreatedByInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUncheckedCreateNestedManyWithoutHandledByInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedCreateNestedManyWithoutRevokedByInput
+  authoredPatientEvents?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUncheckedCreateNestedManyWithoutCreatedByInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredProductComments?: Prisma.ProductCommentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredTaskActivity?: Prisma.TaskActivityUncheckedCreateNestedManyWithoutAuthorInput
+  createdInboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredInboxActivity?: Prisma.InboxActivityUncheckedCreateNestedManyWithoutAuthorInput
+  inboxReads?: Prisma.InboxItemReadUncheckedCreateNestedManyWithoutUserInput
+  inboxSettings?: Prisma.UserInboxSettingsUncheckedCreateNestedManyWithoutUserInput
+  requestedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRequesterInput
+  decidedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutDecidedByInput
+  refundedInvoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutRefundedByInput
+  refundedSales?: Prisma.SaleUncheckedCreateNestedManyWithoutRefundedByInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUncheckedCreateNestedManyWithoutActorInput
+  payrollRunsCreated?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutCreatedByInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUncheckedCreateNestedManyWithoutCreatedByInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUncheckedCreateNestedManyWithoutApproverInput
+  agentConversations?: Prisma.AgentConversationUncheckedCreateNestedManyWithoutUserInput
+  requestedLabTests?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutRequestedByInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutQcReviewedByInput
+  assignedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutAssignedToInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutReviewedByInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutRejectedByInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUncheckedCreateNestedManyWithoutCollectedByInput
+  authoredLabActivity?: Prisma.LabTestActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredLabComments?: Prisma.LabTestCommentUncheckedCreateNestedManyWithoutAuthorInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUncheckedCreateNestedManyWithoutRequestedByInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutAssignedToInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutReviewedByInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutRejectedByInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUncheckedCreateNestedManyWithoutPerformedByInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUncheckedCreateNestedManyWithoutUploadedByInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUncheckedCreateNestedManyWithoutAuthoredByInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUncheckedCreateNestedManyWithoutCriticalNotifiedUserInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredOperationActivity?: Prisma.OperationActivityUncheckedCreateNestedManyWithoutAuthorInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUncheckedCreateNestedManyWithoutRecordedByInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUncheckedCreateNestedManyWithoutAssessedByInput
+  reportedComplications?: Prisma.OperationComplicationUncheckedCreateNestedManyWithoutReportedByInput
+  authoredOperationComments?: Prisma.OperationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUncheckedCreateNestedManyWithoutRecordedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  authoredChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  startedSopRuns?: Prisma.SopRunUncheckedCreateNestedManyWithoutStartedByInput
+  completedSopRuns?: Prisma.SopRunUncheckedCreateNestedManyWithoutCompletedByInput
+  respondedSopSteps?: Prisma.SopRunStepUncheckedCreateNestedManyWithoutRespondedByInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutCreatedByInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutVoidedByInput
+  posSales?: Prisma.SaleUncheckedCreateNestedManyWithoutCreatedByInput
+  posProfileAccess?: Prisma.PosProfileUserUncheckedCreateNestedManyWithoutUserInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUncheckedCreateNestedManyWithoutCashierInput
+  posShiftsClosed?: Prisma.PosClosingEntryUncheckedCreateNestedManyWithoutClosedByInput
+  prescriptionsWritten?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPrescriberInput
+  dispensedEvents?: Prisma.DispenseEventUncheckedCreateNestedManyWithoutDispensedByInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutPerformedByInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutWitnessInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUncheckedCreateNestedManyWithoutPerformedByInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUncheckedCreateNestedManyWithoutUserInput
+  cageMoves?: Prisma.CageAssignmentUncheckedCreateNestedManyWithoutMovedByInput
+  inpatientAdmissions?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutAdmittedByInput
+  inpatientDischarges?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutDischargedByInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUncheckedCreateNestedManyWithoutOrderedByInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUncheckedCreateNestedManyWithoutDiscontinuedByInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUncheckedCreateNestedManyWithoutPerformedByInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUncheckedCreateNestedManyWithoutWitnessInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUncheckedCreateNestedManyWithoutAuthorInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutDispositionByInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutAssessedByInput
+  recordedPatientAlerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutRecordedByInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUncheckedCreateNestedManyWithoutHandledByInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutAuthorInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutFinalizedByInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
+  reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
+  recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutReferredRegistrationRequestsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferredRegistrationRequestsInput, Prisma.UserUncheckedCreateWithoutReferredRegistrationRequestsInput>
+}
+
+export type UserUpsertWithoutAssignedRegistrationRequestsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAssignedRegistrationRequestsInput, Prisma.UserUncheckedUpdateWithoutAssignedRegistrationRequestsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAssignedRegistrationRequestsInput, Prisma.UserUncheckedCreateWithoutAssignedRegistrationRequestsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAssignedRegistrationRequestsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAssignedRegistrationRequestsInput, Prisma.UserUncheckedUpdateWithoutAssignedRegistrationRequestsInput>
+}
+
+export type UserUpdateWithoutAssignedRegistrationRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  clinicUsers?: Prisma.ClinicUserUpdateManyWithoutUserNestedInput
+  invitesSent?: Prisma.InviteUpdateManyWithoutInvitedByNestedInput
+  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneesNestedInput
+  createdTasks?: Prisma.TaskUpdateManyWithoutCreatedByNestedInput
+  crmOwnedLeads?: Prisma.CrmLeadUpdateManyWithoutOwnerUserNestedInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUpdateManyWithoutByUserNestedInput
+  crmAuthoredNotes?: Prisma.CrmNoteUpdateManyWithoutAuthorNestedInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUpdateManyWithoutSentByNestedInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUpdateManyWithoutSentByNestedInput
+  crmSavedViews?: Prisma.CrmSavedViewUpdateManyWithoutUserNestedInput
+  crmAssignedTasks?: Prisma.CrmTaskUpdateManyWithoutAssignedToNestedInput
+  crmAuthoredComments?: Prisma.CrmCommentUpdateManyWithoutAuthorNestedInput
+  crmOwnedDeals?: Prisma.CrmDealUpdateManyWithoutOwnerUserNestedInput
+  managedBranches?: Prisma.BranchUpdateManyWithoutManagerNestedInput
+  managerOfBranches?: Prisma.BranchUpdateManyWithoutManagersNestedInput
+  managedRooms?: Prisma.RoomUpdateManyWithoutManagerNestedInput
+  branchMemberships?: Prisma.BranchUserUpdateManyWithoutUserNestedInput
+  staffProfiles?: Prisma.StaffUpdateManyWithoutUserNestedInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUpdateManyWithoutAuthorNestedInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUpdateManyWithoutAuthorNestedInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUpdateManyWithoutCreatedByNestedInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUpdateManyWithoutHandledByNestedInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUpdateManyWithoutRevokedByNestedInput
+  authoredPatientEvents?: Prisma.PatientActivityUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUpdateManyWithoutAuthorNestedInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUpdateManyWithoutAuthorNestedInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUpdateManyWithoutAuthorNestedInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUpdateManyWithoutCreatedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutCreatedByNestedInput
+  authoredProductComments?: Prisma.ProductCommentUpdateManyWithoutAuthorNestedInput
+  authoredTaskActivity?: Prisma.TaskActivityUpdateManyWithoutAuthorNestedInput
+  createdInboxItems?: Prisma.InboxItemUpdateManyWithoutCreatedByNestedInput
+  authoredInboxActivity?: Prisma.InboxActivityUpdateManyWithoutAuthorNestedInput
+  inboxReads?: Prisma.InboxItemReadUpdateManyWithoutUserNestedInput
+  inboxSettings?: Prisma.UserInboxSettingsUpdateManyWithoutUserNestedInput
+  requestedExpenses?: Prisma.ExpenseUpdateManyWithoutRequesterNestedInput
+  decidedExpenses?: Prisma.ExpenseUpdateManyWithoutDecidedByNestedInput
+  refundedInvoices?: Prisma.InvoiceUpdateManyWithoutRefundedByNestedInput
+  refundedSales?: Prisma.SaleUpdateManyWithoutRefundedByNestedInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUpdateManyWithoutActorNestedInput
+  payrollRunsCreated?: Prisma.PayrollRunUpdateManyWithoutCreatedByNestedInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUpdateManyWithoutCreatedByNestedInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUpdateManyWithoutApproverNestedInput
+  agentConversations?: Prisma.AgentConversationUpdateManyWithoutUserNestedInput
+  requestedLabTests?: Prisma.LabTestOrderUpdateManyWithoutRequestedByNestedInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUpdateManyWithoutQcReviewedByNestedInput
+  assignedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutAssignedToNestedInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutReviewedByNestedInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutRejectedByNestedInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUpdateManyWithoutCollectedByNestedInput
+  authoredLabActivity?: Prisma.LabTestActivityUpdateManyWithoutAuthorNestedInput
+  authoredLabComments?: Prisma.LabTestCommentUpdateManyWithoutAuthorNestedInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUpdateManyWithoutRequestedByNestedInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutAssignedToNestedInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutReviewedByNestedInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutRejectedByNestedInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUpdateManyWithoutPerformedByNestedInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUpdateManyWithoutUploadedByNestedInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUpdateManyWithoutAuthoredByNestedInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUpdateManyWithoutCriticalNotifiedUserNestedInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUpdateManyWithoutAuthoredByNestedInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUpdateManyWithoutAuthorNestedInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUpdateManyWithoutAuthorNestedInput
+  authoredOperationActivity?: Prisma.OperationActivityUpdateManyWithoutAuthorNestedInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUpdateManyWithoutRecordedByNestedInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUpdateManyWithoutAssessedByNestedInput
+  reportedComplications?: Prisma.OperationComplicationUpdateManyWithoutReportedByNestedInput
+  authoredOperationComments?: Prisma.OperationCommentUpdateManyWithoutAuthorNestedInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUpdateManyWithoutRecordedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  authoredChatMessages?: Prisma.ChatMessageUpdateManyWithoutAuthorNestedInput
+  startedSopRuns?: Prisma.SopRunUpdateManyWithoutStartedByNestedInput
+  completedSopRuns?: Prisma.SopRunUpdateManyWithoutCompletedByNestedInput
+  respondedSopSteps?: Prisma.SopRunStepUpdateManyWithoutRespondedByNestedInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutCreatedByNestedInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutVoidedByNestedInput
+  posSales?: Prisma.SaleUpdateManyWithoutCreatedByNestedInput
+  posProfileAccess?: Prisma.PosProfileUserUpdateManyWithoutUserNestedInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUpdateManyWithoutCashierNestedInput
+  posShiftsClosed?: Prisma.PosClosingEntryUpdateManyWithoutClosedByNestedInput
+  prescriptionsWritten?: Prisma.PrescriptionUpdateManyWithoutPrescriberNestedInput
+  dispensedEvents?: Prisma.DispenseEventUpdateManyWithoutDispensedByNestedInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUpdateManyWithoutPerformedByNestedInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUpdateManyWithoutWitnessNestedInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUpdateManyWithoutPerformedByNestedInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUpdateManyWithoutUserNestedInput
+  cageMoves?: Prisma.CageAssignmentUpdateManyWithoutMovedByNestedInput
+  inpatientAdmissions?: Prisma.InpatientStayUpdateManyWithoutAdmittedByNestedInput
+  inpatientDischarges?: Prisma.InpatientStayUpdateManyWithoutDischargedByNestedInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUpdateManyWithoutOrderedByNestedInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUpdateManyWithoutDiscontinuedByNestedInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUpdateManyWithoutPerformedByNestedInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUpdateManyWithoutWitnessNestedInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUpdateManyWithoutAuthorNestedInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutCreatedByNestedInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUpdateManyWithoutDispositionByNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutAssessedByNestedInput
+  recordedPatientAlerts?: Prisma.PatientAlertUpdateManyWithoutRecordedByNestedInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUpdateManyWithoutHandledByNestedInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutAuthorNestedInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutFinalizedByNestedInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
+  reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
+  recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAssignedRegistrationRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  clinicUsers?: Prisma.ClinicUserUncheckedUpdateManyWithoutUserNestedInput
+  invitesSent?: Prisma.InviteUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneesNestedInput
+  createdTasks?: Prisma.TaskUncheckedUpdateManyWithoutCreatedByNestedInput
+  crmOwnedLeads?: Prisma.CrmLeadUncheckedUpdateManyWithoutOwnerUserNestedInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUncheckedUpdateManyWithoutByUserNestedInput
+  crmAuthoredNotes?: Prisma.CrmNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUncheckedUpdateManyWithoutSentByNestedInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUncheckedUpdateManyWithoutSentByNestedInput
+  crmSavedViews?: Prisma.CrmSavedViewUncheckedUpdateManyWithoutUserNestedInput
+  crmAssignedTasks?: Prisma.CrmTaskUncheckedUpdateManyWithoutAssignedToNestedInput
+  crmAuthoredComments?: Prisma.CrmCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  crmOwnedDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerUserNestedInput
+  managedBranches?: Prisma.BranchUncheckedUpdateManyWithoutManagerNestedInput
+  managerOfBranches?: Prisma.BranchUncheckedUpdateManyWithoutManagersNestedInput
+  managedRooms?: Prisma.RoomUncheckedUpdateManyWithoutManagerNestedInput
+  branchMemberships?: Prisma.BranchUserUncheckedUpdateManyWithoutUserNestedInput
+  staffProfiles?: Prisma.StaffUncheckedUpdateManyWithoutUserNestedInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedUpdateManyWithoutCreatedByNestedInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUncheckedUpdateManyWithoutHandledByNestedInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedUpdateManyWithoutRevokedByNestedInput
+  authoredPatientEvents?: Prisma.PatientActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUncheckedUpdateManyWithoutCreatedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredProductComments?: Prisma.ProductCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredTaskActivity?: Prisma.TaskActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  createdInboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredInboxActivity?: Prisma.InboxActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  inboxReads?: Prisma.InboxItemReadUncheckedUpdateManyWithoutUserNestedInput
+  inboxSettings?: Prisma.UserInboxSettingsUncheckedUpdateManyWithoutUserNestedInput
+  requestedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRequesterNestedInput
+  decidedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutDecidedByNestedInput
+  refundedInvoices?: Prisma.InvoiceUncheckedUpdateManyWithoutRefundedByNestedInput
+  refundedSales?: Prisma.SaleUncheckedUpdateManyWithoutRefundedByNestedInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUncheckedUpdateManyWithoutActorNestedInput
+  payrollRunsCreated?: Prisma.PayrollRunUncheckedUpdateManyWithoutCreatedByNestedInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUncheckedUpdateManyWithoutCreatedByNestedInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUncheckedUpdateManyWithoutApproverNestedInput
+  agentConversations?: Prisma.AgentConversationUncheckedUpdateManyWithoutUserNestedInput
+  requestedLabTests?: Prisma.LabTestOrderUncheckedUpdateManyWithoutRequestedByNestedInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUncheckedUpdateManyWithoutQcReviewedByNestedInput
+  assignedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutAssignedToNestedInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutReviewedByNestedInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutRejectedByNestedInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUncheckedUpdateManyWithoutCollectedByNestedInput
+  authoredLabActivity?: Prisma.LabTestActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredLabComments?: Prisma.LabTestCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUncheckedUpdateManyWithoutRequestedByNestedInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutAssignedToNestedInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutReviewedByNestedInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutRejectedByNestedInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUncheckedUpdateManyWithoutPerformedByNestedInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUncheckedUpdateManyWithoutUploadedByNestedInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUncheckedUpdateManyWithoutAuthoredByNestedInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUncheckedUpdateManyWithoutCriticalNotifiedUserNestedInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredOperationActivity?: Prisma.OperationActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUncheckedUpdateManyWithoutRecordedByNestedInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUncheckedUpdateManyWithoutAssessedByNestedInput
+  reportedComplications?: Prisma.OperationComplicationUncheckedUpdateManyWithoutReportedByNestedInput
+  authoredOperationComments?: Prisma.OperationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUncheckedUpdateManyWithoutRecordedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  authoredChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  startedSopRuns?: Prisma.SopRunUncheckedUpdateManyWithoutStartedByNestedInput
+  completedSopRuns?: Prisma.SopRunUncheckedUpdateManyWithoutCompletedByNestedInput
+  respondedSopSteps?: Prisma.SopRunStepUncheckedUpdateManyWithoutRespondedByNestedInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutCreatedByNestedInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutVoidedByNestedInput
+  posSales?: Prisma.SaleUncheckedUpdateManyWithoutCreatedByNestedInput
+  posProfileAccess?: Prisma.PosProfileUserUncheckedUpdateManyWithoutUserNestedInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUncheckedUpdateManyWithoutCashierNestedInput
+  posShiftsClosed?: Prisma.PosClosingEntryUncheckedUpdateManyWithoutClosedByNestedInput
+  prescriptionsWritten?: Prisma.PrescriptionUncheckedUpdateManyWithoutPrescriberNestedInput
+  dispensedEvents?: Prisma.DispenseEventUncheckedUpdateManyWithoutDispensedByNestedInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutPerformedByNestedInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutWitnessNestedInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUncheckedUpdateManyWithoutPerformedByNestedInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUncheckedUpdateManyWithoutUserNestedInput
+  cageMoves?: Prisma.CageAssignmentUncheckedUpdateManyWithoutMovedByNestedInput
+  inpatientAdmissions?: Prisma.InpatientStayUncheckedUpdateManyWithoutAdmittedByNestedInput
+  inpatientDischarges?: Prisma.InpatientStayUncheckedUpdateManyWithoutDischargedByNestedInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUncheckedUpdateManyWithoutOrderedByNestedInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUncheckedUpdateManyWithoutDiscontinuedByNestedInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUncheckedUpdateManyWithoutPerformedByNestedInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUncheckedUpdateManyWithoutWitnessNestedInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutDispositionByNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutAssessedByNestedInput
+  recordedPatientAlerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutRecordedByNestedInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUncheckedUpdateManyWithoutHandledByNestedInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutFinalizedByNestedInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
+  reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
+  recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserUpsertWithoutReferredRegistrationRequestsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutReferredRegistrationRequestsInput, Prisma.UserUncheckedUpdateWithoutReferredRegistrationRequestsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutReferredRegistrationRequestsInput, Prisma.UserUncheckedCreateWithoutReferredRegistrationRequestsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutReferredRegistrationRequestsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutReferredRegistrationRequestsInput, Prisma.UserUncheckedUpdateWithoutReferredRegistrationRequestsInput>
+}
+
+export type UserUpdateWithoutReferredRegistrationRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  clinicUsers?: Prisma.ClinicUserUpdateManyWithoutUserNestedInput
+  invitesSent?: Prisma.InviteUpdateManyWithoutInvitedByNestedInput
+  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneesNestedInput
+  createdTasks?: Prisma.TaskUpdateManyWithoutCreatedByNestedInput
+  crmOwnedLeads?: Prisma.CrmLeadUpdateManyWithoutOwnerUserNestedInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUpdateManyWithoutByUserNestedInput
+  crmAuthoredNotes?: Prisma.CrmNoteUpdateManyWithoutAuthorNestedInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUpdateManyWithoutSentByNestedInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUpdateManyWithoutSentByNestedInput
+  crmSavedViews?: Prisma.CrmSavedViewUpdateManyWithoutUserNestedInput
+  crmAssignedTasks?: Prisma.CrmTaskUpdateManyWithoutAssignedToNestedInput
+  crmAuthoredComments?: Prisma.CrmCommentUpdateManyWithoutAuthorNestedInput
+  crmOwnedDeals?: Prisma.CrmDealUpdateManyWithoutOwnerUserNestedInput
+  managedBranches?: Prisma.BranchUpdateManyWithoutManagerNestedInput
+  managerOfBranches?: Prisma.BranchUpdateManyWithoutManagersNestedInput
+  managedRooms?: Prisma.RoomUpdateManyWithoutManagerNestedInput
+  branchMemberships?: Prisma.BranchUserUpdateManyWithoutUserNestedInput
+  staffProfiles?: Prisma.StaffUpdateManyWithoutUserNestedInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUpdateManyWithoutAuthorNestedInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUpdateManyWithoutAuthorNestedInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUpdateManyWithoutCreatedByNestedInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUpdateManyWithoutHandledByNestedInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUpdateManyWithoutRevokedByNestedInput
+  authoredPatientEvents?: Prisma.PatientActivityUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUpdateManyWithoutAuthorNestedInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUpdateManyWithoutAuthorNestedInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUpdateManyWithoutAuthorNestedInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUpdateManyWithoutCreatedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutCreatedByNestedInput
+  authoredProductComments?: Prisma.ProductCommentUpdateManyWithoutAuthorNestedInput
+  authoredTaskActivity?: Prisma.TaskActivityUpdateManyWithoutAuthorNestedInput
+  createdInboxItems?: Prisma.InboxItemUpdateManyWithoutCreatedByNestedInput
+  authoredInboxActivity?: Prisma.InboxActivityUpdateManyWithoutAuthorNestedInput
+  inboxReads?: Prisma.InboxItemReadUpdateManyWithoutUserNestedInput
+  inboxSettings?: Prisma.UserInboxSettingsUpdateManyWithoutUserNestedInput
+  requestedExpenses?: Prisma.ExpenseUpdateManyWithoutRequesterNestedInput
+  decidedExpenses?: Prisma.ExpenseUpdateManyWithoutDecidedByNestedInput
+  refundedInvoices?: Prisma.InvoiceUpdateManyWithoutRefundedByNestedInput
+  refundedSales?: Prisma.SaleUpdateManyWithoutRefundedByNestedInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUpdateManyWithoutActorNestedInput
+  payrollRunsCreated?: Prisma.PayrollRunUpdateManyWithoutCreatedByNestedInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUpdateManyWithoutCreatedByNestedInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUpdateManyWithoutApproverNestedInput
+  agentConversations?: Prisma.AgentConversationUpdateManyWithoutUserNestedInput
+  requestedLabTests?: Prisma.LabTestOrderUpdateManyWithoutRequestedByNestedInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUpdateManyWithoutQcReviewedByNestedInput
+  assignedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutAssignedToNestedInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutReviewedByNestedInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutRejectedByNestedInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUpdateManyWithoutCollectedByNestedInput
+  authoredLabActivity?: Prisma.LabTestActivityUpdateManyWithoutAuthorNestedInput
+  authoredLabComments?: Prisma.LabTestCommentUpdateManyWithoutAuthorNestedInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUpdateManyWithoutRequestedByNestedInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutAssignedToNestedInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutReviewedByNestedInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutRejectedByNestedInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUpdateManyWithoutPerformedByNestedInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUpdateManyWithoutUploadedByNestedInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUpdateManyWithoutAuthoredByNestedInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUpdateManyWithoutCriticalNotifiedUserNestedInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUpdateManyWithoutAuthoredByNestedInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUpdateManyWithoutAuthorNestedInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUpdateManyWithoutAuthorNestedInput
+  authoredOperationActivity?: Prisma.OperationActivityUpdateManyWithoutAuthorNestedInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUpdateManyWithoutRecordedByNestedInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUpdateManyWithoutAssessedByNestedInput
+  reportedComplications?: Prisma.OperationComplicationUpdateManyWithoutReportedByNestedInput
+  authoredOperationComments?: Prisma.OperationCommentUpdateManyWithoutAuthorNestedInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUpdateManyWithoutRecordedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  authoredChatMessages?: Prisma.ChatMessageUpdateManyWithoutAuthorNestedInput
+  startedSopRuns?: Prisma.SopRunUpdateManyWithoutStartedByNestedInput
+  completedSopRuns?: Prisma.SopRunUpdateManyWithoutCompletedByNestedInput
+  respondedSopSteps?: Prisma.SopRunStepUpdateManyWithoutRespondedByNestedInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutCreatedByNestedInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutVoidedByNestedInput
+  posSales?: Prisma.SaleUpdateManyWithoutCreatedByNestedInput
+  posProfileAccess?: Prisma.PosProfileUserUpdateManyWithoutUserNestedInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUpdateManyWithoutCashierNestedInput
+  posShiftsClosed?: Prisma.PosClosingEntryUpdateManyWithoutClosedByNestedInput
+  prescriptionsWritten?: Prisma.PrescriptionUpdateManyWithoutPrescriberNestedInput
+  dispensedEvents?: Prisma.DispenseEventUpdateManyWithoutDispensedByNestedInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUpdateManyWithoutPerformedByNestedInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUpdateManyWithoutWitnessNestedInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUpdateManyWithoutPerformedByNestedInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUpdateManyWithoutUserNestedInput
+  cageMoves?: Prisma.CageAssignmentUpdateManyWithoutMovedByNestedInput
+  inpatientAdmissions?: Prisma.InpatientStayUpdateManyWithoutAdmittedByNestedInput
+  inpatientDischarges?: Prisma.InpatientStayUpdateManyWithoutDischargedByNestedInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUpdateManyWithoutOrderedByNestedInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUpdateManyWithoutDiscontinuedByNestedInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUpdateManyWithoutPerformedByNestedInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUpdateManyWithoutWitnessNestedInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUpdateManyWithoutAuthorNestedInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutCreatedByNestedInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUpdateManyWithoutDispositionByNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutAssessedByNestedInput
+  recordedPatientAlerts?: Prisma.PatientAlertUpdateManyWithoutRecordedByNestedInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUpdateManyWithoutHandledByNestedInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutAuthorNestedInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutFinalizedByNestedInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
+  reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
+  recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutReferredRegistrationRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  clinicUsers?: Prisma.ClinicUserUncheckedUpdateManyWithoutUserNestedInput
+  invitesSent?: Prisma.InviteUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneesNestedInput
+  createdTasks?: Prisma.TaskUncheckedUpdateManyWithoutCreatedByNestedInput
+  crmOwnedLeads?: Prisma.CrmLeadUncheckedUpdateManyWithoutOwnerUserNestedInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUncheckedUpdateManyWithoutByUserNestedInput
+  crmAuthoredNotes?: Prisma.CrmNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUncheckedUpdateManyWithoutSentByNestedInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUncheckedUpdateManyWithoutSentByNestedInput
+  crmSavedViews?: Prisma.CrmSavedViewUncheckedUpdateManyWithoutUserNestedInput
+  crmAssignedTasks?: Prisma.CrmTaskUncheckedUpdateManyWithoutAssignedToNestedInput
+  crmAuthoredComments?: Prisma.CrmCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  crmOwnedDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerUserNestedInput
+  managedBranches?: Prisma.BranchUncheckedUpdateManyWithoutManagerNestedInput
+  managerOfBranches?: Prisma.BranchUncheckedUpdateManyWithoutManagersNestedInput
+  managedRooms?: Prisma.RoomUncheckedUpdateManyWithoutManagerNestedInput
+  branchMemberships?: Prisma.BranchUserUncheckedUpdateManyWithoutUserNestedInput
+  staffProfiles?: Prisma.StaffUncheckedUpdateManyWithoutUserNestedInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedUpdateManyWithoutCreatedByNestedInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUncheckedUpdateManyWithoutHandledByNestedInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedUpdateManyWithoutRevokedByNestedInput
+  authoredPatientEvents?: Prisma.PatientActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUncheckedUpdateManyWithoutCreatedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredProductComments?: Prisma.ProductCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredTaskActivity?: Prisma.TaskActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  createdInboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredInboxActivity?: Prisma.InboxActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  inboxReads?: Prisma.InboxItemReadUncheckedUpdateManyWithoutUserNestedInput
+  inboxSettings?: Prisma.UserInboxSettingsUncheckedUpdateManyWithoutUserNestedInput
+  requestedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRequesterNestedInput
+  decidedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutDecidedByNestedInput
+  refundedInvoices?: Prisma.InvoiceUncheckedUpdateManyWithoutRefundedByNestedInput
+  refundedSales?: Prisma.SaleUncheckedUpdateManyWithoutRefundedByNestedInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUncheckedUpdateManyWithoutActorNestedInput
+  payrollRunsCreated?: Prisma.PayrollRunUncheckedUpdateManyWithoutCreatedByNestedInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUncheckedUpdateManyWithoutCreatedByNestedInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUncheckedUpdateManyWithoutApproverNestedInput
+  agentConversations?: Prisma.AgentConversationUncheckedUpdateManyWithoutUserNestedInput
+  requestedLabTests?: Prisma.LabTestOrderUncheckedUpdateManyWithoutRequestedByNestedInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUncheckedUpdateManyWithoutQcReviewedByNestedInput
+  assignedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutAssignedToNestedInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutReviewedByNestedInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutRejectedByNestedInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUncheckedUpdateManyWithoutCollectedByNestedInput
+  authoredLabActivity?: Prisma.LabTestActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredLabComments?: Prisma.LabTestCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUncheckedUpdateManyWithoutRequestedByNestedInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutAssignedToNestedInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutReviewedByNestedInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutRejectedByNestedInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUncheckedUpdateManyWithoutPerformedByNestedInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUncheckedUpdateManyWithoutUploadedByNestedInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUncheckedUpdateManyWithoutAuthoredByNestedInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUncheckedUpdateManyWithoutCriticalNotifiedUserNestedInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredOperationActivity?: Prisma.OperationActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUncheckedUpdateManyWithoutRecordedByNestedInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUncheckedUpdateManyWithoutAssessedByNestedInput
+  reportedComplications?: Prisma.OperationComplicationUncheckedUpdateManyWithoutReportedByNestedInput
+  authoredOperationComments?: Prisma.OperationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUncheckedUpdateManyWithoutRecordedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  authoredChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  startedSopRuns?: Prisma.SopRunUncheckedUpdateManyWithoutStartedByNestedInput
+  completedSopRuns?: Prisma.SopRunUncheckedUpdateManyWithoutCompletedByNestedInput
+  respondedSopSteps?: Prisma.SopRunStepUncheckedUpdateManyWithoutRespondedByNestedInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutCreatedByNestedInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutVoidedByNestedInput
+  posSales?: Prisma.SaleUncheckedUpdateManyWithoutCreatedByNestedInput
+  posProfileAccess?: Prisma.PosProfileUserUncheckedUpdateManyWithoutUserNestedInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUncheckedUpdateManyWithoutCashierNestedInput
+  posShiftsClosed?: Prisma.PosClosingEntryUncheckedUpdateManyWithoutClosedByNestedInput
+  prescriptionsWritten?: Prisma.PrescriptionUncheckedUpdateManyWithoutPrescriberNestedInput
+  dispensedEvents?: Prisma.DispenseEventUncheckedUpdateManyWithoutDispensedByNestedInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutPerformedByNestedInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutWitnessNestedInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUncheckedUpdateManyWithoutPerformedByNestedInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUncheckedUpdateManyWithoutUserNestedInput
+  cageMoves?: Prisma.CageAssignmentUncheckedUpdateManyWithoutMovedByNestedInput
+  inpatientAdmissions?: Prisma.InpatientStayUncheckedUpdateManyWithoutAdmittedByNestedInput
+  inpatientDischarges?: Prisma.InpatientStayUncheckedUpdateManyWithoutDischargedByNestedInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUncheckedUpdateManyWithoutOrderedByNestedInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUncheckedUpdateManyWithoutDiscontinuedByNestedInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUncheckedUpdateManyWithoutPerformedByNestedInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUncheckedUpdateManyWithoutWitnessNestedInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutDispositionByNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutAssessedByNestedInput
+  recordedPatientAlerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutRecordedByNestedInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUncheckedUpdateManyWithoutHandledByNestedInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutFinalizedByNestedInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
+  reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
+  recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutAuthoredRegistrationCommentsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  image?: string | null
+  phone?: string | null
+  createdAt: Date | string
+  updatedAt: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  clinicUsers?: Prisma.ClinicUserCreateNestedManyWithoutUserInput
+  invitesSent?: Prisma.InviteCreateNestedManyWithoutInvitedByInput
+  assignedTasks?: Prisma.TaskCreateNestedManyWithoutAssigneesInput
+  createdTasks?: Prisma.TaskCreateNestedManyWithoutCreatedByInput
+  crmOwnedLeads?: Prisma.CrmLeadCreateNestedManyWithoutOwnerUserInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogCreateNestedManyWithoutByUserInput
+  crmAuthoredNotes?: Prisma.CrmNoteCreateNestedManyWithoutAuthorInput
+  crmEmailsSent?: Prisma.CrmEmailMessageCreateNestedManyWithoutSentByInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageCreateNestedManyWithoutSentByInput
+  crmSavedViews?: Prisma.CrmSavedViewCreateNestedManyWithoutUserInput
+  crmAssignedTasks?: Prisma.CrmTaskCreateNestedManyWithoutAssignedToInput
+  crmAuthoredComments?: Prisma.CrmCommentCreateNestedManyWithoutAuthorInput
+  crmOwnedDeals?: Prisma.CrmDealCreateNestedManyWithoutOwnerUserInput
+  managedBranches?: Prisma.BranchCreateNestedManyWithoutManagerInput
+  managerOfBranches?: Prisma.BranchCreateNestedManyWithoutManagersInput
+  managedRooms?: Prisma.RoomCreateNestedManyWithoutManagerInput
+  branchMemberships?: Prisma.BranchUserCreateNestedManyWithoutUserInput
+  staffProfiles?: Prisma.StaffCreateNestedManyWithoutUserInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteCreateNestedManyWithoutAuthorInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityCreateNestedManyWithoutAuthorInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityCreateNestedManyWithoutAuthorInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceCreateNestedManyWithoutCreatedByInput
+  handledMobileRequests?: Prisma.MobileBookingRequestCreateNestedManyWithoutHandledByInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceCreateNestedManyWithoutRevokedByInput
+  authoredPatientEvents?: Prisma.PatientActivityCreateNestedManyWithoutAuthorInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentCreateNestedManyWithoutAuthorInput
+  authoredStaffDocuments?: Prisma.StaffDocumentCreateNestedManyWithoutAuthorInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentCreateNestedManyWithoutAuthorInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryCreateNestedManyWithoutCreatedByInput
+  purchaseOrders?: Prisma.PurchaseOrderCreateNestedManyWithoutCreatedByInput
+  authoredProductComments?: Prisma.ProductCommentCreateNestedManyWithoutAuthorInput
+  authoredTaskActivity?: Prisma.TaskActivityCreateNestedManyWithoutAuthorInput
+  createdInboxItems?: Prisma.InboxItemCreateNestedManyWithoutCreatedByInput
+  authoredInboxActivity?: Prisma.InboxActivityCreateNestedManyWithoutAuthorInput
+  inboxReads?: Prisma.InboxItemReadCreateNestedManyWithoutUserInput
+  inboxSettings?: Prisma.UserInboxSettingsCreateNestedManyWithoutUserInput
+  requestedExpenses?: Prisma.ExpenseCreateNestedManyWithoutRequesterInput
+  decidedExpenses?: Prisma.ExpenseCreateNestedManyWithoutDecidedByInput
+  refundedInvoices?: Prisma.InvoiceCreateNestedManyWithoutRefundedByInput
+  refundedSales?: Prisma.SaleCreateNestedManyWithoutRefundedByInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepCreateNestedManyWithoutActorInput
+  payrollRunsCreated?: Prisma.PayrollRunCreateNestedManyWithoutCreatedByInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementCreateNestedManyWithoutCreatedByInput
+  payrollApprovals?: Prisma.PayrollApprovalStepCreateNestedManyWithoutApproverInput
+  agentConversations?: Prisma.AgentConversationCreateNestedManyWithoutUserInput
+  requestedLabTests?: Prisma.LabTestOrderCreateNestedManyWithoutRequestedByInput
+  qcReviewedLabTests?: Prisma.LabTestOrderCreateNestedManyWithoutQcReviewedByInput
+  assignedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutAssignedToInput
+  reviewedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutReviewedByInput
+  rejectedLabTests?: Prisma.LabTestOrderItemCreateNestedManyWithoutRejectedByInput
+  collectedLabSamples?: Prisma.LabSampleCollectionCreateNestedManyWithoutCollectedByInput
+  authoredLabActivity?: Prisma.LabTestActivityCreateNestedManyWithoutAuthorInput
+  authoredLabComments?: Prisma.LabTestCommentCreateNestedManyWithoutAuthorInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderCreateNestedManyWithoutRequestedByInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutAssignedToInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutReviewedByInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemCreateNestedManyWithoutRejectedByInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionCreateNestedManyWithoutPerformedByInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyCreateNestedManyWithoutUploadedByInput
+  authoredRadiologyReports?: Prisma.RadiologyReportCreateNestedManyWithoutAuthoredByInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportCreateNestedManyWithoutCriticalNotifiedUserInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumCreateNestedManyWithoutAuthoredByInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentCreateNestedManyWithoutAuthorInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityCreateNestedManyWithoutAuthorInput
+  authoredOperationActivity?: Prisma.OperationActivityCreateNestedManyWithoutAuthorInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventCreateNestedManyWithoutRecordedByInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentCreateNestedManyWithoutAssessedByInput
+  reportedComplications?: Prisma.OperationComplicationCreateNestedManyWithoutReportedByInput
+  authoredOperationComments?: Prisma.OperationCommentCreateNestedManyWithoutAuthorInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordCreateNestedManyWithoutRecordedByInput
+  conversationMemberships?: Prisma.ConversationMemberCreateNestedManyWithoutUserInput
+  authoredChatMessages?: Prisma.ChatMessageCreateNestedManyWithoutAuthorInput
+  startedSopRuns?: Prisma.SopRunCreateNestedManyWithoutStartedByInput
+  completedSopRuns?: Prisma.SopRunCreateNestedManyWithoutCompletedByInput
+  respondedSopSteps?: Prisma.SopRunStepCreateNestedManyWithoutRespondedByInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutCreatedByInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutVoidedByInput
+  posSales?: Prisma.SaleCreateNestedManyWithoutCreatedByInput
+  posProfileAccess?: Prisma.PosProfileUserCreateNestedManyWithoutUserInput
+  posShiftsOpened?: Prisma.PosOpeningEntryCreateNestedManyWithoutCashierInput
+  posShiftsClosed?: Prisma.PosClosingEntryCreateNestedManyWithoutClosedByInput
+  prescriptionsWritten?: Prisma.PrescriptionCreateNestedManyWithoutPrescriberInput
+  dispensedEvents?: Prisma.DispenseEventCreateNestedManyWithoutDispensedByInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutPerformedByInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutWitnessInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalCreateNestedManyWithoutPerformedByInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessCreateNestedManyWithoutUserInput
+  cageMoves?: Prisma.CageAssignmentCreateNestedManyWithoutMovedByInput
+  inpatientAdmissions?: Prisma.InpatientStayCreateNestedManyWithoutAdmittedByInput
+  inpatientDischarges?: Prisma.InpatientStayCreateNestedManyWithoutDischargedByInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderCreateNestedManyWithoutOrderedByInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderCreateNestedManyWithoutDiscontinuedByInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationCreateNestedManyWithoutPerformedByInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationCreateNestedManyWithoutWitnessInput
+  authoredInpatientActivity?: Prisma.InpatientActivityCreateNestedManyWithoutAuthorInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutCreatedByInput
+  emergencyDispositions?: Prisma.EmergencyArrivalCreateNestedManyWithoutDispositionByInput
+  triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutAssessedByInput
+  recordedPatientAlerts?: Prisma.PatientAlertCreateNestedManyWithoutRecordedByInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestCreateNestedManyWithoutHandledByInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutAuthorInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutFinalizedByInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumCreateNestedManyWithoutAuthoredByInput
+  reminderOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutRecipientInput
+  recallContacts?: Prisma.RecallContactCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignCreateNestedManyWithoutCreatedByInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutAuthoredRegistrationCommentsInput = {
+  id: string
+  name: string
+  email: string
+  emailVerified: boolean
+  image?: string | null
+  phone?: string | null
+  createdAt: Date | string
+  updatedAt: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  clinicUsers?: Prisma.ClinicUserUncheckedCreateNestedManyWithoutUserInput
+  invitesSent?: Prisma.InviteUncheckedCreateNestedManyWithoutInvitedByInput
+  assignedTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutAssigneesInput
+  createdTasks?: Prisma.TaskUncheckedCreateNestedManyWithoutCreatedByInput
+  crmOwnedLeads?: Prisma.CrmLeadUncheckedCreateNestedManyWithoutOwnerUserInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUncheckedCreateNestedManyWithoutByUserInput
+  crmAuthoredNotes?: Prisma.CrmNoteUncheckedCreateNestedManyWithoutAuthorInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUncheckedCreateNestedManyWithoutSentByInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUncheckedCreateNestedManyWithoutSentByInput
+  crmSavedViews?: Prisma.CrmSavedViewUncheckedCreateNestedManyWithoutUserInput
+  crmAssignedTasks?: Prisma.CrmTaskUncheckedCreateNestedManyWithoutAssignedToInput
+  crmAuthoredComments?: Prisma.CrmCommentUncheckedCreateNestedManyWithoutAuthorInput
+  crmOwnedDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerUserInput
+  managedBranches?: Prisma.BranchUncheckedCreateNestedManyWithoutManagerInput
+  managerOfBranches?: Prisma.BranchUncheckedCreateNestedManyWithoutManagersInput
+  managedRooms?: Prisma.RoomUncheckedCreateNestedManyWithoutManagerInput
+  branchMemberships?: Prisma.BranchUserUncheckedCreateNestedManyWithoutUserInput
+  staffProfiles?: Prisma.StaffUncheckedCreateNestedManyWithoutUserInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUncheckedCreateNestedManyWithoutAuthorInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUncheckedCreateNestedManyWithoutAuthorInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedCreateNestedManyWithoutCreatedByInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUncheckedCreateNestedManyWithoutHandledByInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedCreateNestedManyWithoutRevokedByInput
+  authoredPatientEvents?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUncheckedCreateNestedManyWithoutAuthorInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUncheckedCreateNestedManyWithoutCreatedByInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredProductComments?: Prisma.ProductCommentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredTaskActivity?: Prisma.TaskActivityUncheckedCreateNestedManyWithoutAuthorInput
+  createdInboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutCreatedByInput
+  authoredInboxActivity?: Prisma.InboxActivityUncheckedCreateNestedManyWithoutAuthorInput
+  inboxReads?: Prisma.InboxItemReadUncheckedCreateNestedManyWithoutUserInput
+  inboxSettings?: Prisma.UserInboxSettingsUncheckedCreateNestedManyWithoutUserInput
+  requestedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutRequesterInput
+  decidedExpenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutDecidedByInput
+  refundedInvoices?: Prisma.InvoiceUncheckedCreateNestedManyWithoutRefundedByInput
+  refundedSales?: Prisma.SaleUncheckedCreateNestedManyWithoutRefundedByInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUncheckedCreateNestedManyWithoutActorInput
+  payrollRunsCreated?: Prisma.PayrollRunUncheckedCreateNestedManyWithoutCreatedByInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUncheckedCreateNestedManyWithoutCreatedByInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUncheckedCreateNestedManyWithoutApproverInput
+  agentConversations?: Prisma.AgentConversationUncheckedCreateNestedManyWithoutUserInput
+  requestedLabTests?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutRequestedByInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutQcReviewedByInput
+  assignedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutAssignedToInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutReviewedByInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUncheckedCreateNestedManyWithoutRejectedByInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUncheckedCreateNestedManyWithoutCollectedByInput
+  authoredLabActivity?: Prisma.LabTestActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredLabComments?: Prisma.LabTestCommentUncheckedCreateNestedManyWithoutAuthorInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUncheckedCreateNestedManyWithoutRequestedByInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutAssignedToInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutReviewedByInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedCreateNestedManyWithoutRejectedByInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUncheckedCreateNestedManyWithoutPerformedByInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUncheckedCreateNestedManyWithoutUploadedByInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUncheckedCreateNestedManyWithoutAuthoredByInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUncheckedCreateNestedManyWithoutCriticalNotifiedUserInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUncheckedCreateNestedManyWithoutAuthorInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUncheckedCreateNestedManyWithoutAuthorInput
+  authoredOperationActivity?: Prisma.OperationActivityUncheckedCreateNestedManyWithoutAuthorInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUncheckedCreateNestedManyWithoutRecordedByInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUncheckedCreateNestedManyWithoutAssessedByInput
+  reportedComplications?: Prisma.OperationComplicationUncheckedCreateNestedManyWithoutReportedByInput
+  authoredOperationComments?: Prisma.OperationCommentUncheckedCreateNestedManyWithoutAuthorInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUncheckedCreateNestedManyWithoutRecordedByInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedCreateNestedManyWithoutUserInput
+  authoredChatMessages?: Prisma.ChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+  startedSopRuns?: Prisma.SopRunUncheckedCreateNestedManyWithoutStartedByInput
+  completedSopRuns?: Prisma.SopRunUncheckedCreateNestedManyWithoutCompletedByInput
+  respondedSopSteps?: Prisma.SopRunStepUncheckedCreateNestedManyWithoutRespondedByInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutCreatedByInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutVoidedByInput
+  posSales?: Prisma.SaleUncheckedCreateNestedManyWithoutCreatedByInput
+  posProfileAccess?: Prisma.PosProfileUserUncheckedCreateNestedManyWithoutUserInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUncheckedCreateNestedManyWithoutCashierInput
+  posShiftsClosed?: Prisma.PosClosingEntryUncheckedCreateNestedManyWithoutClosedByInput
+  prescriptionsWritten?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPrescriberInput
+  dispensedEvents?: Prisma.DispenseEventUncheckedCreateNestedManyWithoutDispensedByInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutPerformedByInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutWitnessInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUncheckedCreateNestedManyWithoutPerformedByInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUncheckedCreateNestedManyWithoutUserInput
+  cageMoves?: Prisma.CageAssignmentUncheckedCreateNestedManyWithoutMovedByInput
+  inpatientAdmissions?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutAdmittedByInput
+  inpatientDischarges?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutDischargedByInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUncheckedCreateNestedManyWithoutOrderedByInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUncheckedCreateNestedManyWithoutDiscontinuedByInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUncheckedCreateNestedManyWithoutPerformedByInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUncheckedCreateNestedManyWithoutWitnessInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUncheckedCreateNestedManyWithoutAuthorInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutCreatedByInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutDispositionByInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutAssessedByInput
+  recordedPatientAlerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutRecordedByInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUncheckedCreateNestedManyWithoutHandledByInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutAuthorInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutFinalizedByInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedCreateNestedManyWithoutAuthoredByInput
+  reminderOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutRecipientInput
+  recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutContactedByInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedCreateNestedManyWithoutCreatedByInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutAssignedStaffInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutReferredToStaffInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutAuthoredRegistrationCommentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuthoredRegistrationCommentsInput, Prisma.UserUncheckedCreateWithoutAuthoredRegistrationCommentsInput>
+}
+
+export type UserUpsertWithoutAuthoredRegistrationCommentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAuthoredRegistrationCommentsInput, Prisma.UserUncheckedUpdateWithoutAuthoredRegistrationCommentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAuthoredRegistrationCommentsInput, Prisma.UserUncheckedCreateWithoutAuthoredRegistrationCommentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAuthoredRegistrationCommentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAuthoredRegistrationCommentsInput, Prisma.UserUncheckedUpdateWithoutAuthoredRegistrationCommentsInput>
+}
+
+export type UserUpdateWithoutAuthoredRegistrationCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  clinicUsers?: Prisma.ClinicUserUpdateManyWithoutUserNestedInput
+  invitesSent?: Prisma.InviteUpdateManyWithoutInvitedByNestedInput
+  assignedTasks?: Prisma.TaskUpdateManyWithoutAssigneesNestedInput
+  createdTasks?: Prisma.TaskUpdateManyWithoutCreatedByNestedInput
+  crmOwnedLeads?: Prisma.CrmLeadUpdateManyWithoutOwnerUserNestedInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUpdateManyWithoutByUserNestedInput
+  crmAuthoredNotes?: Prisma.CrmNoteUpdateManyWithoutAuthorNestedInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUpdateManyWithoutSentByNestedInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUpdateManyWithoutSentByNestedInput
+  crmSavedViews?: Prisma.CrmSavedViewUpdateManyWithoutUserNestedInput
+  crmAssignedTasks?: Prisma.CrmTaskUpdateManyWithoutAssignedToNestedInput
+  crmAuthoredComments?: Prisma.CrmCommentUpdateManyWithoutAuthorNestedInput
+  crmOwnedDeals?: Prisma.CrmDealUpdateManyWithoutOwnerUserNestedInput
+  managedBranches?: Prisma.BranchUpdateManyWithoutManagerNestedInput
+  managerOfBranches?: Prisma.BranchUpdateManyWithoutManagersNestedInput
+  managedRooms?: Prisma.RoomUpdateManyWithoutManagerNestedInput
+  branchMemberships?: Prisma.BranchUserUpdateManyWithoutUserNestedInput
+  staffProfiles?: Prisma.StaffUpdateManyWithoutUserNestedInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUpdateManyWithoutAuthorNestedInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUpdateManyWithoutAuthorNestedInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUpdateManyWithoutCreatedByNestedInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUpdateManyWithoutHandledByNestedInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUpdateManyWithoutRevokedByNestedInput
+  authoredPatientEvents?: Prisma.PatientActivityUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUpdateManyWithoutAuthorNestedInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUpdateManyWithoutAuthorNestedInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUpdateManyWithoutAuthorNestedInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUpdateManyWithoutCreatedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUpdateManyWithoutCreatedByNestedInput
+  authoredProductComments?: Prisma.ProductCommentUpdateManyWithoutAuthorNestedInput
+  authoredTaskActivity?: Prisma.TaskActivityUpdateManyWithoutAuthorNestedInput
+  createdInboxItems?: Prisma.InboxItemUpdateManyWithoutCreatedByNestedInput
+  authoredInboxActivity?: Prisma.InboxActivityUpdateManyWithoutAuthorNestedInput
+  inboxReads?: Prisma.InboxItemReadUpdateManyWithoutUserNestedInput
+  inboxSettings?: Prisma.UserInboxSettingsUpdateManyWithoutUserNestedInput
+  requestedExpenses?: Prisma.ExpenseUpdateManyWithoutRequesterNestedInput
+  decidedExpenses?: Prisma.ExpenseUpdateManyWithoutDecidedByNestedInput
+  refundedInvoices?: Prisma.InvoiceUpdateManyWithoutRefundedByNestedInput
+  refundedSales?: Prisma.SaleUpdateManyWithoutRefundedByNestedInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUpdateManyWithoutActorNestedInput
+  payrollRunsCreated?: Prisma.PayrollRunUpdateManyWithoutCreatedByNestedInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUpdateManyWithoutCreatedByNestedInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUpdateManyWithoutApproverNestedInput
+  agentConversations?: Prisma.AgentConversationUpdateManyWithoutUserNestedInput
+  requestedLabTests?: Prisma.LabTestOrderUpdateManyWithoutRequestedByNestedInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUpdateManyWithoutQcReviewedByNestedInput
+  assignedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutAssignedToNestedInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutReviewedByNestedInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUpdateManyWithoutRejectedByNestedInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUpdateManyWithoutCollectedByNestedInput
+  authoredLabActivity?: Prisma.LabTestActivityUpdateManyWithoutAuthorNestedInput
+  authoredLabComments?: Prisma.LabTestCommentUpdateManyWithoutAuthorNestedInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUpdateManyWithoutRequestedByNestedInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutAssignedToNestedInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutReviewedByNestedInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUpdateManyWithoutRejectedByNestedInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUpdateManyWithoutPerformedByNestedInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUpdateManyWithoutUploadedByNestedInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUpdateManyWithoutAuthoredByNestedInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUpdateManyWithoutCriticalNotifiedUserNestedInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUpdateManyWithoutAuthoredByNestedInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUpdateManyWithoutAuthorNestedInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUpdateManyWithoutAuthorNestedInput
+  authoredOperationActivity?: Prisma.OperationActivityUpdateManyWithoutAuthorNestedInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUpdateManyWithoutRecordedByNestedInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUpdateManyWithoutAssessedByNestedInput
+  reportedComplications?: Prisma.OperationComplicationUpdateManyWithoutReportedByNestedInput
+  authoredOperationComments?: Prisma.OperationCommentUpdateManyWithoutAuthorNestedInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUpdateManyWithoutRecordedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUpdateManyWithoutUserNestedInput
+  authoredChatMessages?: Prisma.ChatMessageUpdateManyWithoutAuthorNestedInput
+  startedSopRuns?: Prisma.SopRunUpdateManyWithoutStartedByNestedInput
+  completedSopRuns?: Prisma.SopRunUpdateManyWithoutCompletedByNestedInput
+  respondedSopSteps?: Prisma.SopRunStepUpdateManyWithoutRespondedByNestedInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutCreatedByNestedInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutVoidedByNestedInput
+  posSales?: Prisma.SaleUpdateManyWithoutCreatedByNestedInput
+  posProfileAccess?: Prisma.PosProfileUserUpdateManyWithoutUserNestedInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUpdateManyWithoutCashierNestedInput
+  posShiftsClosed?: Prisma.PosClosingEntryUpdateManyWithoutClosedByNestedInput
+  prescriptionsWritten?: Prisma.PrescriptionUpdateManyWithoutPrescriberNestedInput
+  dispensedEvents?: Prisma.DispenseEventUpdateManyWithoutDispensedByNestedInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUpdateManyWithoutPerformedByNestedInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUpdateManyWithoutWitnessNestedInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUpdateManyWithoutPerformedByNestedInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUpdateManyWithoutUserNestedInput
+  cageMoves?: Prisma.CageAssignmentUpdateManyWithoutMovedByNestedInput
+  inpatientAdmissions?: Prisma.InpatientStayUpdateManyWithoutAdmittedByNestedInput
+  inpatientDischarges?: Prisma.InpatientStayUpdateManyWithoutDischargedByNestedInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUpdateManyWithoutOrderedByNestedInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUpdateManyWithoutDiscontinuedByNestedInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUpdateManyWithoutPerformedByNestedInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUpdateManyWithoutWitnessNestedInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUpdateManyWithoutAuthorNestedInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutCreatedByNestedInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUpdateManyWithoutDispositionByNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutAssessedByNestedInput
+  recordedPatientAlerts?: Prisma.PatientAlertUpdateManyWithoutRecordedByNestedInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUpdateManyWithoutHandledByNestedInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutAuthorNestedInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutFinalizedByNestedInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
+  reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
+  recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAuthoredRegistrationCommentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  clinicUsers?: Prisma.ClinicUserUncheckedUpdateManyWithoutUserNestedInput
+  invitesSent?: Prisma.InviteUncheckedUpdateManyWithoutInvitedByNestedInput
+  assignedTasks?: Prisma.TaskUncheckedUpdateManyWithoutAssigneesNestedInput
+  createdTasks?: Prisma.TaskUncheckedUpdateManyWithoutCreatedByNestedInput
+  crmOwnedLeads?: Prisma.CrmLeadUncheckedUpdateManyWithoutOwnerUserNestedInput
+  crmStatusChanges?: Prisma.CrmStatusChangeLogUncheckedUpdateManyWithoutByUserNestedInput
+  crmAuthoredNotes?: Prisma.CrmNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  crmEmailsSent?: Prisma.CrmEmailMessageUncheckedUpdateManyWithoutSentByNestedInput
+  crmWhatsappSent?: Prisma.CrmWhatsappMessageUncheckedUpdateManyWithoutSentByNestedInput
+  crmSavedViews?: Prisma.CrmSavedViewUncheckedUpdateManyWithoutUserNestedInput
+  crmAssignedTasks?: Prisma.CrmTaskUncheckedUpdateManyWithoutAssignedToNestedInput
+  crmAuthoredComments?: Prisma.CrmCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  crmOwnedDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerUserNestedInput
+  managedBranches?: Prisma.BranchUncheckedUpdateManyWithoutManagerNestedInput
+  managerOfBranches?: Prisma.BranchUncheckedUpdateManyWithoutManagersNestedInput
+  managedRooms?: Prisma.RoomUncheckedUpdateManyWithoutManagerNestedInput
+  branchMemberships?: Prisma.BranchUserUncheckedUpdateManyWithoutUserNestedInput
+  staffProfiles?: Prisma.StaffUncheckedUpdateManyWithoutUserNestedInput
+  authoredInternalNotes?: Prisma.AppointmentInternalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentEvents?: Prisma.AppointmentActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredMobileUnitEvents?: Prisma.MobileUnitActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  pairedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedUpdateManyWithoutCreatedByNestedInput
+  handledMobileRequests?: Prisma.MobileBookingRequestUncheckedUpdateManyWithoutHandledByNestedInput
+  revokedMobileUnitDevices?: Prisma.MobileUnitDeviceUncheckedUpdateManyWithoutRevokedByNestedInput
+  authoredPatientEvents?: Prisma.PatientActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredAppointmentDocuments?: Prisma.AppointmentDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredStaffDocuments?: Prisma.StaffDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredClinicDocuments?: Prisma.ClinicDocumentUncheckedUpdateManyWithoutAuthorNestedInput
+  stockLedgerEntries?: Prisma.StockLedgerEntryUncheckedUpdateManyWithoutCreatedByNestedInput
+  purchaseOrders?: Prisma.PurchaseOrderUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredProductComments?: Prisma.ProductCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredTaskActivity?: Prisma.TaskActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  createdInboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredInboxActivity?: Prisma.InboxActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  inboxReads?: Prisma.InboxItemReadUncheckedUpdateManyWithoutUserNestedInput
+  inboxSettings?: Prisma.UserInboxSettingsUncheckedUpdateManyWithoutUserNestedInput
+  requestedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutRequesterNestedInput
+  decidedExpenses?: Prisma.ExpenseUncheckedUpdateManyWithoutDecidedByNestedInput
+  refundedInvoices?: Prisma.InvoiceUncheckedUpdateManyWithoutRefundedByNestedInput
+  refundedSales?: Prisma.SaleUncheckedUpdateManyWithoutRefundedByNestedInput
+  expenseStepActions?: Prisma.ExpenseApprovalStepUncheckedUpdateManyWithoutActorNestedInput
+  payrollRunsCreated?: Prisma.PayrollRunUncheckedUpdateManyWithoutCreatedByNestedInput
+  eosSettlementsCreated?: Prisma.EndOfServiceSettlementUncheckedUpdateManyWithoutCreatedByNestedInput
+  payrollApprovals?: Prisma.PayrollApprovalStepUncheckedUpdateManyWithoutApproverNestedInput
+  agentConversations?: Prisma.AgentConversationUncheckedUpdateManyWithoutUserNestedInput
+  requestedLabTests?: Prisma.LabTestOrderUncheckedUpdateManyWithoutRequestedByNestedInput
+  qcReviewedLabTests?: Prisma.LabTestOrderUncheckedUpdateManyWithoutQcReviewedByNestedInput
+  assignedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutAssignedToNestedInput
+  reviewedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutReviewedByNestedInput
+  rejectedLabTests?: Prisma.LabTestOrderItemUncheckedUpdateManyWithoutRejectedByNestedInput
+  collectedLabSamples?: Prisma.LabSampleCollectionUncheckedUpdateManyWithoutCollectedByNestedInput
+  authoredLabActivity?: Prisma.LabTestActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredLabComments?: Prisma.LabTestCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  requestedRadiologyOrders?: Prisma.RadiologyOrderUncheckedUpdateManyWithoutRequestedByNestedInput
+  assignedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutAssignedToNestedInput
+  reviewedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutReviewedByNestedInput
+  rejectedRadiologyExams?: Prisma.RadiologyOrderItemUncheckedUpdateManyWithoutRejectedByNestedInput
+  performedRadiologyExams?: Prisma.RadiologyExamExecutionUncheckedUpdateManyWithoutPerformedByNestedInput
+  uploadedRadiologyStudies?: Prisma.RadiologyStudyUncheckedUpdateManyWithoutUploadedByNestedInput
+  authoredRadiologyReports?: Prisma.RadiologyReportUncheckedUpdateManyWithoutAuthoredByNestedInput
+  criticalRadiologyNotices?: Prisma.RadiologyReportUncheckedUpdateManyWithoutCriticalNotifiedUserNestedInput
+  authoredRadiologyAddenda?: Prisma.RadiologyReportAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
+  authoredRadiologyComments?: Prisma.RadiologyCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredRadiologyActivity?: Prisma.RadiologyActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  authoredOperationActivity?: Prisma.OperationActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  recordedAnesthesiaEvents?: Prisma.AnesthesiaEventUncheckedUpdateManyWithoutRecordedByNestedInput
+  recoveryAssessments?: Prisma.RecoveryAssessmentUncheckedUpdateManyWithoutAssessedByNestedInput
+  reportedComplications?: Prisma.OperationComplicationUncheckedUpdateManyWithoutReportedByNestedInput
+  authoredOperationComments?: Prisma.OperationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  recordedVitalSigns?: Prisma.VitalSignsRecordUncheckedUpdateManyWithoutRecordedByNestedInput
+  conversationMemberships?: Prisma.ConversationMemberUncheckedUpdateManyWithoutUserNestedInput
+  authoredChatMessages?: Prisma.ChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+  startedSopRuns?: Prisma.SopRunUncheckedUpdateManyWithoutStartedByNestedInput
+  completedSopRuns?: Prisma.SopRunUncheckedUpdateManyWithoutCompletedByNestedInput
+  respondedSopSteps?: Prisma.SopRunStepUncheckedUpdateManyWithoutRespondedByNestedInput
+  createdVaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutCreatedByNestedInput
+  voidedVaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutVoidedByNestedInput
+  posSales?: Prisma.SaleUncheckedUpdateManyWithoutCreatedByNestedInput
+  posProfileAccess?: Prisma.PosProfileUserUncheckedUpdateManyWithoutUserNestedInput
+  posShiftsOpened?: Prisma.PosOpeningEntryUncheckedUpdateManyWithoutCashierNestedInput
+  posShiftsClosed?: Prisma.PosClosingEntryUncheckedUpdateManyWithoutClosedByNestedInput
+  prescriptionsWritten?: Prisma.PrescriptionUncheckedUpdateManyWithoutPrescriberNestedInput
+  dispensedEvents?: Prisma.DispenseEventUncheckedUpdateManyWithoutDispensedByNestedInput
+  controlledPerformed?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutPerformedByNestedInput
+  controlledWitnessed?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutWitnessNestedInput
+  batchDisposalsPerformed?: Prisma.BatchDisposalUncheckedUpdateManyWithoutPerformedByNestedInput
+  batchDisposalsWitnessed?: Prisma.BatchDisposalWitnessUncheckedUpdateManyWithoutUserNestedInput
+  cageMoves?: Prisma.CageAssignmentUncheckedUpdateManyWithoutMovedByNestedInput
+  inpatientAdmissions?: Prisma.InpatientStayUncheckedUpdateManyWithoutAdmittedByNestedInput
+  inpatientDischarges?: Prisma.InpatientStayUncheckedUpdateManyWithoutDischargedByNestedInput
+  inpatientOrdersPrescribed?: Prisma.InpatientOrderUncheckedUpdateManyWithoutOrderedByNestedInput
+  inpatientOrdersDiscontinued?: Prisma.InpatientOrderUncheckedUpdateManyWithoutDiscontinuedByNestedInput
+  inpatientAdministrationsGiven?: Prisma.InpatientAdministrationUncheckedUpdateManyWithoutPerformedByNestedInput
+  inpatientAdministrationsWitnessed?: Prisma.InpatientAdministrationUncheckedUpdateManyWithoutWitnessNestedInput
+  authoredInpatientActivity?: Prisma.InpatientActivityUncheckedUpdateManyWithoutAuthorNestedInput
+  createdEmergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutCreatedByNestedInput
+  emergencyDispositions?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutDispositionByNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutAssessedByNestedInput
+  recordedPatientAlerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutRecordedByNestedInput
+  handledPetOwnerRequests?: Prisma.PetOwnerRequestUncheckedUpdateManyWithoutHandledByNestedInput
+  authoredClinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutAuthorNestedInput
+  finalizedClinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutFinalizedByNestedInput
+  clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
+  reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
+  recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUpdateWithoutAssignedTasksInput = {
@@ -54289,6 +59042,11 @@ export type UserUpdateWithoutAssignedTasksInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAssignedTasksInput = {
@@ -54406,6 +59164,11 @@ export type UserUncheckedUpdateWithoutAssignedTasksInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutAssignedTasksInput = {
@@ -54534,6 +59297,11 @@ export type UserUpdateWithoutManagerOfBranchesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutManagerOfBranchesInput = {
@@ -54651,6 +59419,11 @@ export type UserUncheckedUpdateWithoutManagerOfBranchesInput = {
   clinicalNoteAddenda?: Prisma.ClinicalNoteAddendumUncheckedUpdateManyWithoutAuthoredByNestedInput
   reminderOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutRecipientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutContactedByNestedInput
+  createdRegistrationCampaigns?: Prisma.RegistrationCampaignUncheckedUpdateManyWithoutCreatedByNestedInput
+  authoredRegistrationComments?: Prisma.RegistrationCommentUncheckedUpdateManyWithoutAuthorNestedInput
+  assignedRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutAssignedStaffNestedInput
+  referredRegistrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutReferredToStaffNestedInput
+  registrationCollaborations?: Prisma.RegistrationCollaboratorUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateManyWithoutManagerOfBranchesInput = {
@@ -54777,6 +59550,11 @@ export type UserCountOutputType = {
   clinicalNoteAddenda: number
   reminderOutbox: number
   recallContacts: number
+  createdRegistrationCampaigns: number
+  authoredRegistrationComments: number
+  assignedRegistrationRequests: number
+  referredRegistrationRequests: number
+  registrationCollaborations: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -54887,6 +59665,11 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   clinicalNoteAddenda?: boolean | UserCountOutputTypeCountClinicalNoteAddendaArgs
   reminderOutbox?: boolean | UserCountOutputTypeCountReminderOutboxArgs
   recallContacts?: boolean | UserCountOutputTypeCountRecallContactsArgs
+  createdRegistrationCampaigns?: boolean | UserCountOutputTypeCountCreatedRegistrationCampaignsArgs
+  authoredRegistrationComments?: boolean | UserCountOutputTypeCountAuthoredRegistrationCommentsArgs
+  assignedRegistrationRequests?: boolean | UserCountOutputTypeCountAssignedRegistrationRequestsArgs
+  referredRegistrationRequests?: boolean | UserCountOutputTypeCountReferredRegistrationRequestsArgs
+  registrationCollaborations?: boolean | UserCountOutputTypeCountRegistrationCollaborationsArgs
 }
 
 /**
@@ -55648,6 +60431,41 @@ export type UserCountOutputTypeCountRecallContactsArgs<ExtArgs extends runtime.T
   where?: Prisma.RecallContactWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreatedRegistrationCampaignsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RegistrationCampaignWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAuthoredRegistrationCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RegistrationCommentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAssignedRegistrationRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RegistrationRequestWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountReferredRegistrationRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RegistrationRequestWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountRegistrationCollaborationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RegistrationCollaboratorWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -55765,6 +60583,11 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   clinicalNoteAddenda?: boolean | Prisma.User$clinicalNoteAddendaArgs<ExtArgs>
   reminderOutbox?: boolean | Prisma.User$reminderOutboxArgs<ExtArgs>
   recallContacts?: boolean | Prisma.User$recallContactsArgs<ExtArgs>
+  createdRegistrationCampaigns?: boolean | Prisma.User$createdRegistrationCampaignsArgs<ExtArgs>
+  authoredRegistrationComments?: boolean | Prisma.User$authoredRegistrationCommentsArgs<ExtArgs>
+  assignedRegistrationRequests?: boolean | Prisma.User$assignedRegistrationRequestsArgs<ExtArgs>
+  referredRegistrationRequests?: boolean | Prisma.User$referredRegistrationRequestsArgs<ExtArgs>
+  registrationCollaborations?: boolean | Prisma.User$registrationCollaborationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -55910,6 +60733,11 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   clinicalNoteAddenda?: boolean | Prisma.User$clinicalNoteAddendaArgs<ExtArgs>
   reminderOutbox?: boolean | Prisma.User$reminderOutboxArgs<ExtArgs>
   recallContacts?: boolean | Prisma.User$recallContactsArgs<ExtArgs>
+  createdRegistrationCampaigns?: boolean | Prisma.User$createdRegistrationCampaignsArgs<ExtArgs>
+  authoredRegistrationComments?: boolean | Prisma.User$authoredRegistrationCommentsArgs<ExtArgs>
+  assignedRegistrationRequests?: boolean | Prisma.User$assignedRegistrationRequestsArgs<ExtArgs>
+  referredRegistrationRequests?: boolean | Prisma.User$referredRegistrationRequestsArgs<ExtArgs>
+  registrationCollaborations?: boolean | Prisma.User$registrationCollaborationsArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -56025,6 +60853,11 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     clinicalNoteAddenda: Prisma.$ClinicalNoteAddendumPayload<ExtArgs>[]
     reminderOutbox: Prisma.$NotificationOutboxPayload<ExtArgs>[]
     recallContacts: Prisma.$RecallContactPayload<ExtArgs>[]
+    createdRegistrationCampaigns: Prisma.$RegistrationCampaignPayload<ExtArgs>[]
+    authoredRegistrationComments: Prisma.$RegistrationCommentPayload<ExtArgs>[]
+    assignedRegistrationRequests: Prisma.$RegistrationRequestPayload<ExtArgs>[]
+    referredRegistrationRequests: Prisma.$RegistrationRequestPayload<ExtArgs>[]
+    registrationCollaborations: Prisma.$RegistrationCollaboratorPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -56536,6 +61369,11 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   clinicalNoteAddenda<T extends Prisma.User$clinicalNoteAddendaArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$clinicalNoteAddendaArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClinicalNoteAddendumPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   reminderOutbox<T extends Prisma.User$reminderOutboxArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reminderOutboxArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationOutboxPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   recallContacts<T extends Prisma.User$recallContactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$recallContactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecallContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  createdRegistrationCampaigns<T extends Prisma.User$createdRegistrationCampaignsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$createdRegistrationCampaignsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RegistrationCampaignPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  authoredRegistrationComments<T extends Prisma.User$authoredRegistrationCommentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$authoredRegistrationCommentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RegistrationCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  assignedRegistrationRequests<T extends Prisma.User$assignedRegistrationRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$assignedRegistrationRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RegistrationRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  referredRegistrationRequests<T extends Prisma.User$referredRegistrationRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$referredRegistrationRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RegistrationRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  registrationCollaborations<T extends Prisma.User$registrationCollaborationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$registrationCollaborationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RegistrationCollaboratorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -59531,6 +64369,126 @@ export type User$recallContactsArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.RecallContactScalarFieldEnum | Prisma.RecallContactScalarFieldEnum[]
+}
+
+/**
+ * User.createdRegistrationCampaigns
+ */
+export type User$createdRegistrationCampaignsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RegistrationCampaign
+   */
+  select?: Prisma.RegistrationCampaignSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RegistrationCampaign
+   */
+  omit?: Prisma.RegistrationCampaignOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RegistrationCampaignInclude<ExtArgs> | null
+  where?: Prisma.RegistrationCampaignWhereInput
+  orderBy?: Prisma.RegistrationCampaignOrderByWithRelationInput | Prisma.RegistrationCampaignOrderByWithRelationInput[]
+  cursor?: Prisma.RegistrationCampaignWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RegistrationCampaignScalarFieldEnum | Prisma.RegistrationCampaignScalarFieldEnum[]
+}
+
+/**
+ * User.authoredRegistrationComments
+ */
+export type User$authoredRegistrationCommentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RegistrationComment
+   */
+  select?: Prisma.RegistrationCommentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RegistrationComment
+   */
+  omit?: Prisma.RegistrationCommentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RegistrationCommentInclude<ExtArgs> | null
+  where?: Prisma.RegistrationCommentWhereInput
+  orderBy?: Prisma.RegistrationCommentOrderByWithRelationInput | Prisma.RegistrationCommentOrderByWithRelationInput[]
+  cursor?: Prisma.RegistrationCommentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RegistrationCommentScalarFieldEnum | Prisma.RegistrationCommentScalarFieldEnum[]
+}
+
+/**
+ * User.assignedRegistrationRequests
+ */
+export type User$assignedRegistrationRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RegistrationRequest
+   */
+  select?: Prisma.RegistrationRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RegistrationRequest
+   */
+  omit?: Prisma.RegistrationRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RegistrationRequestInclude<ExtArgs> | null
+  where?: Prisma.RegistrationRequestWhereInput
+  orderBy?: Prisma.RegistrationRequestOrderByWithRelationInput | Prisma.RegistrationRequestOrderByWithRelationInput[]
+  cursor?: Prisma.RegistrationRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RegistrationRequestScalarFieldEnum | Prisma.RegistrationRequestScalarFieldEnum[]
+}
+
+/**
+ * User.referredRegistrationRequests
+ */
+export type User$referredRegistrationRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RegistrationRequest
+   */
+  select?: Prisma.RegistrationRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RegistrationRequest
+   */
+  omit?: Prisma.RegistrationRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RegistrationRequestInclude<ExtArgs> | null
+  where?: Prisma.RegistrationRequestWhereInput
+  orderBy?: Prisma.RegistrationRequestOrderByWithRelationInput | Prisma.RegistrationRequestOrderByWithRelationInput[]
+  cursor?: Prisma.RegistrationRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RegistrationRequestScalarFieldEnum | Prisma.RegistrationRequestScalarFieldEnum[]
+}
+
+/**
+ * User.registrationCollaborations
+ */
+export type User$registrationCollaborationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RegistrationCollaborator
+   */
+  select?: Prisma.RegistrationCollaboratorSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RegistrationCollaborator
+   */
+  omit?: Prisma.RegistrationCollaboratorOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RegistrationCollaboratorInclude<ExtArgs> | null
+  where?: Prisma.RegistrationCollaboratorWhereInput
+  orderBy?: Prisma.RegistrationCollaboratorOrderByWithRelationInput | Prisma.RegistrationCollaboratorOrderByWithRelationInput[]
+  cursor?: Prisma.RegistrationCollaboratorWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RegistrationCollaboratorScalarFieldEnum | Prisma.RegistrationCollaboratorScalarFieldEnum[]
 }
 
 /**

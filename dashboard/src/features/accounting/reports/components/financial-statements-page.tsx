@@ -216,14 +216,6 @@ export const FinancialStatementsPage = () => {
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
 			{printDocument}
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">القوائم المالية</h1>
-				<p className="text-muted-foreground text-sm">
-					§18.1 — الميزانية العمومية (بربح مؤقت قبل الإقفال)، قائمة الدخل، والتدفقات النقدية
-					غير المباشرة — كلها من محرك القوائم الموحد.
-				</p>
-			</div>
-
 			<TableToolbar
 				className="border-t"
 				searchValue={search}

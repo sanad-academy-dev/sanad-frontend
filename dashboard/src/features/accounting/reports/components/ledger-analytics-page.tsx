@@ -192,14 +192,6 @@ export const LedgerAnalyticsPage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">تحليلات الدفاتر</h1>
-				<p className="text-muted-foreground text-sm">
-					§18 — ملخص أرصدة الأطراف من سجل الذمم، الربح الإجمالي (تقييم بآخر سعر شراء)، اتجاهات
-					الفواتير الشهرية، وفحص توازن الدفاتر.
-				</p>
-			</div>
-
 			<TableToolbar
 				className="border-t"
 				searchValue={search}

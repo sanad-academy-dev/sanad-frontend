@@ -179,15 +179,7 @@ export const PaymentEntriesPage = () => {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <div className="px-4 pt-3">
-        <h1 className="font-medium text-lg">سندات القبض والصرف</h1>
-        <p className="text-muted-foreground text-sm">
-          تحصيل وسداد وتحويلات — تُرحَّل إلى دفتر الأستاذ وتُسوّي المستندات عبر
-          سجل الذمم ({entries.length}).
-        </p>
-      </div>
-
-      <Stats className="px-4 grid-cols-4" stats={stats} />
+      <Stats className="px-4 pt-2.5 pb-1 grid-cols-4" stats={stats} />
 
       <TableToolbar
         className="border-t"

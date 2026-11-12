@@ -100,6 +100,7 @@ export const CourseUnitRelations = t.Object(
           type: t.Union(
             [
               t.Literal("TEXT"),
+              t.Literal("PAGE"),
               t.Literal("VIDEO"),
               t.Literal("DOCUMENT"),
               t.Literal("QUIZ"),

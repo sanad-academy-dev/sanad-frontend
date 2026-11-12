@@ -13,6 +13,7 @@ import type {
 const COURSES_KEY = ["training", "courses"] as const;
 const STATS_KEY = ["training", "courses", "stats"] as const;
 const courseKey = (id: string) => ["training", "course", id] as const;
+const EMPTY_COURSES: CourseListItemResponse[] = [];
 
 export const useCourses = () => {
 	const { data, isLoading } = useQuery<CourseListItemResponse[]>({
@@ -24,7 +25,7 @@ export const useCourses = () => {
 		},
 	});
 
-	return { courses: data ?? [], isLoading };
+	return { courses: data ?? EMPTY_COURSES, isLoading };
 };
 
 export const useCourseStats = () => {
@@ -67,7 +68,10 @@ export const useCreateCourse = () => {
 	const mutation = useMutation({
 		mutationFn: async (values: CreateCoursePayload) => {
 			const { data, error } = await api.training.courses.post(values);
-			if (error) throw new Error("تعذّر إنشاء الدورة");
+			if (error) {
+				const errorMsg = (error.value as any)?.message || "تعذّر إنشاء الدورة";
+				throw new Error(errorMsg);
+			}
 			return data;
 		},
 		onSuccess: () => {
@@ -184,7 +188,10 @@ export const useUpdateCourse = (courseId: string | null) => {
 			const { data, error } = await api.training
 				.courses({ id: courseId })
 				.patch(values as Record<string, unknown>);
-			if (error) throw new Error("تعذّر حفظ التغييرات");
+			if (error) {
+				const errorMsg = (error.value as any)?.message || "تعذّر حفظ التغييرات";
+				throw new Error(errorMsg);
+			}
 			return data;
 		},
 		onSuccess: () => {

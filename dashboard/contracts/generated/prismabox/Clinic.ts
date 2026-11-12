@@ -1193,6 +1193,8 @@ SetNull لا Cascade: حذف قالب لا يجوز أن يحذف تسعيرة �
           country: __nullable__(t.String()),
           city: __nullable__(t.String()),
           address: __nullable__(t.String()),
+          emergencyContactName: __nullable__(t.String()),
+          emergencyContactPhone: __nullable__(t.String()),
           notes: __nullable__(t.String()),
           active: t.Boolean(),
           isDeleted: t.Boolean(),
@@ -1218,8 +1220,6 @@ SetNull لا Cascade: حذف قالب لا يجوز أن يحذف تسعيرة �
             [t.Literal("MALE"), t.Literal("FEMALE"), t.Literal("UNKNOWN")],
             { additionalProperties: false },
           ),
-          animalTypeId: t.String(),
-          animalStrainId: __nullable__(t.String()),
           age: __nullable__(t.Number()),
           birthDate: __nullable__(t.Date()),
           weight: __nullable__(t.Number()),
@@ -1227,9 +1227,148 @@ SetNull لا Cascade: حذف قالب لا يجوز أن يحذف تسعيرة �
           coat: __nullable__(t.String()),
           notes: __nullable__(t.String()),
           active: t.Boolean(),
+          status: t.String(),
+          nationalId: __nullable__(t.String()),
+          ageGroup: __nullable__(t.String()),
+          academicStage: __nullable__(t.String()),
+          classroom: __nullable__(t.String()),
+          bloodType: __nullable__(t.String()),
+          developmentStatus: __nullable__(t.String()),
+          allergies: __nullable__(t.String()),
+          pocketMoneyEnabled: t.Boolean(),
+          transportation: __nullable__(t.String()),
+          feeType: __nullable__(t.String()),
+          healthConditions: __nullable__(t.String()),
+          previousNursery: __nullable__(t.String()),
+          guardianRelationship: __nullable__(t.String()),
+          emergencyContactPhone: __nullable__(t.String()),
+          emergencyContactName: __nullable__(t.String()),
+          level: __nullable__(t.String()),
+          learningMethod: __nullable__(t.String()),
+          preferredShift: __nullable__(t.String()),
+          address: __nullable__(t.String()),
           isDeleted: t.Boolean(),
           deletedAt: __nullable__(t.Date()),
           editsCount: t.Integer(),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    patientGuardians: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          clinicId: t.String(),
+          patientId: t.String(),
+          ownerId: t.String(),
+          relationship: __nullable__(t.String()),
+          createdAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    classrooms: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          code: t.String(),
+          clinicId: t.String(),
+          name: t.String(),
+          ageGroup: __nullable__(t.String()),
+          academicStage: __nullable__(t.String()),
+          category: __nullable__(t.String()),
+          classification: __nullable__(t.String()),
+          learningMode: t.String(),
+          capacity: t.Integer(),
+          enrolledCount: t.Integer(),
+          active: t.Boolean(),
+          notes: __nullable__(t.String()),
+          isDeleted: t.Boolean(),
+          deletedAt: __nullable__(t.Date()),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    classroomClassifications: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          clinicId: t.String(),
+          name: t.String(),
+          createdAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    academicStages: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          clinicId: t.String(),
+          name: t.String(),
+          description: __nullable__(t.String()),
+          isActive: t.Boolean(),
+          sortOrder: t.Integer(),
+          isDeleted: t.Boolean(),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    tracks: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          code: t.String(),
+          clinicId: t.String(),
+          name: t.String(),
+          category: __nullable__(t.String()),
+          coursesCount: t.Integer(),
+          locationMode: t.String(),
+          locationLabel: __nullable__(t.String()),
+          duration: __nullable__(t.String()),
+          studentsCount: t.Integer(),
+          rating: t.Number(),
+          reviewsCount: t.Integer(),
+          price: t.Integer(),
+          revenue: t.Integer(),
+          status: t.String(),
+          description: __nullable__(t.String()),
+          notes: __nullable__(t.String()),
+          academicStage: __nullable__(t.String()),
+          ageGroup: __nullable__(t.String()),
+          trainers: t.Any(),
+          selectedIcon: __nullable__(t.String()),
+          selectedColor: __nullable__(t.String()),
+          active: t.Boolean(),
+          isDeleted: t.Boolean(),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    trackClassifications: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          clinicId: t.String(),
+          name: t.String(),
+          description: __nullable__(t.String()),
+          isActive: t.Boolean(),
+          sortOrder: t.Integer(),
+          isDeleted: t.Boolean(),
           createdAt: t.Date(),
           updatedAt: t.Date(),
         },
@@ -8492,6 +8631,127 @@ D2: الفراغ هنا مسموح، أمّا التحويل إلى زيارة �
       ),
       { additionalProperties: false },
     ),
+    registrationCampaigns: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          code: t.String(),
+          clinicId: t.String(),
+          name: t.String(),
+          ageGroup: t.String(),
+          targetClass: __nullable__(t.String()),
+          capacity: t.Integer(),
+          status: t.Union(
+            [
+              t.Literal("DRAFT"),
+              t.Literal("ACTIVE"),
+              t.Literal("COMPLETED"),
+              t.Literal("CLOSED"),
+            ],
+            { additionalProperties: false },
+          ),
+          startDate: __nullable__(t.Date()),
+          endDate: __nullable__(t.Date()),
+          requireBirthCert: t.Boolean(),
+          requireVaccine: t.Boolean(),
+          requireId: t.Boolean(),
+          generalAccess: t.String(),
+          notes: __nullable__(t.String()),
+          createdById: __nullable__(t.String()),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    registrationRequests: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          code: t.String(),
+          clinicId: t.String(),
+          campaignId: t.String(),
+          status: t.Union(
+            [
+              t.Literal("QUEUE"),
+              t.Literal("SHORTLIST"),
+              t.Literal("INTERVIEW"),
+              t.Literal("ACCEPTED"),
+              t.Literal("AWAITING_PAYMENT"),
+              t.Literal("REJECTED"),
+              t.Literal("DUPLICATE"),
+              t.Literal("IN_EVALUATION"),
+              t.Literal("WAITLIST"),
+              t.Literal("EVALUATION"),
+              t.Literal("REVIEW"),
+              t.Literal("AWAITING_REPLY"),
+            ],
+            { additionalProperties: false },
+          ),
+          source: t.Union(
+            [
+              t.Literal("WEBSITE"),
+              t.Literal("DIRECT_LINK"),
+              t.Literal("REFERRAL"),
+              t.Literal("SOCIAL"),
+              t.Literal("OTHER"),
+            ],
+            { additionalProperties: false },
+          ),
+          studentName: t.String(),
+          gender: t.Union(
+            [t.Literal("MALE"), t.Literal("FEMALE"), t.Literal("UNKNOWN")],
+            { additionalProperties: false },
+          ),
+          birthDate: __nullable__(t.Date()),
+          ageLabel: __nullable__(t.String()),
+          targetClass: __nullable__(t.String()),
+          bloodType: __nullable__(t.String()),
+          allergies: __nullable__(t.String()),
+          hasChronicDiseases: t.Boolean(),
+          chronicDiseases: __nullable__(t.String()),
+          learningMode: __nullable__(t.String()),
+          preferredShift: __nullable__(t.String()),
+          experienceLevel: __nullable__(t.String()),
+          priority: __nullable__(t.String()),
+          appointmentDate: __nullable__(t.Date()),
+          appointmentId: __nullable__(t.String()),
+          roomId: __nullable__(t.String()),
+          roomName: __nullable__(t.String()),
+          notes: __nullable__(t.String()),
+          notifyWhatsapp: t.Boolean(),
+          links: __nullable__(t.Any()),
+          proposedTrack: __nullable__(t.String()),
+          interviewDurationMinutes: t.Integer(),
+          attendanceProbability: t.Integer(),
+          subscriptionPlanId: __nullable__(t.String()),
+          subscriptionPlanName: __nullable__(t.String()),
+          subscriptionAmount: __nullable__(t.Number()),
+          includeMeals: t.Boolean(),
+          enableDailyStipend: t.Boolean(),
+          medications: __nullable__(t.Any()),
+          allergiesList: __nullable__(t.Any()),
+          referredToStaffId: __nullable__(t.String()),
+          referralReason: __nullable__(t.String()),
+          rejectionReason: __nullable__(t.String()),
+          rejectionNotes: __nullable__(t.String()),
+          deletionReason: __nullable__(t.String()),
+          deletionNotes: __nullable__(t.String()),
+          guardianName: t.String(),
+          guardianPhone: t.String(),
+          guardianEmail: __nullable__(t.String()),
+          guardianNationalId: __nullable__(t.String()),
+          convertedPatientId: __nullable__(t.String()),
+          convertedOwnerId: __nullable__(t.String()),
+          assignedStaffId: __nullable__(t.String()),
+          submittedAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
   },
   { additionalProperties: false },
 );
@@ -9131,6 +9391,102 @@ export const ClinicRelationsInputCreate = t.Object(
       ),
     ),
     patients: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    patientGuardians: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    classrooms: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    classroomClassifications: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    academicStages: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    tracks: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    trackClassifications: t.Optional(
       t.Object(
         {
           connect: t.Array(
@@ -11963,6 +12319,38 @@ export const ClinicRelationsInputCreate = t.Object(
         { additionalProperties: false },
       ),
     ),
+    registrationCampaigns: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    registrationRequests: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
   },
   { additionalProperties: false },
 );
@@ -12855,6 +13243,156 @@ export const ClinicRelationsInputUpdate = t.Partial(
         ),
       ),
       patients: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      patientGuardians: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      classrooms: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      classroomClassifications: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      academicStages: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      tracks: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      trackClassifications: t.Partial(
         t.Object(
           {
             connect: t.Array(
@@ -17249,6 +17787,56 @@ export const ClinicRelationsInputUpdate = t.Partial(
           { additionalProperties: false },
         ),
       ),
+      registrationCampaigns: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      registrationRequests: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
     },
     { additionalProperties: false },
   ),
@@ -17392,6 +17980,12 @@ export const ClinicSelect = t.Partial(
       strains: t.Boolean(),
       owners: t.Boolean(),
       patients: t.Boolean(),
+      patientGuardians: t.Boolean(),
+      classrooms: t.Boolean(),
+      classroomClassifications: t.Boolean(),
+      academicStages: t.Boolean(),
+      tracks: t.Boolean(),
+      trackClassifications: t.Boolean(),
       appointments: t.Boolean(),
       invoices: t.Boolean(),
       inventoryItems: t.Boolean(),
@@ -17569,6 +18163,8 @@ export const ClinicSelect = t.Partial(
       reminderRules: t.Boolean(),
       notificationOutbox: t.Boolean(),
       recallContacts: t.Boolean(),
+      registrationCampaigns: t.Boolean(),
+      registrationRequests: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -17618,6 +18214,12 @@ export const ClinicInclude = t.Partial(
       strains: t.Boolean(),
       owners: t.Boolean(),
       patients: t.Boolean(),
+      patientGuardians: t.Boolean(),
+      classrooms: t.Boolean(),
+      classroomClassifications: t.Boolean(),
+      academicStages: t.Boolean(),
+      tracks: t.Boolean(),
+      trackClassifications: t.Boolean(),
       appointments: t.Boolean(),
       invoices: t.Boolean(),
       inventoryItems: t.Boolean(),
@@ -17795,6 +18397,8 @@ export const ClinicInclude = t.Partial(
       reminderRules: t.Boolean(),
       notificationOutbox: t.Boolean(),
       recallContacts: t.Boolean(),
+      registrationCampaigns: t.Boolean(),
+      registrationRequests: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
