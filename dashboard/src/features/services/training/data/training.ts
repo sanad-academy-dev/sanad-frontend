@@ -5,6 +5,7 @@ import {
 	IconFile,
 	IconFileCheck,
 	IconFileDiff,
+	IconFileText,
 	IconMicrophone,
 	IconVideoPlus,
 } from "@tabler/icons-react";
@@ -39,6 +40,7 @@ export const COURSE_TYPE_OPTIONS: { value: CourseType; label: string }[] = [
 // أنواع مواد الدرس — الترتيب هو ترتيب DOM في RTL: أول عنصر في أقصى اليمين
 export const LESSON_TYPE_OPTIONS: { value: LessonType; label: string }[] = [
 	{ value: "TEXT", label: "نص" },
+	{ value: "PAGE", label: "صفحة" },
 	{ value: "VIDEO", label: "فيديو" },
 	{ value: "DOCUMENT", label: "مستند" },
 	{ value: "QUIZ", label: "تقييم" },
@@ -49,6 +51,7 @@ export const LESSON_TYPE_OPTIONS: { value: LessonType; label: string }[] = [
 // أيقونة كل نوع درس — تُستخدم في منتقي النوع داخل النموذج وفي صف الدرس المحفوظ
 export const LESSON_TYPE_ICONS: Record<LessonType, ComponentType<{ className?: string }>> = {
 	TEXT: IconAlignRight,
+	PAGE: IconFileText,
 	VIDEO: IconVideoPlus,
 	DOCUMENT: IconFileDiff,
 	QUIZ: IconFileCheck,

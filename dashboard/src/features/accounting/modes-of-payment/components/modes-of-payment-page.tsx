@@ -85,15 +85,8 @@ export const ModesOfPaymentPage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">طرق الدفع</h1>
-				<p className="text-muted-foreground text-sm">
-					أنواع التحصيل (نقدًا / بنك / هاتف) وحسابها الافتراضي ({modes.length}).
-				</p>
-			</div>
-
 			<Stats
-				className="px-4 grid-cols-4"
+				className="px-4 pt-2.5 pb-1 grid-cols-4"
 				stats={stats}
 			/>
 

@@ -20,10 +20,12 @@ import { createPortal } from "react-dom";
 import { Button } from "@/components/ui/button";
 import type {
 	CourseDetailResponse,
+	CreateLessonFormInput,
 	LevelResponse,
 	ReorderContentInput,
 	UnitResponse,
 } from "@/server/training/training.type";
+import type { CourseContentActions } from "../../hooks/use-course-content";
 import { ContentCard } from "./content-card";
 import { LevelHeading } from "./level-heading";
 
@@ -44,14 +46,22 @@ function buildPayload(items: Item[]): ReorderContentInput[] {
 
 function SortableCard({
 	unit,
-	courseId,
 	courseName,
 	autoOpen,
+	onPreviewLesson,
+	onLessonDraftChange,
+	actions,
 }: {
 	unit: UnitResponse;
-	courseId: string;
 	courseName: string;
 	autoOpen?: boolean;
+	onPreviewLesson: (unitId: string, lessonId: string) => void;
+	onLessonDraftChange: (
+		unitId: string,
+		lessonId: string | null,
+		values: CreateLessonFormInput | null,
+	) => void;
+	actions: CourseContentActions;
 }) {
 	const { attributes, listeners, setNodeRef, transition, transform, isDragging } = useSortable(
 		{
@@ -61,12 +71,14 @@ function SortableCard({
 	return (
 		<ContentCard
 			unit={unit}
-			courseId={courseId}
 			courseName={courseName}
 			autoOpen={autoOpen}
 			dragRef={setNodeRef}
 			style={{ transition, transform: CSS.Transform.toString(transform) }}
 			isDragging={isDragging}
+			onPreviewLesson={onPreviewLesson}
+			onLessonDraftChange={onLessonDraftChange}
+			actions={actions}
 			dragHandleProps={{ ...attributes, ...listeners } as HTMLAttributes<HTMLButtonElement>}
 		/>
 	);
@@ -93,9 +105,11 @@ function LevelGroup({
 	col,
 	itemIds,
 	units,
-	courseId,
 	courseName,
 	autoOpenUnitId,
+	onPreviewLesson,
+	onLessonDraftChange,
+	actions,
 	onInsert,
 	onAddEnd,
 	heading,
@@ -103,9 +117,15 @@ function LevelGroup({
 	col: string;
 	itemIds: string[];
 	units: Map<string, UnitResponse>;
-	courseId: string;
 	courseName: string;
 	autoOpenUnitId?: string | null;
+	onPreviewLesson: (unitId: string, lessonId: string) => void;
+	onLessonDraftChange: (
+		unitId: string,
+		lessonId: string | null,
+		values: CreateLessonFormInput | null,
+	) => void;
+	actions: CourseContentActions;
 	onInsert: (indexInGroup: number) => void;
 	onAddEnd: () => void;
 	heading?: React.ReactNode;
@@ -126,9 +146,11 @@ function LevelGroup({
 							<Fragment key={id}>
 								<SortableCard
 									unit={unit}
-									courseId={courseId}
 									courseName={courseName}
 									autoOpen={unit.id === autoOpenUnitId}
+									onPreviewLesson={onPreviewLesson}
+									onLessonDraftChange={onLessonDraftChange}
+									actions={actions}
 								/>
 								{i < itemIds.length - 1 && <InsertButton onClick={() => onInsert(i + 1)} />}
 							</Fragment>
@@ -154,19 +176,27 @@ function LevelGroup({
 
 export function ContentDnd({
 	course,
-	courseId,
 	levels,
 	autoOpenUnitId,
+	onPreviewLesson,
+	onLessonDraftChange,
+	actions,
 	onAddContent,
 	onRenameLevel,
 	onRemoveLevel,
 	reorderContents,
 }: {
 	course: CourseDetailResponse;
-	courseId: string;
 	levels: LevelResponse[];
 	// معرّف البطاقة المُنشأة حديثًا — تُفتح موسّعة تلقائيًا للتحرير
 	autoOpenUnitId?: string | null;
+	onPreviewLesson: (unitId: string, lessonId: string) => void;
+	onLessonDraftChange: (
+		unitId: string,
+		lessonId: string | null,
+		values: CreateLessonFormInput | null,
+	) => void;
+	actions: CourseContentActions;
 	// إنشاء بطاقة في نهاية المستوى وإرجاعها (لإدراجها بعد ذلك في الموضع المطلوب)
 	onAddContent: (levelId: string | null) => Promise<UnitResponse | undefined>;
 	onRenameLevel: (id: string, name: string) => void;
@@ -269,9 +299,11 @@ export function ContentDnd({
 						col={col}
 						itemIds={idsInCol(col)}
 						units={unitMap}
-						courseId={courseId}
 						courseName={course.name}
 						autoOpenUnitId={autoOpenUnitId}
+						onPreviewLesson={onPreviewLesson}
+						onLessonDraftChange={onLessonDraftChange}
+						actions={actions}
 						onInsert={(idx) => insertAt(levelOfCol(col), idx)}
 						onAddEnd={() => void onAddContent(levelOfCol(col))}
 						heading={

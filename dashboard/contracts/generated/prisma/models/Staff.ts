@@ -433,6 +433,8 @@ export type StaffWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Staff"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Staff"> | Date | string
   clinic?: Prisma.XOR<Prisma.ClinicScalarRelationFilter, Prisma.ClinicWhereInput>
+  classroomAssignments?: Prisma.ClassroomStaffListRelationFilter
+  trackAssignments?: Prisma.TrackStaffListRelationFilter
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   role?: Prisma.XOR<Prisma.StaffRoleScalarRelationFilter, Prisma.StaffRoleWhereInput>
   roleAssignments?: Prisma.StaffRoleAssignmentListRelationFilter
@@ -521,6 +523,8 @@ export type StaffOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   clinic?: Prisma.ClinicOrderByWithRelationInput
+  classroomAssignments?: Prisma.ClassroomStaffOrderByRelationAggregateInput
+  trackAssignments?: Prisma.TrackStaffOrderByRelationAggregateInput
   user?: Prisma.UserOrderByWithRelationInput
   role?: Prisma.StaffRoleOrderByWithRelationInput
   roleAssignments?: Prisma.StaffRoleAssignmentOrderByRelationAggregateInput
@@ -613,6 +617,8 @@ export type StaffWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"Staff"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Staff"> | Date | string
   clinic?: Prisma.XOR<Prisma.ClinicScalarRelationFilter, Prisma.ClinicWhereInput>
+  classroomAssignments?: Prisma.ClassroomStaffListRelationFilter
+  trackAssignments?: Prisma.TrackStaffListRelationFilter
   user?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
   role?: Prisma.XOR<Prisma.StaffRoleScalarRelationFilter, Prisma.StaffRoleWhereInput>
   roleAssignments?: Prisma.StaffRoleAssignmentListRelationFilter
@@ -773,6 +779,8 @@ export type StaffCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -860,6 +868,8 @@ export type StaffUncheckedCreateInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -937,6 +947,8 @@ export type StaffUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -1024,6 +1036,8 @@ export type StaffUncheckedUpdateInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -1944,6 +1958,34 @@ export type StaffUpdateOneRequiredWithoutConsultationTypesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.StaffUpdateToOneWithWhereWithoutConsultationTypesInput, Prisma.StaffUpdateWithoutConsultationTypesInput>, Prisma.StaffUncheckedUpdateWithoutConsultationTypesInput>
 }
 
+export type StaffCreateNestedOneWithoutClassroomAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.StaffCreateWithoutClassroomAssignmentsInput, Prisma.StaffUncheckedCreateWithoutClassroomAssignmentsInput>
+  connectOrCreate?: Prisma.StaffCreateOrConnectWithoutClassroomAssignmentsInput
+  connect?: Prisma.StaffWhereUniqueInput
+}
+
+export type StaffUpdateOneRequiredWithoutClassroomAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.StaffCreateWithoutClassroomAssignmentsInput, Prisma.StaffUncheckedCreateWithoutClassroomAssignmentsInput>
+  connectOrCreate?: Prisma.StaffCreateOrConnectWithoutClassroomAssignmentsInput
+  upsert?: Prisma.StaffUpsertWithoutClassroomAssignmentsInput
+  connect?: Prisma.StaffWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StaffUpdateToOneWithWhereWithoutClassroomAssignmentsInput, Prisma.StaffUpdateWithoutClassroomAssignmentsInput>, Prisma.StaffUncheckedUpdateWithoutClassroomAssignmentsInput>
+}
+
+export type StaffCreateNestedOneWithoutTrackAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.StaffCreateWithoutTrackAssignmentsInput, Prisma.StaffUncheckedCreateWithoutTrackAssignmentsInput>
+  connectOrCreate?: Prisma.StaffCreateOrConnectWithoutTrackAssignmentsInput
+  connect?: Prisma.StaffWhereUniqueInput
+}
+
+export type StaffUpdateOneRequiredWithoutTrackAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.StaffCreateWithoutTrackAssignmentsInput, Prisma.StaffUncheckedCreateWithoutTrackAssignmentsInput>
+  connectOrCreate?: Prisma.StaffCreateOrConnectWithoutTrackAssignmentsInput
+  upsert?: Prisma.StaffUpsertWithoutTrackAssignmentsInput
+  connect?: Prisma.StaffWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.StaffUpdateToOneWithWhereWithoutTrackAssignmentsInput, Prisma.StaffUpdateWithoutTrackAssignmentsInput>, Prisma.StaffUncheckedUpdateWithoutTrackAssignmentsInput>
+}
+
 export type StaffCreateNestedOneWithoutAppointmentsInput = {
   create?: Prisma.XOR<Prisma.StaffCreateWithoutAppointmentsInput, Prisma.StaffUncheckedCreateWithoutAppointmentsInput>
   connectOrCreate?: Prisma.StaffCreateOrConnectWithoutAppointmentsInput
@@ -2295,6 +2337,8 @@ export type StaffCreateWithoutClinicInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -2381,6 +2425,8 @@ export type StaffUncheckedCreateWithoutClinicInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -2522,6 +2568,8 @@ export type StaffCreateWithoutInvitesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -2608,6 +2656,8 @@ export type StaffUncheckedCreateWithoutInvitesInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
   workingHours?: Prisma.StaffWorkingHourUncheckedCreateNestedManyWithoutStaffInput
@@ -2700,6 +2750,8 @@ export type StaffUpdateWithoutInvitesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -2786,6 +2838,8 @@ export type StaffUncheckedUpdateWithoutInvitesInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
   workingHours?: Prisma.StaffWorkingHourUncheckedUpdateManyWithoutStaffNestedInput
@@ -2862,6 +2916,8 @@ export type StaffCreateWithoutTaskActivityMentionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -2948,6 +3004,8 @@ export type StaffUncheckedCreateWithoutTaskActivityMentionsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -3040,6 +3098,8 @@ export type StaffUpdateWithoutTaskActivityMentionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -3126,6 +3186,8 @@ export type StaffUncheckedUpdateWithoutTaskActivityMentionsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -3202,6 +3264,8 @@ export type StaffCreateWithoutLabCommentMentionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -3288,6 +3352,8 @@ export type StaffUncheckedCreateWithoutLabCommentMentionsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -3380,6 +3446,8 @@ export type StaffUpdateWithoutLabCommentMentionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -3466,6 +3534,8 @@ export type StaffUncheckedUpdateWithoutLabCommentMentionsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -3542,6 +3612,8 @@ export type StaffCreateWithoutLabReportMentionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -3628,6 +3700,8 @@ export type StaffUncheckedCreateWithoutLabReportMentionsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -3720,6 +3794,8 @@ export type StaffUpdateWithoutLabReportMentionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -3806,6 +3882,8 @@ export type StaffUncheckedUpdateWithoutLabReportMentionsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -3882,6 +3960,8 @@ export type StaffCreateWithoutRadiologyAddendumMentionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -3968,6 +4048,8 @@ export type StaffUncheckedCreateWithoutRadiologyAddendumMentionsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -4060,6 +4142,8 @@ export type StaffUpdateWithoutRadiologyAddendumMentionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -4146,6 +4230,8 @@ export type StaffUncheckedUpdateWithoutRadiologyAddendumMentionsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -4222,6 +4308,8 @@ export type StaffCreateWithoutRadiologyCommentMentionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -4308,6 +4396,8 @@ export type StaffUncheckedCreateWithoutRadiologyCommentMentionsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -4400,6 +4490,8 @@ export type StaffUpdateWithoutRadiologyCommentMentionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -4486,6 +4578,8 @@ export type StaffUncheckedUpdateWithoutRadiologyCommentMentionsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -4562,6 +4656,8 @@ export type StaffCreateWithoutOperationTeamMembershipsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -4648,6 +4744,8 @@ export type StaffUncheckedCreateWithoutOperationTeamMembershipsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -4740,6 +4838,8 @@ export type StaffUpdateWithoutOperationTeamMembershipsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -4826,6 +4926,8 @@ export type StaffUncheckedUpdateWithoutOperationTeamMembershipsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -4902,6 +5004,8 @@ export type StaffCreateWithoutWitnessedOperationConsentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -4988,6 +5092,8 @@ export type StaffUncheckedCreateWithoutWitnessedOperationConsentsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -5080,6 +5186,8 @@ export type StaffUpdateWithoutWitnessedOperationConsentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -5166,6 +5274,8 @@ export type StaffUncheckedUpdateWithoutWitnessedOperationConsentsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -5242,6 +5352,8 @@ export type StaffCreateWithoutWitnessedPatientConsentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -5328,6 +5440,8 @@ export type StaffUncheckedCreateWithoutWitnessedPatientConsentsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -5409,6 +5523,8 @@ export type StaffCreateWithoutSignedPatientConsentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -5495,6 +5611,8 @@ export type StaffUncheckedCreateWithoutSignedPatientConsentsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -5587,6 +5705,8 @@ export type StaffUpdateWithoutWitnessedPatientConsentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -5673,6 +5793,8 @@ export type StaffUncheckedUpdateWithoutWitnessedPatientConsentsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -5760,6 +5882,8 @@ export type StaffUpdateWithoutSignedPatientConsentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -5846,6 +5970,8 @@ export type StaffUncheckedUpdateWithoutSignedPatientConsentsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -5922,6 +6048,8 @@ export type StaffCreateWithoutOperationAssessmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -6008,6 +6136,8 @@ export type StaffUncheckedCreateWithoutOperationAssessmentsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -6100,6 +6230,8 @@ export type StaffUpdateWithoutOperationAssessmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -6186,6 +6318,8 @@ export type StaffUncheckedUpdateWithoutOperationAssessmentsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -6262,6 +6396,8 @@ export type StaffCreateWithoutAnesthesiaRecordsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -6348,6 +6484,8 @@ export type StaffUncheckedCreateWithoutAnesthesiaRecordsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -6440,6 +6578,8 @@ export type StaffUpdateWithoutAnesthesiaRecordsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -6526,6 +6666,8 @@ export type StaffUncheckedUpdateWithoutAnesthesiaRecordsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -6602,6 +6744,8 @@ export type StaffCreateWithoutSignedOperationNotesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -6688,6 +6832,8 @@ export type StaffUncheckedCreateWithoutSignedOperationNotesInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -6780,6 +6926,8 @@ export type StaffUpdateWithoutSignedOperationNotesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -6866,6 +7014,8 @@ export type StaffUncheckedUpdateWithoutSignedOperationNotesInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -6942,6 +7092,8 @@ export type StaffCreateWithoutOperationCommentMentionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -7028,6 +7180,8 @@ export type StaffUncheckedCreateWithoutOperationCommentMentionsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -7120,6 +7274,8 @@ export type StaffUpdateWithoutOperationCommentMentionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -7206,6 +7362,8 @@ export type StaffUncheckedUpdateWithoutOperationCommentMentionsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -7282,6 +7440,8 @@ export type StaffCreateWithoutBranchInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -7367,6 +7527,8 @@ export type StaffUncheckedCreateWithoutBranchInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -7470,6 +7632,8 @@ export type StaffCreateWithoutPrimarySpecializationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -7555,6 +7719,8 @@ export type StaffUncheckedCreateWithoutPrimarySpecializationInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -7642,6 +7808,8 @@ export type StaffCreateWithoutSecondarySpecializationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -7727,6 +7895,8 @@ export type StaffUncheckedCreateWithoutSecondarySpecializationInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -7846,6 +8016,8 @@ export type StaffCreateWithoutRoleInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
   branch: Prisma.BranchCreateNestedOneWithoutStaffInput
@@ -7931,6 +8103,8 @@ export type StaffUncheckedCreateWithoutRoleInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -8034,6 +8208,8 @@ export type StaffCreateWithoutRoleAssignmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   branch: Prisma.BranchCreateNestedOneWithoutStaffInput
@@ -8120,6 +8296,8 @@ export type StaffUncheckedCreateWithoutRoleAssignmentsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
   workingHours?: Prisma.StaffWorkingHourUncheckedCreateNestedManyWithoutStaffInput
@@ -8212,6 +8390,8 @@ export type StaffUpdateWithoutRoleAssignmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutStaffNestedInput
@@ -8298,6 +8478,8 @@ export type StaffUncheckedUpdateWithoutRoleAssignmentsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
   workingHours?: Prisma.StaffWorkingHourUncheckedUpdateManyWithoutStaffNestedInput
@@ -8374,6 +8556,8 @@ export type StaffCreateWithoutDocumentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -8460,6 +8644,8 @@ export type StaffUncheckedCreateWithoutDocumentsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -8552,6 +8738,8 @@ export type StaffUpdateWithoutDocumentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -8638,6 +8826,8 @@ export type StaffUncheckedUpdateWithoutDocumentsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -8714,6 +8904,8 @@ export type StaffCreateWithoutPayrollLinesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -8800,6 +8992,8 @@ export type StaffUncheckedCreateWithoutPayrollLinesInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -8892,6 +9086,8 @@ export type StaffUpdateWithoutPayrollLinesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -8978,6 +9174,8 @@ export type StaffUncheckedUpdateWithoutPayrollLinesInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -9054,6 +9252,8 @@ export type StaffCreateWithoutEosSettlementsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -9140,6 +9340,8 @@ export type StaffUncheckedCreateWithoutEosSettlementsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -9232,6 +9434,8 @@ export type StaffUpdateWithoutEosSettlementsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -9318,6 +9522,8 @@ export type StaffUncheckedUpdateWithoutEosSettlementsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -9394,6 +9600,8 @@ export type StaffCreateWithoutCompensationInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -9480,6 +9688,8 @@ export type StaffUncheckedCreateWithoutCompensationInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -9572,6 +9782,8 @@ export type StaffUpdateWithoutCompensationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -9658,6 +9870,8 @@ export type StaffUncheckedUpdateWithoutCompensationInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -9734,6 +9948,8 @@ export type StaffCreateWithoutAttendancesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -9820,6 +10036,8 @@ export type StaffUncheckedCreateWithoutAttendancesInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -9912,6 +10130,8 @@ export type StaffUpdateWithoutAttendancesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -9998,6 +10218,8 @@ export type StaffUncheckedUpdateWithoutAttendancesInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -10074,6 +10296,8 @@ export type StaffCreateWithoutShiftAssignmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -10160,6 +10384,8 @@ export type StaffUncheckedCreateWithoutShiftAssignmentsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -10252,6 +10478,8 @@ export type StaffUpdateWithoutShiftAssignmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -10338,6 +10566,8 @@ export type StaffUncheckedUpdateWithoutShiftAssignmentsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -10414,6 +10644,8 @@ export type StaffCreateWithoutLeaveRequestsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -10500,6 +10732,8 @@ export type StaffUncheckedCreateWithoutLeaveRequestsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -10581,6 +10815,8 @@ export type StaffCreateWithoutSubstituteForInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -10667,6 +10903,8 @@ export type StaffUncheckedCreateWithoutSubstituteForInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -10759,6 +10997,8 @@ export type StaffUpdateWithoutLeaveRequestsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -10845,6 +11085,8 @@ export type StaffUncheckedUpdateWithoutLeaveRequestsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -10932,6 +11174,8 @@ export type StaffUpdateWithoutSubstituteForInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -11018,6 +11262,8 @@ export type StaffUncheckedUpdateWithoutSubstituteForInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -11094,6 +11340,8 @@ export type StaffCreateWithoutCompensatoryEntriesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -11180,6 +11428,8 @@ export type StaffUncheckedCreateWithoutCompensatoryEntriesInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -11272,6 +11522,8 @@ export type StaffUpdateWithoutCompensatoryEntriesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -11358,6 +11610,8 @@ export type StaffUncheckedUpdateWithoutCompensatoryEntriesInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -11434,6 +11688,8 @@ export type StaffCreateWithoutSchedulingSettingsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -11520,6 +11776,8 @@ export type StaffUncheckedCreateWithoutSchedulingSettingsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   workingHours?: Prisma.StaffWorkingHourUncheckedCreateNestedManyWithoutStaffInput
@@ -11612,6 +11870,8 @@ export type StaffUpdateWithoutSchedulingSettingsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -11698,6 +11958,8 @@ export type StaffUncheckedUpdateWithoutSchedulingSettingsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   workingHours?: Prisma.StaffWorkingHourUncheckedUpdateManyWithoutStaffNestedInput
@@ -11774,6 +12036,8 @@ export type StaffCreateWithoutWorkingHoursInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -11860,6 +12124,8 @@ export type StaffUncheckedCreateWithoutWorkingHoursInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -11952,6 +12218,8 @@ export type StaffUpdateWithoutWorkingHoursInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -12038,6 +12306,8 @@ export type StaffUncheckedUpdateWithoutWorkingHoursInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -12114,6 +12384,8 @@ export type StaffCreateWithoutServicesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -12200,6 +12472,8 @@ export type StaffUncheckedCreateWithoutServicesInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -12292,6 +12566,8 @@ export type StaffUpdateWithoutServicesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -12378,6 +12654,8 @@ export type StaffUncheckedUpdateWithoutServicesInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -12454,6 +12732,8 @@ export type StaffCreateWithoutConsultationTypesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -12540,6 +12820,8 @@ export type StaffUncheckedCreateWithoutConsultationTypesInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -12632,6 +12914,8 @@ export type StaffUpdateWithoutConsultationTypesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -12718,11 +13002,709 @@ export type StaffUncheckedUpdateWithoutConsultationTypesInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
   workingHours?: Prisma.StaffWorkingHourUncheckedUpdateManyWithoutStaffNestedInput
   services?: Prisma.StaffServiceUncheckedUpdateManyWithoutStaffNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutStaffNestedInput
+  attendances?: Prisma.AttendanceUncheckedUpdateManyWithoutStaffNestedInput
+  shiftAssignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutStaffNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutStaffNestedInput
+  substituteFor?: Prisma.LeaveRequestUncheckedUpdateManyWithoutSubstituteNestedInput
+  compensatoryEntries?: Prisma.CompensatoryEntryUncheckedUpdateManyWithoutStaffNestedInput
+  documents?: Prisma.StaffDocumentUncheckedUpdateManyWithoutStaffNestedInput
+  compensation?: Prisma.StaffCompensationUncheckedUpdateOneWithoutStaffNestedInput
+  payrollLines?: Prisma.PayrollLineUncheckedUpdateManyWithoutStaffNestedInput
+  noteMentions?: Prisma.AppointmentInternalNoteMentionUncheckedUpdateManyWithoutStaffNestedInput
+  labReportMentions?: Prisma.LabTestReportMentionUncheckedUpdateManyWithoutStaffNestedInput
+  labCommentMentions?: Prisma.LabTestCommentMentionUncheckedUpdateManyWithoutStaffNestedInput
+  radiologyCommentMentions?: Prisma.RadiologyCommentMentionUncheckedUpdateManyWithoutStaffNestedInput
+  radiologyAddendumMentions?: Prisma.RadiologyAddendumMentionUncheckedUpdateManyWithoutStaffNestedInput
+  taskActivityMentions?: Prisma.TaskActivityMentionUncheckedUpdateManyWithoutStaffNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutStaffNestedInput
+  eosSettlements?: Prisma.EndOfServiceSettlementUncheckedUpdateManyWithoutStaffNestedInput
+  courseAssignments?: Prisma.CourseAssignmentUncheckedUpdateManyWithoutStaffNestedInput
+  courseCertificates?: Prisma.CourseCertificateUncheckedUpdateManyWithoutStaffNestedInput
+  courseTrainerRoles?: Prisma.CourseTrainerUncheckedUpdateManyWithoutStaffNestedInput
+  courseReviews?: Prisma.CourseReviewUncheckedUpdateManyWithoutStaffNestedInput
+  quizAssignments?: Prisma.QuizAssignmentUncheckedUpdateManyWithoutStaffNestedInput
+  operationTeamMemberships?: Prisma.OperationTeamMemberUncheckedUpdateManyWithoutStaffNestedInput
+  witnessedOperationConsents?: Prisma.OperationConsentUncheckedUpdateManyWithoutWitnessStaffNestedInput
+  witnessedPatientConsents?: Prisma.PatientConsentUncheckedUpdateManyWithoutWitnessStaffNestedInput
+  signedPatientConsents?: Prisma.PatientConsentUncheckedUpdateManyWithoutSignedByStaffNestedInput
+  operationAssessments?: Prisma.PreAnestheticAssessmentUncheckedUpdateManyWithoutAssessedByNestedInput
+  anesthesiaRecords?: Prisma.AnesthesiaRecordUncheckedUpdateManyWithoutAnesthetistStaffNestedInput
+  signedOperationNotes?: Prisma.OperationNoteUncheckedUpdateManyWithoutSignedByNestedInput
+  operationCommentMentions?: Prisma.OperationCommentMentionUncheckedUpdateManyWithoutStaffNestedInput
+  vaccinationsAdministered?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutAdministeredByNestedInput
+  nutritionPlansPrescribed?: Prisma.NutritionPlanUncheckedUpdateManyWithoutPrescriberNestedInput
+  nutritionRechecksPerformed?: Prisma.NutritionRecheckUncheckedUpdateManyWithoutPerformedByNestedInput
+  mobileUnitCrew?: Prisma.MobileUnitCrewUncheckedUpdateManyWithoutStaffNestedInput
+  mobileShiftsOpened?: Prisma.MobileUnitShiftUncheckedUpdateManyWithoutOpenedByStaffNestedInput
+  mobileVisitServices?: Prisma.MobileVisitServiceUncheckedUpdateManyWithoutPerformedByNestedInput
+  groomingSessionsAsGroomer?: Prisma.GroomingSessionUncheckedUpdateManyWithoutGroomerNestedInput
+  groomingSessionsAsAssistant?: Prisma.GroomingSessionUncheckedUpdateManyWithoutAssistantNestedInput
+  groomingSessionsAsVet?: Prisma.GroomingSessionUncheckedUpdateManyWithoutVetOrderByNestedInput
+  groomingProfilesPreferred?: Prisma.PatientGroomingProfileUncheckedUpdateManyWithoutPreferredGroomerNestedInput
+  inpatientStaysAttending?: Prisma.InpatientStayUncheckedUpdateManyWithoutAttendingStaffNestedInput
+}
+
+export type StaffCreateWithoutClassroomAssignmentsInput = {
+  id?: string
+  code: string
+  name: string
+  gender?: $Enums.Gender | null
+  prefix?: $Enums.StaffPrefix | null
+  age?: number | null
+  licenseNumber?: string | null
+  email: string
+  phone?: string | null
+  country?: string | null
+  city?: string | null
+  address?: string | null
+  notes?: string | null
+  bio?: string | null
+  educationalQualification?: string | null
+  nationality?: string | null
+  avatar?: string | null
+  employmentType?: $Enums.EmploymentType | null
+  hireDate?: Date | string | null
+  isSaudi?: boolean
+  status?: $Enums.StaffStatus
+  active?: boolean
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
+  user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
+  role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
+  roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
+  branch: Prisma.BranchCreateNestedOneWithoutStaffInput
+  primarySpecialization?: Prisma.SpecializationCreateNestedOneWithoutPrimaryStaffInput
+  secondarySpecialization?: Prisma.SpecializationCreateNestedOneWithoutSecondaryStaffInput
+  invites?: Prisma.InviteCreateNestedManyWithoutStaffInput
+  schedulingSettings?: Prisma.StaffSchedulingSettingsCreateNestedOneWithoutStaffInput
+  workingHours?: Prisma.StaffWorkingHourCreateNestedManyWithoutStaffInput
+  services?: Prisma.StaffServiceCreateNestedManyWithoutStaffInput
+  consultationTypes?: Prisma.StaffConsultationTypeCreateNestedManyWithoutStaffInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutStaffInput
+  attendances?: Prisma.AttendanceCreateNestedManyWithoutStaffInput
+  shiftAssignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutStaffInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutStaffInput
+  substituteFor?: Prisma.LeaveRequestCreateNestedManyWithoutSubstituteInput
+  compensatoryEntries?: Prisma.CompensatoryEntryCreateNestedManyWithoutStaffInput
+  documents?: Prisma.StaffDocumentCreateNestedManyWithoutStaffInput
+  compensation?: Prisma.StaffCompensationCreateNestedOneWithoutStaffInput
+  payrollLines?: Prisma.PayrollLineCreateNestedManyWithoutStaffInput
+  noteMentions?: Prisma.AppointmentInternalNoteMentionCreateNestedManyWithoutStaffInput
+  labReportMentions?: Prisma.LabTestReportMentionCreateNestedManyWithoutStaffInput
+  labCommentMentions?: Prisma.LabTestCommentMentionCreateNestedManyWithoutStaffInput
+  radiologyCommentMentions?: Prisma.RadiologyCommentMentionCreateNestedManyWithoutStaffInput
+  radiologyAddendumMentions?: Prisma.RadiologyAddendumMentionCreateNestedManyWithoutStaffInput
+  taskActivityMentions?: Prisma.TaskActivityMentionCreateNestedManyWithoutStaffInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutStaffInput
+  eosSettlements?: Prisma.EndOfServiceSettlementCreateNestedManyWithoutStaffInput
+  courseAssignments?: Prisma.CourseAssignmentCreateNestedManyWithoutStaffInput
+  courseCertificates?: Prisma.CourseCertificateCreateNestedManyWithoutStaffInput
+  courseTrainerRoles?: Prisma.CourseTrainerCreateNestedManyWithoutStaffInput
+  courseReviews?: Prisma.CourseReviewCreateNestedManyWithoutStaffInput
+  quizAssignments?: Prisma.QuizAssignmentCreateNestedManyWithoutStaffInput
+  operationTeamMemberships?: Prisma.OperationTeamMemberCreateNestedManyWithoutStaffInput
+  witnessedOperationConsents?: Prisma.OperationConsentCreateNestedManyWithoutWitnessStaffInput
+  witnessedPatientConsents?: Prisma.PatientConsentCreateNestedManyWithoutWitnessStaffInput
+  signedPatientConsents?: Prisma.PatientConsentCreateNestedManyWithoutSignedByStaffInput
+  operationAssessments?: Prisma.PreAnestheticAssessmentCreateNestedManyWithoutAssessedByInput
+  anesthesiaRecords?: Prisma.AnesthesiaRecordCreateNestedManyWithoutAnesthetistStaffInput
+  signedOperationNotes?: Prisma.OperationNoteCreateNestedManyWithoutSignedByInput
+  operationCommentMentions?: Prisma.OperationCommentMentionCreateNestedManyWithoutStaffInput
+  vaccinationsAdministered?: Prisma.VaccinationRecordCreateNestedManyWithoutAdministeredByInput
+  nutritionPlansPrescribed?: Prisma.NutritionPlanCreateNestedManyWithoutPrescriberInput
+  nutritionRechecksPerformed?: Prisma.NutritionRecheckCreateNestedManyWithoutPerformedByInput
+  mobileUnitCrew?: Prisma.MobileUnitCrewCreateNestedManyWithoutStaffInput
+  mobileShiftsOpened?: Prisma.MobileUnitShiftCreateNestedManyWithoutOpenedByStaffInput
+  mobileVisitServices?: Prisma.MobileVisitServiceCreateNestedManyWithoutPerformedByInput
+  groomingSessionsAsGroomer?: Prisma.GroomingSessionCreateNestedManyWithoutGroomerInput
+  groomingSessionsAsAssistant?: Prisma.GroomingSessionCreateNestedManyWithoutAssistantInput
+  groomingSessionsAsVet?: Prisma.GroomingSessionCreateNestedManyWithoutVetOrderByInput
+  groomingProfilesPreferred?: Prisma.PatientGroomingProfileCreateNestedManyWithoutPreferredGroomerInput
+  inpatientStaysAttending?: Prisma.InpatientStayCreateNestedManyWithoutAttendingStaffInput
+}
+
+export type StaffUncheckedCreateWithoutClassroomAssignmentsInput = {
+  id?: string
+  code: string
+  clinicId: string
+  userId?: string | null
+  roleId: string
+  branchId: string
+  name: string
+  gender?: $Enums.Gender | null
+  prefix?: $Enums.StaffPrefix | null
+  age?: number | null
+  licenseNumber?: string | null
+  email: string
+  phone?: string | null
+  country?: string | null
+  city?: string | null
+  address?: string | null
+  notes?: string | null
+  bio?: string | null
+  educationalQualification?: string | null
+  nationality?: string | null
+  avatar?: string | null
+  primarySpecializationId?: string | null
+  secondarySpecializationId?: string | null
+  employmentType?: $Enums.EmploymentType | null
+  hireDate?: Date | string | null
+  isSaudi?: boolean
+  status?: $Enums.StaffStatus
+  active?: boolean
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
+  roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
+  invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
+  schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
+  workingHours?: Prisma.StaffWorkingHourUncheckedCreateNestedManyWithoutStaffInput
+  services?: Prisma.StaffServiceUncheckedCreateNestedManyWithoutStaffInput
+  consultationTypes?: Prisma.StaffConsultationTypeUncheckedCreateNestedManyWithoutStaffInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutStaffInput
+  attendances?: Prisma.AttendanceUncheckedCreateNestedManyWithoutStaffInput
+  shiftAssignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutStaffInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutStaffInput
+  substituteFor?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutSubstituteInput
+  compensatoryEntries?: Prisma.CompensatoryEntryUncheckedCreateNestedManyWithoutStaffInput
+  documents?: Prisma.StaffDocumentUncheckedCreateNestedManyWithoutStaffInput
+  compensation?: Prisma.StaffCompensationUncheckedCreateNestedOneWithoutStaffInput
+  payrollLines?: Prisma.PayrollLineUncheckedCreateNestedManyWithoutStaffInput
+  noteMentions?: Prisma.AppointmentInternalNoteMentionUncheckedCreateNestedManyWithoutStaffInput
+  labReportMentions?: Prisma.LabTestReportMentionUncheckedCreateNestedManyWithoutStaffInput
+  labCommentMentions?: Prisma.LabTestCommentMentionUncheckedCreateNestedManyWithoutStaffInput
+  radiologyCommentMentions?: Prisma.RadiologyCommentMentionUncheckedCreateNestedManyWithoutStaffInput
+  radiologyAddendumMentions?: Prisma.RadiologyAddendumMentionUncheckedCreateNestedManyWithoutStaffInput
+  taskActivityMentions?: Prisma.TaskActivityMentionUncheckedCreateNestedManyWithoutStaffInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutStaffInput
+  eosSettlements?: Prisma.EndOfServiceSettlementUncheckedCreateNestedManyWithoutStaffInput
+  courseAssignments?: Prisma.CourseAssignmentUncheckedCreateNestedManyWithoutStaffInput
+  courseCertificates?: Prisma.CourseCertificateUncheckedCreateNestedManyWithoutStaffInput
+  courseTrainerRoles?: Prisma.CourseTrainerUncheckedCreateNestedManyWithoutStaffInput
+  courseReviews?: Prisma.CourseReviewUncheckedCreateNestedManyWithoutStaffInput
+  quizAssignments?: Prisma.QuizAssignmentUncheckedCreateNestedManyWithoutStaffInput
+  operationTeamMemberships?: Prisma.OperationTeamMemberUncheckedCreateNestedManyWithoutStaffInput
+  witnessedOperationConsents?: Prisma.OperationConsentUncheckedCreateNestedManyWithoutWitnessStaffInput
+  witnessedPatientConsents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutWitnessStaffInput
+  signedPatientConsents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutSignedByStaffInput
+  operationAssessments?: Prisma.PreAnestheticAssessmentUncheckedCreateNestedManyWithoutAssessedByInput
+  anesthesiaRecords?: Prisma.AnesthesiaRecordUncheckedCreateNestedManyWithoutAnesthetistStaffInput
+  signedOperationNotes?: Prisma.OperationNoteUncheckedCreateNestedManyWithoutSignedByInput
+  operationCommentMentions?: Prisma.OperationCommentMentionUncheckedCreateNestedManyWithoutStaffInput
+  vaccinationsAdministered?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutAdministeredByInput
+  nutritionPlansPrescribed?: Prisma.NutritionPlanUncheckedCreateNestedManyWithoutPrescriberInput
+  nutritionRechecksPerformed?: Prisma.NutritionRecheckUncheckedCreateNestedManyWithoutPerformedByInput
+  mobileUnitCrew?: Prisma.MobileUnitCrewUncheckedCreateNestedManyWithoutStaffInput
+  mobileShiftsOpened?: Prisma.MobileUnitShiftUncheckedCreateNestedManyWithoutOpenedByStaffInput
+  mobileVisitServices?: Prisma.MobileVisitServiceUncheckedCreateNestedManyWithoutPerformedByInput
+  groomingSessionsAsGroomer?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutGroomerInput
+  groomingSessionsAsAssistant?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutAssistantInput
+  groomingSessionsAsVet?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutVetOrderByInput
+  groomingProfilesPreferred?: Prisma.PatientGroomingProfileUncheckedCreateNestedManyWithoutPreferredGroomerInput
+  inpatientStaysAttending?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutAttendingStaffInput
+}
+
+export type StaffCreateOrConnectWithoutClassroomAssignmentsInput = {
+  where: Prisma.StaffWhereUniqueInput
+  create: Prisma.XOR<Prisma.StaffCreateWithoutClassroomAssignmentsInput, Prisma.StaffUncheckedCreateWithoutClassroomAssignmentsInput>
+}
+
+export type StaffUpsertWithoutClassroomAssignmentsInput = {
+  update: Prisma.XOR<Prisma.StaffUpdateWithoutClassroomAssignmentsInput, Prisma.StaffUncheckedUpdateWithoutClassroomAssignmentsInput>
+  create: Prisma.XOR<Prisma.StaffCreateWithoutClassroomAssignmentsInput, Prisma.StaffUncheckedCreateWithoutClassroomAssignmentsInput>
+  where?: Prisma.StaffWhereInput
+}
+
+export type StaffUpdateToOneWithWhereWithoutClassroomAssignmentsInput = {
+  where?: Prisma.StaffWhereInput
+  data: Prisma.XOR<Prisma.StaffUpdateWithoutClassroomAssignmentsInput, Prisma.StaffUncheckedUpdateWithoutClassroomAssignmentsInput>
+}
+
+export type StaffUpdateWithoutClassroomAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  prefix?: Prisma.NullableEnumStaffPrefixFieldUpdateOperationsInput | $Enums.StaffPrefix | null
+  age?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  licenseNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  educationalQualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nationality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employmentType?: Prisma.NullableEnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType | null
+  hireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isSaudi?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumStaffStatusFieldUpdateOperationsInput | $Enums.StaffStatus
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
+  user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
+  role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
+  roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
+  branch?: Prisma.BranchUpdateOneRequiredWithoutStaffNestedInput
+  primarySpecialization?: Prisma.SpecializationUpdateOneWithoutPrimaryStaffNestedInput
+  secondarySpecialization?: Prisma.SpecializationUpdateOneWithoutSecondaryStaffNestedInput
+  invites?: Prisma.InviteUpdateManyWithoutStaffNestedInput
+  schedulingSettings?: Prisma.StaffSchedulingSettingsUpdateOneWithoutStaffNestedInput
+  workingHours?: Prisma.StaffWorkingHourUpdateManyWithoutStaffNestedInput
+  services?: Prisma.StaffServiceUpdateManyWithoutStaffNestedInput
+  consultationTypes?: Prisma.StaffConsultationTypeUpdateManyWithoutStaffNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutStaffNestedInput
+  attendances?: Prisma.AttendanceUpdateManyWithoutStaffNestedInput
+  shiftAssignments?: Prisma.ShiftAssignmentUpdateManyWithoutStaffNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutStaffNestedInput
+  substituteFor?: Prisma.LeaveRequestUpdateManyWithoutSubstituteNestedInput
+  compensatoryEntries?: Prisma.CompensatoryEntryUpdateManyWithoutStaffNestedInput
+  documents?: Prisma.StaffDocumentUpdateManyWithoutStaffNestedInput
+  compensation?: Prisma.StaffCompensationUpdateOneWithoutStaffNestedInput
+  payrollLines?: Prisma.PayrollLineUpdateManyWithoutStaffNestedInput
+  noteMentions?: Prisma.AppointmentInternalNoteMentionUpdateManyWithoutStaffNestedInput
+  labReportMentions?: Prisma.LabTestReportMentionUpdateManyWithoutStaffNestedInput
+  labCommentMentions?: Prisma.LabTestCommentMentionUpdateManyWithoutStaffNestedInput
+  radiologyCommentMentions?: Prisma.RadiologyCommentMentionUpdateManyWithoutStaffNestedInput
+  radiologyAddendumMentions?: Prisma.RadiologyAddendumMentionUpdateManyWithoutStaffNestedInput
+  taskActivityMentions?: Prisma.TaskActivityMentionUpdateManyWithoutStaffNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutStaffNestedInput
+  eosSettlements?: Prisma.EndOfServiceSettlementUpdateManyWithoutStaffNestedInput
+  courseAssignments?: Prisma.CourseAssignmentUpdateManyWithoutStaffNestedInput
+  courseCertificates?: Prisma.CourseCertificateUpdateManyWithoutStaffNestedInput
+  courseTrainerRoles?: Prisma.CourseTrainerUpdateManyWithoutStaffNestedInput
+  courseReviews?: Prisma.CourseReviewUpdateManyWithoutStaffNestedInput
+  quizAssignments?: Prisma.QuizAssignmentUpdateManyWithoutStaffNestedInput
+  operationTeamMemberships?: Prisma.OperationTeamMemberUpdateManyWithoutStaffNestedInput
+  witnessedOperationConsents?: Prisma.OperationConsentUpdateManyWithoutWitnessStaffNestedInput
+  witnessedPatientConsents?: Prisma.PatientConsentUpdateManyWithoutWitnessStaffNestedInput
+  signedPatientConsents?: Prisma.PatientConsentUpdateManyWithoutSignedByStaffNestedInput
+  operationAssessments?: Prisma.PreAnestheticAssessmentUpdateManyWithoutAssessedByNestedInput
+  anesthesiaRecords?: Prisma.AnesthesiaRecordUpdateManyWithoutAnesthetistStaffNestedInput
+  signedOperationNotes?: Prisma.OperationNoteUpdateManyWithoutSignedByNestedInput
+  operationCommentMentions?: Prisma.OperationCommentMentionUpdateManyWithoutStaffNestedInput
+  vaccinationsAdministered?: Prisma.VaccinationRecordUpdateManyWithoutAdministeredByNestedInput
+  nutritionPlansPrescribed?: Prisma.NutritionPlanUpdateManyWithoutPrescriberNestedInput
+  nutritionRechecksPerformed?: Prisma.NutritionRecheckUpdateManyWithoutPerformedByNestedInput
+  mobileUnitCrew?: Prisma.MobileUnitCrewUpdateManyWithoutStaffNestedInput
+  mobileShiftsOpened?: Prisma.MobileUnitShiftUpdateManyWithoutOpenedByStaffNestedInput
+  mobileVisitServices?: Prisma.MobileVisitServiceUpdateManyWithoutPerformedByNestedInput
+  groomingSessionsAsGroomer?: Prisma.GroomingSessionUpdateManyWithoutGroomerNestedInput
+  groomingSessionsAsAssistant?: Prisma.GroomingSessionUpdateManyWithoutAssistantNestedInput
+  groomingSessionsAsVet?: Prisma.GroomingSessionUpdateManyWithoutVetOrderByNestedInput
+  groomingProfilesPreferred?: Prisma.PatientGroomingProfileUpdateManyWithoutPreferredGroomerNestedInput
+  inpatientStaysAttending?: Prisma.InpatientStayUpdateManyWithoutAttendingStaffNestedInput
+}
+
+export type StaffUncheckedUpdateWithoutClassroomAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  clinicId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  prefix?: Prisma.NullableEnumStaffPrefixFieldUpdateOperationsInput | $Enums.StaffPrefix | null
+  age?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  licenseNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  educationalQualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nationality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  primarySpecializationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  secondarySpecializationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employmentType?: Prisma.NullableEnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType | null
+  hireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isSaudi?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumStaffStatusFieldUpdateOperationsInput | $Enums.StaffStatus
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
+  roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
+  invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
+  schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
+  workingHours?: Prisma.StaffWorkingHourUncheckedUpdateManyWithoutStaffNestedInput
+  services?: Prisma.StaffServiceUncheckedUpdateManyWithoutStaffNestedInput
+  consultationTypes?: Prisma.StaffConsultationTypeUncheckedUpdateManyWithoutStaffNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutStaffNestedInput
+  attendances?: Prisma.AttendanceUncheckedUpdateManyWithoutStaffNestedInput
+  shiftAssignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutStaffNestedInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedUpdateManyWithoutStaffNestedInput
+  substituteFor?: Prisma.LeaveRequestUncheckedUpdateManyWithoutSubstituteNestedInput
+  compensatoryEntries?: Prisma.CompensatoryEntryUncheckedUpdateManyWithoutStaffNestedInput
+  documents?: Prisma.StaffDocumentUncheckedUpdateManyWithoutStaffNestedInput
+  compensation?: Prisma.StaffCompensationUncheckedUpdateOneWithoutStaffNestedInput
+  payrollLines?: Prisma.PayrollLineUncheckedUpdateManyWithoutStaffNestedInput
+  noteMentions?: Prisma.AppointmentInternalNoteMentionUncheckedUpdateManyWithoutStaffNestedInput
+  labReportMentions?: Prisma.LabTestReportMentionUncheckedUpdateManyWithoutStaffNestedInput
+  labCommentMentions?: Prisma.LabTestCommentMentionUncheckedUpdateManyWithoutStaffNestedInput
+  radiologyCommentMentions?: Prisma.RadiologyCommentMentionUncheckedUpdateManyWithoutStaffNestedInput
+  radiologyAddendumMentions?: Prisma.RadiologyAddendumMentionUncheckedUpdateManyWithoutStaffNestedInput
+  taskActivityMentions?: Prisma.TaskActivityMentionUncheckedUpdateManyWithoutStaffNestedInput
+  expenses?: Prisma.ExpenseUncheckedUpdateManyWithoutStaffNestedInput
+  eosSettlements?: Prisma.EndOfServiceSettlementUncheckedUpdateManyWithoutStaffNestedInput
+  courseAssignments?: Prisma.CourseAssignmentUncheckedUpdateManyWithoutStaffNestedInput
+  courseCertificates?: Prisma.CourseCertificateUncheckedUpdateManyWithoutStaffNestedInput
+  courseTrainerRoles?: Prisma.CourseTrainerUncheckedUpdateManyWithoutStaffNestedInput
+  courseReviews?: Prisma.CourseReviewUncheckedUpdateManyWithoutStaffNestedInput
+  quizAssignments?: Prisma.QuizAssignmentUncheckedUpdateManyWithoutStaffNestedInput
+  operationTeamMemberships?: Prisma.OperationTeamMemberUncheckedUpdateManyWithoutStaffNestedInput
+  witnessedOperationConsents?: Prisma.OperationConsentUncheckedUpdateManyWithoutWitnessStaffNestedInput
+  witnessedPatientConsents?: Prisma.PatientConsentUncheckedUpdateManyWithoutWitnessStaffNestedInput
+  signedPatientConsents?: Prisma.PatientConsentUncheckedUpdateManyWithoutSignedByStaffNestedInput
+  operationAssessments?: Prisma.PreAnestheticAssessmentUncheckedUpdateManyWithoutAssessedByNestedInput
+  anesthesiaRecords?: Prisma.AnesthesiaRecordUncheckedUpdateManyWithoutAnesthetistStaffNestedInput
+  signedOperationNotes?: Prisma.OperationNoteUncheckedUpdateManyWithoutSignedByNestedInput
+  operationCommentMentions?: Prisma.OperationCommentMentionUncheckedUpdateManyWithoutStaffNestedInput
+  vaccinationsAdministered?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutAdministeredByNestedInput
+  nutritionPlansPrescribed?: Prisma.NutritionPlanUncheckedUpdateManyWithoutPrescriberNestedInput
+  nutritionRechecksPerformed?: Prisma.NutritionRecheckUncheckedUpdateManyWithoutPerformedByNestedInput
+  mobileUnitCrew?: Prisma.MobileUnitCrewUncheckedUpdateManyWithoutStaffNestedInput
+  mobileShiftsOpened?: Prisma.MobileUnitShiftUncheckedUpdateManyWithoutOpenedByStaffNestedInput
+  mobileVisitServices?: Prisma.MobileVisitServiceUncheckedUpdateManyWithoutPerformedByNestedInput
+  groomingSessionsAsGroomer?: Prisma.GroomingSessionUncheckedUpdateManyWithoutGroomerNestedInput
+  groomingSessionsAsAssistant?: Prisma.GroomingSessionUncheckedUpdateManyWithoutAssistantNestedInput
+  groomingSessionsAsVet?: Prisma.GroomingSessionUncheckedUpdateManyWithoutVetOrderByNestedInput
+  groomingProfilesPreferred?: Prisma.PatientGroomingProfileUncheckedUpdateManyWithoutPreferredGroomerNestedInput
+  inpatientStaysAttending?: Prisma.InpatientStayUncheckedUpdateManyWithoutAttendingStaffNestedInput
+}
+
+export type StaffCreateWithoutTrackAssignmentsInput = {
+  id?: string
+  code: string
+  name: string
+  gender?: $Enums.Gender | null
+  prefix?: $Enums.StaffPrefix | null
+  age?: number | null
+  licenseNumber?: string | null
+  email: string
+  phone?: string | null
+  country?: string | null
+  city?: string | null
+  address?: string | null
+  notes?: string | null
+  bio?: string | null
+  educationalQualification?: string | null
+  nationality?: string | null
+  avatar?: string | null
+  employmentType?: $Enums.EmploymentType | null
+  hireDate?: Date | string | null
+  isSaudi?: boolean
+  status?: $Enums.StaffStatus
+  active?: boolean
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
+  role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
+  roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
+  branch: Prisma.BranchCreateNestedOneWithoutStaffInput
+  primarySpecialization?: Prisma.SpecializationCreateNestedOneWithoutPrimaryStaffInput
+  secondarySpecialization?: Prisma.SpecializationCreateNestedOneWithoutSecondaryStaffInput
+  invites?: Prisma.InviteCreateNestedManyWithoutStaffInput
+  schedulingSettings?: Prisma.StaffSchedulingSettingsCreateNestedOneWithoutStaffInput
+  workingHours?: Prisma.StaffWorkingHourCreateNestedManyWithoutStaffInput
+  services?: Prisma.StaffServiceCreateNestedManyWithoutStaffInput
+  consultationTypes?: Prisma.StaffConsultationTypeCreateNestedManyWithoutStaffInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutStaffInput
+  attendances?: Prisma.AttendanceCreateNestedManyWithoutStaffInput
+  shiftAssignments?: Prisma.ShiftAssignmentCreateNestedManyWithoutStaffInput
+  leaveRequests?: Prisma.LeaveRequestCreateNestedManyWithoutStaffInput
+  substituteFor?: Prisma.LeaveRequestCreateNestedManyWithoutSubstituteInput
+  compensatoryEntries?: Prisma.CompensatoryEntryCreateNestedManyWithoutStaffInput
+  documents?: Prisma.StaffDocumentCreateNestedManyWithoutStaffInput
+  compensation?: Prisma.StaffCompensationCreateNestedOneWithoutStaffInput
+  payrollLines?: Prisma.PayrollLineCreateNestedManyWithoutStaffInput
+  noteMentions?: Prisma.AppointmentInternalNoteMentionCreateNestedManyWithoutStaffInput
+  labReportMentions?: Prisma.LabTestReportMentionCreateNestedManyWithoutStaffInput
+  labCommentMentions?: Prisma.LabTestCommentMentionCreateNestedManyWithoutStaffInput
+  radiologyCommentMentions?: Prisma.RadiologyCommentMentionCreateNestedManyWithoutStaffInput
+  radiologyAddendumMentions?: Prisma.RadiologyAddendumMentionCreateNestedManyWithoutStaffInput
+  taskActivityMentions?: Prisma.TaskActivityMentionCreateNestedManyWithoutStaffInput
+  expenses?: Prisma.ExpenseCreateNestedManyWithoutStaffInput
+  eosSettlements?: Prisma.EndOfServiceSettlementCreateNestedManyWithoutStaffInput
+  courseAssignments?: Prisma.CourseAssignmentCreateNestedManyWithoutStaffInput
+  courseCertificates?: Prisma.CourseCertificateCreateNestedManyWithoutStaffInput
+  courseTrainerRoles?: Prisma.CourseTrainerCreateNestedManyWithoutStaffInput
+  courseReviews?: Prisma.CourseReviewCreateNestedManyWithoutStaffInput
+  quizAssignments?: Prisma.QuizAssignmentCreateNestedManyWithoutStaffInput
+  operationTeamMemberships?: Prisma.OperationTeamMemberCreateNestedManyWithoutStaffInput
+  witnessedOperationConsents?: Prisma.OperationConsentCreateNestedManyWithoutWitnessStaffInput
+  witnessedPatientConsents?: Prisma.PatientConsentCreateNestedManyWithoutWitnessStaffInput
+  signedPatientConsents?: Prisma.PatientConsentCreateNestedManyWithoutSignedByStaffInput
+  operationAssessments?: Prisma.PreAnestheticAssessmentCreateNestedManyWithoutAssessedByInput
+  anesthesiaRecords?: Prisma.AnesthesiaRecordCreateNestedManyWithoutAnesthetistStaffInput
+  signedOperationNotes?: Prisma.OperationNoteCreateNestedManyWithoutSignedByInput
+  operationCommentMentions?: Prisma.OperationCommentMentionCreateNestedManyWithoutStaffInput
+  vaccinationsAdministered?: Prisma.VaccinationRecordCreateNestedManyWithoutAdministeredByInput
+  nutritionPlansPrescribed?: Prisma.NutritionPlanCreateNestedManyWithoutPrescriberInput
+  nutritionRechecksPerformed?: Prisma.NutritionRecheckCreateNestedManyWithoutPerformedByInput
+  mobileUnitCrew?: Prisma.MobileUnitCrewCreateNestedManyWithoutStaffInput
+  mobileShiftsOpened?: Prisma.MobileUnitShiftCreateNestedManyWithoutOpenedByStaffInput
+  mobileVisitServices?: Prisma.MobileVisitServiceCreateNestedManyWithoutPerformedByInput
+  groomingSessionsAsGroomer?: Prisma.GroomingSessionCreateNestedManyWithoutGroomerInput
+  groomingSessionsAsAssistant?: Prisma.GroomingSessionCreateNestedManyWithoutAssistantInput
+  groomingSessionsAsVet?: Prisma.GroomingSessionCreateNestedManyWithoutVetOrderByInput
+  groomingProfilesPreferred?: Prisma.PatientGroomingProfileCreateNestedManyWithoutPreferredGroomerInput
+  inpatientStaysAttending?: Prisma.InpatientStayCreateNestedManyWithoutAttendingStaffInput
+}
+
+export type StaffUncheckedCreateWithoutTrackAssignmentsInput = {
+  id?: string
+  code: string
+  clinicId: string
+  userId?: string | null
+  roleId: string
+  branchId: string
+  name: string
+  gender?: $Enums.Gender | null
+  prefix?: $Enums.StaffPrefix | null
+  age?: number | null
+  licenseNumber?: string | null
+  email: string
+  phone?: string | null
+  country?: string | null
+  city?: string | null
+  address?: string | null
+  notes?: string | null
+  bio?: string | null
+  educationalQualification?: string | null
+  nationality?: string | null
+  avatar?: string | null
+  primarySpecializationId?: string | null
+  secondarySpecializationId?: string | null
+  employmentType?: $Enums.EmploymentType | null
+  hireDate?: Date | string | null
+  isSaudi?: boolean
+  status?: $Enums.StaffStatus
+  active?: boolean
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
+  invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
+  schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
+  workingHours?: Prisma.StaffWorkingHourUncheckedCreateNestedManyWithoutStaffInput
+  services?: Prisma.StaffServiceUncheckedCreateNestedManyWithoutStaffInput
+  consultationTypes?: Prisma.StaffConsultationTypeUncheckedCreateNestedManyWithoutStaffInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutStaffInput
+  attendances?: Prisma.AttendanceUncheckedCreateNestedManyWithoutStaffInput
+  shiftAssignments?: Prisma.ShiftAssignmentUncheckedCreateNestedManyWithoutStaffInput
+  leaveRequests?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutStaffInput
+  substituteFor?: Prisma.LeaveRequestUncheckedCreateNestedManyWithoutSubstituteInput
+  compensatoryEntries?: Prisma.CompensatoryEntryUncheckedCreateNestedManyWithoutStaffInput
+  documents?: Prisma.StaffDocumentUncheckedCreateNestedManyWithoutStaffInput
+  compensation?: Prisma.StaffCompensationUncheckedCreateNestedOneWithoutStaffInput
+  payrollLines?: Prisma.PayrollLineUncheckedCreateNestedManyWithoutStaffInput
+  noteMentions?: Prisma.AppointmentInternalNoteMentionUncheckedCreateNestedManyWithoutStaffInput
+  labReportMentions?: Prisma.LabTestReportMentionUncheckedCreateNestedManyWithoutStaffInput
+  labCommentMentions?: Prisma.LabTestCommentMentionUncheckedCreateNestedManyWithoutStaffInput
+  radiologyCommentMentions?: Prisma.RadiologyCommentMentionUncheckedCreateNestedManyWithoutStaffInput
+  radiologyAddendumMentions?: Prisma.RadiologyAddendumMentionUncheckedCreateNestedManyWithoutStaffInput
+  taskActivityMentions?: Prisma.TaskActivityMentionUncheckedCreateNestedManyWithoutStaffInput
+  expenses?: Prisma.ExpenseUncheckedCreateNestedManyWithoutStaffInput
+  eosSettlements?: Prisma.EndOfServiceSettlementUncheckedCreateNestedManyWithoutStaffInput
+  courseAssignments?: Prisma.CourseAssignmentUncheckedCreateNestedManyWithoutStaffInput
+  courseCertificates?: Prisma.CourseCertificateUncheckedCreateNestedManyWithoutStaffInput
+  courseTrainerRoles?: Prisma.CourseTrainerUncheckedCreateNestedManyWithoutStaffInput
+  courseReviews?: Prisma.CourseReviewUncheckedCreateNestedManyWithoutStaffInput
+  quizAssignments?: Prisma.QuizAssignmentUncheckedCreateNestedManyWithoutStaffInput
+  operationTeamMemberships?: Prisma.OperationTeamMemberUncheckedCreateNestedManyWithoutStaffInput
+  witnessedOperationConsents?: Prisma.OperationConsentUncheckedCreateNestedManyWithoutWitnessStaffInput
+  witnessedPatientConsents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutWitnessStaffInput
+  signedPatientConsents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutSignedByStaffInput
+  operationAssessments?: Prisma.PreAnestheticAssessmentUncheckedCreateNestedManyWithoutAssessedByInput
+  anesthesiaRecords?: Prisma.AnesthesiaRecordUncheckedCreateNestedManyWithoutAnesthetistStaffInput
+  signedOperationNotes?: Prisma.OperationNoteUncheckedCreateNestedManyWithoutSignedByInput
+  operationCommentMentions?: Prisma.OperationCommentMentionUncheckedCreateNestedManyWithoutStaffInput
+  vaccinationsAdministered?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutAdministeredByInput
+  nutritionPlansPrescribed?: Prisma.NutritionPlanUncheckedCreateNestedManyWithoutPrescriberInput
+  nutritionRechecksPerformed?: Prisma.NutritionRecheckUncheckedCreateNestedManyWithoutPerformedByInput
+  mobileUnitCrew?: Prisma.MobileUnitCrewUncheckedCreateNestedManyWithoutStaffInput
+  mobileShiftsOpened?: Prisma.MobileUnitShiftUncheckedCreateNestedManyWithoutOpenedByStaffInput
+  mobileVisitServices?: Prisma.MobileVisitServiceUncheckedCreateNestedManyWithoutPerformedByInput
+  groomingSessionsAsGroomer?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutGroomerInput
+  groomingSessionsAsAssistant?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutAssistantInput
+  groomingSessionsAsVet?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutVetOrderByInput
+  groomingProfilesPreferred?: Prisma.PatientGroomingProfileUncheckedCreateNestedManyWithoutPreferredGroomerInput
+  inpatientStaysAttending?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutAttendingStaffInput
+}
+
+export type StaffCreateOrConnectWithoutTrackAssignmentsInput = {
+  where: Prisma.StaffWhereUniqueInput
+  create: Prisma.XOR<Prisma.StaffCreateWithoutTrackAssignmentsInput, Prisma.StaffUncheckedCreateWithoutTrackAssignmentsInput>
+}
+
+export type StaffUpsertWithoutTrackAssignmentsInput = {
+  update: Prisma.XOR<Prisma.StaffUpdateWithoutTrackAssignmentsInput, Prisma.StaffUncheckedUpdateWithoutTrackAssignmentsInput>
+  create: Prisma.XOR<Prisma.StaffCreateWithoutTrackAssignmentsInput, Prisma.StaffUncheckedCreateWithoutTrackAssignmentsInput>
+  where?: Prisma.StaffWhereInput
+}
+
+export type StaffUpdateToOneWithWhereWithoutTrackAssignmentsInput = {
+  where?: Prisma.StaffWhereInput
+  data: Prisma.XOR<Prisma.StaffUpdateWithoutTrackAssignmentsInput, Prisma.StaffUncheckedUpdateWithoutTrackAssignmentsInput>
+}
+
+export type StaffUpdateWithoutTrackAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  prefix?: Prisma.NullableEnumStaffPrefixFieldUpdateOperationsInput | $Enums.StaffPrefix | null
+  age?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  licenseNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  educationalQualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nationality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employmentType?: Prisma.NullableEnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType | null
+  hireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isSaudi?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumStaffStatusFieldUpdateOperationsInput | $Enums.StaffStatus
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
+  role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
+  roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
+  branch?: Prisma.BranchUpdateOneRequiredWithoutStaffNestedInput
+  primarySpecialization?: Prisma.SpecializationUpdateOneWithoutPrimaryStaffNestedInput
+  secondarySpecialization?: Prisma.SpecializationUpdateOneWithoutSecondaryStaffNestedInput
+  invites?: Prisma.InviteUpdateManyWithoutStaffNestedInput
+  schedulingSettings?: Prisma.StaffSchedulingSettingsUpdateOneWithoutStaffNestedInput
+  workingHours?: Prisma.StaffWorkingHourUpdateManyWithoutStaffNestedInput
+  services?: Prisma.StaffServiceUpdateManyWithoutStaffNestedInput
+  consultationTypes?: Prisma.StaffConsultationTypeUpdateManyWithoutStaffNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutStaffNestedInput
+  attendances?: Prisma.AttendanceUpdateManyWithoutStaffNestedInput
+  shiftAssignments?: Prisma.ShiftAssignmentUpdateManyWithoutStaffNestedInput
+  leaveRequests?: Prisma.LeaveRequestUpdateManyWithoutStaffNestedInput
+  substituteFor?: Prisma.LeaveRequestUpdateManyWithoutSubstituteNestedInput
+  compensatoryEntries?: Prisma.CompensatoryEntryUpdateManyWithoutStaffNestedInput
+  documents?: Prisma.StaffDocumentUpdateManyWithoutStaffNestedInput
+  compensation?: Prisma.StaffCompensationUpdateOneWithoutStaffNestedInput
+  payrollLines?: Prisma.PayrollLineUpdateManyWithoutStaffNestedInput
+  noteMentions?: Prisma.AppointmentInternalNoteMentionUpdateManyWithoutStaffNestedInput
+  labReportMentions?: Prisma.LabTestReportMentionUpdateManyWithoutStaffNestedInput
+  labCommentMentions?: Prisma.LabTestCommentMentionUpdateManyWithoutStaffNestedInput
+  radiologyCommentMentions?: Prisma.RadiologyCommentMentionUpdateManyWithoutStaffNestedInput
+  radiologyAddendumMentions?: Prisma.RadiologyAddendumMentionUpdateManyWithoutStaffNestedInput
+  taskActivityMentions?: Prisma.TaskActivityMentionUpdateManyWithoutStaffNestedInput
+  expenses?: Prisma.ExpenseUpdateManyWithoutStaffNestedInput
+  eosSettlements?: Prisma.EndOfServiceSettlementUpdateManyWithoutStaffNestedInput
+  courseAssignments?: Prisma.CourseAssignmentUpdateManyWithoutStaffNestedInput
+  courseCertificates?: Prisma.CourseCertificateUpdateManyWithoutStaffNestedInput
+  courseTrainerRoles?: Prisma.CourseTrainerUpdateManyWithoutStaffNestedInput
+  courseReviews?: Prisma.CourseReviewUpdateManyWithoutStaffNestedInput
+  quizAssignments?: Prisma.QuizAssignmentUpdateManyWithoutStaffNestedInput
+  operationTeamMemberships?: Prisma.OperationTeamMemberUpdateManyWithoutStaffNestedInput
+  witnessedOperationConsents?: Prisma.OperationConsentUpdateManyWithoutWitnessStaffNestedInput
+  witnessedPatientConsents?: Prisma.PatientConsentUpdateManyWithoutWitnessStaffNestedInput
+  signedPatientConsents?: Prisma.PatientConsentUpdateManyWithoutSignedByStaffNestedInput
+  operationAssessments?: Prisma.PreAnestheticAssessmentUpdateManyWithoutAssessedByNestedInput
+  anesthesiaRecords?: Prisma.AnesthesiaRecordUpdateManyWithoutAnesthetistStaffNestedInput
+  signedOperationNotes?: Prisma.OperationNoteUpdateManyWithoutSignedByNestedInput
+  operationCommentMentions?: Prisma.OperationCommentMentionUpdateManyWithoutStaffNestedInput
+  vaccinationsAdministered?: Prisma.VaccinationRecordUpdateManyWithoutAdministeredByNestedInput
+  nutritionPlansPrescribed?: Prisma.NutritionPlanUpdateManyWithoutPrescriberNestedInput
+  nutritionRechecksPerformed?: Prisma.NutritionRecheckUpdateManyWithoutPerformedByNestedInput
+  mobileUnitCrew?: Prisma.MobileUnitCrewUpdateManyWithoutStaffNestedInput
+  mobileShiftsOpened?: Prisma.MobileUnitShiftUpdateManyWithoutOpenedByStaffNestedInput
+  mobileVisitServices?: Prisma.MobileVisitServiceUpdateManyWithoutPerformedByNestedInput
+  groomingSessionsAsGroomer?: Prisma.GroomingSessionUpdateManyWithoutGroomerNestedInput
+  groomingSessionsAsAssistant?: Prisma.GroomingSessionUpdateManyWithoutAssistantNestedInput
+  groomingSessionsAsVet?: Prisma.GroomingSessionUpdateManyWithoutVetOrderByNestedInput
+  groomingProfilesPreferred?: Prisma.PatientGroomingProfileUpdateManyWithoutPreferredGroomerNestedInput
+  inpatientStaysAttending?: Prisma.InpatientStayUpdateManyWithoutAttendingStaffNestedInput
+}
+
+export type StaffUncheckedUpdateWithoutTrackAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  clinicId?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleId?: Prisma.StringFieldUpdateOperationsInput | string
+  branchId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  prefix?: Prisma.NullableEnumStaffPrefixFieldUpdateOperationsInput | $Enums.StaffPrefix | null
+  age?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  licenseNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bio?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  educationalQualification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nationality?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  avatar?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  primarySpecializationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  secondarySpecializationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  employmentType?: Prisma.NullableEnumEmploymentTypeFieldUpdateOperationsInput | $Enums.EmploymentType | null
+  hireDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  isSaudi?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.EnumStaffStatusFieldUpdateOperationsInput | $Enums.StaffStatus
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
+  invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
+  schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
+  workingHours?: Prisma.StaffWorkingHourUncheckedUpdateManyWithoutStaffNestedInput
+  services?: Prisma.StaffServiceUncheckedUpdateManyWithoutStaffNestedInput
+  consultationTypes?: Prisma.StaffConsultationTypeUncheckedUpdateManyWithoutStaffNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutStaffNestedInput
   attendances?: Prisma.AttendanceUncheckedUpdateManyWithoutStaffNestedInput
   shiftAssignments?: Prisma.ShiftAssignmentUncheckedUpdateManyWithoutStaffNestedInput
@@ -12794,6 +13776,8 @@ export type StaffCreateWithoutAppointmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -12880,6 +13864,8 @@ export type StaffUncheckedCreateWithoutAppointmentsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -12972,6 +13958,8 @@ export type StaffUpdateWithoutAppointmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -13058,6 +14046,8 @@ export type StaffUncheckedUpdateWithoutAppointmentsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -13134,6 +14124,8 @@ export type StaffCreateWithoutNoteMentionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -13220,6 +14212,8 @@ export type StaffUncheckedCreateWithoutNoteMentionsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -13312,6 +14306,8 @@ export type StaffUpdateWithoutNoteMentionsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -13398,6 +14394,8 @@ export type StaffUncheckedUpdateWithoutNoteMentionsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -13474,6 +14472,8 @@ export type StaffCreateWithoutExpensesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -13560,6 +14560,8 @@ export type StaffUncheckedCreateWithoutExpensesInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -13652,6 +14654,8 @@ export type StaffUpdateWithoutExpensesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -13738,6 +14742,8 @@ export type StaffUncheckedUpdateWithoutExpensesInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -13814,6 +14820,8 @@ export type StaffCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
   branch: Prisma.BranchCreateNestedOneWithoutStaffInput
@@ -13899,6 +14907,8 @@ export type StaffUncheckedCreateWithoutUserInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -14002,6 +15012,8 @@ export type StaffCreateWithoutCourseAssignmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -14088,6 +15100,8 @@ export type StaffUncheckedCreateWithoutCourseAssignmentsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -14180,6 +15194,8 @@ export type StaffUpdateWithoutCourseAssignmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -14266,6 +15282,8 @@ export type StaffUncheckedUpdateWithoutCourseAssignmentsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -14342,6 +15360,8 @@ export type StaffCreateWithoutCourseTrainerRolesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -14428,6 +15448,8 @@ export type StaffUncheckedCreateWithoutCourseTrainerRolesInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -14520,6 +15542,8 @@ export type StaffUpdateWithoutCourseTrainerRolesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -14606,6 +15630,8 @@ export type StaffUncheckedUpdateWithoutCourseTrainerRolesInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -14682,6 +15708,8 @@ export type StaffCreateWithoutCourseReviewsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -14768,6 +15796,8 @@ export type StaffUncheckedCreateWithoutCourseReviewsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -14860,6 +15890,8 @@ export type StaffUpdateWithoutCourseReviewsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -14946,6 +15978,8 @@ export type StaffUncheckedUpdateWithoutCourseReviewsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -15022,6 +16056,8 @@ export type StaffCreateWithoutCourseCertificatesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -15108,6 +16144,8 @@ export type StaffUncheckedCreateWithoutCourseCertificatesInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -15200,6 +16238,8 @@ export type StaffUpdateWithoutCourseCertificatesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -15286,6 +16326,8 @@ export type StaffUncheckedUpdateWithoutCourseCertificatesInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -15362,6 +16404,8 @@ export type StaffCreateWithoutQuizAssignmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -15448,6 +16492,8 @@ export type StaffUncheckedCreateWithoutQuizAssignmentsInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -15540,6 +16586,8 @@ export type StaffUpdateWithoutQuizAssignmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -15626,6 +16674,8 @@ export type StaffUncheckedUpdateWithoutQuizAssignmentsInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -15702,6 +16752,8 @@ export type StaffCreateWithoutVaccinationsAdministeredInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -15788,6 +16840,8 @@ export type StaffUncheckedCreateWithoutVaccinationsAdministeredInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -15880,6 +16934,8 @@ export type StaffUpdateWithoutVaccinationsAdministeredInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -15966,6 +17022,8 @@ export type StaffUncheckedUpdateWithoutVaccinationsAdministeredInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -16042,6 +17100,8 @@ export type StaffCreateWithoutMobileUnitCrewInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -16128,6 +17188,8 @@ export type StaffUncheckedCreateWithoutMobileUnitCrewInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -16220,6 +17282,8 @@ export type StaffUpdateWithoutMobileUnitCrewInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -16306,6 +17370,8 @@ export type StaffUncheckedUpdateWithoutMobileUnitCrewInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -16382,6 +17448,8 @@ export type StaffCreateWithoutMobileShiftsOpenedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -16468,6 +17536,8 @@ export type StaffUncheckedCreateWithoutMobileShiftsOpenedInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -16560,6 +17630,8 @@ export type StaffUpdateWithoutMobileShiftsOpenedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -16646,6 +17718,8 @@ export type StaffUncheckedUpdateWithoutMobileShiftsOpenedInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -16722,6 +17796,8 @@ export type StaffCreateWithoutMobileVisitServicesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -16808,6 +17884,8 @@ export type StaffUncheckedCreateWithoutMobileVisitServicesInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -16900,6 +17978,8 @@ export type StaffUpdateWithoutMobileVisitServicesInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -16986,6 +18066,8 @@ export type StaffUncheckedUpdateWithoutMobileVisitServicesInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -17062,6 +18144,8 @@ export type StaffCreateWithoutNutritionPlansPrescribedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -17148,6 +18232,8 @@ export type StaffUncheckedCreateWithoutNutritionPlansPrescribedInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -17240,6 +18326,8 @@ export type StaffUpdateWithoutNutritionPlansPrescribedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -17326,6 +18414,8 @@ export type StaffUncheckedUpdateWithoutNutritionPlansPrescribedInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -17402,6 +18492,8 @@ export type StaffCreateWithoutNutritionRechecksPerformedInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -17488,6 +18580,8 @@ export type StaffUncheckedCreateWithoutNutritionRechecksPerformedInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -17580,6 +18674,8 @@ export type StaffUpdateWithoutNutritionRechecksPerformedInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -17666,6 +18762,8 @@ export type StaffUncheckedUpdateWithoutNutritionRechecksPerformedInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -17742,6 +18840,8 @@ export type StaffCreateWithoutGroomingProfilesPreferredInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -17828,6 +18928,8 @@ export type StaffUncheckedCreateWithoutGroomingProfilesPreferredInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -17920,6 +19022,8 @@ export type StaffUpdateWithoutGroomingProfilesPreferredInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -18006,6 +19110,8 @@ export type StaffUncheckedUpdateWithoutGroomingProfilesPreferredInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -18082,6 +19188,8 @@ export type StaffCreateWithoutGroomingSessionsAsGroomerInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -18168,6 +19276,8 @@ export type StaffUncheckedCreateWithoutGroomingSessionsAsGroomerInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -18249,6 +19359,8 @@ export type StaffCreateWithoutGroomingSessionsAsAssistantInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -18335,6 +19447,8 @@ export type StaffUncheckedCreateWithoutGroomingSessionsAsAssistantInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -18416,6 +19530,8 @@ export type StaffCreateWithoutGroomingSessionsAsVetInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -18502,6 +19618,8 @@ export type StaffUncheckedCreateWithoutGroomingSessionsAsVetInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -18594,6 +19712,8 @@ export type StaffUpdateWithoutGroomingSessionsAsGroomerInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -18680,6 +19800,8 @@ export type StaffUncheckedUpdateWithoutGroomingSessionsAsGroomerInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -18767,6 +19889,8 @@ export type StaffUpdateWithoutGroomingSessionsAsAssistantInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -18853,6 +19977,8 @@ export type StaffUncheckedUpdateWithoutGroomingSessionsAsAssistantInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -18940,6 +20066,8 @@ export type StaffUpdateWithoutGroomingSessionsAsVetInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -19026,6 +20154,8 @@ export type StaffUncheckedUpdateWithoutGroomingSessionsAsVetInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -19102,6 +20232,8 @@ export type StaffCreateWithoutInpatientStaysAttendingInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutStaffInput
+  classroomAssignments?: Prisma.ClassroomStaffCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffCreateNestedManyWithoutStaffInput
   user?: Prisma.UserCreateNestedOneWithoutStaffProfilesInput
   role: Prisma.StaffRoleCreateNestedOneWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentCreateNestedManyWithoutStaffInput
@@ -19188,6 +20320,8 @@ export type StaffUncheckedCreateWithoutInpatientStaysAttendingInput = {
   deletedAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutStaffInput
+  trackAssignments?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutStaffInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedCreateNestedManyWithoutStaffInput
   invites?: Prisma.InviteUncheckedCreateNestedManyWithoutStaffInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedCreateNestedOneWithoutStaffInput
@@ -19280,6 +20414,8 @@ export type StaffUpdateWithoutInpatientStaysAttendingInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -19366,6 +20502,8 @@ export type StaffUncheckedUpdateWithoutInpatientStaysAttendingInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -19475,6 +20613,8 @@ export type StaffUpdateWithoutClinicInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -19561,6 +20701,8 @@ export type StaffUncheckedUpdateWithoutClinicInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -19706,6 +20848,8 @@ export type StaffUpdateWithoutBranchInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -19791,6 +20935,8 @@ export type StaffUncheckedUpdateWithoutBranchInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -19970,6 +21116,8 @@ export type StaffUpdateWithoutPrimarySpecializationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -20055,6 +21203,8 @@ export type StaffUncheckedUpdateWithoutPrimarySpecializationInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -20166,6 +21316,8 @@ export type StaffUpdateWithoutSecondarySpecializationInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
@@ -20251,6 +21403,8 @@ export type StaffUncheckedUpdateWithoutSecondarySpecializationInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -20396,6 +21550,8 @@ export type StaffUpdateWithoutRoleInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   user?: Prisma.UserUpdateOneWithoutStaffProfilesNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutStaffNestedInput
@@ -20481,6 +21637,8 @@ export type StaffUncheckedUpdateWithoutRoleInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -20626,6 +21784,8 @@ export type StaffUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutStaffNestedInput
+  classroomAssignments?: Prisma.ClassroomStaffUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUpdateManyWithoutStaffNestedInput
   role?: Prisma.StaffRoleUpdateOneRequiredWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUpdateManyWithoutStaffNestedInput
   branch?: Prisma.BranchUpdateOneRequiredWithoutStaffNestedInput
@@ -20711,6 +21871,8 @@ export type StaffUncheckedUpdateWithoutUserInput = {
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutStaffNestedInput
+  trackAssignments?: Prisma.TrackStaffUncheckedUpdateManyWithoutStaffNestedInput
   roleAssignments?: Prisma.StaffRoleAssignmentUncheckedUpdateManyWithoutStaffNestedInput
   invites?: Prisma.InviteUncheckedUpdateManyWithoutStaffNestedInput
   schedulingSettings?: Prisma.StaffSchedulingSettingsUncheckedUpdateOneWithoutStaffNestedInput
@@ -20800,6 +21962,8 @@ export type StaffUncheckedUpdateManyWithoutUserInput = {
  */
 
 export type StaffCountOutputType = {
+  classroomAssignments: number
+  trackAssignments: number
   roleAssignments: number
   invites: number
   workingHours: number
@@ -20848,6 +22012,8 @@ export type StaffCountOutputType = {
 }
 
 export type StaffCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  classroomAssignments?: boolean | StaffCountOutputTypeCountClassroomAssignmentsArgs
+  trackAssignments?: boolean | StaffCountOutputTypeCountTrackAssignmentsArgs
   roleAssignments?: boolean | StaffCountOutputTypeCountRoleAssignmentsArgs
   invites?: boolean | StaffCountOutputTypeCountInvitesArgs
   workingHours?: boolean | StaffCountOutputTypeCountWorkingHoursArgs
@@ -20903,6 +22069,20 @@ export type StaffCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extens
    * Select specific fields to fetch from the StaffCountOutputType
    */
   select?: Prisma.StaffCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * StaffCountOutputType without action
+ */
+export type StaffCountOutputTypeCountClassroomAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ClassroomStaffWhereInput
+}
+
+/**
+ * StaffCountOutputType without action
+ */
+export type StaffCountOutputTypeCountTrackAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TrackStaffWhereInput
 }
 
 /**
@@ -21255,6 +22435,8 @@ export type StaffSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   createdAt?: boolean
   updatedAt?: boolean
   clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>
+  classroomAssignments?: boolean | Prisma.Staff$classroomAssignmentsArgs<ExtArgs>
+  trackAssignments?: boolean | Prisma.Staff$trackAssignmentsArgs<ExtArgs>
   user?: boolean | Prisma.Staff$userArgs<ExtArgs>
   role?: boolean | Prisma.StaffRoleDefaultArgs<ExtArgs>
   roleAssignments?: boolean | Prisma.Staff$roleAssignmentsArgs<ExtArgs>
@@ -21430,6 +22612,8 @@ export type StaffSelectScalar = {
 export type StaffOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "clinicId" | "userId" | "roleId" | "branchId" | "name" | "gender" | "prefix" | "age" | "licenseNumber" | "email" | "phone" | "country" | "city" | "address" | "notes" | "bio" | "educationalQualification" | "nationality" | "avatar" | "primarySpecializationId" | "secondarySpecializationId" | "employmentType" | "hireDate" | "isSaudi" | "status" | "active" | "isDeleted" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["staff"]>
 export type StaffInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>
+  classroomAssignments?: boolean | Prisma.Staff$classroomAssignmentsArgs<ExtArgs>
+  trackAssignments?: boolean | Prisma.Staff$trackAssignmentsArgs<ExtArgs>
   user?: boolean | Prisma.Staff$userArgs<ExtArgs>
   role?: boolean | Prisma.StaffRoleDefaultArgs<ExtArgs>
   roleAssignments?: boolean | Prisma.Staff$roleAssignmentsArgs<ExtArgs>
@@ -21505,6 +22689,8 @@ export type $StaffPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   name: "Staff"
   objects: {
     clinic: Prisma.$ClinicPayload<ExtArgs>
+    classroomAssignments: Prisma.$ClassroomStaffPayload<ExtArgs>[]
+    trackAssignments: Prisma.$TrackStaffPayload<ExtArgs>[]
     user: Prisma.$UserPayload<ExtArgs> | null
     role: Prisma.$StaffRolePayload<ExtArgs>
     roleAssignments: Prisma.$StaffRoleAssignmentPayload<ExtArgs>[]
@@ -21986,6 +23172,8 @@ readonly fields: StaffFieldRefs;
 export interface Prisma__StaffClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   clinic<T extends Prisma.ClinicDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClinicDefaultArgs<ExtArgs>>): Prisma.Prisma__ClinicClient<runtime.Types.Result.GetResult<Prisma.$ClinicPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  classroomAssignments<T extends Prisma.Staff$classroomAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Staff$classroomAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClassroomStaffPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  trackAssignments<T extends Prisma.Staff$trackAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Staff$trackAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrackStaffPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   user<T extends Prisma.Staff$userArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Staff$userArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   role<T extends Prisma.StaffRoleDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffRoleDefaultArgs<ExtArgs>>): Prisma.Prisma__StaffRoleClient<runtime.Types.Result.GetResult<Prisma.$StaffRolePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   roleAssignments<T extends Prisma.Staff$roleAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Staff$roleAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$StaffRoleAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -22497,6 +23685,54 @@ export type StaffDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Limit how many Staff to delete.
    */
   limit?: number
+}
+
+/**
+ * Staff.classroomAssignments
+ */
+export type Staff$classroomAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ClassroomStaff
+   */
+  select?: Prisma.ClassroomStaffSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ClassroomStaff
+   */
+  omit?: Prisma.ClassroomStaffOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClassroomStaffInclude<ExtArgs> | null
+  where?: Prisma.ClassroomStaffWhereInput
+  orderBy?: Prisma.ClassroomStaffOrderByWithRelationInput | Prisma.ClassroomStaffOrderByWithRelationInput[]
+  cursor?: Prisma.ClassroomStaffWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ClassroomStaffScalarFieldEnum | Prisma.ClassroomStaffScalarFieldEnum[]
+}
+
+/**
+ * Staff.trackAssignments
+ */
+export type Staff$trackAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TrackStaff
+   */
+  select?: Prisma.TrackStaffSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TrackStaff
+   */
+  omit?: Prisma.TrackStaffOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TrackStaffInclude<ExtArgs> | null
+  where?: Prisma.TrackStaffWhereInput
+  orderBy?: Prisma.TrackStaffOrderByWithRelationInput | Prisma.TrackStaffOrderByWithRelationInput[]
+  cursor?: Prisma.TrackStaffWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TrackStaffScalarFieldEnum | Prisma.TrackStaffScalarFieldEnum[]
 }
 
 /**

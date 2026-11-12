@@ -89,14 +89,6 @@ export const BankClearancePage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">مقاصة البنك</h1>
-				<p className="text-muted-foreground text-sm">
-					FR-14.4 — ثبّت تاريخ المقاصة يدويًا على السندات غير المُقاصّة دون الحاجة لكشف حساب
-					مستورد.
-				</p>
-			</div>
-
 			{/* toolbar */}
 			<div className="flex flex-wrap items-center gap-2 px-4 py-3">
 				<div className="w-56">

@@ -1,0 +1,15 @@
+import { t } from "elysia";
+
+import { __transformDate__ } from "./__transformDate__";
+
+import { __nullable__ } from "./__nullable__";
+
+export const RegistrationCampaignStatus = t.Union(
+  [
+    t.Literal("DRAFT"),
+    t.Literal("ACTIVE"),
+    t.Literal("COMPLETED"),
+    t.Literal("CLOSED"),
+  ],
+  { additionalProperties: false },
+);

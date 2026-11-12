@@ -52,11 +52,11 @@ const OPTIONS: ContentOption[] = [
 	{
 		key: "page",
 		label: "صفحة",
-		description: "إنشاء صفحة مستقلة تحتوي على محتوى تعليمي.",
+		description: "إنشاء صفحة بمحرر Notion لكتابة وتنسيق محتوى الدروس.",
 		Icon: IconFile,
-		tint: "bg-[#F97316]/10",
-		fg: "text-[#F97316]",
-		badge: "قريباً",
+		tint: "bg-[#8B5CF6]/10",
+		fg: "text-[#8B5CF6]",
+		available: true,
 	},
 	{
 		key: "assignment",
@@ -92,14 +92,17 @@ export function CreateContentMenu({
 	children,
 	onSelectCourse,
 	onSelectQuiz,
+	onSelectPage,
 }: {
 	children: ReactNode;
 	onSelectCourse: () => void;
 	onSelectQuiz: () => void;
+	onSelectPage?: () => void;
 }) {
 	const handle = (opt: ContentOption) => {
 		if (opt.key === "course") onSelectCourse();
 		if (opt.key === "quiz") onSelectQuiz();
+		if (opt.key === "page" && onSelectPage) onSelectPage();
 	};
 
 	return (

@@ -1,14 +1,15 @@
 // تبويبات وحدة إدارة المحتوى المعروضة في الهيدر العلوي
-export type ContentManagementTab = "courses" | "quizzes" | "my-library" | "tracks";
+export type ContentManagementTab = "courses" | "quizzes" | "my-library" | "tracks" | "pages";
 
 export const CONTENT_MANAGEMENT_TABS: {
 	value: ContentManagementTab;
 	label: string;
 }[] = [
 	{ value: "courses", label: "الدورات" },
-	{ value: "quizzes", label: "التقييمات" },
 	{ value: "my-library", label: "مكتبتي" },
+	{ value: "quizzes", label: "التقييمات" },
 	{ value: "tracks", label: "المسارات" },
+	{ value: "pages", label: "الصفحات" },
 ];
 
 // تبويبات حالة الدورات الداخلية

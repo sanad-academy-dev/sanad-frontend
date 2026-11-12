@@ -55,7 +55,7 @@ export type LibraryItem = {
 	downloadsCount: number;
 };
 
-const INITIAL_RESOURCES: LibraryItem[] = [
+export const INITIAL_RESOURCES: LibraryItem[] = [
 	{
 		id: "res-1",
 		title: "دليل التعامل مع حالات اضطراب التوحد",
@@ -130,7 +130,7 @@ const INITIAL_RESOURCES: LibraryItem[] = [
 	},
 ];
 
-const TYPE_CONFIG: Record<
+export const TYPE_CONFIG: Record<
 	LibraryResourceType,
 	{ label: string; icon: typeof IconFile; color: string; bg: string }
 > = {

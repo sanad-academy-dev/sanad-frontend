@@ -175,6 +175,16 @@ export const ModelName = {
   AnimalStrain: 'AnimalStrain',
   Owner: 'Owner',
   Patient: 'Patient',
+  PatientGuardian: 'PatientGuardian',
+  Classroom: 'Classroom',
+  ClassroomStudent: 'ClassroomStudent',
+  ClassroomStaff: 'ClassroomStaff',
+  ClassroomClassification: 'ClassroomClassification',
+  AcademicStage: 'AcademicStage',
+  TrackClassification: 'TrackClassification',
+  Track: 'Track',
+  TrackStudent: 'TrackStudent',
+  TrackStaff: 'TrackStaff',
   PatientActivity: 'PatientActivity',
   VitalSignsRecord: 'VitalSignsRecord',
   Appointment: 'Appointment',
@@ -442,7 +452,14 @@ export const ModelName = {
   LoyaltyOwnerTier: 'LoyaltyOwnerTier',
   LoyaltyLedgerEntry: 'LoyaltyLedgerEntry',
   LoyaltyRedemption: 'LoyaltyRedemption',
-  LoyaltyRedemptionAllocation: 'LoyaltyRedemptionAllocation'
+  LoyaltyRedemptionAllocation: 'LoyaltyRedemptionAllocation',
+  RegistrationCampaign: 'RegistrationCampaign',
+  RegistrationCollaborator: 'RegistrationCollaborator',
+  RegistrationRequest: 'RegistrationRequest',
+  RegistrationDocument: 'RegistrationDocument',
+  PatientDocument: 'PatientDocument',
+  RegistrationComment: 'RegistrationComment',
+  RegistrationTimelineStep: 'RegistrationTimelineStep'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -2590,6 +2607,8 @@ export const OwnerScalarFieldEnum = {
   country: 'country',
   city: 'city',
   address: 'address',
+  emergencyContactName: 'emergencyContactName',
+  emergencyContactPhone: 'emergencyContactPhone',
   notes: 'notes',
   active: 'active',
   isDeleted: 'isDeleted',
@@ -2610,8 +2629,6 @@ export const PatientScalarFieldEnum = {
   name: 'name',
   nameNormalized: 'nameNormalized',
   gender: 'gender',
-  animalTypeId: 'animalTypeId',
-  animalStrainId: 'animalStrainId',
   age: 'age',
   birthDate: 'birthDate',
   weight: 'weight',
@@ -2619,6 +2636,26 @@ export const PatientScalarFieldEnum = {
   coat: 'coat',
   notes: 'notes',
   active: 'active',
+  status: 'status',
+  nationalId: 'nationalId',
+  ageGroup: 'ageGroup',
+  academicStage: 'academicStage',
+  classroom: 'classroom',
+  bloodType: 'bloodType',
+  developmentStatus: 'developmentStatus',
+  allergies: 'allergies',
+  pocketMoneyEnabled: 'pocketMoneyEnabled',
+  transportation: 'transportation',
+  feeType: 'feeType',
+  healthConditions: 'healthConditions',
+  previousNursery: 'previousNursery',
+  guardianRelationship: 'guardianRelationship',
+  emergencyContactPhone: 'emergencyContactPhone',
+  emergencyContactName: 'emergencyContactName',
+  level: 'level',
+  learningMethod: 'learningMethod',
+  preferredShift: 'preferredShift',
+  address: 'address',
   isDeleted: 'isDeleted',
   deletedAt: 'deletedAt',
   editsCount: 'editsCount',
@@ -2627,6 +2664,156 @@ export const PatientScalarFieldEnum = {
 } as const
 
 export type PatientScalarFieldEnum = (typeof PatientScalarFieldEnum)[keyof typeof PatientScalarFieldEnum]
+
+
+export const PatientGuardianScalarFieldEnum = {
+  id: 'id',
+  clinicId: 'clinicId',
+  patientId: 'patientId',
+  ownerId: 'ownerId',
+  relationship: 'relationship',
+  createdAt: 'createdAt'
+} as const
+
+export type PatientGuardianScalarFieldEnum = (typeof PatientGuardianScalarFieldEnum)[keyof typeof PatientGuardianScalarFieldEnum]
+
+
+export const ClassroomScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  clinicId: 'clinicId',
+  name: 'name',
+  ageGroup: 'ageGroup',
+  academicStage: 'academicStage',
+  category: 'category',
+  classification: 'classification',
+  learningMode: 'learningMode',
+  capacity: 'capacity',
+  enrolledCount: 'enrolledCount',
+  active: 'active',
+  notes: 'notes',
+  isDeleted: 'isDeleted',
+  deletedAt: 'deletedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ClassroomScalarFieldEnum = (typeof ClassroomScalarFieldEnum)[keyof typeof ClassroomScalarFieldEnum]
+
+
+export const ClassroomStudentScalarFieldEnum = {
+  id: 'id',
+  classroomId: 'classroomId',
+  patientId: 'patientId',
+  enrolledAt: 'enrolledAt'
+} as const
+
+export type ClassroomStudentScalarFieldEnum = (typeof ClassroomStudentScalarFieldEnum)[keyof typeof ClassroomStudentScalarFieldEnum]
+
+
+export const ClassroomStaffScalarFieldEnum = {
+  id: 'id',
+  classroomId: 'classroomId',
+  staffId: 'staffId',
+  role: 'role',
+  assignedAt: 'assignedAt'
+} as const
+
+export type ClassroomStaffScalarFieldEnum = (typeof ClassroomStaffScalarFieldEnum)[keyof typeof ClassroomStaffScalarFieldEnum]
+
+
+export const ClassroomClassificationScalarFieldEnum = {
+  id: 'id',
+  clinicId: 'clinicId',
+  name: 'name',
+  createdAt: 'createdAt'
+} as const
+
+export type ClassroomClassificationScalarFieldEnum = (typeof ClassroomClassificationScalarFieldEnum)[keyof typeof ClassroomClassificationScalarFieldEnum]
+
+
+export const AcademicStageScalarFieldEnum = {
+  id: 'id',
+  clinicId: 'clinicId',
+  name: 'name',
+  description: 'description',
+  isActive: 'isActive',
+  sortOrder: 'sortOrder',
+  isDeleted: 'isDeleted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AcademicStageScalarFieldEnum = (typeof AcademicStageScalarFieldEnum)[keyof typeof AcademicStageScalarFieldEnum]
+
+
+export const TrackClassificationScalarFieldEnum = {
+  id: 'id',
+  clinicId: 'clinicId',
+  name: 'name',
+  description: 'description',
+  isActive: 'isActive',
+  sortOrder: 'sortOrder',
+  isDeleted: 'isDeleted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TrackClassificationScalarFieldEnum = (typeof TrackClassificationScalarFieldEnum)[keyof typeof TrackClassificationScalarFieldEnum]
+
+
+export const TrackScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  clinicId: 'clinicId',
+  name: 'name',
+  category: 'category',
+  coursesCount: 'coursesCount',
+  locationMode: 'locationMode',
+  locationLabel: 'locationLabel',
+  duration: 'duration',
+  studentsCount: 'studentsCount',
+  rating: 'rating',
+  reviewsCount: 'reviewsCount',
+  price: 'price',
+  revenue: 'revenue',
+  status: 'status',
+  description: 'description',
+  notes: 'notes',
+  academicStage: 'academicStage',
+  ageGroup: 'ageGroup',
+  trainers: 'trainers',
+  selectedIcon: 'selectedIcon',
+  selectedColor: 'selectedColor',
+  active: 'active',
+  isDeleted: 'isDeleted',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TrackScalarFieldEnum = (typeof TrackScalarFieldEnum)[keyof typeof TrackScalarFieldEnum]
+
+
+export const TrackStudentScalarFieldEnum = {
+  id: 'id',
+  trackId: 'trackId',
+  patientId: 'patientId',
+  notes: 'notes',
+  assignedAt: 'assignedAt'
+} as const
+
+export type TrackStudentScalarFieldEnum = (typeof TrackStudentScalarFieldEnum)[keyof typeof TrackStudentScalarFieldEnum]
+
+
+export const TrackStaffScalarFieldEnum = {
+  id: 'id',
+  trackId: 'trackId',
+  staffId: 'staffId',
+  role: 'role',
+  assignedAt: 'assignedAt'
+} as const
+
+export type TrackStaffScalarFieldEnum = (typeof TrackStaffScalarFieldEnum)[keyof typeof TrackStaffScalarFieldEnum]
 
 
 export const PatientActivityScalarFieldEnum = {
@@ -7990,6 +8177,159 @@ export const LoyaltyRedemptionAllocationScalarFieldEnum = {
 } as const
 
 export type LoyaltyRedemptionAllocationScalarFieldEnum = (typeof LoyaltyRedemptionAllocationScalarFieldEnum)[keyof typeof LoyaltyRedemptionAllocationScalarFieldEnum]
+
+
+export const RegistrationCampaignScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  clinicId: 'clinicId',
+  name: 'name',
+  ageGroup: 'ageGroup',
+  targetClass: 'targetClass',
+  capacity: 'capacity',
+  status: 'status',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  requireBirthCert: 'requireBirthCert',
+  requireVaccine: 'requireVaccine',
+  requireId: 'requireId',
+  generalAccess: 'generalAccess',
+  notes: 'notes',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RegistrationCampaignScalarFieldEnum = (typeof RegistrationCampaignScalarFieldEnum)[keyof typeof RegistrationCampaignScalarFieldEnum]
+
+
+export const RegistrationCollaboratorScalarFieldEnum = {
+  id: 'id',
+  campaignId: 'campaignId',
+  clinicId: 'clinicId',
+  userId: 'userId',
+  email: 'email',
+  accessLevel: 'accessLevel',
+  isPending: 'isPending',
+  invitedById: 'invitedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RegistrationCollaboratorScalarFieldEnum = (typeof RegistrationCollaboratorScalarFieldEnum)[keyof typeof RegistrationCollaboratorScalarFieldEnum]
+
+
+export const RegistrationRequestScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  clinicId: 'clinicId',
+  campaignId: 'campaignId',
+  status: 'status',
+  source: 'source',
+  studentName: 'studentName',
+  gender: 'gender',
+  birthDate: 'birthDate',
+  ageLabel: 'ageLabel',
+  targetClass: 'targetClass',
+  bloodType: 'bloodType',
+  allergies: 'allergies',
+  hasChronicDiseases: 'hasChronicDiseases',
+  chronicDiseases: 'chronicDiseases',
+  learningMode: 'learningMode',
+  preferredShift: 'preferredShift',
+  experienceLevel: 'experienceLevel',
+  priority: 'priority',
+  appointmentDate: 'appointmentDate',
+  appointmentId: 'appointmentId',
+  roomId: 'roomId',
+  roomName: 'roomName',
+  notes: 'notes',
+  notifyWhatsapp: 'notifyWhatsapp',
+  links: 'links',
+  proposedTrack: 'proposedTrack',
+  interviewDurationMinutes: 'interviewDurationMinutes',
+  attendanceProbability: 'attendanceProbability',
+  subscriptionPlanId: 'subscriptionPlanId',
+  subscriptionPlanName: 'subscriptionPlanName',
+  subscriptionAmount: 'subscriptionAmount',
+  includeMeals: 'includeMeals',
+  enableDailyStipend: 'enableDailyStipend',
+  medications: 'medications',
+  allergiesList: 'allergiesList',
+  referredToStaffId: 'referredToStaffId',
+  referralReason: 'referralReason',
+  rejectionReason: 'rejectionReason',
+  rejectionNotes: 'rejectionNotes',
+  deletionReason: 'deletionReason',
+  deletionNotes: 'deletionNotes',
+  guardianName: 'guardianName',
+  guardianPhone: 'guardianPhone',
+  guardianEmail: 'guardianEmail',
+  guardianNationalId: 'guardianNationalId',
+  convertedPatientId: 'convertedPatientId',
+  convertedOwnerId: 'convertedOwnerId',
+  assignedStaffId: 'assignedStaffId',
+  submittedAt: 'submittedAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RegistrationRequestScalarFieldEnum = (typeof RegistrationRequestScalarFieldEnum)[keyof typeof RegistrationRequestScalarFieldEnum]
+
+
+export const RegistrationDocumentScalarFieldEnum = {
+  id: 'id',
+  requestId: 'requestId',
+  type: 'type',
+  title: 'title',
+  fileUrl: 'fileUrl',
+  fileSize: 'fileSize',
+  mimeType: 'mimeType',
+  uploadedAt: 'uploadedAt'
+} as const
+
+export type RegistrationDocumentScalarFieldEnum = (typeof RegistrationDocumentScalarFieldEnum)[keyof typeof RegistrationDocumentScalarFieldEnum]
+
+
+export const PatientDocumentScalarFieldEnum = {
+  id: 'id',
+  patientId: 'patientId',
+  type: 'type',
+  title: 'title',
+  fileUrl: 'fileUrl',
+  fileSize: 'fileSize',
+  mimeType: 'mimeType',
+  source: 'source',
+  uploadedAt: 'uploadedAt'
+} as const
+
+export type PatientDocumentScalarFieldEnum = (typeof PatientDocumentScalarFieldEnum)[keyof typeof PatientDocumentScalarFieldEnum]
+
+
+export const RegistrationCommentScalarFieldEnum = {
+  id: 'id',
+  requestId: 'requestId',
+  authorId: 'authorId',
+  content: 'content',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type RegistrationCommentScalarFieldEnum = (typeof RegistrationCommentScalarFieldEnum)[keyof typeof RegistrationCommentScalarFieldEnum]
+
+
+export const RegistrationTimelineStepScalarFieldEnum = {
+  id: 'id',
+  requestId: 'requestId',
+  title: 'title',
+  actorName: 'actorName',
+  statusBadge: 'statusBadge',
+  isCompleted: 'isCompleted',
+  completedAt: 'completedAt',
+  order: 'order',
+  createdAt: 'createdAt'
+} as const
+
+export type RegistrationTimelineStepScalarFieldEnum = (typeof RegistrationTimelineStepScalarFieldEnum)[keyof typeof RegistrationTimelineStepScalarFieldEnum]
 
 
 export const SortOrder = {

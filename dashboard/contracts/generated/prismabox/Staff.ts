@@ -86,6 +86,32 @@ export const StaffRelations = t.Object(
       },
       { additionalProperties: false },
     ),
+    classroomAssignments: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          classroomId: t.String(),
+          staffId: t.String(),
+          role: __nullable__(t.String()),
+          assignedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    trackAssignments: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          trackId: t.String(),
+          staffId: t.String(),
+          role: __nullable__(t.String()),
+          assignedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
     user: __nullable__(
       t.Object(
         {
@@ -2305,6 +2331,38 @@ export const StaffRelationsInputCreate = t.Object(
       },
       { additionalProperties: false },
     ),
+    classroomAssignments: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    trackAssignments: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
     user: t.Optional(
       t.Object(
         {
@@ -3129,6 +3187,56 @@ export const StaffRelationsInputUpdate = t.Partial(
           ),
         },
         { additionalProperties: false },
+      ),
+      classroomAssignments: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      trackAssignments: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
       ),
       user: t.Partial(
         t.Object(
@@ -4565,6 +4673,8 @@ export const StaffSelect = t.Partial(
       createdAt: t.Boolean(),
       updatedAt: t.Boolean(),
       clinic: t.Boolean(),
+      classroomAssignments: t.Boolean(),
+      trackAssignments: t.Boolean(),
       user: t.Boolean(),
       role: t.Boolean(),
       roleAssignments: t.Boolean(),
@@ -4631,6 +4741,8 @@ export const StaffInclude = t.Partial(
       employmentType: t.Boolean(),
       status: t.Boolean(),
       clinic: t.Boolean(),
+      classroomAssignments: t.Boolean(),
+      trackAssignments: t.Boolean(),
       user: t.Boolean(),
       role: t.Boolean(),
       roleAssignments: t.Boolean(),

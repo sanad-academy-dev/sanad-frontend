@@ -84,11 +84,35 @@ export declare const quizContentSchema: z.ZodObject<{
 }, z.core.$strip>;
 export type QuizContent = z.infer<typeof quizContentSchema>;
 export type QuizQuestionInput = z.input<typeof quizQuestionSchema>;
+export declare const lessonContentItemSchema: z.ZodObject<{
+    id: z.ZodString;
+    type: z.ZodEnum<{
+        readonly TEXT: "TEXT";
+        readonly PAGE: "PAGE";
+        readonly VIDEO: "VIDEO";
+        readonly DOCUMENT: "DOCUMENT";
+        readonly QUIZ: "QUIZ";
+        readonly SURVEY: "SURVEY";
+        readonly AUDIO: "AUDIO";
+    }>;
+    title: z.ZodString;
+    description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    mediaSource: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
+        readonly DEVICE: "DEVICE";
+        readonly URL: "URL";
+    }>>>;
+    mediaKey: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    mediaUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    durationSeconds: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+    content: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+}, z.core.$strip>;
+export type LessonContentItem = z.infer<typeof lessonContentItemSchema>;
 export declare function parseQuizContent(content: string | null | undefined): QuizContent["questions"];
 export declare const createLessonSchema: z.ZodObject<{
     title: z.ZodString;
     type: z.ZodEnum<{
         readonly TEXT: "TEXT";
+        readonly PAGE: "PAGE";
         readonly VIDEO: "VIDEO";
         readonly DOCUMENT: "DOCUMENT";
         readonly QUIZ: "QUIZ";
@@ -103,21 +127,43 @@ export declare const createLessonSchema: z.ZodObject<{
     mediaKey: z.ZodOptional<z.ZodString>;
     mediaUrl: z.ZodOptional<z.ZodString>;
     content: z.ZodOptional<z.ZodString>;
-    hours: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
-    minutes: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
-    seconds: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
+    hours: z.ZodPipe<z.ZodTransform<number | undefined, unknown>, z.ZodOptional<z.ZodNumber>>;
+    minutes: z.ZodPipe<z.ZodTransform<number | undefined, unknown>, z.ZodOptional<z.ZodNumber>>;
+    seconds: z.ZodPipe<z.ZodTransform<number | undefined, unknown>, z.ZodOptional<z.ZodNumber>>;
     questions: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodObject<{
         text: z.ZodString;
         answerType: z.ZodDefault<z.ZodOptional<z.ZodEnum<{
             TEXT: "TEXT";
-            MULTIPLE: "MULTIPLE";
             SINGLE: "SINGLE";
+            MULTIPLE: "MULTIPLE";
         }>>>;
         options: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodObject<{
             text: z.ZodString;
             correct: z.ZodDefault<z.ZodOptional<z.ZodBoolean>>;
         }, z.core.$strip>>>>;
         answerText: z.ZodDefault<z.ZodOptional<z.ZodString>>;
+    }, z.core.$strip>>>>;
+    contents: z.ZodDefault<z.ZodOptional<z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        type: z.ZodEnum<{
+            readonly TEXT: "TEXT";
+            readonly PAGE: "PAGE";
+            readonly VIDEO: "VIDEO";
+            readonly DOCUMENT: "DOCUMENT";
+            readonly QUIZ: "QUIZ";
+            readonly SURVEY: "SURVEY";
+            readonly AUDIO: "AUDIO";
+        }>;
+        title: z.ZodString;
+        description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        mediaSource: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
+            readonly DEVICE: "DEVICE";
+            readonly URL: "URL";
+        }>>>;
+        mediaKey: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        mediaUrl: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        durationSeconds: z.ZodOptional<z.ZodNullable<z.ZodNumber>>;
+        content: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     }, z.core.$strip>>>>;
 }, z.core.$strip>;
 export type CreateLessonFormInput = z.input<typeof createLessonSchema>;
@@ -139,13 +185,29 @@ export type ReorderContentInput = {
     levelId: string | null;
     position: number;
 };
+export type ReorderLessonInput = {
+    lessonId: string;
+    unitId: string;
+    position: number;
+    contents?: LessonContentItem[];
+};
 export type CompletionSettingsInput = Partial<Omit<Prisma.CourseCompletionSettingsUncheckedCreateInput, "id" | "courseId" | "createdAt" | "updatedAt">>;
-export type RestoredLessonInput = Pick<Prisma.CourseLessonUncheckedCreateInput, "title"> & Required<Pick<Prisma.CourseLessonUncheckedCreateInput, "type">> & LessonOptionalFields;
-type LessonOptionalFields = Partial<Pick<Prisma.CourseLessonUncheckedCreateInput, "description" | "mediaSource" | "mediaKey" | "mediaUrl" | "durationSeconds" | "content">>;
+export type RestoredLessonInput = Pick<Prisma.CourseLessonUncheckedCreateInput, "title"> & Required<Pick<Prisma.CourseLessonUncheckedCreateInput, "type">> & LessonOptionalFields & {
+    contents?: LessonContentItem[];
+};
+type LessonOptionalFields = Partial<Pick<Prisma.CourseLessonUncheckedCreateInput, "description" | "mediaSource" | "mediaKey" | "mediaUrl" | "durationSeconds" | "content">> & {
+    contents?: LessonContentItem[];
+};
 export type CreateLessonInput = Pick<Prisma.CourseLessonUncheckedCreateInput, "unitId" | "title"> & Partial<Pick<Prisma.CourseLessonUncheckedCreateInput, "type">> & LessonOptionalFields;
 export type CreateLessonPayload = Pick<Prisma.CourseLessonUncheckedCreateInput, "unitId" | "title"> & Required<Pick<Prisma.CourseLessonUncheckedCreateInput, "type">> & LessonOptionalFields;
-export type UpdateLessonInput = Partial<Omit<CreateLessonInput, "unitId">>;
-export type UpdateLessonPayload = Partial<Omit<CreateLessonPayload, "unitId">>;
+export type UpdateLessonInput = Partial<Omit<CreateLessonInput, "unitId">> & {
+    unitId?: string;
+    order?: number;
+};
+export type UpdateLessonPayload = Partial<Omit<CreateLessonPayload, "unitId">> & {
+    unitId?: string;
+    order?: number;
+};
 declare const lessonSelect: {
     readonly id: true;
     readonly unitId: true;
@@ -238,12 +300,18 @@ declare const completionSettingsSelect: {
     readonly gamificationPoints: true;
     readonly reviewEnabled: true;
 };
-export type LessonResponse = Prisma.CourseLessonGetPayload<{
+type LessonDbResponse = Prisma.CourseLessonGetPayload<{
     select: typeof lessonSelect;
 }>;
-export type UnitResponse = Prisma.CourseUnitGetPayload<{
+export type LessonResponse = LessonDbResponse & {
+    contents: LessonContentItem[] | null;
+};
+type UnitDbResponse = Prisma.CourseUnitGetPayload<{
     select: typeof unitSelect;
 }>;
+export type UnitResponse = Omit<UnitDbResponse, "lessons"> & {
+    lessons: LessonResponse[];
+};
 export type LevelResponse = Prisma.CourseLevelGetPayload<{
     select: typeof levelSelect;
 }>;
@@ -253,7 +321,7 @@ export type CourseResponse = Prisma.CourseGetPayload<{
 export type CompletionSettingsResponse = Prisma.CourseCompletionSettingsGetPayload<{
     select: typeof completionSettingsSelect;
 }>;
-export type CourseDetailResponse = Prisma.CourseGetPayload<{
+type CourseDetailDbResponse = Prisma.CourseGetPayload<{
     select: typeof courseSelect & {
         units: {
             select: typeof unitSelect;
@@ -276,6 +344,9 @@ export type CourseDetailResponse = Prisma.CourseGetPayload<{
         };
     };
 }>;
+export type CourseDetailResponse = Omit<CourseDetailDbResponse, "units"> & {
+    units: UnitResponse[];
+};
 export type CourseAssigneePreview = {
     id: string;
     name: string;

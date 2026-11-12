@@ -176,16 +176,8 @@ export const SalesRegisterPage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">سجل المبيعات</h1>
-				<p className="text-muted-foreground text-sm">
-					§18.4 — على مستوى الفاتورة بعمود لكل حساب ضريبة، أو تفصيليًا بالأصناف من
-					item_wise_tax_detail.
-				</p>
-			</div>
-
 			<Stats
-				className="grid-cols-4 px-4"
+				className="grid-cols-4 px-4 pt-2.5 pb-1"
 				stats={stats}
 			/>
 

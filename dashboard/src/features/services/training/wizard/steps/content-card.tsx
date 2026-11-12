@@ -2,6 +2,7 @@ import {
 	IconBook,
 	IconChevronDown,
 	IconDots,
+	IconEye,
 	IconFile,
 	IconFileCheck,
 	IconGripVertical,
@@ -10,8 +11,7 @@ import {
 	IconTrash,
 } from "@tabler/icons-react";
 import type { CSSProperties, HTMLAttributes, Ref } from "react";
-import { useState } from "react";
-
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import type {
 	CourseContentType,
+	CreateLessonFormInput,
 	LessonFormValues,
 	LessonResponse,
 	UnitResponse,
@@ -30,7 +31,7 @@ import type {
 import { DeleteConfirmDialog } from "../../components/delete-confirm-dialog";
 import { LessonForm } from "../../components/lesson-form";
 import { LESSON_TYPE_ICONS } from "../../data/training";
-import { useCourseContent } from "../../hooks/use-course-content";
+import type { CourseContentActions } from "../../hooks/use-course-content";
 
 const CONTENT_TYPE = {
 	PAGE: { label: "صفحة", Icon: IconFile },
@@ -62,16 +63,17 @@ function lessonPayload(unitId: string, v: LessonFormValues) {
 // شارة الحالة، زر تعديل + ⋯ — تُوسّع لتُظهر محرّر الدروس/الاختبار المعاد استخدامه (LessonForm).
 export function ContentCard({
 	unit,
-	courseId,
 	courseName,
 	autoOpen,
 	dragRef,
 	dragHandleProps,
 	style,
 	isDragging,
+	onPreviewLesson,
+	onLessonDraftChange,
+	actions,
 }: {
 	unit: UnitResponse;
-	courseId: string;
 	courseName: string;
 	// بطاقة مُنشأة حديثًا: تُفتح موسّعة، وإن كانت بلا فصول يُفتح نموذج «إضافة فصل» مباشرة
 	autoOpen?: boolean;
@@ -80,6 +82,13 @@ export function ContentCard({
 	dragHandleProps?: HTMLAttributes<HTMLButtonElement>;
 	style?: CSSProperties;
 	isDragging?: boolean;
+	onPreviewLesson?: (unitId: string, lessonId: string) => void;
+	onLessonDraftChange?: (
+		unitId: string,
+		lessonId: string | null,
+		values: CreateLessonFormInput | null,
+	) => void;
+	actions: CourseContentActions;
 }) {
 	const [expanded, setExpanded] = useState(autoOpen ?? false);
 	const [editingName, setEditingName] = useState(false);
@@ -91,6 +100,21 @@ export function ContentCard({
 	const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
 	const [confirmingDelete, setConfirmingDelete] = useState(false);
 	const [deletingLesson, setDeletingLesson] = useState<LessonResponse | null>(null);
+	const didAutoOpenRef = useRef(false);
+	const pageLesson = unit.lessons.find((lesson) => lesson.type === "PAGE") ?? unit.lessons[0];
+
+	useEffect(() => {
+		if (!autoOpen || didAutoOpenRef.current) return;
+		didAutoOpenRef.current = true;
+		setExpanded(true);
+		if (unit.contentType === "PAGE" && pageLesson) {
+			setEditingLessonId(pageLesson.id);
+			setAddingLesson(false);
+		} else if (unit.lessons.length === 0) {
+			setAddingLesson(true);
+		}
+	}, [autoOpen, unit.contentType, pageLesson, unit.lessons.length]);
+
 	const {
 		renameUnit,
 		removeUnit,
@@ -99,7 +123,7 @@ export function ContentCard({
 		updateLesson,
 		removeLesson,
 		isSavingLesson,
-	} = useCourseContent(courseId);
+	} = actions;
 
 	const type = CONTENT_TYPE[unit.contentType];
 	const TypeIcon = type.Icon;
@@ -117,12 +141,30 @@ export function ContentCard({
 
 	const saveLesson = async (v: LessonFormValues) => {
 		const ok = await addLesson(lessonPayload(unit.id, v)).catch(() => null);
-		if (ok) setAddingLesson(false);
+		if (ok) {
+			onPreviewLesson?.(unit.id, ok.id);
+			onLessonDraftChange?.(unit.id, null, null);
+			setAddingLesson(false);
+		}
 	};
 	const editLesson = async (id: string, v: LessonFormValues) => {
 		const { unitId, ...rest } = lessonPayload(unit.id, v);
 		const ok = await updateLesson(id, rest).catch(() => null);
-		if (ok) setEditingLessonId(null);
+		if (ok) {
+			onPreviewLesson?.(unit.id, ok.id);
+			onLessonDraftChange?.(unit.id, id, null);
+			setEditingLessonId(null);
+		}
+	};
+	const openPageEditor = () => {
+		setExpanded(true);
+		if (pageLesson) {
+			onPreviewLesson?.(unit.id, pageLesson.id);
+			setAddingLesson(false);
+			setEditingLessonId(pageLesson.id);
+		} else {
+			setAddingLesson(true);
+		}
 	};
 
 	return (
@@ -202,19 +244,33 @@ export function ContentCard({
 					{published ? "منشور" : "مسودة"}
 				</button>
 
-				<Button
-					type="button"
-					variant="outline"
-					size="sm"
-					onClick={() => setExpanded((v) => !v)}
-					className="h-8 gap-1.5 rounded-lg text-[12px]"
-				>
-					<IconPencil className="size-3.5" />
-					تعديل
-					<IconChevronDown
-						className={cn("size-3.5 transition-transform", expanded && "rotate-180")}
-					/>
-				</Button>
+				{/* زر التعديل — يفتح محرر الصفحة لو النوع PAGE، وإلا يُوسّع البطاقة */}
+				{unit.contentType === "PAGE" ? (
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={openPageEditor}
+						className="h-8 gap-1.5 rounded-lg text-[12px]"
+					>
+						<IconPencil className="size-3.5" />
+						تعديل الصفحة
+					</Button>
+				) : (
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={() => setExpanded((v) => !v)}
+						className="h-8 gap-1.5 rounded-lg text-[12px]"
+					>
+						<IconPencil className="size-3.5" />
+						تعديل
+						<IconChevronDown
+							className={cn("size-3.5 transition-transform", expanded && "rotate-180")}
+						/>
+					</Button>
+				)}
 
 				<DropdownMenu dir="rtl">
 					<DropdownMenuTrigger
@@ -288,8 +344,22 @@ export function ContentCard({
 									</span>
 									<button
 										type="button"
+										onClick={() => onPreviewLesson?.(unit.id, lesson.id)}
+										aria-label={`معاينة ${lesson.title}`}
+										className="rounded p-1 text-muted-foreground hover:bg-primary/10 hover:text-primary"
+										title="معاينة للمتدرب"
+									>
+										<IconEye className="size-3.5" />
+									</button>
+									<button
+										type="button"
 										onClick={() =>
-											setEditingLessonId((id) => (id === lesson.id ? null : lesson.id))
+											setEditingLessonId((editingId) => {
+												const nextId = editingId === lesson.id ? null : lesson.id;
+												if (nextId) onPreviewLesson?.(unit.id, lesson.id);
+												else onLessonDraftChange?.(unit.id, lesson.id, null);
+												return nextId;
+											})
 										}
 										className="text-[11px] font-medium text-primary"
 									>
@@ -307,9 +377,21 @@ export function ContentCard({
 								{editingLessonId === lesson.id && (
 									<LessonForm
 										lesson={lesson}
+										courseId={unit.courseId}
+										unitId={unit.id}
 										unitTitle={unit.title}
 										isSaving={isSavingLesson}
-										onCancel={() => setEditingLessonId(null)}
+										onCancel={() => {
+											onLessonDraftChange?.(unit.id, lesson.id, null);
+											setEditingLessonId(null);
+										}}
+										onKeepDraft={() => {
+											onLessonDraftChange?.(unit.id, lesson.id, null);
+											setEditingLessonId(null);
+										}}
+										onValuesChange={(values) =>
+											onLessonDraftChange?.(unit.id, lesson.id, values)
+										}
 										onSave={(v) => editLesson(lesson.id, v)}
 									/>
 								)}
@@ -319,9 +401,20 @@ export function ContentCard({
 
 					{addingLesson ? (
 						<LessonForm
+							courseId={unit.courseId}
+							unitId={unit.id}
 							unitTitle={unit.title}
 							isSaving={isSavingLesson}
-							onCancel={() => setAddingLesson(false)}
+							initialType={unit.contentType === "PAGE" ? "PAGE" : undefined}
+							onCancel={() => {
+								onLessonDraftChange?.(unit.id, null, null);
+								setAddingLesson(false);
+							}}
+							onKeepDraft={() => {
+								onLessonDraftChange?.(unit.id, null, null);
+								setAddingLesson(false);
+							}}
+							onValuesChange={(values) => onLessonDraftChange?.(unit.id, null, values)}
 							onSave={saveLesson}
 						/>
 					) : (

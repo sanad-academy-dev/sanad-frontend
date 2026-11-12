@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
 import { type FilterGroup, FiltersMenu } from "@/components/common/filters-menu";
 import { Stats } from "@/components/common/stats";
+import type { StatItem } from "@/features/dashboard/types/dashboard.types";
 import { TableDataView } from "@/components/common/table-data-view";
 import { TablePagination } from "@/components/common/table-pagination";
 import { TableToolbar } from "@/components/common/table-toolbar";
@@ -116,7 +117,11 @@ export function TracksView() {
 	const [localTracks, setLocalTracks] = useState<TrackRow[]>([]);
 
 	useEffect(() => {
-		setLocalTracks(serverTracks);
+		setLocalTracks((prev) => {
+			if (prev === serverTracks) return prev;
+			if (prev.length === 0 && serverTracks.length === 0) return prev;
+			return serverTracks;
+		});
 	}, [serverTracks]);
 
 	const tracks = localTracks;
@@ -134,31 +139,38 @@ export function TracksView() {
 	const [deletingTrack, setDeletingTrack] = useState<TrackRow | null>(null);
 
 	// بطاقات الإحصائيات مربوطة بالباك إند وقاعدة البيانات
-	const statsData = useMemo(() => {
+	const statsData = useMemo<StatItem[]>(() => {
+		const totalTracks = serverStats?.totalTracks ?? 0;
+		const totalStudents = serverStats?.totalStudents ?? 0;
+		const pendingTracks = serverStats?.pendingTracks ?? 0;
+		const completedTracks = serverStats?.completedTracks ?? 0;
+		const totalRevenue = serverStats?.totalRevenue ?? 0;
+
 		return [
 			{
 				title: "اجمالي المسارات",
-				value: serverStats.totalTracks,
+				value: totalTracks,
 				tooltip: "العدد الكلي للمسارات التدريبية المسجلة في المنصة",
 			},
 			{
 				title: "# الطلاب",
-				value: serverStats.totalStudents,
+				value: totalStudents,
 				tooltip: "عدد الطلاب الملتحقين بالمسارات",
 			},
 			{
 				title: "جاري",
-				value: serverStats.pendingTracks,
+				value: pendingTracks,
 				tooltip: "المسارات قيد التنفيذ حالياً",
 			},
 			{
 				title: "مكتمل",
-				value: serverStats.completedTracks,
+				value: completedTracks,
 				tooltip: "المسارات التي اكتملت بنجاح",
 			},
 			{
 				title: "قيمة التسجيلات التقديرية",
-				value: serverStats.totalRevenue.toLocaleString("ar-EG"),
+				value: totalRevenue,
+				valueLabel: totalRevenue.toLocaleString("ar-EG"),
 				tooltip: "السعر الحالي مضروبًا في عدد الطلاب المسجلين، وليس المدفوعات المحصلة",
 			},
 		];
@@ -469,7 +481,7 @@ export function TracksView() {
 							<span className="font-medium text-foreground group-hover:text-primary group-hover:underline tabular-nums">
 								{tr.studentsCount} طالب
 							</span>
-							{tr.rating > 0 && (
+							{/* {tr.rating > 0 && (
 								<>
 									<span className="text-muted-foreground">•</span>
 									<span className="flex items-center gap-1 text-[11px] font-medium text-amber-600 dark:text-amber-400">
@@ -480,7 +492,7 @@ export function TracksView() {
 										</span>
 									</span>
 								</>
-							)}
+							)} */}
 						</div>
 					);
 				},
@@ -492,21 +504,21 @@ export function TracksView() {
 				minSize: 110,
 				cell: ({ row }) => (
 					<span className="text-xs font-semibold tabular-nums text-foreground">
-						{row.original.price.toLocaleString()}
+						{(row.original.price ?? 0).toLocaleString()}
 					</span>
 				),
 			},
-			{
-				accessorKey: "revenue",
-				header: "قيمة التسجيلات التقديرية",
-				size: 135,
-				minSize: 120,
-				cell: ({ row }) => (
-					<span className="text-xs font-bold tabular-nums text-foreground">
-						{row.original.revenue.toLocaleString()}
-					</span>
-				),
-			},
+			// {
+			// 	accessorKey: "revenue",
+			// 	header: " التسجيلات التقديرية",
+			// 	size: 135,
+			// 	minSize: 120,
+			// 	cell: ({ row }) => (
+			// 		<span className="text-xs font-bold tabular-nums text-foreground">
+			// 			{row.original.revenue.toLocaleString()}
+			// 		</span>
+			// 	),
+			// },
 			{
 				accessorKey: "status",
 				header: "الحالة",
@@ -611,12 +623,12 @@ export function TracksView() {
 			if (!s) return true;
 			const tr = row.original;
 			return (
-				tr.name.toLowerCase().includes(s) ||
-				tr.code.toLowerCase().includes(s) ||
-				tr.category.toLowerCase().includes(s) ||
+				(tr.name || "").toLowerCase().includes(s) ||
+				(tr.code || "").toLowerCase().includes(s) ||
+				(tr.category || "").toLowerCase().includes(s) ||
 				(tr.academicStage || "").toLowerCase().includes(s) ||
 				(tr.ageGroup || "").toLowerCase().includes(s) ||
-				tr.locationLabel.toLowerCase().includes(s)
+				(tr.locationLabel || "").toLowerCase().includes(s)
 			);
 		},
 	});
@@ -636,9 +648,16 @@ export function TracksView() {
 	};
 
 	return (
-		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			{/* شريط الإحصائيات مطابقة للصورة تماماً */}
-			<Stats stats={statsData} />
+		<div
+			className="flex min-h-0 flex-1 flex-col"
+			dir="rtl"
+		>
+			{/* شريط الإحصائيات مطابق لبقية تبويبات التدريب */}
+			<Stats
+				className="grid-cols-5 gap-3 px-3"
+				stats={statsData}
+				variant="compact"
+			/>
 
 			{/* شريط الأدوات الموحد للمنصة */}
 			<TableToolbar

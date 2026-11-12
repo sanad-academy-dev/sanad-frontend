@@ -99,14 +99,6 @@ export const RevaluationsPage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">إعادة تقييم العملات</h1>
-				<p className="text-muted-foreground text-sm">
-					FR-9.3 — فروق العملة غير المحققة: افحص أرصدة الحسابات الأجنبية، عدِّل السعر، والترحيل
-					يولّد قيد إعادة التقييم ({revaluations.length}).
-				</p>
-			</div>
-
 			<TableToolbar
 				className="border-t"
 				searchPlaceholder="ابحث برقم المستند..."

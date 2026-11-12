@@ -28,17 +28,9 @@ export const InsurancePage = ({ tab }: { tab: InsuranceTab }) => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">التأمين</h1>
-				<p className="text-muted-foreground text-sm">
-					شركات التأمين ومنتجاتها وبوالص الأطفال — بيانات التغطية فقط: تقسيم الفواتير والمطالبات
-					يصلان في المرحلة القادمة، ولا شيء هنا يمسّ التسعير أو القيود.
-				</p>
-			</div>
-
 			{/* the hub's in-page tab strip (§7.8 hub rule) — the same pill treatment */}
 			<nav
-				className="flex flex-wrap items-center gap-[3.49px] border-t px-4 py-2"
+				className="flex flex-wrap items-center gap-[3.49px] border-b px-4 py-2"
 				dir="rtl"
 			>
 				{INSURANCE_TABS.map((entry) => (

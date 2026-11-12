@@ -91,14 +91,6 @@ export const InsuranceClaimsPage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">المطالبات التأمينية</h1>
-				<p className="text-muted-foreground text-sm">
-					مطالبات شركات التأمين عن الفواتير المقسومة — غير «المطالبات» (متابعة متأخرات
-					العملاء): هذه ذمم على المؤمِّن تُرسل وتُسوّى عبر سندات القبض.
-				</p>
-			</div>
-
 			<TabIntro
 				title="سجل المطالبات"
 				hint="الإرسال هو الحدث النظامي: يأخذ رقم CLM- ويستهلك سقف البوليصة ويجعل الفاتورة مؤهلة للترحيل بقيد الدافعَين. إلغاء المسودة يعيد الفاتورة على وليّ الأمر كاملة."
