@@ -44,8 +44,10 @@ import { DeleteRequestDialog } from "./modals/delete-request-dialog";
 import { AssignSubscriptionDialog } from "./modals/assign-subscription-dialog";
 import { CashPaymentDrawer } from "./modals/cash-payment-drawer";
 import { PaymentReceiptDrawer } from "./modals/payment-receipt-drawer";
+import { SendContractDrawer } from "./modals/send-contract-drawer";
 import { RequestStatusTransitionDialog, type RequestTransitionTarget } from "./modals/request-status-transition-dialog";
 import { StudentRequestPrintModal } from "./print/student-request-print-modal";
+import { ServiceAgreementModal } from "./print/service-agreement-modal";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
 import type { RegistrationPaymentReceiptData } from "../types/campaign-request.types";
 import {
@@ -76,7 +78,7 @@ interface CampaignRequestSheetProps {
 	onRequestUpdate?: (updated: Partial<CampaignRequestItem> & { id: string }) => void;
 }
 
-export type ActiveActionDrawer = "queue" | "shortlist" | "waitlist" | "reschedule" | "awaiting-payment" | "cash-payment" | "payment-receipt" | "reject" | "refer" | "delete" | "edit" | "status" | "subscription" | "fill-assessment" | "view-assessment" | null;
+export type ActiveActionDrawer = "queue" | "shortlist" | "waitlist" | "reschedule" | "awaiting-payment" | "cash-payment" | "payment-receipt" | "send-contract" | "reject" | "refer" | "delete" | "edit" | "status" | "subscription" | "fill-assessment" | "view-assessment" | null;
 
 function isNestedDrawerOrOverlayTarget(target: HTMLElement | null): boolean {
 	return Boolean(
@@ -85,6 +87,7 @@ function isNestedDrawerOrOverlayTarget(target: HTMLElement | null): boolean {
 			target?.closest('[data-slot="awaiting-payment-drawer"]') ||
 			target?.closest('[data-slot="cash-payment-drawer"]') ||
 			target?.closest('[data-slot="payment-receipt-drawer"]') ||
+			target?.closest('[data-slot="send-contract-drawer"]') ||
 			target?.closest('[data-slot="subscription-drawer"]') ||
 			target?.closest('[data-slot="fill-assessment-drawer"]') ||
 			target?.closest('[data-slot="assessment-details-drawer"]') ||
@@ -120,6 +123,7 @@ export function CampaignRequestSheet({
 	const [statusTransitionTarget, setStatusTransitionTarget] = useState<RequestTransitionTarget | null>(null);
 	const [rescheduleInitialStaffId, setRescheduleInitialStaffId] = useState<string | null>(null);
 	const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
+	const [isContractModalOpen, setIsContractModalOpen] = useState(false);
 	const [isExpanded, setIsExpanded] = useState(false);
 	const lastDrawerClosedAtRef = useRef<number>(0);
 	const returnToAwaitingPaymentRef = useRef<boolean>(false);
@@ -263,6 +267,7 @@ export function CampaignRequestSheet({
 						onOpenCashPayment={() => setActiveDrawer("cash-payment")}
 						onEnrollStudent={handleEnrollStudent}
 						isEnrollingStudent={enrollStudentMutation.isPending}
+						onOpenContract={() => setIsContractModalOpen(true)}
 						capabilities={capabilities}
 						onOpenEdit={() => setActiveDrawer("edit")}
 						onOpenRefer={() => setActiveDrawer("refer")}
@@ -581,6 +586,18 @@ export function CampaignRequestSheet({
 						campaignId={campaignId}
 						isExpanded={isExpanded}
 					/>
+
+					{/* دراور إرسال نموذج تقديم الخدمة التعليمية إلى ولي الأمر */}
+					<SendContractDrawer
+						key={`send-contract-${request.id}`}
+						request={request}
+						open={activeDrawer === "send-contract"}
+						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("send-contract") : handleCloseDrawer())}
+						campaignId={campaignId}
+						isExpanded={isExpanded}
+						onOpenPreviewModal={() => setIsContractModalOpen(true)}
+						onRequestUpdate={onRequestUpdate}
+					/>
 				</SheetContent>
 			</Sheet>
 
@@ -603,6 +620,16 @@ export function CampaignRequestSheet({
 				request={request}
 				open={isPrintDialogOpen}
 				onOpenChange={setIsPrintDialogOpen}
+			/>
+
+			{/* نافذة تجهيز ومراجعة واعتماد نموذج تقديم الخدمة التعليمية */}
+			<ServiceAgreementModal
+				request={request}
+				campaignId={campaignId}
+				open={isContractModalOpen}
+				onOpenChange={setIsContractModalOpen}
+				onProceedToSend={() => setActiveDrawer("send-contract")}
+				onRequestUpdate={onRequestUpdate}
 			/>
 		</>
 	);

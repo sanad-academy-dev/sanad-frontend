@@ -12,6 +12,7 @@ import {
 	IconClock,
 	IconCoin,
 	IconDots,
+	IconFileText,
 	IconHourglass,
 	IconLink,
 	IconLoader2,
@@ -36,6 +37,7 @@ import { cn } from "@/lib/utils";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import type { DigitalRegistrationCapabilities } from "../../types/campaign-share.types";
 import { useDigitalRegistrationCapabilities } from "../../hooks/use-digital-registration";
+import { getContractStatusMeta } from "../print/service-agreement-print-document";
 
 /** أيقونة نسخ معرّف الطلب (بطاقتين متراكبتين مع رمز ID) مطابقة للشاشات المنظومية */
 function IconCopyId({ className = "size-3.5" }: { className?: string }) {
@@ -82,6 +84,7 @@ interface RequestHeaderActionsProps {
 	onOpenCashPayment?: () => void;
 	onEnrollStudent?: () => void;
 	isEnrollingStudent?: boolean;
+	onOpenContract?: () => void;
 	capabilities?: DigitalRegistrationCapabilities;
 	onOpenEdit?: () => void;
 	onOpenRefer?: () => void;
@@ -106,6 +109,7 @@ export function RequestHeaderActions({
 	onOpenCashPayment,
 	onEnrollStudent,
 	isEnrollingStudent,
+	onOpenContract,
 	capabilities: capabilitiesProp,
 	onOpenEdit,
 	onOpenRefer,
@@ -217,14 +221,9 @@ export function RequestHeaderActions({
 			case "REJECTED":
 				rawItems = [
 					{
-						label: "إعادة إلى الطابور",
-						icon: <IconClock className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onMoveToQueue,
-					},
-					{
-						label: "القائمة المختصرة",
-						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
-						action: onOpenShortlist,
+						label: "إعادة إلى قائمة الانتظار",
+						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						action: capabilities.canChangeStatus ? onOpenWaitlist : undefined,
 					},
 				];
 				break;
@@ -269,6 +268,7 @@ export function RequestHeaderActions({
 		request.status === "INTERVIEW" &&
 		(request.interviewMode ? request.interviewMode === "REMOTE" : request.channel === "CALL")
 	);
+	const dynamicListItems = getDynamicListItems();
 
 	const lacksEnrollPermission = !capabilities.canEdit && !capabilities.canAcceptOrReject;
 	const isEnrollDisabled =
@@ -373,39 +373,69 @@ export function RequestHeaderActions({
 
 			{/* الأزرار والإجراءات */}
 			<div className="flex items-center gap-1.5 print:hidden">
-				{/* 1. عند القبول: زر «إضافة لقائمة الطلاب» ويتعطّل فور إتمام الإضافة */}
+				{/* 1. عند القبول: زر «نموذج الخدمة» + زر «إضافة لقائمة الطلاب» المستقل */}
 				{request.status === "ACCEPTED" ? (
-					Boolean(request.convertedPatientId) ? (
-						<Button
-							disabled
-							size="sm"
-							className="h-7.5 gap-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 shadow-none px-3 rounded-lg cursor-not-allowed select-none opacity-90"
-							title={
-								request.convertedPatientCode
-									? `تمت إضافة الطالب لقائمة الطلاب (${request.convertedPatientCode})`
-									: "تمت إضافة الطالب لقائمة الطلاب"
-							}
-						>
-							<IconCheck className="size-3.5 stroke-[2.5]" />
-							<span>تمت الإضافة لقائمة الطلاب</span>
-						</Button>
-					) : (
-						<Button
-							type="button"
-							size="sm"
-							disabled={isEnrollDisabled}
-							onClick={onEnrollStudent}
-							className="h-7.5 gap-1.5 text-xs font-semibold bg-[#4f6ae0] hover:bg-[#435bc4] text-white shadow-xs px-3 rounded-lg cursor-pointer select-none transition-all border-none disabled:opacity-60 disabled:cursor-not-allowed"
-							title={enrollTitle}
-						>
-							{isEnrollingStudent ? (
-								<IconLoader2 className="size-3.5 animate-spin" />
-							) : (
-								<IconPlus className="size-3.5 stroke-[2.5]" />
-							)}
-							<span>{isEnrollingStudent ? "جاري الإضافة..." : "إضافة لقائمة الطلاب"}</span>
-						</Button>
-					)
+					<div className="flex items-center gap-1.5">
+						{onOpenContract && (
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={onOpenContract}
+								className="h-7.5 gap-1.5 text-xs font-semibold bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border-zinc-200 dark:border-zinc-700 shadow-2xs px-2.5 rounded-lg cursor-pointer select-none transition-colors"
+								title={getContractStatusMeta(request.contractStatus).label}
+							>
+								<IconFileText className="size-3.5 text-zinc-600 dark:text-zinc-300 shrink-0" />
+								<span>نموذج الخدمة</span>
+								<span
+									className={cn(
+										"inline-flex items-center gap-1 rounded px-1.5 py-0.2 text-[10px] font-medium border",
+										getContractStatusMeta(request.contractStatus).badgeClass,
+									)}
+								>
+									<span
+										className={cn(
+											"size-1.5 rounded-full shrink-0",
+											getContractStatusMeta(request.contractStatus).dotClass,
+										)}
+									/>
+									<span>{getContractStatusMeta(request.contractStatus).shortLabel}</span>
+								</span>
+							</Button>
+						)}
+
+						{Boolean(request.convertedPatientId) ? (
+							<Button
+								disabled
+								size="sm"
+								className="h-7.5 gap-1.5 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 shadow-none px-3 rounded-lg cursor-not-allowed select-none opacity-90"
+								title={
+									request.convertedPatientCode
+										? `تمت إضافة الطالب لقائمة الطلاب (${request.convertedPatientCode})`
+										: "تمت إضافة الطالب لقائمة الطلاب"
+								}
+							>
+								<IconCheck className="size-3.5 stroke-[2.5]" />
+								<span>تمت الإضافة لقائمة الطلاب</span>
+							</Button>
+						) : (
+							<Button
+								type="button"
+								size="sm"
+								disabled={isEnrollDisabled}
+								onClick={onEnrollStudent}
+								className="h-7.5 gap-1.5 text-xs font-semibold bg-[#4f6ae0] hover:bg-[#435bc4] text-white shadow-xs px-3 rounded-lg cursor-pointer select-none transition-all border-none disabled:opacity-60 disabled:cursor-not-allowed"
+								title={enrollTitle}
+							>
+								{isEnrollingStudent ? (
+									<IconLoader2 className="size-3.5 animate-spin" />
+								) : (
+									<IconPlus className="size-3.5 stroke-[2.5]" />
+								)}
+								<span>{isEnrollingStudent ? "جاري الإضافة..." : "إضافة لقائمة الطلاب"}</span>
+							</Button>
+						)}
+					</div>
 				) : (
 					<div className="flex items-center gap-1.5">
 						{/* زر بدء مقابلة: يظهر عندما تكون المقابلة مكالمة عبر اتصال/تطبيق الويب */}
@@ -452,7 +482,7 @@ export function RequestHeaderActions({
 									</Button>
 								)}
 							</>
-						) : (
+						) : dynamicListItems.length > 0 ? (
 							<DropdownMenu dir="rtl">
 								<DropdownMenuTrigger asChild>
 									<Button
@@ -465,7 +495,7 @@ export function RequestHeaderActions({
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end" className="w-52 p-1 text-xs z-[100] bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg rounded-xl">
-									{getDynamicListItems().map((item, idx) => (
+									{dynamicListItems.map((item, idx) => (
 										<DropdownMenuItem
 											key={`${item.label}-${idx}`}
 											onSelect={() => triggerSafeOpen(item.action)}
@@ -478,7 +508,7 @@ export function RequestHeaderActions({
 									))}
 								</DropdownMenuContent>
 							</DropdownMenu>
-						)}
+						) : null}
 					</div>
 				)}
 

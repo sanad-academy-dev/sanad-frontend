@@ -1,5 +1,71 @@
 import type { AppointmentColumnId } from "@/features/appointments/types/appointment.types";
 
+export type RegistrationContractStatus =
+	| "NOT_SENT"
+	| "AWAITING_UPLOAD"
+	| "PENDING_REVIEW"
+	| "REJECTED_REUPLOAD"
+	| "APPROVED";
+
+export interface RegistrationContractSnapshot {
+	agreementCode: string;
+	issuedAt: string;
+	representativeName: string;
+	showStamp: boolean;
+	programStartDate: string | null;
+	programEndDate: string | null;
+	includeMedicalDeclaration: boolean;
+	additionalTerms: string | null;
+	academy: {
+		name: string;
+		phone?: string | null;
+		email?: string | null;
+		address?: string | null;
+		logoUrl?: string | null;
+	};
+	guardian: {
+		name: string;
+		phone: string;
+		email?: string | null;
+		nationalId?: string | null;
+	};
+	student: {
+		requestCode: string;
+		convertedPatientCode?: string | null;
+		name: string;
+		gender: string;
+		birthDate?: string | null;
+		ageLabel?: string | null;
+		targetClass?: string | null;
+		proposedTrack?: string | null;
+		learningMode?: string | null;
+		preferredShift?: string | null;
+		experienceLevel?: string | null;
+		medical?: {
+			bloodType?: string | null;
+			allergies?: string | null;
+			allergiesList?: string[];
+			hasChronicDiseases?: boolean;
+			chronicDiseases?: string | null;
+			medications?: string[];
+		} | null;
+	};
+	payment: {
+		planId?: string | null;
+		planName?: string | null;
+		includeMeals: boolean;
+		enableDailyStipend: boolean;
+		amount: number | null;
+		currency: string;
+		currencyCode?: string | null;
+		paidAt?: string | null;
+		paymentMethodType?: string | null;
+		paymentMethodLabel?: string;
+		paymentReference?: string | null;
+		paymentGateway?: string | null;
+	};
+}
+
 export interface RegistrationDocumentItem {
 	id: string;
 	title: string;
@@ -7,7 +73,13 @@ export interface RegistrationDocumentItem {
 	/** Stable storage value; fileUrl may be a short-lived protected display route. */
 	storageKey?: string;
 	fileSize?: string | null;
-	type: "BIRTH_CERTIFICATE" | "VACCINATION_CARD" | "GUARDIAN_ID" | "MEDICAL_REPORT" | "OTHER";
+	type:
+		| "BIRTH_CERTIFICATE"
+		| "VACCINATION_CARD"
+		| "GUARDIAN_ID"
+		| "MEDICAL_REPORT"
+		| "SERVICE_AGREEMENT"
+		| "OTHER";
 	uploadedAt?: string;
 }
 
@@ -138,6 +210,19 @@ export interface CampaignRequestItem {
 	paymentReceiptUrl?: string | null;
 	paymentMethodType?: string | null;
 	paymentNotes?: string | null;
+	contractStatus?: RegistrationContractStatus | null;
+	contractToken?: string | null;
+	contractTokenExpiresAt?: string | null;
+	contractData?: RegistrationContractSnapshot | null;
+	contractIssuedAt?: string | null;
+	contractSignedFileUrl?: string | null;
+	contractSignedFileName?: string | null;
+	contractSignedFileSize?: string | null;
+	contractSignedMimeType?: string | null;
+	contractUploadedAt?: string | null;
+	contractReviewedAt?: string | null;
+	contractReviewedBy?: string | null;
+	contractReviewNotes?: string | null;
 	medications?: Array<{ id?: string; name: string; dose?: string; timing?: string } | string>;
 	allergiesList?: string[];
 	assignedStaffId?: string | null;

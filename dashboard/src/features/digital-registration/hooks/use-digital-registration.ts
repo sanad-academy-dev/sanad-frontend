@@ -1205,6 +1205,129 @@ export function useEnrollAcceptedStudent(campaignId: string = "") {
 	});
 }
 
+function invalidateRegistrationContractQueries(
+	queryClient: ReturnType<typeof useQueryClient>,
+	campaignId: string,
+	requestId: string,
+) {
+	queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
+	if (campaignId) {
+		queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+		queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+	}
+	queryClient.invalidateQueries({ queryKey: ["digital-registration", "request", requestId] });
+	queryClient.invalidateQueries({ queryKey: ["digital-registration", "notifications"] });
+	queryClient.invalidateQueries({ queryKey: ["patients"] });
+	queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
+	queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
+}
+
+export function usePrepareRegistrationContract(campaignId: string = "") {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			requestId,
+			data,
+		}: {
+			requestId: string;
+			data: {
+				representativeName?: string | null;
+				showStamp?: boolean;
+				programStartDate?: string | null;
+				programEndDate?: string | null;
+				includeMedicalDeclaration?: boolean;
+				additionalTerms?: string | null;
+				sendToGuardian?: boolean;
+				customMessage?: string;
+				notifyEmail?: boolean;
+				contractUrl?: string;
+			};
+		}) => {
+			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/contract/prepare`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data),
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "تعذر تجهيز أو إرسال نموذج تقديم الخدمة");
+			}
+			return res.json();
+		},
+		onSuccess: (_data, variables) => {
+			invalidateRegistrationContractQueries(queryClient, campaignId, variables.requestId);
+		},
+	});
+}
+
+export function useReviewSignedContract(campaignId: string = "") {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			requestId,
+			decision,
+			notes,
+		}: {
+			requestId: string;
+			decision: "APPROVE" | "REJECT_REUPLOAD";
+			notes?: string | null;
+		}) => {
+			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/contract/review`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ decision, notes }),
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "تعذر مراجعة النموذج الموقّع");
+			}
+			return res.json();
+		},
+		onSuccess: (_data, variables) => {
+			invalidateRegistrationContractQueries(queryClient, campaignId, variables.requestId);
+		},
+	});
+}
+
+export function useRecordInPersonContract(campaignId: string = "") {
+	const queryClient = useQueryClient();
+	return useMutation({
+		mutationFn: async ({
+			requestId,
+			data,
+		}: {
+			requestId: string;
+			data: {
+				fileUrl: string;
+				fileName?: string | null;
+				fileSize?: string | null;
+				mimeType?: string | null;
+				representativeName?: string | null;
+				showStamp?: boolean;
+				programStartDate?: string | null;
+				programEndDate?: string | null;
+				includeMedicalDeclaration?: boolean;
+				additionalTerms?: string | null;
+				notes?: string | null;
+			};
+		}) => {
+			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/contract/in-person`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data),
+			});
+			if (!res.ok) {
+				const err = await res.json().catch(() => ({}));
+				throw new Error(err.message || "تعذر توثيق استلام النموذج الموقّع حضورياً");
+			}
+			return res.json();
+		},
+		onSuccess: (_data, variables) => {
+			invalidateRegistrationContractQueries(queryClient, campaignId, variables.requestId);
+		},
+	});
+}
+
 export function useCurrentTimeMs(intervalMs = 15_000): number | null {
 	const [nowMs, setNowMs] = useState<number | null>(null);
 

@@ -1,3 +1,5 @@
+import { getPublicWebsiteOrigin } from "./registration-urls";
+
 /** قوالب رسائل جاهزة قابلة للتعديل لمنظومة سند. */
 
 export function generateQueueMessage({
@@ -208,4 +210,38 @@ export function generateReferralMessage({
 	const guardianGreeting = guardianName ? ` (${guardianName})` : "";
 	const reviewerText = staffName ? ` الأخصائي/المراجع أ/ ${staffName}` : "الأخصائي المتابع";
 	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}${guardianGreeting}،\nنود إحاطتكم بأنه تم تحويل ومتابعة ملف الطالب إلى${reviewerText} في أكاديمية سند لإتمام الترتيبات والمتابعة الأكاديمية والتأهيلية.\nنسعد دائماً بخدمتكم وتوفير أفضل رعاية لطفلكم، ولأي استفسار يسعدنا تواصلكم المباشر معنا.`;
+}
+
+export function getPublicContractUrl(token: string): string {
+	if (!token) return "";
+	return `${getPublicWebsiteOrigin()}/contract/${encodeURIComponent(token.trim())}`;
+}
+
+export function generateServiceAgreementMessage({
+	studentName,
+	guardianName,
+	academyName,
+	planName,
+	code,
+	contractToken,
+	contractUrl,
+}: {
+	studentName: string;
+	guardianName?: string | null;
+	academyName?: string | null;
+	planName?: string | null;
+	code?: string | null;
+	contractToken?: string | null;
+	contractUrl?: string | null;
+}): string {
+	const guardianGreeting = guardianName ? ` (${guardianName})` : "";
+	const academy = academyName?.trim() || "أكاديمية سند التعليمية";
+	const finalLink = contractUrl || (contractToken ? getPublicContractUrl(contractToken) : "");
+	const planLine = planName ? `\n• الباقة المعتمدة: ${planName}` : "";
+	const codeLine = code ? `\n• رقم الطلب المرجعي: #${code}` : "";
+	const linkSection = finalLink
+		? `\n\n📄 رابط نموذج تقديم الخدمة التعليمية ورفع النسخة الموقّعة:\n${finalLink}`
+		: "";
+
+	return `السلام عليكم ورحمة الله وبركاته،\nعزيزي ولي أمر الطالب ${studentName}${guardianGreeting}،\nمبارك اعتماد قبول الطالب رسمياً في ${academy} وسداد الرسوم الأكاديمية.${planLine}${codeLine}${linkSection}\n\nيرجى فتح الرابط أعلاه لتحميل وطباعة نموذج تقديم الخدمة التعليمية، ثم التوقيع عليه يدوياً وإعادة رفع النسخة الموقّعة (PDF أو صورة واضحة) عبر نفس الرابط خلال 14 يوماً.\nمع تحيات إدارة القبول والتسجيل.`;
 }

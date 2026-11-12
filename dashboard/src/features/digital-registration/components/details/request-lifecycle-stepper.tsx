@@ -46,6 +46,70 @@ type VisualState =
 	| "completed"
 	| "pending";
 
+const TIMELINE_STAGE_MATCHERS: Array<{
+	stageIdx: number;
+	match: (badge: string, title: string) => boolean;
+}> = [
+	{
+		stageIdx: 4,
+		match: (badge, title) =>
+			badge === "بانتظار الدفع" ||
+			badge === "مراجعة الإيصال" ||
+			title.includes("بانتظار الدفع"),
+	},
+	{
+		stageIdx: 3,
+		match: (badge, title) =>
+			badge === "موعد محدد" ||
+			badge === "مجدول مجدداً" ||
+			badge === "مجدول" ||
+			badge === "المقابلة" ||
+			title.includes("جدولة مقابلة") ||
+			title.includes("إعادة جدولة موعد") ||
+			title.includes("إلغاء موعد"),
+	},
+	{
+		stageIdx: 2,
+		match: (badge, title) =>
+			badge.startsWith("انتظار") || title.includes("قائمة الانتظار"),
+	},
+	{
+		stageIdx: 1,
+		match: (badge, title) =>
+			badge === "قائمة مختصرة" ||
+			badge === "مختصر" ||
+			title.includes("القائمة المختصرة"),
+	},
+];
+
+/**
+ * يستنتج آخر مرحلة وصل إليها الطلب المرفوض قبل رفضه من سجل الخط الزمني،
+ * لأن قرار الرفض يصفّر حقول الموعد النشط ويلغيه.
+ */
+function resolveHighestStageReachedBeforeRejection(request: CampaignRequestItem): number {
+	let highestIdx = 0;
+
+	if (request.paymentToken || request.paymentReference || request.paidAt) {
+		highestIdx = Math.max(highestIdx, 4);
+	}
+	if (request.appointmentDate || request.assessmentAppointment || request.appointmentId) {
+		highestIdx = Math.max(highestIdx, 3);
+	}
+
+	for (const entry of request.timeline || []) {
+		const badge = (entry.statusBadge || "").trim();
+		const title = (entry.title || "").trim();
+		for (const rule of TIMELINE_STAGE_MATCHERS) {
+			if (rule.match(badge, title)) {
+				highestIdx = Math.max(highestIdx, rule.stageIdx);
+				break;
+			}
+		}
+	}
+
+	return highestIdx;
+}
+
 export function RequestLifecycleStepper({
 	request,
 }: RequestLifecycleStepperProps) {
@@ -54,21 +118,18 @@ export function RequestLifecycleStepper({
 	const isRejected = currentStatus === "REJECTED";
 	const isDuplicate = currentStatus === "DUPLICATE";
 	const isAccepted = currentStatus === "ACCEPTED";
+	const highestRejectedPreStageIdx = isRejected
+		? resolveHighestStageReachedBeforeRejection(request)
+		: -1;
 
-	const getStepVisualState = (step: StepDef): VisualState => {
+	const getStepVisualState = (step: StepDef, stepIdx: number): VisualState => {
 		if (step.id === "rejected") {
 			return isRejected ? "active-rejected" : "pending";
 		}
 
 		if (isRejected) {
-			const reachedInterview = Boolean(request.appointmentDate || request.assessmentAppointment);
-			if (step.id === "queue") return "completed";
-			if (reachedInterview) {
-				if (step.id === "shortlist" || step.id === "waitlist" || step.id === "interview") {
-					return "completed";
-				}
-			}
-			return "pending";
+			if (step.id === "accepted") return "pending";
+			return stepIdx <= highestRejectedPreStageIdx ? "completed" : "pending";
 		}
 
 		if (isWaitlist) {
@@ -132,7 +193,7 @@ export function RequestLifecycleStepper({
 
 	const getLineColor = (idx: number) => {
 		const step = SEVEN_LIFECYCLE_STEPS[idx];
-		const visual = getStepVisualState(step);
+		const visual = getStepVisualState(step, idx);
 
 		if (visual === "active-waitlist") return "bg-amber-500 dark:bg-amber-600";
 		if (visual === "active-accepted" || visual === "completed") {
@@ -141,7 +202,6 @@ export function RequestLifecycleStepper({
 		if (visual === "active-payment") return "bg-purple-500 dark:bg-purple-600";
 		if (visual === "active-interview") return "bg-indigo-500 dark:bg-indigo-600";
 		if (visual === "active-primary") return "bg-primary";
-		if (visual === "active-rejected") return "bg-rose-500 dark:bg-rose-600";
 		return "bg-zinc-200 dark:bg-zinc-800";
 	};
 
@@ -175,7 +235,7 @@ export function RequestLifecycleStepper({
 				<div className="relative flex items-center justify-between gap-1 pt-1 pb-1 overflow-x-auto [scrollbar-gutter:stable]">
 					{SEVEN_LIFECYCLE_STEPS.map((step, idx) => {
 						const Icon = step.icon;
-						const visualState = getStepVisualState(step);
+						const visualState = getStepVisualState(step, idx);
 
 						return (
 							<div

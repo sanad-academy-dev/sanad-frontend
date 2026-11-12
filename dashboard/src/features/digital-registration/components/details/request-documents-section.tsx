@@ -110,6 +110,11 @@ export function RequestDocumentsSection({
 								<span className="font-bold text-zinc-900 dark:text-zinc-100 text-xs truncate">
 									{doc.title || "مستند رسمي"}
 								</span>
+								{doc.type === "SERVICE_AGREEMENT" && (
+									<span className="px-1.5 py-0.5 rounded border border-zinc-300 dark:border-zinc-700 bg-zinc-100 dark:bg-zinc-800 text-[10px] font-semibold text-zinc-700 dark:text-zinc-300 shrink-0">
+										نموذج تقديم خدمة
+									</span>
+								)}
 								<IconFileText className="size-4 text-zinc-600 dark:text-zinc-300 shrink-0" />
 							</div>
 

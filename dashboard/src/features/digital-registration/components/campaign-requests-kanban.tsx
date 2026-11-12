@@ -324,6 +324,20 @@ export function CampaignRequestsKanban({
 			req.assessmentAppointment && req.assessmentAppointment.status !== "CANCELLED",
 		);
 
+		// الطلبات المرفوضة يُسمح بإعادتها فقط إلى قائمة الانتظار
+		if (req.status === "REJECTED" && newStatus !== "WAITLIST" && newStatus !== "REJECTED") {
+			toast.error("لا يمكن نقل الطلب المرفوض إلى هذه المرحلة؛ يمكنك فقط إعادته إلى «قائمة الانتظار».");
+			return;
+		}
+		if (req.status === "REJECTED" && newStatus === "WAITLIST") {
+			openRequestWithDrawer(
+				req.id,
+				"waitlist",
+				"يلزم مراجعة تفاصيل إعادة الطلب إلى قائمة الانتظار؛ تم فتح لوحة الإجراء.",
+			);
+			return;
+		}
+
 		// الطلبات في قائمة الانتظار يُسمح بنقلها فقط إلى جدولة مقابلة أو قائمة الرفض
 		if (req.status === "WAITLIST" && newStatus !== "INTERVIEW" && newStatus !== "REJECTED") {
 			toast.error("الطلبات في قائمة الانتظار يمكن نقلها فقط لجدولة مقابلة أو قائمة الرفض");
@@ -765,29 +779,19 @@ export function CampaignRequestsKanban({
 
 			// ─── قواعد السحب المشروط والمقيد من عمود «مرفوض» (Rejected) ───
 			if (prevCol === "rejected" && oldItem) {
-				// 1. الوجهات المسموحة المشروطة:
-				if (targetColumn === "queue") {
+				// 1. الوجهة الوحيدة المسموحة من الرفض هي قائمة الانتظار:
+				if (targetColumn === "waitlist") {
 					committed.push({ ...item, column: prevCol });
 					openRequestWithDrawer(
 						oldItem.id,
-						"queue",
-						"يلزم مراجعة تفاصيل إعادة تفعيل الطلب ونقله إلى الطابور؛ تم فتح لوحة الإجراء.",
+						"waitlist",
+						"يلزم مراجعة تفاصيل إعادة الطلب إلى قائمة الانتظار؛ تم فتح لوحة الإجراء.",
 					);
 					continue;
 				}
 
-				if (targetColumn === "shortlist") {
-					committed.push({ ...item, column: prevCol });
-					openRequestWithDrawer(
-						oldItem.id,
-						"shortlist",
-						"يلزم تحديد أولوية ومراجع الطالب عند إعادته للقائمة المختصرة؛ تم فتح لوحة الإجراء.",
-					);
-					continue;
-				}
-
-				// 2. سائر الوجهات ممنوعة نهائياً (المقابلة، الانتظار، الدفع، القبول):
-				toast.error("لا يمكن نقل الطلب المرفوض إلى هذه المرحلة مباشرة؛ يمكنك فقط إعادته إلى «الطابور» أو «القائمة المختصرة» لإعادة دراسة طلبه.");
+				// 2. سائر الوجهات ممنوعة نهائياً (الطابور، المختصرة، المقابلة، الدفع، القبول، المكرر):
+				toast.error("لا يمكن نقل الطلب المرفوض إلى هذه المرحلة؛ يمكنك فقط إعادته إلى «قائمة الانتظار».");
 				committed.push({ ...item, column: prevCol });
 				continue;
 			}
