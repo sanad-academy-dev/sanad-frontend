@@ -124,6 +124,7 @@ export function LessonForm({
 	courseId,
 	unitId,
 	unitTitle = "",
+	selectedContentId,
 	restored,
 	onValuesChange,
 	onDirtyChange,
@@ -142,6 +143,7 @@ export function LessonForm({
 	courseId?: string | null;
 	unitId?: string;
 	unitTitle?: string;
+	selectedContentId?: string;
 	restored?: CreateLessonFormInput;
 	onValuesChange?: (values: CreateLessonFormInput) => void;
 	onDirtyChange?: (hasUnsaved: boolean) => void;
@@ -536,7 +538,7 @@ export function LessonForm({
 						control={control}
 						render={({ field }) => (
 							<div className="flex flex-wrap items-start gap-[6px]">
-								{LESSON_TYPE_OPTIONS.map((opt) => {
+								{LESSON_TYPE_OPTIONS.filter((opt) => opt.value !== "TEXT").map((opt) => {
 									const Icon = LESSON_TYPE_ICONS[opt.value];
 									const active = field.value === opt.value;
 									return (
@@ -735,6 +737,7 @@ export function LessonForm({
 
 						<CourseLessonContentsField
 							value={lessonContents as LessonContentItem[]}
+							selectedContentId={selectedContentId}
 							disabled={busy}
 							onChange={(contents) =>
 								setValue("contents", contents, { shouldDirty: true, shouldValidate: true })

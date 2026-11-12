@@ -18,7 +18,6 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
-	IconAlignRight,
 	IconArrowsHorizontal,
 	IconCheck,
 	IconChevronDown,
@@ -143,25 +142,22 @@ function toDurationSeconds(
 // مقبض الفاصل القابل للسحب لتعديل عرض الأعمدة بالماوس
 function ResizeHandle({
 	isDragging,
-	onMouseDown,
-	onTouchStart,
+	onPointerDown,
 	onDoubleClick,
 	title,
 }: {
 	isDragging: boolean;
-	onMouseDown: (e: React.MouseEvent) => void;
-	onTouchStart: (e: React.TouchEvent) => void;
+	onPointerDown: (e: React.PointerEvent) => void;
 	onDoubleClick?: () => void;
 	title?: string;
 }) {
 	return (
 		<div
 			aria-hidden="true"
-			onMouseDown={onMouseDown}
-			onTouchStart={onTouchStart}
+			onPointerDown={onPointerDown}
 			onDoubleClick={onDoubleClick}
 			title={title ?? "اسحب لتغيير العرض (نقر مزدوج لإعادة الضبط)"}
-			className="group relative z-20 flex h-full w-[11px] -mx-[5.5px] cursor-col-resize shrink-0 items-center justify-center select-none"
+			className="group relative z-20 flex h-full w-[11px] -mx-[5.5px] cursor-col-resize shrink-0 items-center justify-center select-none touch-none"
 		>
 			{/* الخط العمودي الفاصل */}
 			<div
@@ -293,6 +289,7 @@ function SortableLessonRow({
 	index,
 	isActive,
 	onEdit,
+	onSelectContent,
 	onDelete,
 }: {
 	lesson: LessonResponse;
@@ -300,6 +297,7 @@ function SortableLessonRow({
 	index: number;
 	isActive: boolean;
 	onEdit: () => void;
+	onSelectContent: (contentId: string) => void;
 	onDelete: () => void;
 }) {
 	const TypeIcon = LESSON_TYPE_ICONS[lesson.type];
@@ -310,6 +308,7 @@ function SortableLessonRow({
 		},
 	);
 	const contents = lesson.contents ?? [];
+	const [expanded, setExpanded] = useState(false);
 
 	return (
 		<li
@@ -335,7 +334,11 @@ function SortableLessonRow({
 					</button>
 					<button
 						type="button"
-						onClick={onEdit}
+						onClick={() => {
+							if (contents.length === 0) onEdit();
+							else setExpanded((value) => !value);
+						}}
+						aria-expanded={expanded}
 						className="flex min-w-0 flex-1 items-center gap-[5px] text-right cursor-pointer"
 					>
 						<TypeIcon className="size-5 shrink-0 text-[#808080]" />
@@ -352,6 +355,16 @@ function SortableLessonRow({
 						)}
 					</button>
 					<div className="flex shrink-0 items-center gap-1.5">
+						<button
+							type="button"
+							onClick={() => setExpanded((value) => !value)}
+							aria-label={expanded ? "طي مواد الدرس" : "عرض مواد الدرس"}
+							className="rounded p-1 text-[#828283] hover:bg-muted"
+						>
+							<IconChevronDown
+								className={cn("size-3 transition-transform", !expanded && "rotate-90")}
+							/>
+						</button>
 						<RowMenu
 							label="خيارات الدرس"
 							onEdit={onEdit}
@@ -359,7 +372,7 @@ function SortableLessonRow({
 						/>
 					</div>
 				</div>
-				{contents.length > 0 && (
+				{expanded && contents.length > 0 && (
 					<SortableContext
 						items={contents.map((content) => `content:${content.id}`)}
 						strategy={rectSortingStrategy}
@@ -372,7 +385,7 @@ function SortableLessonRow({
 									lessonId={lesson.id}
 									unitId={unit.id}
 									index={contentIndex}
-									onSelect={onEdit}
+									onSelect={() => onSelectContent(content.id)}
 								/>
 							))}
 						</div>
@@ -444,6 +457,7 @@ function UnitAccordion({
 	onRemoveLesson,
 	onAddLesson,
 	onEditLesson,
+	onSelectLessonContent,
 	onDeleteUnit,
 	activeEditorLessonId,
 	isSelected,
@@ -460,6 +474,12 @@ function UnitAccordion({
 	onRemoveLesson: (lesson: LessonResponse) => void;
 	onAddLesson: (unitId: string, unitTitle: string) => void;
 	onEditLesson: (lesson: LessonResponse, unitTitle: string, unitId: string) => void;
+	onSelectLessonContent: (
+		lesson: LessonResponse,
+		unitTitle: string,
+		unitId: string,
+		contentId: string,
+	) => void;
 	onDeleteUnit: (unit: UnitResponse) => void;
 	activeEditorLessonId?: string | null;
 	isSelected?: boolean;
@@ -634,6 +654,9 @@ function UnitAccordion({
 										index={index}
 										isActive={activeEditorLessonId === lesson.id}
 										onEdit={() => onEditLesson(lesson, unit.title, unit.id)}
+										onSelectContent={(contentId) =>
+											onSelectLessonContent(lesson, unit.title, unit.id, contentId)
+										}
 										onDelete={() => setDeletingLesson(lesson)}
 									/>
 								))}
@@ -751,7 +774,13 @@ function UnitAccordion({
 // حالة المحرر المركزي
 type EditorState =
 	| { mode: "add"; unitId: string; unitTitle: string; initialType?: LessonType }
-	| { mode: "edit"; lesson: LessonResponse; unitTitle: string; unitId: string }
+	| {
+			mode: "edit";
+			lesson: LessonResponse;
+			unitTitle: string;
+			unitId: string;
+			selectedContentId?: string;
+	  }
 	| null;
 
 export function CourseBuilderStep({
@@ -879,10 +908,7 @@ export function CourseBuilderStep({
 			}
 		};
 
-		const handleMouseMove = (e: MouseEvent) => updateResize(e.clientX);
-		const handleTouchMove = (e: TouchEvent) => {
-			if (e.touches[0]) updateResize(e.touches[0].clientX);
-		};
+		const handlePointerMove = (e: PointerEvent) => updateResize(e.clientX);
 
 		const handleEnd = () => {
 			setIsDragging(null);
@@ -895,18 +921,16 @@ export function CourseBuilderStep({
 		document.body.style.userSelect = "none";
 		document.body.style.cursor = "col-resize";
 
-		window.addEventListener("mousemove", handleMouseMove);
-		window.addEventListener("mouseup", handleEnd);
-		window.addEventListener("touchmove", handleTouchMove, { passive: true });
-		window.addEventListener("touchend", handleEnd);
+		window.addEventListener("pointermove", handlePointerMove);
+		window.addEventListener("pointerup", handleEnd);
+		window.addEventListener("pointercancel", handleEnd);
 
 		return () => {
 			document.body.style.userSelect = "";
 			document.body.style.cursor = "";
-			window.removeEventListener("mousemove", handleMouseMove);
-			window.removeEventListener("mouseup", handleEnd);
-			window.removeEventListener("touchmove", handleTouchMove);
-			window.removeEventListener("touchend", handleEnd);
+			window.removeEventListener("pointermove", handlePointerMove);
+			window.removeEventListener("pointerup", handleEnd);
+			window.removeEventListener("pointercancel", handleEnd);
 		};
 	}, [isDragging]);
 
@@ -1208,7 +1232,12 @@ export function CourseBuilderStep({
 	};
 
 	// المحرر: تعديل درس
-	const handleOpenEditLesson = (lesson: LessonResponse, unitTitle: string, unitId: string) => {
+	const handleOpenEditLesson = (
+		lesson: LessonResponse,
+		unitTitle: string,
+		unitId: string,
+		selectedContentId?: string,
+	) => {
 		if (hasFormUnsavedChanges && activeEditorLessonId !== lesson.id) {
 			toast.info("تم حفظ المسودة السابقة تلقائياً");
 		}
@@ -1223,7 +1252,7 @@ export function CourseBuilderStep({
 			unitId,
 			unitTitle,
 		});
-		setEditor({ mode: "edit", lesson, unitTitle, unitId });
+		setEditor({ mode: "edit", lesson, unitTitle, unitId, selectedContentId });
 		refreshDraftBadges();
 	};
 
@@ -1611,6 +1640,9 @@ export function CourseBuilderStep({
 											onDeleteUnit={handleDeleteUnit}
 											onAddLesson={handleOpenAddLesson}
 											onEditLesson={handleOpenEditLesson}
+											onSelectLessonContent={(lesson, unitTitle, unitId, contentId) =>
+												handleOpenEditLesson(lesson, unitTitle, unitId, contentId)
+											}
 											onAddPage={(unitId) => {
 												handleOpenAddLesson(unitId, unit.title, "PAGE");
 											}}
@@ -1638,11 +1670,10 @@ export function CourseBuilderStep({
 			{/* فاصل قابل للسحب بالماوس بين الهيكل والوسط */}
 			<ResizeHandle
 				isDragging={isDragging === "right"}
-				onMouseDown={(e) => {
+				onPointerDown={(e) => {
 					e.preventDefault();
 					setIsDragging("right");
 				}}
-				onTouchStart={() => setIsDragging("right")}
 				onDoubleClick={() => setRightWidth(DEFAULT_RIGHT_WIDTH)}
 				title="اسحبي لتعديل عرض لوحة الوحدات (نقر مزدوج لإعادة الضبط)"
 			/>
@@ -1766,6 +1797,7 @@ export function CourseBuilderStep({
 									courseId={effectiveCourseId}
 									unitId={editor.unitId}
 									unitTitle={editor.unitTitle}
+									selectedContentId={editor.selectedContentId}
 									isSaving={isSavingLesson}
 									restored={restoredEdit}
 									onCancel={handleDiscardEdit}
@@ -1850,15 +1882,6 @@ export function CourseBuilderStep({
 												"text-indigo-600 bg-indigo-50 border-indigo-200 group-hover:border-indigo-400",
 										},
 										{
-											type: "TEXT" as LessonType,
-											title: "شرح ومحتوى نصي",
-											desc: "كتابة مقال أو ملخص تعليمي منسق",
-											icon: IconAlignRight,
-											badge: "قراءة ومقال",
-											color:
-												"text-emerald-600 bg-emerald-50 border-emerald-200 group-hover:border-emerald-400",
-										},
-										{
 											type: "DOCUMENT" as LessonType,
 											title: "مستند وملف مرفق",
 											desc: "ملفات PDF وعروض توضيحية ومراجع",
@@ -1926,11 +1949,10 @@ export function CourseBuilderStep({
 			{/* فاصل قابل للسحب بالماوس بين الوسط والمعاينة */}
 			<ResizeHandle
 				isDragging={isDragging === "left"}
-				onMouseDown={(e) => {
+				onPointerDown={(e) => {
 					e.preventDefault();
 					setIsDragging("left");
 				}}
-				onTouchStart={() => setIsDragging("left")}
 				onDoubleClick={() => setLeftWidth(DEFAULT_LEFT_WIDTH)}
 				title="اسحبي لتعديل عرض لوحة المعاينة (نقر مزدوج لإعادة الضبط)"
 			/>

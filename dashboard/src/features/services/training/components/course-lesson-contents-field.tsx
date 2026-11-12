@@ -27,7 +27,7 @@ import {
 	IconTrash,
 	IconVideo,
 } from "@tabler/icons-react";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -39,7 +39,6 @@ import { cn } from "@/lib/utils";
 
 const CONTENT_OPTIONS: { type: LessonType; label: string; Icon: typeof IconVideo }[] = [
 	{ type: "PAGE", label: "صفحة", Icon: IconFileText },
-	{ type: "TEXT", label: "نص", Icon: IconFileText },
 	{ type: "VIDEO", label: "فيديو", Icon: IconVideo },
 	{ type: "DOCUMENT", label: "مستند", Icon: IconFileDescription },
 	{ type: "AUDIO", label: "صوت", Icon: IconMicrophone },
@@ -57,11 +56,13 @@ function createContent(type: LessonType): LessonContentItem {
 function SortableContentItem({
 	item,
 	disabled,
+	isSelected,
 	onChange,
 	onRemove,
 }: {
 	item: LessonContentItem;
 	disabled: boolean;
+	isSelected: boolean;
 	onChange: (update: Partial<LessonContentItem>) => void;
 	onRemove: () => void;
 }) {
@@ -95,10 +96,12 @@ function SortableContentItem({
 	return (
 		<div
 			ref={setNodeRef}
+			id={`lesson-content-${item.id}`}
 			style={{ transform: CSS.Transform.toString(transform), transition }}
 			className={cn(
 				"rounded-md border bg-white",
 				isDragging ? "z-10 border-primary opacity-70 shadow-lg" : "border-[#E5E5E5]",
+				isSelected && "border-[#6366F1] ring-2 ring-[#6366F1]/20",
 			)}
 		>
 			<div className="flex items-center gap-2 border-b border-[#EFEFEF] px-2 py-1.5">
@@ -207,12 +210,24 @@ export function CourseLessonContentsField({
 	value,
 	onChange,
 	disabled = false,
+	selectedContentId,
 }: {
 	value?: LessonContentItem[];
 	onChange: (items: LessonContentItem[]) => void;
 	disabled?: boolean;
+	selectedContentId?: string;
 }) {
 	const items = value ?? [];
+	useEffect(() => {
+		if (!selectedContentId) return;
+		const frame = window.requestAnimationFrame(() => {
+			document.getElementById(`lesson-content-${selectedContentId}`)?.scrollIntoView({
+				behavior: "smooth",
+				block: "center",
+			});
+		});
+		return () => window.cancelAnimationFrame(frame);
+	}, [selectedContentId]);
 	const sensors = useSensors(
 		useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
 		useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -272,6 +287,7 @@ export function CourseLessonContentsField({
 									key={item.id}
 									item={item}
 									disabled={disabled}
+									isSelected={item.id === selectedContentId}
 									onChange={(update) =>
 										onChange(
 											items.map((current, i) =>
