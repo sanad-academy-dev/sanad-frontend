@@ -1,0 +1,2368 @@
+import type * as runtime from "@prisma/client/runtime/client";
+import type * as Prisma from "../internal/prismaNamespace";
+/**
+ * Model Track
+ *
+ */
+export type TrackModel = runtime.Types.Result.DefaultSelection<Prisma.$TrackPayload>;
+export type AggregateTrack = {
+    _count: TrackCountAggregateOutputType | null;
+    _avg: TrackAvgAggregateOutputType | null;
+    _sum: TrackSumAggregateOutputType | null;
+    _min: TrackMinAggregateOutputType | null;
+    _max: TrackMaxAggregateOutputType | null;
+};
+export type TrackAvgAggregateOutputType = {
+    coursesCount: number | null;
+    studentsCount: number | null;
+    rating: number | null;
+    reviewsCount: number | null;
+    price: number | null;
+    revenue: number | null;
+};
+export type TrackSumAggregateOutputType = {
+    coursesCount: number | null;
+    studentsCount: number | null;
+    rating: number | null;
+    reviewsCount: number | null;
+    price: number | null;
+    revenue: number | null;
+};
+export type TrackMinAggregateOutputType = {
+    id: string | null;
+    code: string | null;
+    clinicId: string | null;
+    name: string | null;
+    category: string | null;
+    coursesCount: number | null;
+    locationMode: string | null;
+    locationLabel: string | null;
+    duration: string | null;
+    studentsCount: number | null;
+    rating: number | null;
+    reviewsCount: number | null;
+    price: number | null;
+    revenue: number | null;
+    status: string | null;
+    description: string | null;
+    notes: string | null;
+    academicStage: string | null;
+    ageGroup: string | null;
+    selectedIcon: string | null;
+    selectedColor: string | null;
+    active: boolean | null;
+    isDeleted: boolean | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+};
+export type TrackMaxAggregateOutputType = {
+    id: string | null;
+    code: string | null;
+    clinicId: string | null;
+    name: string | null;
+    category: string | null;
+    coursesCount: number | null;
+    locationMode: string | null;
+    locationLabel: string | null;
+    duration: string | null;
+    studentsCount: number | null;
+    rating: number | null;
+    reviewsCount: number | null;
+    price: number | null;
+    revenue: number | null;
+    status: string | null;
+    description: string | null;
+    notes: string | null;
+    academicStage: string | null;
+    ageGroup: string | null;
+    selectedIcon: string | null;
+    selectedColor: string | null;
+    active: boolean | null;
+    isDeleted: boolean | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+};
+export type TrackCountAggregateOutputType = {
+    id: number;
+    code: number;
+    clinicId: number;
+    name: number;
+    category: number;
+    coursesCount: number;
+    locationMode: number;
+    locationLabel: number;
+    duration: number;
+    studentsCount: number;
+    rating: number;
+    reviewsCount: number;
+    price: number;
+    revenue: number;
+    status: number;
+    description: number;
+    notes: number;
+    academicStage: number;
+    ageGroup: number;
+    trainers: number;
+    selectedIcon: number;
+    selectedColor: number;
+    active: number;
+    isDeleted: number;
+    createdAt: number;
+    updatedAt: number;
+    _all: number;
+};
+export type TrackAvgAggregateInputType = {
+    coursesCount?: true;
+    studentsCount?: true;
+    rating?: true;
+    reviewsCount?: true;
+    price?: true;
+    revenue?: true;
+};
+export type TrackSumAggregateInputType = {
+    coursesCount?: true;
+    studentsCount?: true;
+    rating?: true;
+    reviewsCount?: true;
+    price?: true;
+    revenue?: true;
+};
+export type TrackMinAggregateInputType = {
+    id?: true;
+    code?: true;
+    clinicId?: true;
+    name?: true;
+    category?: true;
+    coursesCount?: true;
+    locationMode?: true;
+    locationLabel?: true;
+    duration?: true;
+    studentsCount?: true;
+    rating?: true;
+    reviewsCount?: true;
+    price?: true;
+    revenue?: true;
+    status?: true;
+    description?: true;
+    notes?: true;
+    academicStage?: true;
+    ageGroup?: true;
+    selectedIcon?: true;
+    selectedColor?: true;
+    active?: true;
+    isDeleted?: true;
+    createdAt?: true;
+    updatedAt?: true;
+};
+export type TrackMaxAggregateInputType = {
+    id?: true;
+    code?: true;
+    clinicId?: true;
+    name?: true;
+    category?: true;
+    coursesCount?: true;
+    locationMode?: true;
+    locationLabel?: true;
+    duration?: true;
+    studentsCount?: true;
+    rating?: true;
+    reviewsCount?: true;
+    price?: true;
+    revenue?: true;
+    status?: true;
+    description?: true;
+    notes?: true;
+    academicStage?: true;
+    ageGroup?: true;
+    selectedIcon?: true;
+    selectedColor?: true;
+    active?: true;
+    isDeleted?: true;
+    createdAt?: true;
+    updatedAt?: true;
+};
+export type TrackCountAggregateInputType = {
+    id?: true;
+    code?: true;
+    clinicId?: true;
+    name?: true;
+    category?: true;
+    coursesCount?: true;
+    locationMode?: true;
+    locationLabel?: true;
+    duration?: true;
+    studentsCount?: true;
+    rating?: true;
+    reviewsCount?: true;
+    price?: true;
+    revenue?: true;
+    status?: true;
+    description?: true;
+    notes?: true;
+    academicStage?: true;
+    ageGroup?: true;
+    trainers?: true;
+    selectedIcon?: true;
+    selectedColor?: true;
+    active?: true;
+    isDeleted?: true;
+    createdAt?: true;
+    updatedAt?: true;
+    _all?: true;
+};
+export type TrackAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which Track to aggregate.
+     */
+    where?: Prisma.TrackWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Tracks to fetch.
+     */
+    orderBy?: Prisma.TrackOrderByWithRelationInput | Prisma.TrackOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: Prisma.TrackWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Tracks from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Tracks.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned Tracks
+    **/
+    _count?: true | TrackCountAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to average
+    **/
+    _avg?: TrackAvgAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to sum
+    **/
+    _sum?: TrackSumAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+    **/
+    _min?: TrackMinAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+    **/
+    _max?: TrackMaxAggregateInputType;
+};
+export type GetTrackAggregateType<T extends TrackAggregateArgs> = {
+    [P in keyof T & keyof AggregateTrack]: P extends '_count' | 'count' ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregateTrack[P]> : Prisma.GetScalarType<T[P], AggregateTrack[P]>;
+};
+export type TrackGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.TrackWhereInput;
+    orderBy?: Prisma.TrackOrderByWithAggregationInput | Prisma.TrackOrderByWithAggregationInput[];
+    by: Prisma.TrackScalarFieldEnum[] | Prisma.TrackScalarFieldEnum;
+    having?: Prisma.TrackScalarWhereWithAggregatesInput;
+    take?: number;
+    skip?: number;
+    _count?: TrackCountAggregateInputType | true;
+    _avg?: TrackAvgAggregateInputType;
+    _sum?: TrackSumAggregateInputType;
+    _min?: TrackMinAggregateInputType;
+    _max?: TrackMaxAggregateInputType;
+};
+export type TrackGroupByOutputType = {
+    id: string;
+    code: string;
+    clinicId: string;
+    name: string;
+    category: string | null;
+    coursesCount: number;
+    locationMode: string;
+    locationLabel: string | null;
+    duration: string | null;
+    studentsCount: number;
+    rating: number;
+    reviewsCount: number;
+    price: number;
+    revenue: number;
+    status: string;
+    description: string | null;
+    notes: string | null;
+    academicStage: string | null;
+    ageGroup: string | null;
+    trainers: runtime.JsonValue;
+    selectedIcon: string | null;
+    selectedColor: string | null;
+    active: boolean;
+    isDeleted: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    _count: TrackCountAggregateOutputType | null;
+    _avg: TrackAvgAggregateOutputType | null;
+    _sum: TrackSumAggregateOutputType | null;
+    _min: TrackMinAggregateOutputType | null;
+    _max: TrackMaxAggregateOutputType | null;
+};
+export type GetTrackGroupByPayload<T extends TrackGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<TrackGroupByOutputType, T['by']> & {
+    [P in ((keyof T) & (keyof TrackGroupByOutputType))]: P extends '_count' ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], TrackGroupByOutputType[P]> : Prisma.GetScalarType<T[P], TrackGroupByOutputType[P]>;
+}>>;
+export type TrackWhereInput = {
+    AND?: Prisma.TrackWhereInput | Prisma.TrackWhereInput[];
+    OR?: Prisma.TrackWhereInput[];
+    NOT?: Prisma.TrackWhereInput | Prisma.TrackWhereInput[];
+    id?: Prisma.StringFilter<"Track"> | string;
+    code?: Prisma.StringFilter<"Track"> | string;
+    clinicId?: Prisma.StringFilter<"Track"> | string;
+    name?: Prisma.StringFilter<"Track"> | string;
+    category?: Prisma.StringNullableFilter<"Track"> | string | null;
+    coursesCount?: Prisma.IntFilter<"Track"> | number;
+    locationMode?: Prisma.StringFilter<"Track"> | string;
+    locationLabel?: Prisma.StringNullableFilter<"Track"> | string | null;
+    duration?: Prisma.StringNullableFilter<"Track"> | string | null;
+    studentsCount?: Prisma.IntFilter<"Track"> | number;
+    rating?: Prisma.FloatFilter<"Track"> | number;
+    reviewsCount?: Prisma.IntFilter<"Track"> | number;
+    price?: Prisma.IntFilter<"Track"> | number;
+    revenue?: Prisma.IntFilter<"Track"> | number;
+    status?: Prisma.StringFilter<"Track"> | string;
+    description?: Prisma.StringNullableFilter<"Track"> | string | null;
+    notes?: Prisma.StringNullableFilter<"Track"> | string | null;
+    academicStage?: Prisma.StringNullableFilter<"Track"> | string | null;
+    ageGroup?: Prisma.StringNullableFilter<"Track"> | string | null;
+    trainers?: Prisma.JsonFilter<"Track">;
+    selectedIcon?: Prisma.StringNullableFilter<"Track"> | string | null;
+    selectedColor?: Prisma.StringNullableFilter<"Track"> | string | null;
+    active?: Prisma.BoolFilter<"Track"> | boolean;
+    isDeleted?: Prisma.BoolFilter<"Track"> | boolean;
+    createdAt?: Prisma.DateTimeFilter<"Track"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"Track"> | Date | string;
+    clinic?: Prisma.XOR<Prisma.ClinicScalarRelationFilter, Prisma.ClinicWhereInput>;
+    students?: Prisma.TrackStudentListRelationFilter;
+    staff?: Prisma.TrackStaffListRelationFilter;
+};
+export type TrackOrderByWithRelationInput = {
+    id?: Prisma.SortOrder;
+    code?: Prisma.SortOrder;
+    clinicId?: Prisma.SortOrder;
+    name?: Prisma.SortOrder;
+    category?: Prisma.SortOrderInput | Prisma.SortOrder;
+    coursesCount?: Prisma.SortOrder;
+    locationMode?: Prisma.SortOrder;
+    locationLabel?: Prisma.SortOrderInput | Prisma.SortOrder;
+    duration?: Prisma.SortOrderInput | Prisma.SortOrder;
+    studentsCount?: Prisma.SortOrder;
+    rating?: Prisma.SortOrder;
+    reviewsCount?: Prisma.SortOrder;
+    price?: Prisma.SortOrder;
+    revenue?: Prisma.SortOrder;
+    status?: Prisma.SortOrder;
+    description?: Prisma.SortOrderInput | Prisma.SortOrder;
+    notes?: Prisma.SortOrderInput | Prisma.SortOrder;
+    academicStage?: Prisma.SortOrderInput | Prisma.SortOrder;
+    ageGroup?: Prisma.SortOrderInput | Prisma.SortOrder;
+    trainers?: Prisma.SortOrder;
+    selectedIcon?: Prisma.SortOrderInput | Prisma.SortOrder;
+    selectedColor?: Prisma.SortOrderInput | Prisma.SortOrder;
+    active?: Prisma.SortOrder;
+    isDeleted?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+    clinic?: Prisma.ClinicOrderByWithRelationInput;
+    students?: Prisma.TrackStudentOrderByRelationAggregateInput;
+    staff?: Prisma.TrackStaffOrderByRelationAggregateInput;
+};
+export type TrackWhereUniqueInput = Prisma.AtLeast<{
+    id?: string;
+    AND?: Prisma.TrackWhereInput | Prisma.TrackWhereInput[];
+    OR?: Prisma.TrackWhereInput[];
+    NOT?: Prisma.TrackWhereInput | Prisma.TrackWhereInput[];
+    code?: Prisma.StringFilter<"Track"> | string;
+    clinicId?: Prisma.StringFilter<"Track"> | string;
+    name?: Prisma.StringFilter<"Track"> | string;
+    category?: Prisma.StringNullableFilter<"Track"> | string | null;
+    coursesCount?: Prisma.IntFilter<"Track"> | number;
+    locationMode?: Prisma.StringFilter<"Track"> | string;
+    locationLabel?: Prisma.StringNullableFilter<"Track"> | string | null;
+    duration?: Prisma.StringNullableFilter<"Track"> | string | null;
+    studentsCount?: Prisma.IntFilter<"Track"> | number;
+    rating?: Prisma.FloatFilter<"Track"> | number;
+    reviewsCount?: Prisma.IntFilter<"Track"> | number;
+    price?: Prisma.IntFilter<"Track"> | number;
+    revenue?: Prisma.IntFilter<"Track"> | number;
+    status?: Prisma.StringFilter<"Track"> | string;
+    description?: Prisma.StringNullableFilter<"Track"> | string | null;
+    notes?: Prisma.StringNullableFilter<"Track"> | string | null;
+    academicStage?: Prisma.StringNullableFilter<"Track"> | string | null;
+    ageGroup?: Prisma.StringNullableFilter<"Track"> | string | null;
+    trainers?: Prisma.JsonFilter<"Track">;
+    selectedIcon?: Prisma.StringNullableFilter<"Track"> | string | null;
+    selectedColor?: Prisma.StringNullableFilter<"Track"> | string | null;
+    active?: Prisma.BoolFilter<"Track"> | boolean;
+    isDeleted?: Prisma.BoolFilter<"Track"> | boolean;
+    createdAt?: Prisma.DateTimeFilter<"Track"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"Track"> | Date | string;
+    clinic?: Prisma.XOR<Prisma.ClinicScalarRelationFilter, Prisma.ClinicWhereInput>;
+    students?: Prisma.TrackStudentListRelationFilter;
+    staff?: Prisma.TrackStaffListRelationFilter;
+}, "id">;
+export type TrackOrderByWithAggregationInput = {
+    id?: Prisma.SortOrder;
+    code?: Prisma.SortOrder;
+    clinicId?: Prisma.SortOrder;
+    name?: Prisma.SortOrder;
+    category?: Prisma.SortOrderInput | Prisma.SortOrder;
+    coursesCount?: Prisma.SortOrder;
+    locationMode?: Prisma.SortOrder;
+    locationLabel?: Prisma.SortOrderInput | Prisma.SortOrder;
+    duration?: Prisma.SortOrderInput | Prisma.SortOrder;
+    studentsCount?: Prisma.SortOrder;
+    rating?: Prisma.SortOrder;
+    reviewsCount?: Prisma.SortOrder;
+    price?: Prisma.SortOrder;
+    revenue?: Prisma.SortOrder;
+    status?: Prisma.SortOrder;
+    description?: Prisma.SortOrderInput | Prisma.SortOrder;
+    notes?: Prisma.SortOrderInput | Prisma.SortOrder;
+    academicStage?: Prisma.SortOrderInput | Prisma.SortOrder;
+    ageGroup?: Prisma.SortOrderInput | Prisma.SortOrder;
+    trainers?: Prisma.SortOrder;
+    selectedIcon?: Prisma.SortOrderInput | Prisma.SortOrder;
+    selectedColor?: Prisma.SortOrderInput | Prisma.SortOrder;
+    active?: Prisma.SortOrder;
+    isDeleted?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+    _count?: Prisma.TrackCountOrderByAggregateInput;
+    _avg?: Prisma.TrackAvgOrderByAggregateInput;
+    _max?: Prisma.TrackMaxOrderByAggregateInput;
+    _min?: Prisma.TrackMinOrderByAggregateInput;
+    _sum?: Prisma.TrackSumOrderByAggregateInput;
+};
+export type TrackScalarWhereWithAggregatesInput = {
+    AND?: Prisma.TrackScalarWhereWithAggregatesInput | Prisma.TrackScalarWhereWithAggregatesInput[];
+    OR?: Prisma.TrackScalarWhereWithAggregatesInput[];
+    NOT?: Prisma.TrackScalarWhereWithAggregatesInput | Prisma.TrackScalarWhereWithAggregatesInput[];
+    id?: Prisma.StringWithAggregatesFilter<"Track"> | string;
+    code?: Prisma.StringWithAggregatesFilter<"Track"> | string;
+    clinicId?: Prisma.StringWithAggregatesFilter<"Track"> | string;
+    name?: Prisma.StringWithAggregatesFilter<"Track"> | string;
+    category?: Prisma.StringNullableWithAggregatesFilter<"Track"> | string | null;
+    coursesCount?: Prisma.IntWithAggregatesFilter<"Track"> | number;
+    locationMode?: Prisma.StringWithAggregatesFilter<"Track"> | string;
+    locationLabel?: Prisma.StringNullableWithAggregatesFilter<"Track"> | string | null;
+    duration?: Prisma.StringNullableWithAggregatesFilter<"Track"> | string | null;
+    studentsCount?: Prisma.IntWithAggregatesFilter<"Track"> | number;
+    rating?: Prisma.FloatWithAggregatesFilter<"Track"> | number;
+    reviewsCount?: Prisma.IntWithAggregatesFilter<"Track"> | number;
+    price?: Prisma.IntWithAggregatesFilter<"Track"> | number;
+    revenue?: Prisma.IntWithAggregatesFilter<"Track"> | number;
+    status?: Prisma.StringWithAggregatesFilter<"Track"> | string;
+    description?: Prisma.StringNullableWithAggregatesFilter<"Track"> | string | null;
+    notes?: Prisma.StringNullableWithAggregatesFilter<"Track"> | string | null;
+    academicStage?: Prisma.StringNullableWithAggregatesFilter<"Track"> | string | null;
+    ageGroup?: Prisma.StringNullableWithAggregatesFilter<"Track"> | string | null;
+    trainers?: Prisma.JsonWithAggregatesFilter<"Track">;
+    selectedIcon?: Prisma.StringNullableWithAggregatesFilter<"Track"> | string | null;
+    selectedColor?: Prisma.StringNullableWithAggregatesFilter<"Track"> | string | null;
+    active?: Prisma.BoolWithAggregatesFilter<"Track"> | boolean;
+    isDeleted?: Prisma.BoolWithAggregatesFilter<"Track"> | boolean;
+    createdAt?: Prisma.DateTimeWithAggregatesFilter<"Track"> | Date | string;
+    updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Track"> | Date | string;
+};
+export type TrackCreateInput = {
+    id: string;
+    code: string;
+    name: string;
+    category?: string | null;
+    coursesCount?: number;
+    locationMode?: string;
+    locationLabel?: string | null;
+    duration?: string | null;
+    studentsCount?: number;
+    rating?: number;
+    reviewsCount?: number;
+    price?: number;
+    revenue?: number;
+    status?: string;
+    description?: string | null;
+    notes?: string | null;
+    academicStage?: string | null;
+    ageGroup?: string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: string | null;
+    selectedColor?: string | null;
+    active?: boolean;
+    isDeleted?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    clinic: Prisma.ClinicCreateNestedOneWithoutTracksInput;
+    students?: Prisma.TrackStudentCreateNestedManyWithoutTrackInput;
+    staff?: Prisma.TrackStaffCreateNestedManyWithoutTrackInput;
+};
+export type TrackUncheckedCreateInput = {
+    id: string;
+    code: string;
+    clinicId: string;
+    name: string;
+    category?: string | null;
+    coursesCount?: number;
+    locationMode?: string;
+    locationLabel?: string | null;
+    duration?: string | null;
+    studentsCount?: number;
+    rating?: number;
+    reviewsCount?: number;
+    price?: number;
+    revenue?: number;
+    status?: string;
+    description?: string | null;
+    notes?: string | null;
+    academicStage?: string | null;
+    ageGroup?: string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: string | null;
+    selectedColor?: string | null;
+    active?: boolean;
+    isDeleted?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    students?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutTrackInput;
+    staff?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutTrackInput;
+};
+export type TrackUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    coursesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locationMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    studentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    rating?: Prisma.FloatFieldUpdateOperationsInput | number;
+    reviewsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    price?: Prisma.IntFieldUpdateOperationsInput | number;
+    revenue?: Prisma.IntFieldUpdateOperationsInput | number;
+    status?: Prisma.StringFieldUpdateOperationsInput | string;
+    description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    selectedColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    clinic?: Prisma.ClinicUpdateOneRequiredWithoutTracksNestedInput;
+    students?: Prisma.TrackStudentUpdateManyWithoutTrackNestedInput;
+    staff?: Prisma.TrackStaffUpdateManyWithoutTrackNestedInput;
+};
+export type TrackUncheckedUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    clinicId?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    coursesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locationMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    studentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    rating?: Prisma.FloatFieldUpdateOperationsInput | number;
+    reviewsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    price?: Prisma.IntFieldUpdateOperationsInput | number;
+    revenue?: Prisma.IntFieldUpdateOperationsInput | number;
+    status?: Prisma.StringFieldUpdateOperationsInput | string;
+    description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    selectedColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    students?: Prisma.TrackStudentUncheckedUpdateManyWithoutTrackNestedInput;
+    staff?: Prisma.TrackStaffUncheckedUpdateManyWithoutTrackNestedInput;
+};
+export type TrackCreateManyInput = {
+    id: string;
+    code: string;
+    clinicId: string;
+    name: string;
+    category?: string | null;
+    coursesCount?: number;
+    locationMode?: string;
+    locationLabel?: string | null;
+    duration?: string | null;
+    studentsCount?: number;
+    rating?: number;
+    reviewsCount?: number;
+    price?: number;
+    revenue?: number;
+    status?: string;
+    description?: string | null;
+    notes?: string | null;
+    academicStage?: string | null;
+    ageGroup?: string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: string | null;
+    selectedColor?: string | null;
+    active?: boolean;
+    isDeleted?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type TrackUpdateManyMutationInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    coursesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locationMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    studentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    rating?: Prisma.FloatFieldUpdateOperationsInput | number;
+    reviewsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    price?: Prisma.IntFieldUpdateOperationsInput | number;
+    revenue?: Prisma.IntFieldUpdateOperationsInput | number;
+    status?: Prisma.StringFieldUpdateOperationsInput | string;
+    description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    selectedColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type TrackUncheckedUpdateManyInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    clinicId?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    coursesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locationMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    studentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    rating?: Prisma.FloatFieldUpdateOperationsInput | number;
+    reviewsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    price?: Prisma.IntFieldUpdateOperationsInput | number;
+    revenue?: Prisma.IntFieldUpdateOperationsInput | number;
+    status?: Prisma.StringFieldUpdateOperationsInput | string;
+    description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    selectedColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type TrackListRelationFilter = {
+    every?: Prisma.TrackWhereInput;
+    some?: Prisma.TrackWhereInput;
+    none?: Prisma.TrackWhereInput;
+};
+export type TrackOrderByRelationAggregateInput = {
+    _count?: Prisma.SortOrder;
+};
+export type TrackCountOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    code?: Prisma.SortOrder;
+    clinicId?: Prisma.SortOrder;
+    name?: Prisma.SortOrder;
+    category?: Prisma.SortOrder;
+    coursesCount?: Prisma.SortOrder;
+    locationMode?: Prisma.SortOrder;
+    locationLabel?: Prisma.SortOrder;
+    duration?: Prisma.SortOrder;
+    studentsCount?: Prisma.SortOrder;
+    rating?: Prisma.SortOrder;
+    reviewsCount?: Prisma.SortOrder;
+    price?: Prisma.SortOrder;
+    revenue?: Prisma.SortOrder;
+    status?: Prisma.SortOrder;
+    description?: Prisma.SortOrder;
+    notes?: Prisma.SortOrder;
+    academicStage?: Prisma.SortOrder;
+    ageGroup?: Prisma.SortOrder;
+    trainers?: Prisma.SortOrder;
+    selectedIcon?: Prisma.SortOrder;
+    selectedColor?: Prisma.SortOrder;
+    active?: Prisma.SortOrder;
+    isDeleted?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type TrackAvgOrderByAggregateInput = {
+    coursesCount?: Prisma.SortOrder;
+    studentsCount?: Prisma.SortOrder;
+    rating?: Prisma.SortOrder;
+    reviewsCount?: Prisma.SortOrder;
+    price?: Prisma.SortOrder;
+    revenue?: Prisma.SortOrder;
+};
+export type TrackMaxOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    code?: Prisma.SortOrder;
+    clinicId?: Prisma.SortOrder;
+    name?: Prisma.SortOrder;
+    category?: Prisma.SortOrder;
+    coursesCount?: Prisma.SortOrder;
+    locationMode?: Prisma.SortOrder;
+    locationLabel?: Prisma.SortOrder;
+    duration?: Prisma.SortOrder;
+    studentsCount?: Prisma.SortOrder;
+    rating?: Prisma.SortOrder;
+    reviewsCount?: Prisma.SortOrder;
+    price?: Prisma.SortOrder;
+    revenue?: Prisma.SortOrder;
+    status?: Prisma.SortOrder;
+    description?: Prisma.SortOrder;
+    notes?: Prisma.SortOrder;
+    academicStage?: Prisma.SortOrder;
+    ageGroup?: Prisma.SortOrder;
+    selectedIcon?: Prisma.SortOrder;
+    selectedColor?: Prisma.SortOrder;
+    active?: Prisma.SortOrder;
+    isDeleted?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type TrackMinOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    code?: Prisma.SortOrder;
+    clinicId?: Prisma.SortOrder;
+    name?: Prisma.SortOrder;
+    category?: Prisma.SortOrder;
+    coursesCount?: Prisma.SortOrder;
+    locationMode?: Prisma.SortOrder;
+    locationLabel?: Prisma.SortOrder;
+    duration?: Prisma.SortOrder;
+    studentsCount?: Prisma.SortOrder;
+    rating?: Prisma.SortOrder;
+    reviewsCount?: Prisma.SortOrder;
+    price?: Prisma.SortOrder;
+    revenue?: Prisma.SortOrder;
+    status?: Prisma.SortOrder;
+    description?: Prisma.SortOrder;
+    notes?: Prisma.SortOrder;
+    academicStage?: Prisma.SortOrder;
+    ageGroup?: Prisma.SortOrder;
+    selectedIcon?: Prisma.SortOrder;
+    selectedColor?: Prisma.SortOrder;
+    active?: Prisma.SortOrder;
+    isDeleted?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type TrackSumOrderByAggregateInput = {
+    coursesCount?: Prisma.SortOrder;
+    studentsCount?: Prisma.SortOrder;
+    rating?: Prisma.SortOrder;
+    reviewsCount?: Prisma.SortOrder;
+    price?: Prisma.SortOrder;
+    revenue?: Prisma.SortOrder;
+};
+export type TrackScalarRelationFilter = {
+    is?: Prisma.TrackWhereInput;
+    isNot?: Prisma.TrackWhereInput;
+};
+export type TrackCreateNestedManyWithoutClinicInput = {
+    create?: Prisma.XOR<Prisma.TrackCreateWithoutClinicInput, Prisma.TrackUncheckedCreateWithoutClinicInput> | Prisma.TrackCreateWithoutClinicInput[] | Prisma.TrackUncheckedCreateWithoutClinicInput[];
+    connectOrCreate?: Prisma.TrackCreateOrConnectWithoutClinicInput | Prisma.TrackCreateOrConnectWithoutClinicInput[];
+    createMany?: Prisma.TrackCreateManyClinicInputEnvelope;
+    connect?: Prisma.TrackWhereUniqueInput | Prisma.TrackWhereUniqueInput[];
+};
+export type TrackUncheckedCreateNestedManyWithoutClinicInput = {
+    create?: Prisma.XOR<Prisma.TrackCreateWithoutClinicInput, Prisma.TrackUncheckedCreateWithoutClinicInput> | Prisma.TrackCreateWithoutClinicInput[] | Prisma.TrackUncheckedCreateWithoutClinicInput[];
+    connectOrCreate?: Prisma.TrackCreateOrConnectWithoutClinicInput | Prisma.TrackCreateOrConnectWithoutClinicInput[];
+    createMany?: Prisma.TrackCreateManyClinicInputEnvelope;
+    connect?: Prisma.TrackWhereUniqueInput | Prisma.TrackWhereUniqueInput[];
+};
+export type TrackUpdateManyWithoutClinicNestedInput = {
+    create?: Prisma.XOR<Prisma.TrackCreateWithoutClinicInput, Prisma.TrackUncheckedCreateWithoutClinicInput> | Prisma.TrackCreateWithoutClinicInput[] | Prisma.TrackUncheckedCreateWithoutClinicInput[];
+    connectOrCreate?: Prisma.TrackCreateOrConnectWithoutClinicInput | Prisma.TrackCreateOrConnectWithoutClinicInput[];
+    upsert?: Prisma.TrackUpsertWithWhereUniqueWithoutClinicInput | Prisma.TrackUpsertWithWhereUniqueWithoutClinicInput[];
+    createMany?: Prisma.TrackCreateManyClinicInputEnvelope;
+    set?: Prisma.TrackWhereUniqueInput | Prisma.TrackWhereUniqueInput[];
+    disconnect?: Prisma.TrackWhereUniqueInput | Prisma.TrackWhereUniqueInput[];
+    delete?: Prisma.TrackWhereUniqueInput | Prisma.TrackWhereUniqueInput[];
+    connect?: Prisma.TrackWhereUniqueInput | Prisma.TrackWhereUniqueInput[];
+    update?: Prisma.TrackUpdateWithWhereUniqueWithoutClinicInput | Prisma.TrackUpdateWithWhereUniqueWithoutClinicInput[];
+    updateMany?: Prisma.TrackUpdateManyWithWhereWithoutClinicInput | Prisma.TrackUpdateManyWithWhereWithoutClinicInput[];
+    deleteMany?: Prisma.TrackScalarWhereInput | Prisma.TrackScalarWhereInput[];
+};
+export type TrackUncheckedUpdateManyWithoutClinicNestedInput = {
+    create?: Prisma.XOR<Prisma.TrackCreateWithoutClinicInput, Prisma.TrackUncheckedCreateWithoutClinicInput> | Prisma.TrackCreateWithoutClinicInput[] | Prisma.TrackUncheckedCreateWithoutClinicInput[];
+    connectOrCreate?: Prisma.TrackCreateOrConnectWithoutClinicInput | Prisma.TrackCreateOrConnectWithoutClinicInput[];
+    upsert?: Prisma.TrackUpsertWithWhereUniqueWithoutClinicInput | Prisma.TrackUpsertWithWhereUniqueWithoutClinicInput[];
+    createMany?: Prisma.TrackCreateManyClinicInputEnvelope;
+    set?: Prisma.TrackWhereUniqueInput | Prisma.TrackWhereUniqueInput[];
+    disconnect?: Prisma.TrackWhereUniqueInput | Prisma.TrackWhereUniqueInput[];
+    delete?: Prisma.TrackWhereUniqueInput | Prisma.TrackWhereUniqueInput[];
+    connect?: Prisma.TrackWhereUniqueInput | Prisma.TrackWhereUniqueInput[];
+    update?: Prisma.TrackUpdateWithWhereUniqueWithoutClinicInput | Prisma.TrackUpdateWithWhereUniqueWithoutClinicInput[];
+    updateMany?: Prisma.TrackUpdateManyWithWhereWithoutClinicInput | Prisma.TrackUpdateManyWithWhereWithoutClinicInput[];
+    deleteMany?: Prisma.TrackScalarWhereInput | Prisma.TrackScalarWhereInput[];
+};
+export type TrackCreateNestedOneWithoutStudentsInput = {
+    create?: Prisma.XOR<Prisma.TrackCreateWithoutStudentsInput, Prisma.TrackUncheckedCreateWithoutStudentsInput>;
+    connectOrCreate?: Prisma.TrackCreateOrConnectWithoutStudentsInput;
+    connect?: Prisma.TrackWhereUniqueInput;
+};
+export type TrackUpdateOneRequiredWithoutStudentsNestedInput = {
+    create?: Prisma.XOR<Prisma.TrackCreateWithoutStudentsInput, Prisma.TrackUncheckedCreateWithoutStudentsInput>;
+    connectOrCreate?: Prisma.TrackCreateOrConnectWithoutStudentsInput;
+    upsert?: Prisma.TrackUpsertWithoutStudentsInput;
+    connect?: Prisma.TrackWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.TrackUpdateToOneWithWhereWithoutStudentsInput, Prisma.TrackUpdateWithoutStudentsInput>, Prisma.TrackUncheckedUpdateWithoutStudentsInput>;
+};
+export type TrackCreateNestedOneWithoutStaffInput = {
+    create?: Prisma.XOR<Prisma.TrackCreateWithoutStaffInput, Prisma.TrackUncheckedCreateWithoutStaffInput>;
+    connectOrCreate?: Prisma.TrackCreateOrConnectWithoutStaffInput;
+    connect?: Prisma.TrackWhereUniqueInput;
+};
+export type TrackUpdateOneRequiredWithoutStaffNestedInput = {
+    create?: Prisma.XOR<Prisma.TrackCreateWithoutStaffInput, Prisma.TrackUncheckedCreateWithoutStaffInput>;
+    connectOrCreate?: Prisma.TrackCreateOrConnectWithoutStaffInput;
+    upsert?: Prisma.TrackUpsertWithoutStaffInput;
+    connect?: Prisma.TrackWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.TrackUpdateToOneWithWhereWithoutStaffInput, Prisma.TrackUpdateWithoutStaffInput>, Prisma.TrackUncheckedUpdateWithoutStaffInput>;
+};
+export type TrackCreateWithoutClinicInput = {
+    id: string;
+    code: string;
+    name: string;
+    category?: string | null;
+    coursesCount?: number;
+    locationMode?: string;
+    locationLabel?: string | null;
+    duration?: string | null;
+    studentsCount?: number;
+    rating?: number;
+    reviewsCount?: number;
+    price?: number;
+    revenue?: number;
+    status?: string;
+    description?: string | null;
+    notes?: string | null;
+    academicStage?: string | null;
+    ageGroup?: string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: string | null;
+    selectedColor?: string | null;
+    active?: boolean;
+    isDeleted?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    students?: Prisma.TrackStudentCreateNestedManyWithoutTrackInput;
+    staff?: Prisma.TrackStaffCreateNestedManyWithoutTrackInput;
+};
+export type TrackUncheckedCreateWithoutClinicInput = {
+    id: string;
+    code: string;
+    name: string;
+    category?: string | null;
+    coursesCount?: number;
+    locationMode?: string;
+    locationLabel?: string | null;
+    duration?: string | null;
+    studentsCount?: number;
+    rating?: number;
+    reviewsCount?: number;
+    price?: number;
+    revenue?: number;
+    status?: string;
+    description?: string | null;
+    notes?: string | null;
+    academicStage?: string | null;
+    ageGroup?: string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: string | null;
+    selectedColor?: string | null;
+    active?: boolean;
+    isDeleted?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    students?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutTrackInput;
+    staff?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutTrackInput;
+};
+export type TrackCreateOrConnectWithoutClinicInput = {
+    where: Prisma.TrackWhereUniqueInput;
+    create: Prisma.XOR<Prisma.TrackCreateWithoutClinicInput, Prisma.TrackUncheckedCreateWithoutClinicInput>;
+};
+export type TrackCreateManyClinicInputEnvelope = {
+    data: Prisma.TrackCreateManyClinicInput | Prisma.TrackCreateManyClinicInput[];
+    skipDuplicates?: boolean;
+};
+export type TrackUpsertWithWhereUniqueWithoutClinicInput = {
+    where: Prisma.TrackWhereUniqueInput;
+    update: Prisma.XOR<Prisma.TrackUpdateWithoutClinicInput, Prisma.TrackUncheckedUpdateWithoutClinicInput>;
+    create: Prisma.XOR<Prisma.TrackCreateWithoutClinicInput, Prisma.TrackUncheckedCreateWithoutClinicInput>;
+};
+export type TrackUpdateWithWhereUniqueWithoutClinicInput = {
+    where: Prisma.TrackWhereUniqueInput;
+    data: Prisma.XOR<Prisma.TrackUpdateWithoutClinicInput, Prisma.TrackUncheckedUpdateWithoutClinicInput>;
+};
+export type TrackUpdateManyWithWhereWithoutClinicInput = {
+    where: Prisma.TrackScalarWhereInput;
+    data: Prisma.XOR<Prisma.TrackUpdateManyMutationInput, Prisma.TrackUncheckedUpdateManyWithoutClinicInput>;
+};
+export type TrackScalarWhereInput = {
+    AND?: Prisma.TrackScalarWhereInput | Prisma.TrackScalarWhereInput[];
+    OR?: Prisma.TrackScalarWhereInput[];
+    NOT?: Prisma.TrackScalarWhereInput | Prisma.TrackScalarWhereInput[];
+    id?: Prisma.StringFilter<"Track"> | string;
+    code?: Prisma.StringFilter<"Track"> | string;
+    clinicId?: Prisma.StringFilter<"Track"> | string;
+    name?: Prisma.StringFilter<"Track"> | string;
+    category?: Prisma.StringNullableFilter<"Track"> | string | null;
+    coursesCount?: Prisma.IntFilter<"Track"> | number;
+    locationMode?: Prisma.StringFilter<"Track"> | string;
+    locationLabel?: Prisma.StringNullableFilter<"Track"> | string | null;
+    duration?: Prisma.StringNullableFilter<"Track"> | string | null;
+    studentsCount?: Prisma.IntFilter<"Track"> | number;
+    rating?: Prisma.FloatFilter<"Track"> | number;
+    reviewsCount?: Prisma.IntFilter<"Track"> | number;
+    price?: Prisma.IntFilter<"Track"> | number;
+    revenue?: Prisma.IntFilter<"Track"> | number;
+    status?: Prisma.StringFilter<"Track"> | string;
+    description?: Prisma.StringNullableFilter<"Track"> | string | null;
+    notes?: Prisma.StringNullableFilter<"Track"> | string | null;
+    academicStage?: Prisma.StringNullableFilter<"Track"> | string | null;
+    ageGroup?: Prisma.StringNullableFilter<"Track"> | string | null;
+    trainers?: Prisma.JsonFilter<"Track">;
+    selectedIcon?: Prisma.StringNullableFilter<"Track"> | string | null;
+    selectedColor?: Prisma.StringNullableFilter<"Track"> | string | null;
+    active?: Prisma.BoolFilter<"Track"> | boolean;
+    isDeleted?: Prisma.BoolFilter<"Track"> | boolean;
+    createdAt?: Prisma.DateTimeFilter<"Track"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"Track"> | Date | string;
+};
+export type TrackCreateWithoutStudentsInput = {
+    id: string;
+    code: string;
+    name: string;
+    category?: string | null;
+    coursesCount?: number;
+    locationMode?: string;
+    locationLabel?: string | null;
+    duration?: string | null;
+    studentsCount?: number;
+    rating?: number;
+    reviewsCount?: number;
+    price?: number;
+    revenue?: number;
+    status?: string;
+    description?: string | null;
+    notes?: string | null;
+    academicStage?: string | null;
+    ageGroup?: string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: string | null;
+    selectedColor?: string | null;
+    active?: boolean;
+    isDeleted?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    clinic: Prisma.ClinicCreateNestedOneWithoutTracksInput;
+    staff?: Prisma.TrackStaffCreateNestedManyWithoutTrackInput;
+};
+export type TrackUncheckedCreateWithoutStudentsInput = {
+    id: string;
+    code: string;
+    clinicId: string;
+    name: string;
+    category?: string | null;
+    coursesCount?: number;
+    locationMode?: string;
+    locationLabel?: string | null;
+    duration?: string | null;
+    studentsCount?: number;
+    rating?: number;
+    reviewsCount?: number;
+    price?: number;
+    revenue?: number;
+    status?: string;
+    description?: string | null;
+    notes?: string | null;
+    academicStage?: string | null;
+    ageGroup?: string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: string | null;
+    selectedColor?: string | null;
+    active?: boolean;
+    isDeleted?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    staff?: Prisma.TrackStaffUncheckedCreateNestedManyWithoutTrackInput;
+};
+export type TrackCreateOrConnectWithoutStudentsInput = {
+    where: Prisma.TrackWhereUniqueInput;
+    create: Prisma.XOR<Prisma.TrackCreateWithoutStudentsInput, Prisma.TrackUncheckedCreateWithoutStudentsInput>;
+};
+export type TrackUpsertWithoutStudentsInput = {
+    update: Prisma.XOR<Prisma.TrackUpdateWithoutStudentsInput, Prisma.TrackUncheckedUpdateWithoutStudentsInput>;
+    create: Prisma.XOR<Prisma.TrackCreateWithoutStudentsInput, Prisma.TrackUncheckedCreateWithoutStudentsInput>;
+    where?: Prisma.TrackWhereInput;
+};
+export type TrackUpdateToOneWithWhereWithoutStudentsInput = {
+    where?: Prisma.TrackWhereInput;
+    data: Prisma.XOR<Prisma.TrackUpdateWithoutStudentsInput, Prisma.TrackUncheckedUpdateWithoutStudentsInput>;
+};
+export type TrackUpdateWithoutStudentsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    coursesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locationMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    studentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    rating?: Prisma.FloatFieldUpdateOperationsInput | number;
+    reviewsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    price?: Prisma.IntFieldUpdateOperationsInput | number;
+    revenue?: Prisma.IntFieldUpdateOperationsInput | number;
+    status?: Prisma.StringFieldUpdateOperationsInput | string;
+    description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    selectedColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    clinic?: Prisma.ClinicUpdateOneRequiredWithoutTracksNestedInput;
+    staff?: Prisma.TrackStaffUpdateManyWithoutTrackNestedInput;
+};
+export type TrackUncheckedUpdateWithoutStudentsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    clinicId?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    coursesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locationMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    studentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    rating?: Prisma.FloatFieldUpdateOperationsInput | number;
+    reviewsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    price?: Prisma.IntFieldUpdateOperationsInput | number;
+    revenue?: Prisma.IntFieldUpdateOperationsInput | number;
+    status?: Prisma.StringFieldUpdateOperationsInput | string;
+    description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    selectedColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    staff?: Prisma.TrackStaffUncheckedUpdateManyWithoutTrackNestedInput;
+};
+export type TrackCreateWithoutStaffInput = {
+    id: string;
+    code: string;
+    name: string;
+    category?: string | null;
+    coursesCount?: number;
+    locationMode?: string;
+    locationLabel?: string | null;
+    duration?: string | null;
+    studentsCount?: number;
+    rating?: number;
+    reviewsCount?: number;
+    price?: number;
+    revenue?: number;
+    status?: string;
+    description?: string | null;
+    notes?: string | null;
+    academicStage?: string | null;
+    ageGroup?: string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: string | null;
+    selectedColor?: string | null;
+    active?: boolean;
+    isDeleted?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    clinic: Prisma.ClinicCreateNestedOneWithoutTracksInput;
+    students?: Prisma.TrackStudentCreateNestedManyWithoutTrackInput;
+};
+export type TrackUncheckedCreateWithoutStaffInput = {
+    id: string;
+    code: string;
+    clinicId: string;
+    name: string;
+    category?: string | null;
+    coursesCount?: number;
+    locationMode?: string;
+    locationLabel?: string | null;
+    duration?: string | null;
+    studentsCount?: number;
+    rating?: number;
+    reviewsCount?: number;
+    price?: number;
+    revenue?: number;
+    status?: string;
+    description?: string | null;
+    notes?: string | null;
+    academicStage?: string | null;
+    ageGroup?: string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: string | null;
+    selectedColor?: string | null;
+    active?: boolean;
+    isDeleted?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    students?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutTrackInput;
+};
+export type TrackCreateOrConnectWithoutStaffInput = {
+    where: Prisma.TrackWhereUniqueInput;
+    create: Prisma.XOR<Prisma.TrackCreateWithoutStaffInput, Prisma.TrackUncheckedCreateWithoutStaffInput>;
+};
+export type TrackUpsertWithoutStaffInput = {
+    update: Prisma.XOR<Prisma.TrackUpdateWithoutStaffInput, Prisma.TrackUncheckedUpdateWithoutStaffInput>;
+    create: Prisma.XOR<Prisma.TrackCreateWithoutStaffInput, Prisma.TrackUncheckedCreateWithoutStaffInput>;
+    where?: Prisma.TrackWhereInput;
+};
+export type TrackUpdateToOneWithWhereWithoutStaffInput = {
+    where?: Prisma.TrackWhereInput;
+    data: Prisma.XOR<Prisma.TrackUpdateWithoutStaffInput, Prisma.TrackUncheckedUpdateWithoutStaffInput>;
+};
+export type TrackUpdateWithoutStaffInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    coursesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locationMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    studentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    rating?: Prisma.FloatFieldUpdateOperationsInput | number;
+    reviewsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    price?: Prisma.IntFieldUpdateOperationsInput | number;
+    revenue?: Prisma.IntFieldUpdateOperationsInput | number;
+    status?: Prisma.StringFieldUpdateOperationsInput | string;
+    description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    selectedColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    clinic?: Prisma.ClinicUpdateOneRequiredWithoutTracksNestedInput;
+    students?: Prisma.TrackStudentUpdateManyWithoutTrackNestedInput;
+};
+export type TrackUncheckedUpdateWithoutStaffInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    clinicId?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    coursesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locationMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    studentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    rating?: Prisma.FloatFieldUpdateOperationsInput | number;
+    reviewsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    price?: Prisma.IntFieldUpdateOperationsInput | number;
+    revenue?: Prisma.IntFieldUpdateOperationsInput | number;
+    status?: Prisma.StringFieldUpdateOperationsInput | string;
+    description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    selectedColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    students?: Prisma.TrackStudentUncheckedUpdateManyWithoutTrackNestedInput;
+};
+export type TrackCreateManyClinicInput = {
+    id: string;
+    code: string;
+    name: string;
+    category?: string | null;
+    coursesCount?: number;
+    locationMode?: string;
+    locationLabel?: string | null;
+    duration?: string | null;
+    studentsCount?: number;
+    rating?: number;
+    reviewsCount?: number;
+    price?: number;
+    revenue?: number;
+    status?: string;
+    description?: string | null;
+    notes?: string | null;
+    academicStage?: string | null;
+    ageGroup?: string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: string | null;
+    selectedColor?: string | null;
+    active?: boolean;
+    isDeleted?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type TrackUpdateWithoutClinicInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    coursesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locationMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    studentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    rating?: Prisma.FloatFieldUpdateOperationsInput | number;
+    reviewsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    price?: Prisma.IntFieldUpdateOperationsInput | number;
+    revenue?: Prisma.IntFieldUpdateOperationsInput | number;
+    status?: Prisma.StringFieldUpdateOperationsInput | string;
+    description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    selectedColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    students?: Prisma.TrackStudentUpdateManyWithoutTrackNestedInput;
+    staff?: Prisma.TrackStaffUpdateManyWithoutTrackNestedInput;
+};
+export type TrackUncheckedUpdateWithoutClinicInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    coursesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locationMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    studentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    rating?: Prisma.FloatFieldUpdateOperationsInput | number;
+    reviewsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    price?: Prisma.IntFieldUpdateOperationsInput | number;
+    revenue?: Prisma.IntFieldUpdateOperationsInput | number;
+    status?: Prisma.StringFieldUpdateOperationsInput | string;
+    description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    selectedColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    students?: Prisma.TrackStudentUncheckedUpdateManyWithoutTrackNestedInput;
+    staff?: Prisma.TrackStaffUncheckedUpdateManyWithoutTrackNestedInput;
+};
+export type TrackUncheckedUpdateManyWithoutClinicInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    coursesCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    locationMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    locationLabel?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    duration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    studentsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    rating?: Prisma.FloatFieldUpdateOperationsInput | number;
+    reviewsCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    price?: Prisma.IntFieldUpdateOperationsInput | number;
+    revenue?: Prisma.IntFieldUpdateOperationsInput | number;
+    status?: Prisma.StringFieldUpdateOperationsInput | string;
+    description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    trainers?: Prisma.JsonNullValueInput | runtime.InputJsonValue;
+    selectedIcon?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    selectedColor?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+/**
+ * Count Type TrackCountOutputType
+ */
+export type TrackCountOutputType = {
+    students: number;
+    staff: number;
+};
+export type TrackCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    students?: boolean | TrackCountOutputTypeCountStudentsArgs;
+    staff?: boolean | TrackCountOutputTypeCountStaffArgs;
+};
+/**
+ * TrackCountOutputType without action
+ */
+export type TrackCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackCountOutputType
+     */
+    select?: Prisma.TrackCountOutputTypeSelect<ExtArgs> | null;
+};
+/**
+ * TrackCountOutputType without action
+ */
+export type TrackCountOutputTypeCountStudentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.TrackStudentWhereInput;
+};
+/**
+ * TrackCountOutputType without action
+ */
+export type TrackCountOutputTypeCountStaffArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.TrackStaffWhereInput;
+};
+export type TrackSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    code?: boolean;
+    clinicId?: boolean;
+    name?: boolean;
+    category?: boolean;
+    coursesCount?: boolean;
+    locationMode?: boolean;
+    locationLabel?: boolean;
+    duration?: boolean;
+    studentsCount?: boolean;
+    rating?: boolean;
+    reviewsCount?: boolean;
+    price?: boolean;
+    revenue?: boolean;
+    status?: boolean;
+    description?: boolean;
+    notes?: boolean;
+    academicStage?: boolean;
+    ageGroup?: boolean;
+    trainers?: boolean;
+    selectedIcon?: boolean;
+    selectedColor?: boolean;
+    active?: boolean;
+    isDeleted?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+    clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>;
+    students?: boolean | Prisma.Track$studentsArgs<ExtArgs>;
+    staff?: boolean | Prisma.Track$staffArgs<ExtArgs>;
+    _count?: boolean | Prisma.TrackCountOutputTypeDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["track"]>;
+export type TrackSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    code?: boolean;
+    clinicId?: boolean;
+    name?: boolean;
+    category?: boolean;
+    coursesCount?: boolean;
+    locationMode?: boolean;
+    locationLabel?: boolean;
+    duration?: boolean;
+    studentsCount?: boolean;
+    rating?: boolean;
+    reviewsCount?: boolean;
+    price?: boolean;
+    revenue?: boolean;
+    status?: boolean;
+    description?: boolean;
+    notes?: boolean;
+    academicStage?: boolean;
+    ageGroup?: boolean;
+    trainers?: boolean;
+    selectedIcon?: boolean;
+    selectedColor?: boolean;
+    active?: boolean;
+    isDeleted?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+    clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["track"]>;
+export type TrackSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    code?: boolean;
+    clinicId?: boolean;
+    name?: boolean;
+    category?: boolean;
+    coursesCount?: boolean;
+    locationMode?: boolean;
+    locationLabel?: boolean;
+    duration?: boolean;
+    studentsCount?: boolean;
+    rating?: boolean;
+    reviewsCount?: boolean;
+    price?: boolean;
+    revenue?: boolean;
+    status?: boolean;
+    description?: boolean;
+    notes?: boolean;
+    academicStage?: boolean;
+    ageGroup?: boolean;
+    trainers?: boolean;
+    selectedIcon?: boolean;
+    selectedColor?: boolean;
+    active?: boolean;
+    isDeleted?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+    clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["track"]>;
+export type TrackSelectScalar = {
+    id?: boolean;
+    code?: boolean;
+    clinicId?: boolean;
+    name?: boolean;
+    category?: boolean;
+    coursesCount?: boolean;
+    locationMode?: boolean;
+    locationLabel?: boolean;
+    duration?: boolean;
+    studentsCount?: boolean;
+    rating?: boolean;
+    reviewsCount?: boolean;
+    price?: boolean;
+    revenue?: boolean;
+    status?: boolean;
+    description?: boolean;
+    notes?: boolean;
+    academicStage?: boolean;
+    ageGroup?: boolean;
+    trainers?: boolean;
+    selectedIcon?: boolean;
+    selectedColor?: boolean;
+    active?: boolean;
+    isDeleted?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+};
+export type TrackOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "clinicId" | "name" | "category" | "coursesCount" | "locationMode" | "locationLabel" | "duration" | "studentsCount" | "rating" | "reviewsCount" | "price" | "revenue" | "status" | "description" | "notes" | "academicStage" | "ageGroup" | "trainers" | "selectedIcon" | "selectedColor" | "active" | "isDeleted" | "createdAt" | "updatedAt", ExtArgs["result"]["track"]>;
+export type TrackInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>;
+    students?: boolean | Prisma.Track$studentsArgs<ExtArgs>;
+    staff?: boolean | Prisma.Track$staffArgs<ExtArgs>;
+    _count?: boolean | Prisma.TrackCountOutputTypeDefaultArgs<ExtArgs>;
+};
+export type TrackIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>;
+};
+export type TrackIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>;
+};
+export type $TrackPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    name: "Track";
+    objects: {
+        clinic: Prisma.$ClinicPayload<ExtArgs>;
+        students: Prisma.$TrackStudentPayload<ExtArgs>[];
+        staff: Prisma.$TrackStaffPayload<ExtArgs>[];
+    };
+    scalars: runtime.Types.Extensions.GetPayloadResult<{
+        id: string;
+        code: string;
+        clinicId: string;
+        name: string;
+        category: string | null;
+        coursesCount: number;
+        locationMode: string;
+        locationLabel: string | null;
+        duration: string | null;
+        studentsCount: number;
+        rating: number;
+        reviewsCount: number;
+        price: number;
+        revenue: number;
+        status: string;
+        description: string | null;
+        notes: string | null;
+        academicStage: string | null;
+        ageGroup: string | null;
+        trainers: runtime.JsonValue;
+        selectedIcon: string | null;
+        selectedColor: string | null;
+        active: boolean;
+        isDeleted: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+    }, ExtArgs["result"]["track"]>;
+    composites: {};
+};
+export type TrackGetPayload<S extends boolean | null | undefined | TrackDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$TrackPayload, S>;
+export type TrackCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<TrackFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: TrackCountAggregateInputType | true;
+};
+export interface TrackDelegate<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: {
+        types: Prisma.TypeMap<ExtArgs>['model']['Track'];
+        meta: {
+            name: 'Track';
+        };
+    };
+    /**
+     * Find zero or one Track that matches the filter.
+     * @param {TrackFindUniqueArgs} args - Arguments to find a Track
+     * @example
+     * // Get one Track
+     * const track = await prisma.track.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TrackFindUniqueArgs>(args: Prisma.SelectSubset<T, TrackFindUniqueArgs<ExtArgs>>): Prisma.Prisma__TrackClient<runtime.Types.Result.GetResult<Prisma.$TrackPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find one Track that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TrackFindUniqueOrThrowArgs} args - Arguments to find a Track
+     * @example
+     * // Get one Track
+     * const track = await prisma.track.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TrackFindUniqueOrThrowArgs>(args: Prisma.SelectSubset<T, TrackFindUniqueOrThrowArgs<ExtArgs>>): Prisma.Prisma__TrackClient<runtime.Types.Result.GetResult<Prisma.$TrackPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first Track that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackFindFirstArgs} args - Arguments to find a Track
+     * @example
+     * // Get one Track
+     * const track = await prisma.track.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TrackFindFirstArgs>(args?: Prisma.SelectSubset<T, TrackFindFirstArgs<ExtArgs>>): Prisma.Prisma__TrackClient<runtime.Types.Result.GetResult<Prisma.$TrackPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first Track that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackFindFirstOrThrowArgs} args - Arguments to find a Track
+     * @example
+     * // Get one Track
+     * const track = await prisma.track.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TrackFindFirstOrThrowArgs>(args?: Prisma.SelectSubset<T, TrackFindFirstOrThrowArgs<ExtArgs>>): Prisma.Prisma__TrackClient<runtime.Types.Result.GetResult<Prisma.$TrackPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find zero or more Tracks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Tracks
+     * const tracks = await prisma.track.findMany()
+     *
+     * // Get first 10 Tracks
+     * const tracks = await prisma.track.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const trackWithIdOnly = await prisma.track.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends TrackFindManyArgs>(args?: Prisma.SelectSubset<T, TrackFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>;
+    /**
+     * Create a Track.
+     * @param {TrackCreateArgs} args - Arguments to create a Track.
+     * @example
+     * // Create one Track
+     * const Track = await prisma.track.create({
+     *   data: {
+     *     // ... data to create a Track
+     *   }
+     * })
+     *
+     */
+    create<T extends TrackCreateArgs>(args: Prisma.SelectSubset<T, TrackCreateArgs<ExtArgs>>): Prisma.Prisma__TrackClient<runtime.Types.Result.GetResult<Prisma.$TrackPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Create many Tracks.
+     * @param {TrackCreateManyArgs} args - Arguments to create many Tracks.
+     * @example
+     * // Create many Tracks
+     * const track = await prisma.track.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends TrackCreateManyArgs>(args?: Prisma.SelectSubset<T, TrackCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Create many Tracks and returns the data saved in the database.
+     * @param {TrackCreateManyAndReturnArgs} args - Arguments to create many Tracks.
+     * @example
+     * // Create many Tracks
+     * const track = await prisma.track.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Create many Tracks and only return the `id`
+     * const trackWithIdOnly = await prisma.track.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    createManyAndReturn<T extends TrackCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, TrackCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrackPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>;
+    /**
+     * Delete a Track.
+     * @param {TrackDeleteArgs} args - Arguments to delete one Track.
+     * @example
+     * // Delete one Track
+     * const Track = await prisma.track.delete({
+     *   where: {
+     *     // ... filter to delete one Track
+     *   }
+     * })
+     *
+     */
+    delete<T extends TrackDeleteArgs>(args: Prisma.SelectSubset<T, TrackDeleteArgs<ExtArgs>>): Prisma.Prisma__TrackClient<runtime.Types.Result.GetResult<Prisma.$TrackPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Update one Track.
+     * @param {TrackUpdateArgs} args - Arguments to update one Track.
+     * @example
+     * // Update one Track
+     * const track = await prisma.track.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends TrackUpdateArgs>(args: Prisma.SelectSubset<T, TrackUpdateArgs<ExtArgs>>): Prisma.Prisma__TrackClient<runtime.Types.Result.GetResult<Prisma.$TrackPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Delete zero or more Tracks.
+     * @param {TrackDeleteManyArgs} args - Arguments to filter Tracks to delete.
+     * @example
+     * // Delete a few Tracks
+     * const { count } = await prisma.track.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends TrackDeleteManyArgs>(args?: Prisma.SelectSubset<T, TrackDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more Tracks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Tracks
+     * const track = await prisma.track.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends TrackUpdateManyArgs>(args: Prisma.SelectSubset<T, TrackUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more Tracks and returns the data updated in the database.
+     * @param {TrackUpdateManyAndReturnArgs} args - Arguments to update many Tracks.
+     * @example
+     * // Update many Tracks
+     * const track = await prisma.track.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Update zero or more Tracks and only return the `id`
+     * const trackWithIdOnly = await prisma.track.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    updateManyAndReturn<T extends TrackUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, TrackUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrackPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>;
+    /**
+     * Create or update one Track.
+     * @param {TrackUpsertArgs} args - Arguments to update or create a Track.
+     * @example
+     * // Update or create a Track
+     * const track = await prisma.track.upsert({
+     *   create: {
+     *     // ... data to create a Track
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Track we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TrackUpsertArgs>(args: Prisma.SelectSubset<T, TrackUpsertArgs<ExtArgs>>): Prisma.Prisma__TrackClient<runtime.Types.Result.GetResult<Prisma.$TrackPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Count the number of Tracks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackCountArgs} args - Arguments to filter Tracks to count.
+     * @example
+     * // Count the number of Tracks
+     * const count = await prisma.track.count({
+     *   where: {
+     *     // ... the filter for the Tracks we want to count
+     *   }
+     * })
+    **/
+    count<T extends TrackCountArgs>(args?: Prisma.Subset<T, TrackCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<'select', any> ? T['select'] extends true ? number : Prisma.GetScalarType<T['select'], TrackCountAggregateOutputType> : number>;
+    /**
+     * Allows you to perform aggregations operations on a Track.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TrackAggregateArgs>(args: Prisma.Subset<T, TrackAggregateArgs>): Prisma.PrismaPromise<GetTrackAggregateType<T>>;
+    /**
+     * Group by Track.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+    **/
+    groupBy<T extends TrackGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<'skip', Prisma.Keys<T>>, Prisma.Extends<'take', Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
+        orderBy: TrackGroupByArgs['orderBy'];
+    } : {
+        orderBy?: TrackGroupByArgs['orderBy'];
+    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>, ByFields extends Prisma.MaybeTupleToUnion<T['by']>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T['having']>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T['by'] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
+        [P in HavingFields]: P extends ByFields ? never : P extends string ? `Error: Field "${P}" used in "having" needs to be provided in "by".` : [
+            Error,
+            'Field ',
+            P,
+            ` in "having" needs to be provided in "by"`
+        ];
+    }[HavingFields] : 'take' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : 'skip' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "skip", you also need to provide "orderBy"' : ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields]>(args: Prisma.SubsetIntersection<T, TrackGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTrackGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>;
+    /**
+     * Fields of the Track model
+     */
+    readonly fields: TrackFieldRefs;
+}
+/**
+ * The delegate class that acts as a "Promise-like" for Track.
+ * Why is this prefixed with `Prisma__`?
+ * Because we want to prevent naming conflicts as mentioned in
+ * https://github.com/prisma/prisma-client-js/issues/707
+ */
+export interface Prisma__TrackClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise";
+    clinic<T extends Prisma.ClinicDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClinicDefaultArgs<ExtArgs>>): Prisma.Prisma__ClinicClient<runtime.Types.Result.GetResult<Prisma.$ClinicPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    students<T extends Prisma.Track$studentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Track$studentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrackStudentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    staff<T extends Prisma.Track$staffArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Track$staffArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrackStaffPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
+}
+/**
+ * Fields of the Track model
+ */
+export interface TrackFieldRefs {
+    readonly id: Prisma.FieldRef<"Track", 'String'>;
+    readonly code: Prisma.FieldRef<"Track", 'String'>;
+    readonly clinicId: Prisma.FieldRef<"Track", 'String'>;
+    readonly name: Prisma.FieldRef<"Track", 'String'>;
+    readonly category: Prisma.FieldRef<"Track", 'String'>;
+    readonly coursesCount: Prisma.FieldRef<"Track", 'Int'>;
+    readonly locationMode: Prisma.FieldRef<"Track", 'String'>;
+    readonly locationLabel: Prisma.FieldRef<"Track", 'String'>;
+    readonly duration: Prisma.FieldRef<"Track", 'String'>;
+    readonly studentsCount: Prisma.FieldRef<"Track", 'Int'>;
+    readonly rating: Prisma.FieldRef<"Track", 'Float'>;
+    readonly reviewsCount: Prisma.FieldRef<"Track", 'Int'>;
+    readonly price: Prisma.FieldRef<"Track", 'Int'>;
+    readonly revenue: Prisma.FieldRef<"Track", 'Int'>;
+    readonly status: Prisma.FieldRef<"Track", 'String'>;
+    readonly description: Prisma.FieldRef<"Track", 'String'>;
+    readonly notes: Prisma.FieldRef<"Track", 'String'>;
+    readonly academicStage: Prisma.FieldRef<"Track", 'String'>;
+    readonly ageGroup: Prisma.FieldRef<"Track", 'String'>;
+    readonly trainers: Prisma.FieldRef<"Track", 'Json'>;
+    readonly selectedIcon: Prisma.FieldRef<"Track", 'String'>;
+    readonly selectedColor: Prisma.FieldRef<"Track", 'String'>;
+    readonly active: Prisma.FieldRef<"Track", 'Boolean'>;
+    readonly isDeleted: Prisma.FieldRef<"Track", 'Boolean'>;
+    readonly createdAt: Prisma.FieldRef<"Track", 'DateTime'>;
+    readonly updatedAt: Prisma.FieldRef<"Track", 'DateTime'>;
+}
+/**
+ * Track findUnique
+ */
+export type TrackFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Track
+     */
+    select?: Prisma.TrackSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Track
+     */
+    omit?: Prisma.TrackOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackInclude<ExtArgs> | null;
+    /**
+     * Filter, which Track to fetch.
+     */
+    where: Prisma.TrackWhereUniqueInput;
+};
+/**
+ * Track findUniqueOrThrow
+ */
+export type TrackFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Track
+     */
+    select?: Prisma.TrackSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Track
+     */
+    omit?: Prisma.TrackOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackInclude<ExtArgs> | null;
+    /**
+     * Filter, which Track to fetch.
+     */
+    where: Prisma.TrackWhereUniqueInput;
+};
+/**
+ * Track findFirst
+ */
+export type TrackFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Track
+     */
+    select?: Prisma.TrackSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Track
+     */
+    omit?: Prisma.TrackOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackInclude<ExtArgs> | null;
+    /**
+     * Filter, which Track to fetch.
+     */
+    where?: Prisma.TrackWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Tracks to fetch.
+     */
+    orderBy?: Prisma.TrackOrderByWithRelationInput | Prisma.TrackOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Tracks.
+     */
+    cursor?: Prisma.TrackWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Tracks from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Tracks.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Tracks.
+     */
+    distinct?: Prisma.TrackScalarFieldEnum | Prisma.TrackScalarFieldEnum[];
+};
+/**
+ * Track findFirstOrThrow
+ */
+export type TrackFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Track
+     */
+    select?: Prisma.TrackSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Track
+     */
+    omit?: Prisma.TrackOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackInclude<ExtArgs> | null;
+    /**
+     * Filter, which Track to fetch.
+     */
+    where?: Prisma.TrackWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Tracks to fetch.
+     */
+    orderBy?: Prisma.TrackOrderByWithRelationInput | Prisma.TrackOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Tracks.
+     */
+    cursor?: Prisma.TrackWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Tracks from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Tracks.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Tracks.
+     */
+    distinct?: Prisma.TrackScalarFieldEnum | Prisma.TrackScalarFieldEnum[];
+};
+/**
+ * Track findMany
+ */
+export type TrackFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Track
+     */
+    select?: Prisma.TrackSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Track
+     */
+    omit?: Prisma.TrackOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackInclude<ExtArgs> | null;
+    /**
+     * Filter, which Tracks to fetch.
+     */
+    where?: Prisma.TrackWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Tracks to fetch.
+     */
+    orderBy?: Prisma.TrackOrderByWithRelationInput | Prisma.TrackOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing Tracks.
+     */
+    cursor?: Prisma.TrackWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Tracks from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Tracks.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Tracks.
+     */
+    distinct?: Prisma.TrackScalarFieldEnum | Prisma.TrackScalarFieldEnum[];
+};
+/**
+ * Track create
+ */
+export type TrackCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Track
+     */
+    select?: Prisma.TrackSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Track
+     */
+    omit?: Prisma.TrackOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackInclude<ExtArgs> | null;
+    /**
+     * The data needed to create a Track.
+     */
+    data: Prisma.XOR<Prisma.TrackCreateInput, Prisma.TrackUncheckedCreateInput>;
+};
+/**
+ * Track createMany
+ */
+export type TrackCreateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Tracks.
+     */
+    data: Prisma.TrackCreateManyInput | Prisma.TrackCreateManyInput[];
+    skipDuplicates?: boolean;
+};
+/**
+ * Track createManyAndReturn
+ */
+export type TrackCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Track
+     */
+    select?: Prisma.TrackSelectCreateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Track
+     */
+    omit?: Prisma.TrackOmit<ExtArgs> | null;
+    /**
+     * The data used to create many Tracks.
+     */
+    data: Prisma.TrackCreateManyInput | Prisma.TrackCreateManyInput[];
+    skipDuplicates?: boolean;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackIncludeCreateManyAndReturn<ExtArgs> | null;
+};
+/**
+ * Track update
+ */
+export type TrackUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Track
+     */
+    select?: Prisma.TrackSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Track
+     */
+    omit?: Prisma.TrackOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackInclude<ExtArgs> | null;
+    /**
+     * The data needed to update a Track.
+     */
+    data: Prisma.XOR<Prisma.TrackUpdateInput, Prisma.TrackUncheckedUpdateInput>;
+    /**
+     * Choose, which Track to update.
+     */
+    where: Prisma.TrackWhereUniqueInput;
+};
+/**
+ * Track updateMany
+ */
+export type TrackUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Tracks.
+     */
+    data: Prisma.XOR<Prisma.TrackUpdateManyMutationInput, Prisma.TrackUncheckedUpdateManyInput>;
+    /**
+     * Filter which Tracks to update
+     */
+    where?: Prisma.TrackWhereInput;
+    /**
+     * Limit how many Tracks to update.
+     */
+    limit?: number;
+};
+/**
+ * Track updateManyAndReturn
+ */
+export type TrackUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Track
+     */
+    select?: Prisma.TrackSelectUpdateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Track
+     */
+    omit?: Prisma.TrackOmit<ExtArgs> | null;
+    /**
+     * The data used to update Tracks.
+     */
+    data: Prisma.XOR<Prisma.TrackUpdateManyMutationInput, Prisma.TrackUncheckedUpdateManyInput>;
+    /**
+     * Filter which Tracks to update
+     */
+    where?: Prisma.TrackWhereInput;
+    /**
+     * Limit how many Tracks to update.
+     */
+    limit?: number;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackIncludeUpdateManyAndReturn<ExtArgs> | null;
+};
+/**
+ * Track upsert
+ */
+export type TrackUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Track
+     */
+    select?: Prisma.TrackSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Track
+     */
+    omit?: Prisma.TrackOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackInclude<ExtArgs> | null;
+    /**
+     * The filter to search for the Track to update in case it exists.
+     */
+    where: Prisma.TrackWhereUniqueInput;
+    /**
+     * In case the Track found by the `where` argument doesn't exist, create a new Track with this data.
+     */
+    create: Prisma.XOR<Prisma.TrackCreateInput, Prisma.TrackUncheckedCreateInput>;
+    /**
+     * In case the Track was found with the provided `where` argument, update it with this data.
+     */
+    update: Prisma.XOR<Prisma.TrackUpdateInput, Prisma.TrackUncheckedUpdateInput>;
+};
+/**
+ * Track delete
+ */
+export type TrackDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Track
+     */
+    select?: Prisma.TrackSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Track
+     */
+    omit?: Prisma.TrackOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackInclude<ExtArgs> | null;
+    /**
+     * Filter which Track to delete.
+     */
+    where: Prisma.TrackWhereUniqueInput;
+};
+/**
+ * Track deleteMany
+ */
+export type TrackDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which Tracks to delete
+     */
+    where?: Prisma.TrackWhereInput;
+    /**
+     * Limit how many Tracks to delete.
+     */
+    limit?: number;
+};
+/**
+ * Track.students
+ */
+export type Track$studentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackStudent
+     */
+    select?: Prisma.TrackStudentSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the TrackStudent
+     */
+    omit?: Prisma.TrackStudentOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackStudentInclude<ExtArgs> | null;
+    where?: Prisma.TrackStudentWhereInput;
+    orderBy?: Prisma.TrackStudentOrderByWithRelationInput | Prisma.TrackStudentOrderByWithRelationInput[];
+    cursor?: Prisma.TrackStudentWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.TrackStudentScalarFieldEnum | Prisma.TrackStudentScalarFieldEnum[];
+};
+/**
+ * Track.staff
+ */
+export type Track$staffArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackStaff
+     */
+    select?: Prisma.TrackStaffSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the TrackStaff
+     */
+    omit?: Prisma.TrackStaffOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackStaffInclude<ExtArgs> | null;
+    where?: Prisma.TrackStaffWhereInput;
+    orderBy?: Prisma.TrackStaffOrderByWithRelationInput | Prisma.TrackStaffOrderByWithRelationInput[];
+    cursor?: Prisma.TrackStaffWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.TrackStaffScalarFieldEnum | Prisma.TrackStaffScalarFieldEnum[];
+};
+/**
+ * Track without action
+ */
+export type TrackDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Track
+     */
+    select?: Prisma.TrackSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Track
+     */
+    omit?: Prisma.TrackOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackInclude<ExtArgs> | null;
+};

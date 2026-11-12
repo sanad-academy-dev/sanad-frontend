@@ -1,0 +1,1285 @@
+import type * as runtime from "@prisma/client/runtime/client";
+import type * as Prisma from "../internal/prismaNamespace";
+/**
+ * Model TrackStaff
+ *
+ */
+export type TrackStaffModel = runtime.Types.Result.DefaultSelection<Prisma.$TrackStaffPayload>;
+export type AggregateTrackStaff = {
+    _count: TrackStaffCountAggregateOutputType | null;
+    _min: TrackStaffMinAggregateOutputType | null;
+    _max: TrackStaffMaxAggregateOutputType | null;
+};
+export type TrackStaffMinAggregateOutputType = {
+    id: string | null;
+    trackId: string | null;
+    staffId: string | null;
+    role: string | null;
+    assignedAt: Date | null;
+};
+export type TrackStaffMaxAggregateOutputType = {
+    id: string | null;
+    trackId: string | null;
+    staffId: string | null;
+    role: string | null;
+    assignedAt: Date | null;
+};
+export type TrackStaffCountAggregateOutputType = {
+    id: number;
+    trackId: number;
+    staffId: number;
+    role: number;
+    assignedAt: number;
+    _all: number;
+};
+export type TrackStaffMinAggregateInputType = {
+    id?: true;
+    trackId?: true;
+    staffId?: true;
+    role?: true;
+    assignedAt?: true;
+};
+export type TrackStaffMaxAggregateInputType = {
+    id?: true;
+    trackId?: true;
+    staffId?: true;
+    role?: true;
+    assignedAt?: true;
+};
+export type TrackStaffCountAggregateInputType = {
+    id?: true;
+    trackId?: true;
+    staffId?: true;
+    role?: true;
+    assignedAt?: true;
+    _all?: true;
+};
+export type TrackStaffAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which TrackStaff to aggregate.
+     */
+    where?: Prisma.TrackStaffWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of TrackStaffs to fetch.
+     */
+    orderBy?: Prisma.TrackStaffOrderByWithRelationInput | Prisma.TrackStaffOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: Prisma.TrackStaffWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` TrackStaffs from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` TrackStaffs.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned TrackStaffs
+    **/
+    _count?: true | TrackStaffCountAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+    **/
+    _min?: TrackStaffMinAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+    **/
+    _max?: TrackStaffMaxAggregateInputType;
+};
+export type GetTrackStaffAggregateType<T extends TrackStaffAggregateArgs> = {
+    [P in keyof T & keyof AggregateTrackStaff]: P extends '_count' | 'count' ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregateTrackStaff[P]> : Prisma.GetScalarType<T[P], AggregateTrackStaff[P]>;
+};
+export type TrackStaffGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.TrackStaffWhereInput;
+    orderBy?: Prisma.TrackStaffOrderByWithAggregationInput | Prisma.TrackStaffOrderByWithAggregationInput[];
+    by: Prisma.TrackStaffScalarFieldEnum[] | Prisma.TrackStaffScalarFieldEnum;
+    having?: Prisma.TrackStaffScalarWhereWithAggregatesInput;
+    take?: number;
+    skip?: number;
+    _count?: TrackStaffCountAggregateInputType | true;
+    _min?: TrackStaffMinAggregateInputType;
+    _max?: TrackStaffMaxAggregateInputType;
+};
+export type TrackStaffGroupByOutputType = {
+    id: string;
+    trackId: string;
+    staffId: string;
+    role: string | null;
+    assignedAt: Date;
+    _count: TrackStaffCountAggregateOutputType | null;
+    _min: TrackStaffMinAggregateOutputType | null;
+    _max: TrackStaffMaxAggregateOutputType | null;
+};
+export type GetTrackStaffGroupByPayload<T extends TrackStaffGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<TrackStaffGroupByOutputType, T['by']> & {
+    [P in ((keyof T) & (keyof TrackStaffGroupByOutputType))]: P extends '_count' ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], TrackStaffGroupByOutputType[P]> : Prisma.GetScalarType<T[P], TrackStaffGroupByOutputType[P]>;
+}>>;
+export type TrackStaffWhereInput = {
+    AND?: Prisma.TrackStaffWhereInput | Prisma.TrackStaffWhereInput[];
+    OR?: Prisma.TrackStaffWhereInput[];
+    NOT?: Prisma.TrackStaffWhereInput | Prisma.TrackStaffWhereInput[];
+    id?: Prisma.StringFilter<"TrackStaff"> | string;
+    trackId?: Prisma.StringFilter<"TrackStaff"> | string;
+    staffId?: Prisma.StringFilter<"TrackStaff"> | string;
+    role?: Prisma.StringNullableFilter<"TrackStaff"> | string | null;
+    assignedAt?: Prisma.DateTimeFilter<"TrackStaff"> | Date | string;
+    track?: Prisma.XOR<Prisma.TrackScalarRelationFilter, Prisma.TrackWhereInput>;
+    staff?: Prisma.XOR<Prisma.StaffScalarRelationFilter, Prisma.StaffWhereInput>;
+};
+export type TrackStaffOrderByWithRelationInput = {
+    id?: Prisma.SortOrder;
+    trackId?: Prisma.SortOrder;
+    staffId?: Prisma.SortOrder;
+    role?: Prisma.SortOrderInput | Prisma.SortOrder;
+    assignedAt?: Prisma.SortOrder;
+    track?: Prisma.TrackOrderByWithRelationInput;
+    staff?: Prisma.StaffOrderByWithRelationInput;
+};
+export type TrackStaffWhereUniqueInput = Prisma.AtLeast<{
+    id?: string;
+    trackId_staffId?: Prisma.TrackStaffTrackIdStaffIdCompoundUniqueInput;
+    AND?: Prisma.TrackStaffWhereInput | Prisma.TrackStaffWhereInput[];
+    OR?: Prisma.TrackStaffWhereInput[];
+    NOT?: Prisma.TrackStaffWhereInput | Prisma.TrackStaffWhereInput[];
+    trackId?: Prisma.StringFilter<"TrackStaff"> | string;
+    staffId?: Prisma.StringFilter<"TrackStaff"> | string;
+    role?: Prisma.StringNullableFilter<"TrackStaff"> | string | null;
+    assignedAt?: Prisma.DateTimeFilter<"TrackStaff"> | Date | string;
+    track?: Prisma.XOR<Prisma.TrackScalarRelationFilter, Prisma.TrackWhereInput>;
+    staff?: Prisma.XOR<Prisma.StaffScalarRelationFilter, Prisma.StaffWhereInput>;
+}, "id" | "trackId_staffId">;
+export type TrackStaffOrderByWithAggregationInput = {
+    id?: Prisma.SortOrder;
+    trackId?: Prisma.SortOrder;
+    staffId?: Prisma.SortOrder;
+    role?: Prisma.SortOrderInput | Prisma.SortOrder;
+    assignedAt?: Prisma.SortOrder;
+    _count?: Prisma.TrackStaffCountOrderByAggregateInput;
+    _max?: Prisma.TrackStaffMaxOrderByAggregateInput;
+    _min?: Prisma.TrackStaffMinOrderByAggregateInput;
+};
+export type TrackStaffScalarWhereWithAggregatesInput = {
+    AND?: Prisma.TrackStaffScalarWhereWithAggregatesInput | Prisma.TrackStaffScalarWhereWithAggregatesInput[];
+    OR?: Prisma.TrackStaffScalarWhereWithAggregatesInput[];
+    NOT?: Prisma.TrackStaffScalarWhereWithAggregatesInput | Prisma.TrackStaffScalarWhereWithAggregatesInput[];
+    id?: Prisma.StringWithAggregatesFilter<"TrackStaff"> | string;
+    trackId?: Prisma.StringWithAggregatesFilter<"TrackStaff"> | string;
+    staffId?: Prisma.StringWithAggregatesFilter<"TrackStaff"> | string;
+    role?: Prisma.StringNullableWithAggregatesFilter<"TrackStaff"> | string | null;
+    assignedAt?: Prisma.DateTimeWithAggregatesFilter<"TrackStaff"> | Date | string;
+};
+export type TrackStaffCreateInput = {
+    id: string;
+    role?: string | null;
+    assignedAt?: Date | string;
+    track: Prisma.TrackCreateNestedOneWithoutStaffInput;
+    staff: Prisma.StaffCreateNestedOneWithoutTrackAssignmentsInput;
+};
+export type TrackStaffUncheckedCreateInput = {
+    id: string;
+    trackId: string;
+    staffId: string;
+    role?: string | null;
+    assignedAt?: Date | string;
+};
+export type TrackStaffUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    track?: Prisma.TrackUpdateOneRequiredWithoutStaffNestedInput;
+    staff?: Prisma.StaffUpdateOneRequiredWithoutTrackAssignmentsNestedInput;
+};
+export type TrackStaffUncheckedUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    trackId?: Prisma.StringFieldUpdateOperationsInput | string;
+    staffId?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type TrackStaffCreateManyInput = {
+    id: string;
+    trackId: string;
+    staffId: string;
+    role?: string | null;
+    assignedAt?: Date | string;
+};
+export type TrackStaffUpdateManyMutationInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type TrackStaffUncheckedUpdateManyInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    trackId?: Prisma.StringFieldUpdateOperationsInput | string;
+    staffId?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type TrackStaffListRelationFilter = {
+    every?: Prisma.TrackStaffWhereInput;
+    some?: Prisma.TrackStaffWhereInput;
+    none?: Prisma.TrackStaffWhereInput;
+};
+export type TrackStaffOrderByRelationAggregateInput = {
+    _count?: Prisma.SortOrder;
+};
+export type TrackStaffTrackIdStaffIdCompoundUniqueInput = {
+    trackId: string;
+    staffId: string;
+};
+export type TrackStaffCountOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    trackId?: Prisma.SortOrder;
+    staffId?: Prisma.SortOrder;
+    role?: Prisma.SortOrder;
+    assignedAt?: Prisma.SortOrder;
+};
+export type TrackStaffMaxOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    trackId?: Prisma.SortOrder;
+    staffId?: Prisma.SortOrder;
+    role?: Prisma.SortOrder;
+    assignedAt?: Prisma.SortOrder;
+};
+export type TrackStaffMinOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    trackId?: Prisma.SortOrder;
+    staffId?: Prisma.SortOrder;
+    role?: Prisma.SortOrder;
+    assignedAt?: Prisma.SortOrder;
+};
+export type TrackStaffCreateNestedManyWithoutStaffInput = {
+    create?: Prisma.XOR<Prisma.TrackStaffCreateWithoutStaffInput, Prisma.TrackStaffUncheckedCreateWithoutStaffInput> | Prisma.TrackStaffCreateWithoutStaffInput[] | Prisma.TrackStaffUncheckedCreateWithoutStaffInput[];
+    connectOrCreate?: Prisma.TrackStaffCreateOrConnectWithoutStaffInput | Prisma.TrackStaffCreateOrConnectWithoutStaffInput[];
+    createMany?: Prisma.TrackStaffCreateManyStaffInputEnvelope;
+    connect?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+};
+export type TrackStaffUncheckedCreateNestedManyWithoutStaffInput = {
+    create?: Prisma.XOR<Prisma.TrackStaffCreateWithoutStaffInput, Prisma.TrackStaffUncheckedCreateWithoutStaffInput> | Prisma.TrackStaffCreateWithoutStaffInput[] | Prisma.TrackStaffUncheckedCreateWithoutStaffInput[];
+    connectOrCreate?: Prisma.TrackStaffCreateOrConnectWithoutStaffInput | Prisma.TrackStaffCreateOrConnectWithoutStaffInput[];
+    createMany?: Prisma.TrackStaffCreateManyStaffInputEnvelope;
+    connect?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+};
+export type TrackStaffUpdateManyWithoutStaffNestedInput = {
+    create?: Prisma.XOR<Prisma.TrackStaffCreateWithoutStaffInput, Prisma.TrackStaffUncheckedCreateWithoutStaffInput> | Prisma.TrackStaffCreateWithoutStaffInput[] | Prisma.TrackStaffUncheckedCreateWithoutStaffInput[];
+    connectOrCreate?: Prisma.TrackStaffCreateOrConnectWithoutStaffInput | Prisma.TrackStaffCreateOrConnectWithoutStaffInput[];
+    upsert?: Prisma.TrackStaffUpsertWithWhereUniqueWithoutStaffInput | Prisma.TrackStaffUpsertWithWhereUniqueWithoutStaffInput[];
+    createMany?: Prisma.TrackStaffCreateManyStaffInputEnvelope;
+    set?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    disconnect?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    delete?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    connect?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    update?: Prisma.TrackStaffUpdateWithWhereUniqueWithoutStaffInput | Prisma.TrackStaffUpdateWithWhereUniqueWithoutStaffInput[];
+    updateMany?: Prisma.TrackStaffUpdateManyWithWhereWithoutStaffInput | Prisma.TrackStaffUpdateManyWithWhereWithoutStaffInput[];
+    deleteMany?: Prisma.TrackStaffScalarWhereInput | Prisma.TrackStaffScalarWhereInput[];
+};
+export type TrackStaffUncheckedUpdateManyWithoutStaffNestedInput = {
+    create?: Prisma.XOR<Prisma.TrackStaffCreateWithoutStaffInput, Prisma.TrackStaffUncheckedCreateWithoutStaffInput> | Prisma.TrackStaffCreateWithoutStaffInput[] | Prisma.TrackStaffUncheckedCreateWithoutStaffInput[];
+    connectOrCreate?: Prisma.TrackStaffCreateOrConnectWithoutStaffInput | Prisma.TrackStaffCreateOrConnectWithoutStaffInput[];
+    upsert?: Prisma.TrackStaffUpsertWithWhereUniqueWithoutStaffInput | Prisma.TrackStaffUpsertWithWhereUniqueWithoutStaffInput[];
+    createMany?: Prisma.TrackStaffCreateManyStaffInputEnvelope;
+    set?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    disconnect?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    delete?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    connect?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    update?: Prisma.TrackStaffUpdateWithWhereUniqueWithoutStaffInput | Prisma.TrackStaffUpdateWithWhereUniqueWithoutStaffInput[];
+    updateMany?: Prisma.TrackStaffUpdateManyWithWhereWithoutStaffInput | Prisma.TrackStaffUpdateManyWithWhereWithoutStaffInput[];
+    deleteMany?: Prisma.TrackStaffScalarWhereInput | Prisma.TrackStaffScalarWhereInput[];
+};
+export type TrackStaffCreateNestedManyWithoutTrackInput = {
+    create?: Prisma.XOR<Prisma.TrackStaffCreateWithoutTrackInput, Prisma.TrackStaffUncheckedCreateWithoutTrackInput> | Prisma.TrackStaffCreateWithoutTrackInput[] | Prisma.TrackStaffUncheckedCreateWithoutTrackInput[];
+    connectOrCreate?: Prisma.TrackStaffCreateOrConnectWithoutTrackInput | Prisma.TrackStaffCreateOrConnectWithoutTrackInput[];
+    createMany?: Prisma.TrackStaffCreateManyTrackInputEnvelope;
+    connect?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+};
+export type TrackStaffUncheckedCreateNestedManyWithoutTrackInput = {
+    create?: Prisma.XOR<Prisma.TrackStaffCreateWithoutTrackInput, Prisma.TrackStaffUncheckedCreateWithoutTrackInput> | Prisma.TrackStaffCreateWithoutTrackInput[] | Prisma.TrackStaffUncheckedCreateWithoutTrackInput[];
+    connectOrCreate?: Prisma.TrackStaffCreateOrConnectWithoutTrackInput | Prisma.TrackStaffCreateOrConnectWithoutTrackInput[];
+    createMany?: Prisma.TrackStaffCreateManyTrackInputEnvelope;
+    connect?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+};
+export type TrackStaffUpdateManyWithoutTrackNestedInput = {
+    create?: Prisma.XOR<Prisma.TrackStaffCreateWithoutTrackInput, Prisma.TrackStaffUncheckedCreateWithoutTrackInput> | Prisma.TrackStaffCreateWithoutTrackInput[] | Prisma.TrackStaffUncheckedCreateWithoutTrackInput[];
+    connectOrCreate?: Prisma.TrackStaffCreateOrConnectWithoutTrackInput | Prisma.TrackStaffCreateOrConnectWithoutTrackInput[];
+    upsert?: Prisma.TrackStaffUpsertWithWhereUniqueWithoutTrackInput | Prisma.TrackStaffUpsertWithWhereUniqueWithoutTrackInput[];
+    createMany?: Prisma.TrackStaffCreateManyTrackInputEnvelope;
+    set?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    disconnect?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    delete?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    connect?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    update?: Prisma.TrackStaffUpdateWithWhereUniqueWithoutTrackInput | Prisma.TrackStaffUpdateWithWhereUniqueWithoutTrackInput[];
+    updateMany?: Prisma.TrackStaffUpdateManyWithWhereWithoutTrackInput | Prisma.TrackStaffUpdateManyWithWhereWithoutTrackInput[];
+    deleteMany?: Prisma.TrackStaffScalarWhereInput | Prisma.TrackStaffScalarWhereInput[];
+};
+export type TrackStaffUncheckedUpdateManyWithoutTrackNestedInput = {
+    create?: Prisma.XOR<Prisma.TrackStaffCreateWithoutTrackInput, Prisma.TrackStaffUncheckedCreateWithoutTrackInput> | Prisma.TrackStaffCreateWithoutTrackInput[] | Prisma.TrackStaffUncheckedCreateWithoutTrackInput[];
+    connectOrCreate?: Prisma.TrackStaffCreateOrConnectWithoutTrackInput | Prisma.TrackStaffCreateOrConnectWithoutTrackInput[];
+    upsert?: Prisma.TrackStaffUpsertWithWhereUniqueWithoutTrackInput | Prisma.TrackStaffUpsertWithWhereUniqueWithoutTrackInput[];
+    createMany?: Prisma.TrackStaffCreateManyTrackInputEnvelope;
+    set?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    disconnect?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    delete?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    connect?: Prisma.TrackStaffWhereUniqueInput | Prisma.TrackStaffWhereUniqueInput[];
+    update?: Prisma.TrackStaffUpdateWithWhereUniqueWithoutTrackInput | Prisma.TrackStaffUpdateWithWhereUniqueWithoutTrackInput[];
+    updateMany?: Prisma.TrackStaffUpdateManyWithWhereWithoutTrackInput | Prisma.TrackStaffUpdateManyWithWhereWithoutTrackInput[];
+    deleteMany?: Prisma.TrackStaffScalarWhereInput | Prisma.TrackStaffScalarWhereInput[];
+};
+export type TrackStaffCreateWithoutStaffInput = {
+    id: string;
+    role?: string | null;
+    assignedAt?: Date | string;
+    track: Prisma.TrackCreateNestedOneWithoutStaffInput;
+};
+export type TrackStaffUncheckedCreateWithoutStaffInput = {
+    id: string;
+    trackId: string;
+    role?: string | null;
+    assignedAt?: Date | string;
+};
+export type TrackStaffCreateOrConnectWithoutStaffInput = {
+    where: Prisma.TrackStaffWhereUniqueInput;
+    create: Prisma.XOR<Prisma.TrackStaffCreateWithoutStaffInput, Prisma.TrackStaffUncheckedCreateWithoutStaffInput>;
+};
+export type TrackStaffCreateManyStaffInputEnvelope = {
+    data: Prisma.TrackStaffCreateManyStaffInput | Prisma.TrackStaffCreateManyStaffInput[];
+    skipDuplicates?: boolean;
+};
+export type TrackStaffUpsertWithWhereUniqueWithoutStaffInput = {
+    where: Prisma.TrackStaffWhereUniqueInput;
+    update: Prisma.XOR<Prisma.TrackStaffUpdateWithoutStaffInput, Prisma.TrackStaffUncheckedUpdateWithoutStaffInput>;
+    create: Prisma.XOR<Prisma.TrackStaffCreateWithoutStaffInput, Prisma.TrackStaffUncheckedCreateWithoutStaffInput>;
+};
+export type TrackStaffUpdateWithWhereUniqueWithoutStaffInput = {
+    where: Prisma.TrackStaffWhereUniqueInput;
+    data: Prisma.XOR<Prisma.TrackStaffUpdateWithoutStaffInput, Prisma.TrackStaffUncheckedUpdateWithoutStaffInput>;
+};
+export type TrackStaffUpdateManyWithWhereWithoutStaffInput = {
+    where: Prisma.TrackStaffScalarWhereInput;
+    data: Prisma.XOR<Prisma.TrackStaffUpdateManyMutationInput, Prisma.TrackStaffUncheckedUpdateManyWithoutStaffInput>;
+};
+export type TrackStaffScalarWhereInput = {
+    AND?: Prisma.TrackStaffScalarWhereInput | Prisma.TrackStaffScalarWhereInput[];
+    OR?: Prisma.TrackStaffScalarWhereInput[];
+    NOT?: Prisma.TrackStaffScalarWhereInput | Prisma.TrackStaffScalarWhereInput[];
+    id?: Prisma.StringFilter<"TrackStaff"> | string;
+    trackId?: Prisma.StringFilter<"TrackStaff"> | string;
+    staffId?: Prisma.StringFilter<"TrackStaff"> | string;
+    role?: Prisma.StringNullableFilter<"TrackStaff"> | string | null;
+    assignedAt?: Prisma.DateTimeFilter<"TrackStaff"> | Date | string;
+};
+export type TrackStaffCreateWithoutTrackInput = {
+    id: string;
+    role?: string | null;
+    assignedAt?: Date | string;
+    staff: Prisma.StaffCreateNestedOneWithoutTrackAssignmentsInput;
+};
+export type TrackStaffUncheckedCreateWithoutTrackInput = {
+    id: string;
+    staffId: string;
+    role?: string | null;
+    assignedAt?: Date | string;
+};
+export type TrackStaffCreateOrConnectWithoutTrackInput = {
+    where: Prisma.TrackStaffWhereUniqueInput;
+    create: Prisma.XOR<Prisma.TrackStaffCreateWithoutTrackInput, Prisma.TrackStaffUncheckedCreateWithoutTrackInput>;
+};
+export type TrackStaffCreateManyTrackInputEnvelope = {
+    data: Prisma.TrackStaffCreateManyTrackInput | Prisma.TrackStaffCreateManyTrackInput[];
+    skipDuplicates?: boolean;
+};
+export type TrackStaffUpsertWithWhereUniqueWithoutTrackInput = {
+    where: Prisma.TrackStaffWhereUniqueInput;
+    update: Prisma.XOR<Prisma.TrackStaffUpdateWithoutTrackInput, Prisma.TrackStaffUncheckedUpdateWithoutTrackInput>;
+    create: Prisma.XOR<Prisma.TrackStaffCreateWithoutTrackInput, Prisma.TrackStaffUncheckedCreateWithoutTrackInput>;
+};
+export type TrackStaffUpdateWithWhereUniqueWithoutTrackInput = {
+    where: Prisma.TrackStaffWhereUniqueInput;
+    data: Prisma.XOR<Prisma.TrackStaffUpdateWithoutTrackInput, Prisma.TrackStaffUncheckedUpdateWithoutTrackInput>;
+};
+export type TrackStaffUpdateManyWithWhereWithoutTrackInput = {
+    where: Prisma.TrackStaffScalarWhereInput;
+    data: Prisma.XOR<Prisma.TrackStaffUpdateManyMutationInput, Prisma.TrackStaffUncheckedUpdateManyWithoutTrackInput>;
+};
+export type TrackStaffCreateManyStaffInput = {
+    id: string;
+    trackId: string;
+    role?: string | null;
+    assignedAt?: Date | string;
+};
+export type TrackStaffUpdateWithoutStaffInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    track?: Prisma.TrackUpdateOneRequiredWithoutStaffNestedInput;
+};
+export type TrackStaffUncheckedUpdateWithoutStaffInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    trackId?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type TrackStaffUncheckedUpdateManyWithoutStaffInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    trackId?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type TrackStaffCreateManyTrackInput = {
+    id: string;
+    staffId: string;
+    role?: string | null;
+    assignedAt?: Date | string;
+};
+export type TrackStaffUpdateWithoutTrackInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    staff?: Prisma.StaffUpdateOneRequiredWithoutTrackAssignmentsNestedInput;
+};
+export type TrackStaffUncheckedUpdateWithoutTrackInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    staffId?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type TrackStaffUncheckedUpdateManyWithoutTrackInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    staffId?: Prisma.StringFieldUpdateOperationsInput | string;
+    role?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type TrackStaffSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    trackId?: boolean;
+    staffId?: boolean;
+    role?: boolean;
+    assignedAt?: boolean;
+    track?: boolean | Prisma.TrackDefaultArgs<ExtArgs>;
+    staff?: boolean | Prisma.StaffDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["trackStaff"]>;
+export type TrackStaffSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    trackId?: boolean;
+    staffId?: boolean;
+    role?: boolean;
+    assignedAt?: boolean;
+    track?: boolean | Prisma.TrackDefaultArgs<ExtArgs>;
+    staff?: boolean | Prisma.StaffDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["trackStaff"]>;
+export type TrackStaffSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    trackId?: boolean;
+    staffId?: boolean;
+    role?: boolean;
+    assignedAt?: boolean;
+    track?: boolean | Prisma.TrackDefaultArgs<ExtArgs>;
+    staff?: boolean | Prisma.StaffDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["trackStaff"]>;
+export type TrackStaffSelectScalar = {
+    id?: boolean;
+    trackId?: boolean;
+    staffId?: boolean;
+    role?: boolean;
+    assignedAt?: boolean;
+};
+export type TrackStaffOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "trackId" | "staffId" | "role" | "assignedAt", ExtArgs["result"]["trackStaff"]>;
+export type TrackStaffInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    track?: boolean | Prisma.TrackDefaultArgs<ExtArgs>;
+    staff?: boolean | Prisma.StaffDefaultArgs<ExtArgs>;
+};
+export type TrackStaffIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    track?: boolean | Prisma.TrackDefaultArgs<ExtArgs>;
+    staff?: boolean | Prisma.StaffDefaultArgs<ExtArgs>;
+};
+export type TrackStaffIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    track?: boolean | Prisma.TrackDefaultArgs<ExtArgs>;
+    staff?: boolean | Prisma.StaffDefaultArgs<ExtArgs>;
+};
+export type $TrackStaffPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    name: "TrackStaff";
+    objects: {
+        track: Prisma.$TrackPayload<ExtArgs>;
+        staff: Prisma.$StaffPayload<ExtArgs>;
+    };
+    scalars: runtime.Types.Extensions.GetPayloadResult<{
+        id: string;
+        trackId: string;
+        staffId: string;
+        role: string | null;
+        assignedAt: Date;
+    }, ExtArgs["result"]["trackStaff"]>;
+    composites: {};
+};
+export type TrackStaffGetPayload<S extends boolean | null | undefined | TrackStaffDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$TrackStaffPayload, S>;
+export type TrackStaffCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<TrackStaffFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: TrackStaffCountAggregateInputType | true;
+};
+export interface TrackStaffDelegate<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: {
+        types: Prisma.TypeMap<ExtArgs>['model']['TrackStaff'];
+        meta: {
+            name: 'TrackStaff';
+        };
+    };
+    /**
+     * Find zero or one TrackStaff that matches the filter.
+     * @param {TrackStaffFindUniqueArgs} args - Arguments to find a TrackStaff
+     * @example
+     * // Get one TrackStaff
+     * const trackStaff = await prisma.trackStaff.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TrackStaffFindUniqueArgs>(args: Prisma.SelectSubset<T, TrackStaffFindUniqueArgs<ExtArgs>>): Prisma.Prisma__TrackStaffClient<runtime.Types.Result.GetResult<Prisma.$TrackStaffPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find one TrackStaff that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TrackStaffFindUniqueOrThrowArgs} args - Arguments to find a TrackStaff
+     * @example
+     * // Get one TrackStaff
+     * const trackStaff = await prisma.trackStaff.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TrackStaffFindUniqueOrThrowArgs>(args: Prisma.SelectSubset<T, TrackStaffFindUniqueOrThrowArgs<ExtArgs>>): Prisma.Prisma__TrackStaffClient<runtime.Types.Result.GetResult<Prisma.$TrackStaffPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first TrackStaff that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackStaffFindFirstArgs} args - Arguments to find a TrackStaff
+     * @example
+     * // Get one TrackStaff
+     * const trackStaff = await prisma.trackStaff.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TrackStaffFindFirstArgs>(args?: Prisma.SelectSubset<T, TrackStaffFindFirstArgs<ExtArgs>>): Prisma.Prisma__TrackStaffClient<runtime.Types.Result.GetResult<Prisma.$TrackStaffPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first TrackStaff that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackStaffFindFirstOrThrowArgs} args - Arguments to find a TrackStaff
+     * @example
+     * // Get one TrackStaff
+     * const trackStaff = await prisma.trackStaff.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TrackStaffFindFirstOrThrowArgs>(args?: Prisma.SelectSubset<T, TrackStaffFindFirstOrThrowArgs<ExtArgs>>): Prisma.Prisma__TrackStaffClient<runtime.Types.Result.GetResult<Prisma.$TrackStaffPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find zero or more TrackStaffs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackStaffFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TrackStaffs
+     * const trackStaffs = await prisma.trackStaff.findMany()
+     *
+     * // Get first 10 TrackStaffs
+     * const trackStaffs = await prisma.trackStaff.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const trackStaffWithIdOnly = await prisma.trackStaff.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends TrackStaffFindManyArgs>(args?: Prisma.SelectSubset<T, TrackStaffFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrackStaffPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>;
+    /**
+     * Create a TrackStaff.
+     * @param {TrackStaffCreateArgs} args - Arguments to create a TrackStaff.
+     * @example
+     * // Create one TrackStaff
+     * const TrackStaff = await prisma.trackStaff.create({
+     *   data: {
+     *     // ... data to create a TrackStaff
+     *   }
+     * })
+     *
+     */
+    create<T extends TrackStaffCreateArgs>(args: Prisma.SelectSubset<T, TrackStaffCreateArgs<ExtArgs>>): Prisma.Prisma__TrackStaffClient<runtime.Types.Result.GetResult<Prisma.$TrackStaffPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Create many TrackStaffs.
+     * @param {TrackStaffCreateManyArgs} args - Arguments to create many TrackStaffs.
+     * @example
+     * // Create many TrackStaffs
+     * const trackStaff = await prisma.trackStaff.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends TrackStaffCreateManyArgs>(args?: Prisma.SelectSubset<T, TrackStaffCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Create many TrackStaffs and returns the data saved in the database.
+     * @param {TrackStaffCreateManyAndReturnArgs} args - Arguments to create many TrackStaffs.
+     * @example
+     * // Create many TrackStaffs
+     * const trackStaff = await prisma.trackStaff.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Create many TrackStaffs and only return the `id`
+     * const trackStaffWithIdOnly = await prisma.trackStaff.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    createManyAndReturn<T extends TrackStaffCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, TrackStaffCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrackStaffPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>;
+    /**
+     * Delete a TrackStaff.
+     * @param {TrackStaffDeleteArgs} args - Arguments to delete one TrackStaff.
+     * @example
+     * // Delete one TrackStaff
+     * const TrackStaff = await prisma.trackStaff.delete({
+     *   where: {
+     *     // ... filter to delete one TrackStaff
+     *   }
+     * })
+     *
+     */
+    delete<T extends TrackStaffDeleteArgs>(args: Prisma.SelectSubset<T, TrackStaffDeleteArgs<ExtArgs>>): Prisma.Prisma__TrackStaffClient<runtime.Types.Result.GetResult<Prisma.$TrackStaffPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Update one TrackStaff.
+     * @param {TrackStaffUpdateArgs} args - Arguments to update one TrackStaff.
+     * @example
+     * // Update one TrackStaff
+     * const trackStaff = await prisma.trackStaff.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends TrackStaffUpdateArgs>(args: Prisma.SelectSubset<T, TrackStaffUpdateArgs<ExtArgs>>): Prisma.Prisma__TrackStaffClient<runtime.Types.Result.GetResult<Prisma.$TrackStaffPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Delete zero or more TrackStaffs.
+     * @param {TrackStaffDeleteManyArgs} args - Arguments to filter TrackStaffs to delete.
+     * @example
+     * // Delete a few TrackStaffs
+     * const { count } = await prisma.trackStaff.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends TrackStaffDeleteManyArgs>(args?: Prisma.SelectSubset<T, TrackStaffDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more TrackStaffs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackStaffUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TrackStaffs
+     * const trackStaff = await prisma.trackStaff.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends TrackStaffUpdateManyArgs>(args: Prisma.SelectSubset<T, TrackStaffUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more TrackStaffs and returns the data updated in the database.
+     * @param {TrackStaffUpdateManyAndReturnArgs} args - Arguments to update many TrackStaffs.
+     * @example
+     * // Update many TrackStaffs
+     * const trackStaff = await prisma.trackStaff.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Update zero or more TrackStaffs and only return the `id`
+     * const trackStaffWithIdOnly = await prisma.trackStaff.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    updateManyAndReturn<T extends TrackStaffUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, TrackStaffUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrackStaffPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>;
+    /**
+     * Create or update one TrackStaff.
+     * @param {TrackStaffUpsertArgs} args - Arguments to update or create a TrackStaff.
+     * @example
+     * // Update or create a TrackStaff
+     * const trackStaff = await prisma.trackStaff.upsert({
+     *   create: {
+     *     // ... data to create a TrackStaff
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TrackStaff we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TrackStaffUpsertArgs>(args: Prisma.SelectSubset<T, TrackStaffUpsertArgs<ExtArgs>>): Prisma.Prisma__TrackStaffClient<runtime.Types.Result.GetResult<Prisma.$TrackStaffPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Count the number of TrackStaffs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackStaffCountArgs} args - Arguments to filter TrackStaffs to count.
+     * @example
+     * // Count the number of TrackStaffs
+     * const count = await prisma.trackStaff.count({
+     *   where: {
+     *     // ... the filter for the TrackStaffs we want to count
+     *   }
+     * })
+    **/
+    count<T extends TrackStaffCountArgs>(args?: Prisma.Subset<T, TrackStaffCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<'select', any> ? T['select'] extends true ? number : Prisma.GetScalarType<T['select'], TrackStaffCountAggregateOutputType> : number>;
+    /**
+     * Allows you to perform aggregations operations on a TrackStaff.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackStaffAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TrackStaffAggregateArgs>(args: Prisma.Subset<T, TrackStaffAggregateArgs>): Prisma.PrismaPromise<GetTrackStaffAggregateType<T>>;
+    /**
+     * Group by TrackStaff.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TrackStaffGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+    **/
+    groupBy<T extends TrackStaffGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<'skip', Prisma.Keys<T>>, Prisma.Extends<'take', Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
+        orderBy: TrackStaffGroupByArgs['orderBy'];
+    } : {
+        orderBy?: TrackStaffGroupByArgs['orderBy'];
+    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>, ByFields extends Prisma.MaybeTupleToUnion<T['by']>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T['having']>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T['by'] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
+        [P in HavingFields]: P extends ByFields ? never : P extends string ? `Error: Field "${P}" used in "having" needs to be provided in "by".` : [
+            Error,
+            'Field ',
+            P,
+            ` in "having" needs to be provided in "by"`
+        ];
+    }[HavingFields] : 'take' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : 'skip' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "skip", you also need to provide "orderBy"' : ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields]>(args: Prisma.SubsetIntersection<T, TrackStaffGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTrackStaffGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>;
+    /**
+     * Fields of the TrackStaff model
+     */
+    readonly fields: TrackStaffFieldRefs;
+}
+/**
+ * The delegate class that acts as a "Promise-like" for TrackStaff.
+ * Why is this prefixed with `Prisma__`?
+ * Because we want to prevent naming conflicts as mentioned in
+ * https://github.com/prisma/prisma-client-js/issues/707
+ */
+export interface Prisma__TrackStaffClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise";
+    track<T extends Prisma.TrackDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TrackDefaultArgs<ExtArgs>>): Prisma.Prisma__TrackClient<runtime.Types.Result.GetResult<Prisma.$TrackPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    staff<T extends Prisma.StaffDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StaffDefaultArgs<ExtArgs>>): Prisma.Prisma__StaffClient<runtime.Types.Result.GetResult<Prisma.$StaffPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
+}
+/**
+ * Fields of the TrackStaff model
+ */
+export interface TrackStaffFieldRefs {
+    readonly id: Prisma.FieldRef<"TrackStaff", 'String'>;
+    readonly trackId: Prisma.FieldRef<"TrackStaff", 'String'>;
+    readonly staffId: Prisma.FieldRef<"TrackStaff", 'String'>;
+    readonly role: Prisma.FieldRef<"TrackStaff", 'String'>;
+    readonly assignedAt: Prisma.FieldRef<"TrackStaff", 'DateTime'>;
+}
+/**
+ * TrackStaff findUnique
+ */
+export type TrackStaffFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackStaff
+     */
+    select?: Prisma.TrackStaffSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the TrackStaff
+     */
+    omit?: Prisma.TrackStaffOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackStaffInclude<ExtArgs> | null;
+    /**
+     * Filter, which TrackStaff to fetch.
+     */
+    where: Prisma.TrackStaffWhereUniqueInput;
+};
+/**
+ * TrackStaff findUniqueOrThrow
+ */
+export type TrackStaffFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackStaff
+     */
+    select?: Prisma.TrackStaffSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the TrackStaff
+     */
+    omit?: Prisma.TrackStaffOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackStaffInclude<ExtArgs> | null;
+    /**
+     * Filter, which TrackStaff to fetch.
+     */
+    where: Prisma.TrackStaffWhereUniqueInput;
+};
+/**
+ * TrackStaff findFirst
+ */
+export type TrackStaffFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackStaff
+     */
+    select?: Prisma.TrackStaffSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the TrackStaff
+     */
+    omit?: Prisma.TrackStaffOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackStaffInclude<ExtArgs> | null;
+    /**
+     * Filter, which TrackStaff to fetch.
+     */
+    where?: Prisma.TrackStaffWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of TrackStaffs to fetch.
+     */
+    orderBy?: Prisma.TrackStaffOrderByWithRelationInput | Prisma.TrackStaffOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for TrackStaffs.
+     */
+    cursor?: Prisma.TrackStaffWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` TrackStaffs from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` TrackStaffs.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of TrackStaffs.
+     */
+    distinct?: Prisma.TrackStaffScalarFieldEnum | Prisma.TrackStaffScalarFieldEnum[];
+};
+/**
+ * TrackStaff findFirstOrThrow
+ */
+export type TrackStaffFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackStaff
+     */
+    select?: Prisma.TrackStaffSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the TrackStaff
+     */
+    omit?: Prisma.TrackStaffOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackStaffInclude<ExtArgs> | null;
+    /**
+     * Filter, which TrackStaff to fetch.
+     */
+    where?: Prisma.TrackStaffWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of TrackStaffs to fetch.
+     */
+    orderBy?: Prisma.TrackStaffOrderByWithRelationInput | Prisma.TrackStaffOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for TrackStaffs.
+     */
+    cursor?: Prisma.TrackStaffWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` TrackStaffs from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` TrackStaffs.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of TrackStaffs.
+     */
+    distinct?: Prisma.TrackStaffScalarFieldEnum | Prisma.TrackStaffScalarFieldEnum[];
+};
+/**
+ * TrackStaff findMany
+ */
+export type TrackStaffFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackStaff
+     */
+    select?: Prisma.TrackStaffSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the TrackStaff
+     */
+    omit?: Prisma.TrackStaffOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackStaffInclude<ExtArgs> | null;
+    /**
+     * Filter, which TrackStaffs to fetch.
+     */
+    where?: Prisma.TrackStaffWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of TrackStaffs to fetch.
+     */
+    orderBy?: Prisma.TrackStaffOrderByWithRelationInput | Prisma.TrackStaffOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing TrackStaffs.
+     */
+    cursor?: Prisma.TrackStaffWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` TrackStaffs from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` TrackStaffs.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of TrackStaffs.
+     */
+    distinct?: Prisma.TrackStaffScalarFieldEnum | Prisma.TrackStaffScalarFieldEnum[];
+};
+/**
+ * TrackStaff create
+ */
+export type TrackStaffCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackStaff
+     */
+    select?: Prisma.TrackStaffSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the TrackStaff
+     */
+    omit?: Prisma.TrackStaffOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackStaffInclude<ExtArgs> | null;
+    /**
+     * The data needed to create a TrackStaff.
+     */
+    data: Prisma.XOR<Prisma.TrackStaffCreateInput, Prisma.TrackStaffUncheckedCreateInput>;
+};
+/**
+ * TrackStaff createMany
+ */
+export type TrackStaffCreateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TrackStaffs.
+     */
+    data: Prisma.TrackStaffCreateManyInput | Prisma.TrackStaffCreateManyInput[];
+    skipDuplicates?: boolean;
+};
+/**
+ * TrackStaff createManyAndReturn
+ */
+export type TrackStaffCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackStaff
+     */
+    select?: Prisma.TrackStaffSelectCreateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the TrackStaff
+     */
+    omit?: Prisma.TrackStaffOmit<ExtArgs> | null;
+    /**
+     * The data used to create many TrackStaffs.
+     */
+    data: Prisma.TrackStaffCreateManyInput | Prisma.TrackStaffCreateManyInput[];
+    skipDuplicates?: boolean;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackStaffIncludeCreateManyAndReturn<ExtArgs> | null;
+};
+/**
+ * TrackStaff update
+ */
+export type TrackStaffUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackStaff
+     */
+    select?: Prisma.TrackStaffSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the TrackStaff
+     */
+    omit?: Prisma.TrackStaffOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackStaffInclude<ExtArgs> | null;
+    /**
+     * The data needed to update a TrackStaff.
+     */
+    data: Prisma.XOR<Prisma.TrackStaffUpdateInput, Prisma.TrackStaffUncheckedUpdateInput>;
+    /**
+     * Choose, which TrackStaff to update.
+     */
+    where: Prisma.TrackStaffWhereUniqueInput;
+};
+/**
+ * TrackStaff updateMany
+ */
+export type TrackStaffUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TrackStaffs.
+     */
+    data: Prisma.XOR<Prisma.TrackStaffUpdateManyMutationInput, Prisma.TrackStaffUncheckedUpdateManyInput>;
+    /**
+     * Filter which TrackStaffs to update
+     */
+    where?: Prisma.TrackStaffWhereInput;
+    /**
+     * Limit how many TrackStaffs to update.
+     */
+    limit?: number;
+};
+/**
+ * TrackStaff updateManyAndReturn
+ */
+export type TrackStaffUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackStaff
+     */
+    select?: Prisma.TrackStaffSelectUpdateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the TrackStaff
+     */
+    omit?: Prisma.TrackStaffOmit<ExtArgs> | null;
+    /**
+     * The data used to update TrackStaffs.
+     */
+    data: Prisma.XOR<Prisma.TrackStaffUpdateManyMutationInput, Prisma.TrackStaffUncheckedUpdateManyInput>;
+    /**
+     * Filter which TrackStaffs to update
+     */
+    where?: Prisma.TrackStaffWhereInput;
+    /**
+     * Limit how many TrackStaffs to update.
+     */
+    limit?: number;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackStaffIncludeUpdateManyAndReturn<ExtArgs> | null;
+};
+/**
+ * TrackStaff upsert
+ */
+export type TrackStaffUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackStaff
+     */
+    select?: Prisma.TrackStaffSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the TrackStaff
+     */
+    omit?: Prisma.TrackStaffOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackStaffInclude<ExtArgs> | null;
+    /**
+     * The filter to search for the TrackStaff to update in case it exists.
+     */
+    where: Prisma.TrackStaffWhereUniqueInput;
+    /**
+     * In case the TrackStaff found by the `where` argument doesn't exist, create a new TrackStaff with this data.
+     */
+    create: Prisma.XOR<Prisma.TrackStaffCreateInput, Prisma.TrackStaffUncheckedCreateInput>;
+    /**
+     * In case the TrackStaff was found with the provided `where` argument, update it with this data.
+     */
+    update: Prisma.XOR<Prisma.TrackStaffUpdateInput, Prisma.TrackStaffUncheckedUpdateInput>;
+};
+/**
+ * TrackStaff delete
+ */
+export type TrackStaffDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackStaff
+     */
+    select?: Prisma.TrackStaffSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the TrackStaff
+     */
+    omit?: Prisma.TrackStaffOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackStaffInclude<ExtArgs> | null;
+    /**
+     * Filter which TrackStaff to delete.
+     */
+    where: Prisma.TrackStaffWhereUniqueInput;
+};
+/**
+ * TrackStaff deleteMany
+ */
+export type TrackStaffDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which TrackStaffs to delete
+     */
+    where?: Prisma.TrackStaffWhereInput;
+    /**
+     * Limit how many TrackStaffs to delete.
+     */
+    limit?: number;
+};
+/**
+ * TrackStaff without action
+ */
+export type TrackStaffDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TrackStaff
+     */
+    select?: Prisma.TrackStaffSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the TrackStaff
+     */
+    omit?: Prisma.TrackStaffOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.TrackStaffInclude<ExtArgs> | null;
+};

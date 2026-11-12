@@ -7,7 +7,7 @@ import {
 	IconX,
 } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { Stats } from "@/components/common/stats";
@@ -15,10 +15,10 @@ import { TableToolbar } from "@/components/common/table-toolbar";
 import { Button } from "@/components/ui/button";
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import { AddCourseSheet } from "@/features/services/training/components/add-course-sheet";
-import { CourseDialog } from "@/features/services/training/components/course-dialog";
 import { AssignEmployeeDialog } from "@/features/services/training/components/assign-employee-dialog";
 import { CloneSuccessToast } from "@/features/services/training/components/clone-success-toast";
 import { CourseCard } from "@/features/services/training/components/course-card";
+import { CourseDialog } from "@/features/services/training/components/course-dialog";
 import { CourseTable } from "@/features/services/training/components/course-table";
 import { CreateContentMenu } from "@/features/services/training/components/create-content-menu";
 import { DeleteCourseDialog } from "@/features/services/training/components/delete-course-dialog";
@@ -48,6 +48,10 @@ import {
 } from "@/features/services/training/hooks/use-courses";
 import type { TrainingTab } from "@/features/services/training/types/training-tabs.types";
 import { exportCoursesCsv } from "@/features/services/training/utils/export-courses";
+import {
+	readCourseDialogSession,
+	writeCourseDialogSession,
+} from "@/features/services/training/utils/lesson-draft";
 import type {
 	CourseListItemResponse,
 	CourseLocationMode,
@@ -102,17 +106,27 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 	// الدورة قيد الاستنساخ — يظهر صفّ تقدّم مضمّن أسفلها حتى انتهاء العملية
 	const [cloning, setCloning] = useState<CourseListItemResponse | null>(null);
 	const [addOpen, setAddOpen] = useState(false);
-	// معرّف الدورة قيد التعديل — تُفتح اللوحة على الخطوة 1 بحالة محمّلة
+	// معرّف الدورة قيد التعديل — تُفتح اللوحة على الخطوة 1 بحالة محمّلة (أو الخطوة المحفوظة عند إعادة التحميل)
 	const [editId, setEditId] = useState<string | null>(null);
+
+	// استعادة نافذة الدورة المفتوحة بعد hydration فقط حتى يطابق SSR HTML العميل دون أي mismatch
+	useEffect(() => {
+		const restored = readCourseDialogSession();
+		if (!restored) return;
+		setEditId(restored.activeCourseId ?? restored.editCourseId);
+		setAddOpen(true);
+	}, []);
 	// الدورة التي يُعيَّن لها موظفون عبر حوار «تعيين لموظف»
 	const [assigning, setAssigning] = useState<CourseListItemResponse | null>(null);
 
 	const handleAdd = () => {
+		writeCourseDialogSession(null);
 		setEditId(null);
 		setAddOpen(true);
 	};
 
 	const handleEdit = (course: CourseListItemResponse) => {
+		writeCourseDialogSession(null);
 		setEditId(course.id);
 		setAddOpen(true);
 	};
@@ -226,6 +240,7 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 				searchPlaceholder="ابحث عن اسم التدريب / المعرّف..."
 				searchClassName="w-[320px]"
 				searchValue={search}
+				onSearchChange={setSearch}
 				// «فلترة» القياسي مخفيّ لأن TrainingFiltersMenu في leftExtra يقوم بدوره
 				showFilter={false}
 				showExport={false}
@@ -260,6 +275,12 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 					<CreateContentMenu
 						onSelectCourse={handleAdd}
 						onSelectQuiz={() => navigate({ to: "/services/quizzes" })}
+						onSelectPage={() =>
+							navigate({
+								to: "/services/training",
+								search: { tab: "pages" },
+							})
+						}
 					>
 						<Button
 							type="button"

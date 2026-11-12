@@ -24,10 +24,14 @@ import {
 	QUIZ_ANSWER_TYPE_OPTIONS,
 } from "@/features/services/training/data/training";
 import { cn } from "@/lib/utils";
-import type { CreateLessonFormInput, QuizAnswerType } from "@/server/training/training.type";
+import type {
+	CreateLessonFormInput,
+	LessonFormValues,
+	QuizAnswerType,
+} from "@/server/training/training.type";
 
 type QuizProps = {
-	control: Control<CreateLessonFormInput>;
+	control: Control<CreateLessonFormInput, unknown, LessonFormValues>;
 	register: UseFormRegister<CreateLessonFormInput>;
 	setValue: UseFormSetValue<CreateLessonFormInput>;
 	getValues: UseFormGetValues<CreateLessonFormInput>;

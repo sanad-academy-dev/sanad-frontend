@@ -48,6 +48,8 @@ export type OwnerMinAggregateOutputType = {
   country: string | null
   city: string | null
   address: string | null
+  emergencyContactName: string | null
+  emergencyContactPhone: string | null
   notes: string | null
   active: boolean | null
   isDeleted: boolean | null
@@ -71,6 +73,8 @@ export type OwnerMaxAggregateOutputType = {
   country: string | null
   city: string | null
   address: string | null
+  emergencyContactName: string | null
+  emergencyContactPhone: string | null
   notes: string | null
   active: boolean | null
   isDeleted: boolean | null
@@ -94,6 +98,8 @@ export type OwnerCountAggregateOutputType = {
   country: number
   city: number
   address: number
+  emergencyContactName: number
+  emergencyContactPhone: number
   notes: number
   active: number
   isDeleted: number
@@ -127,6 +133,8 @@ export type OwnerMinAggregateInputType = {
   country?: true
   city?: true
   address?: true
+  emergencyContactName?: true
+  emergencyContactPhone?: true
   notes?: true
   active?: true
   isDeleted?: true
@@ -150,6 +158,8 @@ export type OwnerMaxAggregateInputType = {
   country?: true
   city?: true
   address?: true
+  emergencyContactName?: true
+  emergencyContactPhone?: true
   notes?: true
   active?: true
   isDeleted?: true
@@ -173,6 +183,8 @@ export type OwnerCountAggregateInputType = {
   country?: true
   city?: true
   address?: true
+  emergencyContactName?: true
+  emergencyContactPhone?: true
   notes?: true
   active?: true
   isDeleted?: true
@@ -283,6 +295,8 @@ export type OwnerGroupByOutputType = {
   country: string | null
   city: string | null
   address: string | null
+  emergencyContactName: string | null
+  emergencyContactPhone: string | null
   notes: string | null
   active: boolean
   isDeleted: boolean
@@ -329,6 +343,8 @@ export type OwnerWhereInput = {
   country?: Prisma.StringNullableFilter<"Owner"> | string | null
   city?: Prisma.StringNullableFilter<"Owner"> | string | null
   address?: Prisma.StringNullableFilter<"Owner"> | string | null
+  emergencyContactName?: Prisma.StringNullableFilter<"Owner"> | string | null
+  emergencyContactPhone?: Prisma.StringNullableFilter<"Owner"> | string | null
   notes?: Prisma.StringNullableFilter<"Owner"> | string | null
   active?: Prisma.BoolFilter<"Owner"> | boolean
   isDeleted?: Prisma.BoolFilter<"Owner"> | boolean
@@ -340,6 +356,7 @@ export type OwnerWhereInput = {
   crmWonDeals?: Prisma.CrmDealListRelationFilter
   clinic?: Prisma.XOR<Prisma.ClinicScalarRelationFilter, Prisma.ClinicWhereInput>
   patients?: Prisma.PatientListRelationFilter
+  guardianPatients?: Prisma.PatientGuardianListRelationFilter
   appointments?: Prisma.AppointmentListRelationFilter
   portalLinks?: Prisma.PetOwnerClinicLinkListRelationFilter
   inboxItems?: Prisma.InboxItemListRelationFilter
@@ -352,6 +369,7 @@ export type OwnerWhereInput = {
   groomingSessions?: Prisma.GroomingSessionListRelationFilter
   memberships?: Prisma.MembershipListRelationFilter
   insuranceClaims?: Prisma.InsuranceClaimListRelationFilter
+  registrationRequests?: Prisma.RegistrationRequestListRelationFilter
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryListRelationFilter
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionListRelationFilter
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierListRelationFilter
@@ -377,6 +395,8 @@ export type OwnerOrderByWithRelationInput = {
   country?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   active?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
@@ -388,6 +408,7 @@ export type OwnerOrderByWithRelationInput = {
   crmWonDeals?: Prisma.CrmDealOrderByRelationAggregateInput
   clinic?: Prisma.ClinicOrderByWithRelationInput
   patients?: Prisma.PatientOrderByRelationAggregateInput
+  guardianPatients?: Prisma.PatientGuardianOrderByRelationAggregateInput
   appointments?: Prisma.AppointmentOrderByRelationAggregateInput
   portalLinks?: Prisma.PetOwnerClinicLinkOrderByRelationAggregateInput
   inboxItems?: Prisma.InboxItemOrderByRelationAggregateInput
@@ -400,6 +421,7 @@ export type OwnerOrderByWithRelationInput = {
   groomingSessions?: Prisma.GroomingSessionOrderByRelationAggregateInput
   memberships?: Prisma.MembershipOrderByRelationAggregateInput
   insuranceClaims?: Prisma.InsuranceClaimOrderByRelationAggregateInput
+  registrationRequests?: Prisma.RegistrationRequestOrderByRelationAggregateInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryOrderByRelationAggregateInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionOrderByRelationAggregateInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierOrderByRelationAggregateInput
@@ -430,6 +452,8 @@ export type OwnerWhereUniqueInput = Prisma.AtLeast<{
   country?: Prisma.StringNullableFilter<"Owner"> | string | null
   city?: Prisma.StringNullableFilter<"Owner"> | string | null
   address?: Prisma.StringNullableFilter<"Owner"> | string | null
+  emergencyContactName?: Prisma.StringNullableFilter<"Owner"> | string | null
+  emergencyContactPhone?: Prisma.StringNullableFilter<"Owner"> | string | null
   notes?: Prisma.StringNullableFilter<"Owner"> | string | null
   active?: Prisma.BoolFilter<"Owner"> | boolean
   isDeleted?: Prisma.BoolFilter<"Owner"> | boolean
@@ -441,6 +465,7 @@ export type OwnerWhereUniqueInput = Prisma.AtLeast<{
   crmWonDeals?: Prisma.CrmDealListRelationFilter
   clinic?: Prisma.XOR<Prisma.ClinicScalarRelationFilter, Prisma.ClinicWhereInput>
   patients?: Prisma.PatientListRelationFilter
+  guardianPatients?: Prisma.PatientGuardianListRelationFilter
   appointments?: Prisma.AppointmentListRelationFilter
   portalLinks?: Prisma.PetOwnerClinicLinkListRelationFilter
   inboxItems?: Prisma.InboxItemListRelationFilter
@@ -453,6 +478,7 @@ export type OwnerWhereUniqueInput = Prisma.AtLeast<{
   groomingSessions?: Prisma.GroomingSessionListRelationFilter
   memberships?: Prisma.MembershipListRelationFilter
   insuranceClaims?: Prisma.InsuranceClaimListRelationFilter
+  registrationRequests?: Prisma.RegistrationRequestListRelationFilter
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryListRelationFilter
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionListRelationFilter
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierListRelationFilter
@@ -478,6 +504,8 @@ export type OwnerOrderByWithAggregationInput = {
   country?: Prisma.SortOrderInput | Prisma.SortOrder
   city?: Prisma.SortOrderInput | Prisma.SortOrder
   address?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   active?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
@@ -509,6 +537,8 @@ export type OwnerScalarWhereWithAggregatesInput = {
   country?: Prisma.StringNullableWithAggregatesFilter<"Owner"> | string | null
   city?: Prisma.StringNullableWithAggregatesFilter<"Owner"> | string | null
   address?: Prisma.StringNullableWithAggregatesFilter<"Owner"> | string | null
+  emergencyContactName?: Prisma.StringNullableWithAggregatesFilter<"Owner"> | string | null
+  emergencyContactPhone?: Prisma.StringNullableWithAggregatesFilter<"Owner"> | string | null
   notes?: Prisma.StringNullableWithAggregatesFilter<"Owner"> | string | null
   active?: Prisma.BoolWithAggregatesFilter<"Owner"> | boolean
   isDeleted?: Prisma.BoolWithAggregatesFilter<"Owner"> | boolean
@@ -531,6 +561,8 @@ export type OwnerCreateInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -542,6 +574,7 @@ export type OwnerCreateInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -554,6 +587,7 @@ export type OwnerCreateInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -579,6 +613,8 @@ export type OwnerUncheckedCreateInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -589,6 +625,7 @@ export type OwnerUncheckedCreateInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -601,6 +638,7 @@ export type OwnerUncheckedCreateInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -625,6 +663,8 @@ export type OwnerUpdateInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -636,6 +676,7 @@ export type OwnerUpdateInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -648,6 +689,7 @@ export type OwnerUpdateInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -673,6 +715,8 @@ export type OwnerUncheckedUpdateInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -683,6 +727,7 @@ export type OwnerUncheckedUpdateInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -695,6 +740,7 @@ export type OwnerUncheckedUpdateInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -720,6 +766,8 @@ export type OwnerCreateManyInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -742,6 +790,8 @@ export type OwnerUpdateManyMutationInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -765,6 +815,8 @@ export type OwnerUncheckedUpdateManyInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -818,6 +870,8 @@ export type OwnerCountOrderByAggregateInput = {
   country?: Prisma.SortOrder
   city?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   active?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
@@ -845,6 +899,8 @@ export type OwnerMaxOrderByAggregateInput = {
   country?: Prisma.SortOrder
   city?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   active?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
@@ -868,6 +924,8 @@ export type OwnerMinOrderByAggregateInput = {
   country?: Prisma.SortOrder
   city?: Prisma.SortOrder
   address?: Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   active?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
@@ -1045,6 +1103,20 @@ export type OwnerUpdateOneWithoutPatientsNestedInput = {
   delete?: Prisma.OwnerWhereInput | boolean
   connect?: Prisma.OwnerWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.OwnerUpdateToOneWithWhereWithoutPatientsInput, Prisma.OwnerUpdateWithoutPatientsInput>, Prisma.OwnerUncheckedUpdateWithoutPatientsInput>
+}
+
+export type OwnerCreateNestedOneWithoutGuardianPatientsInput = {
+  create?: Prisma.XOR<Prisma.OwnerCreateWithoutGuardianPatientsInput, Prisma.OwnerUncheckedCreateWithoutGuardianPatientsInput>
+  connectOrCreate?: Prisma.OwnerCreateOrConnectWithoutGuardianPatientsInput
+  connect?: Prisma.OwnerWhereUniqueInput
+}
+
+export type OwnerUpdateOneRequiredWithoutGuardianPatientsNestedInput = {
+  create?: Prisma.XOR<Prisma.OwnerCreateWithoutGuardianPatientsInput, Prisma.OwnerUncheckedCreateWithoutGuardianPatientsInput>
+  connectOrCreate?: Prisma.OwnerCreateOrConnectWithoutGuardianPatientsInput
+  upsert?: Prisma.OwnerUpsertWithoutGuardianPatientsInput
+  connect?: Prisma.OwnerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OwnerUpdateToOneWithWhereWithoutGuardianPatientsInput, Prisma.OwnerUpdateWithoutGuardianPatientsInput>, Prisma.OwnerUncheckedUpdateWithoutGuardianPatientsInput>
 }
 
 export type OwnerCreateNestedOneWithoutAppointmentsInput = {
@@ -1285,6 +1357,22 @@ export type OwnerUpdateOneRequiredWithoutLoyaltyRedemptionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.OwnerUpdateToOneWithWhereWithoutLoyaltyRedemptionsInput, Prisma.OwnerUpdateWithoutLoyaltyRedemptionsInput>, Prisma.OwnerUncheckedUpdateWithoutLoyaltyRedemptionsInput>
 }
 
+export type OwnerCreateNestedOneWithoutRegistrationRequestsInput = {
+  create?: Prisma.XOR<Prisma.OwnerCreateWithoutRegistrationRequestsInput, Prisma.OwnerUncheckedCreateWithoutRegistrationRequestsInput>
+  connectOrCreate?: Prisma.OwnerCreateOrConnectWithoutRegistrationRequestsInput
+  connect?: Prisma.OwnerWhereUniqueInput
+}
+
+export type OwnerUpdateOneWithoutRegistrationRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.OwnerCreateWithoutRegistrationRequestsInput, Prisma.OwnerUncheckedCreateWithoutRegistrationRequestsInput>
+  connectOrCreate?: Prisma.OwnerCreateOrConnectWithoutRegistrationRequestsInput
+  upsert?: Prisma.OwnerUpsertWithoutRegistrationRequestsInput
+  disconnect?: Prisma.OwnerWhereInput | boolean
+  delete?: Prisma.OwnerWhereInput | boolean
+  connect?: Prisma.OwnerWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.OwnerUpdateToOneWithWhereWithoutRegistrationRequestsInput, Prisma.OwnerUpdateWithoutRegistrationRequestsInput>, Prisma.OwnerUncheckedUpdateWithoutRegistrationRequestsInput>
+}
+
 export type OwnerCreateWithoutClinicInput = {
   id?: string
   code: string
@@ -1298,6 +1386,8 @@ export type OwnerCreateWithoutClinicInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -1308,6 +1398,7 @@ export type OwnerCreateWithoutClinicInput = {
   crmDeals?: Prisma.CrmDealCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -1320,6 +1411,7 @@ export type OwnerCreateWithoutClinicInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -1344,6 +1436,8 @@ export type OwnerUncheckedCreateWithoutClinicInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -1354,6 +1448,7 @@ export type OwnerUncheckedCreateWithoutClinicInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -1366,6 +1461,7 @@ export type OwnerUncheckedCreateWithoutClinicInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -1420,6 +1516,8 @@ export type OwnerScalarWhereInput = {
   country?: Prisma.StringNullableFilter<"Owner"> | string | null
   city?: Prisma.StringNullableFilter<"Owner"> | string | null
   address?: Prisma.StringNullableFilter<"Owner"> | string | null
+  emergencyContactName?: Prisma.StringNullableFilter<"Owner"> | string | null
+  emergencyContactPhone?: Prisma.StringNullableFilter<"Owner"> | string | null
   notes?: Prisma.StringNullableFilter<"Owner"> | string | null
   active?: Prisma.BoolFilter<"Owner"> | boolean
   isDeleted?: Prisma.BoolFilter<"Owner"> | boolean
@@ -1442,6 +1540,8 @@ export type OwnerCreateWithoutPortalLinksInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -1453,6 +1553,7 @@ export type OwnerCreateWithoutPortalLinksInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
   labTestOrders?: Prisma.LabTestOrderCreateNestedManyWithoutOwnerInput
@@ -1464,6 +1565,7 @@ export type OwnerCreateWithoutPortalLinksInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -1489,6 +1591,8 @@ export type OwnerUncheckedCreateWithoutPortalLinksInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -1499,6 +1603,7 @@ export type OwnerUncheckedCreateWithoutPortalLinksInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
   labTestOrders?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutOwnerInput
@@ -1510,6 +1615,7 @@ export type OwnerUncheckedCreateWithoutPortalLinksInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -1550,6 +1656,8 @@ export type OwnerUpdateWithoutPortalLinksInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1561,6 +1669,7 @@ export type OwnerUpdateWithoutPortalLinksInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
   labTestOrders?: Prisma.LabTestOrderUpdateManyWithoutOwnerNestedInput
@@ -1572,6 +1681,7 @@ export type OwnerUpdateWithoutPortalLinksInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -1597,6 +1707,8 @@ export type OwnerUncheckedUpdateWithoutPortalLinksInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1607,6 +1719,7 @@ export type OwnerUncheckedUpdateWithoutPortalLinksInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
   labTestOrders?: Prisma.LabTestOrderUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1618,6 +1731,7 @@ export type OwnerUncheckedUpdateWithoutPortalLinksInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1642,6 +1756,8 @@ export type OwnerCreateWithoutPetOwnerRequestsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -1653,6 +1769,7 @@ export type OwnerCreateWithoutPetOwnerRequestsInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -1665,6 +1782,7 @@ export type OwnerCreateWithoutPetOwnerRequestsInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -1689,6 +1807,8 @@ export type OwnerUncheckedCreateWithoutPetOwnerRequestsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -1699,6 +1819,7 @@ export type OwnerUncheckedCreateWithoutPetOwnerRequestsInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -1711,6 +1832,7 @@ export type OwnerUncheckedCreateWithoutPetOwnerRequestsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -1750,6 +1872,8 @@ export type OwnerUpdateWithoutPetOwnerRequestsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1761,6 +1885,7 @@ export type OwnerUpdateWithoutPetOwnerRequestsInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -1773,6 +1898,7 @@ export type OwnerUpdateWithoutPetOwnerRequestsInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -1797,6 +1923,8 @@ export type OwnerUncheckedUpdateWithoutPetOwnerRequestsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1807,6 +1935,7 @@ export type OwnerUncheckedUpdateWithoutPetOwnerRequestsInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1819,6 +1948,7 @@ export type OwnerUncheckedUpdateWithoutPetOwnerRequestsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -1842,6 +1972,8 @@ export type OwnerCreateWithoutInboxItemsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -1853,6 +1985,7 @@ export type OwnerCreateWithoutInboxItemsInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   labTestOrders?: Prisma.LabTestOrderCreateNestedManyWithoutOwnerInput
@@ -1864,6 +1997,7 @@ export type OwnerCreateWithoutInboxItemsInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -1889,6 +2023,8 @@ export type OwnerUncheckedCreateWithoutInboxItemsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -1899,6 +2035,7 @@ export type OwnerUncheckedCreateWithoutInboxItemsInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   labTestOrders?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutOwnerInput
@@ -1910,6 +2047,7 @@ export type OwnerUncheckedCreateWithoutInboxItemsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -1950,6 +2088,8 @@ export type OwnerUpdateWithoutInboxItemsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -1961,6 +2101,7 @@ export type OwnerUpdateWithoutInboxItemsInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   labTestOrders?: Prisma.LabTestOrderUpdateManyWithoutOwnerNestedInput
@@ -1972,6 +2113,7 @@ export type OwnerUpdateWithoutInboxItemsInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -1997,6 +2139,8 @@ export type OwnerUncheckedUpdateWithoutInboxItemsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2007,6 +2151,7 @@ export type OwnerUncheckedUpdateWithoutInboxItemsInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   labTestOrders?: Prisma.LabTestOrderUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2018,6 +2163,7 @@ export type OwnerUncheckedUpdateWithoutInboxItemsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2042,6 +2188,8 @@ export type OwnerCreateWithoutLabTestOrdersInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -2053,6 +2201,7 @@ export type OwnerCreateWithoutLabTestOrdersInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -2064,6 +2213,7 @@ export type OwnerCreateWithoutLabTestOrdersInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -2089,6 +2239,8 @@ export type OwnerUncheckedCreateWithoutLabTestOrdersInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -2099,6 +2251,7 @@ export type OwnerUncheckedCreateWithoutLabTestOrdersInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -2110,6 +2263,7 @@ export type OwnerUncheckedCreateWithoutLabTestOrdersInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -2150,6 +2304,8 @@ export type OwnerUpdateWithoutLabTestOrdersInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2161,6 +2317,7 @@ export type OwnerUpdateWithoutLabTestOrdersInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -2172,6 +2329,7 @@ export type OwnerUpdateWithoutLabTestOrdersInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -2197,6 +2355,8 @@ export type OwnerUncheckedUpdateWithoutLabTestOrdersInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2207,6 +2367,7 @@ export type OwnerUncheckedUpdateWithoutLabTestOrdersInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2218,6 +2379,7 @@ export type OwnerUncheckedUpdateWithoutLabTestOrdersInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2242,6 +2404,8 @@ export type OwnerCreateWithoutRadiologyOrdersInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -2253,6 +2417,7 @@ export type OwnerCreateWithoutRadiologyOrdersInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -2264,6 +2429,7 @@ export type OwnerCreateWithoutRadiologyOrdersInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -2289,6 +2455,8 @@ export type OwnerUncheckedCreateWithoutRadiologyOrdersInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -2299,6 +2467,7 @@ export type OwnerUncheckedCreateWithoutRadiologyOrdersInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -2310,6 +2479,7 @@ export type OwnerUncheckedCreateWithoutRadiologyOrdersInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -2350,6 +2520,8 @@ export type OwnerUpdateWithoutRadiologyOrdersInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2361,6 +2533,7 @@ export type OwnerUpdateWithoutRadiologyOrdersInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -2372,6 +2545,7 @@ export type OwnerUpdateWithoutRadiologyOrdersInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -2397,6 +2571,8 @@ export type OwnerUncheckedUpdateWithoutRadiologyOrdersInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2407,6 +2583,7 @@ export type OwnerUncheckedUpdateWithoutRadiologyOrdersInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2418,6 +2595,7 @@ export type OwnerUncheckedUpdateWithoutRadiologyOrdersInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2442,6 +2620,8 @@ export type OwnerCreateWithoutOperationCasesInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -2453,6 +2633,7 @@ export type OwnerCreateWithoutOperationCasesInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -2464,6 +2645,7 @@ export type OwnerCreateWithoutOperationCasesInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -2489,6 +2671,8 @@ export type OwnerUncheckedCreateWithoutOperationCasesInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -2499,6 +2683,7 @@ export type OwnerUncheckedCreateWithoutOperationCasesInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -2510,6 +2695,7 @@ export type OwnerUncheckedCreateWithoutOperationCasesInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -2550,6 +2736,8 @@ export type OwnerUpdateWithoutOperationCasesInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2561,6 +2749,7 @@ export type OwnerUpdateWithoutOperationCasesInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -2572,6 +2761,7 @@ export type OwnerUpdateWithoutOperationCasesInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -2597,6 +2787,8 @@ export type OwnerUncheckedUpdateWithoutOperationCasesInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2607,6 +2799,7 @@ export type OwnerUncheckedUpdateWithoutOperationCasesInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2618,6 +2811,7 @@ export type OwnerUncheckedUpdateWithoutOperationCasesInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2642,6 +2836,8 @@ export type OwnerCreateWithoutConsentsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -2653,6 +2849,7 @@ export type OwnerCreateWithoutConsentsInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -2664,6 +2861,7 @@ export type OwnerCreateWithoutConsentsInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -2689,6 +2887,8 @@ export type OwnerUncheckedCreateWithoutConsentsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -2699,6 +2899,7 @@ export type OwnerUncheckedCreateWithoutConsentsInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -2710,6 +2911,7 @@ export type OwnerUncheckedCreateWithoutConsentsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -2750,6 +2952,8 @@ export type OwnerUpdateWithoutConsentsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2761,6 +2965,7 @@ export type OwnerUpdateWithoutConsentsInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -2772,6 +2977,7 @@ export type OwnerUpdateWithoutConsentsInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -2797,6 +3003,8 @@ export type OwnerUncheckedUpdateWithoutConsentsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2807,6 +3015,7 @@ export type OwnerUncheckedUpdateWithoutConsentsInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2818,6 +3027,7 @@ export type OwnerUncheckedUpdateWithoutConsentsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -2842,6 +3052,8 @@ export type OwnerCreateWithoutPatientsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -2852,6 +3064,7 @@ export type OwnerCreateWithoutPatientsInput = {
   crmDeals?: Prisma.CrmDealCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -2864,6 +3077,7 @@ export type OwnerCreateWithoutPatientsInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -2889,6 +3103,8 @@ export type OwnerUncheckedCreateWithoutPatientsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -2898,6 +3114,7 @@ export type OwnerUncheckedCreateWithoutPatientsInput = {
   updatedAt?: Date | string
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -2910,6 +3127,7 @@ export type OwnerUncheckedCreateWithoutPatientsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -2950,6 +3168,8 @@ export type OwnerUpdateWithoutPatientsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -2960,6 +3180,7 @@ export type OwnerUpdateWithoutPatientsInput = {
   crmDeals?: Prisma.CrmDealUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -2972,6 +3193,7 @@ export type OwnerUpdateWithoutPatientsInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -2997,6 +3219,8 @@ export type OwnerUncheckedUpdateWithoutPatientsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3006,6 +3230,7 @@ export type OwnerUncheckedUpdateWithoutPatientsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3018,6 +3243,223 @@ export type OwnerUncheckedUpdateWithoutPatientsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
+  loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
+  loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
+  loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutOwnerNestedInput
+  inpatientStays?: Prisma.InpatientStayUncheckedUpdateManyWithoutOwnerNestedInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedUpdateManyWithoutOwnerNestedInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutOwnerNestedInput
+  notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutOwnerNestedInput
+  recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutOwnerNestedInput
+}
+
+export type OwnerCreateWithoutGuardianPatientsInput = {
+  id?: string
+  code: string
+  name: string
+  phone: string
+  phoneE164?: string | null
+  email?: string | null
+  gender?: $Enums.Gender | null
+  ownerType?: $Enums.OwnerType
+  relationship?: $Enums.OwnerRelationship | null
+  country?: string | null
+  city?: string | null
+  address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
+  notes?: string | null
+  active?: boolean
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  editsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  crmDeals?: Prisma.CrmDealCreateNestedManyWithoutOwnerInput
+  crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
+  clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
+  patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
+  portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
+  inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
+  labTestOrders?: Prisma.LabTestOrderCreateNestedManyWithoutOwnerInput
+  radiologyOrders?: Prisma.RadiologyOrderCreateNestedManyWithoutOwnerInput
+  operationCases?: Prisma.OperationCaseCreateNestedManyWithoutOwnerInput
+  serviceAddresses?: Prisma.ServiceAddressCreateNestedManyWithoutOwnerInput
+  mobileBookingRequests?: Prisma.MobileBookingRequestCreateNestedManyWithoutOwnerInput
+  consents?: Prisma.PatientConsentCreateNestedManyWithoutOwnerInput
+  groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
+  loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
+  loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
+  loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
+  sales?: Prisma.SaleCreateNestedManyWithoutOwnerInput
+  inpatientStays?: Prisma.InpatientStayCreateNestedManyWithoutOwnerInput
+  petOwnerRequests?: Prisma.PetOwnerRequestCreateNestedManyWithoutOwnerInput
+  emergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutOwnerInput
+  notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutOwnerInput
+  recallContacts?: Prisma.RecallContactCreateNestedManyWithoutOwnerInput
+}
+
+export type OwnerUncheckedCreateWithoutGuardianPatientsInput = {
+  id?: string
+  code: string
+  clinicId: string
+  name: string
+  phone: string
+  phoneE164?: string | null
+  email?: string | null
+  gender?: $Enums.Gender | null
+  ownerType?: $Enums.OwnerType
+  relationship?: $Enums.OwnerRelationship | null
+  country?: string | null
+  city?: string | null
+  address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
+  notes?: string | null
+  active?: boolean
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  editsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
+  crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
+  patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
+  portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
+  inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
+  labTestOrders?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutOwnerInput
+  radiologyOrders?: Prisma.RadiologyOrderUncheckedCreateNestedManyWithoutOwnerInput
+  operationCases?: Prisma.OperationCaseUncheckedCreateNestedManyWithoutOwnerInput
+  serviceAddresses?: Prisma.ServiceAddressUncheckedCreateNestedManyWithoutOwnerInput
+  mobileBookingRequests?: Prisma.MobileBookingRequestUncheckedCreateNestedManyWithoutOwnerInput
+  consents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutOwnerInput
+  groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
+  loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
+  loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
+  loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutOwnerInput
+  inpatientStays?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutOwnerInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedCreateNestedManyWithoutOwnerInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutOwnerInput
+  notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutOwnerInput
+  recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutOwnerInput
+}
+
+export type OwnerCreateOrConnectWithoutGuardianPatientsInput = {
+  where: Prisma.OwnerWhereUniqueInput
+  create: Prisma.XOR<Prisma.OwnerCreateWithoutGuardianPatientsInput, Prisma.OwnerUncheckedCreateWithoutGuardianPatientsInput>
+}
+
+export type OwnerUpsertWithoutGuardianPatientsInput = {
+  update: Prisma.XOR<Prisma.OwnerUpdateWithoutGuardianPatientsInput, Prisma.OwnerUncheckedUpdateWithoutGuardianPatientsInput>
+  create: Prisma.XOR<Prisma.OwnerCreateWithoutGuardianPatientsInput, Prisma.OwnerUncheckedCreateWithoutGuardianPatientsInput>
+  where?: Prisma.OwnerWhereInput
+}
+
+export type OwnerUpdateToOneWithWhereWithoutGuardianPatientsInput = {
+  where?: Prisma.OwnerWhereInput
+  data: Prisma.XOR<Prisma.OwnerUpdateWithoutGuardianPatientsInput, Prisma.OwnerUncheckedUpdateWithoutGuardianPatientsInput>
+}
+
+export type OwnerUpdateWithoutGuardianPatientsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  ownerType?: Prisma.EnumOwnerTypeFieldUpdateOperationsInput | $Enums.OwnerType
+  relationship?: Prisma.NullableEnumOwnerRelationshipFieldUpdateOperationsInput | $Enums.OwnerRelationship | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  crmDeals?: Prisma.CrmDealUpdateManyWithoutOwnerNestedInput
+  crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
+  clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
+  patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
+  portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
+  inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
+  labTestOrders?: Prisma.LabTestOrderUpdateManyWithoutOwnerNestedInput
+  radiologyOrders?: Prisma.RadiologyOrderUpdateManyWithoutOwnerNestedInput
+  operationCases?: Prisma.OperationCaseUpdateManyWithoutOwnerNestedInput
+  serviceAddresses?: Prisma.ServiceAddressUpdateManyWithoutOwnerNestedInput
+  mobileBookingRequests?: Prisma.MobileBookingRequestUpdateManyWithoutOwnerNestedInput
+  consents?: Prisma.PatientConsentUpdateManyWithoutOwnerNestedInput
+  groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
+  loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
+  loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
+  loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutOwnerNestedInput
+  inpatientStays?: Prisma.InpatientStayUpdateManyWithoutOwnerNestedInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUpdateManyWithoutOwnerNestedInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutOwnerNestedInput
+  notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutOwnerNestedInput
+  recallContacts?: Prisma.RecallContactUpdateManyWithoutOwnerNestedInput
+}
+
+export type OwnerUncheckedUpdateWithoutGuardianPatientsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  clinicId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  ownerType?: Prisma.EnumOwnerTypeFieldUpdateOperationsInput | $Enums.OwnerType
+  relationship?: Prisma.NullableEnumOwnerRelationshipFieldUpdateOperationsInput | $Enums.OwnerRelationship | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
+  crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
+  patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
+  portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
+  inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
+  labTestOrders?: Prisma.LabTestOrderUncheckedUpdateManyWithoutOwnerNestedInput
+  radiologyOrders?: Prisma.RadiologyOrderUncheckedUpdateManyWithoutOwnerNestedInput
+  operationCases?: Prisma.OperationCaseUncheckedUpdateManyWithoutOwnerNestedInput
+  serviceAddresses?: Prisma.ServiceAddressUncheckedUpdateManyWithoutOwnerNestedInput
+  mobileBookingRequests?: Prisma.MobileBookingRequestUncheckedUpdateManyWithoutOwnerNestedInput
+  consents?: Prisma.PatientConsentUncheckedUpdateManyWithoutOwnerNestedInput
+  groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3042,6 +3484,8 @@ export type OwnerCreateWithoutAppointmentsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -3053,6 +3497,7 @@ export type OwnerCreateWithoutAppointmentsInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
   labTestOrders?: Prisma.LabTestOrderCreateNestedManyWithoutOwnerInput
@@ -3064,6 +3509,7 @@ export type OwnerCreateWithoutAppointmentsInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -3089,6 +3535,8 @@ export type OwnerUncheckedCreateWithoutAppointmentsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -3099,6 +3547,7 @@ export type OwnerUncheckedCreateWithoutAppointmentsInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
   labTestOrders?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutOwnerInput
@@ -3110,6 +3559,7 @@ export type OwnerUncheckedCreateWithoutAppointmentsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -3150,6 +3600,8 @@ export type OwnerUpdateWithoutAppointmentsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3161,6 +3613,7 @@ export type OwnerUpdateWithoutAppointmentsInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
   labTestOrders?: Prisma.LabTestOrderUpdateManyWithoutOwnerNestedInput
@@ -3172,6 +3625,7 @@ export type OwnerUpdateWithoutAppointmentsInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -3197,6 +3651,8 @@ export type OwnerUncheckedUpdateWithoutAppointmentsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3207,6 +3663,7 @@ export type OwnerUncheckedUpdateWithoutAppointmentsInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
   labTestOrders?: Prisma.LabTestOrderUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3218,6 +3675,7 @@ export type OwnerUncheckedUpdateWithoutAppointmentsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3242,6 +3700,8 @@ export type OwnerCreateWithoutSalesInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -3253,6 +3713,7 @@ export type OwnerCreateWithoutSalesInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -3265,6 +3726,7 @@ export type OwnerCreateWithoutSalesInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -3289,6 +3751,8 @@ export type OwnerUncheckedCreateWithoutSalesInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -3299,6 +3763,7 @@ export type OwnerUncheckedCreateWithoutSalesInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -3311,6 +3776,7 @@ export type OwnerUncheckedCreateWithoutSalesInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -3350,6 +3816,8 @@ export type OwnerUpdateWithoutSalesInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3361,6 +3829,7 @@ export type OwnerUpdateWithoutSalesInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -3373,6 +3842,7 @@ export type OwnerUpdateWithoutSalesInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -3397,6 +3867,8 @@ export type OwnerUncheckedUpdateWithoutSalesInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3407,6 +3879,7 @@ export type OwnerUncheckedUpdateWithoutSalesInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3419,6 +3892,7 @@ export type OwnerUncheckedUpdateWithoutSalesInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3442,6 +3916,8 @@ export type OwnerCreateWithoutServiceAddressesInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -3453,6 +3929,7 @@ export type OwnerCreateWithoutServiceAddressesInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -3464,6 +3941,7 @@ export type OwnerCreateWithoutServiceAddressesInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -3489,6 +3967,8 @@ export type OwnerUncheckedCreateWithoutServiceAddressesInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -3499,6 +3979,7 @@ export type OwnerUncheckedCreateWithoutServiceAddressesInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -3510,6 +3991,7 @@ export type OwnerUncheckedCreateWithoutServiceAddressesInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -3550,6 +4032,8 @@ export type OwnerUpdateWithoutServiceAddressesInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3561,6 +4045,7 @@ export type OwnerUpdateWithoutServiceAddressesInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -3572,6 +4057,7 @@ export type OwnerUpdateWithoutServiceAddressesInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -3597,6 +4083,8 @@ export type OwnerUncheckedUpdateWithoutServiceAddressesInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3607,6 +4095,7 @@ export type OwnerUncheckedUpdateWithoutServiceAddressesInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3618,6 +4107,7 @@ export type OwnerUncheckedUpdateWithoutServiceAddressesInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3642,6 +4132,8 @@ export type OwnerCreateWithoutMobileBookingRequestsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -3653,6 +4145,7 @@ export type OwnerCreateWithoutMobileBookingRequestsInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -3664,6 +4157,7 @@ export type OwnerCreateWithoutMobileBookingRequestsInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -3689,6 +4183,8 @@ export type OwnerUncheckedCreateWithoutMobileBookingRequestsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -3699,6 +4195,7 @@ export type OwnerUncheckedCreateWithoutMobileBookingRequestsInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -3710,6 +4207,7 @@ export type OwnerUncheckedCreateWithoutMobileBookingRequestsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -3750,6 +4248,8 @@ export type OwnerUpdateWithoutMobileBookingRequestsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3761,6 +4261,7 @@ export type OwnerUpdateWithoutMobileBookingRequestsInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -3772,6 +4273,7 @@ export type OwnerUpdateWithoutMobileBookingRequestsInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -3797,6 +4299,8 @@ export type OwnerUncheckedUpdateWithoutMobileBookingRequestsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3807,6 +4311,7 @@ export type OwnerUncheckedUpdateWithoutMobileBookingRequestsInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3818,6 +4323,7 @@ export type OwnerUncheckedUpdateWithoutMobileBookingRequestsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -3842,6 +4348,8 @@ export type OwnerCreateWithoutInsuranceClaimsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -3853,6 +4361,7 @@ export type OwnerCreateWithoutInsuranceClaimsInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -3864,6 +4373,7 @@ export type OwnerCreateWithoutInsuranceClaimsInput = {
   consents?: Prisma.PatientConsentCreateNestedManyWithoutOwnerInput
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -3889,6 +4399,8 @@ export type OwnerUncheckedCreateWithoutInsuranceClaimsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -3899,6 +4411,7 @@ export type OwnerUncheckedCreateWithoutInsuranceClaimsInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -3910,6 +4423,7 @@ export type OwnerUncheckedCreateWithoutInsuranceClaimsInput = {
   consents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutOwnerInput
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -3950,6 +4464,8 @@ export type OwnerUpdateWithoutInsuranceClaimsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -3961,6 +4477,7 @@ export type OwnerUpdateWithoutInsuranceClaimsInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -3972,6 +4489,7 @@ export type OwnerUpdateWithoutInsuranceClaimsInput = {
   consents?: Prisma.PatientConsentUpdateManyWithoutOwnerNestedInput
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -3997,6 +4515,8 @@ export type OwnerUncheckedUpdateWithoutInsuranceClaimsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4007,6 +4527,7 @@ export type OwnerUncheckedUpdateWithoutInsuranceClaimsInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4018,6 +4539,7 @@ export type OwnerUncheckedUpdateWithoutInsuranceClaimsInput = {
   consents?: Prisma.PatientConsentUncheckedUpdateManyWithoutOwnerNestedInput
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4042,6 +4564,8 @@ export type OwnerCreateWithoutGroomingSessionsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -4053,6 +4577,7 @@ export type OwnerCreateWithoutGroomingSessionsInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -4064,6 +4589,7 @@ export type OwnerCreateWithoutGroomingSessionsInput = {
   consents?: Prisma.PatientConsentCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -4089,6 +4615,8 @@ export type OwnerUncheckedCreateWithoutGroomingSessionsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -4099,6 +4627,7 @@ export type OwnerUncheckedCreateWithoutGroomingSessionsInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -4110,6 +4639,7 @@ export type OwnerUncheckedCreateWithoutGroomingSessionsInput = {
   consents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -4150,6 +4680,8 @@ export type OwnerUpdateWithoutGroomingSessionsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4161,6 +4693,7 @@ export type OwnerUpdateWithoutGroomingSessionsInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -4172,6 +4705,7 @@ export type OwnerUpdateWithoutGroomingSessionsInput = {
   consents?: Prisma.PatientConsentUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -4197,6 +4731,8 @@ export type OwnerUncheckedUpdateWithoutGroomingSessionsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4207,6 +4743,7 @@ export type OwnerUncheckedUpdateWithoutGroomingSessionsInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4218,6 +4755,7 @@ export type OwnerUncheckedUpdateWithoutGroomingSessionsInput = {
   consents?: Prisma.PatientConsentUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4242,6 +4780,8 @@ export type OwnerCreateWithoutMembershipsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -4253,6 +4793,7 @@ export type OwnerCreateWithoutMembershipsInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -4264,6 +4805,7 @@ export type OwnerCreateWithoutMembershipsInput = {
   consents?: Prisma.PatientConsentCreateNestedManyWithoutOwnerInput
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -4289,6 +4831,8 @@ export type OwnerUncheckedCreateWithoutMembershipsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -4299,6 +4843,7 @@ export type OwnerUncheckedCreateWithoutMembershipsInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -4310,6 +4855,7 @@ export type OwnerUncheckedCreateWithoutMembershipsInput = {
   consents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutOwnerInput
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -4350,6 +4896,8 @@ export type OwnerUpdateWithoutMembershipsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4361,6 +4909,7 @@ export type OwnerUpdateWithoutMembershipsInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -4372,6 +4921,7 @@ export type OwnerUpdateWithoutMembershipsInput = {
   consents?: Prisma.PatientConsentUpdateManyWithoutOwnerNestedInput
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -4397,6 +4947,8 @@ export type OwnerUncheckedUpdateWithoutMembershipsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4407,6 +4959,7 @@ export type OwnerUncheckedUpdateWithoutMembershipsInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4418,6 +4971,7 @@ export type OwnerUncheckedUpdateWithoutMembershipsInput = {
   consents?: Prisma.PatientConsentUncheckedUpdateManyWithoutOwnerNestedInput
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4442,6 +4996,8 @@ export type OwnerCreateWithoutCrmDealsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -4452,6 +5008,7 @@ export type OwnerCreateWithoutCrmDealsInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -4464,6 +5021,7 @@ export type OwnerCreateWithoutCrmDealsInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -4489,6 +5047,8 @@ export type OwnerUncheckedCreateWithoutCrmDealsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -4498,6 +5058,7 @@ export type OwnerUncheckedCreateWithoutCrmDealsInput = {
   updatedAt?: Date | string
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -4510,6 +5071,7 @@ export type OwnerUncheckedCreateWithoutCrmDealsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -4539,6 +5101,8 @@ export type OwnerCreateWithoutCrmWonDealsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -4549,6 +5113,7 @@ export type OwnerCreateWithoutCrmWonDealsInput = {
   crmDeals?: Prisma.CrmDealCreateNestedManyWithoutOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -4561,6 +5126,7 @@ export type OwnerCreateWithoutCrmWonDealsInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -4586,6 +5152,8 @@ export type OwnerUncheckedCreateWithoutCrmWonDealsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -4595,6 +5163,7 @@ export type OwnerUncheckedCreateWithoutCrmWonDealsInput = {
   updatedAt?: Date | string
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -4607,6 +5176,7 @@ export type OwnerUncheckedCreateWithoutCrmWonDealsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -4647,6 +5217,8 @@ export type OwnerUpdateWithoutCrmDealsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4657,6 +5229,7 @@ export type OwnerUpdateWithoutCrmDealsInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -4669,6 +5242,7 @@ export type OwnerUpdateWithoutCrmDealsInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -4694,6 +5268,8 @@ export type OwnerUncheckedUpdateWithoutCrmDealsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4703,6 +5279,7 @@ export type OwnerUncheckedUpdateWithoutCrmDealsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4715,6 +5292,7 @@ export type OwnerUncheckedUpdateWithoutCrmDealsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4750,6 +5328,8 @@ export type OwnerUpdateWithoutCrmWonDealsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4760,6 +5340,7 @@ export type OwnerUpdateWithoutCrmWonDealsInput = {
   crmDeals?: Prisma.CrmDealUpdateManyWithoutOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -4772,6 +5353,7 @@ export type OwnerUpdateWithoutCrmWonDealsInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -4797,6 +5379,8 @@ export type OwnerUncheckedUpdateWithoutCrmWonDealsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4806,6 +5390,7 @@ export type OwnerUncheckedUpdateWithoutCrmWonDealsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4818,6 +5403,7 @@ export type OwnerUncheckedUpdateWithoutCrmWonDealsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -4842,6 +5428,8 @@ export type OwnerCreateWithoutInpatientStaysInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -4853,6 +5441,7 @@ export type OwnerCreateWithoutInpatientStaysInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -4865,6 +5454,7 @@ export type OwnerCreateWithoutInpatientStaysInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -4889,6 +5479,8 @@ export type OwnerUncheckedCreateWithoutInpatientStaysInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -4899,6 +5491,7 @@ export type OwnerUncheckedCreateWithoutInpatientStaysInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -4911,6 +5504,7 @@ export type OwnerUncheckedCreateWithoutInpatientStaysInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -4950,6 +5544,8 @@ export type OwnerUpdateWithoutInpatientStaysInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -4961,6 +5557,7 @@ export type OwnerUpdateWithoutInpatientStaysInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -4973,6 +5570,7 @@ export type OwnerUpdateWithoutInpatientStaysInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -4997,6 +5595,8 @@ export type OwnerUncheckedUpdateWithoutInpatientStaysInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5007,6 +5607,7 @@ export type OwnerUncheckedUpdateWithoutInpatientStaysInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5019,6 +5620,7 @@ export type OwnerUncheckedUpdateWithoutInpatientStaysInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5042,6 +5644,8 @@ export type OwnerCreateWithoutEmergencyArrivalsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -5053,6 +5657,7 @@ export type OwnerCreateWithoutEmergencyArrivalsInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -5065,6 +5670,7 @@ export type OwnerCreateWithoutEmergencyArrivalsInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -5089,6 +5695,8 @@ export type OwnerUncheckedCreateWithoutEmergencyArrivalsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -5099,6 +5707,7 @@ export type OwnerUncheckedCreateWithoutEmergencyArrivalsInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -5111,6 +5720,7 @@ export type OwnerUncheckedCreateWithoutEmergencyArrivalsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -5150,6 +5760,8 @@ export type OwnerUpdateWithoutEmergencyArrivalsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5161,6 +5773,7 @@ export type OwnerUpdateWithoutEmergencyArrivalsInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -5173,6 +5786,7 @@ export type OwnerUpdateWithoutEmergencyArrivalsInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -5197,6 +5811,8 @@ export type OwnerUncheckedUpdateWithoutEmergencyArrivalsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5207,6 +5823,7 @@ export type OwnerUncheckedUpdateWithoutEmergencyArrivalsInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5219,6 +5836,7 @@ export type OwnerUncheckedUpdateWithoutEmergencyArrivalsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5242,6 +5860,8 @@ export type OwnerCreateWithoutNotificationOutboxInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -5253,6 +5873,7 @@ export type OwnerCreateWithoutNotificationOutboxInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -5265,6 +5886,7 @@ export type OwnerCreateWithoutNotificationOutboxInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -5289,6 +5911,8 @@ export type OwnerUncheckedCreateWithoutNotificationOutboxInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -5299,6 +5923,7 @@ export type OwnerUncheckedCreateWithoutNotificationOutboxInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -5311,6 +5936,7 @@ export type OwnerUncheckedCreateWithoutNotificationOutboxInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -5350,6 +5976,8 @@ export type OwnerUpdateWithoutNotificationOutboxInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5361,6 +5989,7 @@ export type OwnerUpdateWithoutNotificationOutboxInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -5373,6 +6002,7 @@ export type OwnerUpdateWithoutNotificationOutboxInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -5397,6 +6027,8 @@ export type OwnerUncheckedUpdateWithoutNotificationOutboxInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5407,6 +6039,7 @@ export type OwnerUncheckedUpdateWithoutNotificationOutboxInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5419,6 +6052,7 @@ export type OwnerUncheckedUpdateWithoutNotificationOutboxInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5442,6 +6076,8 @@ export type OwnerCreateWithoutRecallContactsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -5453,6 +6089,7 @@ export type OwnerCreateWithoutRecallContactsInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -5465,6 +6102,7 @@ export type OwnerCreateWithoutRecallContactsInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
@@ -5489,6 +6127,8 @@ export type OwnerUncheckedCreateWithoutRecallContactsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -5499,6 +6139,7 @@ export type OwnerUncheckedCreateWithoutRecallContactsInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -5511,6 +6152,7 @@ export type OwnerUncheckedCreateWithoutRecallContactsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
@@ -5550,6 +6192,8 @@ export type OwnerUpdateWithoutRecallContactsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5561,6 +6205,7 @@ export type OwnerUpdateWithoutRecallContactsInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -5573,6 +6218,7 @@ export type OwnerUpdateWithoutRecallContactsInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -5597,6 +6243,8 @@ export type OwnerUncheckedUpdateWithoutRecallContactsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5607,6 +6255,7 @@ export type OwnerUncheckedUpdateWithoutRecallContactsInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5619,6 +6268,7 @@ export type OwnerUncheckedUpdateWithoutRecallContactsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5642,6 +6292,8 @@ export type OwnerCreateWithoutLoyaltyOwnerTiersInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -5653,6 +6305,7 @@ export type OwnerCreateWithoutLoyaltyOwnerTiersInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -5665,6 +6318,7 @@ export type OwnerCreateWithoutLoyaltyOwnerTiersInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   sales?: Prisma.SaleCreateNestedManyWithoutOwnerInput
@@ -5689,6 +6343,8 @@ export type OwnerUncheckedCreateWithoutLoyaltyOwnerTiersInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -5699,6 +6355,7 @@ export type OwnerUncheckedCreateWithoutLoyaltyOwnerTiersInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -5711,6 +6368,7 @@ export type OwnerUncheckedCreateWithoutLoyaltyOwnerTiersInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutOwnerInput
@@ -5750,6 +6408,8 @@ export type OwnerUpdateWithoutLoyaltyOwnerTiersInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5761,6 +6421,7 @@ export type OwnerUpdateWithoutLoyaltyOwnerTiersInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -5773,6 +6434,7 @@ export type OwnerUpdateWithoutLoyaltyOwnerTiersInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   sales?: Prisma.SaleUpdateManyWithoutOwnerNestedInput
@@ -5797,6 +6459,8 @@ export type OwnerUncheckedUpdateWithoutLoyaltyOwnerTiersInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5807,6 +6471,7 @@ export type OwnerUncheckedUpdateWithoutLoyaltyOwnerTiersInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5819,6 +6484,7 @@ export type OwnerUncheckedUpdateWithoutLoyaltyOwnerTiersInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   sales?: Prisma.SaleUncheckedUpdateManyWithoutOwnerNestedInput
@@ -5842,6 +6508,8 @@ export type OwnerCreateWithoutLoyaltyLedgerInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -5853,6 +6521,7 @@ export type OwnerCreateWithoutLoyaltyLedgerInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -5865,6 +6534,7 @@ export type OwnerCreateWithoutLoyaltyLedgerInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
   sales?: Prisma.SaleCreateNestedManyWithoutOwnerInput
@@ -5889,6 +6559,8 @@ export type OwnerUncheckedCreateWithoutLoyaltyLedgerInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -5899,6 +6571,7 @@ export type OwnerUncheckedCreateWithoutLoyaltyLedgerInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -5911,6 +6584,7 @@ export type OwnerUncheckedCreateWithoutLoyaltyLedgerInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutOwnerInput
@@ -5950,6 +6624,8 @@ export type OwnerUpdateWithoutLoyaltyLedgerInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -5961,6 +6637,7 @@ export type OwnerUpdateWithoutLoyaltyLedgerInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -5973,6 +6650,7 @@ export type OwnerUpdateWithoutLoyaltyLedgerInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
   sales?: Prisma.SaleUpdateManyWithoutOwnerNestedInput
@@ -5997,6 +6675,8 @@ export type OwnerUncheckedUpdateWithoutLoyaltyLedgerInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6007,6 +6687,7 @@ export type OwnerUncheckedUpdateWithoutLoyaltyLedgerInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6019,6 +6700,7 @@ export type OwnerUncheckedUpdateWithoutLoyaltyLedgerInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
   sales?: Prisma.SaleUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6042,6 +6724,8 @@ export type OwnerCreateWithoutLoyaltyRedemptionsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -6053,6 +6737,7 @@ export type OwnerCreateWithoutLoyaltyRedemptionsInput = {
   crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
   clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
   patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
@@ -6065,6 +6750,7 @@ export type OwnerCreateWithoutLoyaltyRedemptionsInput = {
   groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
   sales?: Prisma.SaleCreateNestedManyWithoutOwnerInput
@@ -6089,6 +6775,8 @@ export type OwnerUncheckedCreateWithoutLoyaltyRedemptionsInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -6099,6 +6787,7 @@ export type OwnerUncheckedCreateWithoutLoyaltyRedemptionsInput = {
   crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
   crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
   patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
@@ -6111,6 +6800,7 @@ export type OwnerUncheckedCreateWithoutLoyaltyRedemptionsInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
   memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedOwnerInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
   sales?: Prisma.SaleUncheckedCreateNestedManyWithoutOwnerInput
@@ -6150,6 +6840,8 @@ export type OwnerUpdateWithoutLoyaltyRedemptionsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6161,6 +6853,7 @@ export type OwnerUpdateWithoutLoyaltyRedemptionsInput = {
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -6173,6 +6866,7 @@ export type OwnerUpdateWithoutLoyaltyRedemptionsInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
   sales?: Prisma.SaleUpdateManyWithoutOwnerNestedInput
@@ -6197,6 +6891,8 @@ export type OwnerUncheckedUpdateWithoutLoyaltyRedemptionsInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6207,6 +6903,223 @@ export type OwnerUncheckedUpdateWithoutLoyaltyRedemptionsInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
+  portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
+  inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
+  labTestOrders?: Prisma.LabTestOrderUncheckedUpdateManyWithoutOwnerNestedInput
+  radiologyOrders?: Prisma.RadiologyOrderUncheckedUpdateManyWithoutOwnerNestedInput
+  operationCases?: Prisma.OperationCaseUncheckedUpdateManyWithoutOwnerNestedInput
+  serviceAddresses?: Prisma.ServiceAddressUncheckedUpdateManyWithoutOwnerNestedInput
+  mobileBookingRequests?: Prisma.MobileBookingRequestUncheckedUpdateManyWithoutOwnerNestedInput
+  consents?: Prisma.PatientConsentUncheckedUpdateManyWithoutOwnerNestedInput
+  groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
+  loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
+  loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
+  sales?: Prisma.SaleUncheckedUpdateManyWithoutOwnerNestedInput
+  inpatientStays?: Prisma.InpatientStayUncheckedUpdateManyWithoutOwnerNestedInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedUpdateManyWithoutOwnerNestedInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutOwnerNestedInput
+  notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutOwnerNestedInput
+  recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutOwnerNestedInput
+}
+
+export type OwnerCreateWithoutRegistrationRequestsInput = {
+  id?: string
+  code: string
+  name: string
+  phone: string
+  phoneE164?: string | null
+  email?: string | null
+  gender?: $Enums.Gender | null
+  ownerType?: $Enums.OwnerType
+  relationship?: $Enums.OwnerRelationship | null
+  country?: string | null
+  city?: string | null
+  address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
+  notes?: string | null
+  active?: boolean
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  editsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  crmDeals?: Prisma.CrmDealCreateNestedManyWithoutOwnerInput
+  crmWonDeals?: Prisma.CrmDealCreateNestedManyWithoutWonOwnerInput
+  clinic: Prisma.ClinicCreateNestedOneWithoutOwnersInput
+  patients?: Prisma.PatientCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianCreateNestedManyWithoutOwnerInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutOwnerInput
+  portalLinks?: Prisma.PetOwnerClinicLinkCreateNestedManyWithoutOwnerInput
+  inboxItems?: Prisma.InboxItemCreateNestedManyWithoutOwnerInput
+  labTestOrders?: Prisma.LabTestOrderCreateNestedManyWithoutOwnerInput
+  radiologyOrders?: Prisma.RadiologyOrderCreateNestedManyWithoutOwnerInput
+  operationCases?: Prisma.OperationCaseCreateNestedManyWithoutOwnerInput
+  serviceAddresses?: Prisma.ServiceAddressCreateNestedManyWithoutOwnerInput
+  mobileBookingRequests?: Prisma.MobileBookingRequestCreateNestedManyWithoutOwnerInput
+  consents?: Prisma.PatientConsentCreateNestedManyWithoutOwnerInput
+  groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.MembershipCreateNestedManyWithoutOwnerInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutOwnerInput
+  loyaltyLedger?: Prisma.LoyaltyLedgerEntryCreateNestedManyWithoutOwnerInput
+  loyaltyRedemptions?: Prisma.LoyaltyRedemptionCreateNestedManyWithoutOwnerInput
+  loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierCreateNestedManyWithoutOwnerInput
+  sales?: Prisma.SaleCreateNestedManyWithoutOwnerInput
+  inpatientStays?: Prisma.InpatientStayCreateNestedManyWithoutOwnerInput
+  petOwnerRequests?: Prisma.PetOwnerRequestCreateNestedManyWithoutOwnerInput
+  emergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutOwnerInput
+  notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutOwnerInput
+  recallContacts?: Prisma.RecallContactCreateNestedManyWithoutOwnerInput
+}
+
+export type OwnerUncheckedCreateWithoutRegistrationRequestsInput = {
+  id?: string
+  code: string
+  clinicId: string
+  name: string
+  phone: string
+  phoneE164?: string | null
+  email?: string | null
+  gender?: $Enums.Gender | null
+  ownerType?: $Enums.OwnerType
+  relationship?: $Enums.OwnerRelationship | null
+  country?: string | null
+  city?: string | null
+  address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
+  notes?: string | null
+  active?: boolean
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  editsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  crmDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutOwnerInput
+  crmWonDeals?: Prisma.CrmDealUncheckedCreateNestedManyWithoutWonOwnerInput
+  patients?: Prisma.PatientUncheckedCreateNestedManyWithoutOwnerInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutOwnerInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutOwnerInput
+  portalLinks?: Prisma.PetOwnerClinicLinkUncheckedCreateNestedManyWithoutOwnerInput
+  inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutOwnerInput
+  labTestOrders?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutOwnerInput
+  radiologyOrders?: Prisma.RadiologyOrderUncheckedCreateNestedManyWithoutOwnerInput
+  operationCases?: Prisma.OperationCaseUncheckedCreateNestedManyWithoutOwnerInput
+  serviceAddresses?: Prisma.ServiceAddressUncheckedCreateNestedManyWithoutOwnerInput
+  mobileBookingRequests?: Prisma.MobileBookingRequestUncheckedCreateNestedManyWithoutOwnerInput
+  consents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutOwnerInput
+  groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutOwnerInput
+  memberships?: Prisma.MembershipUncheckedCreateNestedManyWithoutOwnerInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutOwnerInput
+  loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedCreateNestedManyWithoutOwnerInput
+  loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedCreateNestedManyWithoutOwnerInput
+  loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedCreateNestedManyWithoutOwnerInput
+  sales?: Prisma.SaleUncheckedCreateNestedManyWithoutOwnerInput
+  inpatientStays?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutOwnerInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedCreateNestedManyWithoutOwnerInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutOwnerInput
+  notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutOwnerInput
+  recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutOwnerInput
+}
+
+export type OwnerCreateOrConnectWithoutRegistrationRequestsInput = {
+  where: Prisma.OwnerWhereUniqueInput
+  create: Prisma.XOR<Prisma.OwnerCreateWithoutRegistrationRequestsInput, Prisma.OwnerUncheckedCreateWithoutRegistrationRequestsInput>
+}
+
+export type OwnerUpsertWithoutRegistrationRequestsInput = {
+  update: Prisma.XOR<Prisma.OwnerUpdateWithoutRegistrationRequestsInput, Prisma.OwnerUncheckedUpdateWithoutRegistrationRequestsInput>
+  create: Prisma.XOR<Prisma.OwnerCreateWithoutRegistrationRequestsInput, Prisma.OwnerUncheckedCreateWithoutRegistrationRequestsInput>
+  where?: Prisma.OwnerWhereInput
+}
+
+export type OwnerUpdateToOneWithWhereWithoutRegistrationRequestsInput = {
+  where?: Prisma.OwnerWhereInput
+  data: Prisma.XOR<Prisma.OwnerUpdateWithoutRegistrationRequestsInput, Prisma.OwnerUncheckedUpdateWithoutRegistrationRequestsInput>
+}
+
+export type OwnerUpdateWithoutRegistrationRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  ownerType?: Prisma.EnumOwnerTypeFieldUpdateOperationsInput | $Enums.OwnerType
+  relationship?: Prisma.NullableEnumOwnerRelationshipFieldUpdateOperationsInput | $Enums.OwnerRelationship | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  crmDeals?: Prisma.CrmDealUpdateManyWithoutOwnerNestedInput
+  crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
+  clinic?: Prisma.ClinicUpdateOneRequiredWithoutOwnersNestedInput
+  patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
+  portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
+  inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
+  labTestOrders?: Prisma.LabTestOrderUpdateManyWithoutOwnerNestedInput
+  radiologyOrders?: Prisma.RadiologyOrderUpdateManyWithoutOwnerNestedInput
+  operationCases?: Prisma.OperationCaseUpdateManyWithoutOwnerNestedInput
+  serviceAddresses?: Prisma.ServiceAddressUpdateManyWithoutOwnerNestedInput
+  mobileBookingRequests?: Prisma.MobileBookingRequestUpdateManyWithoutOwnerNestedInput
+  consents?: Prisma.PatientConsentUpdateManyWithoutOwnerNestedInput
+  groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
+  memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
+  loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
+  loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
+  sales?: Prisma.SaleUpdateManyWithoutOwnerNestedInput
+  inpatientStays?: Prisma.InpatientStayUpdateManyWithoutOwnerNestedInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUpdateManyWithoutOwnerNestedInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutOwnerNestedInput
+  notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutOwnerNestedInput
+  recallContacts?: Prisma.RecallContactUpdateManyWithoutOwnerNestedInput
+}
+
+export type OwnerUncheckedUpdateWithoutRegistrationRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  clinicId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.StringFieldUpdateOperationsInput | string
+  phoneE164?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableEnumGenderFieldUpdateOperationsInput | $Enums.Gender | null
+  ownerType?: Prisma.EnumOwnerTypeFieldUpdateOperationsInput | $Enums.OwnerType
+  relationship?: Prisma.NullableEnumOwnerRelationshipFieldUpdateOperationsInput | $Enums.OwnerRelationship | null
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
+  crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
+  patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6220,6 +7133,7 @@ export type OwnerUncheckedUpdateWithoutLoyaltyRedemptionsInput = {
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
+  loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
   sales?: Prisma.SaleUncheckedUpdateManyWithoutOwnerNestedInput
   inpatientStays?: Prisma.InpatientStayUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6242,6 +7156,8 @@ export type OwnerCreateManyClinicInput = {
   country?: string | null
   city?: string | null
   address?: string | null
+  emergencyContactName?: string | null
+  emergencyContactPhone?: string | null
   notes?: string | null
   active?: boolean
   isDeleted?: boolean
@@ -6264,6 +7180,8 @@ export type OwnerUpdateWithoutClinicInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6274,6 +7192,7 @@ export type OwnerUpdateWithoutClinicInput = {
   crmDeals?: Prisma.CrmDealUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutOwnerNestedInput
@@ -6286,6 +7205,7 @@ export type OwnerUpdateWithoutClinicInput = {
   groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUpdateManyWithoutOwnerNestedInput
@@ -6310,6 +7230,8 @@ export type OwnerUncheckedUpdateWithoutClinicInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6320,6 +7242,7 @@ export type OwnerUncheckedUpdateWithoutClinicInput = {
   crmDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutOwnerNestedInput
   crmWonDeals?: Prisma.CrmDealUncheckedUpdateManyWithoutWonOwnerNestedInput
   patients?: Prisma.PatientUncheckedUpdateManyWithoutOwnerNestedInput
+  guardianPatients?: Prisma.PatientGuardianUncheckedUpdateManyWithoutOwnerNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutOwnerNestedInput
   portalLinks?: Prisma.PetOwnerClinicLinkUncheckedUpdateManyWithoutOwnerNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6332,6 +7255,7 @@ export type OwnerUncheckedUpdateWithoutClinicInput = {
   groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutOwnerNestedInput
   memberships?: Prisma.MembershipUncheckedUpdateManyWithoutOwnerNestedInput
   insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutOwnerNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedOwnerNestedInput
   loyaltyLedger?: Prisma.LoyaltyLedgerEntryUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyRedemptions?: Prisma.LoyaltyRedemptionUncheckedUpdateManyWithoutOwnerNestedInput
   loyaltyOwnerTiers?: Prisma.LoyaltyOwnerTierUncheckedUpdateManyWithoutOwnerNestedInput
@@ -6356,6 +7280,8 @@ export type OwnerUncheckedUpdateManyWithoutClinicInput = {
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
@@ -6374,6 +7300,7 @@ export type OwnerCountOutputType = {
   crmDeals: number
   crmWonDeals: number
   patients: number
+  guardianPatients: number
   appointments: number
   portalLinks: number
   inboxItems: number
@@ -6386,6 +7313,7 @@ export type OwnerCountOutputType = {
   groomingSessions: number
   memberships: number
   insuranceClaims: number
+  registrationRequests: number
   loyaltyLedger: number
   loyaltyRedemptions: number
   loyaltyOwnerTiers: number
@@ -6401,6 +7329,7 @@ export type OwnerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   crmDeals?: boolean | OwnerCountOutputTypeCountCrmDealsArgs
   crmWonDeals?: boolean | OwnerCountOutputTypeCountCrmWonDealsArgs
   patients?: boolean | OwnerCountOutputTypeCountPatientsArgs
+  guardianPatients?: boolean | OwnerCountOutputTypeCountGuardianPatientsArgs
   appointments?: boolean | OwnerCountOutputTypeCountAppointmentsArgs
   portalLinks?: boolean | OwnerCountOutputTypeCountPortalLinksArgs
   inboxItems?: boolean | OwnerCountOutputTypeCountInboxItemsArgs
@@ -6413,6 +7342,7 @@ export type OwnerCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.
   groomingSessions?: boolean | OwnerCountOutputTypeCountGroomingSessionsArgs
   memberships?: boolean | OwnerCountOutputTypeCountMembershipsArgs
   insuranceClaims?: boolean | OwnerCountOutputTypeCountInsuranceClaimsArgs
+  registrationRequests?: boolean | OwnerCountOutputTypeCountRegistrationRequestsArgs
   loyaltyLedger?: boolean | OwnerCountOutputTypeCountLoyaltyLedgerArgs
   loyaltyRedemptions?: boolean | OwnerCountOutputTypeCountLoyaltyRedemptionsArgs
   loyaltyOwnerTiers?: boolean | OwnerCountOutputTypeCountLoyaltyOwnerTiersArgs
@@ -6453,6 +7383,13 @@ export type OwnerCountOutputTypeCountCrmWonDealsArgs<ExtArgs extends runtime.Typ
  */
 export type OwnerCountOutputTypeCountPatientsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.PatientWhereInput
+}
+
+/**
+ * OwnerCountOutputType without action
+ */
+export type OwnerCountOutputTypeCountGuardianPatientsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PatientGuardianWhereInput
 }
 
 /**
@@ -6542,6 +7479,13 @@ export type OwnerCountOutputTypeCountInsuranceClaimsArgs<ExtArgs extends runtime
 /**
  * OwnerCountOutputType without action
  */
+export type OwnerCountOutputTypeCountRegistrationRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RegistrationRequestWhereInput
+}
+
+/**
+ * OwnerCountOutputType without action
+ */
 export type OwnerCountOutputTypeCountLoyaltyLedgerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.LoyaltyLedgerEntryWhereInput
 }
@@ -6617,6 +7561,8 @@ export type OwnerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   country?: boolean
   city?: boolean
   address?: boolean
+  emergencyContactName?: boolean
+  emergencyContactPhone?: boolean
   notes?: boolean
   active?: boolean
   isDeleted?: boolean
@@ -6628,6 +7574,7 @@ export type OwnerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   crmWonDeals?: boolean | Prisma.Owner$crmWonDealsArgs<ExtArgs>
   clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>
   patients?: boolean | Prisma.Owner$patientsArgs<ExtArgs>
+  guardianPatients?: boolean | Prisma.Owner$guardianPatientsArgs<ExtArgs>
   appointments?: boolean | Prisma.Owner$appointmentsArgs<ExtArgs>
   portalLinks?: boolean | Prisma.Owner$portalLinksArgs<ExtArgs>
   inboxItems?: boolean | Prisma.Owner$inboxItemsArgs<ExtArgs>
@@ -6640,6 +7587,7 @@ export type OwnerSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   groomingSessions?: boolean | Prisma.Owner$groomingSessionsArgs<ExtArgs>
   memberships?: boolean | Prisma.Owner$membershipsArgs<ExtArgs>
   insuranceClaims?: boolean | Prisma.Owner$insuranceClaimsArgs<ExtArgs>
+  registrationRequests?: boolean | Prisma.Owner$registrationRequestsArgs<ExtArgs>
   loyaltyLedger?: boolean | Prisma.Owner$loyaltyLedgerArgs<ExtArgs>
   loyaltyRedemptions?: boolean | Prisma.Owner$loyaltyRedemptionsArgs<ExtArgs>
   loyaltyOwnerTiers?: boolean | Prisma.Owner$loyaltyOwnerTiersArgs<ExtArgs>
@@ -6666,6 +7614,8 @@ export type OwnerSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   country?: boolean
   city?: boolean
   address?: boolean
+  emergencyContactName?: boolean
+  emergencyContactPhone?: boolean
   notes?: boolean
   active?: boolean
   isDeleted?: boolean
@@ -6690,6 +7640,8 @@ export type OwnerSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   country?: boolean
   city?: boolean
   address?: boolean
+  emergencyContactName?: boolean
+  emergencyContactPhone?: boolean
   notes?: boolean
   active?: boolean
   isDeleted?: boolean
@@ -6714,6 +7666,8 @@ export type OwnerSelectScalar = {
   country?: boolean
   city?: boolean
   address?: boolean
+  emergencyContactName?: boolean
+  emergencyContactPhone?: boolean
   notes?: boolean
   active?: boolean
   isDeleted?: boolean
@@ -6723,12 +7677,13 @@ export type OwnerSelectScalar = {
   updatedAt?: boolean
 }
 
-export type OwnerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "clinicId" | "name" | "phone" | "phoneE164" | "email" | "gender" | "ownerType" | "relationship" | "country" | "city" | "address" | "notes" | "active" | "isDeleted" | "deletedAt" | "editsCount" | "createdAt" | "updatedAt", ExtArgs["result"]["owner"]>
+export type OwnerOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "clinicId" | "name" | "phone" | "phoneE164" | "email" | "gender" | "ownerType" | "relationship" | "country" | "city" | "address" | "emergencyContactName" | "emergencyContactPhone" | "notes" | "active" | "isDeleted" | "deletedAt" | "editsCount" | "createdAt" | "updatedAt", ExtArgs["result"]["owner"]>
 export type OwnerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   crmDeals?: boolean | Prisma.Owner$crmDealsArgs<ExtArgs>
   crmWonDeals?: boolean | Prisma.Owner$crmWonDealsArgs<ExtArgs>
   clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>
   patients?: boolean | Prisma.Owner$patientsArgs<ExtArgs>
+  guardianPatients?: boolean | Prisma.Owner$guardianPatientsArgs<ExtArgs>
   appointments?: boolean | Prisma.Owner$appointmentsArgs<ExtArgs>
   portalLinks?: boolean | Prisma.Owner$portalLinksArgs<ExtArgs>
   inboxItems?: boolean | Prisma.Owner$inboxItemsArgs<ExtArgs>
@@ -6741,6 +7696,7 @@ export type OwnerInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   groomingSessions?: boolean | Prisma.Owner$groomingSessionsArgs<ExtArgs>
   memberships?: boolean | Prisma.Owner$membershipsArgs<ExtArgs>
   insuranceClaims?: boolean | Prisma.Owner$insuranceClaimsArgs<ExtArgs>
+  registrationRequests?: boolean | Prisma.Owner$registrationRequestsArgs<ExtArgs>
   loyaltyLedger?: boolean | Prisma.Owner$loyaltyLedgerArgs<ExtArgs>
   loyaltyRedemptions?: boolean | Prisma.Owner$loyaltyRedemptionsArgs<ExtArgs>
   loyaltyOwnerTiers?: boolean | Prisma.Owner$loyaltyOwnerTiersArgs<ExtArgs>
@@ -6766,6 +7722,7 @@ export type $OwnerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     crmWonDeals: Prisma.$CrmDealPayload<ExtArgs>[]
     clinic: Prisma.$ClinicPayload<ExtArgs>
     patients: Prisma.$PatientPayload<ExtArgs>[]
+    guardianPatients: Prisma.$PatientGuardianPayload<ExtArgs>[]
     appointments: Prisma.$AppointmentPayload<ExtArgs>[]
     portalLinks: Prisma.$PetOwnerClinicLinkPayload<ExtArgs>[]
     inboxItems: Prisma.$InboxItemPayload<ExtArgs>[]
@@ -6778,6 +7735,7 @@ export type $OwnerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     groomingSessions: Prisma.$GroomingSessionPayload<ExtArgs>[]
     memberships: Prisma.$MembershipPayload<ExtArgs>[]
     insuranceClaims: Prisma.$InsuranceClaimPayload<ExtArgs>[]
+    registrationRequests: Prisma.$RegistrationRequestPayload<ExtArgs>[]
     loyaltyLedger: Prisma.$LoyaltyLedgerEntryPayload<ExtArgs>[]
     loyaltyRedemptions: Prisma.$LoyaltyRedemptionPayload<ExtArgs>[]
     loyaltyOwnerTiers: Prisma.$LoyaltyOwnerTierPayload<ExtArgs>[]
@@ -6802,6 +7760,8 @@ export type $OwnerPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     country: string | null
     city: string | null
     address: string | null
+    emergencyContactName: string | null
+    emergencyContactPhone: string | null
     notes: string | null
     active: boolean
     isDeleted: boolean
@@ -7207,6 +8167,7 @@ export interface Prisma__OwnerClient<T, Null = never, ExtArgs extends runtime.Ty
   crmWonDeals<T extends Prisma.Owner$crmWonDealsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Owner$crmWonDealsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CrmDealPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clinic<T extends Prisma.ClinicDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClinicDefaultArgs<ExtArgs>>): Prisma.Prisma__ClinicClient<runtime.Types.Result.GetResult<Prisma.$ClinicPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   patients<T extends Prisma.Owner$patientsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Owner$patientsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PatientPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  guardianPatients<T extends Prisma.Owner$guardianPatientsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Owner$guardianPatientsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PatientGuardianPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   appointments<T extends Prisma.Owner$appointmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Owner$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   portalLinks<T extends Prisma.Owner$portalLinksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Owner$portalLinksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PetOwnerClinicLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   inboxItems<T extends Prisma.Owner$inboxItemsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Owner$inboxItemsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InboxItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -7219,6 +8180,7 @@ export interface Prisma__OwnerClient<T, Null = never, ExtArgs extends runtime.Ty
   groomingSessions<T extends Prisma.Owner$groomingSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Owner$groomingSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GroomingSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   memberships<T extends Prisma.Owner$membershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Owner$membershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   insuranceClaims<T extends Prisma.Owner$insuranceClaimsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Owner$insuranceClaimsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InsuranceClaimPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  registrationRequests<T extends Prisma.Owner$registrationRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Owner$registrationRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RegistrationRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   loyaltyLedger<T extends Prisma.Owner$loyaltyLedgerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Owner$loyaltyLedgerArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LoyaltyLedgerEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   loyaltyRedemptions<T extends Prisma.Owner$loyaltyRedemptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Owner$loyaltyRedemptionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LoyaltyRedemptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   loyaltyOwnerTiers<T extends Prisma.Owner$loyaltyOwnerTiersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Owner$loyaltyOwnerTiersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$LoyaltyOwnerTierPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -7270,6 +8232,8 @@ export interface OwnerFieldRefs {
   readonly country: Prisma.FieldRef<"Owner", 'String'>
   readonly city: Prisma.FieldRef<"Owner", 'String'>
   readonly address: Prisma.FieldRef<"Owner", 'String'>
+  readonly emergencyContactName: Prisma.FieldRef<"Owner", 'String'>
+  readonly emergencyContactPhone: Prisma.FieldRef<"Owner", 'String'>
   readonly notes: Prisma.FieldRef<"Owner", 'String'>
   readonly active: Prisma.FieldRef<"Owner", 'Boolean'>
   readonly isDeleted: Prisma.FieldRef<"Owner", 'Boolean'>
@@ -7750,6 +8714,30 @@ export type Owner$patientsArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
+ * Owner.guardianPatients
+ */
+export type Owner$guardianPatientsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PatientGuardian
+   */
+  select?: Prisma.PatientGuardianSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PatientGuardian
+   */
+  omit?: Prisma.PatientGuardianOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PatientGuardianInclude<ExtArgs> | null
+  where?: Prisma.PatientGuardianWhereInput
+  orderBy?: Prisma.PatientGuardianOrderByWithRelationInput | Prisma.PatientGuardianOrderByWithRelationInput[]
+  cursor?: Prisma.PatientGuardianWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PatientGuardianScalarFieldEnum | Prisma.PatientGuardianScalarFieldEnum[]
+}
+
+/**
  * Owner.appointments
  */
 export type Owner$appointmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -8035,6 +9023,30 @@ export type Owner$insuranceClaimsArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.InsuranceClaimScalarFieldEnum | Prisma.InsuranceClaimScalarFieldEnum[]
+}
+
+/**
+ * Owner.registrationRequests
+ */
+export type Owner$registrationRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RegistrationRequest
+   */
+  select?: Prisma.RegistrationRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RegistrationRequest
+   */
+  omit?: Prisma.RegistrationRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RegistrationRequestInclude<ExtArgs> | null
+  where?: Prisma.RegistrationRequestWhereInput
+  orderBy?: Prisma.RegistrationRequestOrderByWithRelationInput | Prisma.RegistrationRequestOrderByWithRelationInput[]
+  cursor?: Prisma.RegistrationRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RegistrationRequestScalarFieldEnum | Prisma.RegistrationRequestScalarFieldEnum[]
 }
 
 /**

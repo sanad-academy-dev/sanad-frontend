@@ -188,16 +188,7 @@ export const PurchaseInvoicesPage = () => {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-      <div className="px-4 pt-3">
-        <h1 className="font-medium text-lg">فواتير المشتريات</h1>
-        {/* scope line — «المصروفات» (التشغيلية) sits one tab away; say which is which */}
-        <p className="text-muted-foreground text-sm">
-          فوترة الموردين المحاسبية — تُرحَّل إلى دفتر الأستاذ وسجل الذمم (
-          {invoices.length}).
-        </p>
-      </div>
-
-      <Stats className="px-4 grid-cols-4" stats={stats} />
+      <Stats className="px-4 pt-2.5 pb-1 grid-cols-4" stats={stats} />
 
       <TableToolbar
         className="border-t"

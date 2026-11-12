@@ -78,15 +78,8 @@ export const CurrencyExchangesPage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">أسعار الصرف</h1>
-				<p className="text-muted-foreground text-sm">
-					الأسعار اليدوية المؤرّخة التي تعتمدها المستندات ({rates.length}).
-				</p>
-			</div>
-
 			<Stats
-				className="px-4 grid-cols-3"
+				className="px-4 pt-2.5 pb-1 grid-cols-3"
 				stats={stats}
 			/>
 

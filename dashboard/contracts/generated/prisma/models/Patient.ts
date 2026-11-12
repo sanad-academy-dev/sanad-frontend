@@ -46,8 +46,6 @@ export type PatientMinAggregateOutputType = {
   name: string | null
   nameNormalized: string | null
   gender: $Enums.Gender | null
-  animalTypeId: string | null
-  animalStrainId: string | null
   age: number | null
   birthDate: Date | null
   weight: number | null
@@ -55,6 +53,26 @@ export type PatientMinAggregateOutputType = {
   coat: string | null
   notes: string | null
   active: boolean | null
+  status: string | null
+  nationalId: string | null
+  ageGroup: string | null
+  academicStage: string | null
+  classroom: string | null
+  bloodType: string | null
+  developmentStatus: string | null
+  allergies: string | null
+  pocketMoneyEnabled: boolean | null
+  transportation: string | null
+  feeType: string | null
+  healthConditions: string | null
+  previousNursery: string | null
+  guardianRelationship: string | null
+  emergencyContactPhone: string | null
+  emergencyContactName: string | null
+  level: string | null
+  learningMethod: string | null
+  preferredShift: string | null
+  address: string | null
   isDeleted: boolean | null
   deletedAt: Date | null
   editsCount: number | null
@@ -70,8 +88,6 @@ export type PatientMaxAggregateOutputType = {
   name: string | null
   nameNormalized: string | null
   gender: $Enums.Gender | null
-  animalTypeId: string | null
-  animalStrainId: string | null
   age: number | null
   birthDate: Date | null
   weight: number | null
@@ -79,6 +95,26 @@ export type PatientMaxAggregateOutputType = {
   coat: string | null
   notes: string | null
   active: boolean | null
+  status: string | null
+  nationalId: string | null
+  ageGroup: string | null
+  academicStage: string | null
+  classroom: string | null
+  bloodType: string | null
+  developmentStatus: string | null
+  allergies: string | null
+  pocketMoneyEnabled: boolean | null
+  transportation: string | null
+  feeType: string | null
+  healthConditions: string | null
+  previousNursery: string | null
+  guardianRelationship: string | null
+  emergencyContactPhone: string | null
+  emergencyContactName: string | null
+  level: string | null
+  learningMethod: string | null
+  preferredShift: string | null
+  address: string | null
   isDeleted: boolean | null
   deletedAt: Date | null
   editsCount: number | null
@@ -94,8 +130,6 @@ export type PatientCountAggregateOutputType = {
   name: number
   nameNormalized: number
   gender: number
-  animalTypeId: number
-  animalStrainId: number
   age: number
   birthDate: number
   weight: number
@@ -103,6 +137,26 @@ export type PatientCountAggregateOutputType = {
   coat: number
   notes: number
   active: number
+  status: number
+  nationalId: number
+  ageGroup: number
+  academicStage: number
+  classroom: number
+  bloodType: number
+  developmentStatus: number
+  allergies: number
+  pocketMoneyEnabled: number
+  transportation: number
+  feeType: number
+  healthConditions: number
+  previousNursery: number
+  guardianRelationship: number
+  emergencyContactPhone: number
+  emergencyContactName: number
+  level: number
+  learningMethod: number
+  preferredShift: number
+  address: number
   isDeleted: number
   deletedAt: number
   editsCount: number
@@ -132,8 +186,6 @@ export type PatientMinAggregateInputType = {
   name?: true
   nameNormalized?: true
   gender?: true
-  animalTypeId?: true
-  animalStrainId?: true
   age?: true
   birthDate?: true
   weight?: true
@@ -141,6 +193,26 @@ export type PatientMinAggregateInputType = {
   coat?: true
   notes?: true
   active?: true
+  status?: true
+  nationalId?: true
+  ageGroup?: true
+  academicStage?: true
+  classroom?: true
+  bloodType?: true
+  developmentStatus?: true
+  allergies?: true
+  pocketMoneyEnabled?: true
+  transportation?: true
+  feeType?: true
+  healthConditions?: true
+  previousNursery?: true
+  guardianRelationship?: true
+  emergencyContactPhone?: true
+  emergencyContactName?: true
+  level?: true
+  learningMethod?: true
+  preferredShift?: true
+  address?: true
   isDeleted?: true
   deletedAt?: true
   editsCount?: true
@@ -156,8 +228,6 @@ export type PatientMaxAggregateInputType = {
   name?: true
   nameNormalized?: true
   gender?: true
-  animalTypeId?: true
-  animalStrainId?: true
   age?: true
   birthDate?: true
   weight?: true
@@ -165,6 +235,26 @@ export type PatientMaxAggregateInputType = {
   coat?: true
   notes?: true
   active?: true
+  status?: true
+  nationalId?: true
+  ageGroup?: true
+  academicStage?: true
+  classroom?: true
+  bloodType?: true
+  developmentStatus?: true
+  allergies?: true
+  pocketMoneyEnabled?: true
+  transportation?: true
+  feeType?: true
+  healthConditions?: true
+  previousNursery?: true
+  guardianRelationship?: true
+  emergencyContactPhone?: true
+  emergencyContactName?: true
+  level?: true
+  learningMethod?: true
+  preferredShift?: true
+  address?: true
   isDeleted?: true
   deletedAt?: true
   editsCount?: true
@@ -180,8 +270,6 @@ export type PatientCountAggregateInputType = {
   name?: true
   nameNormalized?: true
   gender?: true
-  animalTypeId?: true
-  animalStrainId?: true
   age?: true
   birthDate?: true
   weight?: true
@@ -189,6 +277,26 @@ export type PatientCountAggregateInputType = {
   coat?: true
   notes?: true
   active?: true
+  status?: true
+  nationalId?: true
+  ageGroup?: true
+  academicStage?: true
+  classroom?: true
+  bloodType?: true
+  developmentStatus?: true
+  allergies?: true
+  pocketMoneyEnabled?: true
+  transportation?: true
+  feeType?: true
+  healthConditions?: true
+  previousNursery?: true
+  guardianRelationship?: true
+  emergencyContactPhone?: true
+  emergencyContactName?: true
+  level?: true
+  learningMethod?: true
+  preferredShift?: true
+  address?: true
   isDeleted?: true
   deletedAt?: true
   editsCount?: true
@@ -291,8 +399,6 @@ export type PatientGroupByOutputType = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId: string | null
   age: number | null
   birthDate: Date | null
   weight: number | null
@@ -300,6 +406,26 @@ export type PatientGroupByOutputType = {
   coat: string | null
   notes: string | null
   active: boolean
+  status: string
+  nationalId: string | null
+  ageGroup: string | null
+  academicStage: string | null
+  classroom: string | null
+  bloodType: string | null
+  developmentStatus: string | null
+  allergies: string | null
+  pocketMoneyEnabled: boolean
+  transportation: string | null
+  feeType: string | null
+  healthConditions: string | null
+  previousNursery: string | null
+  guardianRelationship: string | null
+  emergencyContactPhone: string | null
+  emergencyContactName: string | null
+  level: string | null
+  learningMethod: string | null
+  preferredShift: string | null
+  address: string | null
   isDeleted: boolean
   deletedAt: Date | null
   editsCount: number
@@ -338,8 +464,6 @@ export type PatientWhereInput = {
   name?: Prisma.StringFilter<"Patient"> | string
   nameNormalized?: Prisma.StringFilter<"Patient"> | string
   gender?: Prisma.EnumGenderFilter<"Patient"> | $Enums.Gender
-  animalTypeId?: Prisma.StringFilter<"Patient"> | string
-  animalStrainId?: Prisma.StringNullableFilter<"Patient"> | string | null
   age?: Prisma.FloatNullableFilter<"Patient"> | number | null
   birthDate?: Prisma.DateTimeNullableFilter<"Patient"> | Date | string | null
   weight?: Prisma.FloatNullableFilter<"Patient"> | number | null
@@ -347,6 +471,26 @@ export type PatientWhereInput = {
   coat?: Prisma.StringNullableFilter<"Patient"> | string | null
   notes?: Prisma.StringNullableFilter<"Patient"> | string | null
   active?: Prisma.BoolFilter<"Patient"> | boolean
+  status?: Prisma.StringFilter<"Patient"> | string
+  nationalId?: Prisma.StringNullableFilter<"Patient"> | string | null
+  ageGroup?: Prisma.StringNullableFilter<"Patient"> | string | null
+  academicStage?: Prisma.StringNullableFilter<"Patient"> | string | null
+  classroom?: Prisma.StringNullableFilter<"Patient"> | string | null
+  bloodType?: Prisma.StringNullableFilter<"Patient"> | string | null
+  developmentStatus?: Prisma.StringNullableFilter<"Patient"> | string | null
+  allergies?: Prisma.StringNullableFilter<"Patient"> | string | null
+  pocketMoneyEnabled?: Prisma.BoolFilter<"Patient"> | boolean
+  transportation?: Prisma.StringNullableFilter<"Patient"> | string | null
+  feeType?: Prisma.StringNullableFilter<"Patient"> | string | null
+  healthConditions?: Prisma.StringNullableFilter<"Patient"> | string | null
+  previousNursery?: Prisma.StringNullableFilter<"Patient"> | string | null
+  guardianRelationship?: Prisma.StringNullableFilter<"Patient"> | string | null
+  emergencyContactPhone?: Prisma.StringNullableFilter<"Patient"> | string | null
+  emergencyContactName?: Prisma.StringNullableFilter<"Patient"> | string | null
+  level?: Prisma.StringNullableFilter<"Patient"> | string | null
+  learningMethod?: Prisma.StringNullableFilter<"Patient"> | string | null
+  preferredShift?: Prisma.StringNullableFilter<"Patient"> | string | null
+  address?: Prisma.StringNullableFilter<"Patient"> | string | null
   isDeleted?: Prisma.BoolFilter<"Patient"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"Patient"> | Date | string | null
   editsCount?: Prisma.IntFilter<"Patient"> | number
@@ -354,8 +498,9 @@ export type PatientWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Patient"> | Date | string
   clinic?: Prisma.XOR<Prisma.ClinicScalarRelationFilter, Prisma.ClinicWhereInput>
   owner?: Prisma.XOR<Prisma.OwnerNullableScalarRelationFilter, Prisma.OwnerWhereInput> | null
-  animalType?: Prisma.XOR<Prisma.AnimalTypeScalarRelationFilter, Prisma.AnimalTypeWhereInput>
-  animalStrain?: Prisma.XOR<Prisma.AnimalStrainNullableScalarRelationFilter, Prisma.AnimalStrainWhereInput> | null
+  guardians?: Prisma.PatientGuardianListRelationFilter
+  classroomAssignments?: Prisma.ClassroomStudentListRelationFilter
+  trackAssignments?: Prisma.TrackStudentListRelationFilter
   appointments?: Prisma.AppointmentListRelationFilter
   carePlanEnrollments?: Prisma.CarePlanEnrollmentListRelationFilter
   activity?: Prisma.PatientActivityListRelationFilter
@@ -380,6 +525,8 @@ export type PatientWhereInput = {
   triageAssessments?: Prisma.TriageAssessmentListRelationFilter
   alerts?: Prisma.PatientAlertListRelationFilter
   clinicalNotes?: Prisma.ClinicalNoteListRelationFilter
+  registrationRequests?: Prisma.RegistrationRequestListRelationFilter
+  patientDocuments?: Prisma.PatientDocumentListRelationFilter
   notificationOutbox?: Prisma.NotificationOutboxListRelationFilter
   recallContacts?: Prisma.RecallContactListRelationFilter
 }
@@ -392,8 +539,6 @@ export type PatientOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   nameNormalized?: Prisma.SortOrder
   gender?: Prisma.SortOrder
-  animalTypeId?: Prisma.SortOrder
-  animalStrainId?: Prisma.SortOrderInput | Prisma.SortOrder
   age?: Prisma.SortOrderInput | Prisma.SortOrder
   birthDate?: Prisma.SortOrderInput | Prisma.SortOrder
   weight?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -401,6 +546,26 @@ export type PatientOrderByWithRelationInput = {
   coat?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   active?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  nationalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  ageGroup?: Prisma.SortOrderInput | Prisma.SortOrder
+  academicStage?: Prisma.SortOrderInput | Prisma.SortOrder
+  classroom?: Prisma.SortOrderInput | Prisma.SortOrder
+  bloodType?: Prisma.SortOrderInput | Prisma.SortOrder
+  developmentStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  allergies?: Prisma.SortOrderInput | Prisma.SortOrder
+  pocketMoneyEnabled?: Prisma.SortOrder
+  transportation?: Prisma.SortOrderInput | Prisma.SortOrder
+  feeType?: Prisma.SortOrderInput | Prisma.SortOrder
+  healthConditions?: Prisma.SortOrderInput | Prisma.SortOrder
+  previousNursery?: Prisma.SortOrderInput | Prisma.SortOrder
+  guardianRelationship?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrderInput | Prisma.SortOrder
+  level?: Prisma.SortOrderInput | Prisma.SortOrder
+  learningMethod?: Prisma.SortOrderInput | Prisma.SortOrder
+  preferredShift?: Prisma.SortOrderInput | Prisma.SortOrder
+  address?: Prisma.SortOrderInput | Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   editsCount?: Prisma.SortOrder
@@ -408,8 +573,9 @@ export type PatientOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   clinic?: Prisma.ClinicOrderByWithRelationInput
   owner?: Prisma.OwnerOrderByWithRelationInput
-  animalType?: Prisma.AnimalTypeOrderByWithRelationInput
-  animalStrain?: Prisma.AnimalStrainOrderByWithRelationInput
+  guardians?: Prisma.PatientGuardianOrderByRelationAggregateInput
+  classroomAssignments?: Prisma.ClassroomStudentOrderByRelationAggregateInput
+  trackAssignments?: Prisma.TrackStudentOrderByRelationAggregateInput
   appointments?: Prisma.AppointmentOrderByRelationAggregateInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentOrderByRelationAggregateInput
   activity?: Prisma.PatientActivityOrderByRelationAggregateInput
@@ -434,6 +600,8 @@ export type PatientOrderByWithRelationInput = {
   triageAssessments?: Prisma.TriageAssessmentOrderByRelationAggregateInput
   alerts?: Prisma.PatientAlertOrderByRelationAggregateInput
   clinicalNotes?: Prisma.ClinicalNoteOrderByRelationAggregateInput
+  registrationRequests?: Prisma.RegistrationRequestOrderByRelationAggregateInput
+  patientDocuments?: Prisma.PatientDocumentOrderByRelationAggregateInput
   notificationOutbox?: Prisma.NotificationOutboxOrderByRelationAggregateInput
   recallContacts?: Prisma.RecallContactOrderByRelationAggregateInput
 }
@@ -450,8 +618,6 @@ export type PatientWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Patient"> | string
   nameNormalized?: Prisma.StringFilter<"Patient"> | string
   gender?: Prisma.EnumGenderFilter<"Patient"> | $Enums.Gender
-  animalTypeId?: Prisma.StringFilter<"Patient"> | string
-  animalStrainId?: Prisma.StringNullableFilter<"Patient"> | string | null
   age?: Prisma.FloatNullableFilter<"Patient"> | number | null
   birthDate?: Prisma.DateTimeNullableFilter<"Patient"> | Date | string | null
   weight?: Prisma.FloatNullableFilter<"Patient"> | number | null
@@ -459,6 +625,26 @@ export type PatientWhereUniqueInput = Prisma.AtLeast<{
   coat?: Prisma.StringNullableFilter<"Patient"> | string | null
   notes?: Prisma.StringNullableFilter<"Patient"> | string | null
   active?: Prisma.BoolFilter<"Patient"> | boolean
+  status?: Prisma.StringFilter<"Patient"> | string
+  nationalId?: Prisma.StringNullableFilter<"Patient"> | string | null
+  ageGroup?: Prisma.StringNullableFilter<"Patient"> | string | null
+  academicStage?: Prisma.StringNullableFilter<"Patient"> | string | null
+  classroom?: Prisma.StringNullableFilter<"Patient"> | string | null
+  bloodType?: Prisma.StringNullableFilter<"Patient"> | string | null
+  developmentStatus?: Prisma.StringNullableFilter<"Patient"> | string | null
+  allergies?: Prisma.StringNullableFilter<"Patient"> | string | null
+  pocketMoneyEnabled?: Prisma.BoolFilter<"Patient"> | boolean
+  transportation?: Prisma.StringNullableFilter<"Patient"> | string | null
+  feeType?: Prisma.StringNullableFilter<"Patient"> | string | null
+  healthConditions?: Prisma.StringNullableFilter<"Patient"> | string | null
+  previousNursery?: Prisma.StringNullableFilter<"Patient"> | string | null
+  guardianRelationship?: Prisma.StringNullableFilter<"Patient"> | string | null
+  emergencyContactPhone?: Prisma.StringNullableFilter<"Patient"> | string | null
+  emergencyContactName?: Prisma.StringNullableFilter<"Patient"> | string | null
+  level?: Prisma.StringNullableFilter<"Patient"> | string | null
+  learningMethod?: Prisma.StringNullableFilter<"Patient"> | string | null
+  preferredShift?: Prisma.StringNullableFilter<"Patient"> | string | null
+  address?: Prisma.StringNullableFilter<"Patient"> | string | null
   isDeleted?: Prisma.BoolFilter<"Patient"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"Patient"> | Date | string | null
   editsCount?: Prisma.IntFilter<"Patient"> | number
@@ -466,8 +652,9 @@ export type PatientWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Patient"> | Date | string
   clinic?: Prisma.XOR<Prisma.ClinicScalarRelationFilter, Prisma.ClinicWhereInput>
   owner?: Prisma.XOR<Prisma.OwnerNullableScalarRelationFilter, Prisma.OwnerWhereInput> | null
-  animalType?: Prisma.XOR<Prisma.AnimalTypeScalarRelationFilter, Prisma.AnimalTypeWhereInput>
-  animalStrain?: Prisma.XOR<Prisma.AnimalStrainNullableScalarRelationFilter, Prisma.AnimalStrainWhereInput> | null
+  guardians?: Prisma.PatientGuardianListRelationFilter
+  classroomAssignments?: Prisma.ClassroomStudentListRelationFilter
+  trackAssignments?: Prisma.TrackStudentListRelationFilter
   appointments?: Prisma.AppointmentListRelationFilter
   carePlanEnrollments?: Prisma.CarePlanEnrollmentListRelationFilter
   activity?: Prisma.PatientActivityListRelationFilter
@@ -492,6 +679,8 @@ export type PatientWhereUniqueInput = Prisma.AtLeast<{
   triageAssessments?: Prisma.TriageAssessmentListRelationFilter
   alerts?: Prisma.PatientAlertListRelationFilter
   clinicalNotes?: Prisma.ClinicalNoteListRelationFilter
+  registrationRequests?: Prisma.RegistrationRequestListRelationFilter
+  patientDocuments?: Prisma.PatientDocumentListRelationFilter
   notificationOutbox?: Prisma.NotificationOutboxListRelationFilter
   recallContacts?: Prisma.RecallContactListRelationFilter
 }, "id" | "code" | "ownerId_nameNormalized">
@@ -504,8 +693,6 @@ export type PatientOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   nameNormalized?: Prisma.SortOrder
   gender?: Prisma.SortOrder
-  animalTypeId?: Prisma.SortOrder
-  animalStrainId?: Prisma.SortOrderInput | Prisma.SortOrder
   age?: Prisma.SortOrderInput | Prisma.SortOrder
   birthDate?: Prisma.SortOrderInput | Prisma.SortOrder
   weight?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -513,6 +700,26 @@ export type PatientOrderByWithAggregationInput = {
   coat?: Prisma.SortOrderInput | Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   active?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  nationalId?: Prisma.SortOrderInput | Prisma.SortOrder
+  ageGroup?: Prisma.SortOrderInput | Prisma.SortOrder
+  academicStage?: Prisma.SortOrderInput | Prisma.SortOrder
+  classroom?: Prisma.SortOrderInput | Prisma.SortOrder
+  bloodType?: Prisma.SortOrderInput | Prisma.SortOrder
+  developmentStatus?: Prisma.SortOrderInput | Prisma.SortOrder
+  allergies?: Prisma.SortOrderInput | Prisma.SortOrder
+  pocketMoneyEnabled?: Prisma.SortOrder
+  transportation?: Prisma.SortOrderInput | Prisma.SortOrder
+  feeType?: Prisma.SortOrderInput | Prisma.SortOrder
+  healthConditions?: Prisma.SortOrderInput | Prisma.SortOrder
+  previousNursery?: Prisma.SortOrderInput | Prisma.SortOrder
+  guardianRelationship?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrderInput | Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrderInput | Prisma.SortOrder
+  level?: Prisma.SortOrderInput | Prisma.SortOrder
+  learningMethod?: Prisma.SortOrderInput | Prisma.SortOrder
+  preferredShift?: Prisma.SortOrderInput | Prisma.SortOrder
+  address?: Prisma.SortOrderInput | Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   editsCount?: Prisma.SortOrder
@@ -536,8 +743,6 @@ export type PatientScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Patient"> | string
   nameNormalized?: Prisma.StringWithAggregatesFilter<"Patient"> | string
   gender?: Prisma.EnumGenderWithAggregatesFilter<"Patient"> | $Enums.Gender
-  animalTypeId?: Prisma.StringWithAggregatesFilter<"Patient"> | string
-  animalStrainId?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
   age?: Prisma.FloatNullableWithAggregatesFilter<"Patient"> | number | null
   birthDate?: Prisma.DateTimeNullableWithAggregatesFilter<"Patient"> | Date | string | null
   weight?: Prisma.FloatNullableWithAggregatesFilter<"Patient"> | number | null
@@ -545,6 +750,26 @@ export type PatientScalarWhereWithAggregatesInput = {
   coat?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
   notes?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
   active?: Prisma.BoolWithAggregatesFilter<"Patient"> | boolean
+  status?: Prisma.StringWithAggregatesFilter<"Patient"> | string
+  nationalId?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  ageGroup?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  academicStage?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  classroom?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  bloodType?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  developmentStatus?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  allergies?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  pocketMoneyEnabled?: Prisma.BoolWithAggregatesFilter<"Patient"> | boolean
+  transportation?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  feeType?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  healthConditions?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  previousNursery?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  guardianRelationship?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  emergencyContactPhone?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  emergencyContactName?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  level?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  learningMethod?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  preferredShift?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
+  address?: Prisma.StringNullableWithAggregatesFilter<"Patient"> | string | null
   isDeleted?: Prisma.BoolWithAggregatesFilter<"Patient"> | boolean
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Patient"> | Date | string | null
   editsCount?: Prisma.IntWithAggregatesFilter<"Patient"> | number
@@ -565,6 +790,26 @@ export type PatientCreateInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -572,8 +817,9 @@ export type PatientCreateInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -598,6 +844,8 @@ export type PatientCreateInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -610,8 +858,6 @@ export type PatientUncheckedCreateInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -619,11 +865,34 @@ export type PatientUncheckedCreateInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -648,6 +917,8 @@ export type PatientUncheckedCreateInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -665,6 +936,26 @@ export type PatientUpdateInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -672,8 +963,9 @@ export type PatientUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -698,6 +990,8 @@ export type PatientUpdateInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -710,8 +1004,6 @@ export type PatientUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -719,11 +1011,34 @@ export type PatientUncheckedUpdateInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -748,6 +1063,8 @@ export type PatientUncheckedUpdateInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -760,8 +1077,6 @@ export type PatientCreateManyInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -769,6 +1084,26 @@ export type PatientCreateManyInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -789,6 +1124,26 @@ export type PatientUpdateManyMutationInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -804,8 +1159,6 @@ export type PatientUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -813,6 +1166,26 @@ export type PatientUncheckedUpdateManyInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -853,8 +1226,6 @@ export type PatientCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   nameNormalized?: Prisma.SortOrder
   gender?: Prisma.SortOrder
-  animalTypeId?: Prisma.SortOrder
-  animalStrainId?: Prisma.SortOrder
   age?: Prisma.SortOrder
   birthDate?: Prisma.SortOrder
   weight?: Prisma.SortOrder
@@ -862,6 +1233,26 @@ export type PatientCountOrderByAggregateInput = {
   coat?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   active?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  nationalId?: Prisma.SortOrder
+  ageGroup?: Prisma.SortOrder
+  academicStage?: Prisma.SortOrder
+  classroom?: Prisma.SortOrder
+  bloodType?: Prisma.SortOrder
+  developmentStatus?: Prisma.SortOrder
+  allergies?: Prisma.SortOrder
+  pocketMoneyEnabled?: Prisma.SortOrder
+  transportation?: Prisma.SortOrder
+  feeType?: Prisma.SortOrder
+  healthConditions?: Prisma.SortOrder
+  previousNursery?: Prisma.SortOrder
+  guardianRelationship?: Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrder
+  level?: Prisma.SortOrder
+  learningMethod?: Prisma.SortOrder
+  preferredShift?: Prisma.SortOrder
+  address?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   editsCount?: Prisma.SortOrder
@@ -883,8 +1274,6 @@ export type PatientMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   nameNormalized?: Prisma.SortOrder
   gender?: Prisma.SortOrder
-  animalTypeId?: Prisma.SortOrder
-  animalStrainId?: Prisma.SortOrder
   age?: Prisma.SortOrder
   birthDate?: Prisma.SortOrder
   weight?: Prisma.SortOrder
@@ -892,6 +1281,26 @@ export type PatientMaxOrderByAggregateInput = {
   coat?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   active?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  nationalId?: Prisma.SortOrder
+  ageGroup?: Prisma.SortOrder
+  academicStage?: Prisma.SortOrder
+  classroom?: Prisma.SortOrder
+  bloodType?: Prisma.SortOrder
+  developmentStatus?: Prisma.SortOrder
+  allergies?: Prisma.SortOrder
+  pocketMoneyEnabled?: Prisma.SortOrder
+  transportation?: Prisma.SortOrder
+  feeType?: Prisma.SortOrder
+  healthConditions?: Prisma.SortOrder
+  previousNursery?: Prisma.SortOrder
+  guardianRelationship?: Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrder
+  level?: Prisma.SortOrder
+  learningMethod?: Prisma.SortOrder
+  preferredShift?: Prisma.SortOrder
+  address?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   editsCount?: Prisma.SortOrder
@@ -907,8 +1316,6 @@ export type PatientMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   nameNormalized?: Prisma.SortOrder
   gender?: Prisma.SortOrder
-  animalTypeId?: Prisma.SortOrder
-  animalStrainId?: Prisma.SortOrder
   age?: Prisma.SortOrder
   birthDate?: Prisma.SortOrder
   weight?: Prisma.SortOrder
@@ -916,6 +1323,26 @@ export type PatientMinOrderByAggregateInput = {
   coat?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   active?: Prisma.SortOrder
+  status?: Prisma.SortOrder
+  nationalId?: Prisma.SortOrder
+  ageGroup?: Prisma.SortOrder
+  academicStage?: Prisma.SortOrder
+  classroom?: Prisma.SortOrder
+  bloodType?: Prisma.SortOrder
+  developmentStatus?: Prisma.SortOrder
+  allergies?: Prisma.SortOrder
+  pocketMoneyEnabled?: Prisma.SortOrder
+  transportation?: Prisma.SortOrder
+  feeType?: Prisma.SortOrder
+  healthConditions?: Prisma.SortOrder
+  previousNursery?: Prisma.SortOrder
+  guardianRelationship?: Prisma.SortOrder
+  emergencyContactPhone?: Prisma.SortOrder
+  emergencyContactName?: Prisma.SortOrder
+  level?: Prisma.SortOrder
+  learningMethod?: Prisma.SortOrder
+  preferredShift?: Prisma.SortOrder
+  address?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
   editsCount?: Prisma.SortOrder
@@ -1059,90 +1486,6 @@ export type PatientUpdateOneRequiredWithoutConsentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PatientUpdateToOneWithWhereWithoutConsentsInput, Prisma.PatientUpdateWithoutConsentsInput>, Prisma.PatientUncheckedUpdateWithoutConsentsInput>
 }
 
-export type PatientCreateNestedManyWithoutAnimalTypeInput = {
-  create?: Prisma.XOR<Prisma.PatientCreateWithoutAnimalTypeInput, Prisma.PatientUncheckedCreateWithoutAnimalTypeInput> | Prisma.PatientCreateWithoutAnimalTypeInput[] | Prisma.PatientUncheckedCreateWithoutAnimalTypeInput[]
-  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutAnimalTypeInput | Prisma.PatientCreateOrConnectWithoutAnimalTypeInput[]
-  createMany?: Prisma.PatientCreateManyAnimalTypeInputEnvelope
-  connect?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-}
-
-export type PatientUncheckedCreateNestedManyWithoutAnimalTypeInput = {
-  create?: Prisma.XOR<Prisma.PatientCreateWithoutAnimalTypeInput, Prisma.PatientUncheckedCreateWithoutAnimalTypeInput> | Prisma.PatientCreateWithoutAnimalTypeInput[] | Prisma.PatientUncheckedCreateWithoutAnimalTypeInput[]
-  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutAnimalTypeInput | Prisma.PatientCreateOrConnectWithoutAnimalTypeInput[]
-  createMany?: Prisma.PatientCreateManyAnimalTypeInputEnvelope
-  connect?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-}
-
-export type PatientUpdateManyWithoutAnimalTypeNestedInput = {
-  create?: Prisma.XOR<Prisma.PatientCreateWithoutAnimalTypeInput, Prisma.PatientUncheckedCreateWithoutAnimalTypeInput> | Prisma.PatientCreateWithoutAnimalTypeInput[] | Prisma.PatientUncheckedCreateWithoutAnimalTypeInput[]
-  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutAnimalTypeInput | Prisma.PatientCreateOrConnectWithoutAnimalTypeInput[]
-  upsert?: Prisma.PatientUpsertWithWhereUniqueWithoutAnimalTypeInput | Prisma.PatientUpsertWithWhereUniqueWithoutAnimalTypeInput[]
-  createMany?: Prisma.PatientCreateManyAnimalTypeInputEnvelope
-  set?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  disconnect?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  delete?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  connect?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  update?: Prisma.PatientUpdateWithWhereUniqueWithoutAnimalTypeInput | Prisma.PatientUpdateWithWhereUniqueWithoutAnimalTypeInput[]
-  updateMany?: Prisma.PatientUpdateManyWithWhereWithoutAnimalTypeInput | Prisma.PatientUpdateManyWithWhereWithoutAnimalTypeInput[]
-  deleteMany?: Prisma.PatientScalarWhereInput | Prisma.PatientScalarWhereInput[]
-}
-
-export type PatientUncheckedUpdateManyWithoutAnimalTypeNestedInput = {
-  create?: Prisma.XOR<Prisma.PatientCreateWithoutAnimalTypeInput, Prisma.PatientUncheckedCreateWithoutAnimalTypeInput> | Prisma.PatientCreateWithoutAnimalTypeInput[] | Prisma.PatientUncheckedCreateWithoutAnimalTypeInput[]
-  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutAnimalTypeInput | Prisma.PatientCreateOrConnectWithoutAnimalTypeInput[]
-  upsert?: Prisma.PatientUpsertWithWhereUniqueWithoutAnimalTypeInput | Prisma.PatientUpsertWithWhereUniqueWithoutAnimalTypeInput[]
-  createMany?: Prisma.PatientCreateManyAnimalTypeInputEnvelope
-  set?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  disconnect?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  delete?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  connect?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  update?: Prisma.PatientUpdateWithWhereUniqueWithoutAnimalTypeInput | Prisma.PatientUpdateWithWhereUniqueWithoutAnimalTypeInput[]
-  updateMany?: Prisma.PatientUpdateManyWithWhereWithoutAnimalTypeInput | Prisma.PatientUpdateManyWithWhereWithoutAnimalTypeInput[]
-  deleteMany?: Prisma.PatientScalarWhereInput | Prisma.PatientScalarWhereInput[]
-}
-
-export type PatientCreateNestedManyWithoutAnimalStrainInput = {
-  create?: Prisma.XOR<Prisma.PatientCreateWithoutAnimalStrainInput, Prisma.PatientUncheckedCreateWithoutAnimalStrainInput> | Prisma.PatientCreateWithoutAnimalStrainInput[] | Prisma.PatientUncheckedCreateWithoutAnimalStrainInput[]
-  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutAnimalStrainInput | Prisma.PatientCreateOrConnectWithoutAnimalStrainInput[]
-  createMany?: Prisma.PatientCreateManyAnimalStrainInputEnvelope
-  connect?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-}
-
-export type PatientUncheckedCreateNestedManyWithoutAnimalStrainInput = {
-  create?: Prisma.XOR<Prisma.PatientCreateWithoutAnimalStrainInput, Prisma.PatientUncheckedCreateWithoutAnimalStrainInput> | Prisma.PatientCreateWithoutAnimalStrainInput[] | Prisma.PatientUncheckedCreateWithoutAnimalStrainInput[]
-  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutAnimalStrainInput | Prisma.PatientCreateOrConnectWithoutAnimalStrainInput[]
-  createMany?: Prisma.PatientCreateManyAnimalStrainInputEnvelope
-  connect?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-}
-
-export type PatientUpdateManyWithoutAnimalStrainNestedInput = {
-  create?: Prisma.XOR<Prisma.PatientCreateWithoutAnimalStrainInput, Prisma.PatientUncheckedCreateWithoutAnimalStrainInput> | Prisma.PatientCreateWithoutAnimalStrainInput[] | Prisma.PatientUncheckedCreateWithoutAnimalStrainInput[]
-  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutAnimalStrainInput | Prisma.PatientCreateOrConnectWithoutAnimalStrainInput[]
-  upsert?: Prisma.PatientUpsertWithWhereUniqueWithoutAnimalStrainInput | Prisma.PatientUpsertWithWhereUniqueWithoutAnimalStrainInput[]
-  createMany?: Prisma.PatientCreateManyAnimalStrainInputEnvelope
-  set?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  disconnect?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  delete?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  connect?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  update?: Prisma.PatientUpdateWithWhereUniqueWithoutAnimalStrainInput | Prisma.PatientUpdateWithWhereUniqueWithoutAnimalStrainInput[]
-  updateMany?: Prisma.PatientUpdateManyWithWhereWithoutAnimalStrainInput | Prisma.PatientUpdateManyWithWhereWithoutAnimalStrainInput[]
-  deleteMany?: Prisma.PatientScalarWhereInput | Prisma.PatientScalarWhereInput[]
-}
-
-export type PatientUncheckedUpdateManyWithoutAnimalStrainNestedInput = {
-  create?: Prisma.XOR<Prisma.PatientCreateWithoutAnimalStrainInput, Prisma.PatientUncheckedCreateWithoutAnimalStrainInput> | Prisma.PatientCreateWithoutAnimalStrainInput[] | Prisma.PatientUncheckedCreateWithoutAnimalStrainInput[]
-  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutAnimalStrainInput | Prisma.PatientCreateOrConnectWithoutAnimalStrainInput[]
-  upsert?: Prisma.PatientUpsertWithWhereUniqueWithoutAnimalStrainInput | Prisma.PatientUpsertWithWhereUniqueWithoutAnimalStrainInput[]
-  createMany?: Prisma.PatientCreateManyAnimalStrainInputEnvelope
-  set?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  disconnect?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  delete?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  connect?: Prisma.PatientWhereUniqueInput | Prisma.PatientWhereUniqueInput[]
-  update?: Prisma.PatientUpdateWithWhereUniqueWithoutAnimalStrainInput | Prisma.PatientUpdateWithWhereUniqueWithoutAnimalStrainInput[]
-  updateMany?: Prisma.PatientUpdateManyWithWhereWithoutAnimalStrainInput | Prisma.PatientUpdateManyWithWhereWithoutAnimalStrainInput[]
-  deleteMany?: Prisma.PatientScalarWhereInput | Prisma.PatientScalarWhereInput[]
-}
-
 export type PatientCreateNestedManyWithoutOwnerInput = {
   create?: Prisma.XOR<Prisma.PatientCreateWithoutOwnerInput, Prisma.PatientUncheckedCreateWithoutOwnerInput> | Prisma.PatientCreateWithoutOwnerInput[] | Prisma.PatientUncheckedCreateWithoutOwnerInput[]
   connectOrCreate?: Prisma.PatientCreateOrConnectWithoutOwnerInput | Prisma.PatientCreateOrConnectWithoutOwnerInput[]
@@ -1195,6 +1538,48 @@ export type NullableFloatFieldUpdateOperationsInput = {
   decrement?: number
   multiply?: number
   divide?: number
+}
+
+export type PatientCreateNestedOneWithoutGuardiansInput = {
+  create?: Prisma.XOR<Prisma.PatientCreateWithoutGuardiansInput, Prisma.PatientUncheckedCreateWithoutGuardiansInput>
+  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutGuardiansInput
+  connect?: Prisma.PatientWhereUniqueInput
+}
+
+export type PatientUpdateOneRequiredWithoutGuardiansNestedInput = {
+  create?: Prisma.XOR<Prisma.PatientCreateWithoutGuardiansInput, Prisma.PatientUncheckedCreateWithoutGuardiansInput>
+  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutGuardiansInput
+  upsert?: Prisma.PatientUpsertWithoutGuardiansInput
+  connect?: Prisma.PatientWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PatientUpdateToOneWithWhereWithoutGuardiansInput, Prisma.PatientUpdateWithoutGuardiansInput>, Prisma.PatientUncheckedUpdateWithoutGuardiansInput>
+}
+
+export type PatientCreateNestedOneWithoutClassroomAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.PatientCreateWithoutClassroomAssignmentsInput, Prisma.PatientUncheckedCreateWithoutClassroomAssignmentsInput>
+  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutClassroomAssignmentsInput
+  connect?: Prisma.PatientWhereUniqueInput
+}
+
+export type PatientUpdateOneRequiredWithoutClassroomAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.PatientCreateWithoutClassroomAssignmentsInput, Prisma.PatientUncheckedCreateWithoutClassroomAssignmentsInput>
+  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutClassroomAssignmentsInput
+  upsert?: Prisma.PatientUpsertWithoutClassroomAssignmentsInput
+  connect?: Prisma.PatientWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PatientUpdateToOneWithWhereWithoutClassroomAssignmentsInput, Prisma.PatientUpdateWithoutClassroomAssignmentsInput>, Prisma.PatientUncheckedUpdateWithoutClassroomAssignmentsInput>
+}
+
+export type PatientCreateNestedOneWithoutTrackAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.PatientCreateWithoutTrackAssignmentsInput, Prisma.PatientUncheckedCreateWithoutTrackAssignmentsInput>
+  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutTrackAssignmentsInput
+  connect?: Prisma.PatientWhereUniqueInput
+}
+
+export type PatientUpdateOneRequiredWithoutTrackAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.PatientCreateWithoutTrackAssignmentsInput, Prisma.PatientUncheckedCreateWithoutTrackAssignmentsInput>
+  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutTrackAssignmentsInput
+  upsert?: Prisma.PatientUpsertWithoutTrackAssignmentsInput
+  connect?: Prisma.PatientWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PatientUpdateToOneWithWhereWithoutTrackAssignmentsInput, Prisma.PatientUpdateWithoutTrackAssignmentsInput>, Prisma.PatientUncheckedUpdateWithoutTrackAssignmentsInput>
 }
 
 export type PatientCreateNestedOneWithoutActivityInput = {
@@ -1487,6 +1872,36 @@ export type PatientUpdateOneWithoutRecallContactsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.PatientUpdateToOneWithWhereWithoutRecallContactsInput, Prisma.PatientUpdateWithoutRecallContactsInput>, Prisma.PatientUncheckedUpdateWithoutRecallContactsInput>
 }
 
+export type PatientCreateNestedOneWithoutRegistrationRequestsInput = {
+  create?: Prisma.XOR<Prisma.PatientCreateWithoutRegistrationRequestsInput, Prisma.PatientUncheckedCreateWithoutRegistrationRequestsInput>
+  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutRegistrationRequestsInput
+  connect?: Prisma.PatientWhereUniqueInput
+}
+
+export type PatientUpdateOneWithoutRegistrationRequestsNestedInput = {
+  create?: Prisma.XOR<Prisma.PatientCreateWithoutRegistrationRequestsInput, Prisma.PatientUncheckedCreateWithoutRegistrationRequestsInput>
+  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutRegistrationRequestsInput
+  upsert?: Prisma.PatientUpsertWithoutRegistrationRequestsInput
+  disconnect?: Prisma.PatientWhereInput | boolean
+  delete?: Prisma.PatientWhereInput | boolean
+  connect?: Prisma.PatientWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PatientUpdateToOneWithWhereWithoutRegistrationRequestsInput, Prisma.PatientUpdateWithoutRegistrationRequestsInput>, Prisma.PatientUncheckedUpdateWithoutRegistrationRequestsInput>
+}
+
+export type PatientCreateNestedOneWithoutPatientDocumentsInput = {
+  create?: Prisma.XOR<Prisma.PatientCreateWithoutPatientDocumentsInput, Prisma.PatientUncheckedCreateWithoutPatientDocumentsInput>
+  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutPatientDocumentsInput
+  connect?: Prisma.PatientWhereUniqueInput
+}
+
+export type PatientUpdateOneRequiredWithoutPatientDocumentsNestedInput = {
+  create?: Prisma.XOR<Prisma.PatientCreateWithoutPatientDocumentsInput, Prisma.PatientUncheckedCreateWithoutPatientDocumentsInput>
+  connectOrCreate?: Prisma.PatientCreateOrConnectWithoutPatientDocumentsInput
+  upsert?: Prisma.PatientUpsertWithoutPatientDocumentsInput
+  connect?: Prisma.PatientWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PatientUpdateToOneWithWhereWithoutPatientDocumentsInput, Prisma.PatientUpdateWithoutPatientDocumentsInput>, Prisma.PatientUncheckedUpdateWithoutPatientDocumentsInput>
+}
+
 export type PatientCreateWithoutClinicInput = {
   id?: string
   code: string
@@ -1500,14 +1915,35 @@ export type PatientCreateWithoutClinicInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -1532,6 +1968,8 @@ export type PatientCreateWithoutClinicInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -1543,8 +1981,6 @@ export type PatientUncheckedCreateWithoutClinicInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -1552,11 +1988,34 @@ export type PatientUncheckedCreateWithoutClinicInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -1581,6 +2040,8 @@ export type PatientUncheckedCreateWithoutClinicInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -1622,8 +2083,6 @@ export type PatientScalarWhereInput = {
   name?: Prisma.StringFilter<"Patient"> | string
   nameNormalized?: Prisma.StringFilter<"Patient"> | string
   gender?: Prisma.EnumGenderFilter<"Patient"> | $Enums.Gender
-  animalTypeId?: Prisma.StringFilter<"Patient"> | string
-  animalStrainId?: Prisma.StringNullableFilter<"Patient"> | string | null
   age?: Prisma.FloatNullableFilter<"Patient"> | number | null
   birthDate?: Prisma.DateTimeNullableFilter<"Patient"> | Date | string | null
   weight?: Prisma.FloatNullableFilter<"Patient"> | number | null
@@ -1631,6 +2090,26 @@ export type PatientScalarWhereInput = {
   coat?: Prisma.StringNullableFilter<"Patient"> | string | null
   notes?: Prisma.StringNullableFilter<"Patient"> | string | null
   active?: Prisma.BoolFilter<"Patient"> | boolean
+  status?: Prisma.StringFilter<"Patient"> | string
+  nationalId?: Prisma.StringNullableFilter<"Patient"> | string | null
+  ageGroup?: Prisma.StringNullableFilter<"Patient"> | string | null
+  academicStage?: Prisma.StringNullableFilter<"Patient"> | string | null
+  classroom?: Prisma.StringNullableFilter<"Patient"> | string | null
+  bloodType?: Prisma.StringNullableFilter<"Patient"> | string | null
+  developmentStatus?: Prisma.StringNullableFilter<"Patient"> | string | null
+  allergies?: Prisma.StringNullableFilter<"Patient"> | string | null
+  pocketMoneyEnabled?: Prisma.BoolFilter<"Patient"> | boolean
+  transportation?: Prisma.StringNullableFilter<"Patient"> | string | null
+  feeType?: Prisma.StringNullableFilter<"Patient"> | string | null
+  healthConditions?: Prisma.StringNullableFilter<"Patient"> | string | null
+  previousNursery?: Prisma.StringNullableFilter<"Patient"> | string | null
+  guardianRelationship?: Prisma.StringNullableFilter<"Patient"> | string | null
+  emergencyContactPhone?: Prisma.StringNullableFilter<"Patient"> | string | null
+  emergencyContactName?: Prisma.StringNullableFilter<"Patient"> | string | null
+  level?: Prisma.StringNullableFilter<"Patient"> | string | null
+  learningMethod?: Prisma.StringNullableFilter<"Patient"> | string | null
+  preferredShift?: Prisma.StringNullableFilter<"Patient"> | string | null
+  address?: Prisma.StringNullableFilter<"Patient"> | string | null
   isDeleted?: Prisma.BoolFilter<"Patient"> | boolean
   deletedAt?: Prisma.DateTimeNullableFilter<"Patient"> | Date | string | null
   editsCount?: Prisma.IntFilter<"Patient"> | number
@@ -1651,6 +2130,26 @@ export type PatientCreateWithoutPetOwnerRequestsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -1658,8 +2157,9 @@ export type PatientCreateWithoutPetOwnerRequestsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -1683,6 +2183,8 @@ export type PatientCreateWithoutPetOwnerRequestsInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -1695,8 +2197,6 @@ export type PatientUncheckedCreateWithoutPetOwnerRequestsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -1704,11 +2204,34 @@ export type PatientUncheckedCreateWithoutPetOwnerRequestsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -1732,6 +2255,8 @@ export type PatientUncheckedCreateWithoutPetOwnerRequestsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -1765,6 +2290,26 @@ export type PatientUpdateWithoutPetOwnerRequestsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1772,8 +2317,9 @@ export type PatientUpdateWithoutPetOwnerRequestsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -1797,6 +2343,8 @@ export type PatientUpdateWithoutPetOwnerRequestsInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -1809,8 +2357,6 @@ export type PatientUncheckedUpdateWithoutPetOwnerRequestsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -1818,11 +2364,34 @@ export type PatientUncheckedUpdateWithoutPetOwnerRequestsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -1846,6 +2415,8 @@ export type PatientUncheckedUpdateWithoutPetOwnerRequestsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -1863,6 +2434,26 @@ export type PatientCreateWithoutInboxItemsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -1870,8 +2461,9 @@ export type PatientCreateWithoutInboxItemsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -1895,6 +2487,8 @@ export type PatientCreateWithoutInboxItemsInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -1907,8 +2501,6 @@ export type PatientUncheckedCreateWithoutInboxItemsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -1916,11 +2508,34 @@ export type PatientUncheckedCreateWithoutInboxItemsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -1944,6 +2559,8 @@ export type PatientUncheckedCreateWithoutInboxItemsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -1977,6 +2594,26 @@ export type PatientUpdateWithoutInboxItemsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1984,8 +2621,9 @@ export type PatientUpdateWithoutInboxItemsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -2009,6 +2647,8 @@ export type PatientUpdateWithoutInboxItemsInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -2021,8 +2661,6 @@ export type PatientUncheckedUpdateWithoutInboxItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -2030,11 +2668,34 @@ export type PatientUncheckedUpdateWithoutInboxItemsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -2058,6 +2719,8 @@ export type PatientUncheckedUpdateWithoutInboxItemsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -2075,6 +2738,26 @@ export type PatientCreateWithoutLabTestOrdersInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -2082,8 +2765,9 @@ export type PatientCreateWithoutLabTestOrdersInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -2107,6 +2791,8 @@ export type PatientCreateWithoutLabTestOrdersInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -2119,8 +2805,6 @@ export type PatientUncheckedCreateWithoutLabTestOrdersInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -2128,11 +2812,34 @@ export type PatientUncheckedCreateWithoutLabTestOrdersInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -2156,6 +2863,8 @@ export type PatientUncheckedCreateWithoutLabTestOrdersInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -2189,6 +2898,26 @@ export type PatientUpdateWithoutLabTestOrdersInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2196,8 +2925,9 @@ export type PatientUpdateWithoutLabTestOrdersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -2221,6 +2951,8 @@ export type PatientUpdateWithoutLabTestOrdersInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -2233,8 +2965,6 @@ export type PatientUncheckedUpdateWithoutLabTestOrdersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -2242,11 +2972,34 @@ export type PatientUncheckedUpdateWithoutLabTestOrdersInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -2270,6 +3023,8 @@ export type PatientUncheckedUpdateWithoutLabTestOrdersInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -2287,6 +3042,26 @@ export type PatientCreateWithoutRadiologyOrdersInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -2294,8 +3069,9 @@ export type PatientCreateWithoutRadiologyOrdersInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -2319,6 +3095,8 @@ export type PatientCreateWithoutRadiologyOrdersInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -2331,8 +3109,6 @@ export type PatientUncheckedCreateWithoutRadiologyOrdersInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -2340,11 +3116,34 @@ export type PatientUncheckedCreateWithoutRadiologyOrdersInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -2368,6 +3167,8 @@ export type PatientUncheckedCreateWithoutRadiologyOrdersInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -2401,6 +3202,26 @@ export type PatientUpdateWithoutRadiologyOrdersInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2408,8 +3229,9 @@ export type PatientUpdateWithoutRadiologyOrdersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -2433,6 +3255,8 @@ export type PatientUpdateWithoutRadiologyOrdersInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -2445,8 +3269,6 @@ export type PatientUncheckedUpdateWithoutRadiologyOrdersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -2454,11 +3276,34 @@ export type PatientUncheckedUpdateWithoutRadiologyOrdersInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -2482,6 +3327,8 @@ export type PatientUncheckedUpdateWithoutRadiologyOrdersInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -2499,6 +3346,26 @@ export type PatientCreateWithoutOperationCasesInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -2506,8 +3373,9 @@ export type PatientCreateWithoutOperationCasesInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -2531,6 +3399,8 @@ export type PatientCreateWithoutOperationCasesInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -2543,8 +3413,6 @@ export type PatientUncheckedCreateWithoutOperationCasesInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -2552,11 +3420,34 @@ export type PatientUncheckedCreateWithoutOperationCasesInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -2580,6 +3471,8 @@ export type PatientUncheckedCreateWithoutOperationCasesInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -2613,6 +3506,26 @@ export type PatientUpdateWithoutOperationCasesInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2620,8 +3533,9 @@ export type PatientUpdateWithoutOperationCasesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -2645,6 +3559,8 @@ export type PatientUpdateWithoutOperationCasesInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -2657,8 +3573,6 @@ export type PatientUncheckedUpdateWithoutOperationCasesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -2666,11 +3580,34 @@ export type PatientUncheckedUpdateWithoutOperationCasesInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -2694,6 +3631,8 @@ export type PatientUncheckedUpdateWithoutOperationCasesInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -2711,6 +3650,26 @@ export type PatientCreateWithoutConsentsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -2718,8 +3677,9 @@ export type PatientCreateWithoutConsentsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -2743,6 +3703,8 @@ export type PatientCreateWithoutConsentsInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -2755,8 +3717,6 @@ export type PatientUncheckedCreateWithoutConsentsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -2764,11 +3724,34 @@ export type PatientUncheckedCreateWithoutConsentsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -2792,6 +3775,8 @@ export type PatientUncheckedCreateWithoutConsentsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -2825,6 +3810,26 @@ export type PatientUpdateWithoutConsentsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -2832,8 +3837,9 @@ export type PatientUpdateWithoutConsentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -2857,6 +3863,8 @@ export type PatientUpdateWithoutConsentsInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -2869,8 +3877,6 @@ export type PatientUncheckedUpdateWithoutConsentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -2878,11 +3884,34 @@ export type PatientUncheckedUpdateWithoutConsentsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -2906,256 +3935,10 @@ export type PatientUncheckedUpdateWithoutConsentsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
-}
-
-export type PatientCreateWithoutAnimalTypeInput = {
-  id?: string
-  code: string
-  name: string
-  nameNormalized: string
-  gender: $Enums.Gender
-  age?: number | null
-  birthDate?: Date | string | null
-  weight?: number | null
-  microchipNumber?: string | null
-  coat?: string | null
-  notes?: string | null
-  active?: boolean
-  isDeleted?: boolean
-  deletedAt?: Date | string | null
-  editsCount?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
-  owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
-  appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
-  carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
-  activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
-  inboxItems?: Prisma.InboxItemCreateNestedManyWithoutPatientInput
-  labTestOrders?: Prisma.LabTestOrderCreateNestedManyWithoutPatientInput
-  radiologyOrders?: Prisma.RadiologyOrderCreateNestedManyWithoutPatientInput
-  vitalSignsRecords?: Prisma.VitalSignsRecordCreateNestedManyWithoutPatientInput
-  operationCases?: Prisma.OperationCaseCreateNestedManyWithoutPatientInput
-  vaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutPatientInput
-  consents?: Prisma.PatientConsentCreateNestedManyWithoutPatientInput
-  groomingProfile?: Prisma.PatientGroomingProfileCreateNestedOneWithoutPatientInput
-  groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutPatientInput
-  groomingFindings?: Prisma.GroomingFindingCreateNestedManyWithoutPatientInput
-  nutritionPlans?: Prisma.NutritionPlanCreateNestedManyWithoutPatientInput
-  insurancePolicies?: Prisma.PatientPolicyCreateNestedManyWithoutPatientInput
-  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutPatientInput
-  prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPatientInput
-  controlledRegister?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutPatientInput
-  inpatientStays?: Prisma.InpatientStayCreateNestedManyWithoutPatientInput
-  petOwnerRequests?: Prisma.PetOwnerRequestCreateNestedManyWithoutPatientInput
-  emergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutPatientInput
-  triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
-  alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
-  clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
-  notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
-  recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
-}
-
-export type PatientUncheckedCreateWithoutAnimalTypeInput = {
-  id?: string
-  code: string
-  clinicId: string
-  ownerId?: string | null
-  name: string
-  nameNormalized: string
-  gender: $Enums.Gender
-  animalStrainId?: string | null
-  age?: number | null
-  birthDate?: Date | string | null
-  weight?: number | null
-  microchipNumber?: string | null
-  coat?: string | null
-  notes?: string | null
-  active?: boolean
-  isDeleted?: boolean
-  deletedAt?: Date | string | null
-  editsCount?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
-  carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
-  activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
-  inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutPatientInput
-  labTestOrders?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutPatientInput
-  radiologyOrders?: Prisma.RadiologyOrderUncheckedCreateNestedManyWithoutPatientInput
-  vitalSignsRecords?: Prisma.VitalSignsRecordUncheckedCreateNestedManyWithoutPatientInput
-  operationCases?: Prisma.OperationCaseUncheckedCreateNestedManyWithoutPatientInput
-  vaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutPatientInput
-  consents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutPatientInput
-  groomingProfile?: Prisma.PatientGroomingProfileUncheckedCreateNestedOneWithoutPatientInput
-  groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutPatientInput
-  groomingFindings?: Prisma.GroomingFindingUncheckedCreateNestedManyWithoutPatientInput
-  nutritionPlans?: Prisma.NutritionPlanUncheckedCreateNestedManyWithoutPatientInput
-  insurancePolicies?: Prisma.PatientPolicyUncheckedCreateNestedManyWithoutPatientInput
-  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutPatientInput
-  prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
-  controlledRegister?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutPatientInput
-  inpatientStays?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutPatientInput
-  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedCreateNestedManyWithoutPatientInput
-  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutPatientInput
-  triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
-  alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
-  clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
-  notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
-  recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
-}
-
-export type PatientCreateOrConnectWithoutAnimalTypeInput = {
-  where: Prisma.PatientWhereUniqueInput
-  create: Prisma.XOR<Prisma.PatientCreateWithoutAnimalTypeInput, Prisma.PatientUncheckedCreateWithoutAnimalTypeInput>
-}
-
-export type PatientCreateManyAnimalTypeInputEnvelope = {
-  data: Prisma.PatientCreateManyAnimalTypeInput | Prisma.PatientCreateManyAnimalTypeInput[]
-  skipDuplicates?: boolean
-}
-
-export type PatientUpsertWithWhereUniqueWithoutAnimalTypeInput = {
-  where: Prisma.PatientWhereUniqueInput
-  update: Prisma.XOR<Prisma.PatientUpdateWithoutAnimalTypeInput, Prisma.PatientUncheckedUpdateWithoutAnimalTypeInput>
-  create: Prisma.XOR<Prisma.PatientCreateWithoutAnimalTypeInput, Prisma.PatientUncheckedCreateWithoutAnimalTypeInput>
-}
-
-export type PatientUpdateWithWhereUniqueWithoutAnimalTypeInput = {
-  where: Prisma.PatientWhereUniqueInput
-  data: Prisma.XOR<Prisma.PatientUpdateWithoutAnimalTypeInput, Prisma.PatientUncheckedUpdateWithoutAnimalTypeInput>
-}
-
-export type PatientUpdateManyWithWhereWithoutAnimalTypeInput = {
-  where: Prisma.PatientScalarWhereInput
-  data: Prisma.XOR<Prisma.PatientUpdateManyMutationInput, Prisma.PatientUncheckedUpdateManyWithoutAnimalTypeInput>
-}
-
-export type PatientCreateWithoutAnimalStrainInput = {
-  id?: string
-  code: string
-  name: string
-  nameNormalized: string
-  gender: $Enums.Gender
-  age?: number | null
-  birthDate?: Date | string | null
-  weight?: number | null
-  microchipNumber?: string | null
-  coat?: string | null
-  notes?: string | null
-  active?: boolean
-  isDeleted?: boolean
-  deletedAt?: Date | string | null
-  editsCount?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
-  owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
-  carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
-  activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
-  inboxItems?: Prisma.InboxItemCreateNestedManyWithoutPatientInput
-  labTestOrders?: Prisma.LabTestOrderCreateNestedManyWithoutPatientInput
-  radiologyOrders?: Prisma.RadiologyOrderCreateNestedManyWithoutPatientInput
-  vitalSignsRecords?: Prisma.VitalSignsRecordCreateNestedManyWithoutPatientInput
-  operationCases?: Prisma.OperationCaseCreateNestedManyWithoutPatientInput
-  vaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutPatientInput
-  consents?: Prisma.PatientConsentCreateNestedManyWithoutPatientInput
-  groomingProfile?: Prisma.PatientGroomingProfileCreateNestedOneWithoutPatientInput
-  groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutPatientInput
-  groomingFindings?: Prisma.GroomingFindingCreateNestedManyWithoutPatientInput
-  nutritionPlans?: Prisma.NutritionPlanCreateNestedManyWithoutPatientInput
-  insurancePolicies?: Prisma.PatientPolicyCreateNestedManyWithoutPatientInput
-  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutPatientInput
-  prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPatientInput
-  controlledRegister?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutPatientInput
-  inpatientStays?: Prisma.InpatientStayCreateNestedManyWithoutPatientInput
-  petOwnerRequests?: Prisma.PetOwnerRequestCreateNestedManyWithoutPatientInput
-  emergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutPatientInput
-  triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
-  alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
-  clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
-  notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
-  recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
-}
-
-export type PatientUncheckedCreateWithoutAnimalStrainInput = {
-  id?: string
-  code: string
-  clinicId: string
-  ownerId?: string | null
-  name: string
-  nameNormalized: string
-  gender: $Enums.Gender
-  animalTypeId: string
-  age?: number | null
-  birthDate?: Date | string | null
-  weight?: number | null
-  microchipNumber?: string | null
-  coat?: string | null
-  notes?: string | null
-  active?: boolean
-  isDeleted?: boolean
-  deletedAt?: Date | string | null
-  editsCount?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
-  carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
-  activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
-  inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutPatientInput
-  labTestOrders?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutPatientInput
-  radiologyOrders?: Prisma.RadiologyOrderUncheckedCreateNestedManyWithoutPatientInput
-  vitalSignsRecords?: Prisma.VitalSignsRecordUncheckedCreateNestedManyWithoutPatientInput
-  operationCases?: Prisma.OperationCaseUncheckedCreateNestedManyWithoutPatientInput
-  vaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutPatientInput
-  consents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutPatientInput
-  groomingProfile?: Prisma.PatientGroomingProfileUncheckedCreateNestedOneWithoutPatientInput
-  groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutPatientInput
-  groomingFindings?: Prisma.GroomingFindingUncheckedCreateNestedManyWithoutPatientInput
-  nutritionPlans?: Prisma.NutritionPlanUncheckedCreateNestedManyWithoutPatientInput
-  insurancePolicies?: Prisma.PatientPolicyUncheckedCreateNestedManyWithoutPatientInput
-  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutPatientInput
-  prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
-  controlledRegister?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutPatientInput
-  inpatientStays?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutPatientInput
-  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedCreateNestedManyWithoutPatientInput
-  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutPatientInput
-  triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
-  alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
-  clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
-  notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
-  recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
-}
-
-export type PatientCreateOrConnectWithoutAnimalStrainInput = {
-  where: Prisma.PatientWhereUniqueInput
-  create: Prisma.XOR<Prisma.PatientCreateWithoutAnimalStrainInput, Prisma.PatientUncheckedCreateWithoutAnimalStrainInput>
-}
-
-export type PatientCreateManyAnimalStrainInputEnvelope = {
-  data: Prisma.PatientCreateManyAnimalStrainInput | Prisma.PatientCreateManyAnimalStrainInput[]
-  skipDuplicates?: boolean
-}
-
-export type PatientUpsertWithWhereUniqueWithoutAnimalStrainInput = {
-  where: Prisma.PatientWhereUniqueInput
-  update: Prisma.XOR<Prisma.PatientUpdateWithoutAnimalStrainInput, Prisma.PatientUncheckedUpdateWithoutAnimalStrainInput>
-  create: Prisma.XOR<Prisma.PatientCreateWithoutAnimalStrainInput, Prisma.PatientUncheckedCreateWithoutAnimalStrainInput>
-}
-
-export type PatientUpdateWithWhereUniqueWithoutAnimalStrainInput = {
-  where: Prisma.PatientWhereUniqueInput
-  data: Prisma.XOR<Prisma.PatientUpdateWithoutAnimalStrainInput, Prisma.PatientUncheckedUpdateWithoutAnimalStrainInput>
-}
-
-export type PatientUpdateManyWithWhereWithoutAnimalStrainInput = {
-  where: Prisma.PatientScalarWhereInput
-  data: Prisma.XOR<Prisma.PatientUpdateManyMutationInput, Prisma.PatientUncheckedUpdateManyWithoutAnimalStrainInput>
 }
 
 export type PatientCreateWithoutOwnerInput = {
@@ -3171,14 +3954,35 @@ export type PatientCreateWithoutOwnerInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -3203,6 +4007,8 @@ export type PatientCreateWithoutOwnerInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -3214,8 +4020,6 @@ export type PatientUncheckedCreateWithoutOwnerInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -3223,11 +4027,34 @@ export type PatientUncheckedCreateWithoutOwnerInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -3252,6 +4079,8 @@ export type PatientUncheckedCreateWithoutOwnerInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -3282,6 +4111,918 @@ export type PatientUpdateManyWithWhereWithoutOwnerInput = {
   data: Prisma.XOR<Prisma.PatientUpdateManyMutationInput, Prisma.PatientUncheckedUpdateManyWithoutOwnerInput>
 }
 
+export type PatientCreateWithoutGuardiansInput = {
+  id?: string
+  code: string
+  name: string
+  nameNormalized: string
+  gender: $Enums.Gender
+  age?: number | null
+  birthDate?: Date | string | null
+  weight?: number | null
+  microchipNumber?: string | null
+  coat?: string | null
+  notes?: string | null
+  active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  editsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
+  owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
+  activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
+  inboxItems?: Prisma.InboxItemCreateNestedManyWithoutPatientInput
+  labTestOrders?: Prisma.LabTestOrderCreateNestedManyWithoutPatientInput
+  radiologyOrders?: Prisma.RadiologyOrderCreateNestedManyWithoutPatientInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordCreateNestedManyWithoutPatientInput
+  operationCases?: Prisma.OperationCaseCreateNestedManyWithoutPatientInput
+  vaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutPatientInput
+  consents?: Prisma.PatientConsentCreateNestedManyWithoutPatientInput
+  groomingProfile?: Prisma.PatientGroomingProfileCreateNestedOneWithoutPatientInput
+  groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutPatientInput
+  groomingFindings?: Prisma.GroomingFindingCreateNestedManyWithoutPatientInput
+  nutritionPlans?: Prisma.NutritionPlanCreateNestedManyWithoutPatientInput
+  insurancePolicies?: Prisma.PatientPolicyCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutPatientInput
+  prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPatientInput
+  controlledRegister?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutPatientInput
+  inpatientStays?: Prisma.InpatientStayCreateNestedManyWithoutPatientInput
+  petOwnerRequests?: Prisma.PetOwnerRequestCreateNestedManyWithoutPatientInput
+  emergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutPatientInput
+  triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
+  alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
+  clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
+  recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
+}
+
+export type PatientUncheckedCreateWithoutGuardiansInput = {
+  id?: string
+  code: string
+  clinicId: string
+  ownerId?: string | null
+  name: string
+  nameNormalized: string
+  gender: $Enums.Gender
+  age?: number | null
+  birthDate?: Date | string | null
+  weight?: number | null
+  microchipNumber?: string | null
+  coat?: string | null
+  notes?: string | null
+  active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  editsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
+  activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
+  inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutPatientInput
+  labTestOrders?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutPatientInput
+  radiologyOrders?: Prisma.RadiologyOrderUncheckedCreateNestedManyWithoutPatientInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUncheckedCreateNestedManyWithoutPatientInput
+  operationCases?: Prisma.OperationCaseUncheckedCreateNestedManyWithoutPatientInput
+  vaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutPatientInput
+  consents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutPatientInput
+  groomingProfile?: Prisma.PatientGroomingProfileUncheckedCreateNestedOneWithoutPatientInput
+  groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutPatientInput
+  groomingFindings?: Prisma.GroomingFindingUncheckedCreateNestedManyWithoutPatientInput
+  nutritionPlans?: Prisma.NutritionPlanUncheckedCreateNestedManyWithoutPatientInput
+  insurancePolicies?: Prisma.PatientPolicyUncheckedCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutPatientInput
+  prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutPatientInput
+  inpatientStays?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutPatientInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedCreateNestedManyWithoutPatientInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutPatientInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
+  alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
+  clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
+  recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
+}
+
+export type PatientCreateOrConnectWithoutGuardiansInput = {
+  where: Prisma.PatientWhereUniqueInput
+  create: Prisma.XOR<Prisma.PatientCreateWithoutGuardiansInput, Prisma.PatientUncheckedCreateWithoutGuardiansInput>
+}
+
+export type PatientUpsertWithoutGuardiansInput = {
+  update: Prisma.XOR<Prisma.PatientUpdateWithoutGuardiansInput, Prisma.PatientUncheckedUpdateWithoutGuardiansInput>
+  create: Prisma.XOR<Prisma.PatientCreateWithoutGuardiansInput, Prisma.PatientUncheckedCreateWithoutGuardiansInput>
+  where?: Prisma.PatientWhereInput
+}
+
+export type PatientUpdateToOneWithWhereWithoutGuardiansInput = {
+  where?: Prisma.PatientWhereInput
+  data: Prisma.XOR<Prisma.PatientUpdateWithoutGuardiansInput, Prisma.PatientUncheckedUpdateWithoutGuardiansInput>
+}
+
+export type PatientUpdateWithoutGuardiansInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
+  owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
+  activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
+  inboxItems?: Prisma.InboxItemUpdateManyWithoutPatientNestedInput
+  labTestOrders?: Prisma.LabTestOrderUpdateManyWithoutPatientNestedInput
+  radiologyOrders?: Prisma.RadiologyOrderUpdateManyWithoutPatientNestedInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUpdateManyWithoutPatientNestedInput
+  operationCases?: Prisma.OperationCaseUpdateManyWithoutPatientNestedInput
+  vaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutPatientNestedInput
+  consents?: Prisma.PatientConsentUpdateManyWithoutPatientNestedInput
+  groomingProfile?: Prisma.PatientGroomingProfileUpdateOneWithoutPatientNestedInput
+  groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutPatientNestedInput
+  groomingFindings?: Prisma.GroomingFindingUpdateManyWithoutPatientNestedInput
+  nutritionPlans?: Prisma.NutritionPlanUpdateManyWithoutPatientNestedInput
+  insurancePolicies?: Prisma.PatientPolicyUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutPatientNestedInput
+  prescriptions?: Prisma.PrescriptionUpdateManyWithoutPatientNestedInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUpdateManyWithoutPatientNestedInput
+  inpatientStays?: Prisma.InpatientStayUpdateManyWithoutPatientNestedInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUpdateManyWithoutPatientNestedInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutPatientNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
+  alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
+  clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
+  recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
+}
+
+export type PatientUncheckedUpdateWithoutGuardiansInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  clinicId?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
+  activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
+  inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutPatientNestedInput
+  labTestOrders?: Prisma.LabTestOrderUncheckedUpdateManyWithoutPatientNestedInput
+  radiologyOrders?: Prisma.RadiologyOrderUncheckedUpdateManyWithoutPatientNestedInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUncheckedUpdateManyWithoutPatientNestedInput
+  operationCases?: Prisma.OperationCaseUncheckedUpdateManyWithoutPatientNestedInput
+  vaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutPatientNestedInput
+  consents?: Prisma.PatientConsentUncheckedUpdateManyWithoutPatientNestedInput
+  groomingProfile?: Prisma.PatientGroomingProfileUncheckedUpdateOneWithoutPatientNestedInput
+  groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutPatientNestedInput
+  groomingFindings?: Prisma.GroomingFindingUncheckedUpdateManyWithoutPatientNestedInput
+  nutritionPlans?: Prisma.NutritionPlanUncheckedUpdateManyWithoutPatientNestedInput
+  insurancePolicies?: Prisma.PatientPolicyUncheckedUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutPatientNestedInput
+  prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutPatientNestedInput
+  inpatientStays?: Prisma.InpatientStayUncheckedUpdateManyWithoutPatientNestedInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedUpdateManyWithoutPatientNestedInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutPatientNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
+  alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
+  clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
+  recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
+}
+
+export type PatientCreateWithoutClassroomAssignmentsInput = {
+  id?: string
+  code: string
+  name: string
+  nameNormalized: string
+  gender: $Enums.Gender
+  age?: number | null
+  birthDate?: Date | string | null
+  weight?: number | null
+  microchipNumber?: string | null
+  coat?: string | null
+  notes?: string | null
+  active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  editsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
+  owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
+  activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
+  inboxItems?: Prisma.InboxItemCreateNestedManyWithoutPatientInput
+  labTestOrders?: Prisma.LabTestOrderCreateNestedManyWithoutPatientInput
+  radiologyOrders?: Prisma.RadiologyOrderCreateNestedManyWithoutPatientInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordCreateNestedManyWithoutPatientInput
+  operationCases?: Prisma.OperationCaseCreateNestedManyWithoutPatientInput
+  vaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutPatientInput
+  consents?: Prisma.PatientConsentCreateNestedManyWithoutPatientInput
+  groomingProfile?: Prisma.PatientGroomingProfileCreateNestedOneWithoutPatientInput
+  groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutPatientInput
+  groomingFindings?: Prisma.GroomingFindingCreateNestedManyWithoutPatientInput
+  nutritionPlans?: Prisma.NutritionPlanCreateNestedManyWithoutPatientInput
+  insurancePolicies?: Prisma.PatientPolicyCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutPatientInput
+  prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPatientInput
+  controlledRegister?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutPatientInput
+  inpatientStays?: Prisma.InpatientStayCreateNestedManyWithoutPatientInput
+  petOwnerRequests?: Prisma.PetOwnerRequestCreateNestedManyWithoutPatientInput
+  emergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutPatientInput
+  triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
+  alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
+  clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
+  recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
+}
+
+export type PatientUncheckedCreateWithoutClassroomAssignmentsInput = {
+  id?: string
+  code: string
+  clinicId: string
+  ownerId?: string | null
+  name: string
+  nameNormalized: string
+  gender: $Enums.Gender
+  age?: number | null
+  birthDate?: Date | string | null
+  weight?: number | null
+  microchipNumber?: string | null
+  coat?: string | null
+  notes?: string | null
+  active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  editsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
+  activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
+  inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutPatientInput
+  labTestOrders?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutPatientInput
+  radiologyOrders?: Prisma.RadiologyOrderUncheckedCreateNestedManyWithoutPatientInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUncheckedCreateNestedManyWithoutPatientInput
+  operationCases?: Prisma.OperationCaseUncheckedCreateNestedManyWithoutPatientInput
+  vaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutPatientInput
+  consents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutPatientInput
+  groomingProfile?: Prisma.PatientGroomingProfileUncheckedCreateNestedOneWithoutPatientInput
+  groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutPatientInput
+  groomingFindings?: Prisma.GroomingFindingUncheckedCreateNestedManyWithoutPatientInput
+  nutritionPlans?: Prisma.NutritionPlanUncheckedCreateNestedManyWithoutPatientInput
+  insurancePolicies?: Prisma.PatientPolicyUncheckedCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutPatientInput
+  prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutPatientInput
+  inpatientStays?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutPatientInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedCreateNestedManyWithoutPatientInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutPatientInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
+  alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
+  clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
+  recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
+}
+
+export type PatientCreateOrConnectWithoutClassroomAssignmentsInput = {
+  where: Prisma.PatientWhereUniqueInput
+  create: Prisma.XOR<Prisma.PatientCreateWithoutClassroomAssignmentsInput, Prisma.PatientUncheckedCreateWithoutClassroomAssignmentsInput>
+}
+
+export type PatientUpsertWithoutClassroomAssignmentsInput = {
+  update: Prisma.XOR<Prisma.PatientUpdateWithoutClassroomAssignmentsInput, Prisma.PatientUncheckedUpdateWithoutClassroomAssignmentsInput>
+  create: Prisma.XOR<Prisma.PatientCreateWithoutClassroomAssignmentsInput, Prisma.PatientUncheckedCreateWithoutClassroomAssignmentsInput>
+  where?: Prisma.PatientWhereInput
+}
+
+export type PatientUpdateToOneWithWhereWithoutClassroomAssignmentsInput = {
+  where?: Prisma.PatientWhereInput
+  data: Prisma.XOR<Prisma.PatientUpdateWithoutClassroomAssignmentsInput, Prisma.PatientUncheckedUpdateWithoutClassroomAssignmentsInput>
+}
+
+export type PatientUpdateWithoutClassroomAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
+  owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
+  activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
+  inboxItems?: Prisma.InboxItemUpdateManyWithoutPatientNestedInput
+  labTestOrders?: Prisma.LabTestOrderUpdateManyWithoutPatientNestedInput
+  radiologyOrders?: Prisma.RadiologyOrderUpdateManyWithoutPatientNestedInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUpdateManyWithoutPatientNestedInput
+  operationCases?: Prisma.OperationCaseUpdateManyWithoutPatientNestedInput
+  vaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutPatientNestedInput
+  consents?: Prisma.PatientConsentUpdateManyWithoutPatientNestedInput
+  groomingProfile?: Prisma.PatientGroomingProfileUpdateOneWithoutPatientNestedInput
+  groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutPatientNestedInput
+  groomingFindings?: Prisma.GroomingFindingUpdateManyWithoutPatientNestedInput
+  nutritionPlans?: Prisma.NutritionPlanUpdateManyWithoutPatientNestedInput
+  insurancePolicies?: Prisma.PatientPolicyUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutPatientNestedInput
+  prescriptions?: Prisma.PrescriptionUpdateManyWithoutPatientNestedInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUpdateManyWithoutPatientNestedInput
+  inpatientStays?: Prisma.InpatientStayUpdateManyWithoutPatientNestedInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUpdateManyWithoutPatientNestedInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutPatientNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
+  alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
+  clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
+  recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
+}
+
+export type PatientUncheckedUpdateWithoutClassroomAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  clinicId?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
+  activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
+  inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutPatientNestedInput
+  labTestOrders?: Prisma.LabTestOrderUncheckedUpdateManyWithoutPatientNestedInput
+  radiologyOrders?: Prisma.RadiologyOrderUncheckedUpdateManyWithoutPatientNestedInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUncheckedUpdateManyWithoutPatientNestedInput
+  operationCases?: Prisma.OperationCaseUncheckedUpdateManyWithoutPatientNestedInput
+  vaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutPatientNestedInput
+  consents?: Prisma.PatientConsentUncheckedUpdateManyWithoutPatientNestedInput
+  groomingProfile?: Prisma.PatientGroomingProfileUncheckedUpdateOneWithoutPatientNestedInput
+  groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutPatientNestedInput
+  groomingFindings?: Prisma.GroomingFindingUncheckedUpdateManyWithoutPatientNestedInput
+  nutritionPlans?: Prisma.NutritionPlanUncheckedUpdateManyWithoutPatientNestedInput
+  insurancePolicies?: Prisma.PatientPolicyUncheckedUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutPatientNestedInput
+  prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutPatientNestedInput
+  inpatientStays?: Prisma.InpatientStayUncheckedUpdateManyWithoutPatientNestedInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedUpdateManyWithoutPatientNestedInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutPatientNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
+  alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
+  clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
+  recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
+}
+
+export type PatientCreateWithoutTrackAssignmentsInput = {
+  id?: string
+  code: string
+  name: string
+  nameNormalized: string
+  gender: $Enums.Gender
+  age?: number | null
+  birthDate?: Date | string | null
+  weight?: number | null
+  microchipNumber?: string | null
+  coat?: string | null
+  notes?: string | null
+  active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  editsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
+  owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
+  activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
+  inboxItems?: Prisma.InboxItemCreateNestedManyWithoutPatientInput
+  labTestOrders?: Prisma.LabTestOrderCreateNestedManyWithoutPatientInput
+  radiologyOrders?: Prisma.RadiologyOrderCreateNestedManyWithoutPatientInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordCreateNestedManyWithoutPatientInput
+  operationCases?: Prisma.OperationCaseCreateNestedManyWithoutPatientInput
+  vaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutPatientInput
+  consents?: Prisma.PatientConsentCreateNestedManyWithoutPatientInput
+  groomingProfile?: Prisma.PatientGroomingProfileCreateNestedOneWithoutPatientInput
+  groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutPatientInput
+  groomingFindings?: Prisma.GroomingFindingCreateNestedManyWithoutPatientInput
+  nutritionPlans?: Prisma.NutritionPlanCreateNestedManyWithoutPatientInput
+  insurancePolicies?: Prisma.PatientPolicyCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutPatientInput
+  prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPatientInput
+  controlledRegister?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutPatientInput
+  inpatientStays?: Prisma.InpatientStayCreateNestedManyWithoutPatientInput
+  petOwnerRequests?: Prisma.PetOwnerRequestCreateNestedManyWithoutPatientInput
+  emergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutPatientInput
+  triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
+  alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
+  clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
+  recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
+}
+
+export type PatientUncheckedCreateWithoutTrackAssignmentsInput = {
+  id?: string
+  code: string
+  clinicId: string
+  ownerId?: string | null
+  name: string
+  nameNormalized: string
+  gender: $Enums.Gender
+  age?: number | null
+  birthDate?: Date | string | null
+  weight?: number | null
+  microchipNumber?: string | null
+  coat?: string | null
+  notes?: string | null
+  active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  editsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
+  activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
+  inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutPatientInput
+  labTestOrders?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutPatientInput
+  radiologyOrders?: Prisma.RadiologyOrderUncheckedCreateNestedManyWithoutPatientInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUncheckedCreateNestedManyWithoutPatientInput
+  operationCases?: Prisma.OperationCaseUncheckedCreateNestedManyWithoutPatientInput
+  vaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutPatientInput
+  consents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutPatientInput
+  groomingProfile?: Prisma.PatientGroomingProfileUncheckedCreateNestedOneWithoutPatientInput
+  groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutPatientInput
+  groomingFindings?: Prisma.GroomingFindingUncheckedCreateNestedManyWithoutPatientInput
+  nutritionPlans?: Prisma.NutritionPlanUncheckedCreateNestedManyWithoutPatientInput
+  insurancePolicies?: Prisma.PatientPolicyUncheckedCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutPatientInput
+  prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutPatientInput
+  inpatientStays?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutPatientInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedCreateNestedManyWithoutPatientInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutPatientInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
+  alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
+  clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
+  recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
+}
+
+export type PatientCreateOrConnectWithoutTrackAssignmentsInput = {
+  where: Prisma.PatientWhereUniqueInput
+  create: Prisma.XOR<Prisma.PatientCreateWithoutTrackAssignmentsInput, Prisma.PatientUncheckedCreateWithoutTrackAssignmentsInput>
+}
+
+export type PatientUpsertWithoutTrackAssignmentsInput = {
+  update: Prisma.XOR<Prisma.PatientUpdateWithoutTrackAssignmentsInput, Prisma.PatientUncheckedUpdateWithoutTrackAssignmentsInput>
+  create: Prisma.XOR<Prisma.PatientCreateWithoutTrackAssignmentsInput, Prisma.PatientUncheckedCreateWithoutTrackAssignmentsInput>
+  where?: Prisma.PatientWhereInput
+}
+
+export type PatientUpdateToOneWithWhereWithoutTrackAssignmentsInput = {
+  where?: Prisma.PatientWhereInput
+  data: Prisma.XOR<Prisma.PatientUpdateWithoutTrackAssignmentsInput, Prisma.PatientUncheckedUpdateWithoutTrackAssignmentsInput>
+}
+
+export type PatientUpdateWithoutTrackAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
+  owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
+  activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
+  inboxItems?: Prisma.InboxItemUpdateManyWithoutPatientNestedInput
+  labTestOrders?: Prisma.LabTestOrderUpdateManyWithoutPatientNestedInput
+  radiologyOrders?: Prisma.RadiologyOrderUpdateManyWithoutPatientNestedInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUpdateManyWithoutPatientNestedInput
+  operationCases?: Prisma.OperationCaseUpdateManyWithoutPatientNestedInput
+  vaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutPatientNestedInput
+  consents?: Prisma.PatientConsentUpdateManyWithoutPatientNestedInput
+  groomingProfile?: Prisma.PatientGroomingProfileUpdateOneWithoutPatientNestedInput
+  groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutPatientNestedInput
+  groomingFindings?: Prisma.GroomingFindingUpdateManyWithoutPatientNestedInput
+  nutritionPlans?: Prisma.NutritionPlanUpdateManyWithoutPatientNestedInput
+  insurancePolicies?: Prisma.PatientPolicyUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutPatientNestedInput
+  prescriptions?: Prisma.PrescriptionUpdateManyWithoutPatientNestedInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUpdateManyWithoutPatientNestedInput
+  inpatientStays?: Prisma.InpatientStayUpdateManyWithoutPatientNestedInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUpdateManyWithoutPatientNestedInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutPatientNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
+  alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
+  clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
+  recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
+}
+
+export type PatientUncheckedUpdateWithoutTrackAssignmentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  clinicId?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
+  activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
+  inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutPatientNestedInput
+  labTestOrders?: Prisma.LabTestOrderUncheckedUpdateManyWithoutPatientNestedInput
+  radiologyOrders?: Prisma.RadiologyOrderUncheckedUpdateManyWithoutPatientNestedInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUncheckedUpdateManyWithoutPatientNestedInput
+  operationCases?: Prisma.OperationCaseUncheckedUpdateManyWithoutPatientNestedInput
+  vaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutPatientNestedInput
+  consents?: Prisma.PatientConsentUncheckedUpdateManyWithoutPatientNestedInput
+  groomingProfile?: Prisma.PatientGroomingProfileUncheckedUpdateOneWithoutPatientNestedInput
+  groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutPatientNestedInput
+  groomingFindings?: Prisma.GroomingFindingUncheckedUpdateManyWithoutPatientNestedInput
+  nutritionPlans?: Prisma.NutritionPlanUncheckedUpdateManyWithoutPatientNestedInput
+  insurancePolicies?: Prisma.PatientPolicyUncheckedUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutPatientNestedInput
+  prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutPatientNestedInput
+  inpatientStays?: Prisma.InpatientStayUncheckedUpdateManyWithoutPatientNestedInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedUpdateManyWithoutPatientNestedInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutPatientNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
+  alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
+  clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
+  recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
+}
+
 export type PatientCreateWithoutActivityInput = {
   id?: string
   code: string
@@ -3295,6 +5036,26 @@ export type PatientCreateWithoutActivityInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -3302,8 +5063,9 @@ export type PatientCreateWithoutActivityInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutPatientInput
@@ -3327,6 +5089,8 @@ export type PatientCreateWithoutActivityInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -3339,8 +5103,6 @@ export type PatientUncheckedCreateWithoutActivityInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -3348,11 +5110,34 @@ export type PatientUncheckedCreateWithoutActivityInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutPatientInput
@@ -3376,6 +5161,8 @@ export type PatientUncheckedCreateWithoutActivityInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -3409,6 +5196,26 @@ export type PatientUpdateWithoutActivityInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3416,8 +5223,9 @@ export type PatientUpdateWithoutActivityInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutPatientNestedInput
@@ -3441,6 +5249,8 @@ export type PatientUpdateWithoutActivityInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -3453,8 +5263,6 @@ export type PatientUncheckedUpdateWithoutActivityInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -3462,11 +5270,34 @@ export type PatientUncheckedUpdateWithoutActivityInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutPatientNestedInput
@@ -3490,6 +5321,8 @@ export type PatientUncheckedUpdateWithoutActivityInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -3507,6 +5340,26 @@ export type PatientCreateWithoutVitalSignsRecordsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -3514,8 +5367,9 @@ export type PatientCreateWithoutVitalSignsRecordsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -3539,6 +5393,8 @@ export type PatientCreateWithoutVitalSignsRecordsInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -3551,8 +5407,6 @@ export type PatientUncheckedCreateWithoutVitalSignsRecordsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -3560,11 +5414,34 @@ export type PatientUncheckedCreateWithoutVitalSignsRecordsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -3588,6 +5465,8 @@ export type PatientUncheckedCreateWithoutVitalSignsRecordsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -3621,6 +5500,26 @@ export type PatientUpdateWithoutVitalSignsRecordsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3628,8 +5527,9 @@ export type PatientUpdateWithoutVitalSignsRecordsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -3653,6 +5553,8 @@ export type PatientUpdateWithoutVitalSignsRecordsInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -3665,8 +5567,6 @@ export type PatientUncheckedUpdateWithoutVitalSignsRecordsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -3674,11 +5574,34 @@ export type PatientUncheckedUpdateWithoutVitalSignsRecordsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -3702,6 +5625,8 @@ export type PatientUncheckedUpdateWithoutVitalSignsRecordsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -3719,6 +5644,26 @@ export type PatientCreateWithoutAppointmentsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -3726,8 +5671,9 @@ export type PatientCreateWithoutAppointmentsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutPatientInput
@@ -3751,6 +5697,8 @@ export type PatientCreateWithoutAppointmentsInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -3763,8 +5711,6 @@ export type PatientUncheckedCreateWithoutAppointmentsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -3772,11 +5718,34 @@ export type PatientUncheckedCreateWithoutAppointmentsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutPatientInput
@@ -3800,6 +5769,8 @@ export type PatientUncheckedCreateWithoutAppointmentsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -3833,6 +5804,26 @@ export type PatientUpdateWithoutAppointmentsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -3840,8 +5831,9 @@ export type PatientUpdateWithoutAppointmentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutPatientNestedInput
@@ -3865,6 +5857,8 @@ export type PatientUpdateWithoutAppointmentsInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -3877,8 +5871,6 @@ export type PatientUncheckedUpdateWithoutAppointmentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -3886,11 +5878,34 @@ export type PatientUncheckedUpdateWithoutAppointmentsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutPatientNestedInput
@@ -3914,6 +5929,8 @@ export type PatientUncheckedUpdateWithoutAppointmentsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -3931,6 +5948,26 @@ export type PatientCreateWithoutClinicalNotesInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -3938,8 +5975,9 @@ export type PatientCreateWithoutClinicalNotesInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -3963,6 +6001,8 @@ export type PatientCreateWithoutClinicalNotesInput = {
   emergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutPatientInput
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -3975,8 +6015,6 @@ export type PatientUncheckedCreateWithoutClinicalNotesInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -3984,11 +6022,34 @@ export type PatientUncheckedCreateWithoutClinicalNotesInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -4012,6 +6073,8 @@ export type PatientUncheckedCreateWithoutClinicalNotesInput = {
   emergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutPatientInput
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -4045,6 +6108,26 @@ export type PatientUpdateWithoutClinicalNotesInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4052,8 +6135,9 @@ export type PatientUpdateWithoutClinicalNotesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -4077,6 +6161,8 @@ export type PatientUpdateWithoutClinicalNotesInput = {
   emergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutPatientNestedInput
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -4089,8 +6175,6 @@ export type PatientUncheckedUpdateWithoutClinicalNotesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -4098,11 +6182,34 @@ export type PatientUncheckedUpdateWithoutClinicalNotesInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -4126,6 +6233,8 @@ export type PatientUncheckedUpdateWithoutClinicalNotesInput = {
   emergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutPatientNestedInput
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -4143,6 +6252,26 @@ export type PatientCreateWithoutCarePlanEnrollmentsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -4150,8 +6279,9 @@ export type PatientCreateWithoutCarePlanEnrollmentsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
   inboxItems?: Prisma.InboxItemCreateNestedManyWithoutPatientInput
@@ -4175,6 +6305,8 @@ export type PatientCreateWithoutCarePlanEnrollmentsInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -4187,8 +6319,6 @@ export type PatientUncheckedCreateWithoutCarePlanEnrollmentsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -4196,11 +6326,34 @@ export type PatientUncheckedCreateWithoutCarePlanEnrollmentsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
   inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutPatientInput
@@ -4224,6 +6377,8 @@ export type PatientUncheckedCreateWithoutCarePlanEnrollmentsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -4257,6 +6412,26 @@ export type PatientUpdateWithoutCarePlanEnrollmentsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4264,8 +6439,9 @@ export type PatientUpdateWithoutCarePlanEnrollmentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
   inboxItems?: Prisma.InboxItemUpdateManyWithoutPatientNestedInput
@@ -4289,6 +6465,8 @@ export type PatientUpdateWithoutCarePlanEnrollmentsInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -4301,8 +6479,6 @@ export type PatientUncheckedUpdateWithoutCarePlanEnrollmentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -4310,11 +6486,34 @@ export type PatientUncheckedUpdateWithoutCarePlanEnrollmentsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
   inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutPatientNestedInput
@@ -4338,6 +6537,8 @@ export type PatientUncheckedUpdateWithoutCarePlanEnrollmentsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -4355,6 +6556,26 @@ export type PatientCreateWithoutVaccinationRecordsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -4362,8 +6583,9 @@ export type PatientCreateWithoutVaccinationRecordsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -4387,6 +6609,8 @@ export type PatientCreateWithoutVaccinationRecordsInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -4399,8 +6623,6 @@ export type PatientUncheckedCreateWithoutVaccinationRecordsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -4408,11 +6630,34 @@ export type PatientUncheckedCreateWithoutVaccinationRecordsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -4436,6 +6681,8 @@ export type PatientUncheckedCreateWithoutVaccinationRecordsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -4469,6 +6716,26 @@ export type PatientUpdateWithoutVaccinationRecordsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4476,8 +6743,9 @@ export type PatientUpdateWithoutVaccinationRecordsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -4501,6 +6769,8 @@ export type PatientUpdateWithoutVaccinationRecordsInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -4513,8 +6783,6 @@ export type PatientUncheckedUpdateWithoutVaccinationRecordsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -4522,11 +6790,34 @@ export type PatientUncheckedUpdateWithoutVaccinationRecordsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -4550,6 +6841,8 @@ export type PatientUncheckedUpdateWithoutVaccinationRecordsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -4567,6 +6860,26 @@ export type PatientCreateWithoutInsurancePoliciesInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -4574,8 +6887,9 @@ export type PatientCreateWithoutInsurancePoliciesInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -4599,6 +6913,8 @@ export type PatientCreateWithoutInsurancePoliciesInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -4611,8 +6927,6 @@ export type PatientUncheckedCreateWithoutInsurancePoliciesInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -4620,11 +6934,34 @@ export type PatientUncheckedCreateWithoutInsurancePoliciesInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -4648,6 +6985,8 @@ export type PatientUncheckedCreateWithoutInsurancePoliciesInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -4681,6 +7020,26 @@ export type PatientUpdateWithoutInsurancePoliciesInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4688,8 +7047,9 @@ export type PatientUpdateWithoutInsurancePoliciesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -4713,6 +7073,8 @@ export type PatientUpdateWithoutInsurancePoliciesInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -4725,8 +7087,6 @@ export type PatientUncheckedUpdateWithoutInsurancePoliciesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -4734,11 +7094,34 @@ export type PatientUncheckedUpdateWithoutInsurancePoliciesInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -4762,6 +7145,8 @@ export type PatientUncheckedUpdateWithoutInsurancePoliciesInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -4779,6 +7164,26 @@ export type PatientCreateWithoutInsuranceClaimsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -4786,8 +7191,9 @@ export type PatientCreateWithoutInsuranceClaimsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -4811,6 +7217,8 @@ export type PatientCreateWithoutInsuranceClaimsInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -4823,8 +7231,6 @@ export type PatientUncheckedCreateWithoutInsuranceClaimsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -4832,11 +7238,34 @@ export type PatientUncheckedCreateWithoutInsuranceClaimsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -4860,6 +7289,8 @@ export type PatientUncheckedCreateWithoutInsuranceClaimsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -4893,6 +7324,26 @@ export type PatientUpdateWithoutInsuranceClaimsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -4900,8 +7351,9 @@ export type PatientUpdateWithoutInsuranceClaimsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -4925,6 +7377,8 @@ export type PatientUpdateWithoutInsuranceClaimsInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -4937,8 +7391,6 @@ export type PatientUncheckedUpdateWithoutInsuranceClaimsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -4946,11 +7398,34 @@ export type PatientUncheckedUpdateWithoutInsuranceClaimsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -4974,6 +7449,8 @@ export type PatientUncheckedUpdateWithoutInsuranceClaimsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -4991,6 +7468,26 @@ export type PatientCreateWithoutNutritionPlansInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -4998,8 +7495,9 @@ export type PatientCreateWithoutNutritionPlansInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -5023,6 +7521,8 @@ export type PatientCreateWithoutNutritionPlansInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -5035,8 +7535,6 @@ export type PatientUncheckedCreateWithoutNutritionPlansInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -5044,11 +7542,34 @@ export type PatientUncheckedCreateWithoutNutritionPlansInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -5072,6 +7593,8 @@ export type PatientUncheckedCreateWithoutNutritionPlansInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -5105,6 +7628,26 @@ export type PatientUpdateWithoutNutritionPlansInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -5112,8 +7655,9 @@ export type PatientUpdateWithoutNutritionPlansInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -5137,6 +7681,8 @@ export type PatientUpdateWithoutNutritionPlansInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -5149,8 +7695,6 @@ export type PatientUncheckedUpdateWithoutNutritionPlansInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -5158,11 +7702,34 @@ export type PatientUncheckedUpdateWithoutNutritionPlansInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -5186,6 +7753,8 @@ export type PatientUncheckedUpdateWithoutNutritionPlansInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -5203,6 +7772,26 @@ export type PatientCreateWithoutGroomingProfileInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -5210,8 +7799,9 @@ export type PatientCreateWithoutGroomingProfileInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -5235,6 +7825,8 @@ export type PatientCreateWithoutGroomingProfileInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -5247,8 +7839,6 @@ export type PatientUncheckedCreateWithoutGroomingProfileInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -5256,11 +7846,34 @@ export type PatientUncheckedCreateWithoutGroomingProfileInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -5284,6 +7897,8 @@ export type PatientUncheckedCreateWithoutGroomingProfileInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -5317,6 +7932,26 @@ export type PatientUpdateWithoutGroomingProfileInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -5324,8 +7959,9 @@ export type PatientUpdateWithoutGroomingProfileInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -5349,6 +7985,8 @@ export type PatientUpdateWithoutGroomingProfileInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -5361,8 +7999,6 @@ export type PatientUncheckedUpdateWithoutGroomingProfileInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -5370,11 +8006,34 @@ export type PatientUncheckedUpdateWithoutGroomingProfileInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -5398,6 +8057,8 @@ export type PatientUncheckedUpdateWithoutGroomingProfileInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -5415,6 +8076,26 @@ export type PatientCreateWithoutGroomingSessionsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -5422,8 +8103,9 @@ export type PatientCreateWithoutGroomingSessionsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -5447,6 +8129,8 @@ export type PatientCreateWithoutGroomingSessionsInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -5459,8 +8143,6 @@ export type PatientUncheckedCreateWithoutGroomingSessionsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -5468,11 +8150,34 @@ export type PatientUncheckedCreateWithoutGroomingSessionsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -5496,6 +8201,8 @@ export type PatientUncheckedCreateWithoutGroomingSessionsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -5529,6 +8236,26 @@ export type PatientUpdateWithoutGroomingSessionsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -5536,8 +8263,9 @@ export type PatientUpdateWithoutGroomingSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -5561,6 +8289,8 @@ export type PatientUpdateWithoutGroomingSessionsInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -5573,8 +8303,6 @@ export type PatientUncheckedUpdateWithoutGroomingSessionsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -5582,11 +8310,34 @@ export type PatientUncheckedUpdateWithoutGroomingSessionsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -5610,6 +8361,8 @@ export type PatientUncheckedUpdateWithoutGroomingSessionsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -5627,6 +8380,26 @@ export type PatientCreateWithoutGroomingFindingsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -5634,8 +8407,9 @@ export type PatientCreateWithoutGroomingFindingsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -5659,6 +8433,8 @@ export type PatientCreateWithoutGroomingFindingsInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -5671,8 +8447,6 @@ export type PatientUncheckedCreateWithoutGroomingFindingsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -5680,11 +8454,34 @@ export type PatientUncheckedCreateWithoutGroomingFindingsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -5708,6 +8505,8 @@ export type PatientUncheckedCreateWithoutGroomingFindingsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -5741,6 +8540,26 @@ export type PatientUpdateWithoutGroomingFindingsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -5748,8 +8567,9 @@ export type PatientUpdateWithoutGroomingFindingsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -5773,6 +8593,8 @@ export type PatientUpdateWithoutGroomingFindingsInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -5785,8 +8607,6 @@ export type PatientUncheckedUpdateWithoutGroomingFindingsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -5794,11 +8614,34 @@ export type PatientUncheckedUpdateWithoutGroomingFindingsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -5822,6 +8665,8 @@ export type PatientUncheckedUpdateWithoutGroomingFindingsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -5839,6 +8684,26 @@ export type PatientCreateWithoutPrescriptionsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -5846,8 +8711,9 @@ export type PatientCreateWithoutPrescriptionsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -5871,6 +8737,8 @@ export type PatientCreateWithoutPrescriptionsInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -5883,8 +8751,6 @@ export type PatientUncheckedCreateWithoutPrescriptionsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -5892,11 +8758,34 @@ export type PatientUncheckedCreateWithoutPrescriptionsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -5920,6 +8809,8 @@ export type PatientUncheckedCreateWithoutPrescriptionsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -5953,6 +8844,26 @@ export type PatientUpdateWithoutPrescriptionsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -5960,8 +8871,9 @@ export type PatientUpdateWithoutPrescriptionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -5985,6 +8897,8 @@ export type PatientUpdateWithoutPrescriptionsInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -5997,8 +8911,6 @@ export type PatientUncheckedUpdateWithoutPrescriptionsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -6006,11 +8918,34 @@ export type PatientUncheckedUpdateWithoutPrescriptionsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -6034,6 +8969,8 @@ export type PatientUncheckedUpdateWithoutPrescriptionsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -6051,6 +8988,26 @@ export type PatientCreateWithoutControlledRegisterInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -6058,8 +9015,9 @@ export type PatientCreateWithoutControlledRegisterInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -6083,6 +9041,8 @@ export type PatientCreateWithoutControlledRegisterInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -6095,8 +9055,6 @@ export type PatientUncheckedCreateWithoutControlledRegisterInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -6104,11 +9062,34 @@ export type PatientUncheckedCreateWithoutControlledRegisterInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -6132,6 +9113,8 @@ export type PatientUncheckedCreateWithoutControlledRegisterInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -6165,6 +9148,26 @@ export type PatientUpdateWithoutControlledRegisterInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -6172,8 +9175,9 @@ export type PatientUpdateWithoutControlledRegisterInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -6197,6 +9201,8 @@ export type PatientUpdateWithoutControlledRegisterInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -6209,8 +9215,6 @@ export type PatientUncheckedUpdateWithoutControlledRegisterInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -6218,11 +9222,34 @@ export type PatientUncheckedUpdateWithoutControlledRegisterInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -6246,6 +9273,8 @@ export type PatientUncheckedUpdateWithoutControlledRegisterInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -6263,6 +9292,26 @@ export type PatientCreateWithoutInpatientStaysInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -6270,8 +9319,9 @@ export type PatientCreateWithoutInpatientStaysInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -6295,6 +9345,8 @@ export type PatientCreateWithoutInpatientStaysInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -6307,8 +9359,6 @@ export type PatientUncheckedCreateWithoutInpatientStaysInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -6316,11 +9366,34 @@ export type PatientUncheckedCreateWithoutInpatientStaysInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -6344,6 +9417,8 @@ export type PatientUncheckedCreateWithoutInpatientStaysInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -6377,6 +9452,26 @@ export type PatientUpdateWithoutInpatientStaysInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -6384,8 +9479,9 @@ export type PatientUpdateWithoutInpatientStaysInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -6409,6 +9505,8 @@ export type PatientUpdateWithoutInpatientStaysInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -6421,8 +9519,6 @@ export type PatientUncheckedUpdateWithoutInpatientStaysInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -6430,11 +9526,34 @@ export type PatientUncheckedUpdateWithoutInpatientStaysInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -6458,6 +9577,8 @@ export type PatientUncheckedUpdateWithoutInpatientStaysInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -6475,6 +9596,26 @@ export type PatientCreateWithoutEmergencyArrivalsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -6482,8 +9623,9 @@ export type PatientCreateWithoutEmergencyArrivalsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -6507,6 +9649,8 @@ export type PatientCreateWithoutEmergencyArrivalsInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -6519,8 +9663,6 @@ export type PatientUncheckedCreateWithoutEmergencyArrivalsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -6528,11 +9670,34 @@ export type PatientUncheckedCreateWithoutEmergencyArrivalsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -6556,6 +9721,8 @@ export type PatientUncheckedCreateWithoutEmergencyArrivalsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -6589,6 +9756,26 @@ export type PatientUpdateWithoutEmergencyArrivalsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -6596,8 +9783,9 @@ export type PatientUpdateWithoutEmergencyArrivalsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -6621,6 +9809,8 @@ export type PatientUpdateWithoutEmergencyArrivalsInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -6633,8 +9823,6 @@ export type PatientUncheckedUpdateWithoutEmergencyArrivalsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -6642,11 +9830,34 @@ export type PatientUncheckedUpdateWithoutEmergencyArrivalsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -6670,6 +9881,8 @@ export type PatientUncheckedUpdateWithoutEmergencyArrivalsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -6687,6 +9900,26 @@ export type PatientCreateWithoutTriageAssessmentsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -6694,8 +9927,9 @@ export type PatientCreateWithoutTriageAssessmentsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -6719,6 +9953,8 @@ export type PatientCreateWithoutTriageAssessmentsInput = {
   emergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -6731,8 +9967,6 @@ export type PatientUncheckedCreateWithoutTriageAssessmentsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -6740,11 +9974,34 @@ export type PatientUncheckedCreateWithoutTriageAssessmentsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -6768,6 +10025,8 @@ export type PatientUncheckedCreateWithoutTriageAssessmentsInput = {
   emergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -6801,6 +10060,26 @@ export type PatientUpdateWithoutTriageAssessmentsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -6808,8 +10087,9 @@ export type PatientUpdateWithoutTriageAssessmentsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -6833,6 +10113,8 @@ export type PatientUpdateWithoutTriageAssessmentsInput = {
   emergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -6845,8 +10127,6 @@ export type PatientUncheckedUpdateWithoutTriageAssessmentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -6854,11 +10134,34 @@ export type PatientUncheckedUpdateWithoutTriageAssessmentsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -6882,6 +10185,8 @@ export type PatientUncheckedUpdateWithoutTriageAssessmentsInput = {
   emergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -6899,6 +10204,26 @@ export type PatientCreateWithoutAlertsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -6906,8 +10231,9 @@ export type PatientCreateWithoutAlertsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -6931,6 +10257,8 @@ export type PatientCreateWithoutAlertsInput = {
   emergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutPatientInput
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
@@ -6943,8 +10271,6 @@ export type PatientUncheckedCreateWithoutAlertsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -6952,11 +10278,34 @@ export type PatientUncheckedCreateWithoutAlertsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -6980,6 +10329,8 @@ export type PatientUncheckedCreateWithoutAlertsInput = {
   emergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutPatientInput
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
@@ -7013,6 +10364,26 @@ export type PatientUpdateWithoutAlertsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -7020,8 +10391,9 @@ export type PatientUpdateWithoutAlertsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -7045,6 +10417,8 @@ export type PatientUpdateWithoutAlertsInput = {
   emergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutPatientNestedInput
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -7057,8 +10431,6 @@ export type PatientUncheckedUpdateWithoutAlertsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -7066,11 +10438,34 @@ export type PatientUncheckedUpdateWithoutAlertsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -7094,6 +10489,8 @@ export type PatientUncheckedUpdateWithoutAlertsInput = {
   emergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutPatientNestedInput
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -7111,6 +10508,26 @@ export type PatientCreateWithoutNotificationOutboxInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -7118,8 +10535,9 @@ export type PatientCreateWithoutNotificationOutboxInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -7144,6 +10562,8 @@ export type PatientCreateWithoutNotificationOutboxInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
 }
 
@@ -7155,8 +10575,6 @@ export type PatientUncheckedCreateWithoutNotificationOutboxInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -7164,11 +10582,34 @@ export type PatientUncheckedCreateWithoutNotificationOutboxInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -7193,6 +10634,8 @@ export type PatientUncheckedCreateWithoutNotificationOutboxInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
 }
 
@@ -7225,6 +10668,26 @@ export type PatientUpdateWithoutNotificationOutboxInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -7232,8 +10695,9 @@ export type PatientUpdateWithoutNotificationOutboxInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -7258,6 +10722,8 @@ export type PatientUpdateWithoutNotificationOutboxInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
 
@@ -7269,8 +10735,6 @@ export type PatientUncheckedUpdateWithoutNotificationOutboxInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -7278,11 +10742,34 @@ export type PatientUncheckedUpdateWithoutNotificationOutboxInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -7307,6 +10794,8 @@ export type PatientUncheckedUpdateWithoutNotificationOutboxInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
 
@@ -7323,6 +10812,26 @@ export type PatientCreateWithoutRecallContactsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -7330,8 +10839,9 @@ export type PatientCreateWithoutRecallContactsInput = {
   updatedAt?: Date | string
   clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
   owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
-  animalType: Prisma.AnimalTypeCreateNestedOneWithoutPatientsInput
-  animalStrain?: Prisma.AnimalStrainCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
@@ -7356,6 +10866,8 @@ export type PatientCreateWithoutRecallContactsInput = {
   triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
 }
 
@@ -7367,8 +10879,6 @@ export type PatientUncheckedCreateWithoutRecallContactsInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -7376,11 +10886,34 @@ export type PatientUncheckedCreateWithoutRecallContactsInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
   appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
   activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
@@ -7405,6 +10938,8 @@ export type PatientUncheckedCreateWithoutRecallContactsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
   alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
 }
 
@@ -7437,6 +10972,26 @@ export type PatientUpdateWithoutRecallContactsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -7444,8 +10999,9 @@ export type PatientUpdateWithoutRecallContactsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -7470,6 +11026,8 @@ export type PatientUpdateWithoutRecallContactsInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
 }
 
@@ -7481,8 +11039,6 @@ export type PatientUncheckedUpdateWithoutRecallContactsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -7490,11 +11046,34 @@ export type PatientUncheckedUpdateWithoutRecallContactsInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -7519,7 +11098,617 @@ export type PatientUncheckedUpdateWithoutRecallContactsInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
+}
+
+export type PatientCreateWithoutRegistrationRequestsInput = {
+  id?: string
+  code: string
+  name: string
+  nameNormalized: string
+  gender: $Enums.Gender
+  age?: number | null
+  birthDate?: Date | string | null
+  weight?: number | null
+  microchipNumber?: string | null
+  coat?: string | null
+  notes?: string | null
+  active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  editsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
+  owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
+  activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
+  inboxItems?: Prisma.InboxItemCreateNestedManyWithoutPatientInput
+  labTestOrders?: Prisma.LabTestOrderCreateNestedManyWithoutPatientInput
+  radiologyOrders?: Prisma.RadiologyOrderCreateNestedManyWithoutPatientInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordCreateNestedManyWithoutPatientInput
+  operationCases?: Prisma.OperationCaseCreateNestedManyWithoutPatientInput
+  vaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutPatientInput
+  consents?: Prisma.PatientConsentCreateNestedManyWithoutPatientInput
+  groomingProfile?: Prisma.PatientGroomingProfileCreateNestedOneWithoutPatientInput
+  groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutPatientInput
+  groomingFindings?: Prisma.GroomingFindingCreateNestedManyWithoutPatientInput
+  nutritionPlans?: Prisma.NutritionPlanCreateNestedManyWithoutPatientInput
+  insurancePolicies?: Prisma.PatientPolicyCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutPatientInput
+  prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPatientInput
+  controlledRegister?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutPatientInput
+  inpatientStays?: Prisma.InpatientStayCreateNestedManyWithoutPatientInput
+  petOwnerRequests?: Prisma.PetOwnerRequestCreateNestedManyWithoutPatientInput
+  emergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutPatientInput
+  triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
+  alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
+  clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  patientDocuments?: Prisma.PatientDocumentCreateNestedManyWithoutPatientInput
+  notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
+  recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
+}
+
+export type PatientUncheckedCreateWithoutRegistrationRequestsInput = {
+  id?: string
+  code: string
+  clinicId: string
+  ownerId?: string | null
+  name: string
+  nameNormalized: string
+  gender: $Enums.Gender
+  age?: number | null
+  birthDate?: Date | string | null
+  weight?: number | null
+  microchipNumber?: string | null
+  coat?: string | null
+  notes?: string | null
+  active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  editsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
+  activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
+  inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutPatientInput
+  labTestOrders?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutPatientInput
+  radiologyOrders?: Prisma.RadiologyOrderUncheckedCreateNestedManyWithoutPatientInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUncheckedCreateNestedManyWithoutPatientInput
+  operationCases?: Prisma.OperationCaseUncheckedCreateNestedManyWithoutPatientInput
+  vaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutPatientInput
+  consents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutPatientInput
+  groomingProfile?: Prisma.PatientGroomingProfileUncheckedCreateNestedOneWithoutPatientInput
+  groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutPatientInput
+  groomingFindings?: Prisma.GroomingFindingUncheckedCreateNestedManyWithoutPatientInput
+  nutritionPlans?: Prisma.NutritionPlanUncheckedCreateNestedManyWithoutPatientInput
+  insurancePolicies?: Prisma.PatientPolicyUncheckedCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutPatientInput
+  prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutPatientInput
+  inpatientStays?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutPatientInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedCreateNestedManyWithoutPatientInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutPatientInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
+  alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
+  clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedCreateNestedManyWithoutPatientInput
+  notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
+  recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
+}
+
+export type PatientCreateOrConnectWithoutRegistrationRequestsInput = {
+  where: Prisma.PatientWhereUniqueInput
+  create: Prisma.XOR<Prisma.PatientCreateWithoutRegistrationRequestsInput, Prisma.PatientUncheckedCreateWithoutRegistrationRequestsInput>
+}
+
+export type PatientUpsertWithoutRegistrationRequestsInput = {
+  update: Prisma.XOR<Prisma.PatientUpdateWithoutRegistrationRequestsInput, Prisma.PatientUncheckedUpdateWithoutRegistrationRequestsInput>
+  create: Prisma.XOR<Prisma.PatientCreateWithoutRegistrationRequestsInput, Prisma.PatientUncheckedCreateWithoutRegistrationRequestsInput>
+  where?: Prisma.PatientWhereInput
+}
+
+export type PatientUpdateToOneWithWhereWithoutRegistrationRequestsInput = {
+  where?: Prisma.PatientWhereInput
+  data: Prisma.XOR<Prisma.PatientUpdateWithoutRegistrationRequestsInput, Prisma.PatientUncheckedUpdateWithoutRegistrationRequestsInput>
+}
+
+export type PatientUpdateWithoutRegistrationRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
+  owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
+  activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
+  inboxItems?: Prisma.InboxItemUpdateManyWithoutPatientNestedInput
+  labTestOrders?: Prisma.LabTestOrderUpdateManyWithoutPatientNestedInput
+  radiologyOrders?: Prisma.RadiologyOrderUpdateManyWithoutPatientNestedInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUpdateManyWithoutPatientNestedInput
+  operationCases?: Prisma.OperationCaseUpdateManyWithoutPatientNestedInput
+  vaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutPatientNestedInput
+  consents?: Prisma.PatientConsentUpdateManyWithoutPatientNestedInput
+  groomingProfile?: Prisma.PatientGroomingProfileUpdateOneWithoutPatientNestedInput
+  groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutPatientNestedInput
+  groomingFindings?: Prisma.GroomingFindingUpdateManyWithoutPatientNestedInput
+  nutritionPlans?: Prisma.NutritionPlanUpdateManyWithoutPatientNestedInput
+  insurancePolicies?: Prisma.PatientPolicyUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutPatientNestedInput
+  prescriptions?: Prisma.PrescriptionUpdateManyWithoutPatientNestedInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUpdateManyWithoutPatientNestedInput
+  inpatientStays?: Prisma.InpatientStayUpdateManyWithoutPatientNestedInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUpdateManyWithoutPatientNestedInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutPatientNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
+  alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
+  clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
+  notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
+  recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
+}
+
+export type PatientUncheckedUpdateWithoutRegistrationRequestsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  clinicId?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
+  activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
+  inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutPatientNestedInput
+  labTestOrders?: Prisma.LabTestOrderUncheckedUpdateManyWithoutPatientNestedInput
+  radiologyOrders?: Prisma.RadiologyOrderUncheckedUpdateManyWithoutPatientNestedInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUncheckedUpdateManyWithoutPatientNestedInput
+  operationCases?: Prisma.OperationCaseUncheckedUpdateManyWithoutPatientNestedInput
+  vaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutPatientNestedInput
+  consents?: Prisma.PatientConsentUncheckedUpdateManyWithoutPatientNestedInput
+  groomingProfile?: Prisma.PatientGroomingProfileUncheckedUpdateOneWithoutPatientNestedInput
+  groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutPatientNestedInput
+  groomingFindings?: Prisma.GroomingFindingUncheckedUpdateManyWithoutPatientNestedInput
+  nutritionPlans?: Prisma.NutritionPlanUncheckedUpdateManyWithoutPatientNestedInput
+  insurancePolicies?: Prisma.PatientPolicyUncheckedUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutPatientNestedInput
+  prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutPatientNestedInput
+  inpatientStays?: Prisma.InpatientStayUncheckedUpdateManyWithoutPatientNestedInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedUpdateManyWithoutPatientNestedInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutPatientNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
+  alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
+  clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
+  notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
+  recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
+}
+
+export type PatientCreateWithoutPatientDocumentsInput = {
+  id?: string
+  code: string
+  name: string
+  nameNormalized: string
+  gender: $Enums.Gender
+  age?: number | null
+  birthDate?: Date | string | null
+  weight?: number | null
+  microchipNumber?: string | null
+  coat?: string | null
+  notes?: string | null
+  active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  editsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  clinic: Prisma.ClinicCreateNestedOneWithoutPatientsInput
+  owner?: Prisma.OwnerCreateNestedOneWithoutPatientsInput
+  guardians?: Prisma.PatientGuardianCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentCreateNestedManyWithoutPatientInput
+  appointments?: Prisma.AppointmentCreateNestedManyWithoutPatientInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentCreateNestedManyWithoutPatientInput
+  activity?: Prisma.PatientActivityCreateNestedManyWithoutPatientInput
+  inboxItems?: Prisma.InboxItemCreateNestedManyWithoutPatientInput
+  labTestOrders?: Prisma.LabTestOrderCreateNestedManyWithoutPatientInput
+  radiologyOrders?: Prisma.RadiologyOrderCreateNestedManyWithoutPatientInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordCreateNestedManyWithoutPatientInput
+  operationCases?: Prisma.OperationCaseCreateNestedManyWithoutPatientInput
+  vaccinationRecords?: Prisma.VaccinationRecordCreateNestedManyWithoutPatientInput
+  consents?: Prisma.PatientConsentCreateNestedManyWithoutPatientInput
+  groomingProfile?: Prisma.PatientGroomingProfileCreateNestedOneWithoutPatientInput
+  groomingSessions?: Prisma.GroomingSessionCreateNestedManyWithoutPatientInput
+  groomingFindings?: Prisma.GroomingFindingCreateNestedManyWithoutPatientInput
+  nutritionPlans?: Prisma.NutritionPlanCreateNestedManyWithoutPatientInput
+  insurancePolicies?: Prisma.PatientPolicyCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimCreateNestedManyWithoutPatientInput
+  prescriptions?: Prisma.PrescriptionCreateNestedManyWithoutPatientInput
+  controlledRegister?: Prisma.ControlledDrugRegisterCreateNestedManyWithoutPatientInput
+  inpatientStays?: Prisma.InpatientStayCreateNestedManyWithoutPatientInput
+  petOwnerRequests?: Prisma.PetOwnerRequestCreateNestedManyWithoutPatientInput
+  emergencyArrivals?: Prisma.EmergencyArrivalCreateNestedManyWithoutPatientInput
+  triageAssessments?: Prisma.TriageAssessmentCreateNestedManyWithoutPatientInput
+  alerts?: Prisma.PatientAlertCreateNestedManyWithoutPatientInput
+  clinicalNotes?: Prisma.ClinicalNoteCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestCreateNestedManyWithoutConvertedPatientInput
+  notificationOutbox?: Prisma.NotificationOutboxCreateNestedManyWithoutPatientInput
+  recallContacts?: Prisma.RecallContactCreateNestedManyWithoutPatientInput
+}
+
+export type PatientUncheckedCreateWithoutPatientDocumentsInput = {
+  id?: string
+  code: string
+  clinicId: string
+  ownerId?: string | null
+  name: string
+  nameNormalized: string
+  gender: $Enums.Gender
+  age?: number | null
+  birthDate?: Date | string | null
+  weight?: number | null
+  microchipNumber?: string | null
+  coat?: string | null
+  notes?: string | null
+  active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
+  isDeleted?: boolean
+  deletedAt?: Date | string | null
+  editsCount?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  guardians?: Prisma.PatientGuardianUncheckedCreateNestedManyWithoutPatientInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutPatientInput
+  trackAssignments?: Prisma.TrackStudentUncheckedCreateNestedManyWithoutPatientInput
+  appointments?: Prisma.AppointmentUncheckedCreateNestedManyWithoutPatientInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedCreateNestedManyWithoutPatientInput
+  activity?: Prisma.PatientActivityUncheckedCreateNestedManyWithoutPatientInput
+  inboxItems?: Prisma.InboxItemUncheckedCreateNestedManyWithoutPatientInput
+  labTestOrders?: Prisma.LabTestOrderUncheckedCreateNestedManyWithoutPatientInput
+  radiologyOrders?: Prisma.RadiologyOrderUncheckedCreateNestedManyWithoutPatientInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUncheckedCreateNestedManyWithoutPatientInput
+  operationCases?: Prisma.OperationCaseUncheckedCreateNestedManyWithoutPatientInput
+  vaccinationRecords?: Prisma.VaccinationRecordUncheckedCreateNestedManyWithoutPatientInput
+  consents?: Prisma.PatientConsentUncheckedCreateNestedManyWithoutPatientInput
+  groomingProfile?: Prisma.PatientGroomingProfileUncheckedCreateNestedOneWithoutPatientInput
+  groomingSessions?: Prisma.GroomingSessionUncheckedCreateNestedManyWithoutPatientInput
+  groomingFindings?: Prisma.GroomingFindingUncheckedCreateNestedManyWithoutPatientInput
+  nutritionPlans?: Prisma.NutritionPlanUncheckedCreateNestedManyWithoutPatientInput
+  insurancePolicies?: Prisma.PatientPolicyUncheckedCreateNestedManyWithoutPatientInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedCreateNestedManyWithoutPatientInput
+  prescriptions?: Prisma.PrescriptionUncheckedCreateNestedManyWithoutPatientInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUncheckedCreateNestedManyWithoutPatientInput
+  inpatientStays?: Prisma.InpatientStayUncheckedCreateNestedManyWithoutPatientInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedCreateNestedManyWithoutPatientInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedCreateNestedManyWithoutPatientInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedCreateNestedManyWithoutPatientInput
+  alerts?: Prisma.PatientAlertUncheckedCreateNestedManyWithoutPatientInput
+  clinicalNotes?: Prisma.ClinicalNoteUncheckedCreateNestedManyWithoutPatientInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedCreateNestedManyWithoutConvertedPatientInput
+  notificationOutbox?: Prisma.NotificationOutboxUncheckedCreateNestedManyWithoutPatientInput
+  recallContacts?: Prisma.RecallContactUncheckedCreateNestedManyWithoutPatientInput
+}
+
+export type PatientCreateOrConnectWithoutPatientDocumentsInput = {
+  where: Prisma.PatientWhereUniqueInput
+  create: Prisma.XOR<Prisma.PatientCreateWithoutPatientDocumentsInput, Prisma.PatientUncheckedCreateWithoutPatientDocumentsInput>
+}
+
+export type PatientUpsertWithoutPatientDocumentsInput = {
+  update: Prisma.XOR<Prisma.PatientUpdateWithoutPatientDocumentsInput, Prisma.PatientUncheckedUpdateWithoutPatientDocumentsInput>
+  create: Prisma.XOR<Prisma.PatientCreateWithoutPatientDocumentsInput, Prisma.PatientUncheckedCreateWithoutPatientDocumentsInput>
+  where?: Prisma.PatientWhereInput
+}
+
+export type PatientUpdateToOneWithWhereWithoutPatientDocumentsInput = {
+  where?: Prisma.PatientWhereInput
+  data: Prisma.XOR<Prisma.PatientUpdateWithoutPatientDocumentsInput, Prisma.PatientUncheckedUpdateWithoutPatientDocumentsInput>
+}
+
+export type PatientUpdateWithoutPatientDocumentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
+  owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
+  appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
+  activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
+  inboxItems?: Prisma.InboxItemUpdateManyWithoutPatientNestedInput
+  labTestOrders?: Prisma.LabTestOrderUpdateManyWithoutPatientNestedInput
+  radiologyOrders?: Prisma.RadiologyOrderUpdateManyWithoutPatientNestedInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUpdateManyWithoutPatientNestedInput
+  operationCases?: Prisma.OperationCaseUpdateManyWithoutPatientNestedInput
+  vaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutPatientNestedInput
+  consents?: Prisma.PatientConsentUpdateManyWithoutPatientNestedInput
+  groomingProfile?: Prisma.PatientGroomingProfileUpdateOneWithoutPatientNestedInput
+  groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutPatientNestedInput
+  groomingFindings?: Prisma.GroomingFindingUpdateManyWithoutPatientNestedInput
+  nutritionPlans?: Prisma.NutritionPlanUpdateManyWithoutPatientNestedInput
+  insurancePolicies?: Prisma.PatientPolicyUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutPatientNestedInput
+  prescriptions?: Prisma.PrescriptionUpdateManyWithoutPatientNestedInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUpdateManyWithoutPatientNestedInput
+  inpatientStays?: Prisma.InpatientStayUpdateManyWithoutPatientNestedInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUpdateManyWithoutPatientNestedInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutPatientNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
+  alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
+  clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
+  recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
+}
+
+export type PatientUncheckedUpdateWithoutPatientDocumentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  clinicId?: Prisma.StringFieldUpdateOperationsInput | string
+  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
+  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
+  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
+  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
+  carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
+  activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
+  inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutPatientNestedInput
+  labTestOrders?: Prisma.LabTestOrderUncheckedUpdateManyWithoutPatientNestedInput
+  radiologyOrders?: Prisma.RadiologyOrderUncheckedUpdateManyWithoutPatientNestedInput
+  vitalSignsRecords?: Prisma.VitalSignsRecordUncheckedUpdateManyWithoutPatientNestedInput
+  operationCases?: Prisma.OperationCaseUncheckedUpdateManyWithoutPatientNestedInput
+  vaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutPatientNestedInput
+  consents?: Prisma.PatientConsentUncheckedUpdateManyWithoutPatientNestedInput
+  groomingProfile?: Prisma.PatientGroomingProfileUncheckedUpdateOneWithoutPatientNestedInput
+  groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutPatientNestedInput
+  groomingFindings?: Prisma.GroomingFindingUncheckedUpdateManyWithoutPatientNestedInput
+  nutritionPlans?: Prisma.NutritionPlanUncheckedUpdateManyWithoutPatientNestedInput
+  insurancePolicies?: Prisma.PatientPolicyUncheckedUpdateManyWithoutPatientNestedInput
+  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutPatientNestedInput
+  prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
+  controlledRegister?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutPatientNestedInput
+  inpatientStays?: Prisma.InpatientStayUncheckedUpdateManyWithoutPatientNestedInput
+  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedUpdateManyWithoutPatientNestedInput
+  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutPatientNestedInput
+  triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
+  alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
+  clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
+  recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
 
 export type PatientCreateManyClinicInput = {
@@ -7529,8 +11718,6 @@ export type PatientCreateManyClinicInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -7538,6 +11725,26 @@ export type PatientCreateManyClinicInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -7558,14 +11765,35 @@ export type PatientUpdateWithoutClinicInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -7590,6 +11818,8 @@ export type PatientUpdateWithoutClinicInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -7601,8 +11831,6 @@ export type PatientUncheckedUpdateWithoutClinicInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -7610,11 +11838,34 @@ export type PatientUncheckedUpdateWithoutClinicInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -7639,6 +11890,8 @@ export type PatientUncheckedUpdateWithoutClinicInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -7650,8 +11903,6 @@ export type PatientUncheckedUpdateManyWithoutClinicInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -7659,294 +11910,26 @@ export type PatientUncheckedUpdateManyWithoutClinicInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type PatientCreateManyAnimalTypeInput = {
-  id?: string
-  code: string
-  clinicId: string
-  ownerId?: string | null
-  name: string
-  nameNormalized: string
-  gender: $Enums.Gender
-  animalStrainId?: string | null
-  age?: number | null
-  birthDate?: Date | string | null
-  weight?: number | null
-  microchipNumber?: string | null
-  coat?: string | null
-  notes?: string | null
-  active?: boolean
-  isDeleted?: boolean
-  deletedAt?: Date | string | null
-  editsCount?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type PatientUpdateWithoutAnimalTypeInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
-  owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
-  appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
-  carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
-  activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
-  inboxItems?: Prisma.InboxItemUpdateManyWithoutPatientNestedInput
-  labTestOrders?: Prisma.LabTestOrderUpdateManyWithoutPatientNestedInput
-  radiologyOrders?: Prisma.RadiologyOrderUpdateManyWithoutPatientNestedInput
-  vitalSignsRecords?: Prisma.VitalSignsRecordUpdateManyWithoutPatientNestedInput
-  operationCases?: Prisma.OperationCaseUpdateManyWithoutPatientNestedInput
-  vaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutPatientNestedInput
-  consents?: Prisma.PatientConsentUpdateManyWithoutPatientNestedInput
-  groomingProfile?: Prisma.PatientGroomingProfileUpdateOneWithoutPatientNestedInput
-  groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutPatientNestedInput
-  groomingFindings?: Prisma.GroomingFindingUpdateManyWithoutPatientNestedInput
-  nutritionPlans?: Prisma.NutritionPlanUpdateManyWithoutPatientNestedInput
-  insurancePolicies?: Prisma.PatientPolicyUpdateManyWithoutPatientNestedInput
-  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutPatientNestedInput
-  prescriptions?: Prisma.PrescriptionUpdateManyWithoutPatientNestedInput
-  controlledRegister?: Prisma.ControlledDrugRegisterUpdateManyWithoutPatientNestedInput
-  inpatientStays?: Prisma.InpatientStayUpdateManyWithoutPatientNestedInput
-  petOwnerRequests?: Prisma.PetOwnerRequestUpdateManyWithoutPatientNestedInput
-  emergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutPatientNestedInput
-  triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
-  alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
-  clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
-  notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
-  recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
-}
-
-export type PatientUncheckedUpdateWithoutAnimalTypeInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
-  clinicId?: Prisma.StringFieldUpdateOperationsInput | string
-  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
-  carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
-  activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
-  inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutPatientNestedInput
-  labTestOrders?: Prisma.LabTestOrderUncheckedUpdateManyWithoutPatientNestedInput
-  radiologyOrders?: Prisma.RadiologyOrderUncheckedUpdateManyWithoutPatientNestedInput
-  vitalSignsRecords?: Prisma.VitalSignsRecordUncheckedUpdateManyWithoutPatientNestedInput
-  operationCases?: Prisma.OperationCaseUncheckedUpdateManyWithoutPatientNestedInput
-  vaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutPatientNestedInput
-  consents?: Prisma.PatientConsentUncheckedUpdateManyWithoutPatientNestedInput
-  groomingProfile?: Prisma.PatientGroomingProfileUncheckedUpdateOneWithoutPatientNestedInput
-  groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutPatientNestedInput
-  groomingFindings?: Prisma.GroomingFindingUncheckedUpdateManyWithoutPatientNestedInput
-  nutritionPlans?: Prisma.NutritionPlanUncheckedUpdateManyWithoutPatientNestedInput
-  insurancePolicies?: Prisma.PatientPolicyUncheckedUpdateManyWithoutPatientNestedInput
-  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutPatientNestedInput
-  prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
-  controlledRegister?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutPatientNestedInput
-  inpatientStays?: Prisma.InpatientStayUncheckedUpdateManyWithoutPatientNestedInput
-  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedUpdateManyWithoutPatientNestedInput
-  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutPatientNestedInput
-  triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
-  alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
-  clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
-  notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
-  recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
-}
-
-export type PatientUncheckedUpdateManyWithoutAnimalTypeInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
-  clinicId?: Prisma.StringFieldUpdateOperationsInput | string
-  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-}
-
-export type PatientCreateManyAnimalStrainInput = {
-  id?: string
-  code: string
-  clinicId: string
-  ownerId?: string | null
-  name: string
-  nameNormalized: string
-  gender: $Enums.Gender
-  animalTypeId: string
-  age?: number | null
-  birthDate?: Date | string | null
-  weight?: number | null
-  microchipNumber?: string | null
-  coat?: string | null
-  notes?: string | null
-  active?: boolean
-  isDeleted?: boolean
-  deletedAt?: Date | string | null
-  editsCount?: number
-  createdAt?: Date | string
-  updatedAt?: Date | string
-}
-
-export type PatientUpdateWithoutAnimalStrainInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
-  owner?: Prisma.OwnerUpdateOneWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
-  carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
-  activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
-  inboxItems?: Prisma.InboxItemUpdateManyWithoutPatientNestedInput
-  labTestOrders?: Prisma.LabTestOrderUpdateManyWithoutPatientNestedInput
-  radiologyOrders?: Prisma.RadiologyOrderUpdateManyWithoutPatientNestedInput
-  vitalSignsRecords?: Prisma.VitalSignsRecordUpdateManyWithoutPatientNestedInput
-  operationCases?: Prisma.OperationCaseUpdateManyWithoutPatientNestedInput
-  vaccinationRecords?: Prisma.VaccinationRecordUpdateManyWithoutPatientNestedInput
-  consents?: Prisma.PatientConsentUpdateManyWithoutPatientNestedInput
-  groomingProfile?: Prisma.PatientGroomingProfileUpdateOneWithoutPatientNestedInput
-  groomingSessions?: Prisma.GroomingSessionUpdateManyWithoutPatientNestedInput
-  groomingFindings?: Prisma.GroomingFindingUpdateManyWithoutPatientNestedInput
-  nutritionPlans?: Prisma.NutritionPlanUpdateManyWithoutPatientNestedInput
-  insurancePolicies?: Prisma.PatientPolicyUpdateManyWithoutPatientNestedInput
-  insuranceClaims?: Prisma.InsuranceClaimUpdateManyWithoutPatientNestedInput
-  prescriptions?: Prisma.PrescriptionUpdateManyWithoutPatientNestedInput
-  controlledRegister?: Prisma.ControlledDrugRegisterUpdateManyWithoutPatientNestedInput
-  inpatientStays?: Prisma.InpatientStayUpdateManyWithoutPatientNestedInput
-  petOwnerRequests?: Prisma.PetOwnerRequestUpdateManyWithoutPatientNestedInput
-  emergencyArrivals?: Prisma.EmergencyArrivalUpdateManyWithoutPatientNestedInput
-  triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
-  alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
-  clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
-  notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
-  recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
-}
-
-export type PatientUncheckedUpdateWithoutAnimalStrainInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
-  clinicId?: Prisma.StringFieldUpdateOperationsInput | string
-  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  editsCount?: Prisma.IntFieldUpdateOperationsInput | number
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
-  carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
-  activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
-  inboxItems?: Prisma.InboxItemUncheckedUpdateManyWithoutPatientNestedInput
-  labTestOrders?: Prisma.LabTestOrderUncheckedUpdateManyWithoutPatientNestedInput
-  radiologyOrders?: Prisma.RadiologyOrderUncheckedUpdateManyWithoutPatientNestedInput
-  vitalSignsRecords?: Prisma.VitalSignsRecordUncheckedUpdateManyWithoutPatientNestedInput
-  operationCases?: Prisma.OperationCaseUncheckedUpdateManyWithoutPatientNestedInput
-  vaccinationRecords?: Prisma.VaccinationRecordUncheckedUpdateManyWithoutPatientNestedInput
-  consents?: Prisma.PatientConsentUncheckedUpdateManyWithoutPatientNestedInput
-  groomingProfile?: Prisma.PatientGroomingProfileUncheckedUpdateOneWithoutPatientNestedInput
-  groomingSessions?: Prisma.GroomingSessionUncheckedUpdateManyWithoutPatientNestedInput
-  groomingFindings?: Prisma.GroomingFindingUncheckedUpdateManyWithoutPatientNestedInput
-  nutritionPlans?: Prisma.NutritionPlanUncheckedUpdateManyWithoutPatientNestedInput
-  insurancePolicies?: Prisma.PatientPolicyUncheckedUpdateManyWithoutPatientNestedInput
-  insuranceClaims?: Prisma.InsuranceClaimUncheckedUpdateManyWithoutPatientNestedInput
-  prescriptions?: Prisma.PrescriptionUncheckedUpdateManyWithoutPatientNestedInput
-  controlledRegister?: Prisma.ControlledDrugRegisterUncheckedUpdateManyWithoutPatientNestedInput
-  inpatientStays?: Prisma.InpatientStayUncheckedUpdateManyWithoutPatientNestedInput
-  petOwnerRequests?: Prisma.PetOwnerRequestUncheckedUpdateManyWithoutPatientNestedInput
-  emergencyArrivals?: Prisma.EmergencyArrivalUncheckedUpdateManyWithoutPatientNestedInput
-  triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
-  alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
-  clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
-  notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
-  recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
-}
-
-export type PatientUncheckedUpdateManyWithoutAnimalStrainInput = {
-  id?: Prisma.StringFieldUpdateOperationsInput | string
-  code?: Prisma.StringFieldUpdateOperationsInput | string
-  clinicId?: Prisma.StringFieldUpdateOperationsInput | string
-  ownerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  name?: Prisma.StringFieldUpdateOperationsInput | string
-  nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
-  gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
-  microchipNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -7961,8 +11944,6 @@ export type PatientCreateManyOwnerInput = {
   name: string
   nameNormalized: string
   gender: $Enums.Gender
-  animalTypeId: string
-  animalStrainId?: string | null
   age?: number | null
   birthDate?: Date | string | null
   weight?: number | null
@@ -7970,6 +11951,26 @@ export type PatientCreateManyOwnerInput = {
   coat?: string | null
   notes?: string | null
   active?: boolean
+  status?: string
+  nationalId?: string | null
+  ageGroup?: string | null
+  academicStage?: string | null
+  classroom?: string | null
+  bloodType?: string | null
+  developmentStatus?: string | null
+  allergies?: string | null
+  pocketMoneyEnabled?: boolean
+  transportation?: string | null
+  feeType?: string | null
+  healthConditions?: string | null
+  previousNursery?: string | null
+  guardianRelationship?: string | null
+  emergencyContactPhone?: string | null
+  emergencyContactName?: string | null
+  level?: string | null
+  learningMethod?: string | null
+  preferredShift?: string | null
+  address?: string | null
   isDeleted?: boolean
   deletedAt?: Date | string | null
   editsCount?: number
@@ -7990,14 +11991,35 @@ export type PatientUpdateWithoutOwnerInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   clinic?: Prisma.ClinicUpdateOneRequiredWithoutPatientsNestedInput
-  animalType?: Prisma.AnimalTypeUpdateOneRequiredWithoutPatientsNestedInput
-  animalStrain?: Prisma.AnimalStrainUpdateOneWithoutPatientsNestedInput
+  guardians?: Prisma.PatientGuardianUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUpdateManyWithoutPatientNestedInput
@@ -8022,6 +12044,8 @@ export type PatientUpdateWithoutOwnerInput = {
   triageAssessments?: Prisma.TriageAssessmentUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUpdateManyWithoutPatientNestedInput
 }
@@ -8033,8 +12057,6 @@ export type PatientUncheckedUpdateWithoutOwnerInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -8042,11 +12064,34 @@ export type PatientUncheckedUpdateWithoutOwnerInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  guardians?: Prisma.PatientGuardianUncheckedUpdateManyWithoutPatientNestedInput
+  classroomAssignments?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutPatientNestedInput
+  trackAssignments?: Prisma.TrackStudentUncheckedUpdateManyWithoutPatientNestedInput
   appointments?: Prisma.AppointmentUncheckedUpdateManyWithoutPatientNestedInput
   carePlanEnrollments?: Prisma.CarePlanEnrollmentUncheckedUpdateManyWithoutPatientNestedInput
   activity?: Prisma.PatientActivityUncheckedUpdateManyWithoutPatientNestedInput
@@ -8071,6 +12116,8 @@ export type PatientUncheckedUpdateWithoutOwnerInput = {
   triageAssessments?: Prisma.TriageAssessmentUncheckedUpdateManyWithoutPatientNestedInput
   alerts?: Prisma.PatientAlertUncheckedUpdateManyWithoutPatientNestedInput
   clinicalNotes?: Prisma.ClinicalNoteUncheckedUpdateManyWithoutPatientNestedInput
+  registrationRequests?: Prisma.RegistrationRequestUncheckedUpdateManyWithoutConvertedPatientNestedInput
+  patientDocuments?: Prisma.PatientDocumentUncheckedUpdateManyWithoutPatientNestedInput
   notificationOutbox?: Prisma.NotificationOutboxUncheckedUpdateManyWithoutPatientNestedInput
   recallContacts?: Prisma.RecallContactUncheckedUpdateManyWithoutPatientNestedInput
 }
@@ -8082,8 +12129,6 @@ export type PatientUncheckedUpdateManyWithoutOwnerInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   nameNormalized?: Prisma.StringFieldUpdateOperationsInput | string
   gender?: Prisma.EnumGenderFieldUpdateOperationsInput | $Enums.Gender
-  animalTypeId?: Prisma.StringFieldUpdateOperationsInput | string
-  animalStrainId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   age?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   birthDate?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   weight?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
@@ -8091,6 +12136,26 @@ export type PatientUncheckedUpdateManyWithoutOwnerInput = {
   coat?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  nationalId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classroom?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  bloodType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  developmentStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  allergies?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pocketMoneyEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  transportation?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  feeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  healthConditions?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  previousNursery?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  guardianRelationship?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactPhone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emergencyContactName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  learningMethod?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  preferredShift?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  address?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   editsCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -8104,6 +12169,9 @@ export type PatientUncheckedUpdateManyWithoutOwnerInput = {
  */
 
 export type PatientCountOutputType = {
+  guardians: number
+  classroomAssignments: number
+  trackAssignments: number
   appointments: number
   carePlanEnrollments: number
   activity: number
@@ -8127,11 +12195,16 @@ export type PatientCountOutputType = {
   triageAssessments: number
   alerts: number
   clinicalNotes: number
+  registrationRequests: number
+  patientDocuments: number
   notificationOutbox: number
   recallContacts: number
 }
 
 export type PatientCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  guardians?: boolean | PatientCountOutputTypeCountGuardiansArgs
+  classroomAssignments?: boolean | PatientCountOutputTypeCountClassroomAssignmentsArgs
+  trackAssignments?: boolean | PatientCountOutputTypeCountTrackAssignmentsArgs
   appointments?: boolean | PatientCountOutputTypeCountAppointmentsArgs
   carePlanEnrollments?: boolean | PatientCountOutputTypeCountCarePlanEnrollmentsArgs
   activity?: boolean | PatientCountOutputTypeCountActivityArgs
@@ -8155,6 +12228,8 @@ export type PatientCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   triageAssessments?: boolean | PatientCountOutputTypeCountTriageAssessmentsArgs
   alerts?: boolean | PatientCountOutputTypeCountAlertsArgs
   clinicalNotes?: boolean | PatientCountOutputTypeCountClinicalNotesArgs
+  registrationRequests?: boolean | PatientCountOutputTypeCountRegistrationRequestsArgs
+  patientDocuments?: boolean | PatientCountOutputTypeCountPatientDocumentsArgs
   notificationOutbox?: boolean | PatientCountOutputTypeCountNotificationOutboxArgs
   recallContacts?: boolean | PatientCountOutputTypeCountRecallContactsArgs
 }
@@ -8167,6 +12242,27 @@ export type PatientCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Exte
    * Select specific fields to fetch from the PatientCountOutputType
    */
   select?: Prisma.PatientCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * PatientCountOutputType without action
+ */
+export type PatientCountOutputTypeCountGuardiansArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PatientGuardianWhereInput
+}
+
+/**
+ * PatientCountOutputType without action
+ */
+export type PatientCountOutputTypeCountClassroomAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ClassroomStudentWhereInput
+}
+
+/**
+ * PatientCountOutputType without action
+ */
+export type PatientCountOutputTypeCountTrackAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TrackStudentWhereInput
 }
 
 /**
@@ -8333,6 +12429,20 @@ export type PatientCountOutputTypeCountClinicalNotesArgs<ExtArgs extends runtime
 /**
  * PatientCountOutputType without action
  */
+export type PatientCountOutputTypeCountRegistrationRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.RegistrationRequestWhereInput
+}
+
+/**
+ * PatientCountOutputType without action
+ */
+export type PatientCountOutputTypeCountPatientDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PatientDocumentWhereInput
+}
+
+/**
+ * PatientCountOutputType without action
+ */
 export type PatientCountOutputTypeCountNotificationOutboxArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.NotificationOutboxWhereInput
 }
@@ -8353,8 +12463,6 @@ export type PatientSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   name?: boolean
   nameNormalized?: boolean
   gender?: boolean
-  animalTypeId?: boolean
-  animalStrainId?: boolean
   age?: boolean
   birthDate?: boolean
   weight?: boolean
@@ -8362,6 +12470,26 @@ export type PatientSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   coat?: boolean
   notes?: boolean
   active?: boolean
+  status?: boolean
+  nationalId?: boolean
+  ageGroup?: boolean
+  academicStage?: boolean
+  classroom?: boolean
+  bloodType?: boolean
+  developmentStatus?: boolean
+  allergies?: boolean
+  pocketMoneyEnabled?: boolean
+  transportation?: boolean
+  feeType?: boolean
+  healthConditions?: boolean
+  previousNursery?: boolean
+  guardianRelationship?: boolean
+  emergencyContactPhone?: boolean
+  emergencyContactName?: boolean
+  level?: boolean
+  learningMethod?: boolean
+  preferredShift?: boolean
+  address?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
   editsCount?: boolean
@@ -8369,8 +12497,9 @@ export type PatientSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   updatedAt?: boolean
   clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>
   owner?: boolean | Prisma.Patient$ownerArgs<ExtArgs>
-  animalType?: boolean | Prisma.AnimalTypeDefaultArgs<ExtArgs>
-  animalStrain?: boolean | Prisma.Patient$animalStrainArgs<ExtArgs>
+  guardians?: boolean | Prisma.Patient$guardiansArgs<ExtArgs>
+  classroomAssignments?: boolean | Prisma.Patient$classroomAssignmentsArgs<ExtArgs>
+  trackAssignments?: boolean | Prisma.Patient$trackAssignmentsArgs<ExtArgs>
   appointments?: boolean | Prisma.Patient$appointmentsArgs<ExtArgs>
   carePlanEnrollments?: boolean | Prisma.Patient$carePlanEnrollmentsArgs<ExtArgs>
   activity?: boolean | Prisma.Patient$activityArgs<ExtArgs>
@@ -8395,6 +12524,8 @@ export type PatientSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   triageAssessments?: boolean | Prisma.Patient$triageAssessmentsArgs<ExtArgs>
   alerts?: boolean | Prisma.Patient$alertsArgs<ExtArgs>
   clinicalNotes?: boolean | Prisma.Patient$clinicalNotesArgs<ExtArgs>
+  registrationRequests?: boolean | Prisma.Patient$registrationRequestsArgs<ExtArgs>
+  patientDocuments?: boolean | Prisma.Patient$patientDocumentsArgs<ExtArgs>
   notificationOutbox?: boolean | Prisma.Patient$notificationOutboxArgs<ExtArgs>
   recallContacts?: boolean | Prisma.Patient$recallContactsArgs<ExtArgs>
   _count?: boolean | Prisma.PatientCountOutputTypeDefaultArgs<ExtArgs>
@@ -8408,8 +12539,6 @@ export type PatientSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   name?: boolean
   nameNormalized?: boolean
   gender?: boolean
-  animalTypeId?: boolean
-  animalStrainId?: boolean
   age?: boolean
   birthDate?: boolean
   weight?: boolean
@@ -8417,6 +12546,26 @@ export type PatientSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   coat?: boolean
   notes?: boolean
   active?: boolean
+  status?: boolean
+  nationalId?: boolean
+  ageGroup?: boolean
+  academicStage?: boolean
+  classroom?: boolean
+  bloodType?: boolean
+  developmentStatus?: boolean
+  allergies?: boolean
+  pocketMoneyEnabled?: boolean
+  transportation?: boolean
+  feeType?: boolean
+  healthConditions?: boolean
+  previousNursery?: boolean
+  guardianRelationship?: boolean
+  emergencyContactPhone?: boolean
+  emergencyContactName?: boolean
+  level?: boolean
+  learningMethod?: boolean
+  preferredShift?: boolean
+  address?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
   editsCount?: boolean
@@ -8424,8 +12573,6 @@ export type PatientSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   updatedAt?: boolean
   clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>
   owner?: boolean | Prisma.Patient$ownerArgs<ExtArgs>
-  animalType?: boolean | Prisma.AnimalTypeDefaultArgs<ExtArgs>
-  animalStrain?: boolean | Prisma.Patient$animalStrainArgs<ExtArgs>
 }, ExtArgs["result"]["patient"]>
 
 export type PatientSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -8436,8 +12583,6 @@ export type PatientSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   name?: boolean
   nameNormalized?: boolean
   gender?: boolean
-  animalTypeId?: boolean
-  animalStrainId?: boolean
   age?: boolean
   birthDate?: boolean
   weight?: boolean
@@ -8445,6 +12590,26 @@ export type PatientSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   coat?: boolean
   notes?: boolean
   active?: boolean
+  status?: boolean
+  nationalId?: boolean
+  ageGroup?: boolean
+  academicStage?: boolean
+  classroom?: boolean
+  bloodType?: boolean
+  developmentStatus?: boolean
+  allergies?: boolean
+  pocketMoneyEnabled?: boolean
+  transportation?: boolean
+  feeType?: boolean
+  healthConditions?: boolean
+  previousNursery?: boolean
+  guardianRelationship?: boolean
+  emergencyContactPhone?: boolean
+  emergencyContactName?: boolean
+  level?: boolean
+  learningMethod?: boolean
+  preferredShift?: boolean
+  address?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
   editsCount?: boolean
@@ -8452,8 +12617,6 @@ export type PatientSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   updatedAt?: boolean
   clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>
   owner?: boolean | Prisma.Patient$ownerArgs<ExtArgs>
-  animalType?: boolean | Prisma.AnimalTypeDefaultArgs<ExtArgs>
-  animalStrain?: boolean | Prisma.Patient$animalStrainArgs<ExtArgs>
 }, ExtArgs["result"]["patient"]>
 
 export type PatientSelectScalar = {
@@ -8464,8 +12627,6 @@ export type PatientSelectScalar = {
   name?: boolean
   nameNormalized?: boolean
   gender?: boolean
-  animalTypeId?: boolean
-  animalStrainId?: boolean
   age?: boolean
   birthDate?: boolean
   weight?: boolean
@@ -8473,6 +12634,26 @@ export type PatientSelectScalar = {
   coat?: boolean
   notes?: boolean
   active?: boolean
+  status?: boolean
+  nationalId?: boolean
+  ageGroup?: boolean
+  academicStage?: boolean
+  classroom?: boolean
+  bloodType?: boolean
+  developmentStatus?: boolean
+  allergies?: boolean
+  pocketMoneyEnabled?: boolean
+  transportation?: boolean
+  feeType?: boolean
+  healthConditions?: boolean
+  previousNursery?: boolean
+  guardianRelationship?: boolean
+  emergencyContactPhone?: boolean
+  emergencyContactName?: boolean
+  level?: boolean
+  learningMethod?: boolean
+  preferredShift?: boolean
+  address?: boolean
   isDeleted?: boolean
   deletedAt?: boolean
   editsCount?: boolean
@@ -8480,12 +12661,13 @@ export type PatientSelectScalar = {
   updatedAt?: boolean
 }
 
-export type PatientOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "clinicId" | "ownerId" | "name" | "nameNormalized" | "gender" | "animalTypeId" | "animalStrainId" | "age" | "birthDate" | "weight" | "microchipNumber" | "coat" | "notes" | "active" | "isDeleted" | "deletedAt" | "editsCount" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
+export type PatientOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "clinicId" | "ownerId" | "name" | "nameNormalized" | "gender" | "age" | "birthDate" | "weight" | "microchipNumber" | "coat" | "notes" | "active" | "status" | "nationalId" | "ageGroup" | "academicStage" | "classroom" | "bloodType" | "developmentStatus" | "allergies" | "pocketMoneyEnabled" | "transportation" | "feeType" | "healthConditions" | "previousNursery" | "guardianRelationship" | "emergencyContactPhone" | "emergencyContactName" | "level" | "learningMethod" | "preferredShift" | "address" | "isDeleted" | "deletedAt" | "editsCount" | "createdAt" | "updatedAt", ExtArgs["result"]["patient"]>
 export type PatientInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>
   owner?: boolean | Prisma.Patient$ownerArgs<ExtArgs>
-  animalType?: boolean | Prisma.AnimalTypeDefaultArgs<ExtArgs>
-  animalStrain?: boolean | Prisma.Patient$animalStrainArgs<ExtArgs>
+  guardians?: boolean | Prisma.Patient$guardiansArgs<ExtArgs>
+  classroomAssignments?: boolean | Prisma.Patient$classroomAssignmentsArgs<ExtArgs>
+  trackAssignments?: boolean | Prisma.Patient$trackAssignmentsArgs<ExtArgs>
   appointments?: boolean | Prisma.Patient$appointmentsArgs<ExtArgs>
   carePlanEnrollments?: boolean | Prisma.Patient$carePlanEnrollmentsArgs<ExtArgs>
   activity?: boolean | Prisma.Patient$activityArgs<ExtArgs>
@@ -8510,6 +12692,8 @@ export type PatientInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   triageAssessments?: boolean | Prisma.Patient$triageAssessmentsArgs<ExtArgs>
   alerts?: boolean | Prisma.Patient$alertsArgs<ExtArgs>
   clinicalNotes?: boolean | Prisma.Patient$clinicalNotesArgs<ExtArgs>
+  registrationRequests?: boolean | Prisma.Patient$registrationRequestsArgs<ExtArgs>
+  patientDocuments?: boolean | Prisma.Patient$patientDocumentsArgs<ExtArgs>
   notificationOutbox?: boolean | Prisma.Patient$notificationOutboxArgs<ExtArgs>
   recallContacts?: boolean | Prisma.Patient$recallContactsArgs<ExtArgs>
   _count?: boolean | Prisma.PatientCountOutputTypeDefaultArgs<ExtArgs>
@@ -8517,14 +12701,10 @@ export type PatientInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
 export type PatientIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>
   owner?: boolean | Prisma.Patient$ownerArgs<ExtArgs>
-  animalType?: boolean | Prisma.AnimalTypeDefaultArgs<ExtArgs>
-  animalStrain?: boolean | Prisma.Patient$animalStrainArgs<ExtArgs>
 }
 export type PatientIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>
   owner?: boolean | Prisma.Patient$ownerArgs<ExtArgs>
-  animalType?: boolean | Prisma.AnimalTypeDefaultArgs<ExtArgs>
-  animalStrain?: boolean | Prisma.Patient$animalStrainArgs<ExtArgs>
 }
 
 export type $PatientPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -8532,8 +12712,9 @@ export type $PatientPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   objects: {
     clinic: Prisma.$ClinicPayload<ExtArgs>
     owner: Prisma.$OwnerPayload<ExtArgs> | null
-    animalType: Prisma.$AnimalTypePayload<ExtArgs>
-    animalStrain: Prisma.$AnimalStrainPayload<ExtArgs> | null
+    guardians: Prisma.$PatientGuardianPayload<ExtArgs>[]
+    classroomAssignments: Prisma.$ClassroomStudentPayload<ExtArgs>[]
+    trackAssignments: Prisma.$TrackStudentPayload<ExtArgs>[]
     appointments: Prisma.$AppointmentPayload<ExtArgs>[]
     carePlanEnrollments: Prisma.$CarePlanEnrollmentPayload<ExtArgs>[]
     activity: Prisma.$PatientActivityPayload<ExtArgs>[]
@@ -8558,6 +12739,8 @@ export type $PatientPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     triageAssessments: Prisma.$TriageAssessmentPayload<ExtArgs>[]
     alerts: Prisma.$PatientAlertPayload<ExtArgs>[]
     clinicalNotes: Prisma.$ClinicalNotePayload<ExtArgs>[]
+    registrationRequests: Prisma.$RegistrationRequestPayload<ExtArgs>[]
+    patientDocuments: Prisma.$PatientDocumentPayload<ExtArgs>[]
     notificationOutbox: Prisma.$NotificationOutboxPayload<ExtArgs>[]
     recallContacts: Prisma.$RecallContactPayload<ExtArgs>[]
   }
@@ -8569,8 +12752,6 @@ export type $PatientPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     name: string
     nameNormalized: string
     gender: $Enums.Gender
-    animalTypeId: string
-    animalStrainId: string | null
     age: number | null
     birthDate: Date | null
     weight: number | null
@@ -8578,6 +12759,26 @@ export type $PatientPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     coat: string | null
     notes: string | null
     active: boolean
+    status: string
+    nationalId: string | null
+    ageGroup: string | null
+    academicStage: string | null
+    classroom: string | null
+    bloodType: string | null
+    developmentStatus: string | null
+    allergies: string | null
+    pocketMoneyEnabled: boolean
+    transportation: string | null
+    feeType: string | null
+    healthConditions: string | null
+    previousNursery: string | null
+    guardianRelationship: string | null
+    emergencyContactPhone: string | null
+    emergencyContactName: string | null
+    level: string | null
+    learningMethod: string | null
+    preferredShift: string | null
+    address: string | null
     isDeleted: boolean
     deletedAt: Date | null
     editsCount: number
@@ -8979,8 +13180,9 @@ export interface Prisma__PatientClient<T, Null = never, ExtArgs extends runtime.
   readonly [Symbol.toStringTag]: "PrismaPromise"
   clinic<T extends Prisma.ClinicDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClinicDefaultArgs<ExtArgs>>): Prisma.Prisma__ClinicClient<runtime.Types.Result.GetResult<Prisma.$ClinicPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   owner<T extends Prisma.Patient$ownerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$ownerArgs<ExtArgs>>): Prisma.Prisma__OwnerClient<runtime.Types.Result.GetResult<Prisma.$OwnerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  animalType<T extends Prisma.AnimalTypeDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AnimalTypeDefaultArgs<ExtArgs>>): Prisma.Prisma__AnimalTypeClient<runtime.Types.Result.GetResult<Prisma.$AnimalTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  animalStrain<T extends Prisma.Patient$animalStrainArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$animalStrainArgs<ExtArgs>>): Prisma.Prisma__AnimalStrainClient<runtime.Types.Result.GetResult<Prisma.$AnimalStrainPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  guardians<T extends Prisma.Patient$guardiansArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$guardiansArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PatientGuardianPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  classroomAssignments<T extends Prisma.Patient$classroomAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$classroomAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClassroomStudentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  trackAssignments<T extends Prisma.Patient$trackAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$trackAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TrackStudentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   appointments<T extends Prisma.Patient$appointmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$appointmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AppointmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   carePlanEnrollments<T extends Prisma.Patient$carePlanEnrollmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$carePlanEnrollmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CarePlanEnrollmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   activity<T extends Prisma.Patient$activityArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$activityArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PatientActivityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -9005,6 +13207,8 @@ export interface Prisma__PatientClient<T, Null = never, ExtArgs extends runtime.
   triageAssessments<T extends Prisma.Patient$triageAssessmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$triageAssessmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TriageAssessmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   alerts<T extends Prisma.Patient$alertsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$alertsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PatientAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   clinicalNotes<T extends Prisma.Patient$clinicalNotesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$clinicalNotesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClinicalNotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  registrationRequests<T extends Prisma.Patient$registrationRequestsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$registrationRequestsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RegistrationRequestPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  patientDocuments<T extends Prisma.Patient$patientDocumentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$patientDocumentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PatientDocumentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   notificationOutbox<T extends Prisma.Patient$notificationOutboxArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$notificationOutboxArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationOutboxPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   recallContacts<T extends Prisma.Patient$recallContactsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Patient$recallContactsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RecallContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -9043,8 +13247,6 @@ export interface PatientFieldRefs {
   readonly name: Prisma.FieldRef<"Patient", 'String'>
   readonly nameNormalized: Prisma.FieldRef<"Patient", 'String'>
   readonly gender: Prisma.FieldRef<"Patient", 'Gender'>
-  readonly animalTypeId: Prisma.FieldRef<"Patient", 'String'>
-  readonly animalStrainId: Prisma.FieldRef<"Patient", 'String'>
   readonly age: Prisma.FieldRef<"Patient", 'Float'>
   readonly birthDate: Prisma.FieldRef<"Patient", 'DateTime'>
   readonly weight: Prisma.FieldRef<"Patient", 'Float'>
@@ -9052,6 +13254,26 @@ export interface PatientFieldRefs {
   readonly coat: Prisma.FieldRef<"Patient", 'String'>
   readonly notes: Prisma.FieldRef<"Patient", 'String'>
   readonly active: Prisma.FieldRef<"Patient", 'Boolean'>
+  readonly status: Prisma.FieldRef<"Patient", 'String'>
+  readonly nationalId: Prisma.FieldRef<"Patient", 'String'>
+  readonly ageGroup: Prisma.FieldRef<"Patient", 'String'>
+  readonly academicStage: Prisma.FieldRef<"Patient", 'String'>
+  readonly classroom: Prisma.FieldRef<"Patient", 'String'>
+  readonly bloodType: Prisma.FieldRef<"Patient", 'String'>
+  readonly developmentStatus: Prisma.FieldRef<"Patient", 'String'>
+  readonly allergies: Prisma.FieldRef<"Patient", 'String'>
+  readonly pocketMoneyEnabled: Prisma.FieldRef<"Patient", 'Boolean'>
+  readonly transportation: Prisma.FieldRef<"Patient", 'String'>
+  readonly feeType: Prisma.FieldRef<"Patient", 'String'>
+  readonly healthConditions: Prisma.FieldRef<"Patient", 'String'>
+  readonly previousNursery: Prisma.FieldRef<"Patient", 'String'>
+  readonly guardianRelationship: Prisma.FieldRef<"Patient", 'String'>
+  readonly emergencyContactPhone: Prisma.FieldRef<"Patient", 'String'>
+  readonly emergencyContactName: Prisma.FieldRef<"Patient", 'String'>
+  readonly level: Prisma.FieldRef<"Patient", 'String'>
+  readonly learningMethod: Prisma.FieldRef<"Patient", 'String'>
+  readonly preferredShift: Prisma.FieldRef<"Patient", 'String'>
+  readonly address: Prisma.FieldRef<"Patient", 'String'>
   readonly isDeleted: Prisma.FieldRef<"Patient", 'Boolean'>
   readonly deletedAt: Prisma.FieldRef<"Patient", 'DateTime'>
   readonly editsCount: Prisma.FieldRef<"Patient", 'Int'>
@@ -9477,22 +13699,75 @@ export type Patient$ownerArgs<ExtArgs extends runtime.Types.Extensions.InternalA
 }
 
 /**
- * Patient.animalStrain
+ * Patient.guardians
  */
-export type Patient$animalStrainArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type Patient$guardiansArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the AnimalStrain
+   * Select specific fields to fetch from the PatientGuardian
    */
-  select?: Prisma.AnimalStrainSelect<ExtArgs> | null
+  select?: Prisma.PatientGuardianSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the AnimalStrain
+   * Omit specific fields from the PatientGuardian
    */
-  omit?: Prisma.AnimalStrainOmit<ExtArgs> | null
+  omit?: Prisma.PatientGuardianOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.AnimalStrainInclude<ExtArgs> | null
-  where?: Prisma.AnimalStrainWhereInput
+  include?: Prisma.PatientGuardianInclude<ExtArgs> | null
+  where?: Prisma.PatientGuardianWhereInput
+  orderBy?: Prisma.PatientGuardianOrderByWithRelationInput | Prisma.PatientGuardianOrderByWithRelationInput[]
+  cursor?: Prisma.PatientGuardianWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PatientGuardianScalarFieldEnum | Prisma.PatientGuardianScalarFieldEnum[]
+}
+
+/**
+ * Patient.classroomAssignments
+ */
+export type Patient$classroomAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ClassroomStudent
+   */
+  select?: Prisma.ClassroomStudentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ClassroomStudent
+   */
+  omit?: Prisma.ClassroomStudentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ClassroomStudentInclude<ExtArgs> | null
+  where?: Prisma.ClassroomStudentWhereInput
+  orderBy?: Prisma.ClassroomStudentOrderByWithRelationInput | Prisma.ClassroomStudentOrderByWithRelationInput[]
+  cursor?: Prisma.ClassroomStudentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ClassroomStudentScalarFieldEnum | Prisma.ClassroomStudentScalarFieldEnum[]
+}
+
+/**
+ * Patient.trackAssignments
+ */
+export type Patient$trackAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TrackStudent
+   */
+  select?: Prisma.TrackStudentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TrackStudent
+   */
+  omit?: Prisma.TrackStudentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TrackStudentInclude<ExtArgs> | null
+  where?: Prisma.TrackStudentWhereInput
+  orderBy?: Prisma.TrackStudentOrderByWithRelationInput | Prisma.TrackStudentOrderByWithRelationInput[]
+  cursor?: Prisma.TrackStudentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TrackStudentScalarFieldEnum | Prisma.TrackStudentScalarFieldEnum[]
 }
 
 /**
@@ -10064,6 +14339,54 @@ export type Patient$clinicalNotesArgs<ExtArgs extends runtime.Types.Extensions.I
   take?: number
   skip?: number
   distinct?: Prisma.ClinicalNoteScalarFieldEnum | Prisma.ClinicalNoteScalarFieldEnum[]
+}
+
+/**
+ * Patient.registrationRequests
+ */
+export type Patient$registrationRequestsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the RegistrationRequest
+   */
+  select?: Prisma.RegistrationRequestSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the RegistrationRequest
+   */
+  omit?: Prisma.RegistrationRequestOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.RegistrationRequestInclude<ExtArgs> | null
+  where?: Prisma.RegistrationRequestWhereInput
+  orderBy?: Prisma.RegistrationRequestOrderByWithRelationInput | Prisma.RegistrationRequestOrderByWithRelationInput[]
+  cursor?: Prisma.RegistrationRequestWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.RegistrationRequestScalarFieldEnum | Prisma.RegistrationRequestScalarFieldEnum[]
+}
+
+/**
+ * Patient.patientDocuments
+ */
+export type Patient$patientDocumentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PatientDocument
+   */
+  select?: Prisma.PatientDocumentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PatientDocument
+   */
+  omit?: Prisma.PatientDocumentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PatientDocumentInclude<ExtArgs> | null
+  where?: Prisma.PatientDocumentWhereInput
+  orderBy?: Prisma.PatientDocumentOrderByWithRelationInput | Prisma.PatientDocumentOrderByWithRelationInput[]
+  cursor?: Prisma.PatientDocumentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PatientDocumentScalarFieldEnum | Prisma.PatientDocumentScalarFieldEnum[]
 }
 
 /**

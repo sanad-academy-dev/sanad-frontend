@@ -35,9 +35,10 @@ export interface AssignStudentDialogProps {
 	title?: string;
 }
 
-type FilterKey = "all" | "assigned" | "unassigned" | "other";
+type FilterKey = "same_stage" | "all" | "assigned" | "unassigned" | "other";
 
 const FILTER_LABELS: Record<FilterKey, string> = {
+	same_stage: "طلاب نفس المرحلة الدراسية",
 	all: "كل الطلاب",
 	assigned: "المسجلون في هذا الفصل",
 	unassigned: "بدون أي فصول",
@@ -64,9 +65,11 @@ export function AssignStudentDialog({
 	const { classrooms } = useClassrooms();
 	const { mutate: assignStudents, isPending } = useAssignClassroomStudents();
 
+	const classroomStage = classroom?.academicStage || classroom?.classification;
+
 	const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([]);
 	const [search, setSearch] = useState("");
-	const [filter, setFilter] = useState<FilterKey>("all");
+	const [filter, setFilter] = useState<FilterKey>(classroomStage ? "same_stage" : "all");
 	const [isExpanded, setIsExpanded] = useState(false);
 	const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
@@ -94,7 +97,7 @@ export function AssignStudentDialog({
 		});
 	}, [patients, selectedStudentIds, classroom]);
 
-	// مزامنة الطلاب المحددين عند فتح الشيت
+	// مزامنة الطلاب المحددين عند فتح الشيت مع جعل الفلتر الافتراضي طلاب نفس المرحلة
 	useEffect(() => {
 		if (open) {
 			if (initialSelectedStudentIds !== undefined) {
@@ -105,7 +108,8 @@ export function AssignStudentDialog({
 				setSelectedStudentIds([]);
 			}
 			setSearch("");
-			setFilter("all");
+			const stage = classroom?.academicStage || classroom?.classification;
+			setFilter(stage ? "same_stage" : "all");
 			setConfirmModalOpen(false);
 		}
 	}, [open, classroom, initialSelectedStudentIds]);
@@ -136,9 +140,65 @@ export function AssignStudentDialog({
 		return map;
 	}, [classrooms, classroom, patients]);
 
+	// مفاتيح الفلاتر المتاحة للفصل
+	const availableFilterKeys = useMemo<FilterKey[]>(() => {
+		const stage = classroom?.academicStage || classroom?.classification;
+		if (stage) {
+			return ["same_stage", "all", "unassigned", "assigned", "other"];
+		}
+		return ["all", "unassigned", "assigned", "other"];
+	}, [classroom]);
+
+	// حساب أعداد الطلاب لكل خيار من خيارات الفلتر
+	const filterCounts = useMemo(() => {
+		const stage = classroom?.academicStage || classroom?.classification;
+		const normalize = (v?: string | null) =>
+			(v || "")
+				.trim()
+				.toLowerCase()
+				.replace(/^(المرحلة|مرحلة)\s+/, "");
+
+		let sameStageCount = 0;
+		let assignedCount = 0;
+		let unassignedCount = 0;
+		let otherCount = 0;
+
+		for (const p of patients) {
+			const assignedInfo = studentClassroomMap.get(p.id);
+			const isAssignedHere = selectedStudentIds.includes(p.id);
+			const hasNoClasses = !assignedInfo;
+
+			if (isAssignedHere) assignedCount++;
+			if (hasNoClasses && !isAssignedHere) unassignedCount++;
+			if (!hasNoClasses && !isAssignedHere) otherCount++;
+
+			if (stage) {
+				const matches =
+					normalize(p.academicStage) === normalize(stage) ||
+					p.academicStage?.trim() === stage.trim() ||
+					isAssignedHere;
+				if (matches) sameStageCount++;
+			}
+		}
+
+		return {
+			same_stage: sameStageCount,
+			all: patients.length,
+			assigned: assignedCount,
+			unassigned: unassignedCount,
+			other: otherCount,
+		};
+	}, [patients, studentClassroomMap, selectedStudentIds, classroom]);
+
 	// تصفية الطلاب بناءً على البحث والفلتر
 	const filteredStudents = useMemo(() => {
 		const q = search.trim().toLowerCase();
+		const stage = classroom?.academicStage || classroom?.classification;
+		const normalize = (v?: string | null) =>
+			(v || "")
+				.trim()
+				.toLowerCase()
+				.replace(/^(المرحلة|مرحلة)\s+/, "");
 
 		return patients.filter((p) => {
 			if (q) {
@@ -156,23 +216,30 @@ export function AssignStudentDialog({
 			const isAssignedHere = selectedStudentIds.includes(p.id);
 			const hasNoClasses = !assignedInfo;
 
-			// التحقق من توافق المرحلة الدراسية مع الفصل الدراسي
-			if (classroom) {
-				const classroomStage = classroom.academicStage || classroom.classification;
-				if (classroomStage) {
-					const normalizeStage = (value?: string | null) => value?.trim().toLocaleLowerCase() || "";
-					const matchesStage = normalizeStage(p.academicStage) === normalizeStage(classroomStage);
-					// نسمح للطالب المسجل بالفعل في هذا الفصل بالظهور، بينما الطلاب الآخرين يجب مطابقتهم للمرحلة الدراسية
+			// 1. خيار "طلاب نفس المرحلة الدراسية": الفلتر الافتراضي عند فتح الشيت
+			if (filter === "same_stage") {
+				if (stage) {
+					const matchesStage =
+						normalize(p.academicStage) === normalize(stage) ||
+						p.academicStage?.trim() === stage.trim();
+					// نسمح للطالب المسجل بالفعل في هذا الفصل بالظهور دائماً حتى لو كانت مرحلته غير متطابقة
 					if (!matchesStage && !isAssignedHere) {
 						return false;
 					}
 				}
+				return true;
 			}
 
+			// 2. خيار "المسجلون في هذا الفصل"
 			if (filter === "assigned") return isAssignedHere;
+
+			// 3. خيار "بدون أي فصول"
 			if (filter === "unassigned") return hasNoClasses && !isAssignedHere;
+
+			// 4. خيار "مسجلين في فصول أخرى"
 			if (filter === "other") return !hasNoClasses && !isAssignedHere;
 
+			// 5. خيار "كل الطلاب" (all): يظهر كافة الطلاب دون أي تصفية على المرحلة الدراسية
 			return true;
 		});
 	}, [patients, search, filter, studentClassroomMap, selectedStudentIds, classroom]);
@@ -326,25 +393,50 @@ export function AssignStudentDialog({
 							<DropdownMenuTrigger asChild>
 								<button
 									type="button"
-									className="flex h-[27px] shrink-0 items-center gap-1.5 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white px-2 text-[11px] font-medium text-[#08090A] cursor-pointer dark:border-border dark:bg-background dark:text-foreground hover:bg-muted/50"
+									className={cn(
+										"flex h-[27px] shrink-0 items-center gap-1.5 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white px-2 text-[11px] font-medium text-[#08090A] cursor-pointer dark:border-border dark:bg-background dark:text-foreground hover:bg-muted/50 transition-colors",
+										filter === "same_stage" &&
+											"border-emerald-300 bg-emerald-50/60 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 font-semibold",
+									)}
 								>
-									{FILTER_LABELS[filter]}
+									<span>{FILTER_LABELS[filter]}</span>
 									<IconChevronDown className="size-2.5 text-[#9B9B9D]" />
 								</button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent
 								align="end"
-								className="min-w-[130px] p-[3px]"
+								className="min-w-[170px] p-[3px] rounded-md shadow-md border border-border"
 							>
-								{(Object.keys(FILTER_LABELS) as FilterKey[]).map((key) => (
-									<DropdownMenuItem
-										key={key}
-										onSelect={() => setFilter(key)}
-										className="h-6 justify-start rounded-[4px] px-2 text-[11px] cursor-pointer"
-									>
-										{FILTER_LABELS[key]}
-									</DropdownMenuItem>
-								))}
+								{availableFilterKeys.map((key) => {
+									const isCurrent = filter === key;
+									return (
+										<DropdownMenuItem
+											key={key}
+											onSelect={() => setFilter(key)}
+											className={cn(
+												"h-7 justify-between rounded px-2 text-[11px] cursor-pointer flex items-center gap-2",
+												isCurrent &&
+													(key === "same_stage"
+														? "font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40"
+														: "font-bold text-foreground bg-muted"),
+											)}
+										>
+											<span className="truncate">{FILTER_LABELS[key]}</span>
+											<span
+												className={cn(
+													"text-[10px] tabular-nums font-medium px-1.5 py-0.2 rounded-full shrink-0",
+													isCurrent
+														? key === "same_stage"
+															? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/60 dark:text-emerald-200"
+															: "bg-muted-foreground/15 text-foreground"
+														: "text-muted-foreground bg-muted/60",
+												)}
+											>
+												{filterCounts[key]}
+											</span>
+										</DropdownMenuItem>
+									);
+								})}
 							</DropdownMenuContent>
 						</DropdownMenu>
 					</div>
@@ -376,9 +468,9 @@ export function AssignStudentDialog({
 							</div>
 						) : filteredStudents.length === 0 ? (
 							<div className="py-12 text-center text-xs text-muted-foreground">
-								{(classroom?.academicStage || classroom?.classification)
-									? `لا يوجد طلاب مطابقون للمرحلة الدراسية لهذا الفصل (${classroom.academicStage || classroom.classification})`
-									: "لا يوجد طلاب مطابقون للبحث"}
+								{filter === "same_stage" && classroomStage
+									? `لا يوجد طلاب مطابقون للمرحلة الدراسية لهذا الفصل (${classroomStage})`
+									: "لا يوجد طلاب مطابقون للبحث أو الفلتر المحدد"}
 							</div>
 						) : (
 							filteredStudents.map((p) => {

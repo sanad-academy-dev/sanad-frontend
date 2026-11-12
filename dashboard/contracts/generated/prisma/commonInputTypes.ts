@@ -5644,6 +5644,74 @@ export type EnumLoyaltyLedgerSourceTypeWithAggregatesFilter<$PrismaModel = never
   _max?: Prisma.NestedEnumLoyaltyLedgerSourceTypeFilter<$PrismaModel>
 }
 
+export type EnumRegistrationCampaignStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationCampaignStatus | Prisma.EnumRegistrationCampaignStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationCampaignStatus[] | Prisma.ListEnumRegistrationCampaignStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationCampaignStatus[] | Prisma.ListEnumRegistrationCampaignStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationCampaignStatusFilter<$PrismaModel> | $Enums.RegistrationCampaignStatus
+}
+
+export type EnumRegistrationCampaignStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationCampaignStatus | Prisma.EnumRegistrationCampaignStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationCampaignStatus[] | Prisma.ListEnumRegistrationCampaignStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationCampaignStatus[] | Prisma.ListEnumRegistrationCampaignStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationCampaignStatusWithAggregatesFilter<$PrismaModel> | $Enums.RegistrationCampaignStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRegistrationCampaignStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRegistrationCampaignStatusFilter<$PrismaModel>
+}
+
+export type EnumRegistrationRequestStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationRequestStatus | Prisma.EnumRegistrationRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationRequestStatus[] | Prisma.ListEnumRegistrationRequestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationRequestStatus[] | Prisma.ListEnumRegistrationRequestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationRequestStatusFilter<$PrismaModel> | $Enums.RegistrationRequestStatus
+}
+
+export type EnumRegistrationSourceFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationSource | Prisma.EnumRegistrationSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationSource[] | Prisma.ListEnumRegistrationSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationSource[] | Prisma.ListEnumRegistrationSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationSourceFilter<$PrismaModel> | $Enums.RegistrationSource
+}
+
+export type EnumRegistrationRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationRequestStatus | Prisma.EnumRegistrationRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationRequestStatus[] | Prisma.ListEnumRegistrationRequestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationRequestStatus[] | Prisma.ListEnumRegistrationRequestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.RegistrationRequestStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRegistrationRequestStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRegistrationRequestStatusFilter<$PrismaModel>
+}
+
+export type EnumRegistrationSourceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationSource | Prisma.EnumRegistrationSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationSource[] | Prisma.ListEnumRegistrationSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationSource[] | Prisma.ListEnumRegistrationSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationSourceWithAggregatesFilter<$PrismaModel> | $Enums.RegistrationSource
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRegistrationSourceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRegistrationSourceFilter<$PrismaModel>
+}
+
+export type EnumRegistrationDocumentTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationDocumentType | Prisma.EnumRegistrationDocumentTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationDocumentType[] | Prisma.ListEnumRegistrationDocumentTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationDocumentType[] | Prisma.ListEnumRegistrationDocumentTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationDocumentTypeFilter<$PrismaModel> | $Enums.RegistrationDocumentType
+}
+
+export type EnumRegistrationDocumentTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationDocumentType | Prisma.EnumRegistrationDocumentTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationDocumentType[] | Prisma.ListEnumRegistrationDocumentTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationDocumentType[] | Prisma.ListEnumRegistrationDocumentTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationDocumentTypeWithAggregatesFilter<$PrismaModel> | $Enums.RegistrationDocumentType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRegistrationDocumentTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRegistrationDocumentTypeFilter<$PrismaModel>
+}
+
 export type NestedStringFilter<$PrismaModel = never> = {
   equals?: string | Prisma.StringFieldRefInput<$PrismaModel>
   in?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
@@ -11209,6 +11277,74 @@ export type NestedEnumLoyaltyLedgerSourceTypeWithAggregatesFilter<$PrismaModel =
   _count?: Prisma.NestedIntFilter<$PrismaModel>
   _min?: Prisma.NestedEnumLoyaltyLedgerSourceTypeFilter<$PrismaModel>
   _max?: Prisma.NestedEnumLoyaltyLedgerSourceTypeFilter<$PrismaModel>
+}
+
+export type NestedEnumRegistrationCampaignStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationCampaignStatus | Prisma.EnumRegistrationCampaignStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationCampaignStatus[] | Prisma.ListEnumRegistrationCampaignStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationCampaignStatus[] | Prisma.ListEnumRegistrationCampaignStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationCampaignStatusFilter<$PrismaModel> | $Enums.RegistrationCampaignStatus
+}
+
+export type NestedEnumRegistrationCampaignStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationCampaignStatus | Prisma.EnumRegistrationCampaignStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationCampaignStatus[] | Prisma.ListEnumRegistrationCampaignStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationCampaignStatus[] | Prisma.ListEnumRegistrationCampaignStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationCampaignStatusWithAggregatesFilter<$PrismaModel> | $Enums.RegistrationCampaignStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRegistrationCampaignStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRegistrationCampaignStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumRegistrationRequestStatusFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationRequestStatus | Prisma.EnumRegistrationRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationRequestStatus[] | Prisma.ListEnumRegistrationRequestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationRequestStatus[] | Prisma.ListEnumRegistrationRequestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationRequestStatusFilter<$PrismaModel> | $Enums.RegistrationRequestStatus
+}
+
+export type NestedEnumRegistrationSourceFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationSource | Prisma.EnumRegistrationSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationSource[] | Prisma.ListEnumRegistrationSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationSource[] | Prisma.ListEnumRegistrationSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationSourceFilter<$PrismaModel> | $Enums.RegistrationSource
+}
+
+export type NestedEnumRegistrationRequestStatusWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationRequestStatus | Prisma.EnumRegistrationRequestStatusFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationRequestStatus[] | Prisma.ListEnumRegistrationRequestStatusFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationRequestStatus[] | Prisma.ListEnumRegistrationRequestStatusFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationRequestStatusWithAggregatesFilter<$PrismaModel> | $Enums.RegistrationRequestStatus
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRegistrationRequestStatusFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRegistrationRequestStatusFilter<$PrismaModel>
+}
+
+export type NestedEnumRegistrationSourceWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationSource | Prisma.EnumRegistrationSourceFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationSource[] | Prisma.ListEnumRegistrationSourceFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationSource[] | Prisma.ListEnumRegistrationSourceFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationSourceWithAggregatesFilter<$PrismaModel> | $Enums.RegistrationSource
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRegistrationSourceFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRegistrationSourceFilter<$PrismaModel>
+}
+
+export type NestedEnumRegistrationDocumentTypeFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationDocumentType | Prisma.EnumRegistrationDocumentTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationDocumentType[] | Prisma.ListEnumRegistrationDocumentTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationDocumentType[] | Prisma.ListEnumRegistrationDocumentTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationDocumentTypeFilter<$PrismaModel> | $Enums.RegistrationDocumentType
+}
+
+export type NestedEnumRegistrationDocumentTypeWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.RegistrationDocumentType | Prisma.EnumRegistrationDocumentTypeFieldRefInput<$PrismaModel>
+  in?: $Enums.RegistrationDocumentType[] | Prisma.ListEnumRegistrationDocumentTypeFieldRefInput<$PrismaModel>
+  notIn?: $Enums.RegistrationDocumentType[] | Prisma.ListEnumRegistrationDocumentTypeFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumRegistrationDocumentTypeWithAggregatesFilter<$PrismaModel> | $Enums.RegistrationDocumentType
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumRegistrationDocumentTypeFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumRegistrationDocumentTypeFilter<$PrismaModel>
 }
 
 

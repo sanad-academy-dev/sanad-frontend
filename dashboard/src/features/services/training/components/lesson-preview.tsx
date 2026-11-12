@@ -1,3 +1,4 @@
+import { parseQuizContent } from "@sanad/contracts/runtime/server/training/training.type";
 import {
 	IconAlignRight,
 	IconCheckbox,
@@ -5,18 +6,23 @@ import {
 	IconExternalLink,
 	IconFileCheck,
 	IconFileDiff,
+	IconFileText,
 	IconMicrophone,
 	IconVideoPlus,
 } from "@tabler/icons-react";
 import type { ReactNode } from "react";
-
 import { getFileUrl } from "@/lib/file-url";
 import { cn } from "@/lib/utils";
-import type { LessonResponse, LessonType } from "@/server/training/training.type";
-import { parseQuizContent } from "@sanad/contracts/runtime/server/training/training.type";
+import type {
+	LessonContentItem,
+	LessonResponse,
+	LessonType,
+} from "@/server/training/training.type";
+import { CoursePageContent } from "./course-page-content";
 
 const TYPE_META: Record<LessonType, { label: string; Icon: typeof IconAlignRight }> = {
 	TEXT: { label: "نص", Icon: IconAlignRight },
+	PAGE: { label: "صفحة", Icon: IconFileText },
 	VIDEO: { label: "فيديو", Icon: IconVideoPlus },
 	DOCUMENT: { label: "مستند", Icon: IconFileDiff },
 	QUIZ: { label: "تقييم", Icon: IconFileCheck },
@@ -107,20 +113,41 @@ function Missing({ text }: { text: string }) {
 }
 
 // جسم المعاينة حسب نوع الدرس — كما سيراه الموظف قبل النشر
-function LessonBody({ lesson }: { lesson: LessonResponse }) {
+function SingleLessonBody({
+	lesson,
+	preferredPageId,
+}: {
+	lesson: LessonResponse;
+	preferredPageId?: string | null;
+}) {
 	const href = mediaHref(lesson);
 	const sourceLabel =
 		lesson.mediaSource === "URL" ? (lesson.mediaUrl ?? "") : fileName(lesson.mediaKey);
 
-	if (lesson.type === "TEXT") {
-		return lesson.content?.trim() ? (
-			<div className="rounded-lg border border-border bg-background px-3 py-2.5">
-				<p className="whitespace-pre-wrap text-[12px] leading-6 text-foreground/80">
-					{lesson.content}
-				</p>
+	if (lesson.type === "TEXT" || lesson.type === "PAGE") {
+		const trimmed = lesson.content?.trim() ?? "";
+		if (!trimmed) {
+			return (
+				<Missing
+					text={lesson.type === "PAGE" ? "لا يوجد محتوى للصفحة بعد." : "لا يوجد نصّ للدرس بعد."}
+				/>
+			);
+		}
+		const isRichBlocks =
+			lesson.type === "PAGE" ||
+			trimmed.startsWith('{"version":1,"pages":') ||
+			trimmed.startsWith("[");
+		return (
+			<div className="rounded-lg border border-border bg-background px-3 py-2.5 text-[12px] leading-6 text-foreground/85">
+				{isRichBlocks ? (
+					<CoursePageContent
+						content={trimmed}
+						preferredPageId={preferredPageId}
+					/>
+				) : (
+					<p className="whitespace-pre-wrap">{trimmed}</p>
+				)}
 			</div>
-		) : (
-			<Missing text="لا يوجد نصّ للدرس بعد." />
 		);
 	}
 
@@ -257,8 +284,73 @@ function LessonBody({ lesson }: { lesson: LessonResponse }) {
 	);
 }
 
+export function LessonContentsPreview({
+	lesson,
+	preferredPageId,
+}: {
+	lesson: LessonResponse;
+	preferredPageId?: string | null;
+}) {
+	const contents = lesson.contents;
+	if (!contents?.length) {
+		return (
+			<SingleLessonBody
+				lesson={lesson}
+				preferredPageId={preferredPageId}
+			/>
+		);
+	}
+
+	return (
+		<div className="flex flex-col gap-2.5">
+			{contents.map((content, index) => {
+				const resource = {
+					...lesson,
+					...content,
+					id: content.id,
+					title: content.title || `محتوى ${index + 1}`,
+				} as LessonResponse & LessonContentItem;
+				const { Icon } = TYPE_META[content.type] ?? TYPE_META.TEXT;
+				return (
+					<article
+						key={content.id}
+						className="rounded-md border border-[#E5E5E5] bg-white p-2.5"
+					>
+						<div className="mb-2 flex items-center gap-2">
+							<Icon className="size-3.5 shrink-0 text-primary" />
+							<span className="flex-1 truncate text-[11px] font-semibold text-foreground">
+								{content.title || `محتوى ${index + 1}`}
+							</span>
+							<span className="shrink-0 text-[9px] text-muted-foreground">
+								{TYPE_META[content.type]?.label ?? "محتوى"}
+							</span>
+						</div>
+						{content.description?.trim() && (
+							<p className="mb-2 text-[10px] leading-5 text-muted-foreground">
+								{content.description}
+							</p>
+						)}
+						<SingleLessonBody
+							lesson={resource}
+							preferredPageId={preferredPageId}
+						/>
+					</article>
+				);
+			})}
+		</div>
+	);
+}
+
 // بطاقة معاينة درس واحد — ترويسة (النوع/العنوان/المدة) + الجسم حسب النوع
-export function LessonPreview({ lesson, index }: { lesson: LessonResponse; index: number }) {
+export function LessonPreview({
+	lesson,
+	index,
+	preferredPageId,
+}: {
+	lesson: LessonResponse;
+	index: number;
+	preferredPageId?: string | null;
+}) {
 	const meta = TYPE_META[lesson.type] ?? TYPE_META.TEXT;
 	const duration = formatDuration(lesson.durationSeconds);
 	const { Icon } = meta;
@@ -293,7 +385,10 @@ export function LessonPreview({ lesson, index }: { lesson: LessonResponse; index
 				<p className="text-[11px] leading-5 text-muted-foreground">{lesson.description}</p>
 			)}
 
-			<LessonBody lesson={lesson} />
+			<LessonContentsPreview
+				lesson={lesson}
+				preferredPageId={preferredPageId}
+			/>
 		</div>
 	);
 }

@@ -124,15 +124,8 @@ export const CostCentersPage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="text-lg font-medium">مراكز التكلفة</h1>
-				<p className="text-sm text-muted-foreground">
-					الفروع والأقسام كأبعاد تحليلية على القيود ({costCenters.length}).
-				</p>
-			</div>
-
 			<Stats
-				className="px-4 grid-cols-4"
+				className="px-4 pt-2.5 pb-1 grid-cols-4"
 				stats={stats}
 			/>
 

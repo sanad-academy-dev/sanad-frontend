@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { lazy, Suspense, useEffect } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { useI18n } from "@/hooks/use-i18n";
 import { getDirection } from "@/lib/i18n";
 import appCss from "@/styles.css?url";
@@ -106,7 +107,9 @@ function RootDocument({ children }: { children: ReactNode }) {
 				<HeadContent />
 			</head>
 			<body suppressHydrationWarning>
-				{children}
+				<TooltipProvider delayDuration={200}>
+					{children}
+				</TooltipProvider>
 				{Devtools ? (
 					<Suspense fallback={null}>
 						<Devtools />

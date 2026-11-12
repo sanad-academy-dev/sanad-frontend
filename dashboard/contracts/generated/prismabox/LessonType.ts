@@ -7,6 +7,7 @@ import { __nullable__ } from "./__nullable__";
 export const LessonType = t.Union(
   [
     t.Literal("TEXT"),
+    t.Literal("PAGE"),
     t.Literal("VIDEO"),
     t.Literal("DOCUMENT"),
     t.Literal("QUIZ"),

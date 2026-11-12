@@ -1,5 +1,10 @@
 import { IconInfoCircle } from "@tabler/icons-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 import type { StatItem } from "@/features/dashboard/types/dashboard.types";
 import { cn } from "@/lib/utils";
 
@@ -7,19 +12,26 @@ type StatsVariant = "default" | "inventory" | "compact";
 
 // تلميح موحّد لكل بطاقات الإحصائيات: أيقونة InfoCircle + محتوى أكبر قليلًا.
 // مصدر واحد يضمن تطابق التلميحات في كل مكان بالتطبيق.
-function StatTooltip({ tooltip }: { tooltip: string }) {
+function StatTooltip({ tooltip }: { tooltip?: string }) {
+	if (!tooltip) return null;
 	return (
-		<Tooltip>
-			<TooltipTrigger>
-				<IconInfoCircle
-					className="size-4 text-[#08090A]"
-					stroke={1.5}
-				/>
-			</TooltipTrigger>
-			<TooltipContent className="max-w-[300px] px-4 py-2.5 text-sm leading-relaxed">
-				<p>{tooltip}</p>
-			</TooltipContent>
-		</Tooltip>
+		<TooltipProvider delayDuration={200}>
+			<Tooltip>
+				<TooltipTrigger
+					type="button"
+					className="inline-flex cursor-help items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+					aria-label="معلومات"
+				>
+					<IconInfoCircle
+						className="size-4 text-[#08090A]"
+						stroke={1.5}
+					/>
+				</TooltipTrigger>
+				<TooltipContent className="max-w-[300px] px-4 py-2.5 text-sm leading-relaxed">
+					<p>{tooltip}</p>
+				</TooltipContent>
+			</Tooltip>
+		</TooltipProvider>
 	);
 }
 
@@ -32,6 +44,7 @@ export function Stats({
 	stats: StatItem[];
 	variant?: StatsVariant;
 }) {
+	if (!stats || stats.length === 0) return null;
 	return (
 		<div
 			// حشوة رأسية موحّدة ومتساوية (أعلى=أسفل) لصف بطاقات الإحصائيات في كل النظام

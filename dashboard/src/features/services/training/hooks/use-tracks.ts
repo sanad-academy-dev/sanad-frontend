@@ -1,7 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { toast } from "sonner";
 import { backendFetch } from "@/lib/backend-fetch";
 import type { TrackRow } from "../components/tracks-view";
+
+const EMPTY_TRACKS: TrackRow[] = [];
+const DEFAULT_TRACK_STATS: TrackStats = {
+	totalTracks: 0,
+	totalStudents: 0,
+	pendingTracks: 0,
+	completedTracks: 0,
+	totalRevenue: 0,
+};
 
 export interface TrackStats {
 	totalTracks: number;
@@ -63,7 +73,10 @@ export const useTracks = (
 		staleTime: 1000 * 60 * 2,
 	});
 
-	const tracks = Array.isArray(data) ? data : (data?.items ?? []);
+	const tracks = useMemo(
+		() => (Array.isArray(data) ? data : (data?.items ?? EMPTY_TRACKS)),
+		[data],
+	);
 
 	return {
 		tracks,
@@ -88,13 +101,7 @@ export const useTrackStats = () => {
 	});
 
 	return {
-		stats: data ?? {
-			totalTracks: 0,
-			totalStudents: 0,
-			pendingTracks: 0,
-			completedTracks: 0,
-			totalRevenue: 0,
-		},
+		stats: data ?? DEFAULT_TRACK_STATS,
 		isLoading,
 		refetch,
 	};

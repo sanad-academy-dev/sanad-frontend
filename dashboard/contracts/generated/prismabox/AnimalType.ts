@@ -109,38 +109,6 @@ export const AnimalTypeRelations = t.Object(
       ),
       { additionalProperties: false },
     ),
-    patients: t.Array(
-      t.Object(
-        {
-          id: t.String(),
-          code: t.String(),
-          clinicId: t.String(),
-          ownerId: __nullable__(t.String()),
-          name: t.String(),
-          nameNormalized: t.String(),
-          gender: t.Union(
-            [t.Literal("MALE"), t.Literal("FEMALE"), t.Literal("UNKNOWN")],
-            { additionalProperties: false },
-          ),
-          animalTypeId: t.String(),
-          animalStrainId: __nullable__(t.String()),
-          age: __nullable__(t.Number()),
-          birthDate: __nullable__(t.Date()),
-          weight: __nullable__(t.Number()),
-          microchipNumber: __nullable__(t.String()),
-          coat: __nullable__(t.String()),
-          notes: __nullable__(t.String()),
-          active: t.Boolean(),
-          isDeleted: t.Boolean(),
-          deletedAt: __nullable__(t.Date()),
-          editsCount: t.Integer(),
-          createdAt: t.Date(),
-          updatedAt: t.Date(),
-        },
-        { additionalProperties: false },
-      ),
-      { additionalProperties: false },
-    ),
     carePlans: t.Array(
       t.Object(
         {
@@ -461,22 +429,6 @@ export const AnimalTypeRelationsInputCreate = t.Object(
         { additionalProperties: false },
       ),
     ),
-    patients: t.Optional(
-      t.Object(
-        {
-          connect: t.Array(
-            t.Object(
-              {
-                id: t.String({ additionalProperties: false }),
-              },
-              { additionalProperties: false },
-            ),
-            { additionalProperties: false },
-          ),
-        },
-        { additionalProperties: false },
-      ),
-    ),
     carePlans: t.Optional(
       t.Object(
         {
@@ -579,31 +531,6 @@ export const AnimalTypeRelationsInputUpdate = t.Partial(
         ),
       ),
       strains: t.Partial(
-        t.Object(
-          {
-            connect: t.Array(
-              t.Object(
-                {
-                  id: t.String({ additionalProperties: false }),
-                },
-                { additionalProperties: false },
-              ),
-              { additionalProperties: false },
-            ),
-            disconnect: t.Array(
-              t.Object(
-                {
-                  id: t.String({ additionalProperties: false }),
-                },
-                { additionalProperties: false },
-              ),
-              { additionalProperties: false },
-            ),
-          },
-          { additionalProperties: false },
-        ),
-      ),
-      patients: t.Partial(
         t.Object(
           {
             connect: t.Array(
@@ -876,7 +803,6 @@ export const AnimalTypeSelect = t.Partial(
       species: t.Boolean(),
       clinic: t.Boolean(),
       strains: t.Boolean(),
-      patients: t.Boolean(),
       carePlans: t.Boolean(),
       vaccinationProtocols: t.Boolean(),
       groomingPriceRules: t.Boolean(),
@@ -894,7 +820,6 @@ export const AnimalTypeInclude = t.Partial(
       species: t.Boolean(),
       clinic: t.Boolean(),
       strains: t.Boolean(),
-      patients: t.Boolean(),
       carePlans: t.Boolean(),
       vaccinationProtocols: t.Boolean(),
       groomingPriceRules: t.Boolean(),

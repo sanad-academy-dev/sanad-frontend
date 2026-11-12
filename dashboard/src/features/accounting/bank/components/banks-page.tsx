@@ -109,16 +109,8 @@ export const BanksPage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">البنوك والحسابات البنكية</h1>
-				<p className="text-muted-foreground text-sm">
-					§14 — البنوك وحساباتها؛ حساب الشركة يرتبط بحساب دفتر أستاذ من نوع «بنك» وهو مرساة
-					التسوية والمقاصة.
-				</p>
-			</div>
-
 			<Stats
-				className="px-4 grid-cols-4"
+				className="px-4 pt-2.5 pb-1 grid-cols-4"
 				stats={stats}
 			/>
 

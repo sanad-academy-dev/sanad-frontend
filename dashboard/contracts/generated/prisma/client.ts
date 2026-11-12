@@ -691,6 +691,56 @@ export type Owner = Prisma.OwnerModel
  */
 export type Patient = Prisma.PatientModel
 /**
+ * Model PatientGuardian
+ * 
+ */
+export type PatientGuardian = Prisma.PatientGuardianModel
+/**
+ * Model Classroom
+ * 
+ */
+export type Classroom = Prisma.ClassroomModel
+/**
+ * Model ClassroomStudent
+ * 
+ */
+export type ClassroomStudent = Prisma.ClassroomStudentModel
+/**
+ * Model ClassroomStaff
+ * 
+ */
+export type ClassroomStaff = Prisma.ClassroomStaffModel
+/**
+ * Model ClassroomClassification
+ * 
+ */
+export type ClassroomClassification = Prisma.ClassroomClassificationModel
+/**
+ * Model AcademicStage
+ * 
+ */
+export type AcademicStage = Prisma.AcademicStageModel
+/**
+ * Model TrackClassification
+ * 
+ */
+export type TrackClassification = Prisma.TrackClassificationModel
+/**
+ * Model Track
+ * 
+ */
+export type Track = Prisma.TrackModel
+/**
+ * Model TrackStudent
+ * 
+ */
+export type TrackStudent = Prisma.TrackStudentModel
+/**
+ * Model TrackStaff
+ * 
+ */
+export type TrackStaff = Prisma.TrackStaffModel
+/**
  * Model PatientActivity
  * 
  */
@@ -2246,3 +2296,38 @@ export type LoyaltyRedemption = Prisma.LoyaltyRedemptionModel
  * كاملة. و`expiresAtSnapshot` محفوظٌ هنا ليُحسم شرطُ «غير المنتهية» بلا قراءة ثانية.
  */
 export type LoyaltyRedemptionAllocation = Prisma.LoyaltyRedemptionAllocationModel
+/**
+ * Model RegistrationCampaign
+ * 
+ */
+export type RegistrationCampaign = Prisma.RegistrationCampaignModel
+/**
+ * Model RegistrationCollaborator
+ * 
+ */
+export type RegistrationCollaborator = Prisma.RegistrationCollaboratorModel
+/**
+ * Model RegistrationRequest
+ * 
+ */
+export type RegistrationRequest = Prisma.RegistrationRequestModel
+/**
+ * Model RegistrationDocument
+ * 
+ */
+export type RegistrationDocument = Prisma.RegistrationDocumentModel
+/**
+ * Model PatientDocument
+ * 
+ */
+export type PatientDocument = Prisma.PatientDocumentModel
+/**
+ * Model RegistrationComment
+ * 
+ */
+export type RegistrationComment = Prisma.RegistrationCommentModel
+/**
+ * Model RegistrationTimelineStep
+ * 
+ */
+export type RegistrationTimelineStep = Prisma.RegistrationTimelineStepModel

@@ -126,14 +126,6 @@ export const BankRulesPage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">قواعد البنك</h1>
-				<p className="text-muted-foreground text-sm">
-					FR-14.3 — قواعد مرتّبة بالأولوية تصنّف حركات كشف الحساب تلقائيًا: أول قاعدة مطابقة تُنشئ
-					قيد اليومية على حسابها المقابل وتقفل الحركة.
-				</p>
-			</div>
-
 			{/* the §19 engine flag — while OFF the sweep refuses to run, so banner it here
 			    (same master-switch row pattern as the dimensions tab; tokens only) */}
 			{!settingsLoading && !rulesEnabled ? (

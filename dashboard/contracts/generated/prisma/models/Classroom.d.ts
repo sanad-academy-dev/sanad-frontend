@@ -1,0 +1,1963 @@
+import type * as runtime from "@prisma/client/runtime/client";
+import type * as Prisma from "../internal/prismaNamespace";
+/**
+ * Model Classroom
+ *
+ */
+export type ClassroomModel = runtime.Types.Result.DefaultSelection<Prisma.$ClassroomPayload>;
+export type AggregateClassroom = {
+    _count: ClassroomCountAggregateOutputType | null;
+    _avg: ClassroomAvgAggregateOutputType | null;
+    _sum: ClassroomSumAggregateOutputType | null;
+    _min: ClassroomMinAggregateOutputType | null;
+    _max: ClassroomMaxAggregateOutputType | null;
+};
+export type ClassroomAvgAggregateOutputType = {
+    capacity: number | null;
+    enrolledCount: number | null;
+};
+export type ClassroomSumAggregateOutputType = {
+    capacity: number | null;
+    enrolledCount: number | null;
+};
+export type ClassroomMinAggregateOutputType = {
+    id: string | null;
+    code: string | null;
+    clinicId: string | null;
+    name: string | null;
+    ageGroup: string | null;
+    academicStage: string | null;
+    category: string | null;
+    classification: string | null;
+    learningMode: string | null;
+    capacity: number | null;
+    enrolledCount: number | null;
+    active: boolean | null;
+    notes: string | null;
+    isDeleted: boolean | null;
+    deletedAt: Date | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+};
+export type ClassroomMaxAggregateOutputType = {
+    id: string | null;
+    code: string | null;
+    clinicId: string | null;
+    name: string | null;
+    ageGroup: string | null;
+    academicStage: string | null;
+    category: string | null;
+    classification: string | null;
+    learningMode: string | null;
+    capacity: number | null;
+    enrolledCount: number | null;
+    active: boolean | null;
+    notes: string | null;
+    isDeleted: boolean | null;
+    deletedAt: Date | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
+};
+export type ClassroomCountAggregateOutputType = {
+    id: number;
+    code: number;
+    clinicId: number;
+    name: number;
+    ageGroup: number;
+    academicStage: number;
+    category: number;
+    classification: number;
+    learningMode: number;
+    capacity: number;
+    enrolledCount: number;
+    active: number;
+    notes: number;
+    isDeleted: number;
+    deletedAt: number;
+    createdAt: number;
+    updatedAt: number;
+    _all: number;
+};
+export type ClassroomAvgAggregateInputType = {
+    capacity?: true;
+    enrolledCount?: true;
+};
+export type ClassroomSumAggregateInputType = {
+    capacity?: true;
+    enrolledCount?: true;
+};
+export type ClassroomMinAggregateInputType = {
+    id?: true;
+    code?: true;
+    clinicId?: true;
+    name?: true;
+    ageGroup?: true;
+    academicStage?: true;
+    category?: true;
+    classification?: true;
+    learningMode?: true;
+    capacity?: true;
+    enrolledCount?: true;
+    active?: true;
+    notes?: true;
+    isDeleted?: true;
+    deletedAt?: true;
+    createdAt?: true;
+    updatedAt?: true;
+};
+export type ClassroomMaxAggregateInputType = {
+    id?: true;
+    code?: true;
+    clinicId?: true;
+    name?: true;
+    ageGroup?: true;
+    academicStage?: true;
+    category?: true;
+    classification?: true;
+    learningMode?: true;
+    capacity?: true;
+    enrolledCount?: true;
+    active?: true;
+    notes?: true;
+    isDeleted?: true;
+    deletedAt?: true;
+    createdAt?: true;
+    updatedAt?: true;
+};
+export type ClassroomCountAggregateInputType = {
+    id?: true;
+    code?: true;
+    clinicId?: true;
+    name?: true;
+    ageGroup?: true;
+    academicStage?: true;
+    category?: true;
+    classification?: true;
+    learningMode?: true;
+    capacity?: true;
+    enrolledCount?: true;
+    active?: true;
+    notes?: true;
+    isDeleted?: true;
+    deletedAt?: true;
+    createdAt?: true;
+    updatedAt?: true;
+    _all?: true;
+};
+export type ClassroomAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which Classroom to aggregate.
+     */
+    where?: Prisma.ClassroomWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Classrooms to fetch.
+     */
+    orderBy?: Prisma.ClassroomOrderByWithRelationInput | Prisma.ClassroomOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the start position
+     */
+    cursor?: Prisma.ClassroomWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Classrooms from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Classrooms.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Count returned Classrooms
+    **/
+    _count?: true | ClassroomCountAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to average
+    **/
+    _avg?: ClassroomAvgAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to sum
+    **/
+    _sum?: ClassroomSumAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the minimum value
+    **/
+    _min?: ClassroomMinAggregateInputType;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     *
+     * Select which fields to find the maximum value
+    **/
+    _max?: ClassroomMaxAggregateInputType;
+};
+export type GetClassroomAggregateType<T extends ClassroomAggregateArgs> = {
+    [P in keyof T & keyof AggregateClassroom]: P extends '_count' | 'count' ? T[P] extends true ? number : Prisma.GetScalarType<T[P], AggregateClassroom[P]> : Prisma.GetScalarType<T[P], AggregateClassroom[P]>;
+};
+export type ClassroomGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.ClassroomWhereInput;
+    orderBy?: Prisma.ClassroomOrderByWithAggregationInput | Prisma.ClassroomOrderByWithAggregationInput[];
+    by: Prisma.ClassroomScalarFieldEnum[] | Prisma.ClassroomScalarFieldEnum;
+    having?: Prisma.ClassroomScalarWhereWithAggregatesInput;
+    take?: number;
+    skip?: number;
+    _count?: ClassroomCountAggregateInputType | true;
+    _avg?: ClassroomAvgAggregateInputType;
+    _sum?: ClassroomSumAggregateInputType;
+    _min?: ClassroomMinAggregateInputType;
+    _max?: ClassroomMaxAggregateInputType;
+};
+export type ClassroomGroupByOutputType = {
+    id: string;
+    code: string;
+    clinicId: string;
+    name: string;
+    ageGroup: string | null;
+    academicStage: string | null;
+    category: string | null;
+    classification: string | null;
+    learningMode: string;
+    capacity: number;
+    enrolledCount: number;
+    active: boolean;
+    notes: string | null;
+    isDeleted: boolean;
+    deletedAt: Date | null;
+    createdAt: Date;
+    updatedAt: Date;
+    _count: ClassroomCountAggregateOutputType | null;
+    _avg: ClassroomAvgAggregateOutputType | null;
+    _sum: ClassroomSumAggregateOutputType | null;
+    _min: ClassroomMinAggregateOutputType | null;
+    _max: ClassroomMaxAggregateOutputType | null;
+};
+export type GetClassroomGroupByPayload<T extends ClassroomGroupByArgs> = Prisma.PrismaPromise<Array<Prisma.PickEnumerable<ClassroomGroupByOutputType, T['by']> & {
+    [P in ((keyof T) & (keyof ClassroomGroupByOutputType))]: P extends '_count' ? T[P] extends boolean ? number : Prisma.GetScalarType<T[P], ClassroomGroupByOutputType[P]> : Prisma.GetScalarType<T[P], ClassroomGroupByOutputType[P]>;
+}>>;
+export type ClassroomWhereInput = {
+    AND?: Prisma.ClassroomWhereInput | Prisma.ClassroomWhereInput[];
+    OR?: Prisma.ClassroomWhereInput[];
+    NOT?: Prisma.ClassroomWhereInput | Prisma.ClassroomWhereInput[];
+    id?: Prisma.StringFilter<"Classroom"> | string;
+    code?: Prisma.StringFilter<"Classroom"> | string;
+    clinicId?: Prisma.StringFilter<"Classroom"> | string;
+    name?: Prisma.StringFilter<"Classroom"> | string;
+    ageGroup?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    academicStage?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    category?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    classification?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    learningMode?: Prisma.StringFilter<"Classroom"> | string;
+    capacity?: Prisma.IntFilter<"Classroom"> | number;
+    enrolledCount?: Prisma.IntFilter<"Classroom"> | number;
+    active?: Prisma.BoolFilter<"Classroom"> | boolean;
+    notes?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    isDeleted?: Prisma.BoolFilter<"Classroom"> | boolean;
+    deletedAt?: Prisma.DateTimeNullableFilter<"Classroom"> | Date | string | null;
+    createdAt?: Prisma.DateTimeFilter<"Classroom"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"Classroom"> | Date | string;
+    clinic?: Prisma.XOR<Prisma.ClinicScalarRelationFilter, Prisma.ClinicWhereInput>;
+    students?: Prisma.ClassroomStudentListRelationFilter;
+    staff?: Prisma.ClassroomStaffListRelationFilter;
+};
+export type ClassroomOrderByWithRelationInput = {
+    id?: Prisma.SortOrder;
+    code?: Prisma.SortOrder;
+    clinicId?: Prisma.SortOrder;
+    name?: Prisma.SortOrder;
+    ageGroup?: Prisma.SortOrderInput | Prisma.SortOrder;
+    academicStage?: Prisma.SortOrderInput | Prisma.SortOrder;
+    category?: Prisma.SortOrderInput | Prisma.SortOrder;
+    classification?: Prisma.SortOrderInput | Prisma.SortOrder;
+    learningMode?: Prisma.SortOrder;
+    capacity?: Prisma.SortOrder;
+    enrolledCount?: Prisma.SortOrder;
+    active?: Prisma.SortOrder;
+    notes?: Prisma.SortOrderInput | Prisma.SortOrder;
+    isDeleted?: Prisma.SortOrder;
+    deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+    clinic?: Prisma.ClinicOrderByWithRelationInput;
+    students?: Prisma.ClassroomStudentOrderByRelationAggregateInput;
+    staff?: Prisma.ClassroomStaffOrderByRelationAggregateInput;
+};
+export type ClassroomWhereUniqueInput = Prisma.AtLeast<{
+    id?: string;
+    AND?: Prisma.ClassroomWhereInput | Prisma.ClassroomWhereInput[];
+    OR?: Prisma.ClassroomWhereInput[];
+    NOT?: Prisma.ClassroomWhereInput | Prisma.ClassroomWhereInput[];
+    code?: Prisma.StringFilter<"Classroom"> | string;
+    clinicId?: Prisma.StringFilter<"Classroom"> | string;
+    name?: Prisma.StringFilter<"Classroom"> | string;
+    ageGroup?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    academicStage?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    category?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    classification?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    learningMode?: Prisma.StringFilter<"Classroom"> | string;
+    capacity?: Prisma.IntFilter<"Classroom"> | number;
+    enrolledCount?: Prisma.IntFilter<"Classroom"> | number;
+    active?: Prisma.BoolFilter<"Classroom"> | boolean;
+    notes?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    isDeleted?: Prisma.BoolFilter<"Classroom"> | boolean;
+    deletedAt?: Prisma.DateTimeNullableFilter<"Classroom"> | Date | string | null;
+    createdAt?: Prisma.DateTimeFilter<"Classroom"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"Classroom"> | Date | string;
+    clinic?: Prisma.XOR<Prisma.ClinicScalarRelationFilter, Prisma.ClinicWhereInput>;
+    students?: Prisma.ClassroomStudentListRelationFilter;
+    staff?: Prisma.ClassroomStaffListRelationFilter;
+}, "id">;
+export type ClassroomOrderByWithAggregationInput = {
+    id?: Prisma.SortOrder;
+    code?: Prisma.SortOrder;
+    clinicId?: Prisma.SortOrder;
+    name?: Prisma.SortOrder;
+    ageGroup?: Prisma.SortOrderInput | Prisma.SortOrder;
+    academicStage?: Prisma.SortOrderInput | Prisma.SortOrder;
+    category?: Prisma.SortOrderInput | Prisma.SortOrder;
+    classification?: Prisma.SortOrderInput | Prisma.SortOrder;
+    learningMode?: Prisma.SortOrder;
+    capacity?: Prisma.SortOrder;
+    enrolledCount?: Prisma.SortOrder;
+    active?: Prisma.SortOrder;
+    notes?: Prisma.SortOrderInput | Prisma.SortOrder;
+    isDeleted?: Prisma.SortOrder;
+    deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+    _count?: Prisma.ClassroomCountOrderByAggregateInput;
+    _avg?: Prisma.ClassroomAvgOrderByAggregateInput;
+    _max?: Prisma.ClassroomMaxOrderByAggregateInput;
+    _min?: Prisma.ClassroomMinOrderByAggregateInput;
+    _sum?: Prisma.ClassroomSumOrderByAggregateInput;
+};
+export type ClassroomScalarWhereWithAggregatesInput = {
+    AND?: Prisma.ClassroomScalarWhereWithAggregatesInput | Prisma.ClassroomScalarWhereWithAggregatesInput[];
+    OR?: Prisma.ClassroomScalarWhereWithAggregatesInput[];
+    NOT?: Prisma.ClassroomScalarWhereWithAggregatesInput | Prisma.ClassroomScalarWhereWithAggregatesInput[];
+    id?: Prisma.StringWithAggregatesFilter<"Classroom"> | string;
+    code?: Prisma.StringWithAggregatesFilter<"Classroom"> | string;
+    clinicId?: Prisma.StringWithAggregatesFilter<"Classroom"> | string;
+    name?: Prisma.StringWithAggregatesFilter<"Classroom"> | string;
+    ageGroup?: Prisma.StringNullableWithAggregatesFilter<"Classroom"> | string | null;
+    academicStage?: Prisma.StringNullableWithAggregatesFilter<"Classroom"> | string | null;
+    category?: Prisma.StringNullableWithAggregatesFilter<"Classroom"> | string | null;
+    classification?: Prisma.StringNullableWithAggregatesFilter<"Classroom"> | string | null;
+    learningMode?: Prisma.StringWithAggregatesFilter<"Classroom"> | string;
+    capacity?: Prisma.IntWithAggregatesFilter<"Classroom"> | number;
+    enrolledCount?: Prisma.IntWithAggregatesFilter<"Classroom"> | number;
+    active?: Prisma.BoolWithAggregatesFilter<"Classroom"> | boolean;
+    notes?: Prisma.StringNullableWithAggregatesFilter<"Classroom"> | string | null;
+    isDeleted?: Prisma.BoolWithAggregatesFilter<"Classroom"> | boolean;
+    deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Classroom"> | Date | string | null;
+    createdAt?: Prisma.DateTimeWithAggregatesFilter<"Classroom"> | Date | string;
+    updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Classroom"> | Date | string;
+};
+export type ClassroomCreateInput = {
+    id: string;
+    code: string;
+    name: string;
+    ageGroup?: string | null;
+    academicStage?: string | null;
+    category?: string | null;
+    classification?: string | null;
+    learningMode?: string;
+    capacity?: number;
+    enrolledCount?: number;
+    active?: boolean;
+    notes?: string | null;
+    isDeleted?: boolean;
+    deletedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    clinic: Prisma.ClinicCreateNestedOneWithoutClassroomsInput;
+    students?: Prisma.ClassroomStudentCreateNestedManyWithoutClassroomInput;
+    staff?: Prisma.ClassroomStaffCreateNestedManyWithoutClassroomInput;
+};
+export type ClassroomUncheckedCreateInput = {
+    id: string;
+    code: string;
+    clinicId: string;
+    name: string;
+    ageGroup?: string | null;
+    academicStage?: string | null;
+    category?: string | null;
+    classification?: string | null;
+    learningMode?: string;
+    capacity?: number;
+    enrolledCount?: number;
+    active?: boolean;
+    notes?: string | null;
+    isDeleted?: boolean;
+    deletedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    students?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutClassroomInput;
+    staff?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutClassroomInput;
+};
+export type ClassroomUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    classification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    learningMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    capacity?: Prisma.IntFieldUpdateOperationsInput | number;
+    enrolledCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    clinic?: Prisma.ClinicUpdateOneRequiredWithoutClassroomsNestedInput;
+    students?: Prisma.ClassroomStudentUpdateManyWithoutClassroomNestedInput;
+    staff?: Prisma.ClassroomStaffUpdateManyWithoutClassroomNestedInput;
+};
+export type ClassroomUncheckedUpdateInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    clinicId?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    classification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    learningMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    capacity?: Prisma.IntFieldUpdateOperationsInput | number;
+    enrolledCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    students?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutClassroomNestedInput;
+    staff?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutClassroomNestedInput;
+};
+export type ClassroomCreateManyInput = {
+    id: string;
+    code: string;
+    clinicId: string;
+    name: string;
+    ageGroup?: string | null;
+    academicStage?: string | null;
+    category?: string | null;
+    classification?: string | null;
+    learningMode?: string;
+    capacity?: number;
+    enrolledCount?: number;
+    active?: boolean;
+    notes?: string | null;
+    isDeleted?: boolean;
+    deletedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type ClassroomUpdateManyMutationInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    classification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    learningMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    capacity?: Prisma.IntFieldUpdateOperationsInput | number;
+    enrolledCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type ClassroomUncheckedUpdateManyInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    clinicId?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    classification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    learningMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    capacity?: Prisma.IntFieldUpdateOperationsInput | number;
+    enrolledCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+export type ClassroomListRelationFilter = {
+    every?: Prisma.ClassroomWhereInput;
+    some?: Prisma.ClassroomWhereInput;
+    none?: Prisma.ClassroomWhereInput;
+};
+export type ClassroomOrderByRelationAggregateInput = {
+    _count?: Prisma.SortOrder;
+};
+export type ClassroomCountOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    code?: Prisma.SortOrder;
+    clinicId?: Prisma.SortOrder;
+    name?: Prisma.SortOrder;
+    ageGroup?: Prisma.SortOrder;
+    academicStage?: Prisma.SortOrder;
+    category?: Prisma.SortOrder;
+    classification?: Prisma.SortOrder;
+    learningMode?: Prisma.SortOrder;
+    capacity?: Prisma.SortOrder;
+    enrolledCount?: Prisma.SortOrder;
+    active?: Prisma.SortOrder;
+    notes?: Prisma.SortOrder;
+    isDeleted?: Prisma.SortOrder;
+    deletedAt?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type ClassroomAvgOrderByAggregateInput = {
+    capacity?: Prisma.SortOrder;
+    enrolledCount?: Prisma.SortOrder;
+};
+export type ClassroomMaxOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    code?: Prisma.SortOrder;
+    clinicId?: Prisma.SortOrder;
+    name?: Prisma.SortOrder;
+    ageGroup?: Prisma.SortOrder;
+    academicStage?: Prisma.SortOrder;
+    category?: Prisma.SortOrder;
+    classification?: Prisma.SortOrder;
+    learningMode?: Prisma.SortOrder;
+    capacity?: Prisma.SortOrder;
+    enrolledCount?: Prisma.SortOrder;
+    active?: Prisma.SortOrder;
+    notes?: Prisma.SortOrder;
+    isDeleted?: Prisma.SortOrder;
+    deletedAt?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type ClassroomMinOrderByAggregateInput = {
+    id?: Prisma.SortOrder;
+    code?: Prisma.SortOrder;
+    clinicId?: Prisma.SortOrder;
+    name?: Prisma.SortOrder;
+    ageGroup?: Prisma.SortOrder;
+    academicStage?: Prisma.SortOrder;
+    category?: Prisma.SortOrder;
+    classification?: Prisma.SortOrder;
+    learningMode?: Prisma.SortOrder;
+    capacity?: Prisma.SortOrder;
+    enrolledCount?: Prisma.SortOrder;
+    active?: Prisma.SortOrder;
+    notes?: Prisma.SortOrder;
+    isDeleted?: Prisma.SortOrder;
+    deletedAt?: Prisma.SortOrder;
+    createdAt?: Prisma.SortOrder;
+    updatedAt?: Prisma.SortOrder;
+};
+export type ClassroomSumOrderByAggregateInput = {
+    capacity?: Prisma.SortOrder;
+    enrolledCount?: Prisma.SortOrder;
+};
+export type ClassroomScalarRelationFilter = {
+    is?: Prisma.ClassroomWhereInput;
+    isNot?: Prisma.ClassroomWhereInput;
+};
+export type ClassroomCreateNestedManyWithoutClinicInput = {
+    create?: Prisma.XOR<Prisma.ClassroomCreateWithoutClinicInput, Prisma.ClassroomUncheckedCreateWithoutClinicInput> | Prisma.ClassroomCreateWithoutClinicInput[] | Prisma.ClassroomUncheckedCreateWithoutClinicInput[];
+    connectOrCreate?: Prisma.ClassroomCreateOrConnectWithoutClinicInput | Prisma.ClassroomCreateOrConnectWithoutClinicInput[];
+    createMany?: Prisma.ClassroomCreateManyClinicInputEnvelope;
+    connect?: Prisma.ClassroomWhereUniqueInput | Prisma.ClassroomWhereUniqueInput[];
+};
+export type ClassroomUncheckedCreateNestedManyWithoutClinicInput = {
+    create?: Prisma.XOR<Prisma.ClassroomCreateWithoutClinicInput, Prisma.ClassroomUncheckedCreateWithoutClinicInput> | Prisma.ClassroomCreateWithoutClinicInput[] | Prisma.ClassroomUncheckedCreateWithoutClinicInput[];
+    connectOrCreate?: Prisma.ClassroomCreateOrConnectWithoutClinicInput | Prisma.ClassroomCreateOrConnectWithoutClinicInput[];
+    createMany?: Prisma.ClassroomCreateManyClinicInputEnvelope;
+    connect?: Prisma.ClassroomWhereUniqueInput | Prisma.ClassroomWhereUniqueInput[];
+};
+export type ClassroomUpdateManyWithoutClinicNestedInput = {
+    create?: Prisma.XOR<Prisma.ClassroomCreateWithoutClinicInput, Prisma.ClassroomUncheckedCreateWithoutClinicInput> | Prisma.ClassroomCreateWithoutClinicInput[] | Prisma.ClassroomUncheckedCreateWithoutClinicInput[];
+    connectOrCreate?: Prisma.ClassroomCreateOrConnectWithoutClinicInput | Prisma.ClassroomCreateOrConnectWithoutClinicInput[];
+    upsert?: Prisma.ClassroomUpsertWithWhereUniqueWithoutClinicInput | Prisma.ClassroomUpsertWithWhereUniqueWithoutClinicInput[];
+    createMany?: Prisma.ClassroomCreateManyClinicInputEnvelope;
+    set?: Prisma.ClassroomWhereUniqueInput | Prisma.ClassroomWhereUniqueInput[];
+    disconnect?: Prisma.ClassroomWhereUniqueInput | Prisma.ClassroomWhereUniqueInput[];
+    delete?: Prisma.ClassroomWhereUniqueInput | Prisma.ClassroomWhereUniqueInput[];
+    connect?: Prisma.ClassroomWhereUniqueInput | Prisma.ClassroomWhereUniqueInput[];
+    update?: Prisma.ClassroomUpdateWithWhereUniqueWithoutClinicInput | Prisma.ClassroomUpdateWithWhereUniqueWithoutClinicInput[];
+    updateMany?: Prisma.ClassroomUpdateManyWithWhereWithoutClinicInput | Prisma.ClassroomUpdateManyWithWhereWithoutClinicInput[];
+    deleteMany?: Prisma.ClassroomScalarWhereInput | Prisma.ClassroomScalarWhereInput[];
+};
+export type ClassroomUncheckedUpdateManyWithoutClinicNestedInput = {
+    create?: Prisma.XOR<Prisma.ClassroomCreateWithoutClinicInput, Prisma.ClassroomUncheckedCreateWithoutClinicInput> | Prisma.ClassroomCreateWithoutClinicInput[] | Prisma.ClassroomUncheckedCreateWithoutClinicInput[];
+    connectOrCreate?: Prisma.ClassroomCreateOrConnectWithoutClinicInput | Prisma.ClassroomCreateOrConnectWithoutClinicInput[];
+    upsert?: Prisma.ClassroomUpsertWithWhereUniqueWithoutClinicInput | Prisma.ClassroomUpsertWithWhereUniqueWithoutClinicInput[];
+    createMany?: Prisma.ClassroomCreateManyClinicInputEnvelope;
+    set?: Prisma.ClassroomWhereUniqueInput | Prisma.ClassroomWhereUniqueInput[];
+    disconnect?: Prisma.ClassroomWhereUniqueInput | Prisma.ClassroomWhereUniqueInput[];
+    delete?: Prisma.ClassroomWhereUniqueInput | Prisma.ClassroomWhereUniqueInput[];
+    connect?: Prisma.ClassroomWhereUniqueInput | Prisma.ClassroomWhereUniqueInput[];
+    update?: Prisma.ClassroomUpdateWithWhereUniqueWithoutClinicInput | Prisma.ClassroomUpdateWithWhereUniqueWithoutClinicInput[];
+    updateMany?: Prisma.ClassroomUpdateManyWithWhereWithoutClinicInput | Prisma.ClassroomUpdateManyWithWhereWithoutClinicInput[];
+    deleteMany?: Prisma.ClassroomScalarWhereInput | Prisma.ClassroomScalarWhereInput[];
+};
+export type ClassroomCreateNestedOneWithoutStudentsInput = {
+    create?: Prisma.XOR<Prisma.ClassroomCreateWithoutStudentsInput, Prisma.ClassroomUncheckedCreateWithoutStudentsInput>;
+    connectOrCreate?: Prisma.ClassroomCreateOrConnectWithoutStudentsInput;
+    connect?: Prisma.ClassroomWhereUniqueInput;
+};
+export type ClassroomUpdateOneRequiredWithoutStudentsNestedInput = {
+    create?: Prisma.XOR<Prisma.ClassroomCreateWithoutStudentsInput, Prisma.ClassroomUncheckedCreateWithoutStudentsInput>;
+    connectOrCreate?: Prisma.ClassroomCreateOrConnectWithoutStudentsInput;
+    upsert?: Prisma.ClassroomUpsertWithoutStudentsInput;
+    connect?: Prisma.ClassroomWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.ClassroomUpdateToOneWithWhereWithoutStudentsInput, Prisma.ClassroomUpdateWithoutStudentsInput>, Prisma.ClassroomUncheckedUpdateWithoutStudentsInput>;
+};
+export type ClassroomCreateNestedOneWithoutStaffInput = {
+    create?: Prisma.XOR<Prisma.ClassroomCreateWithoutStaffInput, Prisma.ClassroomUncheckedCreateWithoutStaffInput>;
+    connectOrCreate?: Prisma.ClassroomCreateOrConnectWithoutStaffInput;
+    connect?: Prisma.ClassroomWhereUniqueInput;
+};
+export type ClassroomUpdateOneRequiredWithoutStaffNestedInput = {
+    create?: Prisma.XOR<Prisma.ClassroomCreateWithoutStaffInput, Prisma.ClassroomUncheckedCreateWithoutStaffInput>;
+    connectOrCreate?: Prisma.ClassroomCreateOrConnectWithoutStaffInput;
+    upsert?: Prisma.ClassroomUpsertWithoutStaffInput;
+    connect?: Prisma.ClassroomWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.ClassroomUpdateToOneWithWhereWithoutStaffInput, Prisma.ClassroomUpdateWithoutStaffInput>, Prisma.ClassroomUncheckedUpdateWithoutStaffInput>;
+};
+export type ClassroomCreateWithoutClinicInput = {
+    id: string;
+    code: string;
+    name: string;
+    ageGroup?: string | null;
+    academicStage?: string | null;
+    category?: string | null;
+    classification?: string | null;
+    learningMode?: string;
+    capacity?: number;
+    enrolledCount?: number;
+    active?: boolean;
+    notes?: string | null;
+    isDeleted?: boolean;
+    deletedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    students?: Prisma.ClassroomStudentCreateNestedManyWithoutClassroomInput;
+    staff?: Prisma.ClassroomStaffCreateNestedManyWithoutClassroomInput;
+};
+export type ClassroomUncheckedCreateWithoutClinicInput = {
+    id: string;
+    code: string;
+    name: string;
+    ageGroup?: string | null;
+    academicStage?: string | null;
+    category?: string | null;
+    classification?: string | null;
+    learningMode?: string;
+    capacity?: number;
+    enrolledCount?: number;
+    active?: boolean;
+    notes?: string | null;
+    isDeleted?: boolean;
+    deletedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    students?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutClassroomInput;
+    staff?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutClassroomInput;
+};
+export type ClassroomCreateOrConnectWithoutClinicInput = {
+    where: Prisma.ClassroomWhereUniqueInput;
+    create: Prisma.XOR<Prisma.ClassroomCreateWithoutClinicInput, Prisma.ClassroomUncheckedCreateWithoutClinicInput>;
+};
+export type ClassroomCreateManyClinicInputEnvelope = {
+    data: Prisma.ClassroomCreateManyClinicInput | Prisma.ClassroomCreateManyClinicInput[];
+    skipDuplicates?: boolean;
+};
+export type ClassroomUpsertWithWhereUniqueWithoutClinicInput = {
+    where: Prisma.ClassroomWhereUniqueInput;
+    update: Prisma.XOR<Prisma.ClassroomUpdateWithoutClinicInput, Prisma.ClassroomUncheckedUpdateWithoutClinicInput>;
+    create: Prisma.XOR<Prisma.ClassroomCreateWithoutClinicInput, Prisma.ClassroomUncheckedCreateWithoutClinicInput>;
+};
+export type ClassroomUpdateWithWhereUniqueWithoutClinicInput = {
+    where: Prisma.ClassroomWhereUniqueInput;
+    data: Prisma.XOR<Prisma.ClassroomUpdateWithoutClinicInput, Prisma.ClassroomUncheckedUpdateWithoutClinicInput>;
+};
+export type ClassroomUpdateManyWithWhereWithoutClinicInput = {
+    where: Prisma.ClassroomScalarWhereInput;
+    data: Prisma.XOR<Prisma.ClassroomUpdateManyMutationInput, Prisma.ClassroomUncheckedUpdateManyWithoutClinicInput>;
+};
+export type ClassroomScalarWhereInput = {
+    AND?: Prisma.ClassroomScalarWhereInput | Prisma.ClassroomScalarWhereInput[];
+    OR?: Prisma.ClassroomScalarWhereInput[];
+    NOT?: Prisma.ClassroomScalarWhereInput | Prisma.ClassroomScalarWhereInput[];
+    id?: Prisma.StringFilter<"Classroom"> | string;
+    code?: Prisma.StringFilter<"Classroom"> | string;
+    clinicId?: Prisma.StringFilter<"Classroom"> | string;
+    name?: Prisma.StringFilter<"Classroom"> | string;
+    ageGroup?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    academicStage?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    category?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    classification?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    learningMode?: Prisma.StringFilter<"Classroom"> | string;
+    capacity?: Prisma.IntFilter<"Classroom"> | number;
+    enrolledCount?: Prisma.IntFilter<"Classroom"> | number;
+    active?: Prisma.BoolFilter<"Classroom"> | boolean;
+    notes?: Prisma.StringNullableFilter<"Classroom"> | string | null;
+    isDeleted?: Prisma.BoolFilter<"Classroom"> | boolean;
+    deletedAt?: Prisma.DateTimeNullableFilter<"Classroom"> | Date | string | null;
+    createdAt?: Prisma.DateTimeFilter<"Classroom"> | Date | string;
+    updatedAt?: Prisma.DateTimeFilter<"Classroom"> | Date | string;
+};
+export type ClassroomCreateWithoutStudentsInput = {
+    id: string;
+    code: string;
+    name: string;
+    ageGroup?: string | null;
+    academicStage?: string | null;
+    category?: string | null;
+    classification?: string | null;
+    learningMode?: string;
+    capacity?: number;
+    enrolledCount?: number;
+    active?: boolean;
+    notes?: string | null;
+    isDeleted?: boolean;
+    deletedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    clinic: Prisma.ClinicCreateNestedOneWithoutClassroomsInput;
+    staff?: Prisma.ClassroomStaffCreateNestedManyWithoutClassroomInput;
+};
+export type ClassroomUncheckedCreateWithoutStudentsInput = {
+    id: string;
+    code: string;
+    clinicId: string;
+    name: string;
+    ageGroup?: string | null;
+    academicStage?: string | null;
+    category?: string | null;
+    classification?: string | null;
+    learningMode?: string;
+    capacity?: number;
+    enrolledCount?: number;
+    active?: boolean;
+    notes?: string | null;
+    isDeleted?: boolean;
+    deletedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    staff?: Prisma.ClassroomStaffUncheckedCreateNestedManyWithoutClassroomInput;
+};
+export type ClassroomCreateOrConnectWithoutStudentsInput = {
+    where: Prisma.ClassroomWhereUniqueInput;
+    create: Prisma.XOR<Prisma.ClassroomCreateWithoutStudentsInput, Prisma.ClassroomUncheckedCreateWithoutStudentsInput>;
+};
+export type ClassroomUpsertWithoutStudentsInput = {
+    update: Prisma.XOR<Prisma.ClassroomUpdateWithoutStudentsInput, Prisma.ClassroomUncheckedUpdateWithoutStudentsInput>;
+    create: Prisma.XOR<Prisma.ClassroomCreateWithoutStudentsInput, Prisma.ClassroomUncheckedCreateWithoutStudentsInput>;
+    where?: Prisma.ClassroomWhereInput;
+};
+export type ClassroomUpdateToOneWithWhereWithoutStudentsInput = {
+    where?: Prisma.ClassroomWhereInput;
+    data: Prisma.XOR<Prisma.ClassroomUpdateWithoutStudentsInput, Prisma.ClassroomUncheckedUpdateWithoutStudentsInput>;
+};
+export type ClassroomUpdateWithoutStudentsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    classification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    learningMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    capacity?: Prisma.IntFieldUpdateOperationsInput | number;
+    enrolledCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    clinic?: Prisma.ClinicUpdateOneRequiredWithoutClassroomsNestedInput;
+    staff?: Prisma.ClassroomStaffUpdateManyWithoutClassroomNestedInput;
+};
+export type ClassroomUncheckedUpdateWithoutStudentsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    clinicId?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    classification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    learningMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    capacity?: Prisma.IntFieldUpdateOperationsInput | number;
+    enrolledCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    staff?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutClassroomNestedInput;
+};
+export type ClassroomCreateWithoutStaffInput = {
+    id: string;
+    code: string;
+    name: string;
+    ageGroup?: string | null;
+    academicStage?: string | null;
+    category?: string | null;
+    classification?: string | null;
+    learningMode?: string;
+    capacity?: number;
+    enrolledCount?: number;
+    active?: boolean;
+    notes?: string | null;
+    isDeleted?: boolean;
+    deletedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    clinic: Prisma.ClinicCreateNestedOneWithoutClassroomsInput;
+    students?: Prisma.ClassroomStudentCreateNestedManyWithoutClassroomInput;
+};
+export type ClassroomUncheckedCreateWithoutStaffInput = {
+    id: string;
+    code: string;
+    clinicId: string;
+    name: string;
+    ageGroup?: string | null;
+    academicStage?: string | null;
+    category?: string | null;
+    classification?: string | null;
+    learningMode?: string;
+    capacity?: number;
+    enrolledCount?: number;
+    active?: boolean;
+    notes?: string | null;
+    isDeleted?: boolean;
+    deletedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    students?: Prisma.ClassroomStudentUncheckedCreateNestedManyWithoutClassroomInput;
+};
+export type ClassroomCreateOrConnectWithoutStaffInput = {
+    where: Prisma.ClassroomWhereUniqueInput;
+    create: Prisma.XOR<Prisma.ClassroomCreateWithoutStaffInput, Prisma.ClassroomUncheckedCreateWithoutStaffInput>;
+};
+export type ClassroomUpsertWithoutStaffInput = {
+    update: Prisma.XOR<Prisma.ClassroomUpdateWithoutStaffInput, Prisma.ClassroomUncheckedUpdateWithoutStaffInput>;
+    create: Prisma.XOR<Prisma.ClassroomCreateWithoutStaffInput, Prisma.ClassroomUncheckedCreateWithoutStaffInput>;
+    where?: Prisma.ClassroomWhereInput;
+};
+export type ClassroomUpdateToOneWithWhereWithoutStaffInput = {
+    where?: Prisma.ClassroomWhereInput;
+    data: Prisma.XOR<Prisma.ClassroomUpdateWithoutStaffInput, Prisma.ClassroomUncheckedUpdateWithoutStaffInput>;
+};
+export type ClassroomUpdateWithoutStaffInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    classification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    learningMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    capacity?: Prisma.IntFieldUpdateOperationsInput | number;
+    enrolledCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    clinic?: Prisma.ClinicUpdateOneRequiredWithoutClassroomsNestedInput;
+    students?: Prisma.ClassroomStudentUpdateManyWithoutClassroomNestedInput;
+};
+export type ClassroomUncheckedUpdateWithoutStaffInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    clinicId?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    classification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    learningMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    capacity?: Prisma.IntFieldUpdateOperationsInput | number;
+    enrolledCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    students?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutClassroomNestedInput;
+};
+export type ClassroomCreateManyClinicInput = {
+    id: string;
+    code: string;
+    name: string;
+    ageGroup?: string | null;
+    academicStage?: string | null;
+    category?: string | null;
+    classification?: string | null;
+    learningMode?: string;
+    capacity?: number;
+    enrolledCount?: number;
+    active?: boolean;
+    notes?: string | null;
+    isDeleted?: boolean;
+    deletedAt?: Date | string | null;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+};
+export type ClassroomUpdateWithoutClinicInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    classification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    learningMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    capacity?: Prisma.IntFieldUpdateOperationsInput | number;
+    enrolledCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    students?: Prisma.ClassroomStudentUpdateManyWithoutClassroomNestedInput;
+    staff?: Prisma.ClassroomStaffUpdateManyWithoutClassroomNestedInput;
+};
+export type ClassroomUncheckedUpdateWithoutClinicInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    classification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    learningMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    capacity?: Prisma.IntFieldUpdateOperationsInput | number;
+    enrolledCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    students?: Prisma.ClassroomStudentUncheckedUpdateManyWithoutClassroomNestedInput;
+    staff?: Prisma.ClassroomStaffUncheckedUpdateManyWithoutClassroomNestedInput;
+};
+export type ClassroomUncheckedUpdateManyWithoutClinicInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    code?: Prisma.StringFieldUpdateOperationsInput | string;
+    name?: Prisma.StringFieldUpdateOperationsInput | string;
+    ageGroup?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    academicStage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    classification?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    learningMode?: Prisma.StringFieldUpdateOperationsInput | string;
+    capacity?: Prisma.IntFieldUpdateOperationsInput | number;
+    enrolledCount?: Prisma.IntFieldUpdateOperationsInput | number;
+    active?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+};
+/**
+ * Count Type ClassroomCountOutputType
+ */
+export type ClassroomCountOutputType = {
+    students: number;
+    staff: number;
+};
+export type ClassroomCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    students?: boolean | ClassroomCountOutputTypeCountStudentsArgs;
+    staff?: boolean | ClassroomCountOutputTypeCountStaffArgs;
+};
+/**
+ * ClassroomCountOutputType without action
+ */
+export type ClassroomCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClassroomCountOutputType
+     */
+    select?: Prisma.ClassroomCountOutputTypeSelect<ExtArgs> | null;
+};
+/**
+ * ClassroomCountOutputType without action
+ */
+export type ClassroomCountOutputTypeCountStudentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.ClassroomStudentWhereInput;
+};
+/**
+ * ClassroomCountOutputType without action
+ */
+export type ClassroomCountOutputTypeCountStaffArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.ClassroomStaffWhereInput;
+};
+export type ClassroomSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    code?: boolean;
+    clinicId?: boolean;
+    name?: boolean;
+    ageGroup?: boolean;
+    academicStage?: boolean;
+    category?: boolean;
+    classification?: boolean;
+    learningMode?: boolean;
+    capacity?: boolean;
+    enrolledCount?: boolean;
+    active?: boolean;
+    notes?: boolean;
+    isDeleted?: boolean;
+    deletedAt?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+    clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>;
+    students?: boolean | Prisma.Classroom$studentsArgs<ExtArgs>;
+    staff?: boolean | Prisma.Classroom$staffArgs<ExtArgs>;
+    _count?: boolean | Prisma.ClassroomCountOutputTypeDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["classroom"]>;
+export type ClassroomSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    code?: boolean;
+    clinicId?: boolean;
+    name?: boolean;
+    ageGroup?: boolean;
+    academicStage?: boolean;
+    category?: boolean;
+    classification?: boolean;
+    learningMode?: boolean;
+    capacity?: boolean;
+    enrolledCount?: boolean;
+    active?: boolean;
+    notes?: boolean;
+    isDeleted?: boolean;
+    deletedAt?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+    clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["classroom"]>;
+export type ClassroomSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
+    id?: boolean;
+    code?: boolean;
+    clinicId?: boolean;
+    name?: boolean;
+    ageGroup?: boolean;
+    academicStage?: boolean;
+    category?: boolean;
+    classification?: boolean;
+    learningMode?: boolean;
+    capacity?: boolean;
+    enrolledCount?: boolean;
+    active?: boolean;
+    notes?: boolean;
+    isDeleted?: boolean;
+    deletedAt?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+    clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>;
+}, ExtArgs["result"]["classroom"]>;
+export type ClassroomSelectScalar = {
+    id?: boolean;
+    code?: boolean;
+    clinicId?: boolean;
+    name?: boolean;
+    ageGroup?: boolean;
+    academicStage?: boolean;
+    category?: boolean;
+    classification?: boolean;
+    learningMode?: boolean;
+    capacity?: boolean;
+    enrolledCount?: boolean;
+    active?: boolean;
+    notes?: boolean;
+    isDeleted?: boolean;
+    deletedAt?: boolean;
+    createdAt?: boolean;
+    updatedAt?: boolean;
+};
+export type ClassroomOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "clinicId" | "name" | "ageGroup" | "academicStage" | "category" | "classification" | "learningMode" | "capacity" | "enrolledCount" | "active" | "notes" | "isDeleted" | "deletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["classroom"]>;
+export type ClassroomInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>;
+    students?: boolean | Prisma.Classroom$studentsArgs<ExtArgs>;
+    staff?: boolean | Prisma.Classroom$staffArgs<ExtArgs>;
+    _count?: boolean | Prisma.ClassroomCountOutputTypeDefaultArgs<ExtArgs>;
+};
+export type ClassroomIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>;
+};
+export type ClassroomIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    clinic?: boolean | Prisma.ClinicDefaultArgs<ExtArgs>;
+};
+export type $ClassroomPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    name: "Classroom";
+    objects: {
+        clinic: Prisma.$ClinicPayload<ExtArgs>;
+        students: Prisma.$ClassroomStudentPayload<ExtArgs>[];
+        staff: Prisma.$ClassroomStaffPayload<ExtArgs>[];
+    };
+    scalars: runtime.Types.Extensions.GetPayloadResult<{
+        id: string;
+        code: string;
+        clinicId: string;
+        name: string;
+        ageGroup: string | null;
+        academicStage: string | null;
+        category: string | null;
+        classification: string | null;
+        learningMode: string;
+        capacity: number;
+        enrolledCount: number;
+        active: boolean;
+        notes: string | null;
+        isDeleted: boolean;
+        deletedAt: Date | null;
+        createdAt: Date;
+        updatedAt: Date;
+    }, ExtArgs["result"]["classroom"]>;
+    composites: {};
+};
+export type ClassroomGetPayload<S extends boolean | null | undefined | ClassroomDefaultArgs> = runtime.Types.Result.GetResult<Prisma.$ClassroomPayload, S>;
+export type ClassroomCountArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = Omit<ClassroomFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+    select?: ClassroomCountAggregateInputType | true;
+};
+export interface ClassroomDelegate<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: {
+        types: Prisma.TypeMap<ExtArgs>['model']['Classroom'];
+        meta: {
+            name: 'Classroom';
+        };
+    };
+    /**
+     * Find zero or one Classroom that matches the filter.
+     * @param {ClassroomFindUniqueArgs} args - Arguments to find a Classroom
+     * @example
+     * // Get one Classroom
+     * const classroom = await prisma.classroom.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ClassroomFindUniqueArgs>(args: Prisma.SelectSubset<T, ClassroomFindUniqueArgs<ExtArgs>>): Prisma.Prisma__ClassroomClient<runtime.Types.Result.GetResult<Prisma.$ClassroomPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find one Classroom that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ClassroomFindUniqueOrThrowArgs} args - Arguments to find a Classroom
+     * @example
+     * // Get one Classroom
+     * const classroom = await prisma.classroom.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ClassroomFindUniqueOrThrowArgs>(args: Prisma.SelectSubset<T, ClassroomFindUniqueOrThrowArgs<ExtArgs>>): Prisma.Prisma__ClassroomClient<runtime.Types.Result.GetResult<Prisma.$ClassroomPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first Classroom that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClassroomFindFirstArgs} args - Arguments to find a Classroom
+     * @example
+     * // Get one Classroom
+     * const classroom = await prisma.classroom.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ClassroomFindFirstArgs>(args?: Prisma.SelectSubset<T, ClassroomFindFirstArgs<ExtArgs>>): Prisma.Prisma__ClassroomClient<runtime.Types.Result.GetResult<Prisma.$ClassroomPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find the first Classroom that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClassroomFindFirstOrThrowArgs} args - Arguments to find a Classroom
+     * @example
+     * // Get one Classroom
+     * const classroom = await prisma.classroom.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ClassroomFindFirstOrThrowArgs>(args?: Prisma.SelectSubset<T, ClassroomFindFirstOrThrowArgs<ExtArgs>>): Prisma.Prisma__ClassroomClient<runtime.Types.Result.GetResult<Prisma.$ClassroomPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Find zero or more Classrooms that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClassroomFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Classrooms
+     * const classrooms = await prisma.classroom.findMany()
+     *
+     * // Get first 10 Classrooms
+     * const classrooms = await prisma.classroom.findMany({ take: 10 })
+     *
+     * // Only select the `id`
+     * const classroomWithIdOnly = await prisma.classroom.findMany({ select: { id: true } })
+     *
+     */
+    findMany<T extends ClassroomFindManyArgs>(args?: Prisma.SelectSubset<T, ClassroomFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClassroomPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>;
+    /**
+     * Create a Classroom.
+     * @param {ClassroomCreateArgs} args - Arguments to create a Classroom.
+     * @example
+     * // Create one Classroom
+     * const Classroom = await prisma.classroom.create({
+     *   data: {
+     *     // ... data to create a Classroom
+     *   }
+     * })
+     *
+     */
+    create<T extends ClassroomCreateArgs>(args: Prisma.SelectSubset<T, ClassroomCreateArgs<ExtArgs>>): Prisma.Prisma__ClassroomClient<runtime.Types.Result.GetResult<Prisma.$ClassroomPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Create many Classrooms.
+     * @param {ClassroomCreateManyArgs} args - Arguments to create many Classrooms.
+     * @example
+     * // Create many Classrooms
+     * const classroom = await prisma.classroom.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     */
+    createMany<T extends ClassroomCreateManyArgs>(args?: Prisma.SelectSubset<T, ClassroomCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Create many Classrooms and returns the data saved in the database.
+     * @param {ClassroomCreateManyAndReturnArgs} args - Arguments to create many Classrooms.
+     * @example
+     * // Create many Classrooms
+     * const classroom = await prisma.classroom.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Create many Classrooms and only return the `id`
+     * const classroomWithIdOnly = await prisma.classroom.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    createManyAndReturn<T extends ClassroomCreateManyAndReturnArgs>(args?: Prisma.SelectSubset<T, ClassroomCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClassroomPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>;
+    /**
+     * Delete a Classroom.
+     * @param {ClassroomDeleteArgs} args - Arguments to delete one Classroom.
+     * @example
+     * // Delete one Classroom
+     * const Classroom = await prisma.classroom.delete({
+     *   where: {
+     *     // ... filter to delete one Classroom
+     *   }
+     * })
+     *
+     */
+    delete<T extends ClassroomDeleteArgs>(args: Prisma.SelectSubset<T, ClassroomDeleteArgs<ExtArgs>>): Prisma.Prisma__ClassroomClient<runtime.Types.Result.GetResult<Prisma.$ClassroomPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Update one Classroom.
+     * @param {ClassroomUpdateArgs} args - Arguments to update one Classroom.
+     * @example
+     * // Update one Classroom
+     * const classroom = await prisma.classroom.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    update<T extends ClassroomUpdateArgs>(args: Prisma.SelectSubset<T, ClassroomUpdateArgs<ExtArgs>>): Prisma.Prisma__ClassroomClient<runtime.Types.Result.GetResult<Prisma.$ClassroomPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Delete zero or more Classrooms.
+     * @param {ClassroomDeleteManyArgs} args - Arguments to filter Classrooms to delete.
+     * @example
+     * // Delete a few Classrooms
+     * const { count } = await prisma.classroom.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     *
+     */
+    deleteMany<T extends ClassroomDeleteManyArgs>(args?: Prisma.SelectSubset<T, ClassroomDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more Classrooms.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClassroomUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Classrooms
+     * const classroom = await prisma.classroom.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     *
+     */
+    updateMany<T extends ClassroomUpdateManyArgs>(args: Prisma.SelectSubset<T, ClassroomUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<Prisma.BatchPayload>;
+    /**
+     * Update zero or more Classrooms and returns the data updated in the database.
+     * @param {ClassroomUpdateManyAndReturnArgs} args - Arguments to update many Classrooms.
+     * @example
+     * // Update many Classrooms
+     * const classroom = await prisma.classroom.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *
+     * // Update zero or more Classrooms and only return the `id`
+     * const classroomWithIdOnly = await prisma.classroom.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     *
+     */
+    updateManyAndReturn<T extends ClassroomUpdateManyAndReturnArgs>(args: Prisma.SelectSubset<T, ClassroomUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClassroomPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>;
+    /**
+     * Create or update one Classroom.
+     * @param {ClassroomUpsertArgs} args - Arguments to update or create a Classroom.
+     * @example
+     * // Update or create a Classroom
+     * const classroom = await prisma.classroom.upsert({
+     *   create: {
+     *     // ... data to create a Classroom
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Classroom we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ClassroomUpsertArgs>(args: Prisma.SelectSubset<T, ClassroomUpsertArgs<ExtArgs>>): Prisma.Prisma__ClassroomClient<runtime.Types.Result.GetResult<Prisma.$ClassroomPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>;
+    /**
+     * Count the number of Classrooms.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClassroomCountArgs} args - Arguments to filter Classrooms to count.
+     * @example
+     * // Count the number of Classrooms
+     * const count = await prisma.classroom.count({
+     *   where: {
+     *     // ... the filter for the Classrooms we want to count
+     *   }
+     * })
+    **/
+    count<T extends ClassroomCountArgs>(args?: Prisma.Subset<T, ClassroomCountArgs>): Prisma.PrismaPromise<T extends runtime.Types.Utils.Record<'select', any> ? T['select'] extends true ? number : Prisma.GetScalarType<T['select'], ClassroomCountAggregateOutputType> : number>;
+    /**
+     * Allows you to perform aggregations operations on a Classroom.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClassroomAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ClassroomAggregateArgs>(args: Prisma.Subset<T, ClassroomAggregateArgs>): Prisma.PrismaPromise<GetClassroomAggregateType<T>>;
+    /**
+     * Group by Classroom.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ClassroomGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     *
+    **/
+    groupBy<T extends ClassroomGroupByArgs, HasSelectOrTake extends Prisma.Or<Prisma.Extends<'skip', Prisma.Keys<T>>, Prisma.Extends<'take', Prisma.Keys<T>>>, OrderByArg extends Prisma.True extends HasSelectOrTake ? {
+        orderBy: ClassroomGroupByArgs['orderBy'];
+    } : {
+        orderBy?: ClassroomGroupByArgs['orderBy'];
+    }, OrderFields extends Prisma.ExcludeUnderscoreKeys<Prisma.Keys<Prisma.MaybeTupleToUnion<T['orderBy']>>>, ByFields extends Prisma.MaybeTupleToUnion<T['by']>, ByValid extends Prisma.Has<ByFields, OrderFields>, HavingFields extends Prisma.GetHavingFields<T['having']>, HavingValid extends Prisma.Has<ByFields, HavingFields>, ByEmpty extends T['by'] extends never[] ? Prisma.True : Prisma.False, InputErrors extends ByEmpty extends Prisma.True ? `Error: "by" must not be empty.` : HavingValid extends Prisma.False ? {
+        [P in HavingFields]: P extends ByFields ? never : P extends string ? `Error: Field "${P}" used in "having" needs to be provided in "by".` : [
+            Error,
+            'Field ',
+            P,
+            ` in "having" needs to be provided in "by"`
+        ];
+    }[HavingFields] : 'take' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "take", you also need to provide "orderBy"' : 'skip' extends Prisma.Keys<T> ? 'orderBy' extends Prisma.Keys<T> ? ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields] : 'Error: If you provide "skip", you also need to provide "orderBy"' : ByValid extends Prisma.True ? {} : {
+        [P in OrderFields]: P extends ByFields ? never : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`;
+    }[OrderFields]>(args: Prisma.SubsetIntersection<T, ClassroomGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetClassroomGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>;
+    /**
+     * Fields of the Classroom model
+     */
+    readonly fields: ClassroomFieldRefs;
+}
+/**
+ * The delegate class that acts as a "Promise-like" for Classroom.
+ * Why is this prefixed with `Prisma__`?
+ * Because we want to prevent naming conflicts as mentioned in
+ * https://github.com/prisma/prisma-client-js/issues/707
+ */
+export interface Prisma__ClassroomClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise";
+    clinic<T extends Prisma.ClinicDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.ClinicDefaultArgs<ExtArgs>>): Prisma.Prisma__ClinicClient<runtime.Types.Result.GetResult<Prisma.$ClinicPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>;
+    students<T extends Prisma.Classroom$studentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Classroom$studentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClassroomStudentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    staff<T extends Prisma.Classroom$staffArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Classroom$staffArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ClassroomStaffPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): runtime.Types.Utils.JsPromise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): runtime.Types.Utils.JsPromise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): runtime.Types.Utils.JsPromise<T>;
+}
+/**
+ * Fields of the Classroom model
+ */
+export interface ClassroomFieldRefs {
+    readonly id: Prisma.FieldRef<"Classroom", 'String'>;
+    readonly code: Prisma.FieldRef<"Classroom", 'String'>;
+    readonly clinicId: Prisma.FieldRef<"Classroom", 'String'>;
+    readonly name: Prisma.FieldRef<"Classroom", 'String'>;
+    readonly ageGroup: Prisma.FieldRef<"Classroom", 'String'>;
+    readonly academicStage: Prisma.FieldRef<"Classroom", 'String'>;
+    readonly category: Prisma.FieldRef<"Classroom", 'String'>;
+    readonly classification: Prisma.FieldRef<"Classroom", 'String'>;
+    readonly learningMode: Prisma.FieldRef<"Classroom", 'String'>;
+    readonly capacity: Prisma.FieldRef<"Classroom", 'Int'>;
+    readonly enrolledCount: Prisma.FieldRef<"Classroom", 'Int'>;
+    readonly active: Prisma.FieldRef<"Classroom", 'Boolean'>;
+    readonly notes: Prisma.FieldRef<"Classroom", 'String'>;
+    readonly isDeleted: Prisma.FieldRef<"Classroom", 'Boolean'>;
+    readonly deletedAt: Prisma.FieldRef<"Classroom", 'DateTime'>;
+    readonly createdAt: Prisma.FieldRef<"Classroom", 'DateTime'>;
+    readonly updatedAt: Prisma.FieldRef<"Classroom", 'DateTime'>;
+}
+/**
+ * Classroom findUnique
+ */
+export type ClassroomFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Classroom
+     */
+    select?: Prisma.ClassroomSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Classroom
+     */
+    omit?: Prisma.ClassroomOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ClassroomInclude<ExtArgs> | null;
+    /**
+     * Filter, which Classroom to fetch.
+     */
+    where: Prisma.ClassroomWhereUniqueInput;
+};
+/**
+ * Classroom findUniqueOrThrow
+ */
+export type ClassroomFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Classroom
+     */
+    select?: Prisma.ClassroomSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Classroom
+     */
+    omit?: Prisma.ClassroomOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ClassroomInclude<ExtArgs> | null;
+    /**
+     * Filter, which Classroom to fetch.
+     */
+    where: Prisma.ClassroomWhereUniqueInput;
+};
+/**
+ * Classroom findFirst
+ */
+export type ClassroomFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Classroom
+     */
+    select?: Prisma.ClassroomSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Classroom
+     */
+    omit?: Prisma.ClassroomOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ClassroomInclude<ExtArgs> | null;
+    /**
+     * Filter, which Classroom to fetch.
+     */
+    where?: Prisma.ClassroomWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Classrooms to fetch.
+     */
+    orderBy?: Prisma.ClassroomOrderByWithRelationInput | Prisma.ClassroomOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Classrooms.
+     */
+    cursor?: Prisma.ClassroomWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Classrooms from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Classrooms.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Classrooms.
+     */
+    distinct?: Prisma.ClassroomScalarFieldEnum | Prisma.ClassroomScalarFieldEnum[];
+};
+/**
+ * Classroom findFirstOrThrow
+ */
+export type ClassroomFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Classroom
+     */
+    select?: Prisma.ClassroomSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Classroom
+     */
+    omit?: Prisma.ClassroomOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ClassroomInclude<ExtArgs> | null;
+    /**
+     * Filter, which Classroom to fetch.
+     */
+    where?: Prisma.ClassroomWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Classrooms to fetch.
+     */
+    orderBy?: Prisma.ClassroomOrderByWithRelationInput | Prisma.ClassroomOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for searching for Classrooms.
+     */
+    cursor?: Prisma.ClassroomWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Classrooms from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Classrooms.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Classrooms.
+     */
+    distinct?: Prisma.ClassroomScalarFieldEnum | Prisma.ClassroomScalarFieldEnum[];
+};
+/**
+ * Classroom findMany
+ */
+export type ClassroomFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Classroom
+     */
+    select?: Prisma.ClassroomSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Classroom
+     */
+    omit?: Prisma.ClassroomOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ClassroomInclude<ExtArgs> | null;
+    /**
+     * Filter, which Classrooms to fetch.
+     */
+    where?: Prisma.ClassroomWhereInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     *
+     * Determine the order of Classrooms to fetch.
+     */
+    orderBy?: Prisma.ClassroomOrderByWithRelationInput | Prisma.ClassroomOrderByWithRelationInput[];
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     *
+     * Sets the position for listing Classrooms.
+     */
+    cursor?: Prisma.ClassroomWhereUniqueInput;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Take `±n` Classrooms from the position of the cursor.
+     */
+    take?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     *
+     * Skip the first `n` Classrooms.
+     */
+    skip?: number;
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     *
+     * Filter by unique combinations of Classrooms.
+     */
+    distinct?: Prisma.ClassroomScalarFieldEnum | Prisma.ClassroomScalarFieldEnum[];
+};
+/**
+ * Classroom create
+ */
+export type ClassroomCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Classroom
+     */
+    select?: Prisma.ClassroomSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Classroom
+     */
+    omit?: Prisma.ClassroomOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ClassroomInclude<ExtArgs> | null;
+    /**
+     * The data needed to create a Classroom.
+     */
+    data: Prisma.XOR<Prisma.ClassroomCreateInput, Prisma.ClassroomUncheckedCreateInput>;
+};
+/**
+ * Classroom createMany
+ */
+export type ClassroomCreateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Classrooms.
+     */
+    data: Prisma.ClassroomCreateManyInput | Prisma.ClassroomCreateManyInput[];
+    skipDuplicates?: boolean;
+};
+/**
+ * Classroom createManyAndReturn
+ */
+export type ClassroomCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Classroom
+     */
+    select?: Prisma.ClassroomSelectCreateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Classroom
+     */
+    omit?: Prisma.ClassroomOmit<ExtArgs> | null;
+    /**
+     * The data used to create many Classrooms.
+     */
+    data: Prisma.ClassroomCreateManyInput | Prisma.ClassroomCreateManyInput[];
+    skipDuplicates?: boolean;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ClassroomIncludeCreateManyAndReturn<ExtArgs> | null;
+};
+/**
+ * Classroom update
+ */
+export type ClassroomUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Classroom
+     */
+    select?: Prisma.ClassroomSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Classroom
+     */
+    omit?: Prisma.ClassroomOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ClassroomInclude<ExtArgs> | null;
+    /**
+     * The data needed to update a Classroom.
+     */
+    data: Prisma.XOR<Prisma.ClassroomUpdateInput, Prisma.ClassroomUncheckedUpdateInput>;
+    /**
+     * Choose, which Classroom to update.
+     */
+    where: Prisma.ClassroomWhereUniqueInput;
+};
+/**
+ * Classroom updateMany
+ */
+export type ClassroomUpdateManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Classrooms.
+     */
+    data: Prisma.XOR<Prisma.ClassroomUpdateManyMutationInput, Prisma.ClassroomUncheckedUpdateManyInput>;
+    /**
+     * Filter which Classrooms to update
+     */
+    where?: Prisma.ClassroomWhereInput;
+    /**
+     * Limit how many Classrooms to update.
+     */
+    limit?: number;
+};
+/**
+ * Classroom updateManyAndReturn
+ */
+export type ClassroomUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Classroom
+     */
+    select?: Prisma.ClassroomSelectUpdateManyAndReturn<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Classroom
+     */
+    omit?: Prisma.ClassroomOmit<ExtArgs> | null;
+    /**
+     * The data used to update Classrooms.
+     */
+    data: Prisma.XOR<Prisma.ClassroomUpdateManyMutationInput, Prisma.ClassroomUncheckedUpdateManyInput>;
+    /**
+     * Filter which Classrooms to update
+     */
+    where?: Prisma.ClassroomWhereInput;
+    /**
+     * Limit how many Classrooms to update.
+     */
+    limit?: number;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ClassroomIncludeUpdateManyAndReturn<ExtArgs> | null;
+};
+/**
+ * Classroom upsert
+ */
+export type ClassroomUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Classroom
+     */
+    select?: Prisma.ClassroomSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Classroom
+     */
+    omit?: Prisma.ClassroomOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ClassroomInclude<ExtArgs> | null;
+    /**
+     * The filter to search for the Classroom to update in case it exists.
+     */
+    where: Prisma.ClassroomWhereUniqueInput;
+    /**
+     * In case the Classroom found by the `where` argument doesn't exist, create a new Classroom with this data.
+     */
+    create: Prisma.XOR<Prisma.ClassroomCreateInput, Prisma.ClassroomUncheckedCreateInput>;
+    /**
+     * In case the Classroom was found with the provided `where` argument, update it with this data.
+     */
+    update: Prisma.XOR<Prisma.ClassroomUpdateInput, Prisma.ClassroomUncheckedUpdateInput>;
+};
+/**
+ * Classroom delete
+ */
+export type ClassroomDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Classroom
+     */
+    select?: Prisma.ClassroomSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Classroom
+     */
+    omit?: Prisma.ClassroomOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ClassroomInclude<ExtArgs> | null;
+    /**
+     * Filter which Classroom to delete.
+     */
+    where: Prisma.ClassroomWhereUniqueInput;
+};
+/**
+ * Classroom deleteMany
+ */
+export type ClassroomDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Filter which Classrooms to delete
+     */
+    where?: Prisma.ClassroomWhereInput;
+    /**
+     * Limit how many Classrooms to delete.
+     */
+    limit?: number;
+};
+/**
+ * Classroom.students
+ */
+export type Classroom$studentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClassroomStudent
+     */
+    select?: Prisma.ClassroomStudentSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the ClassroomStudent
+     */
+    omit?: Prisma.ClassroomStudentOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ClassroomStudentInclude<ExtArgs> | null;
+    where?: Prisma.ClassroomStudentWhereInput;
+    orderBy?: Prisma.ClassroomStudentOrderByWithRelationInput | Prisma.ClassroomStudentOrderByWithRelationInput[];
+    cursor?: Prisma.ClassroomStudentWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.ClassroomStudentScalarFieldEnum | Prisma.ClassroomStudentScalarFieldEnum[];
+};
+/**
+ * Classroom.staff
+ */
+export type Classroom$staffArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ClassroomStaff
+     */
+    select?: Prisma.ClassroomStaffSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the ClassroomStaff
+     */
+    omit?: Prisma.ClassroomStaffOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ClassroomStaffInclude<ExtArgs> | null;
+    where?: Prisma.ClassroomStaffWhereInput;
+    orderBy?: Prisma.ClassroomStaffOrderByWithRelationInput | Prisma.ClassroomStaffOrderByWithRelationInput[];
+    cursor?: Prisma.ClassroomStaffWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.ClassroomStaffScalarFieldEnum | Prisma.ClassroomStaffScalarFieldEnum[];
+};
+/**
+ * Classroom without action
+ */
+export type ClassroomDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Classroom
+     */
+    select?: Prisma.ClassroomSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Classroom
+     */
+    omit?: Prisma.ClassroomOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.ClassroomInclude<ExtArgs> | null;
+};

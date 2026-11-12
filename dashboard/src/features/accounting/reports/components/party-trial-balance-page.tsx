@@ -110,15 +110,8 @@ export const PartyTrialBalancePage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">ميزان مراجعة الأطراف</h1>
-				<p className="text-muted-foreground text-sm">
-					افتتاحي / حركة / إقفال لكل طرف ضمن نوع ذمم واحد (§18.2).
-				</p>
-			</div>
-
 			<Stats
-				className="px-4 grid-cols-4"
+				className="px-4 pt-2.5 pb-1 grid-cols-4"
 				stats={stats}
 			/>
 

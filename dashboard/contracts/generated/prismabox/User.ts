@@ -4949,6 +4949,246 @@ D2: الفراغ هنا مسموح، أمّا التحويل إلى زيارة �
       ),
       { additionalProperties: false },
     ),
+    createdRegistrationCampaigns: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          code: t.String(),
+          clinicId: t.String(),
+          name: t.String(),
+          ageGroup: t.String(),
+          targetClass: __nullable__(t.String()),
+          capacity: t.Integer(),
+          status: t.Union(
+            [
+              t.Literal("DRAFT"),
+              t.Literal("ACTIVE"),
+              t.Literal("COMPLETED"),
+              t.Literal("CLOSED"),
+            ],
+            { additionalProperties: false },
+          ),
+          startDate: __nullable__(t.Date()),
+          endDate: __nullable__(t.Date()),
+          requireBirthCert: t.Boolean(),
+          requireVaccine: t.Boolean(),
+          requireId: t.Boolean(),
+          generalAccess: t.String(),
+          notes: __nullable__(t.String()),
+          createdById: __nullable__(t.String()),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    authoredRegistrationComments: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          requestId: t.String(),
+          authorId: t.String(),
+          content: t.String(),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    assignedRegistrationRequests: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          code: t.String(),
+          clinicId: t.String(),
+          campaignId: t.String(),
+          status: t.Union(
+            [
+              t.Literal("QUEUE"),
+              t.Literal("SHORTLIST"),
+              t.Literal("INTERVIEW"),
+              t.Literal("ACCEPTED"),
+              t.Literal("AWAITING_PAYMENT"),
+              t.Literal("REJECTED"),
+              t.Literal("DUPLICATE"),
+              t.Literal("IN_EVALUATION"),
+              t.Literal("WAITLIST"),
+              t.Literal("EVALUATION"),
+              t.Literal("REVIEW"),
+              t.Literal("AWAITING_REPLY"),
+            ],
+            { additionalProperties: false },
+          ),
+          source: t.Union(
+            [
+              t.Literal("WEBSITE"),
+              t.Literal("DIRECT_LINK"),
+              t.Literal("REFERRAL"),
+              t.Literal("SOCIAL"),
+              t.Literal("OTHER"),
+            ],
+            { additionalProperties: false },
+          ),
+          studentName: t.String(),
+          gender: t.Union(
+            [t.Literal("MALE"), t.Literal("FEMALE"), t.Literal("UNKNOWN")],
+            { additionalProperties: false },
+          ),
+          birthDate: __nullable__(t.Date()),
+          ageLabel: __nullable__(t.String()),
+          targetClass: __nullable__(t.String()),
+          bloodType: __nullable__(t.String()),
+          allergies: __nullable__(t.String()),
+          hasChronicDiseases: t.Boolean(),
+          chronicDiseases: __nullable__(t.String()),
+          learningMode: __nullable__(t.String()),
+          preferredShift: __nullable__(t.String()),
+          experienceLevel: __nullable__(t.String()),
+          priority: __nullable__(t.String()),
+          appointmentDate: __nullable__(t.Date()),
+          appointmentId: __nullable__(t.String()),
+          roomId: __nullable__(t.String()),
+          roomName: __nullable__(t.String()),
+          notes: __nullable__(t.String()),
+          notifyWhatsapp: t.Boolean(),
+          links: __nullable__(t.Any()),
+          proposedTrack: __nullable__(t.String()),
+          interviewDurationMinutes: t.Integer(),
+          attendanceProbability: t.Integer(),
+          subscriptionPlanId: __nullable__(t.String()),
+          subscriptionPlanName: __nullable__(t.String()),
+          subscriptionAmount: __nullable__(t.Number()),
+          includeMeals: t.Boolean(),
+          enableDailyStipend: t.Boolean(),
+          medications: __nullable__(t.Any()),
+          allergiesList: __nullable__(t.Any()),
+          referredToStaffId: __nullable__(t.String()),
+          referralReason: __nullable__(t.String()),
+          rejectionReason: __nullable__(t.String()),
+          rejectionNotes: __nullable__(t.String()),
+          deletionReason: __nullable__(t.String()),
+          deletionNotes: __nullable__(t.String()),
+          guardianName: t.String(),
+          guardianPhone: t.String(),
+          guardianEmail: __nullable__(t.String()),
+          guardianNationalId: __nullable__(t.String()),
+          convertedPatientId: __nullable__(t.String()),
+          convertedOwnerId: __nullable__(t.String()),
+          assignedStaffId: __nullable__(t.String()),
+          submittedAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    referredRegistrationRequests: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          code: t.String(),
+          clinicId: t.String(),
+          campaignId: t.String(),
+          status: t.Union(
+            [
+              t.Literal("QUEUE"),
+              t.Literal("SHORTLIST"),
+              t.Literal("INTERVIEW"),
+              t.Literal("ACCEPTED"),
+              t.Literal("AWAITING_PAYMENT"),
+              t.Literal("REJECTED"),
+              t.Literal("DUPLICATE"),
+              t.Literal("IN_EVALUATION"),
+              t.Literal("WAITLIST"),
+              t.Literal("EVALUATION"),
+              t.Literal("REVIEW"),
+              t.Literal("AWAITING_REPLY"),
+            ],
+            { additionalProperties: false },
+          ),
+          source: t.Union(
+            [
+              t.Literal("WEBSITE"),
+              t.Literal("DIRECT_LINK"),
+              t.Literal("REFERRAL"),
+              t.Literal("SOCIAL"),
+              t.Literal("OTHER"),
+            ],
+            { additionalProperties: false },
+          ),
+          studentName: t.String(),
+          gender: t.Union(
+            [t.Literal("MALE"), t.Literal("FEMALE"), t.Literal("UNKNOWN")],
+            { additionalProperties: false },
+          ),
+          birthDate: __nullable__(t.Date()),
+          ageLabel: __nullable__(t.String()),
+          targetClass: __nullable__(t.String()),
+          bloodType: __nullable__(t.String()),
+          allergies: __nullable__(t.String()),
+          hasChronicDiseases: t.Boolean(),
+          chronicDiseases: __nullable__(t.String()),
+          learningMode: __nullable__(t.String()),
+          preferredShift: __nullable__(t.String()),
+          experienceLevel: __nullable__(t.String()),
+          priority: __nullable__(t.String()),
+          appointmentDate: __nullable__(t.Date()),
+          appointmentId: __nullable__(t.String()),
+          roomId: __nullable__(t.String()),
+          roomName: __nullable__(t.String()),
+          notes: __nullable__(t.String()),
+          notifyWhatsapp: t.Boolean(),
+          links: __nullable__(t.Any()),
+          proposedTrack: __nullable__(t.String()),
+          interviewDurationMinutes: t.Integer(),
+          attendanceProbability: t.Integer(),
+          subscriptionPlanId: __nullable__(t.String()),
+          subscriptionPlanName: __nullable__(t.String()),
+          subscriptionAmount: __nullable__(t.Number()),
+          includeMeals: t.Boolean(),
+          enableDailyStipend: t.Boolean(),
+          medications: __nullable__(t.Any()),
+          allergiesList: __nullable__(t.Any()),
+          referredToStaffId: __nullable__(t.String()),
+          referralReason: __nullable__(t.String()),
+          rejectionReason: __nullable__(t.String()),
+          rejectionNotes: __nullable__(t.String()),
+          deletionReason: __nullable__(t.String()),
+          deletionNotes: __nullable__(t.String()),
+          guardianName: t.String(),
+          guardianPhone: t.String(),
+          guardianEmail: __nullable__(t.String()),
+          guardianNationalId: __nullable__(t.String()),
+          convertedPatientId: __nullable__(t.String()),
+          convertedOwnerId: __nullable__(t.String()),
+          assignedStaffId: __nullable__(t.String()),
+          submittedAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
+    registrationCollaborations: t.Array(
+      t.Object(
+        {
+          id: t.String(),
+          campaignId: t.String(),
+          clinicId: t.String(),
+          userId: __nullable__(t.String()),
+          email: __nullable__(t.String()),
+          accessLevel: t.String(),
+          isPending: t.Boolean(),
+          invitedById: __nullable__(t.String()),
+          createdAt: t.Date(),
+          updatedAt: t.Date(),
+        },
+        { additionalProperties: false },
+      ),
+      { additionalProperties: false },
+    ),
   },
   { additionalProperties: false },
 );
@@ -6678,6 +6918,86 @@ export const UserRelationsInputCreate = t.Object(
       ),
     ),
     recallContacts: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    createdRegistrationCampaigns: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    authoredRegistrationComments: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    assignedRegistrationRequests: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    referredRegistrationRequests: t.Optional(
+      t.Object(
+        {
+          connect: t.Array(
+            t.Object(
+              {
+                id: t.String({ additionalProperties: false }),
+              },
+              { additionalProperties: false },
+            ),
+            { additionalProperties: false },
+          ),
+        },
+        { additionalProperties: false },
+      ),
+    ),
+    registrationCollaborations: t.Optional(
       t.Object(
         {
           connect: t.Array(
@@ -9375,6 +9695,131 @@ export const UserRelationsInputUpdate = t.Partial(
           { additionalProperties: false },
         ),
       ),
+      createdRegistrationCampaigns: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      authoredRegistrationComments: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      assignedRegistrationRequests: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      referredRegistrationRequests: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
+      registrationCollaborations: t.Partial(
+        t.Object(
+          {
+            connect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+            disconnect: t.Array(
+              t.Object(
+                {
+                  id: t.String({ additionalProperties: false }),
+                },
+                { additionalProperties: false },
+              ),
+              { additionalProperties: false },
+            ),
+          },
+          { additionalProperties: false },
+        ),
+      ),
     },
     { additionalProperties: false },
   ),
@@ -9571,6 +10016,11 @@ export const UserSelect = t.Partial(
       clinicalNoteAddenda: t.Boolean(),
       reminderOutbox: t.Boolean(),
       recallContacts: t.Boolean(),
+      createdRegistrationCampaigns: t.Boolean(),
+      authoredRegistrationComments: t.Boolean(),
+      assignedRegistrationRequests: t.Boolean(),
+      referredRegistrationRequests: t.Boolean(),
+      registrationCollaborations: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },
@@ -9687,6 +10137,11 @@ export const UserInclude = t.Partial(
       clinicalNoteAddenda: t.Boolean(),
       reminderOutbox: t.Boolean(),
       recallContacts: t.Boolean(),
+      createdRegistrationCampaigns: t.Boolean(),
+      authoredRegistrationComments: t.Boolean(),
+      assignedRegistrationRequests: t.Boolean(),
+      referredRegistrationRequests: t.Boolean(),
+      registrationCollaborations: t.Boolean(),
       _count: t.Boolean(),
     },
     { additionalProperties: false },

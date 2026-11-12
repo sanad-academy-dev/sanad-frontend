@@ -113,15 +113,8 @@ export const GeneralLedgerPage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">دفتر الأستاذ العام</h1>
-				<p className="text-muted-foreground text-sm">
-					كل حركة على كل حساب، برصيد جارٍ وصفَّي افتتاح وإقفال (§18.2).
-				</p>
-			</div>
-
 			<Stats
-				className="px-4 grid-cols-3"
+				className="px-4 pt-2.5 pb-1 grid-cols-3"
 				stats={stats}
 			/>
 

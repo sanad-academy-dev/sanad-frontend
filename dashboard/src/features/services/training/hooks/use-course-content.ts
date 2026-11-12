@@ -19,6 +19,7 @@ import type {
 
 // التصميم يسمّي المحتوى المحفوظ حسب نوعه في رسائل التوست («الدرس» / «التقييم»)
 const SAVED_LABELS: Partial<Record<LessonType, string>> = {
+	PAGE: "الدرس بصفحة",
 	QUIZ: "التقييم",
 	SURVEY: "الاستبيان",
 };
@@ -338,7 +339,12 @@ export const useCourseContent = (courseId: string | null) => {
 					toast.promise(
 						addUnit.mutateAsync({
 							title: unit.title,
-							lessons: unit.lessons.map(({ id, unitId, order, createdAt, ...rest }) => rest),
+							lessons: unit.lessons.map(
+								({ id, unitId, order, createdAt, contents, ...rest }) => ({
+									...rest,
+									...(contents ? { contents } : {}),
+								}),
+							),
 						}),
 						{
 							loading: "جارٍ استعادة الوحدة...",
@@ -410,3 +416,5 @@ export const useCourseContent = (courseId: string | null) => {
 		isSavingLesson: addLesson.isPending || updateLesson.isPending,
 	};
 };
+
+export type CourseContentActions = ReturnType<typeof useCourseContent>;

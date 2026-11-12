@@ -12,6 +12,7 @@ export const CourseLessonPlain = t.Object(
     type: t.Union(
       [
         t.Literal("TEXT"),
+        t.Literal("PAGE"),
         t.Literal("VIDEO"),
         t.Literal("DOCUMENT"),
         t.Literal("QUIZ"),
@@ -82,6 +83,7 @@ export const CourseLessonPlainInputCreate = t.Object(
       t.Union(
         [
           t.Literal("TEXT"),
+          t.Literal("PAGE"),
           t.Literal("VIDEO"),
           t.Literal("DOCUMENT"),
           t.Literal("QUIZ"),
@@ -116,6 +118,7 @@ export const CourseLessonPlainInputUpdate = t.Object(
       t.Union(
         [
           t.Literal("TEXT"),
+          t.Literal("PAGE"),
           t.Literal("VIDEO"),
           t.Literal("DOCUMENT"),
           t.Literal("QUIZ"),
@@ -234,6 +237,7 @@ export const CourseLessonWhere = t.Partial(
           type: t.Union(
             [
               t.Literal("TEXT"),
+              t.Literal("PAGE"),
               t.Literal("VIDEO"),
               t.Literal("DOCUMENT"),
               t.Literal("QUIZ"),
@@ -295,6 +299,7 @@ export const CourseLessonWhereUnique = t.Recursive(
               type: t.Union(
                 [
                   t.Literal("TEXT"),
+                  t.Literal("PAGE"),
                   t.Literal("VIDEO"),
                   t.Literal("DOCUMENT"),
                   t.Literal("QUIZ"),

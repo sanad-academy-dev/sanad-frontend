@@ -1590,6 +1590,7 @@ export type CourseStatus = (typeof CourseStatus)[keyof typeof CourseStatus]
 
 export const LessonType = {
   TEXT: 'TEXT',
+  PAGE: 'PAGE',
   VIDEO: 'VIDEO',
   DOCUMENT: 'DOCUMENT',
   QUIZ: 'QUIZ',
@@ -3176,3 +3177,53 @@ export const LoyaltyLedgerSourceType = {
 } as const
 
 export type LoyaltyLedgerSourceType = (typeof LoyaltyLedgerSourceType)[keyof typeof LoyaltyLedgerSourceType]
+
+
+export const RegistrationCampaignStatus = {
+  DRAFT: 'DRAFT',
+  ACTIVE: 'ACTIVE',
+  COMPLETED: 'COMPLETED',
+  CLOSED: 'CLOSED'
+} as const
+
+export type RegistrationCampaignStatus = (typeof RegistrationCampaignStatus)[keyof typeof RegistrationCampaignStatus]
+
+
+export const RegistrationRequestStatus = {
+  QUEUE: 'QUEUE',
+  SHORTLIST: 'SHORTLIST',
+  INTERVIEW: 'INTERVIEW',
+  ACCEPTED: 'ACCEPTED',
+  AWAITING_PAYMENT: 'AWAITING_PAYMENT',
+  REJECTED: 'REJECTED',
+  DUPLICATE: 'DUPLICATE',
+  IN_EVALUATION: 'IN_EVALUATION',
+  WAITLIST: 'WAITLIST',
+  EVALUATION: 'EVALUATION',
+  REVIEW: 'REVIEW',
+  AWAITING_REPLY: 'AWAITING_REPLY'
+} as const
+
+export type RegistrationRequestStatus = (typeof RegistrationRequestStatus)[keyof typeof RegistrationRequestStatus]
+
+
+export const RegistrationSource = {
+  WEBSITE: 'WEBSITE',
+  DIRECT_LINK: 'DIRECT_LINK',
+  REFERRAL: 'REFERRAL',
+  SOCIAL: 'SOCIAL',
+  OTHER: 'OTHER'
+} as const
+
+export type RegistrationSource = (typeof RegistrationSource)[keyof typeof RegistrationSource]
+
+
+export const RegistrationDocumentType = {
+  BIRTH_CERTIFICATE: 'BIRTH_CERTIFICATE',
+  VACCINATION_CARD: 'VACCINATION_CARD',
+  GUARDIAN_ID: 'GUARDIAN_ID',
+  MEDICAL_REPORT: 'MEDICAL_REPORT',
+  OTHER: 'OTHER'
+} as const
+
+export type RegistrationDocumentType = (typeof RegistrationDocumentType)[keyof typeof RegistrationDocumentType]

@@ -114,13 +114,6 @@ export const PaymentReportsPage = () => {
 
 	return (
 		<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-			<div className="px-4 pt-3">
-				<h1 className="font-medium text-lg">تقارير المدفوعات</h1>
-				<p className="text-muted-foreground text-sm">
-					عمر التحصيل لكل تخصيص، وملخص المقبوضات اليومي حسب وسيلة الدفع.
-				</p>
-			</div>
-
 			<TableToolbar
 				className="border-t"
 				searchValue={search}
