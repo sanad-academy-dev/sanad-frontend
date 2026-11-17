@@ -6,7 +6,7 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import { useMemo } from "react";
-
+import { StaffHoverCard } from "@/components/common/hover-cards";
 import { TableDataView } from "@/components/common/table-data-view";
 import {
 	DropdownMenu,
@@ -20,8 +20,8 @@ import { cn } from "@/lib/utils";
 import type {
 	AssignmentResponse,
 	AssignmentStatus,
-} from "@/server/course-assignments/course-assignments.type";
-import type { CourseLocationMode } from "@/server/training/training.type";
+} from "@sanad/contracts/runtime/server/course-assignments/course-assignments.type";
+import type { CourseLocationMode } from "@sanad/contracts/runtime/server/training/training.type";
 
 const Dash = () => <span className="text-muted-foreground">—</span>;
 
@@ -154,22 +154,37 @@ export function CourseRosterTable({
 			{
 				id: "staff",
 				header: "اسم الموظف / المعرّف",
-				cell: ({ row }) => (
-					<div className="flex items-center gap-2">
-						<StaffAvatar
-							name={row.original.staff.name}
-							avatar={row.original.staff.avatar}
-						/>
-						<div className="flex min-w-0 flex-col">
-							<span className="line-clamp-1 text-[13px] font-semibold text-foreground">
-								{row.original.staff.name}
-							</span>
-							<span className="text-[11px] text-muted-foreground">
-								{row.original.staff.code}
-							</span>
-						</div>
-					</div>
-				),
+				cell: ({ row }) => {
+					const s = row.original.staff;
+					return (
+						<StaffHoverCard
+							staff={{
+								id: s.id,
+								name: s.name,
+								image: s.avatar,
+								phone: s.phone,
+								email: s.email,
+								role: s.role?.name,
+								branch: s.branch?.name,
+								employmentType: s.employmentType,
+								active: s.active,
+							}}
+						>
+							<div className="flex items-center gap-2 cursor-pointer group">
+								<StaffAvatar
+									name={s.name}
+									avatar={s.avatar}
+								/>
+								<div className="flex min-w-0 flex-col">
+									<span className="line-clamp-1 text-[13px] font-semibold text-foreground group-hover:text-primary transition-colors">
+										{s.name}
+									</span>
+									<span className="text-[11px] text-muted-foreground font-mono">{s.code}</span>
+								</div>
+							</div>
+						</StaffHoverCard>
+					);
+				},
 			},
 			{
 				id: "role",

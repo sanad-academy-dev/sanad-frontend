@@ -26,6 +26,7 @@ import {
 import { ContentAvatar } from "@/features/services/training/components/content-avatar";
 import { cn } from "@/lib/utils";
 import type { QuizListItemResponse, QuizStatus } from "@/server/quizzes/quizzes.type";
+import { QuizStatusSelect } from "./quiz-status-select";
 
 const fmtDate = (d: Date | string) =>
 	new Date(d).toLocaleDateString("ar-SA-u-nu-latn", {
@@ -35,27 +36,6 @@ const fmtDate = (d: Date | string) =>
 	});
 
 const Dash = () => <span className="text-muted-foreground">—</span>;
-
-const STATUS: Record<QuizStatus, { label: string; text: string; dot: string }> = {
-	PUBLISHED: { label: "منشور", text: "text-[#008A2E]", dot: "bg-[#008A2E]" },
-	DRAFT: { label: "مسودة", text: "text-muted-foreground", dot: "bg-muted-foreground" },
-	ARCHIVED: { label: "مؤرشف", text: "text-[#B45309]", dot: "bg-[#F59E0B]" },
-};
-
-function StatusPill({ status }: { status: QuizStatus }) {
-	const s = STATUS[status] ?? STATUS.DRAFT;
-	return (
-		<span
-			className={cn(
-				"inline-flex w-fit items-center gap-1.5 rounded-md border bg-background px-2 py-0.5 text-xs font-medium",
-				s.text,
-			)}
-		>
-			<span className={cn("size-1.5 rounded-full", s.dot)} />
-			{s.label}
-		</span>
-	);
-}
 
 // عنوان عمود مُتوسّط فوق قيمه
 function centeredHeader(label: string) {
@@ -76,6 +56,7 @@ export function QuizTable({
 	onPlay,
 	onResults,
 	onRowOpen,
+	onStatusChange,
 }: {
 	quizzes: QuizListItemResponse[];
 	isLoading: boolean;
@@ -86,6 +67,7 @@ export function QuizTable({
 	onPlay: (quiz: QuizListItemResponse) => void;
 	onResults: (quiz: QuizListItemResponse) => void;
 	onRowOpen?: (quiz: QuizListItemResponse) => void;
+	onStatusChange?: (quiz: QuizListItemResponse, newStatus: QuizStatus) => void;
 }) {
 	const columns = useMemo<ColumnDef<QuizListItemResponse>[]>(
 		() => [
@@ -164,7 +146,10 @@ export function QuizTable({
 				header: centeredHeader("الحالة"),
 				cell: ({ row }) => (
 					<div className={centered}>
-						<StatusPill status={row.original.status} />
+						<QuizStatusSelect
+							status={row.original.status}
+							onChange={(newStatus) => onStatusChange?.(row.original, newStatus)}
+						/>
 					</div>
 				),
 			},
@@ -251,7 +236,7 @@ export function QuizTable({
 				},
 			},
 		],
-		[onEdit, onPublish, onUnpublish, onDelete, onPlay, onResults],
+		[onEdit, onPublish, onUnpublish, onDelete, onPlay, onResults, onStatusChange],
 	);
 
 	const sizedColumns = useMemo(

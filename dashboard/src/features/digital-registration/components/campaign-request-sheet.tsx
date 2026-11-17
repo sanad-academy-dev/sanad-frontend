@@ -1,14 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import {
-	IconCalendar,
-	IconCopy,
-	IconExternalLink,
-	IconHourglass,
-	IconUser,
-	IconUserCircle,
-	IconX,
-} from "@tabler/icons-react";
-import { Link } from "@tanstack/react-router";
+import { IconCopy } from "@tabler/icons-react";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -45,7 +36,10 @@ import { AssignSubscriptionDialog } from "./modals/assign-subscription-dialog";
 import { CashPaymentDrawer } from "./modals/cash-payment-drawer";
 import { PaymentReceiptDrawer } from "./modals/payment-receipt-drawer";
 import { SendContractDrawer } from "./modals/send-contract-drawer";
-import { RequestStatusTransitionDialog, type RequestTransitionTarget } from "./modals/request-status-transition-dialog";
+import {
+	RequestStatusTransitionDialog,
+	type RequestTransitionTarget,
+} from "./modals/request-status-transition-dialog";
 import { StudentRequestPrintModal } from "./print/student-request-print-modal";
 import { ServiceAgreementModal } from "./print/service-agreement-modal";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
@@ -54,11 +48,6 @@ import {
 	buildReceiptFromRequest,
 	resolveClinicCurrencySymbol,
 } from "../utils/payment-helpers";
-import {
-	formatAppointmentDate,
-	formatAppointmentTime,
-	DEFAULT_CLINIC_TIMEZONE,
-} from "../utils/date-format";
 
 interface CampaignRequestSheetProps {
 	campaignId?: string;
@@ -66,7 +55,10 @@ interface CampaignRequestSheetProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
 	isUpdating?: boolean;
-	onStatusChange?: (request: CampaignRequestItem, status: CampaignRequestItem["status"]) => void;
+	onStatusChange?: (
+		request: CampaignRequestItem,
+		status: CampaignRequestItem["status"],
+	) => void;
 	onAccept?: (request: CampaignRequestItem) => void;
 	onWaitlist?: (request: CampaignRequestItem) => void;
 	onReject?: (request: CampaignRequestItem) => void;
@@ -78,7 +70,24 @@ interface CampaignRequestSheetProps {
 	onRequestUpdate?: (updated: Partial<CampaignRequestItem> & { id: string }) => void;
 }
 
-export type ActiveActionDrawer = "queue" | "shortlist" | "waitlist" | "reschedule" | "awaiting-payment" | "cash-payment" | "payment-receipt" | "send-contract" | "reject" | "refer" | "delete" | "edit" | "status" | "subscription" | "fill-assessment" | "view-assessment" | null;
+export type ActiveActionDrawer =
+	| "queue"
+	| "shortlist"
+	| "waitlist"
+	| "reschedule"
+	| "awaiting-payment"
+	| "cash-payment"
+	| "payment-receipt"
+	| "send-contract"
+	| "reject"
+	| "refer"
+	| "delete"
+	| "edit"
+	| "status"
+	| "subscription"
+	| "fill-assessment"
+	| "view-assessment"
+	| null;
 
 function isNestedDrawerOrOverlayTarget(target: HTMLElement | null): boolean {
 	return Boolean(
@@ -93,8 +102,8 @@ function isNestedDrawerOrOverlayTarget(target: HTMLElement | null): boolean {
 			target?.closest('[data-slot="assessment-details-drawer"]') ||
 			target?.closest('[role="dialog"]') ||
 			target?.closest('[role="menu"]') ||
-			target?.closest('[data-radix-portal]') ||
-			target?.closest('[data-radix-popper-content-wrapper]'),
+			target?.closest("[data-radix-portal]") ||
+			target?.closest("[data-radix-popper-content-wrapper]"),
 	);
 }
 
@@ -103,11 +112,8 @@ export function CampaignRequestSheet({
 	open,
 	onOpenChange,
 	campaignId = "",
-	isUpdating,
 	onStatusChange,
 	onAccept,
-	onWaitlist,
-	onReject,
 	onDelete,
 	openRescheduleOnOpen = false,
 	initialDrawer = null,
@@ -116,12 +122,16 @@ export function CampaignRequestSheet({
 	const { capabilities } = useDigitalRegistrationCapabilities(campaignId);
 	const enrollStudentMutation = useEnrollAcceptedStudent(campaignId);
 	const { clinicInfo } = useClinicInfo();
-	const clinicTimezone = clinicInfo?.timezone || DEFAULT_CLINIC_TIMEZONE;
 	// Active drawer state - guarantees only ONE action modal/drawer is ever open at a time
 	const [activeDrawer, setActiveDrawer] = useState<ActiveActionDrawer>(null);
-	const [activeReceipt, setActiveReceipt] = useState<RegistrationPaymentReceiptData | null>(null);
-	const [statusTransitionTarget, setStatusTransitionTarget] = useState<RequestTransitionTarget | null>(null);
-	const [rescheduleInitialStaffId, setRescheduleInitialStaffId] = useState<string | null>(null);
+	const [activeReceipt, setActiveReceipt] = useState<RegistrationPaymentReceiptData | null>(
+		null,
+	);
+	const [statusTransitionTarget, setStatusTransitionTarget] =
+		useState<RequestTransitionTarget | null>(null);
+	const [rescheduleInitialStaffId, setRescheduleInitialStaffId] = useState<string | null>(
+		null,
+	);
 	const [isPrintDialogOpen, setIsPrintDialogOpen] = useState(false);
 	const [isContractModalOpen, setIsContractModalOpen] = useState(false);
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -180,7 +190,10 @@ export function CampaignRequestSheet({
 
 	if (!request) return null;
 
-	const handleStatusChange = (req: CampaignRequestItem, newStatus: CampaignRequestItem["status"]) => {
+	const handleStatusChange = (
+		req: CampaignRequestItem,
+		newStatus: CampaignRequestItem["status"],
+	) => {
 		onStatusChange?.(req, newStatus);
 	};
 
@@ -212,7 +225,10 @@ export function CampaignRequestSheet({
 
 	return (
 		<>
-			<Sheet open={open} onOpenChange={onOpenChange}>
+			<Sheet
+				open={open}
+				onOpenChange={onOpenChange}
+			>
 				<SheetContent
 					side="left"
 					dir="rtl"
@@ -250,7 +266,7 @@ export function CampaignRequestSheet({
 						"w-full flex flex-col p-0 gap-0! sm:max-w-none! overflow-hidden bg-background border-zinc-200 dark:border-zinc-800 shadow-2xl transition-all duration-200 print:w-full print:max-w-none print:shadow-none print:border-none print:overflow-visible z-50",
 						isExpanded
 							? "sm:w-[65vw]! md:w-[65vw]! lg:w-[65vw]!"
-							: "sm:w-[60vw]! md:w-[60vw]! lg:w-[60vw]!"
+							: "sm:w-[60vw]! md:w-[60vw]! lg:w-[60vw]!",
 					)}
 				>
 					{/* الترويسة العلوية مع مسار التنقل والأزرار والقائمة السريعة */}
@@ -259,8 +275,8 @@ export function CampaignRequestSheet({
 						onClose={() => onOpenChange(false)}
 						onOpenShortlist={() => setActiveDrawer("shortlist")}
 						onOpenWaitlist={() => setActiveDrawer("waitlist")}
-							onOpenSchedule={openReschedule}
-							onOpenReschedule={openReschedule}
+						onOpenSchedule={openReschedule}
+						onOpenReschedule={openReschedule}
 						onOpenReject={() => setActiveDrawer("reject")}
 						onOpenDelete={() => setActiveDrawer("delete")}
 						onAcceptDirect={onAccept ? () => openStatusTransition("ACCEPTED") : undefined}
@@ -280,16 +296,23 @@ export function CampaignRequestSheet({
 					/>
 
 					{/* الحاوية الرئيسية للتمرير الموحد للعمودين معاً كصفحة واحدة متكاملة */}
-					<div className="flex-1 overflow-y-auto min-h-0 bg-background" dir="rtl">
+					<div
+						className="flex-1 overflow-y-auto min-h-0 bg-background"
+						dir="rtl"
+					>
 						<div className="flex min-h-full flex-col items-stretch lg:flex-row">
-
 							{/* العمود الرئيسي (بيانات الطالب الموحدة، المسار، المستندات، والنشاط) 72% - يميناً في RTL */}
-							<div className="w-full lg:w-[72%] flex-1 px-3.5 md:px-4 pb-3.5 md:pb-4 pt-3.5 space-y-3 min-w-0" dir="rtl">
+							<div
+								className="w-full lg:w-[72%] flex-1 px-3.5 md:px-4 pb-3.5 md:pb-4 pt-3.5 space-y-3 min-w-0"
+								dir="rtl"
+							>
 								{/* بيانات الطالب: البوكس الموحد الشامل من الاسم حتى الاشتراك */}
 								<RequestChildDataCard
 									request={request}
 									campaignId={campaignId}
-									onStatusChange={capabilities.canChangeStatus ? handleStatusChange : undefined}
+									onStatusChange={
+										capabilities.canChangeStatus ? handleStatusChange : undefined
+									}
 									onOpenReschedule={capabilities.canSchedule ? openReschedule : undefined}
 									onOpenAssignPlan={() => setActiveDrawer("subscription")}
 									onOpenCashPayment={() => setActiveDrawer("cash-payment")}
@@ -297,11 +320,7 @@ export function CampaignRequestSheet({
 										const receipt =
 											activeReceipt && activeReceipt.requestId === request.id
 												? activeReceipt
-												: buildReceiptFromRequest(
-														request,
-														currencySymbol,
-														clinicInfo?.name,
-												  );
+												: buildReceiptFromRequest(request, currencySymbol, clinicInfo?.name);
 										if (receipt) {
 											setActiveReceipt(receipt);
 											setActiveDrawer("payment-receipt");
@@ -323,12 +342,16 @@ export function CampaignRequestSheet({
 												<IconCopy className="size-4 shrink-0 text-amber-600 dark:text-amber-400" />
 												<span>تم تصنيف هذا السجل كطلب مكرر</span>
 											</div>
-											<Badge variant="outline" className="text-xs bg-amber-100 text-amber-900 border-amber-300 font-bold px-2 py-0.5">
+											<Badge
+												variant="outline"
+												className="text-xs bg-amber-100 text-amber-900 border-amber-300 font-bold px-2 py-0.5"
+											>
 												مكرر
 											</Badge>
 										</div>
 										<p className="text-[11px] text-muted-foreground leading-relaxed">
-											تم تعليق هذا الطلب لاحتوائه على نفس بيانات طالب مسجل مسبقاً لمنع ازدواجية السجلات.
+											تم تعليق هذا الطلب لاحتوائه على نفس بيانات طالب مسجل مسبقاً لمنع ازدواجية
+											السجلات.
 										</p>
 										{capabilities.canChangeStatus && (
 											<div className="flex items-center justify-end pt-1">
@@ -346,15 +369,15 @@ export function CampaignRequestSheet({
 								)}
 
 								{/* مسار الطلب (بروتوكول القبول الأفقي بـ 5 محطات) */}
-								<RequestLifecycleStepper
-									request={request}
-								/>
+								<RequestLifecycleStepper request={request} />
 
 								{/* المستندات والروابط المرفقة */}
 								<RequestDocumentsSection
 									request={request}
 									campaignId={campaignId}
-									onOpenAddDocument={capabilities.canEdit ? () => setActiveDrawer("edit") : undefined}
+									onOpenAddDocument={
+										capabilities.canEdit ? () => setActiveDrawer("edit") : undefined
+									}
 								/>
 
 								{/* سجل النشاط وصندوق التعليقات الغني */}
@@ -379,7 +402,9 @@ export function CampaignRequestSheet({
 						key={`reject-${request.id}`}
 						request={request}
 						open={activeDrawer === "reject"}
-						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("reject") : handleCloseDrawer())}
+						onOpenChange={(isOpen) =>
+							isOpen ? setActiveDrawer("reject") : handleCloseDrawer()
+						}
 						campaignId={campaignId}
 						onSuccess={handleActionCompleted}
 						isExpanded={isExpanded}
@@ -389,7 +414,9 @@ export function CampaignRequestSheet({
 						key={`queue-${request.id}`}
 						request={request}
 						open={activeDrawer === "queue"}
-						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("queue") : handleCloseDrawer())}
+						onOpenChange={(isOpen) =>
+							isOpen ? setActiveDrawer("queue") : handleCloseDrawer()
+						}
 						campaignId={campaignId}
 						onSuccess={handleActionCompleted}
 						isExpanded={isExpanded}
@@ -399,7 +426,9 @@ export function CampaignRequestSheet({
 						key={`shortlist-${request.id}`}
 						request={request}
 						open={activeDrawer === "shortlist"}
-						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("shortlist") : handleCloseDrawer())}
+						onOpenChange={(isOpen) =>
+							isOpen ? setActiveDrawer("shortlist") : handleCloseDrawer()
+						}
 						campaignId={campaignId}
 						onSuccess={handleActionCompleted}
 						isExpanded={isExpanded}
@@ -409,7 +438,9 @@ export function CampaignRequestSheet({
 						key={`waitlist-${request.id}`}
 						request={request}
 						open={activeDrawer === "waitlist"}
-						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("waitlist") : handleCloseDrawer())}
+						onOpenChange={(isOpen) =>
+							isOpen ? setActiveDrawer("waitlist") : handleCloseDrawer()
+						}
 						campaignId={campaignId}
 						onSuccess={handleActionCompleted}
 						isExpanded={isExpanded}
@@ -419,7 +450,9 @@ export function CampaignRequestSheet({
 						key={`reschedule-${request.id}`}
 						request={request}
 						open={activeDrawer === "reschedule"}
-						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("reschedule") : handleCloseDrawer())}
+						onOpenChange={(isOpen) =>
+							isOpen ? setActiveDrawer("reschedule") : handleCloseDrawer()
+						}
 						campaignId={campaignId}
 						initialStaffId={rescheduleInitialStaffId}
 						onSuccess={handleActionCompleted}
@@ -430,7 +463,9 @@ export function CampaignRequestSheet({
 						key={`awaiting-payment-${request.id}`}
 						request={request}
 						open={activeDrawer === "awaiting-payment"}
-						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("awaiting-payment") : handleCloseDrawer())}
+						onOpenChange={(isOpen) =>
+							isOpen ? setActiveDrawer("awaiting-payment") : handleCloseDrawer()
+						}
 						campaignId={campaignId}
 						onSuccess={handleActionCompleted}
 						onRequestUpdate={onRequestUpdate}
@@ -445,7 +480,9 @@ export function CampaignRequestSheet({
 						key={`refer-${request.id}`}
 						request={request}
 						open={activeDrawer === "refer"}
-						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("refer") : handleCloseDrawer())}
+						onOpenChange={(isOpen) =>
+							isOpen ? setActiveDrawer("refer") : handleCloseDrawer()
+						}
 						campaignId={campaignId}
 						onSuccess={handleActionCompleted}
 						isExpanded={isExpanded}
@@ -455,7 +492,9 @@ export function CampaignRequestSheet({
 						key={`delete-${request.id}`}
 						request={request}
 						open={activeDrawer === "delete"}
-						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("delete") : handleCloseDrawer())}
+						onOpenChange={(isOpen) =>
+							isOpen ? setActiveDrawer("delete") : handleCloseDrawer()
+						}
 						campaignId={campaignId}
 						onDeletedSuccess={() => {
 							onOpenChange(false);
@@ -468,7 +507,9 @@ export function CampaignRequestSheet({
 						key={`subscription-${request.id}`}
 						request={request}
 						open={activeDrawer === "subscription"}
-						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("subscription") : handleCloseDrawer())}
+						onOpenChange={(isOpen) =>
+							isOpen ? setActiveDrawer("subscription") : handleCloseDrawer()
+						}
 						campaignId={campaignId}
 						onSuccess={(assignedPlan, updatedReq) => {
 							if (assignedPlan && onRequestUpdate) {
@@ -481,7 +522,7 @@ export function CampaignRequestSheet({
 										? {
 												paymentToken: updatedReq.paymentToken,
 												paymentTokenExpiresAt: updatedReq.paymentTokenExpiresAt,
-										  }
+											}
 										: {}),
 								});
 							}
@@ -499,7 +540,9 @@ export function CampaignRequestSheet({
 						key={`cash-payment-${request.id}`}
 						request={request}
 						open={activeDrawer === "cash-payment"}
-						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("cash-payment") : handleCloseDrawer())}
+						onOpenChange={(isOpen) =>
+							isOpen ? setActiveDrawer("cash-payment") : handleCloseDrawer()
+						}
 						campaignId={campaignId}
 						isExpanded={isExpanded}
 						onOpenAssignPlan={() => setActiveDrawer("subscription")}
@@ -571,7 +614,9 @@ export function CampaignRequestSheet({
 						key={`fill-assessment-${request.id}`}
 						request={request}
 						open={activeDrawer === "fill-assessment"}
-						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("fill-assessment") : handleCloseDrawer())}
+						onOpenChange={(isOpen) =>
+							isOpen ? setActiveDrawer("fill-assessment") : handleCloseDrawer()
+						}
 						campaignId={campaignId}
 						isExpanded={isExpanded}
 						onSuccess={handleActionCompleted}
@@ -582,7 +627,9 @@ export function CampaignRequestSheet({
 						key={`view-assessment-${request.id}`}
 						request={request}
 						open={activeDrawer === "view-assessment"}
-						onOpenChange={(isOpen) => (isOpen ? setActiveDrawer("view-assessment") : handleCloseDrawer())}
+						onOpenChange={(isOpen) =>
+							isOpen ? setActiveDrawer("view-assessment") : handleCloseDrawer()
+						}
 						campaignId={campaignId}
 						isExpanded={isExpanded}
 					/>

@@ -1,11 +1,8 @@
 import { cn } from "@/lib/utils";
 import { useEffect, useRef, useState, useMemo } from "react";
 import {
-	IconArrowRight,
 	IconCheck,
-	IconBuildingCommunity,
 	IconChevronDown,
-	IconClock,
 	IconCopy,
 	IconInfoCircle,
 	IconLoader2,
@@ -23,11 +20,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { AppointmentPickerPopover } from "../appointment-picker-popover";
@@ -89,8 +82,8 @@ export function RescheduleRequestDialog({
 	// لا يعتبر الطلب "إعادة جدولة" إلا إذا كان الطلب في مرحلة المقابلة بالفعل وله موعد نشط غير ملغي
 	const hasActiveAppointment = Boolean(
 		request?.status === "INTERVIEW" &&
-		request?.assessmentAppointment &&
-		request.assessmentAppointment.status !== "CANCELLED"
+			request?.assessmentAppointment &&
+			request.assessmentAppointment.status !== "CANCELLED",
 	);
 	const isReschedule = hasActiveAppointment;
 
@@ -100,7 +93,10 @@ export function RescheduleRequestDialog({
 	const [priority, setPriority] = useState<string>(request?.priority || "بدون أولوية");
 	const [newDate, setNewDate] = useState("");
 	const [staffId, setStaffId] = useState<string | null>(
-		request?.assessmentAppointment?.staffId || request?.assignedStaff?.id || request?.assignedStaffId || null,
+		request?.assessmentAppointment?.staffId ||
+			request?.assignedStaff?.id ||
+			request?.assignedStaffId ||
+			null,
 	);
 	const [interviewMode, setInterviewMode] = useState<"IN_CLINIC" | "REMOTE">(
 		request?.interviewMode === "REMOTE" ? "REMOTE" : "IN_CLINIC",
@@ -122,8 +118,7 @@ export function RescheduleRequestDialog({
 	const rescheduleMutation = useRescheduleRequest(campaignId);
 
 	const isAssessmentDone = Boolean(
-		request?.assessmentData ||
-		(request?.notes && request.notes.includes("إجابات التقييم:"))
+		request?.assessmentData || (request?.notes && request.notes.includes("إجابات التقييم:")),
 	);
 
 	const evaluationUrl = useMemo(() => {
@@ -132,7 +127,9 @@ export function RescheduleRequestDialog({
 
 	const meetingUrl = useMemo(() => {
 		if (request?.meetingUrl) return request.meetingUrl;
-		const sessionIdentifier = request?.code || (request?.id ? `SA-${request.id.slice(0, 8).toUpperCase()}` : "SA-SESSION");
+		const sessionIdentifier =
+			request?.code ||
+			(request?.id ? `SA-${request.id.slice(0, 8).toUpperCase()}` : "SA-SESSION");
 		return `https://meet.sanad-academy.com/session/${sessionIdentifier}`;
 	}, [request?.meetingUrl, request?.code, request?.id]);
 
@@ -153,9 +150,16 @@ export function RescheduleRequestDialog({
 			setNewDate("");
 			const requestInterviewMode = request.interviewMode === "REMOTE" ? "REMOTE" : "IN_CLINIC";
 			setInterviewMode(requestInterviewMode);
-			setRoomName(requestInterviewMode === "IN_CLINIC" ? request.roomName || "الغرفة" : "الغرفة");
+			setRoomName(
+				requestInterviewMode === "IN_CLINIC" ? request.roomName || "الغرفة" : "الغرفة",
+			);
 			setRoomId(requestInterviewMode === "IN_CLINIC" ? request.roomId || null : null);
-			const initialStaff = initialStaffId || request.assessmentAppointment?.staffId || request.assignedStaff?.id || request.assignedStaffId || null;
+			const initialStaff =
+				initialStaffId ||
+				request.assessmentAppointment?.staffId ||
+				request.assignedStaff?.id ||
+				request.assignedStaffId ||
+				null;
 			setStaffId(initialStaff);
 			setPriority(request.priority || "بدون أولوية");
 			setCustomReason("");
@@ -208,9 +212,17 @@ export function RescheduleRequestDialog({
 			if (currentStaffId && staff.some((member) => member.staffId === currentStaffId)) {
 				return currentStaffId;
 			}
-			const requestedStaffId = request.assessmentAppointment?.staffId || request.assignedStaff?.id || request.assignedStaffId;
+			const requestedStaffId =
+				request.assessmentAppointment?.staffId ||
+				request.assignedStaff?.id ||
+				request.assignedStaffId;
 			if (requestedStaffId) {
-				return staff.find((member) => member.staffId === requestedStaffId || member.userId === requestedStaffId)?.staffId || null;
+				return (
+					staff.find(
+						(member) =>
+							member.staffId === requestedStaffId || member.userId === requestedStaffId,
+					)?.staffId || null
+				);
 			}
 			return null;
 		});
@@ -251,7 +263,12 @@ export function RescheduleRequestDialog({
 				newDate: formattedDate,
 				interviewMode,
 				meetingUrl: interviewMode === "REMOTE" ? meetingUrl : undefined,
-				roomName: interviewMode === "IN_CLINIC" ? (roomName && roomName !== "الغرفة" ? roomName : undefined) : undefined,
+				roomName:
+					interviewMode === "IN_CLINIC"
+						? roomName && roomName !== "الغرفة"
+							? roomName
+							: undefined
+						: undefined,
 			});
 			setMessageText(generated);
 		} else {
@@ -261,7 +278,12 @@ export function RescheduleRequestDialog({
 				appointmentDate: formattedDate,
 				interviewMode,
 				meetingUrl: interviewMode === "REMOTE" ? meetingUrl : undefined,
-				roomName: interviewMode === "IN_CLINIC" ? (roomName && roomName !== "الغرفة" ? roomName : undefined) : undefined,
+				roomName:
+					interviewMode === "IN_CLINIC"
+						? roomName && roomName !== "الغرفة"
+							? roomName
+							: undefined
+						: undefined,
 				assessmentUrl: isAssessmentDone ? undefined : evaluationUrl,
 				isAssessmentDone,
 			});
@@ -301,7 +323,9 @@ export function RescheduleRequestDialog({
 		}
 
 		const activeReason = isReschedule
-			? (reason === "سبب آخر" ? customReason.trim() : reason)
+			? reason === "سبب آخر"
+				? customReason.trim()
+				: reason
 			: undefined;
 
 		if (isReschedule && reason === "سبب آخر" && !customReason.trim()) {
@@ -322,7 +346,7 @@ export function RescheduleRequestDialog({
 			{
 				requestId: request.id,
 				data: {
-					reason: activeReason,
+					reason: activeReason || "موعد جديد",
 					customReason: isReschedule && reason === "سبب آخر" ? customReason.trim() : undefined,
 					newAppointmentDate: appointmentDate.toISOString(),
 					staffId,
@@ -367,7 +391,10 @@ export function RescheduleRequestDialog({
 		<aside
 			data-slot="reschedule-drawer"
 			onWheel={handleDrawerWheel}
-			className={cn("fixed z-50 w-full lg:w-[28vw]! lg:min-w-[20rem]! lg:max-w-[28rem]!  lg:right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background h-[calc(100dvh-1rem)]! max-h-[calc(100dvh-1rem)]! inset-y-2! rounded-lg animate-in fade-in-0 duration-200 select-text", isExpanded ? "lg:left-[calc(65vw+0.75rem)]!" : "lg:left-[calc(60vw+0.75rem)]!")}
+			className={cn(
+				"fixed z-50 w-full lg:w-[28vw]! lg:min-w-[20rem]! lg:max-w-[28rem]!  lg:right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background h-[calc(100dvh-1rem)]! max-h-[calc(100dvh-1rem)]! inset-y-2! rounded-lg animate-in fade-in-0 duration-200 select-text",
+				isExpanded ? "lg:left-[calc(65vw+0.75rem)]!" : "lg:left-[calc(60vw+0.75rem)]!",
+			)}
 			dir="rtl"
 		>
 			{/* 1. رأس اللوحة الموحد */}
@@ -397,9 +424,13 @@ export function RescheduleRequestDialog({
 					<div className="rounded-xl border border-amber-200/80 bg-amber-50/70 dark:border-amber-900/50 dark:bg-amber-950/20 p-2.5 text-right flex items-center justify-between text-xs shadow-2xs">
 						<div className="flex items-center gap-2">
 							<span className="size-2 rounded-full bg-amber-500 shrink-0" />
-							<span className="text-amber-800 dark:text-amber-300 font-semibold">الموعد الحالي المحجوز:</span>
+							<span className="text-amber-800 dark:text-amber-300 font-semibold">
+								الموعد الحالي المحجوز:
+							</span>
 						</div>
-						<span className="font-bold text-amber-900 dark:text-amber-200">{formattedOldDate}</span>
+						<span className="font-bold text-amber-900 dark:text-amber-200">
+							{formattedOldDate}
+						</span>
 					</div>
 				)}
 
@@ -504,7 +535,10 @@ export function RescheduleRequestDialog({
 					<div className="rounded-xl border border-zinc-200/80 dark:border-zinc-800 bg-[#F9F9FD] dark:bg-zinc-900/60 p-3 flex items-center justify-between gap-3 shadow-2xs">
 						<div className="flex items-center gap-2.5 min-w-0 flex-1">
 							<div className="size-9 rounded-lg bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center p-1.5 shrink-0 shadow-2xs">
-								<SanadLogo iconOnly className="size-6 object-contain" />
+								<SanadLogo
+									iconOnly
+									className="size-6 object-contain"
+								/>
 							</div>
 							<div className="min-w-0 flex-1 text-right">
 								<p className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
@@ -570,7 +604,9 @@ export function RescheduleRequestDialog({
 							تضمين رسالة لولي الأمر
 						</label>
 						<span className="text-[10px] text-muted-foreground">
-							{enableMessage ? "سيتم حفظ الرسالة وإشعار ولي الأمر بالموعد" : "لن يتم إرسال أي نص مكتوب لولي الأمر"}
+							{enableMessage
+								? "سيتم حفظ الرسالة وإشعار ولي الأمر بالموعد"
+								: "لن يتم إرسال أي نص مكتوب لولي الأمر"}
 						</span>
 					</div>
 					<Switch
@@ -629,7 +665,9 @@ export function RescheduleRequestDialog({
 								className="w-(--radix-dropdown-menu-trigger-width) min-w-(--radix-dropdown-menu-trigger-width) p-1"
 								align="start"
 							>
-								<p className="text-[10px] text-muted-foreground font-semibold px-2 py-1">اختر السبب...</p>
+								<p className="text-[10px] text-muted-foreground font-semibold px-2 py-1">
+									اختر السبب...
+								</p>
 								{RESCHEDULE_REASONS.map((r) => (
 									<DropdownMenuItem
 										key={r}
@@ -653,7 +691,6 @@ export function RescheduleRequestDialog({
 						)}
 					</div>
 				)}
-
 			</div>
 
 			{/* 3. شريط أدوات الجدولة السريع المنظم فوق الفوتر */}
@@ -663,12 +700,22 @@ export function RescheduleRequestDialog({
 					{/* 1. تاريخ ووقت الموعد (إجباري) */}
 					<div className="min-w-0">
 						<AppointmentPickerPopover
-							value={newDate ? formattedNewDate : (isReschedule ? "تحديد موعد جديد *" : "تاريخ الموعد *")}
+							value={
+								newDate
+									? formattedNewDate
+									: isReschedule
+										? "تحديد موعد جديد *"
+										: "تاريخ الموعد *"
+							}
 							isoValue={newDate || null}
 							onChange={(_label, isoDate) => setNewDate(isoDate || "")}
 							reviewerName={selectedStaffMember?.name || "المراجع"}
 							reviewerId={staffId || undefined}
-							excludeAppointmentId={isReschedule ? (request.assessmentAppointment?.id || request.appointmentId || null) : null}
+							excludeAppointmentId={
+								isReschedule
+									? request.assessmentAppointment?.id || request.appointmentId || null
+									: null
+							}
 							excludeRequestId={isReschedule ? request.id : null}
 							currentAppointmentDate={currentAppointmentDate}
 							className="w-full h-8 text-[11px] justify-between font-normal shadow-2xs whitespace-nowrap bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800"
@@ -677,7 +724,10 @@ export function RescheduleRequestDialog({
 
 					{/* 2. اختيار المراجع (إجباري إذا لم يكن محدداً مسبقاً) */}
 					<div className="min-w-0">
-						<Popover open={staffPopoverOpen} onOpenChange={setStaffPopoverOpen}>
+						<Popover
+							open={staffPopoverOpen}
+							onOpenChange={setStaffPopoverOpen}
+						>
 							<PopoverTrigger asChild>
 								<Button
 									variant="outline"
@@ -692,21 +742,31 @@ export function RescheduleRequestDialog({
 									<span className="flex items-center gap-1 min-w-0 truncate">
 										<IconUser className="size-3.5 text-zinc-500 shrink-0" />
 										<span className="truncate">
-											{selectedStaffMember?.name ? `إسناد: ${selectedStaffMember.name}` : "تعيين مراجع *"}
+											{selectedStaffMember?.name
+												? `إسناد: ${selectedStaffMember.name}`
+												: "تعيين مراجع *"}
 										</span>
 									</span>
 									<IconChevronDown className="size-3 opacity-60 shrink-0" />
 								</Button>
 							</PopoverTrigger>
-							<PopoverContent align="start" className="w-56 p-1.5 z-50 bg-popover border border-border shadow-xl rounded-xl" dir="rtl">
+							<PopoverContent
+								align="start"
+								className="w-56 p-1.5 z-50 bg-popover border border-border shadow-xl rounded-xl"
+								dir="rtl"
+							>
 								<p className="text-[10.5px] font-bold text-zinc-900 dark:text-zinc-100 p-1 border-b border-border/50">
 									إسناد المقابلة إلى مراجع...
 								</p>
 								<div className="max-h-48 overflow-y-auto space-y-0.5 pt-1">
 									{staffLoading ? (
-										<p className="text-[10px] p-2 text-center text-muted-foreground">جاري التحميل...</p>
+										<p className="text-[10px] p-2 text-center text-muted-foreground">
+											جاري التحميل...
+										</p>
 									) : staff.length === 0 ? (
-										<p className="text-[10px] p-2 text-center text-muted-foreground">لا يوجد موظفون متاحون</p>
+										<p className="text-[10px] p-2 text-center text-muted-foreground">
+											لا يوجد موظفون متاحون
+										</p>
 									) : (
 										staff.map((s) => {
 											const isSelected = s.staffId === staffId;
@@ -720,7 +780,8 @@ export function RescheduleRequestDialog({
 													}}
 													className={cn(
 														"w-full text-right text-xs p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between gap-2 transition-colors cursor-pointer",
-														isSelected && "bg-blue-50/80 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold",
+														isSelected &&
+															"bg-blue-50/80 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold",
 													)}
 												>
 													<div className="flex items-center gap-2 min-w-0 flex-1">
@@ -752,7 +813,11 @@ export function RescheduleRequestDialog({
 							<RoomPickerPopover
 								value={roomName && roomName !== "الغرفة" ? roomName : "الغرفة *"}
 								appointmentDate={newDate}
-								excludeAppointmentId={isReschedule ? (request.assessmentAppointment?.id || request.appointmentId || null) : null}
+								excludeAppointmentId={
+									isReschedule
+										? request.assessmentAppointment?.id || request.appointmentId || null
+										: null
+								}
 								onChange={(name, id) => {
 									setRoomName(name);
 									setRoomId(id || null);
@@ -815,8 +880,8 @@ export function RescheduleRequestDialog({
 							{rescheduleMutation.isPending
 								? "جاري الحفظ..."
 								: isReschedule
-								? "تأكيد إعادة الجدولة"
-								: "تأكيد جدولة المقابلة"}
+									? "تأكيد إعادة الجدولة"
+									: "تأكيد جدولة المقابلة"}
 						</span>
 					</Button>
 				</div>

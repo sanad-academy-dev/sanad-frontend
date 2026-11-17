@@ -1,25 +1,17 @@
 import { useState, useEffect } from "react";
-import {
-	IconCalendar,
-	IconCheck,
-	IconCopy,
-	IconMapPin,
-	IconPhone,
-	IconPlus,
-} from "@tabler/icons-react";
+import { IconCalendar, IconCheck, IconMapPin, IconPhone, IconPlus } from "@tabler/icons-react";
 import { toast } from "sonner";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
-import { useRegistrationReviewers, useAssignReviewer } from "../../hooks/use-digital-registration";
+import {
+	useRegistrationReviewers,
+	useAssignReviewer,
+} from "../../hooks/use-digital-registration";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
 import {
 	formatAppointmentDate,
@@ -48,7 +40,6 @@ interface RequestGuardianSidebarProps {
 
 export function RequestGuardianSidebar({
 	request,
-	onOpenReschedule,
 	onOpenReferDialog,
 	onRequestUpdate,
 }: RequestGuardianSidebarProps) {
@@ -65,17 +56,26 @@ export function RequestGuardianSidebar({
 		return (
 			request.assignedStaff ||
 			(request.reviewerName
-				? { name: request.reviewerName, id: request.assignedStaffId || "", phone: (request as any).reviewerPhone || null }
+				? {
+						name: request.reviewerName,
+						id: request.assignedStaffId || "",
+						phone: (request as any).reviewerPhone || null,
+					}
 				: null)
 		);
 	});
+	const localReviewerId = localReviewer?.id ?? "";
 
 	useEffect(() => {
 		setLocalReviewer(
 			request.assignedStaff ||
 				(request.reviewerName
-					? { name: request.reviewerName, id: request.assignedStaffId || "", phone: (request as any).reviewerPhone || null }
-					: null)
+					? {
+							name: request.reviewerName,
+							id: request.assignedStaffId || "",
+							phone: (request as any).reviewerPhone || null,
+						}
+					: null),
 		);
 	}, [request.assignedStaff, request.reviewerName, request.assignedStaffId]);
 
@@ -97,7 +97,7 @@ export function RequestGuardianSidebar({
 					name: targetStaff.name,
 					phone: targetStaff.phone || null,
 					image: targetStaff.image || null,
-			  }
+				}
 			: null;
 
 		// 1. تحديث محلي وفوري بنسبة 100% بدون أي تأخير (0ms Optimistic UI)
@@ -132,8 +132,12 @@ export function RequestGuardianSidebar({
 					setLocalReviewer(
 						request.assignedStaff ||
 							(request.reviewerName
-								? { name: request.reviewerName, id: request.assignedStaffId || "", phone: (request as any).reviewerPhone || null }
-								: null)
+								? {
+										name: request.reviewerName,
+										id: request.assignedStaffId || "",
+										phone: (request as any).reviewerPhone || null,
+									}
+								: null),
 					);
 					toast.error(err.message || "فشل تعيين المراجع");
 				},
@@ -143,8 +147,15 @@ export function RequestGuardianSidebar({
 
 	const guardianWaUrl = request.guardianPhone ? getWhatsAppUrl(request.guardianPhone) : "";
 
-	const reviewer = localReviewer || request.assignedStaff || (request.reviewerName ? { name: request.reviewerName, id: request.assignedStaffId || "", phone: null } : null);
-	const matchedReviewer = reviewers.find((r) => r.id === reviewer?.id || r.userId === reviewer?.id);
+	const reviewer =
+		localReviewer ||
+		request.assignedStaff ||
+		(request.reviewerName
+			? { name: request.reviewerName, id: request.assignedStaffId || "", phone: null }
+			: null);
+	const matchedReviewer = reviewers.find(
+		(r) => r.id === reviewer?.id || r.userId === reviewer?.id,
+	);
 	const reviewerPhone = (reviewer as any)?.phone || matchedReviewer?.phone || "";
 	const reviewerWaUrl = reviewerPhone ? getWhatsAppUrl(reviewerPhone) : "";
 
@@ -153,13 +164,7 @@ export function RequestGuardianSidebar({
 
 	const submittedAtFormatted = request.submittedAt
 		? `${formatAppointmentDate(request.submittedAt, clinicTimezone, "ar-EG-u-nu-latn", { month: "short", day: "numeric", weekday: undefined, year: undefined })} • ${formatAppointmentTime(request.submittedAt, clinicTimezone, "ar-EG-u-nu-latn")}`
-		: (request.date || "قيد المراجعة");
-	const hasInterviewContext = Boolean(
-		request.status === "INTERVIEW" ||
-		request.appointmentDate ||
-		request.assessmentAppointment
-	);
-
+		: request.date || "قيد المراجعة";
 	const isRemote = request.interviewMode
 		? request.interviewMode === "REMOTE"
 		: request.channel === "CALL";
@@ -213,7 +218,10 @@ export function RequestGuardianSidebar({
 						<div className="flex items-center justify-between gap-2 text-xs pt-0.5">
 							<div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-300 min-w-0">
 								<IconPhone className="size-3 text-zinc-400 shrink-0" />
-								<span className="font-mono text-[10.5px] truncate" dir="ltr">
+								<span
+									className="font-mono text-[10.5px] truncate"
+									dir="ltr"
+								>
 									{request.guardianPhone || "غير محدد"}
 								</span>
 							</div>
@@ -256,7 +264,10 @@ export function RequestGuardianSidebar({
 					<div className="flex items-center justify-between text-xs font-bold text-zinc-900 dark:text-zinc-100">
 						<span>المراجع</span>
 						{reviewer && (
-							<Popover open={reviewerPopoverOpen} onOpenChange={setReviewerPopoverOpen}>
+							<Popover
+								open={reviewerPopoverOpen}
+								onOpenChange={setReviewerPopoverOpen}
+							>
 								<PopoverTrigger asChild>
 									<button
 										type="button"
@@ -265,19 +276,28 @@ export function RequestGuardianSidebar({
 										تغيير
 									</button>
 								</PopoverTrigger>
-								<PopoverContent align="end" className="w-56 p-1.5 z-50 bg-popover border border-border shadow-xl rounded-xl" dir="rtl">
+								<PopoverContent
+									align="end"
+									className="w-56 p-1.5 z-50 bg-popover border border-border shadow-xl rounded-xl"
+									dir="rtl"
+								>
 									<div className="space-y-1">
 										<p className="text-[10.5px] font-bold text-zinc-900 dark:text-zinc-100 px-1.5 py-0.5">
 											تغيير المراجع
 										</p>
 										<div className="max-h-44 overflow-y-auto space-y-0.5">
 											{staffLoading ? (
-												<p className="text-[10px] text-muted-foreground p-1 text-center">جاري التحميل...</p>
+												<p className="text-[10px] text-muted-foreground p-1 text-center">
+													جاري التحميل...
+												</p>
 											) : reviewers.length === 0 ? (
-												<p className="text-[10px] text-muted-foreground p-1 text-center">لا يوجد أعضاء متاحين</p>
+												<p className="text-[10px] text-muted-foreground p-1 text-center">
+													لا يوجد أعضاء متاحين
+												</p>
 											) : (
 												reviewers.map((s) => {
-													const isSelected = s.staffId === localReviewer?.id || s.id === localReviewer?.id;
+													const isSelected =
+									s.staffId === localReviewerId || s.id === localReviewerId;
 													return (
 														<button
 															key={s.id}
@@ -285,7 +305,8 @@ export function RequestGuardianSidebar({
 															onClick={() => handleAssignReviewer(s.staffId)}
 															className={cn(
 																"w-full flex items-center justify-between gap-1.5 p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-right transition-colors cursor-pointer",
-																isSelected && "bg-blue-50/80 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold",
+																isSelected &&
+																	"bg-blue-50/80 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold",
 															)}
 														>
 															<div className="flex items-center gap-1.5 min-w-0 flex-1">
@@ -299,13 +320,18 @@ export function RequestGuardianSidebar({
 																		{s.name}
 																	</span>
 																	{s.phone && (
-																		<span className="text-[9px] text-muted-foreground font-mono block" dir="ltr">
+																		<span
+																			className="text-[9px] text-muted-foreground font-mono block"
+																			dir="ltr"
+																		>
 																			{s.phone}
 																		</span>
 																	)}
 																</div>
 															</div>
-															{isSelected && <IconCheck className="size-3.5 text-blue-600 dark:text-blue-400 shrink-0" />}
+															{isSelected && (
+																<IconCheck className="size-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+															)}
 														</button>
 													);
 												})
@@ -357,7 +383,10 @@ export function RequestGuardianSidebar({
 							<div className="flex items-center justify-between gap-2 text-xs pt-0.5">
 								<div className="flex items-center gap-1 text-zinc-600 dark:text-zinc-300 min-w-0">
 									<IconPhone className="size-3 text-zinc-400 shrink-0" />
-									<span className="font-mono text-[10.5px] truncate" dir="ltr">
+									<span
+										className="font-mono text-[10.5px] truncate"
+										dir="ltr"
+									>
 										{reviewerPhone || "غير محدد"}
 									</span>
 								</div>
@@ -375,7 +404,10 @@ export function RequestGuardianSidebar({
 						</div>
 					) : (
 						<div className="pt-0.5">
-							<Popover open={reviewerPopoverOpen} onOpenChange={setReviewerPopoverOpen}>
+							<Popover
+								open={reviewerPopoverOpen}
+								onOpenChange={setReviewerPopoverOpen}
+							>
 								<PopoverTrigger asChild>
 									<Button
 										type="button"
@@ -386,19 +418,28 @@ export function RequestGuardianSidebar({
 										<span>تعيين مراجع</span>
 									</Button>
 								</PopoverTrigger>
-								<PopoverContent align="end" className="w-56 p-1.5 z-50 bg-popover border border-border shadow-xl rounded-xl" dir="rtl">
+								<PopoverContent
+									align="end"
+									className="w-56 p-1.5 z-50 bg-popover border border-border shadow-xl rounded-xl"
+									dir="rtl"
+								>
 									<div className="space-y-1">
 										<p className="text-[10.5px] font-bold text-zinc-900 dark:text-zinc-100 px-1.5 py-0.5">
 											اختر الأخصائي / المراجع
 										</p>
 										<div className="max-h-44 overflow-y-auto space-y-0.5">
 											{staffLoading ? (
-												<p className="text-[10px] text-muted-foreground p-1 text-center">جاري التحميل...</p>
+												<p className="text-[10px] text-muted-foreground p-1 text-center">
+													جاري التحميل...
+												</p>
 											) : reviewers.length === 0 ? (
-												<p className="text-[10px] text-muted-foreground p-1 text-center">لا يوجد أعضاء متاحين</p>
+												<p className="text-[10px] text-muted-foreground p-1 text-center">
+													لا يوجد أعضاء متاحين
+												</p>
 											) : (
 												reviewers.map((s) => {
-													const isSelected = s.staffId === localReviewer?.id || s.id === localReviewer?.id;
+													const isSelected =
+										s.staffId === localReviewerId || s.id === localReviewerId;
 													return (
 														<button
 															key={s.id}
@@ -406,7 +447,8 @@ export function RequestGuardianSidebar({
 															onClick={() => handleAssignReviewer(s.staffId)}
 															className={cn(
 																"w-full flex items-center justify-between gap-1.5 p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-right transition-colors cursor-pointer",
-																isSelected && "bg-blue-50/80 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold",
+																isSelected &&
+																	"bg-blue-50/80 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold",
 															)}
 														>
 															<div className="flex items-center gap-1.5 min-w-0 flex-1">
@@ -420,13 +462,18 @@ export function RequestGuardianSidebar({
 																		{s.name}
 																	</span>
 																	{s.phone && (
-																		<span className="text-[9px] text-muted-foreground font-mono block" dir="ltr">
+																		<span
+																			className="text-[9px] text-muted-foreground font-mono block"
+																			dir="ltr"
+																		>
 																			{s.phone}
 																		</span>
 																	)}
 																</div>
 															</div>
-															{isSelected && <IconCheck className="size-3.5 text-blue-600 dark:text-blue-400 shrink-0" />}
+															{isSelected && (
+																<IconCheck className="size-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
+															)}
 														</button>
 													);
 												})
@@ -447,8 +494,13 @@ export function RequestGuardianSidebar({
 					{request.referredToStaff ? (
 						<div className="rounded-lg border border-purple-200 dark:border-purple-800 bg-purple-50/50 dark:bg-purple-950/20 p-2 space-y-0.5 text-xs">
 							<div className="flex items-center justify-between">
-								<span className="font-bold text-purple-900 dark:text-purple-300 text-[10.5px]">تمت الإحالة إلى:</span>
-								<Badge variant="outline" className="text-[8.5px] px-1 py-0 border-purple-300 text-purple-800 dark:text-purple-200 bg-purple-100">
+								<span className="font-bold text-purple-900 dark:text-purple-300 text-[10.5px]">
+									تمت الإحالة إلى:
+								</span>
+								<Badge
+									variant="outline"
+									className="text-[8.5px] px-1 py-0 border-purple-300 text-purple-800 dark:text-purple-200 bg-purple-100"
+								>
 									محال
 								</Badge>
 							</div>

@@ -28,7 +28,7 @@ import { getFileUrl } from "@/lib/file-url";
 import type {
 	AssignmentResponse,
 	EligibleLearnerResponse,
-} from "@/server/course-assignments/course-assignments.type";
+} from "@sanad/contracts/runtime/server/course-assignments/course-assignments.type";
 import {
 	useAssignmentActions,
 	useAutoAssignRules,

@@ -7,7 +7,7 @@ import type {
 	AutoAssignRuleFormInput,
 	AutoAssignRuleResponse,
 	EligibleLearnerResponse,
-} from "@/server/course-assignments/course-assignments.type";
+} from "@sanad/contracts/runtime/server/course-assignments/course-assignments.type";
 
 const eligibleKey = (courseId: string, branchId?: string) =>
 	["course-assignments", "eligible", courseId, branchId ?? "all"] as const;

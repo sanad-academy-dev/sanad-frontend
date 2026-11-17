@@ -3,7 +3,6 @@ import {
 	IconArrowsDiagonalMinimize2,
 	IconArrowsExchange,
 	IconBan,
-	IconCake,
 	IconChevronLeft,
 	IconCircleCheck,
 	IconCircleOff,
@@ -323,7 +322,9 @@ export function PatientProfileSheet({
 										) : (
 											<IconCircleOff className="size-4 text-muted-foreground" />
 										)}
-										<span className="text-sm font-medium">{patient?.active ? "نشط" : "غير نشط"}</span>
+										<span className="text-sm font-medium">
+											{patient?.active ? "نشط" : "غير نشط"}
+										</span>
 									</div>
 
 									{/* classroom */}
@@ -339,9 +340,7 @@ export function PatientProfileSheet({
 									{/* feeType */}
 									<div className="flex items-center justify-between gap-2">
 										<span className="text-xs text-muted-foreground">نوع الرسوم</span>
-										<span className="text-xs font-medium">
-											{patient?.feeType || "—"}
-										</span>
+										<span className="text-xs font-medium">{patient?.feeType || "—"}</span>
 									</div>
 
 									{/* pocketMoneyEnabled */}
@@ -381,7 +380,9 @@ export function PatientProfileSheet({
 									{patient?.nationalId && (
 										<div className="flex items-center justify-between gap-2">
 											<span className="text-xs text-muted-foreground">رقم الهوية</span>
-											<span className="text-xs font-mono tabular-nums">{patient.nationalId}</span>
+											<span className="text-xs font-mono tabular-nums">
+												{patient.nationalId}
+											</span>
 										</div>
 									)}
 
@@ -399,7 +400,10 @@ export function PatientProfileSheet({
 									{patient?.transportation && (
 										<div className="flex items-center justify-between gap-2">
 											<span className="text-xs text-muted-foreground">وسيلة النقل</span>
-											<span className="text-xs truncate max-w-[130px]" title={patient.transportation}>
+											<span
+												className="text-xs truncate max-w-[130px]"
+												title={patient.transportation}
+											>
 												{patient.transportation}
 											</span>
 										</div>

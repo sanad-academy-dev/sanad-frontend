@@ -1,6 +1,5 @@
 import {
 	IconChevronLeft,
-	IconChevronRight,
 	IconDots,
 	IconFolders,
 	IconRoute,
@@ -42,7 +41,10 @@ function RouteComponent() {
 	}, [setTitleSuppressed]);
 
 	const headerContent = (
-		<div className="flex items-center gap-2" dir="rtl">
+		<div
+			className="flex items-center gap-2"
+			dir="rtl"
+		>
 			<Link
 				to="/management/settings"
 				className="whitespace-nowrap text-xs font-semibold text-foreground hover:underline"
@@ -136,9 +138,8 @@ function RouteComponent() {
 				className="px-6"
 				stats={SPECIALTIES_STATS}
 			/>
-			
+
 			<SpecializationsTable />
-			
 		</div>
 	);
 }

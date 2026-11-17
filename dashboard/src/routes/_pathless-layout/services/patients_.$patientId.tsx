@@ -4,20 +4,13 @@ import {
 	IconArrowsExchange,
 	IconBan,
 	IconChevronLeft,
-	IconCircleCheck,
-	IconCircleOff,
-	IconCopy,
 	IconDots,
 	IconEdit,
-	IconPhone,
 	IconTrash,
-	IconUser,
 } from "@tabler/icons-react";
 import { createFileRoute, Link, redirect, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { toast } from "sonner";
-import { InitialsAvatar } from "@/components/common/initials-avatar";
 import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,7 +20,6 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Separator } from "@/components/ui/separator";
 import { Tabs } from "@/components/ui/tabs";
 import { PatientSidebar } from "@/features/services/patients/components/patient-sidebar";
 import { DeletePatientDialog } from "@/features/services/patients/components/delete-patient-dialog";
@@ -112,12 +104,6 @@ function PatientDetailPage() {
 		return () => setTitleSuppressed(false);
 	}, [setTitleSuppressed]);
 
-	const copyPhone = () => {
-		if (!patient?.owner?.phone) return;
-		navigator.clipboard.writeText(patient.owner.phone);
-		toast.success("تم النسخ");
-	};
-
 	if (isLoading) {
 		return (
 			<div className="flex flex-1 items-center justify-center min-h-[400px]">
@@ -141,9 +127,6 @@ function PatientDetailPage() {
 			</div>
 		);
 	}
-
-	const isFemale = patient.gender === "FEMALE";
-	const genderText = isFemale ? "أنثى" : "ذكر";
 
 	// ترويسة الصفحة الموحدة مع الديزاين سيستم — تُحقن عبر الـ Portal في شريط الهيدر العلوي
 	const headerContent = (
@@ -245,8 +228,7 @@ function PatientDetailPage() {
 
 			{/* جسم الصفحة الرئيسي: تقسيم عمودين (البيانات الجانبية + محتوى التبويب) */}
 			<div className="grid grid-cols-1 lg:grid-cols-12 flex-1 min-h-0 overflow-hidden">
-
-         {/* منطقة التبويب المفتوح */}
+				{/* منطقة التبويب المفتوح */}
 				<main className="lg:col-span-8 xl:col-span-8 flex-1 min-h-0 overflow-y-auto p-4">
 					<Tabs
 						value={activeTab}
@@ -285,8 +267,6 @@ function PatientDetailPage() {
 					onEdit={() => setEditTarget(patient)}
 					onNavigateTab={(tab) => setActiveTab(tab as PatientTabValue)}
 				/>
-
-				
 			</div>
 
 			{/* حوارات التعديل والإجراءات */}

@@ -1,5 +1,4 @@
 import {
-	IconAlertCircle,
 	IconAlertTriangle,
 	IconBan,
 	IconBrandWhatsapp,
@@ -20,10 +19,8 @@ import {
 	IconPhoneCall,
 	IconPlus,
 	IconSchool,
-	IconShieldCheck,
 	IconTrash,
 	IconUser,
-	IconUserCheck,
 	IconUsers,
 } from "@tabler/icons-react";
 import { useQuery } from "@tanstack/react-query";
@@ -59,7 +56,7 @@ import { usePageHeaderTakeover } from "@/hooks/use-page-header-takeover";
 import { api } from "@/lib/api";
 import { PERMISSIONS } from "@/lib/permissions";
 import { cn } from "@/lib/utils";
-import type { OwnerRelationship, OwnerResponse } from "@/server/owners/owners.type";
+import type { OwnerResponse } from "@/server/owners/owners.type";
 
 export const Route = createFileRoute("/_pathless-layout/services/owners_/$ownerId")({
 	component: OwnerDetailPage,
@@ -111,7 +108,9 @@ function InfoField({
 		<div className="flex flex-col justify-between gap-1.5 rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs">
 			<div className="flex items-center justify-between gap-2 text-muted-foreground">
 				<div className="flex items-center gap-1.5">
-					<span className="size-3.5 shrink-0 flex items-center justify-center text-muted-foreground/80">{icon}</span>
+					<span className="size-3.5 shrink-0 flex items-center justify-center text-muted-foreground/80">
+						{icon}
+					</span>
 					<p className="text-xs font-medium">{label}</p>
 				</div>
 				{action && <div className="shrink-0">{action}</div>}
@@ -191,11 +190,20 @@ function OwnerDetailPage() {
 
 	if (!owner) {
 		return (
-			<div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center" dir="rtl">
+			<div
+				className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center"
+				dir="rtl"
+			>
 				<IconAlertTriangle className="size-10 text-amber-500" />
 				<h2 className="text-lg font-bold">لم يتم العثور على وليّ الأمر</h2>
-				<p className="text-sm text-muted-foreground">وليّ الأمر المطلوب غير موجود أو تم حذفه من النظام.</p>
-				<Button asChild variant="outline" className="mt-2">
+				<p className="text-sm text-muted-foreground">
+					وليّ الأمر المطلوب غير موجود أو تم حذفه من النظام.
+				</p>
+				<Button
+					asChild
+					variant="outline"
+					className="mt-2"
+				>
 					<Link to="/services/owners">العودة لقائمة أولياء الأمور</Link>
 				</Button>
 			</div>
@@ -204,16 +212,21 @@ function OwnerDetailPage() {
 
 	const cleanPhone = (owner.phone || "").replace(/\D/g, "");
 	const fullAddress =
-		owner.address ||
-		[owner.city, owner.country].filter(Boolean).join("، ") ||
-		"غير مسجل";
+		owner.address || [owner.city, owner.country].filter(Boolean).join("، ") || "غير مسجل";
 
 	// جهة اتصال الطوارئ لولي الأمر مع دعم البيانات السابقة للطلاب كخيار احتياطي
-	const emergencyContactName = owner.emergencyContactName || linkedPatients.find((p) => p.emergencyContactName)?.emergencyContactName;
-	const emergencyContactPhone = owner.emergencyContactPhone || linkedPatients.find((p) => p.emergencyContactPhone)?.emergencyContactPhone;
+	const emergencyContactName =
+		owner.emergencyContactName ||
+		linkedPatients.find((p) => p.emergencyContactName)?.emergencyContactName;
+	const emergencyContactPhone =
+		owner.emergencyContactPhone ||
+		linkedPatients.find((p) => p.emergencyContactPhone)?.emergencyContactPhone;
 
 	const headerContent = (
-		<div className="flex items-center gap-2" dir="rtl">
+		<div
+			className="flex items-center gap-2"
+			dir="rtl"
+		>
 			<Link
 				to="/services/owners"
 				className="whitespace-nowrap text-xs font-semibold text-foreground hover:underline"
@@ -221,9 +234,7 @@ function OwnerDetailPage() {
 				أولياء الأمور
 			</Link>
 			<IconChevronLeft className="size-3 shrink-0 text-muted-foreground ltr:rotate-180" />
-			<span className="whitespace-nowrap text-xs font-bold text-foreground">
-				{owner.name}
-			</span>
+			<span className="whitespace-nowrap text-xs font-bold text-foreground">{owner.name}</span>
 
 			<span className="h-4 w-px bg-border shrink-0" />
 
@@ -249,7 +260,7 @@ function OwnerDetailPage() {
 							<IconDots className="size-3.5" />
 						</Button>
 					</DropdownMenuTrigger>
-					
+
 					<DropdownMenuContent align="start">
 						<DropdownMenuItem
 							className="gap-2 text-xs"
@@ -280,7 +291,10 @@ function OwnerDetailPage() {
 	);
 
 	return (
-		<div className="flex flex-1 flex-col overflow-y-auto p-4 lg:p-6 gap-5 bg-background" dir="rtl">
+		<div
+			className="flex flex-1 flex-col overflow-y-auto p-4 lg:p-6 gap-5 bg-background"
+			dir="rtl"
+		>
 			{slot && createPortal(headerContent, slot)}
 
 			{/* ── بطاقة هوية ولي الأمر والترويسة ── */}
@@ -349,7 +363,10 @@ function OwnerDetailPage() {
 							{owner.phone && (
 								<>
 									<span className="text-border/80">•</span>
-									<span className="flex items-center gap-1.5 font-mono" dir="ltr">
+									<span
+										className="flex items-center gap-1.5 font-mono"
+										dir="ltr"
+									>
 										<IconPhone className="size-3 text-muted-foreground/80 shrink-0" />
 										<span>{owner.phone}</span>
 									</span>
@@ -404,9 +421,13 @@ function OwnerDetailPage() {
 							<IconUsers className="size-6" />
 						</div>
 						<div className="flex flex-col">
-							<span className="text-xs text-muted-foreground font-medium">الطلاب التابعين</span>
+							<span className="text-xs text-muted-foreground font-medium">
+								الطلاب التابعين
+							</span>
 							<div className="flex items-baseline gap-1.5 mt-0.5">
-								<span className="text-xl font-bold text-foreground font-mono">{linkedPatients.length}</span>
+								<span className="text-xl font-bold text-foreground font-mono">
+									{linkedPatients.length}
+								</span>
 								<span className="text-xs text-muted-foreground font-medium">طالب مسجل</span>
 							</div>
 						</div>
@@ -436,7 +457,9 @@ function OwnerDetailPage() {
 							<IconCreditCard className="size-6" />
 						</div>
 						<div className="flex flex-col min-w-0">
-							<span className="text-xs text-muted-foreground font-medium">الرصيد المالي الحالي</span>
+							<span className="text-xs text-muted-foreground font-medium">
+								الرصيد المالي الحالي
+							</span>
 							<div className="flex items-center gap-2 mt-0.5 flex-wrap">
 								{balanceData && Number(balanceData.outstanding) > 0 ? (
 									<>
@@ -453,7 +476,9 @@ function OwnerDetailPage() {
 									</>
 								) : (
 									<>
-										<span className="text-xl font-bold text-foreground font-mono tabular-nums">0.00</span>
+										<span className="text-xl font-bold text-foreground font-mono tabular-nums">
+											0.00
+										</span>
 										<span className="text-xs text-muted-foreground font-medium">ج.م</span>
 										<Badge
 											variant="outline"
@@ -476,7 +501,9 @@ function OwnerDetailPage() {
 							<IconCoins className="size-6" />
 						</div>
 						<div className="flex flex-col">
-							<span className="text-xs text-muted-foreground font-medium">نقاط الولاء والمكافآت</span>
+							<span className="text-xs text-muted-foreground font-medium">
+								نقاط الولاء والمكافآت
+							</span>
 							<div className="flex items-baseline gap-1.5 mt-0.5">
 								<span className="text-xl font-bold text-foreground font-mono">
 									{loyaltySummary?.balance ?? 0}
@@ -574,7 +601,10 @@ function OwnerDetailPage() {
 								label="العنوان ومكان الإقامة"
 								icon={<IconMapPin className="size-3.5" />}
 							>
-								<span className="text-xs font-medium truncate block" title={fullAddress}>
+								<span
+									className="text-xs font-medium truncate block"
+									title={fullAddress}
+								>
 									{fullAddress}
 								</span>
 							</InfoField>
@@ -584,7 +614,11 @@ function OwnerDetailPage() {
 								icon={<IconUser className="size-3.5" />}
 							>
 								<span className="text-xs font-medium">
-									{owner.gender === "FEMALE" ? "أنثى" : owner.gender === "MALE" ? "ذكر" : "غير محدد"}
+									{owner.gender === "FEMALE"
+										? "أنثى"
+										: owner.gender === "MALE"
+											? "ذكر"
+											: "غير محدد"}
 								</span>
 							</InfoField>
 						</CardContent>
@@ -644,7 +678,9 @@ function OwnerDetailPage() {
 												{emergencyContactPhone}
 											</a>
 										) : (
-											<span className="text-muted-foreground text-xs font-normal">غير مسجل</span>
+											<span className="text-muted-foreground text-xs font-normal">
+												غير مسجل
+											</span>
 										)}
 									</InfoField>
 								</div>
@@ -688,7 +724,9 @@ function OwnerDetailPage() {
 						<CardHeader className="pb-3 pt-4 px-4 flex flex-row items-center justify-between">
 							<div className="flex items-center gap-2">
 								<IconSchool className="size-4.5 text-primary" />
-								<CardTitle className="text-base font-bold">الطلاب التابعين لولي الأمر</CardTitle>
+								<CardTitle className="text-base font-bold">
+									الطلاب التابعين لولي الأمر
+								</CardTitle>
 								<span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20">
 									{linkedPatients.length}
 								</span>
@@ -711,9 +749,12 @@ function OwnerDetailPage() {
 										<IconUsers className="size-6" />
 									</div>
 									<div className="flex flex-col gap-1 max-w-sm">
-										<h4 className="font-bold text-sm text-foreground">لا يوجد طلاب مسجلون حالياً</h4>
+										<h4 className="font-bold text-sm text-foreground">
+											لا يوجد طلاب مسجلون حالياً
+										</h4>
 										<p className="text-xs text-muted-foreground leading-relaxed">
-											لم يتم ربط أي طلاب بولي الأمر هذا حتى الآن. يمكنك إضافة طالب جديد وربطه تلقائياً.
+											لم يتم ربط أي طلاب بولي الأمر هذا حتى الآن. يمكنك إضافة طالب جديد وربطه
+											تلقائياً.
 										</p>
 									</div>
 									<Button

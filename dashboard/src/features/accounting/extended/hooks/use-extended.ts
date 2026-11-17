@@ -1,7 +1,40 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import type { RepostStatus } from "@/generated/prisma/enums";
 import { api } from "@/lib/api";
+import type { DeferredScheduleReport } from "@/server/accounting/deferred/deferred.report";
+import type { OverdueInvoiceRow } from "@/server/accounting/dunning/dunning.service";
+import type { CustomerStatement } from "@/server/accounting/psoa/psoa.service";
+import type { RepostCandidate } from "@/server/accounting/repost/repost.service";
+import type { WithholdingSummaryRow } from "@/server/accounting/tax-withholding/tax-withholding.report";
+
+type DunningRows = Awaited<
+	ReturnType<typeof import("@/server/accounting/dunning/dunning.service").listDunnings>
+>;
+type DunningTypeRows = Awaited<
+	ReturnType<typeof import("@/server/accounting/dunning/dunning.service").listDunningTypes>
+>;
+type SubscriptionRows = Awaited<
+	ReturnType<typeof import("@/server/accounting/subscription/subscription.service").listSubscriptions>
+>;
+type PsoaConfigRows = Awaited<
+	ReturnType<typeof import("@/server/accounting/psoa/psoa.service").listPsoaConfigs>
+>;
+type RepostRows = {
+	id: string;
+	reason: string;
+	createdAt: Date | string;
+	items: unknown[];
+	status: RepostStatus;
+	errorMessage: string | null;
+}[];
+type PosRegisterRows = Awaited<
+	ReturnType<typeof import("@/server/accounting/pos-shift/pos-shift.service").posRegisterReport>
+>;
+type RunRepostResult = Awaited<
+	ReturnType<typeof import("@/server/accounting/repost/repost.service").runRepost>
+>;
 
 /**
  * [P12.14] Hooks for «العمليات الممتدّة» — the Phase-12 Extended features that shipped
@@ -33,12 +66,12 @@ const useAccountingInvalidator = () => {
 /* ── [P12.5] dunning ──────────────────────────────────────────────────────────────────── */
 
 export const useDunnings = () => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<DunningRows>({
 		queryKey: key("dunnings"),
 		queryFn: async () => {
 			const { data, error } = await api.accounting.dunning.get();
 			if (error) throw new Error("تعذّر تحميل المطالبات");
-			return data;
+			return data as DunningRows;
 		},
 		staleTime: 1000 * 30,
 	});
@@ -46,12 +79,12 @@ export const useDunnings = () => {
 };
 
 export const useDunningTypes = () => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<DunningTypeRows>({
 		queryKey: key("dunning-types"),
 		queryFn: async () => {
 			const { data, error } = await api.accounting.dunning.types.get();
 			if (error) throw new Error("تعذّر تحميل أنواع المطالبات");
-			return data;
+			return data as DunningTypeRows;
 		},
 		staleTime: 1000 * 60,
 	});
@@ -67,14 +100,14 @@ export const useDunningTypes = () => {
  * about.
  */
 export const useOverdueInvoices = (partyType: string | null, partyId: string | null) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<OverdueInvoiceRow[]>({
 		queryKey: key("overdue", partyType ?? "", partyId ?? ""),
 		queryFn: async () => {
 			const { data, error } = await api.accounting.dunning.overdue.get({
 				query: { partyType: partyType as string, partyId: partyId as string },
 			});
 			if (error) throw new Error("تعذّر تحميل الفواتير المتأخّرة");
-			return data;
+			return data as OverdueInvoiceRow[];
 		},
 		enabled: Boolean(partyType && partyId),
 		staleTime: 1000 * 15,
@@ -176,12 +209,12 @@ export const useSubmitDunning = () => {
 /* ── [P12.5] subscriptions ────────────────────────────────────────────────────────────── */
 
 export const useSubscriptions = () => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<SubscriptionRows>({
 		queryKey: key("subscriptions"),
 		queryFn: async () => {
 			const { data, error } = await api.accounting.subscriptions.get();
 			if (error) throw new Error("تعذّر تحميل الاشتراكات");
-			return data;
+			return data as SubscriptionRows;
 		},
 		staleTime: 1000 * 30,
 	});
@@ -256,12 +289,12 @@ export const useRunSubscriptionBilling = () => {
 /* ── [P12.2] deferred revenue/expense ─────────────────────────────────────────────────── */
 
 export const useDeferredSchedule = () => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<DeferredScheduleReport>({
 		queryKey: key("deferred-schedule"),
 		queryFn: async () => {
 			const { data, error } = await api.accounting.deferred.schedule.get({ query: {} });
 			if (error) throw new Error("تعذّر تحميل جدول الاستحقاق المؤجل");
-			return data;
+			return data as DeferredScheduleReport;
 		},
 		staleTime: 1000 * 30,
 	});
@@ -294,12 +327,12 @@ export const useRunDeferred = () => {
 /* ── [P12.7] statements of accounts ───────────────────────────────────────────────────── */
 
 export const usePsoaConfigs = () => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<PsoaConfigRows>({
 		queryKey: key("psoa"),
 		queryFn: async () => {
 			const { data, error } = await api.accounting["statements-of-accounts"].get();
 			if (error) throw new Error("تعذّر تحميل تهيئات كشوف الحساب");
-			return data;
+			return data as PsoaConfigRows;
 		},
 		staleTime: 1000 * 60,
 	});
@@ -346,14 +379,14 @@ export const useCreatePsoaConfig = () => {
  * every list render would make the tab expensive for no reason.
  */
 export const usePsoaPreview = (psoaId: string | null) => {
-	const { data, isLoading, error } = useQuery({
+	const { data, isLoading, error } = useQuery<CustomerStatement[]>({
 		queryKey: key("psoa-preview", psoaId ?? ""),
 		queryFn: async () => {
 			const { data, error } = await api.accounting["statements-of-accounts"]({
 				id: psoaId as string,
 			}).preview.get({ query: {} });
 			if (error) throw new Error(messageOf(error, "تعذّرت المعاينة"));
-			return data;
+			return data as CustomerStatement[];
 		},
 		enabled: Boolean(psoaId),
 		retry: false,
@@ -393,12 +426,12 @@ export const useSendStatements = () => {
 /* ── [P12.9] repost ───────────────────────────────────────────────────────────────────── */
 
 export const useReposts = () => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<RepostRows>({
 		queryKey: key("reposts"),
 		queryFn: async () => {
 			const { data, error } = await api.accounting.repost.get();
 			if (error) throw new Error("تعذّر تحميل طلبات إعادة الترحيل");
-			return data;
+			return data as RepostRows;
 		},
 		staleTime: 1000 * 30,
 	});
@@ -406,14 +439,14 @@ export const useReposts = () => {
 };
 
 export const useRepostCandidates = (voucherType: string | null) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<RepostCandidate[]>({
 		queryKey: key("repost-candidates", voucherType ?? ""),
 		queryFn: async () => {
 			const { data, error } = await api.accounting.repost.candidates.get({
 				query: { voucherType: voucherType as string },
 			});
 			if (error) throw new Error(messageOf(error, "تعذّر تحميل المستندات المرشّحة"));
-			return data;
+			return data as RepostCandidate[];
 		},
 		enabled: Boolean(voucherType),
 		staleTime: 1000 * 15,
@@ -453,7 +486,7 @@ export const useRunRepost = () => {
 		mutationFn: async (id: string) => {
 			const { data, error } = await api.accounting.repost({ id }).run.post();
 			if (error) throw new Error(messageOf(error, "تعذّر تشغيل إعادة الترحيل"));
-			return data;
+			return data as RunRepostResult;
 		},
 		onSettled: invalidate,
 	});
@@ -474,14 +507,14 @@ export const useRunRepost = () => {
 /* ── [P12.4] POS shifts ───────────────────────────────────────────────────────────────── */
 
 export const usePosRegister = (fromDate: string, toDate: string) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<PosRegisterRows>({
 		queryKey: key("pos-register", fromDate, toDate),
 		queryFn: async () => {
 			const { data, error } = await api.accounting["pos-shifts"].register.get({
 				query: { fromDate, toDate },
 			});
 			if (error) throw new Error("تعذّر تحميل سجلّ الورديات");
-			return data;
+			return data as PosRegisterRows;
 		},
 		enabled: Boolean(fromDate && toDate),
 		staleTime: 1000 * 30,
@@ -492,14 +525,14 @@ export const usePosRegister = (fromDate: string, toDate: string) => {
 /* ── [P12.3] withholding ──────────────────────────────────────────────────────────────── */
 
 export const useWithholdingSummary = (fromDate: string, toDate: string) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<WithholdingSummaryRow[]>({
 		queryKey: key("withholding-summary", fromDate, toDate),
 		queryFn: async () => {
 			const { data, error } = await api.accounting.reports["withholding-summary"].get({
 				query: { fromDate, toDate },
 			});
 			if (error) throw new Error("تعذّر تحميل ملخّص الاستقطاع");
-			return data;
+			return data as WithholdingSummaryRow[];
 		},
 		enabled: Boolean(fromDate && toDate),
 		staleTime: 1000 * 30,

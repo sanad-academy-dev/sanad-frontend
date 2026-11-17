@@ -1,22 +1,13 @@
-import {
-	type CollisionDetection,
-	closestCenter,
-	DndContext,
-	type DragEndEvent,
-	KeyboardSensor,
-	PointerSensor,
-	useSensor,
-	useSensors,
-} from "@dnd-kit/core";
-import {
-	arrayMove,
-	rectSortingStrategy,
-	SortableContext,
-	sortableKeyboardCoordinates,
-	useSortable,
-	verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import type {
+	CreateLessonFormInput,
+	LessonContentItem,
+	LessonFormValues,
+	LessonResponse,
+	LessonType,
+	ReorderLessonInput,
+	UnitResponse,
+	UpdateLessonPayload,
+} from "@sanad/contracts/runtime/server/training/training.type";
 import {
 	IconArrowsHorizontal,
 	IconCheck,
@@ -25,10 +16,13 @@ import {
 	IconDots,
 	IconEye,
 	IconFileCheck,
+	IconFileDescription,
 	IconFileDiff,
 	IconFileText,
 	IconFocusCentered,
 	IconGripVertical,
+	IconInfoCircle,
+	IconMinus,
 	IconPencil,
 	IconPlus,
 	IconSparkles,
@@ -38,22 +32,42 @@ import {
 	IconX,
 } from "@tabler/icons-react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { type DragEvent, Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { showUndoToast } from "@/components/common/undo-toast";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
+import { Switch } from "@/components/ui/switch";
 import { CoverPicker } from "@/features/services/training/components/cover-picker";
 import { DeleteConfirmDialog } from "@/features/services/training/components/delete-confirm-dialog";
 import { LessonForm } from "@/features/services/training/components/lesson-form";
 import { LessonPreview } from "@/features/services/training/components/lesson-preview";
+import {
+	LessonSuppliesPanel,
+	type LessonSupplyItem,
+} from "@/features/services/training/components/lesson-supplies-sheet";
+import {
+	type TrainerMember,
+	TrainersCell,
+} from "@/features/services/training/components/trainers-cell";
 import { LESSON_TYPE_ICONS } from "@/features/services/training/data/training";
 import { useCourseContent } from "@/features/services/training/hooks/use-course-content";
 import { useCourse } from "@/features/services/training/hooks/use-courses";
@@ -73,15 +87,6 @@ import {
 } from "@/features/services/training/utils/lesson-draft";
 import { backendUrl } from "@/lib/backend-fetch";
 import { cn } from "@/lib/utils";
-import type {
-	CreateLessonFormInput,
-	LessonContentItem,
-	LessonFormValues,
-	LessonResponse,
-	LessonType,
-	ReorderLessonInput,
-	UnitResponse,
-} from "@/server/training/training.type";
 
 const UNIT_NAME_MAX = 60;
 
@@ -96,16 +101,6 @@ const MIN_MIDDLE_WIDTH = 340;
 
 const STORAGE_KEY_RIGHT = "course_builder_right_width";
 const STORAGE_KEY_LEFT = "course_builder_left_width";
-
-const structureCollisionDetection: CollisionDetection = (args) => {
-	if (args.active.data.current?.kind !== "unit") return closestCenter(args);
-	return closestCenter({
-		...args,
-		droppableContainers: args.droppableContainers.filter(
-			(container) => container.data.current?.kind === "unit",
-		),
-	});
-};
 
 // النتائج المترتبة على الحذف — تختلف بين الوحدة والدرس
 const UNIT_CONSEQUENCES = [
@@ -126,6 +121,14 @@ const LESSON_TYPE_AR_LABELS: Record<string, string> = {
 	AUDIO: "ملف صوتي",
 	SURVEY: "استبيان",
 };
+
+const ADD_CONTENT_TYPE_OPTIONS: { type: LessonType; label: string }[] = [
+	{ type: "PAGE", label: "صفحة" },
+	{ type: "VIDEO", label: "فيديو" },
+	{ type: "DOCUMENT", label: "مستند" },
+	{ type: "AUDIO", label: "ملف صوتي" },
+	{ type: "QUIZ", label: "تقييم واختبار" },
+];
 
 // يحوّل ساعة/دقيقة/ثانية إلى ثوانٍ، ويعيد null إذا كانت المدة صفرًا
 function toDurationSeconds(
@@ -186,11 +189,15 @@ function ResizeHandle({
 // قائمة النقاط الثلاث بنمط التصميم
 function RowMenu({
 	label,
+	onAddLesson,
+	onAddContent,
 	onEdit,
 	onDuplicate,
 	onDelete,
 }: {
 	label: string;
+	onAddLesson?: () => void;
+	onAddContent?: (type: LessonType) => void;
 	onEdit?: () => void;
 	onDuplicate?: () => void;
 	onDelete: () => void;
@@ -199,7 +206,7 @@ function RowMenu({
 		<DropdownMenu dir="rtl">
 			<DropdownMenuTrigger
 				aria-label={label}
-				className="flex h-[15px] w-6 shrink-0 items-center justify-center rounded-[4px] border-[0.75px] border-[#E5E5E5] text-[#161616]"
+				className="flex h-[15px] w-6 shrink-0 items-center justify-center rounded-[4px] border-[0.75px] border-[#E5E5E5] text-[#161616] cursor-pointer hover:border-primary/60 transition-colors"
 			>
 				<IconDots className="size-3" />
 			</DropdownMenuTrigger>
@@ -207,10 +214,42 @@ function RowMenu({
 				align="start"
 				className="flex w-[177px] flex-col gap-1.5 rounded-[4px] border border-[#E5E5E5] bg-white px-1.5 py-3 shadow-[0px_4px_12px_rgba(0,0,0,0.12)] ring-0"
 			>
+				{onAddLesson && (
+					<DropdownMenuItem
+						onSelect={onAddLesson}
+						className="h-[29px] gap-2 rounded-[4px] px-2 text-[12px] font-bold text-[#08090A] focus:bg-[#F2F2F2] cursor-pointer"
+					>
+						<IconPlus className="size-4 text-primary" />
+						إضافة درس جديد
+					</DropdownMenuItem>
+				)}
+				{onAddContent && (
+					<DropdownMenuSub>
+						<DropdownMenuSubTrigger className="h-[29px] gap-2 rounded-[4px] px-2 text-[12px] font-bold text-[#08090A] focus:bg-[#F2F2F2] cursor-pointer">
+							<IconPlus className="size-4 text-primary" />
+							<span>إضافة محتوى للدرس</span>
+						</DropdownMenuSubTrigger>
+						<DropdownMenuSubContent className="flex w-[160px] flex-col gap-1 rounded-[4px] border border-[#E5E5E5] bg-white p-1.5 shadow-[0px_4px_12px_rgba(0,0,0,0.12)]">
+							{ADD_CONTENT_TYPE_OPTIONS.map((opt) => {
+								const TypeIcon = LESSON_TYPE_ICONS[opt.type];
+								return (
+									<DropdownMenuItem
+										key={opt.type}
+										onSelect={() => onAddContent(opt.type)}
+										className="h-[28px] gap-2 rounded-[4px] px-2 text-[11px] font-medium text-[#08090A] focus:bg-[#F2F2F2] cursor-pointer"
+									>
+										<TypeIcon className="size-3.5 text-primary" />
+										<span>{opt.label}</span>
+									</DropdownMenuItem>
+								);
+							})}
+						</DropdownMenuSubContent>
+					</DropdownMenuSub>
+				)}
 				{onEdit && (
 					<DropdownMenuItem
 						onSelect={onEdit}
-						className="h-[29px] rounded-[4px] px-2 text-[12px] font-bold text-[#08090A] focus:bg-[#F2F2F2]"
+						className="h-[29px] gap-2 rounded-[4px] px-2 text-[12px] font-bold text-[#08090A] focus:bg-[#F2F2F2] cursor-pointer"
 					>
 						<IconPencil className="size-4" />
 						تعديل
@@ -219,7 +258,7 @@ function RowMenu({
 				{onDuplicate && (
 					<DropdownMenuItem
 						onSelect={onDuplicate}
-						className="h-[29px] rounded-[4px] px-2 text-[12px] font-bold text-[#08090A] focus:bg-[#EBEBEB]"
+						className="h-[29px] gap-2 rounded-[4px] px-2 text-[12px] font-bold text-[#08090A] focus:bg-[#EBEBEB] cursor-pointer"
 					>
 						<IconCopy className="size-[15px]" />
 						استنساخ
@@ -228,7 +267,7 @@ function RowMenu({
 				<DropdownMenuItem
 					variant="destructive"
 					onSelect={onDelete}
-					className="h-[29px] rounded-[4px] px-2 text-[12px] font-bold text-[#DC2626] focus:bg-[#EBEBEB] focus:text-[#DC2626] [&_svg]:text-[#EF4444]"
+					className="h-[29px] gap-2 rounded-[4px] px-2 text-[12px] font-bold text-[#DC2626] focus:bg-[#EBEBEB] focus:text-[#DC2626] [&_svg]:text-[#EF4444] cursor-pointer"
 				>
 					<IconTrash className="size-4" />
 					حذف
@@ -283,175 +322,482 @@ function UnitCopyingSkeleton({ unit }: { unit: UnitResponse }) {
 	);
 }
 
-function SortableLessonRow({
+type DragHandlers = {
+	draggedUnitId: string | null;
+	dragOverUnitTargetId: string | null;
+	draggedLesson: { lessonId: string; fromUnitId: string } | null;
+	dragOverUnitId: string | null;
+	dragOverLessonTarget: { unitId: string; lessonIndex: number } | null;
+	draggedContent: {
+		contentId: string;
+		fromLessonId: string;
+		fromUnitId: string;
+	} | null;
+	dragOverLessonId: string | null;
+	dragOverContentTarget: { lessonId: string; contentIndex: number } | null;
+	onUnitDragStart: (e: DragEvent, unitId: string) => void;
+	onUnitDragEnd: () => void;
+	onUnitReorderDragOver: (e: DragEvent, targetUnitId: string) => void;
+	onUnitReorderDragLeave: (e: DragEvent, unitId: string) => void;
+	onUnitReorderDrop: (e: DragEvent, targetUnitId: string) => void;
+	onLessonDragStart: (e: DragEvent, lessonId: string, fromUnitId: string) => void;
+	onLessonDragEnd: () => void;
+	onLessonDragOver: (
+		e: DragEvent,
+		unitId: string,
+		lessonIndex: number,
+		lessonId: string,
+	) => void;
+	onLessonDrop: (
+		e: DragEvent,
+		targetUnitId: string,
+		targetIndex: number,
+		targetLessonId: string,
+	) => void;
+	onContentDragStart: (
+		e: DragEvent,
+		contentId: string,
+		fromLessonId: string,
+		fromUnitId: string,
+	) => void;
+	onContentDragEnd: () => void;
+	onContentDragOver: (e: DragEvent, lessonId: string, contentIndex: number) => void;
+	onContentDrop: (e: DragEvent, targetLessonId: string, targetIndex: number) => void;
+};
+
+function DraggableLessonRow({
 	lesson,
 	unit,
 	index,
 	isActive,
+	activeContentId,
+	drag,
 	onEdit,
 	onSelectContent,
 	onDelete,
+	onDuplicate,
+	onDeleteContent,
+	onAddContent,
+	onOpenSupplies,
+	suppliesCount = 0,
 }: {
 	lesson: LessonResponse;
 	unit: UnitResponse;
 	index: number;
 	isActive: boolean;
+	activeContentId?: string | null;
+	drag: DragHandlers;
 	onEdit: () => void;
 	onSelectContent: (contentId: string) => void;
 	onDelete: () => void;
+	onDuplicate?: () => void;
+	onDeleteContent: (content: LessonContentItem) => void;
+	onAddContent?: (type: LessonType) => void;
+	onOpenSupplies?: () => void;
+	suppliesCount?: number;
 }) {
 	const TypeIcon = LESSON_TYPE_ICONS[lesson.type];
-	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable(
-		{
-			id: `lesson:${lesson.id}`,
-			data: { kind: "lesson", lessonId: lesson.id, unitId: unit.id, index },
-		},
-	);
 	const contents = lesson.contents ?? [];
 	const [expanded, setExpanded] = useState(false);
 
+	useEffect(() => {
+		if (isActive || (activeContentId && contents.some((c) => c.id === activeContentId))) {
+			setExpanded(true);
+		}
+	}, [isActive, activeContentId, contents]);
+
+	const isThisLessonDragged = drag.draggedLesson?.lessonId === lesson.id;
+	const isLessonDragOverThis =
+		drag.dragOverLessonTarget?.unitId === unit.id &&
+		drag.dragOverLessonTarget?.lessonIndex === index &&
+		!isThisLessonDragged;
+	const isContentDropOnLesson =
+		drag.draggedContent !== null &&
+		drag.draggedContent.fromLessonId !== lesson.id &&
+		drag.dragOverLessonId === lesson.id;
+
 	return (
-		<li
-			ref={setNodeRef}
-			style={{ transform: CSS.Transform.toString(transform), transition }}
-			className={cn(isDragging && "relative z-10 opacity-70")}
-		>
-			<div className="overflow-hidden rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white">
-				<div
-					className={cn(
-						"flex h-[37px] w-full items-center justify-between gap-2 px-2 text-right transition-colors",
-						isActive && "bg-[#6366F1]/5",
-					)}
-				>
-					<button
-						type="button"
-						{...attributes}
-						{...listeners}
-						aria-label={`تحريك الدرس ${lesson.title}`}
-						className="touch-none cursor-grab text-[#828283] active:cursor-grabbing"
-					>
-						<IconGripVertical className="size-3 shrink-0" />
-					</button>
-					<button
-						type="button"
-						onClick={() => {
-							if (contents.length === 0) onEdit();
-							else setExpanded((value) => !value);
-						}}
-						aria-expanded={expanded}
-						className="flex min-w-0 flex-1 items-center gap-[5px] text-right cursor-pointer"
-					>
-						<TypeIcon className="size-5 shrink-0 text-[#808080]" />
-						<span className="truncate text-[10px] font-semibold leading-[10px] text-[#08090A]">
+		<li>
+			{/* biome-ignore lint/a11y/noStaticElementInteractions: draggable lesson row matching track stages */}
+			{/* biome-ignore lint/a11y/useKeyWithClickEvents: lesson click opens editor */}
+			<div
+				data-draggable-lesson="true"
+				draggable
+				onDragStart={(e) => {
+					e.stopPropagation();
+					const target = e.target as HTMLElement;
+					if (target.closest("button, input, textarea, a, [data-draggable-content]")) {
+						e.preventDefault();
+						return;
+					}
+					drag.onLessonDragStart(e, lesson.id, unit.id);
+				}}
+				onDragEnd={drag.onLessonDragEnd}
+				onDragOver={(e) => drag.onLessonDragOver(e, unit.id, index, lesson.id)}
+				onDrop={(e) => drag.onLessonDrop(e, unit.id, index, lesson.id)}
+				onClick={(e) => {
+					const target = e.target as HTMLElement;
+					if (target.closest("button, input, textarea, a, [data-drag-handle]")) {
+						return;
+					}
+					if (contents.length > 0) {
+						setExpanded((prev) => !prev);
+					}
+					onEdit();
+				}}
+				className={cn(
+					"group overflow-hidden rounded-[5px] border transition-all duration-150 cursor-pointer select-none",
+					isThisLessonDragged
+						? "opacity-35 scale-[0.98] border-dashed border-purple-500 bg-purple-50/60"
+						: isLessonDragOverThis
+							? "border-t-2 border-t-purple-600 border-[#E5E5E5] bg-purple-50/25"
+							: isContentDropOnLesson
+								? "border-purple-500 bg-purple-50/40 ring-2 ring-purple-400/40"
+								: isActive
+									? "border-primary/70 bg-primary/[0.04] shadow-xs"
+									: "border-[#E5E5E5] dark:border-border bg-white dark:bg-card hover:border-primary/50 hover:bg-[#F9FAFB] dark:hover:bg-muted/40 hover:shadow-xs",
+				)}
+			>
+				<div className="flex h-[37px] w-full items-center justify-between gap-2 px-2 text-right">
+					<div className="flex min-w-0 flex-1 items-center gap-[6px]">
+						<div
+							data-drag-handle="true"
+							title="اسحب لتغيير ترتيب الدرس أو نقله لوحدة أخرى"
+							className="cursor-grab text-[#828283] hover:text-primary active:cursor-grabbing shrink-0 transition-colors p-0.5"
+						>
+							<IconGripVertical className="size-3 shrink-0" />
+						</div>
+						<span className="flex size-4.5 shrink-0 items-center justify-center rounded bg-[#F2F2F2] dark:bg-muted text-[10px] font-semibold text-[#6B6B67] tabular-nums">
+							{index + 1}
+						</span>
+						<TypeIcon className="size-4.5 shrink-0 text-muted-foreground group-hover:text-primary transition-colors" />
+						<span className="truncate text-xs font-semibold leading-[14px] text-[#08090A] dark:text-foreground group-hover:text-primary transition-colors">
 							{lesson.title}
 						</span>
-						<span className="shrink-0 rounded bg-[#F1F0FF] px-1 py-0.5 text-[8px] font-semibold text-[#5B4AE8]">
-							{contents.length} {contents.length === 1 ? "محتوى" : "محتويات"}
-						</span>
-						{hasEditLessonDraft(lesson.id) && (
+						{contents.length > 1 && (
+							<span className="shrink-0 rounded bg-primary/10 px-1 py-0.5 text-[8.5px] font-semibold text-primary">
+								{contents.length} محتويات
+							</span>
+						)}
+						{(hasEditLessonDraft(lesson.id) ||
+							contents.some((c) => hasEditLessonDraft(lesson.id, c.id))) && (
 							<span className="shrink-0 rounded bg-amber-100 px-1 py-0.5 text-[8px] font-semibold text-amber-700">
 								مسودة تعديل
 							</span>
 						)}
-					</button>
-					<div className="flex shrink-0 items-center gap-1.5">
+					</div>
+					{/* biome-ignore lint/a11y/noStaticElementInteractions: stop propagation for action buttons */}
+					{/* biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation for action buttons */}
+					<div
+						className="flex shrink-0 items-center gap-1.5"
+						onClick={(e) => e.stopPropagation()}
+					>
+						{onDuplicate && (
+							<button
+								type="button"
+								onClick={(e) => {
+									e.stopPropagation();
+									onDuplicate();
+								}}
+								title="استنساخ الدرس"
+								className="h-[22px] rounded border border-[#E5E5E5] dark:border-border bg-white dark:bg-card px-2 text-[10px] font-medium text-[#08090A] dark:text-foreground hover:bg-[#FAFAFA] dark:hover:bg-muted transition-colors cursor-pointer"
+							>
+								استنساخ
+							</button>
+						)}
 						<button
 							type="button"
-							onClick={() => setExpanded((value) => !value)}
-							aria-label={expanded ? "طي مواد الدرس" : "عرض مواد الدرس"}
-							className="rounded p-1 text-[#828283] hover:bg-muted"
+							onClick={(e) => {
+								e.stopPropagation();
+								onDelete();
+							}}
+							title="حذف الدرس"
+							className="flex size-6 items-center justify-center rounded text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
 						>
-							<IconChevronDown
-								className={cn("size-3 transition-transform", !expanded && "rotate-90")}
-							/>
+							<IconTrash className="size-3.5" />
 						</button>
-						<RowMenu
-							label="خيارات الدرس"
-							onEdit={onEdit}
-							onDelete={onDelete}
-						/>
+						{contents.length > 0 && (
+							<button
+								type="button"
+								onClick={(e) => {
+									e.stopPropagation();
+									setExpanded((value) => !value);
+								}}
+								aria-label={expanded ? "طي مواد الدرس" : "عرض مواد الدرس"}
+								className="rounded p-1 text-[#828283] hover:text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
+							>
+								<IconChevronDown
+									className={cn(
+										"size-3.5 transition-transform duration-200",
+										!expanded && "rotate-90",
+									)}
+								/>
+							</button>
+						)}
 					</div>
 				</div>
-				{expanded && contents.length > 0 && (
-					<SortableContext
-						items={contents.map((content) => `content:${content.id}`)}
-						strategy={rectSortingStrategy}
-					>
-						<div className="flex flex-wrap gap-1 border-t border-[#F0F0F0] bg-[#FCFCFD] px-2 py-1.5">
-							{contents.map((content, contentIndex) => (
-								<SortableLessonContent
-									key={content.id}
-									content={content}
-									lessonId={lesson.id}
-									unitId={unit.id}
-									index={contentIndex}
-									onSelect={() => onSelectContent(content.id)}
-								/>
-							))}
-						</div>
-					</SortableContext>
+
+				{expanded && (contents.length > 0 || onAddContent) && (
+					<div className="flex flex-col gap-1.5 border-t border-[#F0F0F0] dark:border-border/60 bg-[#FAFAFA]/80 dark:bg-muted/20 p-2">
+						{contents.map((content, contentIndex) => (
+							<DraggableLessonContent
+								key={content.id}
+								content={content}
+								lessonId={lesson.id}
+								unitId={unit.id}
+								index={contentIndex}
+								drag={drag}
+								isActive={activeContentId === content.id}
+								onSelect={() => onSelectContent(content.id)}
+								onDelete={() => onDeleteContent(content)}
+							/>
+						))}
+						{onAddContent && (
+							<div className="pt-0.5">
+								<Button
+									type="button"
+									variant="ghost"
+									size="sm"
+									onClick={(e) => {
+										e.stopPropagation();
+										onAddContent("PAGE");
+									}}
+									className="w-full h-[28px] border border-dashed border-[#DCDCF0] bg-white hover:bg-primary/5 hover:border-primary/50 text-primary text-[11px] font-medium gap-1.5 rounded-[4px] cursor-pointer transition-colors"
+								>
+									<IconPlus className="size-3.5" />
+									<span>إضافة محتوى إضافي للدرس</span>
+								</Button>
+							</div>
+						)}
+					</div>
 				)}
+				{/* شريط إعدادات المستلزمات لهذا الدرس — يفتح لوحة إعداد مواد الخدمة والمخزون */}
+				<div className="px-2 pb-2 pt-1 border-t border-[#F0F0F0]/60 dark:border-border/40">
+					<div className="flex items-center justify-between gap-2 rounded-[4px] border border-[#E5E5E5] dark:border-border bg-[#F9FAFB] dark:bg-muted/30 p-2">
+						<div className="flex items-center gap-2 min-w-0">
+							<div className="flex size-6 shrink-0 items-center justify-center rounded border border-[#E5E5E5] dark:border-border bg-white dark:bg-card text-muted-foreground">
+								<IconFileDescription className="size-3.5" />
+							</div>
+							<div className="flex flex-col text-right min-w-0">
+								<span className="text-[11px] font-semibold text-[#08090A] dark:text-foreground">
+									إعدادات المستلزمات
+								</span>
+								<span className="truncate text-[9.5px] text-muted-foreground leading-tight">
+									{suppliesCount > 0
+										? `${suppliesCount} ${suppliesCount === 1 ? "مستلزم محدد" : "مستلزمات محددة"}`
+										: "حدد المستلزمات المطلوبة لهذا الدرس، لخصمها تلقائيًا من المخزون عند تنفيذ الدرس."}
+								</span>
+							</div>
+						</div>
+						<button
+							type="button"
+							onClick={(e) => {
+								e.stopPropagation();
+								onOpenSupplies?.();
+							}}
+							aria-label="إعداد المستلزمات"
+							className="flex size-6 shrink-0 items-center justify-center rounded border border-[#E5E5E5] dark:border-border bg-white dark:bg-card text-muted-foreground hover:bg-muted hover:text-foreground cursor-pointer transition-colors"
+						>
+							<IconPlus className="size-3" />
+						</button>
+					</div>
+				</div>
 			</div>
 		</li>
 	);
 }
 
-function SortableLessonContent({
+function DraggableLessonContent({
 	content,
 	lessonId,
 	unitId,
 	index,
+	drag,
+	isActive = false,
 	onSelect,
+	onDelete,
 }: {
 	content: LessonContentItem;
 	lessonId: string;
 	unitId: string;
 	index: number;
+	drag: DragHandlers;
+	isActive?: boolean;
 	onSelect: () => void;
+	onDelete?: () => void;
 }) {
-	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable(
-		{
-			id: `content:${content.id}`,
-			data: { kind: "content", contentId: content.id, lessonId, unitId, index },
-		},
-	);
-	const Icon = LESSON_TYPE_ICONS[content.type];
+	const Icon = LESSON_TYPE_ICONS[content.type] || IconFileText;
+	const isThisContentDragged = drag.draggedContent?.contentId === content.id;
+	const isContentDragOverThis =
+		drag.dragOverContentTarget?.lessonId === lessonId &&
+		drag.dragOverContentTarget?.contentIndex === index &&
+		!isThisContentDragged;
+
+	const typeLabel = LESSON_TYPE_AR_LABELS[content.type] || "محتوى";
+
 	return (
+		/* biome-ignore lint/a11y/noStaticElementInteractions: draggable lesson content chip */
+		/* biome-ignore lint/a11y/useKeyWithClickEvents: chip click opens content in editor */
 		<div
-			ref={setNodeRef}
-			style={{ transform: CSS.Transform.toString(transform), transition }}
+			data-draggable-content="true"
+			draggable
+			onDragStart={(e) => {
+				e.stopPropagation();
+				const target = e.target as HTMLElement;
+				if (target.closest("input, textarea, a, button")) {
+					e.preventDefault();
+					return;
+				}
+				drag.onContentDragStart(e, content.id, lessonId, unitId);
+			}}
+			onDragEnd={drag.onContentDragEnd}
+			onDragOver={(e) => drag.onContentDragOver(e, lessonId, index)}
+			onDrop={(e) => drag.onContentDrop(e, lessonId, index)}
+			onClick={(e) => {
+				e.stopPropagation();
+				onSelect();
+			}}
 			className={cn(
-				"flex max-w-full items-center gap-1 rounded border border-[#E5E5E5] bg-white ps-1 pe-1.5 py-0.5",
-				isDragging && "z-10 border-primary opacity-70 shadow-md",
+				"group/content flex w-full h-[36px] items-center justify-between gap-2 rounded-[5px] border bg-white dark:bg-card px-2.5 transition-all cursor-pointer select-none",
+				isThisContentDragged
+					? "opacity-35 scale-[0.98] border-dashed border-purple-500 bg-purple-50/60"
+					: isContentDragOverThis
+						? "border-purple-600 bg-purple-50/40 ring-2 ring-purple-400/50"
+						: isActive
+							? "border-primary bg-primary/[0.06] shadow-2xs"
+							: "border-[#E5E5E5] dark:border-border hover:border-primary/50 hover:bg-[#F9FAFB] dark:hover:bg-muted/40 hover:shadow-2xs",
 			)}
 		>
-			<button
-				type="button"
-				{...attributes}
-				{...listeners}
-				aria-label={`نقل محتوى ${content.title}`}
-				className="touch-none cursor-grab text-[#9B9B9D] active:cursor-grabbing"
-			>
-				<IconGripVertical className="size-2.5" />
-			</button>
-			<button
-				type="button"
-				onClick={onSelect}
-				className="flex min-w-0 items-center gap-1 text-right"
-			>
-				<Icon className="size-3 shrink-0 text-[#6F62E8]" />
-				<span className="max-w-28 truncate text-[9px] text-[#5E5E64]">
+			<div className="flex min-w-0 flex-1 items-center gap-2">
+				<div
+					data-drag-handle="true"
+					title="اسحب لإعادة ترتيب المحتوى أو نقله لدرس آخر"
+					className="cursor-grab text-[#9B9B9D] hover:text-primary active:cursor-grabbing shrink-0 transition-colors p-0.5"
+				>
+					<IconGripVertical className="size-3" />
+				</div>
+				<Icon className="size-4 shrink-0 text-primary" />
+				<span className="truncate text-xs font-medium text-foreground group-hover/content:text-primary transition-colors">
 					{content.title || "محتوى بلا عنوان"}
 				</span>
-			</button>
+			</div>
+
+			<div className="flex shrink-0 items-center gap-1.5">
+				<span className="rounded bg-muted/80 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+					{typeLabel}
+				</span>
+				{onDelete && (
+					<button
+						type="button"
+						onClick={(e) => {
+							e.stopPropagation();
+							onDelete();
+						}}
+						aria-label={`حذف ${content.title || "المحتوى"}`}
+						title="حذف هذا المحتوى"
+						className="rounded p-1 text-[#9B9B9D] hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer"
+					>
+						<IconTrash className="size-3.5" />
+					</button>
+				)}
+			</div>
 		</div>
 	);
 }
 
-// أكورديون وحدة واحدة — يرفع أحداث اختيار/إضافة الدرس للمحرر المركزي
+// فاصل زمني بين الدروس أو الوحدات المتعاقبة — مطابق لتصميم لوحة الخطط والزيارات
+function IntervalDivider({
+	value,
+	unit,
+	label = "الفاصل الزمني",
+	title = "الفاصل الزمني التلقائي",
+	className,
+	onValueChange,
+	onUnitChange,
+}: {
+	value: number;
+	unit: "DAY" | "WEEK" | "MONTH";
+	label?: string;
+	title?: string;
+	className?: string;
+	onValueChange: (value: number) => void;
+	onUnitChange: (unit: "DAY" | "WEEK" | "MONTH") => void;
+}) {
+	return (
+		<div
+			className={cn("flex items-center gap-2.5 my-1", className)}
+			dir="rtl"
+		>
+			<span className="h-px flex-1 bg-[#E5E5E5] dark:bg-border" />
+			<div className="flex items-center gap-1.5 text-[11px] text-[#08090A] dark:text-foreground">
+				<span className="font-medium text-[#6B6B67] dark:text-muted-foreground">{label}</span>
+				<div title={title}>
+					<IconInfoCircle className="size-3.5 text-[#9B9B9D]" />
+				</div>
+				<div className="flex h-[26px] items-center gap-1 rounded-[4px] border border-[#E5E5E5] dark:border-border bg-white dark:bg-card px-1.5 shadow-2xs">
+					<button
+						type="button"
+						onClick={() => onValueChange(value + 1)}
+						className="flex size-4 items-center justify-center text-[#828283] hover:text-foreground cursor-pointer transition-colors"
+						title="زيادة"
+					>
+						<IconPlus className="size-3" />
+					</button>
+					<span className="w-5 text-center text-[11px] tabular-nums font-semibold">
+						{value.toString().padStart(2, "0")}
+					</span>
+					<button
+						type="button"
+						onClick={() => onValueChange(Math.max(0, value - 1))}
+						className="flex size-4 items-center justify-center text-[#828283] hover:text-foreground cursor-pointer transition-colors"
+						title="إنقاص"
+					>
+						<IconMinus className="size-3" />
+					</button>
+				</div>
+				<Select
+					value={unit}
+					onValueChange={(v) => onUnitChange(v as "DAY" | "WEEK" | "MONTH")}
+					dir="rtl"
+				>
+					<SelectTrigger
+						size="sm"
+						className="h-[26px] min-h-[26px] py-0 pe-1.5 ps-2 text-[11px] rounded-[4px] border-[#E5E5E5] dark:border-border bg-white dark:bg-card text-[#08090A] dark:text-foreground gap-1 shadow-2xs font-normal [&_svg]:size-3"
+					>
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent dir="rtl">
+						<SelectItem
+							value="DAY"
+							className="text-right text-xs"
+						>
+							يوم
+						</SelectItem>
+						<SelectItem
+							value="WEEK"
+							className="text-right text-xs"
+						>
+							أسبوع
+						</SelectItem>
+						<SelectItem
+							value="MONTH"
+							className="text-right text-xs"
+						>
+							شهر
+						</SelectItem>
+					</SelectContent>
+				</Select>
+			</div>
+			<span className="h-px flex-1 bg-[#E5E5E5] dark:bg-border" />
+		</div>
+	);
+}
+
+// أكورديون وحدة واحدة — يرفع أحداث اختيار/إضافة الدرس للمحرر المركزي ويدعم السحب والإفلات السلس
 function UnitAccordion({
 	unit,
 	courseName,
+	drag,
 	onDuplicate,
 	onRenameUnit,
 	onRemoveLesson,
@@ -459,16 +805,24 @@ function UnitAccordion({
 	onEditLesson,
 	onSelectLessonContent,
 	onDeleteUnit,
+	onDeleteContent,
+	onAddLessonContent,
 	activeEditorLessonId,
+	activeEditorContentId,
 	isSelected,
 	onSelect,
-	onAddPage,
 	pendingAddDraft,
 	onResumeDraft,
 	onDiscardDraft,
+	onOpenSupplies,
+	getLessonSuppliesCount,
+	getLessonInterval,
+	onUpdateLessonInterval,
+	onDuplicateLesson,
 }: {
 	unit: UnitResponse;
 	courseName: string;
+	drag: DragHandlers;
 	onDuplicate: () => void;
 	onRenameUnit: (unitId: string, title: string) => void;
 	onRemoveLesson: (lesson: LessonResponse) => void;
@@ -481,25 +835,47 @@ function UnitAccordion({
 		contentId: string,
 	) => void;
 	onDeleteUnit: (unit: UnitResponse) => void;
+	onDeleteContent: (lesson: LessonResponse, content: LessonContentItem) => void;
+	onAddLessonContent: (
+		lesson: LessonResponse,
+		unitTitle: string,
+		unitId: string,
+		type: LessonType,
+	) => void;
 	activeEditorLessonId?: string | null;
+	activeEditorContentId?: string | null;
 	isSelected?: boolean;
 	onSelect?: () => void;
-	onAddPage?: (unitId: string) => void;
 	pendingAddDraft?: StoredLessonDraft | null;
 	onResumeDraft?: (unitId: string, unitTitle: string, draftType?: LessonType) => void;
 	onDiscardDraft?: (unitId: string) => void;
+	onOpenSupplies?: (lesson: LessonResponse) => void;
+	getLessonSuppliesCount?: (lessonId: string) => number;
+	getLessonInterval?: (
+		lessonId: string,
+	) => { value: number; unit: "DAY" | "WEEK" | "MONTH" } | undefined;
+	onUpdateLessonInterval?: (
+		lessonId: string,
+		value: number,
+		unit: "DAY" | "WEEK" | "MONTH",
+	) => void;
+	onDuplicateLesson?: (lesson: LessonResponse) => void;
 }) {
 	const [expanded, setExpanded] = useState(true);
 	const [editingName, setEditingName] = useState(false);
 	const [title, setTitle] = useState(unit.title);
 	const [confirmingDelete, setConfirmingDelete] = useState(false);
 	const [deletingLesson, setDeletingLesson] = useState<LessonResponse | null>(null);
-	const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable(
-		{
-			id: `unit:${unit.id}`,
-			data: { kind: "unit", unitId: unit.id },
-		},
-	);
+
+	// تفعيل الفواصل الزمنية تلقائيًا إذا كانت الوحدة تحتوي على أكثر من درس واحد
+	const [intervalsEnabled, setIntervalsEnabled] = useState(() => unit.lessons.length > 1);
+	const prevLessonsCountRef = useRef(unit.lessons.length);
+	useEffect(() => {
+		if (unit.lessons.length > 1 && prevLessonsCountRef.current <= 1) {
+			setIntervalsEnabled(true);
+		}
+		prevLessonsCountRef.current = unit.lessons.length;
+	}, [unit.lessons.length]);
 
 	const commitRename = () => {
 		setEditingName(false);
@@ -508,26 +884,64 @@ function UnitAccordion({
 	};
 
 	const hasLessons = unit.lessons.length > 0;
+	const isThisUnitDragged = drag.draggedUnitId === unit.id;
+	const isUnitReorderTarget =
+		drag.draggedUnitId !== null &&
+		drag.draggedUnitId !== unit.id &&
+		drag.dragOverUnitTargetId === unit.id;
+	const isUnitLessonDropActive =
+		drag.dragOverUnitId === unit.id &&
+		drag.draggedLesson !== null &&
+		drag.draggedLesson.fromUnitId !== unit.id;
 
 	return (
+		/* biome-ignore lint/a11y/noStaticElementInteractions: dropzone container for unit and lessons */
 		<div
-			ref={setNodeRef}
-			style={{ transform: CSS.Transform.toString(transform), transition }}
+			onDragOver={(e) => drag.onUnitReorderDragOver(e, unit.id)}
+			onDragLeave={(e) => drag.onUnitReorderDragLeave(e, unit.id)}
+			onDrop={(e) => drag.onUnitReorderDrop(e, unit.id)}
 			className={cn(
-				"flex w-full flex-col rounded-[4px] transition-colors",
-				isSelected && "ring-1 ring-[#6366F1]/50 shadow-2xs",
-				isDragging && "relative z-10 opacity-70 shadow-lg",
+				"flex w-full flex-col rounded-[6px] transition-all duration-200",
+				isThisUnitDragged &&
+					"opacity-40 scale-[0.99] ring-1 ring-dashed ring-purple-500 bg-purple-50/20",
+				isUnitReorderTarget && "ring-2 ring-purple-600 bg-purple-50/40 scale-[1.01]",
+				!isThisUnitDragged &&
+					!isUnitReorderTarget &&
+					(isUnitLessonDropActive
+						? "ring-2 ring-purple-500 bg-purple-50/40"
+						: isSelected && "ring-1 ring-[#6366F1]/50 shadow-2xs"),
 			)}
 		>
-			{/* رأس الوحدة */}
+			{/* رأس الوحدة — قابل للسحب مثل المرحلة في المسارات */}
 			{/* biome-ignore lint/a11y/useKeyWithClickEvents: header delegates unit selection */}
-			{/* biome-ignore lint/a11y/noStaticElementInteractions: clickable header for active unit */}
+			{/* biome-ignore lint/a11y/noStaticElementInteractions: draggable unit header */}
 			<div
-				onClick={() => onSelect?.()}
+				draggable={!editingName}
+				onDragStart={(e) => {
+					const target = e.target as HTMLElement;
+					if (
+						target.closest(
+							"button, input, textarea, a, [data-draggable-lesson], [data-draggable-content]",
+						)
+					) {
+						return;
+					}
+					drag.onUnitDragStart(e, unit.id);
+				}}
+				onDragEnd={drag.onUnitDragEnd}
+				onClick={(e) => {
+					const target = e.target as HTMLElement;
+					if (target.closest("button, input, textarea, a, [data-drag-handle]")) {
+						return;
+					}
+					setExpanded((v) => !v);
+					onSelect?.();
+				}}
 				className={cn(
-					"flex h-[27px] items-center justify-between border-[0.75px] border-[#E5E5E5] bg-[#FAFAFA] ps-2 pe-3 cursor-pointer",
-					expanded ? "rounded-t-[4px]" : "rounded-[4px]",
-					isSelected && "bg-[#6366F1]/[0.04]",
+					"flex h-[32px] items-center justify-between border-[0.75px] border-[#E5E5E5] dark:border-border bg-[#FAFAFA] dark:bg-muted/30 ps-2.5 pe-3 cursor-pointer select-none transition-colors",
+					"hover:bg-[#F3F4F6] hover:border-[#D1D5DB] dark:hover:bg-muted/60",
+					expanded ? "rounded-t-[5px]" : "rounded-[5px]",
+					isSelected && "bg-primary/[0.05] border-primary/40",
 				)}
 			>
 				<div className="flex min-w-0 items-center gap-1.5">
@@ -538,22 +952,26 @@ function UnitAccordion({
 							setExpanded((v) => !v);
 						}}
 						aria-label={expanded ? "طي الوحدة" : "توسيع الوحدة"}
-						className="flex size-2.5 items-center justify-center text-[#9B9B9D]"
+						className="flex size-4 items-center justify-center text-[#9B9B9D] hover:text-foreground cursor-pointer transition-colors"
 					>
 						<IconChevronDown
-							className={cn("size-2.5 transition-transform", !expanded && "rotate-90")}
+							className={cn(
+								"size-3 transition-transform duration-200",
+								!expanded && "rotate-90",
+							)}
 						/>
 					</button>
-					<button
-						type="button"
-						{...attributes}
-						{...listeners}
-						aria-label={`تحريك الوحدة ${unit.title}`}
-						onClick={(event) => event.stopPropagation()}
-						className="touch-none cursor-grab text-[#828283] active:cursor-grabbing"
+					{/* biome-ignore lint/a11y/noStaticElementInteractions: draggable unit grip handle */}
+					<div
+						data-drag-handle="true"
+						draggable
+						onDragStart={(e) => drag.onUnitDragStart(e, unit.id)}
+						onDragEnd={drag.onUnitDragEnd}
+						title="اسحبي لتغيير ترتيب الوحدة"
+						className="cursor-grab text-[#828283] hover:text-primary active:cursor-grabbing transition-colors p-0.5"
 					>
-						<IconGripVertical className="size-2.5 shrink-0" />
-					</button>
+						<IconGripVertical className="size-3 shrink-0" />
+					</div>
 
 					{editingName ? (
 						<Input
@@ -597,6 +1015,7 @@ function UnitAccordion({
 				<div onClick={(e) => e.stopPropagation()}>
 					<RowMenu
 						label="خيارات الوحدة"
+						onAddLesson={() => onAddLesson(unit.id, unit.title)}
 						onDuplicate={onDuplicate}
 						onDelete={() => setConfirmingDelete(true)}
 					/>
@@ -638,30 +1057,99 @@ function UnitAccordion({
 
 			{/* جسم الوحدة */}
 			{expanded && (
-				<div className="flex flex-col gap-3 rounded-b-[4px] border-[0.75px] border-t-0 border-[#E5E5E5] bg-white px-2 pt-[11px] pb-[4.5px]">
+				<div className="flex flex-col gap-2.5 rounded-b-[4px] border-[0.75px] border-t-0 border-[#E5E5E5] bg-white px-2 pt-2.5 pb-[4.5px]">
+					{/* شريط تنبيه تفعيل الفواصل الزمنية تلقائياً عند إضافة أكثر من درس */}
+					{unit.lessons.length > 1 && (
+						<div className="flex items-center justify-center rounded-[4px] border border-amber-200/90 bg-amber-50/90 py-1.5 px-3 text-center text-[11px] font-medium text-amber-800">
+							تُفعَّل الفواصل الزمنية تلقائيًا عند إضافة أكثر من درس.
+						</div>
+					)}
+
+					{/* شريط عدد الدروس وزر تفعيل/تعطيل الفواصل الزمنية */}
+					{hasLessons && (
+						<div className="flex items-center justify-between px-0.5 text-xs">
+							<span className="text-[11px] font-medium text-[#08090A] dark:text-foreground">
+								{unit.lessons.length}{" "}
+								{unit.lessons.length === 1
+									? "درس"
+									: unit.lessons.length === 2
+										? "درسان"
+										: unit.lessons.length <= 10
+											? "دروس"
+											: "درس"}
+							</span>
+							<div className="flex items-center gap-2">
+								<span className="text-[11px] font-medium text-muted-foreground select-none">
+									فواصل زمنية
+								</span>
+								<Switch
+									checked={intervalsEnabled}
+									onCheckedChange={setIntervalsEnabled}
+									size="sm"
+									aria-label="تفعيل الفواصل الزمنية"
+								/>
+							</div>
+						</div>
+					)}
+
 					{/* الدروس المحفوظة */}
 					{hasLessons && (
-						<SortableContext
-							items={unit.lessons.map((lesson) => `lesson:${lesson.id}`)}
-							strategy={verticalListSortingStrategy}
-						>
-							<ul className="flex flex-col gap-1.5">
-								{unit.lessons.map((lesson, index) => (
-									<SortableLessonRow
-										key={lesson.id}
+						<ul className="flex flex-col gap-1.5">
+							{unit.lessons.map((lesson, index) => (
+								<Fragment key={lesson.id}>
+									<DraggableLessonRow
 										lesson={lesson}
 										unit={unit}
 										index={index}
+										drag={drag}
 										isActive={activeEditorLessonId === lesson.id}
+										activeContentId={
+											activeEditorLessonId === lesson.id ? activeEditorContentId : undefined
+										}
 										onEdit={() => onEditLesson(lesson, unit.title, unit.id)}
+										onDuplicate={() => onDuplicateLesson?.(lesson)}
 										onSelectContent={(contentId) =>
 											onSelectLessonContent(lesson, unit.title, unit.id, contentId)
 										}
 										onDelete={() => setDeletingLesson(lesson)}
+										onDeleteContent={(content) => onDeleteContent(lesson, content)}
+										onAddContent={(type) =>
+											onAddLessonContent(lesson, unit.title, unit.id, type)
+										}
+										onOpenSupplies={() => onOpenSupplies?.(lesson)}
+										suppliesCount={getLessonSuppliesCount?.(lesson.id) ?? 0}
 									/>
-								))}
-							</ul>
-						</SortableContext>
+									{intervalsEnabled && index < unit.lessons.length - 1 && (
+										<IntervalDivider
+											value={getLessonInterval?.(lesson.id)?.value ?? 0}
+											unit={getLessonInterval?.(lesson.id)?.unit ?? "DAY"}
+											label="الفاصل الزمني"
+											title="الفاصل الزمني بين هذا الدرس والدرس التالي"
+											onValueChange={(val) =>
+												onUpdateLessonInterval?.(
+													lesson.id,
+													val,
+													getLessonInterval?.(lesson.id)?.unit ?? "DAY",
+												)
+											}
+											onUnitChange={(u) =>
+												onUpdateLessonInterval?.(
+													lesson.id,
+													getLessonInterval?.(lesson.id)?.value ?? 0,
+													u,
+												)
+											}
+										/>
+									)}
+								</Fragment>
+							))}
+						</ul>
+					)}
+
+					{isUnitLessonDropActive && (
+						<div className="rounded-[4px] border border-dashed border-purple-500 bg-purple-50/70 px-2 py-2 text-center text-[10px] font-medium text-purple-700">
+							أفلتي الدرس هنا لنقله إلى «{unit.title}»
+						</div>
 					)}
 
 					{/* مسودة درس/صفحة محفوظة محليًا ولم تُنشر في الوحدة بعد */}
@@ -693,78 +1181,23 @@ function UnitAccordion({
 						</div>
 					)}
 
-					{/* زر إضافة درس جديد */}
-					{hasLessons ? (
-						<div className="flex items-center gap-1.5 justify-start">
-							<Button
-								type="button"
-								variant="outline"
-								onClick={(event) => {
-									event.preventDefault();
-									event.stopPropagation();
-									setExpanded(true);
-									onSelect?.();
-									onAddLesson(unit.id, unit.title);
-								}}
-								aria-label={`إضافة درس إلى ${unit.title}`}
-								className="h-[26px] gap-1 rounded-[4px] px-[7px] text-[12px] font-medium"
-							>
-								إضافة درس جديد
-								<IconPlus className="size-[15px]" />
-							</Button>
-							{onAddPage && (
-								<Button
-									type="button"
-									variant="outline"
-									onClick={(event) => {
-										event.preventDefault();
-										event.stopPropagation();
-										setExpanded(true);
-										onSelect?.();
-										onAddPage(unit.id);
-									}}
-									aria-label={`إضافة درس بصفحة إلى ${unit.title}`}
-									className="h-[26px] gap-1 rounded-[4px] px-[7px] text-[11px] font-medium text-purple-600 hover:text-purple-700 hover:bg-purple-50 border-purple-200"
-								>
-									<IconFileText className="size-3.5" />
-									درس بصفحة
-								</Button>
-							)}
-						</div>
-					) : (
-						<div className="flex items-center gap-1.5 w-full">
-							<button
-								type="button"
-								onClick={(event) => {
-									event.preventDefault();
-									event.stopPropagation();
-									setExpanded(true);
-									onSelect?.();
-									onAddLesson(unit.id, unit.title);
-								}}
-								className="flex-1 flex items-center justify-center gap-1.5 rounded-[4px] border border-dashed border-[#E5E5E5] bg-[#FAFAFA]/60 py-2.5 text-[11px] font-medium text-[#6B6B67] hover:border-[#6366F1]/50 hover:bg-[#6366F1]/5 hover:text-[#6366F1] transition-all cursor-pointer"
-							>
-								<IconPlus className="size-3.5" />
-								<span>إضافة أول درس للوحدة</span>
-							</button>
-							{onAddPage && (
-								<button
-									type="button"
-									onClick={(event) => {
-										event.preventDefault();
-										event.stopPropagation();
-										setExpanded(true);
-										onSelect?.();
-										onAddPage(unit.id);
-									}}
-									className="flex items-center justify-center gap-1 rounded-[4px] border border-dashed border-purple-200 bg-purple-50/60 px-2 py-2.5 text-[11px] font-medium text-purple-600 hover:border-purple-400 hover:bg-purple-100/60 transition-all cursor-pointer shrink-0"
-								>
-									<IconFileText className="size-3.5" />
-									<span>درس بصفحة</span>
-								</button>
-							)}
-						</div>
-					)}
+					{/* زر إضافة درس جديد — بعرض كامل مع إزالة زر درس بصفحة */}
+					<Button
+						type="button"
+						variant="outline"
+						onClick={(event) => {
+							event.preventDefault();
+							event.stopPropagation();
+							setExpanded(true);
+							onSelect?.();
+							onAddLesson(unit.id, unit.title);
+						}}
+						aria-label={`إضافة درس إلى ${unit.title}`}
+						className="w-full h-8 gap-1.5 rounded-[5px] border-dashed border-[#D4D4D8] dark:border-border bg-white dark:bg-card/50 text-xs font-semibold text-muted-foreground hover:text-primary hover:border-primary/60 hover:bg-primary/[0.04] transition-all cursor-pointer justify-center shadow-2xs"
+					>
+						<IconPlus className="size-3.5 text-primary" />
+						<span>إضافة درس جديد</span>
+					</Button>
 				</div>
 			)}
 		</div>
@@ -785,14 +1218,24 @@ type EditorState =
 
 export function CourseBuilderStep({
 	courseId,
+	trainers,
 	onGenerateAI,
 	onEnsureCourseCreated,
 	onDirtyChange,
+	activeSuppliesLesson: externalActiveSuppliesLesson,
+	onOpenSuppliesLesson,
+	lessonSupplies: externalLessonSupplies,
+	onSaveLessonSupplies: externalSaveLessonSupplies,
 }: {
 	courseId: string | null;
+	trainers?: TrainerMember[];
 	onGenerateAI?: () => void;
 	onEnsureCourseCreated?: () => Promise<string>;
 	onDirtyChange?: (hasUnsaved: boolean) => void;
+	activeSuppliesLesson?: LessonResponse | null;
+	onOpenSuppliesLesson?: (lesson: LessonResponse | null) => void;
+	lessonSupplies?: Record<string, LessonSupplyItem[]>;
+	onSaveLessonSupplies?: (lessonId: string, items: LessonSupplyItem[]) => void;
 }) {
 	const [internalCourseId, setInternalCourseId] = useState<string | null>(courseId);
 	useEffect(() => {
@@ -801,6 +1244,28 @@ export function CourseBuilderStep({
 
 	const effectiveCourseId = courseId || internalCourseId;
 	const { course, isLoading } = useCourse(effectiveCourseId);
+
+	// قائمة المدربين المعينين للدورة لعرضها في ترويسة الهيكل أعلى اليمين
+	const effectiveTrainers = useMemo(() => {
+		if (trainers && trainers.length > 0) return trainers;
+		if (course?.trainers && course.trainers.length > 0) {
+			return course.trainers.map((t) => {
+				const staffObj = t as unknown as {
+					id?: string;
+					staffId?: string;
+					name?: string;
+					avatar?: string;
+					staff?: { id?: string; name?: string; avatar?: string };
+				};
+				return {
+					id: staffObj.id || staffObj.staffId || staffObj.staff?.id || "",
+					name: staffObj.name || staffObj.staff?.name || "مدرب",
+					avatar: staffObj.avatar || staffObj.staff?.avatar,
+				};
+			});
+		}
+		return [];
+	}, [trainers, course?.trainers]);
 	const {
 		addUnit,
 		duplicateUnit,
@@ -813,11 +1278,32 @@ export function CourseBuilderStep({
 	} = useCourseContent(effectiveCourseId);
 	const { reorderContents } = useReorderContents(effectiveCourseId);
 	const { reorderLessons } = useReorderLessons(effectiveCourseId);
-	const structureSensors = useSensors(
-		useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-		useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-	);
+	const [draggedUnitId, setDraggedUnitId] = useState<string | null>(null);
+	const [dragOverUnitTargetId, setDragOverUnitTargetId] = useState<string | null>(null);
+	const [draggedLesson, setDraggedLesson] = useState<{
+		lessonId: string;
+		fromUnitId: string;
+	} | null>(null);
+	const [dragOverUnitId, setDragOverUnitId] = useState<string | null>(null);
+	const [dragOverLessonTarget, setDragOverLessonTarget] = useState<{
+		unitId: string;
+		lessonIndex: number;
+	} | null>(null);
+	const [draggedContent, setDraggedContent] = useState<{
+		contentId: string;
+		fromLessonId: string;
+		fromUnitId: string;
+	} | null>(null);
+	const [dragOverLessonId, setDragOverLessonId] = useState<string | null>(null);
+	const [dragOverContentTarget, setDragOverContentTarget] = useState<{
+		lessonId: string;
+		contentIndex: number;
+	} | null>(null);
 	const [copyingUnitId, setCopyingUnitId] = useState<string | null>(null);
+	const [deletingContent, setDeletingContent] = useState<{
+		lesson: LessonResponse;
+		content: LessonContentItem;
+	} | null>(null);
 	// إضافة وحدة جديدة عبر الإدخال المباشر
 	const [isAddingUnit, setIsAddingUnit] = useState(false);
 	const [newUnitTitle, setNewUnitTitle] = useState("");
@@ -851,6 +1337,95 @@ export function CourseBuilderStep({
 	useEffect(() => {
 		onDirtyChange?.(Boolean(editor && hasFormUnsavedChanges));
 	}, [editor, hasFormUnsavedChanges, onDirtyChange]);
+
+	// لوحة إعداد مواد الخدمة والمخزون للدرس
+	const [activeSuppliesLesson, setActiveSuppliesLesson] = useState<LessonResponse | null>(
+		null,
+	);
+	const effectiveActiveSuppliesLesson =
+		externalActiveSuppliesLesson !== undefined
+			? externalActiveSuppliesLesson
+			: activeSuppliesLesson;
+	const [lessonSupplies, setLessonSupplies] = useState<Record<string, LessonSupplyItem[]>>(
+		() => {
+			if (typeof window !== "undefined") {
+				try {
+					const stored = localStorage.getItem(
+						`sanad_course_supplies_${effectiveCourseId || "default"}`,
+					);
+					if (stored) return JSON.parse(stored);
+				} catch {}
+			}
+			return {};
+		},
+	);
+	const effectiveLessonSupplies = externalLessonSupplies ?? lessonSupplies;
+
+	const handleOpenSupplies = (lesson: LessonResponse) => {
+		onOpenSuppliesLesson?.(lesson);
+		setActiveSuppliesLesson(lesson);
+	};
+
+	const handleCloseSupplies = () => {
+		onOpenSuppliesLesson?.(null);
+		setActiveSuppliesLesson(null);
+	};
+
+	// الفواصل الزمنية بين الدروس
+	const [lessonIntervals, setLessonIntervals] = useState<
+		Record<string, { value: number; unit: "DAY" | "WEEK" | "MONTH" }>
+	>(() => {
+		if (typeof window !== "undefined") {
+			try {
+				const stored = localStorage.getItem(
+					`sanad_course_intervals_${effectiveCourseId || "default"}`,
+				);
+				if (stored) return JSON.parse(stored);
+			} catch {}
+		}
+		return {};
+	});
+
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			try {
+				localStorage.setItem(
+					`sanad_course_supplies_${effectiveCourseId || "default"}`,
+					JSON.stringify(lessonSupplies),
+				);
+			} catch {}
+		}
+	}, [lessonSupplies, effectiveCourseId]);
+
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			try {
+				localStorage.setItem(
+					`sanad_course_intervals_${effectiveCourseId || "default"}`,
+					JSON.stringify(lessonIntervals),
+				);
+			} catch {}
+		}
+	}, [lessonIntervals, effectiveCourseId]);
+
+	const handleUpdateLessonInterval = (
+		lessonId: string,
+		value: number,
+		unit: "DAY" | "WEEK" | "MONTH",
+	) => {
+		setLessonIntervals((prev) => ({
+			...prev,
+			[lessonId]: { value, unit },
+		}));
+	};
+
+	const handleSaveLessonSupplies = (lessonId: string, items: LessonSupplyItem[]) => {
+		setLessonSupplies((prev) => ({
+			...prev,
+			[lessonId]: items,
+		}));
+		externalSaveLessonSupplies?.(lessonId, items);
+	};
 
 	// أحجام الأعمدة القابلة للتغيير بالسحب بالماوس مع الحفظ في localStorage
 	const [rightWidth, setRightWidth] = useState(() => {
@@ -936,128 +1511,118 @@ export function CourseBuilderStep({
 
 	const units = course?.units ?? [];
 	const cover = resolveCover(course?.coverKey);
-	const handleStructureDragEnd = ({ active, over }: DragEndEvent) => {
-		if (!over || active.id === over.id) return;
-		const activeData = active.data.current as
-			| { kind: "unit"; unitId: string }
-			| { kind: "lesson"; lessonId: string; unitId: string; index: number }
-			| { kind: "content"; contentId: string; lessonId: string; unitId: string; index: number }
-			| undefined;
-		const overData = over.data.current as
-			| { kind: "unit"; unitId: string }
-			| { kind: "lesson"; lessonId: string; unitId: string; index: number }
-			| { kind: "content"; contentId: string; lessonId: string; unitId: string; index: number }
-			| undefined;
-		if (!activeData || !overData) return;
 
-		if (activeData.kind === "unit") {
-			if (overData.kind !== "unit") return;
-			const from = units.findIndex((unit) => unit.id === activeData.unitId);
-			const to = units.findIndex((unit) => unit.id === overData.unitId);
-			if (from < 0 || to < 0 || from === to) return;
-			const reordered = arrayMove(units, from, to);
-			void reorderContents(
-				reordered.map((unit, position) => ({
-					unitId: unit.id,
-					levelId: unit.levelId,
-					position,
-				})),
-			);
-			return;
+	// الفواصل الزمنية بين الوحدات
+	const [unitIntervalsEnabled, setUnitIntervalsEnabled] = useState(() => units.length > 1);
+	const prevUnitsCountRef = useRef(units.length);
+	useEffect(() => {
+		if (units.length > 1 && prevUnitsCountRef.current <= 1) {
+			setUnitIntervalsEnabled(true);
 		}
+		prevUnitsCountRef.current = units.length;
+	}, [units.length]);
 
-		if (activeData.kind === "content") {
-			if (overData.kind === "unit") return;
-			const reorderedUnits = units.map((unit) => ({
-				...unit,
-				lessons: unit.lessons.map((lesson) => ({
-					...lesson,
-					contents: Array.isArray(lesson.contents) ? [...lesson.contents] : [],
-				})),
-			}));
-			const sourceLesson = reorderedUnits
-				.flatMap((unit) => unit.lessons)
-				.find((lesson) => lesson.id === activeData.lessonId);
-			const targetLesson = reorderedUnits
-				.flatMap((unit) => unit.lessons)
-				.find((lesson) => lesson.id === overData.lessonId);
-			if (!sourceLesson || !targetLesson) return;
-			const sourceContents = sourceLesson.contents ?? [];
-			const from = sourceContents.findIndex((item) => item.id === activeData.contentId);
-			if (from < 0) return;
-			if (sourceLesson.id === targetLesson.id) {
-				const to =
-					overData.kind === "content"
-						? sourceContents.findIndex((item) => item.id === overData.contentId)
-						: sourceContents.length - 1;
-				if (to < 0 || to === from) return;
-				sourceLesson.contents = arrayMove(sourceContents, from, to);
-			} else {
-				const [moved] = sourceContents.splice(from, 1);
-				if (!moved) return;
-				const targetContents = targetLesson.contents ?? [];
-				const insertAt =
-					overData.kind === "content"
-						? Math.max(
-								0,
-								targetContents.findIndex((item) => item.id === overData.contentId),
-							)
-						: targetContents.length;
-				targetContents.splice(insertAt, 0, moved);
-				targetLesson.contents = targetContents;
-			}
-			const items: ReorderLessonInput[] = reorderedUnits.flatMap((unit) =>
-				unit.lessons.map((lesson, position) => ({
-					lessonId: lesson.id,
-					unitId: unit.id,
-					position,
-					contents: lesson.contents ?? [],
-				})),
-			);
-			void reorderLessons(items);
-			return;
+	const [unitIntervals, setUnitIntervals] = useState<
+		Record<string, { value: number; unit: "DAY" | "WEEK" | "MONTH" }>
+	>(() => {
+		if (typeof window !== "undefined") {
+			try {
+				const stored = localStorage.getItem(
+					`sanad_course_unit_intervals_${effectiveCourseId || "default"}`,
+				);
+				if (stored) return JSON.parse(stored);
+			} catch {}
 		}
+		return {};
+	});
 
-		const targetUnitId = overData.unitId;
-		const sourceUnit = units.find((unit) => unit.id === activeData.unitId);
-		const targetUnit = units.find((unit) => unit.id === targetUnitId);
-		if (!sourceUnit || !targetUnit) return;
-		if (overData.kind === "unit" && sourceUnit.id === targetUnit.id) return;
-		const sourceIndex = sourceUnit.lessons.findIndex(
-			(lesson) => lesson.id === activeData.lessonId,
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			try {
+				localStorage.setItem(
+					`sanad_course_unit_intervals_${effectiveCourseId || "default"}`,
+					JSON.stringify(unitIntervals),
+				);
+			} catch {}
+		}
+	}, [unitIntervals, effectiveCourseId]);
+
+	const handleUpdateUnitInterval = (
+		unitId: string,
+		value: number,
+		unit: "DAY" | "WEEK" | "MONTH",
+	) => {
+		setUnitIntervals((prev) => ({
+			...prev,
+			[unitId]: { value, unit },
+		}));
+	};
+
+	const resetAllDragState = () => {
+		setDraggedUnitId(null);
+		setDragOverUnitTargetId(null);
+		setDraggedLesson(null);
+		setDragOverUnitId(null);
+		setDragOverLessonTarget(null);
+		setDraggedContent(null);
+		setDragOverLessonId(null);
+		setDragOverContentTarget(null);
+	};
+
+	const moveUnit = (unitToMoveId: string, targetUnitId: string) => {
+		if (unitToMoveId === targetUnitId) return;
+		const from = units.findIndex((unit) => unit.id === unitToMoveId);
+		const to = units.findIndex((unit) => unit.id === targetUnitId);
+		if (from < 0 || to < 0 || from === to) return;
+		const reordered = [...units];
+		const [moved] = reordered.splice(from, 1);
+		if (!moved) return;
+		reordered.splice(to, 0, moved);
+		void reorderContents(
+			reordered.map((unit, position) => ({
+				unitId: unit.id,
+				levelId: unit.levelId,
+				position,
+			})),
 		);
-		if (sourceIndex < 0) return;
+		toast.success(`تم تغيير ترتيب الوحدة «${moved.title}»`);
+	};
 
-		const reorderedUnits = units.map((unit) => ({ ...unit, lessons: [...unit.lessons] }));
-		const source = reorderedUnits.find((unit) => unit.id === sourceUnit.id);
+	const moveLesson = (
+		lessonId: string,
+		fromUnitId: string,
+		targetUnitId: string,
+		targetIndex?: number,
+	) => {
+		const sourceUnit = units.find((u) => u.id === fromUnitId);
+		const targetUnit = units.find((u) => u.id === targetUnitId);
+		if (!sourceUnit || !targetUnit) return;
+		const sourceIndex = sourceUnit.lessons.findIndex((l) => l.id === lessonId);
+		if (sourceIndex < 0) return;
+		if (
+			fromUnitId === targetUnitId &&
+			targetIndex !== undefined &&
+			sourceIndex === targetIndex
+		) {
+			return;
+		}
+
+		const reorderedUnits = units.map((unit) => ({
+			...unit,
+			lessons: [...unit.lessons],
+		}));
+		const source = reorderedUnits.find((unit) => unit.id === fromUnitId);
 		const target = reorderedUnits.find((unit) => unit.id === targetUnitId);
 		if (!source || !target) return;
-		if (source.id === target.id) {
-			const to =
-				overData.kind === "lesson"
-					? source.lessons.findIndex((lesson) => lesson.id === overData.lessonId)
-					: overData.kind === "content"
-						? source.lessons.findIndex((lesson) => lesson.id === overData.lessonId)
-						: source.lessons.length - 1;
-			if (to < 0 || to === sourceIndex) return;
-			source.lessons = arrayMove(source.lessons, sourceIndex, to);
-		} else {
-			const [moved] = source.lessons.splice(sourceIndex, 1);
-			if (!moved) return;
-			const insertAt =
-				overData.kind === "lesson"
-					? Math.max(
-							0,
-							target.lessons.findIndex((lesson) => lesson.id === overData.lessonId),
-						)
-					: overData.kind === "content"
-						? Math.max(
-								0,
-								target.lessons.findIndex((lesson) => lesson.id === overData.lessonId),
-							)
-						: target.lessons.length;
-			target.lessons.splice(insertAt, 0, { ...moved, unitId: target.id });
-		}
+		const [moved] = source.lessons.splice(sourceIndex, 1);
+		if (!moved) return;
+
+		const insertAt =
+			targetIndex !== undefined && targetIndex >= 0 && targetIndex <= target.lessons.length
+				? targetIndex
+				: target.lessons.length;
+		target.lessons.splice(insertAt, 0, { ...moved, unitId: target.id });
+
 		const items: ReorderLessonInput[] = reorderedUnits.flatMap((unit) =>
 			unit.lessons.map((lesson, position) => ({
 				lessonId: lesson.id,
@@ -1066,6 +1631,262 @@ export function CourseBuilderStep({
 			})),
 		);
 		void reorderLessons(items);
+		toast.success(
+			fromUnitId !== targetUnitId
+				? `تم نقل «${moved.title}» إلى ${targetUnit.title}`
+				: `تمت إعادة ترتيب «${moved.title}»`,
+		);
+	};
+
+	const moveContent = (
+		contentId: string,
+		fromLessonId: string,
+		targetLessonId: string,
+		targetIndex?: number,
+	) => {
+		const reorderedUnits = units.map((unit) => ({
+			...unit,
+			lessons: unit.lessons.map((lesson) => ({
+				...lesson,
+				contents: Array.isArray(lesson.contents) ? [...lesson.contents] : [],
+			})),
+		}));
+		const sourceLesson = reorderedUnits
+			.flatMap((unit) => unit.lessons)
+			.find((lesson) => lesson.id === fromLessonId);
+		const targetLesson = reorderedUnits
+			.flatMap((unit) => unit.lessons)
+			.find((lesson) => lesson.id === targetLessonId);
+		if (!sourceLesson || !targetLesson) return;
+
+		const sourceContents = sourceLesson.contents ?? [];
+		const from = sourceContents.findIndex((item) => item.id === contentId);
+		if (from < 0) return;
+		if (fromLessonId === targetLessonId && targetIndex !== undefined && from === targetIndex) {
+			return;
+		}
+		const [moved] = sourceContents.splice(from, 1);
+		if (!moved) return;
+		const targetContents = targetLesson.contents ?? [];
+		const insertAt =
+			targetIndex !== undefined && targetIndex >= 0 && targetIndex <= targetContents.length
+				? targetIndex
+				: targetContents.length;
+		targetContents.splice(insertAt, 0, moved);
+		targetLesson.contents = targetContents;
+
+		const items: ReorderLessonInput[] = reorderedUnits.flatMap((unit) =>
+			unit.lessons.map((lesson, position) => ({
+				lessonId: lesson.id,
+				unitId: unit.id,
+				position,
+				contents: lesson.contents ?? [],
+			})),
+		);
+		void reorderLessons(items);
+		toast.success(
+			fromLessonId !== targetLessonId
+				? `تم نقل «${moved.title}» إلى ${targetLesson.title}`
+				: `تمت إعادة ترتيب «${moved.title}»`,
+		);
+	};
+
+	const dragHandlers: DragHandlers = {
+		draggedUnitId,
+		dragOverUnitTargetId,
+		draggedLesson,
+		dragOverUnitId,
+		dragOverLessonTarget,
+		draggedContent,
+		dragOverLessonId,
+		dragOverContentTarget,
+		onUnitDragStart: (e, unitId) => {
+			e.stopPropagation();
+			setDraggedUnitId(unitId);
+			try {
+				e.dataTransfer.setData("application/course-unit-id", unitId);
+			} catch {
+				// ignore
+			}
+			e.dataTransfer.effectAllowed = "move";
+		},
+		onUnitDragEnd: resetAllDragState,
+		onUnitReorderDragOver: (e, targetUnitId) => {
+			e.preventDefault();
+			e.dataTransfer.dropEffect = "move";
+			if (draggedUnitId) {
+				e.stopPropagation();
+				if (dragOverUnitTargetId !== targetUnitId) {
+					setDragOverUnitTargetId(targetUnitId);
+				}
+				return;
+			}
+			if (draggedLesson && dragOverUnitId !== targetUnitId) {
+				setDragOverUnitId(targetUnitId);
+			}
+		},
+		onUnitReorderDragLeave: (e, unitId) => {
+			const related = e.relatedTarget as HTMLElement | null;
+			if (!e.currentTarget.contains(related)) {
+				if (draggedUnitId && dragOverUnitTargetId === unitId) {
+					setDragOverUnitTargetId(null);
+				}
+				if (dragOverUnitId === unitId) {
+					setDragOverUnitId(null);
+				}
+			}
+		},
+		onUnitReorderDrop: (e, targetUnitId) => {
+			e.preventDefault();
+			e.stopPropagation();
+			let unitToMove = draggedUnitId;
+			if (!unitToMove) {
+				try {
+					unitToMove = e.dataTransfer.getData("application/course-unit-id") || null;
+				} catch {
+					// ignore
+				}
+			}
+			let lessonData = draggedLesson;
+			if (!lessonData) {
+				try {
+					const raw = e.dataTransfer.getData("application/course-lesson");
+					if (raw) lessonData = JSON.parse(raw);
+				} catch {
+					// ignore
+				}
+			}
+			resetAllDragState();
+			if (unitToMove) {
+				moveUnit(unitToMove, targetUnitId);
+				return;
+			}
+			if (lessonData) {
+				moveLesson(lessonData.lessonId, lessonData.fromUnitId, targetUnitId);
+			}
+		},
+		onLessonDragStart: (e, lessonId, fromUnitId) => {
+			setDraggedLesson({ lessonId, fromUnitId });
+			try {
+				e.dataTransfer.setData(
+					"application/course-lesson",
+					JSON.stringify({ lessonId, fromUnitId }),
+				);
+			} catch {
+				// ignore
+			}
+			e.dataTransfer.effectAllowed = "move";
+		},
+		onLessonDragEnd: resetAllDragState,
+		onLessonDragOver: (e, unitId, lessonIndex, lessonId) => {
+			e.preventDefault();
+			e.stopPropagation();
+			e.dataTransfer.dropEffect = "move";
+			if (draggedUnitId) {
+				if (dragOverUnitTargetId !== unitId) setDragOverUnitTargetId(unitId);
+				return;
+			}
+			if (draggedContent) {
+				if (dragOverLessonId !== lessonId) setDragOverLessonId(lessonId);
+				return;
+			}
+			if (
+				dragOverLessonTarget?.unitId !== unitId ||
+				dragOverLessonTarget?.lessonIndex !== lessonIndex
+			) {
+				setDragOverLessonTarget({ unitId, lessonIndex });
+				setDragOverUnitId(unitId);
+			}
+		},
+		onLessonDrop: (e, targetUnitId, targetIndex, targetLessonId) => {
+			e.preventDefault();
+			e.stopPropagation();
+			let unitToMove = draggedUnitId;
+			if (!unitToMove) {
+				try {
+					unitToMove = e.dataTransfer.getData("application/course-unit-id") || null;
+				} catch {
+					// ignore
+				}
+			}
+			let lessonData = draggedLesson;
+			if (!lessonData) {
+				try {
+					const raw = e.dataTransfer.getData("application/course-lesson");
+					if (raw) lessonData = JSON.parse(raw);
+				} catch {
+					// ignore
+				}
+			}
+			let contentData = draggedContent;
+			if (!contentData) {
+				try {
+					const raw = e.dataTransfer.getData("application/course-content");
+					if (raw) contentData = JSON.parse(raw);
+				} catch {
+					// ignore
+				}
+			}
+			resetAllDragState();
+			if (unitToMove) {
+				moveUnit(unitToMove, targetUnitId);
+				return;
+			}
+			if (contentData) {
+				moveContent(contentData.contentId, contentData.fromLessonId, targetLessonId);
+				return;
+			}
+			if (lessonData) {
+				moveLesson(lessonData.lessonId, lessonData.fromUnitId, targetUnitId, targetIndex);
+			}
+		},
+		onContentDragStart: (e, contentId, fromLessonId, fromUnitId) => {
+			setDraggedContent({ contentId, fromLessonId, fromUnitId });
+			try {
+				e.dataTransfer.setData(
+					"application/course-content",
+					JSON.stringify({ contentId, fromLessonId, fromUnitId }),
+				);
+			} catch {
+				// ignore
+			}
+			e.dataTransfer.effectAllowed = "move";
+		},
+		onContentDragEnd: resetAllDragState,
+		onContentDragOver: (e, lessonId, contentIndex) => {
+			e.preventDefault();
+			e.stopPropagation();
+			e.dataTransfer.dropEffect = "move";
+			if (
+				dragOverContentTarget?.lessonId !== lessonId ||
+				dragOverContentTarget?.contentIndex !== contentIndex
+			) {
+				setDragOverContentTarget({ lessonId, contentIndex });
+				setDragOverLessonId(lessonId);
+			}
+		},
+		onContentDrop: (e, targetLessonId, targetIndex) => {
+			e.preventDefault();
+			e.stopPropagation();
+			let contentData = draggedContent;
+			if (!contentData) {
+				try {
+					const raw = e.dataTransfer.getData("application/course-content");
+					if (raw) contentData = JSON.parse(raw);
+				} catch {
+					// ignore
+				}
+			}
+			resetAllDragState();
+			if (contentData) {
+				moveContent(
+					contentData.contentId,
+					contentData.fromLessonId,
+					targetLessonId,
+					targetIndex,
+				);
+			}
+		},
 	};
 	const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
 	const activeUnit =
@@ -1176,6 +1997,116 @@ export function CourseBuilderStep({
 		await removeUnit(unit);
 	};
 
+	// حذف محتوى من داخل درس
+	const handleDeleteContent = async (lesson: LessonResponse, contentId: string) => {
+		const existingContents = lesson.contents ?? [];
+		if (existingContents.length <= 1) {
+			await removeLesson(lesson);
+			if (editor?.mode === "edit" && editor.lesson.id === lesson.id) {
+				closeEditorPanel(true);
+			}
+			clearLessonDraft(getLessonDraftKey({ lessonId: lesson.id, contentId }));
+			refreshDraftBadges();
+			toast.success("تم حذف الدرس بنجاح");
+			return;
+		}
+
+		const nextContents = existingContents.filter((item) => item.id !== contentId);
+		const isFirstDeleted = existingContents[0]?.id === contentId;
+		const nextPrimary = nextContents[0];
+
+		const updatePayload: UpdateLessonPayload =
+			isFirstDeleted && nextPrimary
+				? {
+						title: lesson.title || nextPrimary.title,
+						type: nextPrimary.type,
+						description: nextPrimary.description,
+						mediaSource: nextPrimary.mediaSource,
+						mediaKey: nextPrimary.mediaKey,
+						mediaUrl: nextPrimary.mediaUrl,
+						content: nextPrimary.content,
+						durationSeconds: nextPrimary.durationSeconds,
+						contents: nextContents,
+					}
+				: {
+						contents: nextContents,
+					};
+
+		const updated = await updateLesson(lesson.id, updatePayload).catch((err) => {
+			console.error("handleDeleteContent error:", err);
+			toast.error("تعذّر حذف المحتوى");
+			return null;
+		});
+
+		if (updated) {
+			clearLessonDraft(getLessonDraftKey({ lessonId: lesson.id, contentId }));
+			if (editor?.mode === "edit" && editor.lesson.id === lesson.id) {
+				if (editor.selectedContentId === contentId) {
+					setEditor({
+						...editor,
+						lesson: updated,
+						selectedContentId: undefined,
+					});
+				} else {
+					setEditor({
+						...editor,
+						lesson: updated,
+					});
+				}
+			}
+			refreshDraftBadges();
+			toast.success("تم حذف المحتوى بنجاح");
+		}
+	};
+
+	// إضافة محتوى جديد لدرس موجود
+	const handleAddContentToLesson = async (
+		lesson: LessonResponse,
+		unitTitle: string,
+		unitId: string,
+		type: LessonType = "PAGE",
+	) => {
+		const existingContents = lesson.contents ?? [];
+		const fallbackPrimary: LessonContentItem = {
+			id: `content-${Date.now()}-primary`,
+			type: lesson.type,
+			title: lesson.title || "المحتوى الأساسي",
+			description: lesson.description ?? null,
+			mediaSource: lesson.mediaSource ?? null,
+			mediaKey: lesson.mediaKey ?? null,
+			mediaUrl: lesson.mediaUrl ?? null,
+			durationSeconds: lesson.durationSeconds ?? null,
+			content: lesson.content ?? null,
+		};
+
+		const primary = existingContents[0] ?? fallbackPrimary;
+		const existingExtras = existingContents.length > 0 ? existingContents.slice(1) : [];
+
+		const typeLabel = LESSON_TYPE_AR_LABELS[type] || "محتوى";
+		const newContentItem: LessonContentItem = {
+			id: `content-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+			type,
+			title: `محتوى جديد (${typeLabel})`,
+			mediaSource: "DEVICE",
+			content: type === "PAGE" ? "" : null,
+		};
+
+		const nextContents: LessonContentItem[] = [primary, ...existingExtras, newContentItem];
+
+		const updated = await updateLesson(lesson.id, {
+			contents: nextContents,
+		}).catch((err) => {
+			console.error("handleAddContentToLesson error:", err);
+			toast.error("تعذّر إضافة المحتوى للدرس");
+			return null;
+		});
+
+		if (updated) {
+			toast.success(`تمت إضافة محتوى (${typeLabel}) للدرس بنجاح`);
+			handleOpenEditLesson(updated, unitTitle, unitId, newContentItem.id);
+		}
+	};
+
 	const saveCover = async (coverKey: string | null) => {
 		let currentCourseId = effectiveCourseId;
 		if (!currentCourseId && onEnsureCourseCreated) {
@@ -1199,7 +2130,9 @@ export function CourseBuilderStep({
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "تعذّر حفظ الغلاف");
 			}
-			await qc.invalidateQueries({ queryKey: ["training", "course", currentCourseId] });
+			await qc.invalidateQueries({
+				queryKey: ["training", "course", currentCourseId],
+			});
 			await qc.invalidateQueries({ queryKey: ["training", "courses"] });
 		} catch (e) {
 			console.error("saveCover error:", e);
@@ -1295,34 +2228,55 @@ export function CourseBuilderStep({
 			}
 		}
 
+		const effectiveLessonTitle =
+			values.lessonTitle?.trim() || values.title?.trim() || "درس جديد";
+		const effectiveContentTitle =
+			values.title?.trim() || values.lessonTitle?.trim() || "المحتوى الأساسي";
+
 		const isMedia =
 			values.type === "VIDEO" || values.type === "AUDIO" || values.type === "DOCUMENT";
+		const initialContents = buildLessonContents({
+			...values,
+			title: effectiveContentTitle,
+			lessonTitle: effectiveLessonTitle,
+		});
+
 		const saved = await addLesson({
 			unitId: targetUnitId,
-			title: values.title,
+			title: effectiveLessonTitle,
 			type: values.type,
 			description: values.description || null,
 			mediaSource: isMedia ? (values.mediaSource ?? null) : null,
 			mediaKey: isMedia ? values.mediaKey || null : null,
 			mediaUrl: isMedia ? values.mediaUrl || null : null,
 			content:
-				values.type === "QUIZ"
+				values.type === "QUIZ" || values.type === "SURVEY"
 					? JSON.stringify({ questions: values.questions ?? [] })
 					: values.content || null,
-			contents: buildLessonContents(values),
+			contents: initialContents,
 			durationSeconds: toDurationSeconds(values),
 		}).catch((err) => {
 			console.error("handleSaveNewLesson error:", err);
+			const msg = err instanceof Error ? err.message : "تعذّر حفظ الدرس الجديد";
+			toast.error(msg);
 			return null;
 		});
 
 		if (saved) {
+			toast.success(`تمت إضافة درس "${effectiveLessonTitle}" بنجاح`);
 			clearLessonDraft(
 				getLessonDraftKey({ courseId: effectiveCourseId, unitId: editor.unitId }),
 			);
 			clearLessonDraft(getLessonDraftKey({ courseId: currentCourseId, unitId: targetUnitId }));
 			setLiveDraft(null);
 			setHasFormUnsavedChanges(false);
+			const lessonToSet: LessonResponse = {
+				...saved,
+				contents:
+					Array.isArray(saved.contents) && saved.contents.length > 0
+						? saved.contents
+						: initialContents,
+			};
 			writeOpenEditorSession(currentCourseId, {
 				mode: "edit",
 				lessonId: saved.id,
@@ -1331,7 +2285,7 @@ export function CourseBuilderStep({
 			});
 			setEditor({
 				mode: "edit",
-				lesson: saved,
+				lesson: lessonToSet,
 				unitTitle: targetUnitTitle,
 				unitId: targetUnitId,
 			});
@@ -1344,34 +2298,72 @@ export function CourseBuilderStep({
 	// حفظ تعديل درس
 	const handleUpdateLesson = async (values: LessonFormValues): Promise<boolean> => {
 		if (editor?.mode !== "edit") return false;
+		const selectedIdx =
+			editor.selectedContentId && editor.lesson.contents
+				? editor.lesson.contents.findIndex((item) => item.id === editor.selectedContentId)
+				: -1;
+		const isSecondaryContent = selectedIdx > 0;
+		const effectiveLessonTitle =
+			values.lessonTitle?.trim() || values.title?.trim() || editor.lesson.title || "درس جديد";
+		const effectiveContentTitle =
+			values.title?.trim() || values.lessonTitle?.trim() || "المحتوى الأساسي";
+		const nextContents = buildLessonContents(
+			{ ...values, title: effectiveContentTitle, lessonTitle: effectiveLessonTitle },
+			editor.lesson.contents,
+			editor.selectedContentId,
+		);
 		const isMedia =
 			values.type === "VIDEO" || values.type === "AUDIO" || values.type === "DOCUMENT";
-		const saved = await updateLesson(editor.lesson.id, {
-			title: values.title,
-			type: values.type,
-			description: values.description || null,
-			mediaSource: isMedia ? (values.mediaSource ?? null) : null,
-			mediaKey: isMedia ? values.mediaKey || null : null,
-			mediaUrl: isMedia ? values.mediaUrl || null : null,
-			content:
-				values.type === "QUIZ"
-					? JSON.stringify({ questions: values.questions ?? [] })
-					: values.content || null,
-			contents: buildLessonContents(values, editor.lesson.contents),
-			durationSeconds: toDurationSeconds(values),
-		}).catch((err) => {
+		const saved = await updateLesson(
+			editor.lesson.id,
+			isSecondaryContent
+				? {
+						title: effectiveLessonTitle,
+						contents: nextContents,
+					}
+				: {
+						title: effectiveLessonTitle,
+						type: values.type,
+						description: values.description || null,
+						mediaSource: isMedia ? (values.mediaSource ?? null) : null,
+						mediaKey: isMedia ? values.mediaKey || null : null,
+						mediaUrl: isMedia ? values.mediaUrl || null : null,
+						content:
+							values.type === "QUIZ" || values.type === "SURVEY"
+								? JSON.stringify({ questions: values.questions ?? [] })
+								: values.content || null,
+						contents: nextContents,
+						durationSeconds: toDurationSeconds(values),
+					},
+		).catch((err) => {
 			console.error("handleUpdateLesson error:", err);
+			const msg = err instanceof Error ? err.message : "تعذّر حفظ تعديلات الدرس";
+			toast.error(msg);
 			return null;
 		});
 		if (saved) {
-			clearLessonDraft(getLessonDraftKey({ lessonId: editor.lesson.id }));
+			toast.success("تم حفظ تعديلات الدرس بنجاح");
+			clearLessonDraft(
+				getLessonDraftKey({
+					lessonId: editor.lesson.id,
+					contentId: isSecondaryContent ? editor.selectedContentId : undefined,
+				}),
+			);
 			setLiveDraft(null);
 			setHasFormUnsavedChanges(false);
+			const lessonToSet: LessonResponse = {
+				...saved,
+				contents:
+					Array.isArray(saved.contents) && saved.contents.length > 0
+						? saved.contents
+						: nextContents,
+			};
 			setEditor({
 				mode: "edit",
-				lesson: saved,
+				lesson: lessonToSet,
 				unitTitle: editor.unitTitle,
 				unitId: editor.unitId,
+				selectedContentId: editor.selectedContentId,
 			});
 			refreshDraftBadges();
 			return true;
@@ -1464,7 +2456,7 @@ export function CourseBuilderStep({
 					? editor.lesson.mediaUrl
 					: null;
 		const content =
-			type === "QUIZ"
+			type === "QUIZ" || type === "SURVEY"
 				? JSON.stringify({ questions: liveDraft?.questions ?? [] })
 				: liveDraft?.content !== undefined
 					? liveDraft.content
@@ -1491,6 +2483,7 @@ export function CourseBuilderStep({
 				? buildLessonContents(
 						liveDraft,
 						editor.mode === "edit" ? editor.lesson.contents : null,
+						editor.mode === "edit" ? editor.selectedContentId : undefined,
 					)
 				: editor.mode === "edit"
 					? editor.lesson.contents
@@ -1516,13 +2509,34 @@ export function CourseBuilderStep({
 			{/* ===== 1. يمين: هيكل الدورة (الوحدات والدروس والمحتوى) ===== */}
 			<div
 				style={{ width: `${rightWidth}px` }}
-				className="flex min-h-0 shrink-0 flex-col gap-3 self-stretch overflow-hidden px-3 pt-3"
+				className="flex min-h-0 shrink-0 flex-col gap-2.5 self-stretch overflow-hidden px-3 pt-3"
 			>
+				{/* بطاقة المدربين/الموظفين المعينين للدورة — أعلى يمين الخطوة الثانية */}
+				<div className="flex items-center justify-between gap-2 rounded-[6px] border border-[#E5E5E5] dark:border-border bg-white dark:bg-card px-2.5 py-1.5 shadow-2xs shrink-0">
+					<div className="flex items-center gap-1.5 min-w-0">
+						<span className="text-[11px] font-semibold text-[#08090A] dark:text-foreground">
+							المدربون:
+						</span>
+						<span className="text-[10px] text-muted-foreground truncate">
+							{effectiveTrainers.length > 0
+								? `${effectiveTrainers.length} ${effectiveTrainers.length === 1 ? "معيّن" : "معيّنون"}`
+								: "لم يتم التعيين"}
+						</span>
+					</div>
+					<div className="flex shrink-0 items-center">
+						<TrainersCell
+							trainers={effectiveTrainers}
+							maxVisible={4}
+							emptyText="بدون مدرب"
+						/>
+					</div>
+				</div>
+
 				{/* ترويسة الهيكل والأزرار */}
 				<div className="flex items-center justify-between gap-1.5">
 					<div className="flex min-w-0 flex-col">
 						<h2 className="truncate text-[12px] font-bold leading-tight text-[#08090A]">
-							وحدات الدورة
+							هيكل الصفحات
 						</h2>
 						<span className="truncate text-[10px] leading-tight text-[#6B6B67]">
 							اسحبي لإعادة الترتيب أو النقل
@@ -1545,7 +2559,7 @@ export function CourseBuilderStep({
 							className="flex h-[24px] items-center gap-1 rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-white px-2 text-[10px] font-medium text-[#08090A] hover:bg-[#FAFAFA] disabled:opacity-50 transition-colors"
 						>
 							<IconPlus className="size-3" />
-							إضافة وحدة
+							إضافة قسم
 						</button>
 					</div>
 				</div>
@@ -1618,51 +2632,110 @@ export function CourseBuilderStep({
 							</button>
 						</div>
 					) : (
-						<DndContext
-							sensors={structureSensors}
-							collisionDetection={structureCollisionDetection}
-							onDragEnd={handleStructureDragEnd}
-						>
-							<SortableContext
-								items={units.map((unit) => `unit:${unit.id}`)}
-								strategy={verticalListSortingStrategy}
-							>
-								{units.map((unit) => (
-									<Fragment key={unit.id}>
-										<UnitAccordion
-											unit={unit}
-											courseName={course?.name ?? ""}
-											isSelected={activeUnitId === unit.id}
-											onSelect={() => setSelectedUnitId(unit.id)}
-											onDuplicate={() => handleDuplicateUnit(unit)}
-											onRenameUnit={renameUnit}
-											onRemoveLesson={removeLesson}
-											onDeleteUnit={handleDeleteUnit}
-											onAddLesson={handleOpenAddLesson}
-											onEditLesson={handleOpenEditLesson}
-											onSelectLessonContent={(lesson, unitTitle, unitId, contentId) =>
-												handleOpenEditLesson(lesson, unitTitle, unitId, contentId)
-											}
-											onAddPage={(unitId) => {
-												handleOpenAddLesson(unitId, unit.title, "PAGE");
-											}}
-											pendingAddDraft={pendingAddDrafts[unit.id] ?? null}
-											onResumeDraft={(unitId, unitTitle, draftType) => {
-												handleOpenAddLesson(unitId, unitTitle, draftType);
-											}}
-											onDiscardDraft={(unitId) => {
-												clearLessonDraft(
-													getLessonDraftKey({ courseId: effectiveCourseId, unitId }),
-												);
-												refreshDraftBadges();
-											}}
-											activeEditorLessonId={activeEditorLessonId}
+						<>
+							{/* شريط تنبيه تفعيل الفواصل الزمنية بين الوحدات تلقائياً عند إضافة أكثر من وحدة */}
+							{units.length > 1 && (
+								<div className="flex items-center justify-center rounded-[4px] border border-amber-200/90 bg-amber-50/90 py-1.5 px-3 text-center text-[11px] font-medium text-amber-800 shrink-0">
+									تُفعَّل الفواصل الزمنية بين الوحدات تلقائيًا عند إضافة أكثر من وحدة.
+								</div>
+							)}
+
+							{/* شريط عدد الوحدات وزر تفعيل/تعطيل الفواصل الزمنية بين الوحدات */}
+							{units.length > 1 && (
+								<div className="flex items-center justify-between px-0.5 text-xs shrink-0">
+									<span className="text-[11px] font-medium text-[#08090A] dark:text-foreground">
+										{units.length}{" "}
+										{units.length === 2 ? "وحدتان" : units.length <= 10 ? "وحدات" : "وحدة"}
+									</span>
+									<div className="flex items-center gap-2">
+										<span className="text-[11px] font-medium text-muted-foreground select-none">
+											فواصل الوحدات
+										</span>
+										<Switch
+											checked={unitIntervalsEnabled}
+											onCheckedChange={setUnitIntervalsEnabled}
+											size="sm"
+											aria-label="تفعيل الفواصل الزمنية بين الوحدات"
 										/>
-										{copyingUnitId === unit.id && <UnitCopyingSkeleton unit={unit} />}
-									</Fragment>
-								))}
-							</SortableContext>
-						</DndContext>
+									</div>
+								</div>
+							)}
+
+							{units.map((unit, unitIndex) => (
+								<Fragment key={unit.id}>
+									<UnitAccordion
+										unit={unit}
+										courseName={course?.name ?? ""}
+										drag={dragHandlers}
+										isSelected={activeUnitId === unit.id}
+										onSelect={() => setSelectedUnitId(unit.id)}
+										onDuplicate={() => handleDuplicateUnit(unit)}
+										onRenameUnit={renameUnit}
+										onRemoveLesson={removeLesson}
+										onDeleteUnit={handleDeleteUnit}
+										onDeleteContent={(lesson, content) =>
+											setDeletingContent({ lesson, content })
+										}
+										onAddLesson={handleOpenAddLesson}
+										onAddLessonContent={handleAddContentToLesson}
+										onEditLesson={handleOpenEditLesson}
+										onSelectLessonContent={(lesson, unitTitle, unitId, contentId) =>
+											handleOpenEditLesson(lesson, unitTitle, unitId, contentId)
+										}
+										pendingAddDraft={pendingAddDrafts[unit.id] ?? null}
+										onResumeDraft={(unitId, unitTitle, draftType) => {
+											handleOpenAddLesson(unitId, unitTitle, draftType);
+										}}
+										onDiscardDraft={(unitId) => {
+											clearLessonDraft(
+												getLessonDraftKey({
+													courseId: effectiveCourseId,
+													unitId,
+												}),
+											);
+											refreshDraftBadges();
+										}}
+										activeEditorLessonId={activeEditorLessonId}
+										activeEditorContentId={
+											editor?.mode === "edit" ? editor.selectedContentId : undefined
+										}
+										onOpenSupplies={handleOpenSupplies}
+										getLessonSuppliesCount={(lessonId) =>
+											effectiveLessonSupplies[lessonId]?.length ?? 0
+										}
+										getLessonInterval={(lessonId) => lessonIntervals[lessonId]}
+										onUpdateLessonInterval={handleUpdateLessonInterval}
+										onDuplicateLesson={(lesson) =>
+											addLesson(lessonToPayload(lesson, unit.id)).catch(() => null)
+										}
+									/>
+									{copyingUnitId === unit.id && <UnitCopyingSkeleton unit={unit} />}
+									{unitIntervalsEnabled && unitIndex < units.length - 1 && (
+										<IntervalDivider
+											value={unitIntervals[unit.id]?.value ?? 0}
+											unit={unitIntervals[unit.id]?.unit ?? "DAY"}
+											label="الفاصل بين الوحدات"
+											title="الفاصل الزمني بين هذه الوحدة والوحدة التالية"
+											onValueChange={(val) =>
+												handleUpdateUnitInterval(
+													unit.id,
+													val,
+													unitIntervals[unit.id]?.unit ?? "DAY",
+												)
+											}
+											onUnitChange={(u) =>
+												handleUpdateUnitInterval(
+													unit.id,
+													unitIntervals[unit.id]?.value ?? 0,
+													u,
+												)
+											}
+											className="my-2 px-1"
+										/>
+									)}
+								</Fragment>
+							))}
+						</>
 					)}
 				</div>
 			</div>
@@ -1792,7 +2865,7 @@ export function CourseBuilderStep({
 								/>
 							) : (
 								<LessonForm
-									key={`edit-${editor.lesson.id}`}
+									key={`edit-${editor.lesson.id}-${editor.selectedContentId ?? "primary"}`}
 									lesson={editor.lesson}
 									courseId={effectiveCourseId}
 									unitId={editor.unitId}
@@ -1807,6 +2880,21 @@ export function CourseBuilderStep({
 									onDirtyChange={setHasFormUnsavedChanges}
 									onActivePageChange={setActivePreviewPageId}
 									cancelSignal={cancelSignal}
+									onDeleteContent={
+										editor.selectedContentId && editor.lesson.contents
+											? () => {
+													const currentItem = editor.lesson.contents?.find(
+														(c) => c.id === editor.selectedContentId,
+													);
+													if (currentItem) {
+														setDeletingContent({
+															lesson: editor.lesson,
+															content: currentItem,
+														});
+													}
+												}
+											: undefined
+									}
 								/>
 							)}
 						</div>
@@ -2142,6 +3230,79 @@ export function CourseBuilderStep({
 					)}
 				</div>
 			</div>
+
+			{deletingContent && (
+				<Dialog
+					open
+					onOpenChange={(open) => {
+						if (!open) setDeletingContent(null);
+					}}
+				>
+					<DialogContent
+						className="sm:max-w-md p-5"
+						dir="rtl"
+					>
+						<div className="flex items-start gap-3">
+							<div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-rose-100 text-rose-600">
+								<IconTrash className="size-5" />
+							</div>
+							<div className="flex flex-col gap-1 flex-1 min-w-0">
+								<DialogTitle className="text-sm font-bold text-[#08090A]">
+									حذف محتوى الدرس
+								</DialogTitle>
+								<DialogDescription className="text-xs text-muted-foreground leading-relaxed">
+									{deletingContent.lesson.contents &&
+									deletingContent.lesson.contents.length <= 1
+										? `هذا هو المحتوى الوحيد في الدرس "${deletingContent.lesson.title}". حذفه سيؤدي لحذف الدرس كاملاً. هل تريد المتابعة؟`
+										: `هل أنت متأكد من حذف محتوى "${deletingContent.content.title || "المحتوى"}" من درس "${deletingContent.lesson.title}"؟`}
+								</DialogDescription>
+							</div>
+						</div>
+						<div className="flex justify-end items-center gap-2 mt-4 pt-3 border-t border-[#E5E5E5]">
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={() => setDeletingContent(null)}
+								className="h-8 rounded-[4px] px-3 text-xs font-medium cursor-pointer"
+							>
+								إلغاء
+							</Button>
+							<Button
+								type="button"
+								variant="destructive"
+								size="sm"
+								onClick={async () => {
+									const { lesson, content } = deletingContent;
+									setDeletingContent(null);
+									await handleDeleteContent(lesson, content.id);
+								}}
+								className="h-8 rounded-[4px] px-3.5 text-xs font-semibold bg-[#DC2626] hover:bg-[#DC2626]/90 text-white cursor-pointer"
+							>
+								حذف المحتوى
+							</Button>
+						</div>
+					</DialogContent>
+				</Dialog>
+			)}
+			{/* سايدشيت المستلزمات — ينزلق بسلاسة في الجنب الأيسر لباني المحتوى داخل نافذة الدورة دون أن تختفي الدورة أبداً */}
+			{effectiveActiveSuppliesLesson && (
+				<aside
+					aria-label="إعداد مواد الخدمة والمخزون للدرس"
+					className="absolute inset-y-0 left-0 z-40 w-[520px] max-w-[calc(100%-340px)] border-r border-[#E5E5E5] dark:border-border bg-white dark:bg-card shadow-2xl flex flex-col overflow-hidden animate-in fade-in-0 slide-in-from-left duration-200"
+					dir="rtl"
+				>
+					<LessonSuppliesPanel
+						lessonTitle={effectiveActiveSuppliesLesson.title || "الدرس"}
+						initialItems={effectiveLessonSupplies[effectiveActiveSuppliesLesson.id] ?? []}
+						onClose={handleCloseSupplies}
+						onSave={(items) => {
+							handleSaveLessonSupplies(effectiveActiveSuppliesLesson.id, items);
+							handleCloseSupplies();
+						}}
+					/>
+				</aside>
+			)}
 		</div>
 	);
 }

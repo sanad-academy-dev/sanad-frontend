@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Badge } from "@/components/ui/badge";
 import { formatAmount, formatDisplayDate } from "@/features/accounting/utils/format-amount";
 import { api } from "@/lib/api";
+import type { PatientPolicyResponse } from "@/server/accounting/insurance/patient-policy.type";
 
 /**
  * [MI-P6] §11's patient-profile row: "Policy chip + coverage preview" — insurer, product,
@@ -25,7 +26,7 @@ const STATUS_META: Record<
 };
 
 export const PatientPolicyCard = ({ patientId }: { patientId: string | null | undefined }) => {
-	const { data } = useQuery({
+	const { data } = useQuery<PatientPolicyResponse[] | null>({
 		queryKey: ["accounting", "patient-policies", "by-patient", patientId ?? ""],
 		enabled: Boolean(patientId),
 		staleTime: 1000 * 30,
@@ -35,7 +36,7 @@ export const PatientPolicyCard = ({ patientId }: { patientId: string | null | un
 				query: { patientId: patientId as string },
 			});
 			if (error) return null;
-			return data;
+			return data as PatientPolicyResponse[];
 		},
 	});
 

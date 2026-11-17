@@ -3,7 +3,6 @@ import {
 	IconArrowsDiagonalMinimize2,
 	IconArrowUp,
 	IconCheck,
-	IconCube,
 	IconPaperclip,
 	IconSparkles,
 	IconX,
@@ -89,7 +88,10 @@ function IsometricCubesPattern() {
 					const v5 = `${cx - r * 0.866},${cy - r * 0.5}`;
 
 					return (
-						<g key={`${rowIdx}-${colIdx}`} opacity={rowOpacity}>
+						<g
+							key={`${rowIdx}-${colIdx}`}
+							opacity={rowOpacity}
+						>
 							<polygon
 								points={`${v0} ${v1} ${v2} ${v3} ${v4} ${v5}`}
 								stroke="currentColor"
@@ -180,7 +182,11 @@ export function TrackAgentPanel({
 				};
 				replyText =
 					"تم تصميم مسار البرمجة والمنطق بنجاح: حددت المدة بـ 6 أسابيع و 4 دورات تدريبية متسلسلة وتكلفة مناسبة.";
-			} else if (lower.includes("توحد") || lower.includes("تخاطب") || lower.includes("تأهيل")) {
+			} else if (
+				lower.includes("توحد") ||
+				lower.includes("تخاطب") ||
+				lower.includes("تأهيل")
+			) {
 				suggested = {
 					name: "تأهيل النطق والتخاطب الشامل للأطفال",
 					code: "REHAB-SP",
@@ -196,7 +202,11 @@ export function TrackAgentPanel({
 				};
 				replyText =
 					"تمت صياغة بيانات مسار تأهيل النطق والتخاطب للأطفال مع تحديد المقاعد والقاعة والمدة المناسبة.";
-			} else if (lower.includes("معلم") || lower.includes("رياض أطفال") || lower.includes("مرب")) {
+			} else if (
+				lower.includes("معلم") ||
+				lower.includes("رياض أطفال") ||
+				lower.includes("مرب")
+			) {
 				suggested = {
 					name: "إعداد معلمات رياض الأطفال المتقدم",
 					code: "KDG-PRO",
@@ -250,9 +260,7 @@ export function TrackAgentPanel({
 	const handleApplySpecific = (msgId: string, data?: Partial<TrackAgentFormState>) => {
 		if (!data) return;
 		onApplyData(data);
-		setMessages((prev) =>
-			prev.map((m) => (m.id === msgId ? { ...m, applied: true } : m)),
-		);
+		setMessages((prev) => prev.map((m) => (m.id === msgId ? { ...m, applied: true } : m)));
 		toast.success("تم تطبيق الاقتراح على النموذج!");
 	};
 
@@ -261,7 +269,9 @@ export function TrackAgentPanel({
 		if (!file) return;
 		setAttachedFileName(file.name);
 		toast.info(`تم إرفاق: ${file.name}`);
-		handleGenerate(`قم بتحليل ملف التوصيف التدريبي المرفق (${file.name}) وصياغة بيانات المسار منه`);
+		handleGenerate(
+			`قم بتحليل ملف التوصيف التدريبي المرفق (${file.name}) وصياغة بيانات المسار منه`,
+		);
 	};
 
 	const handleResetChat = () => {
@@ -280,7 +290,10 @@ export function TrackAgentPanel({
 			<div className="flex h-10 items-center justify-between gap-2 border-b border-border px-4 shrink-0 bg-transparent">
 				<div className="flex items-center gap-1.5">
 					<div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[11px] font-semibold">
-						<SanadLogo iconOnly className="size-3" />
+						<SanadLogo
+							iconOnly
+							className="size-3"
+						/>
 						<span>سند الذكي</span>
 					</div>
 					{messages.length > 0 && (
@@ -321,7 +334,8 @@ export function TrackAgentPanel({
 								مساعد سند الذكي لصياغة المسارات التدريبية
 							</h4>
 							<p className="text-[11px] text-muted-foreground mt-1 max-w-[270px] leading-relaxed">
-								اكتب فكرة المسار أو جمهوره المستهدف، وسيقوم المساعد باقتراح الاسم، التوصيف، المدة، والتصنيف المناسب وتعبئتها فورياً.
+								اكتب فكرة المسار أو جمهوره المستهدف، وسيقوم المساعد باقتراح الاسم، التوصيف،
+								المدة، والتصنيف المناسب وتعبئتها فورياً.
 							</p>
 						</div>
 
@@ -461,4 +475,3 @@ export function TrackAgentPanel({
 		</aside>
 	);
 }
-

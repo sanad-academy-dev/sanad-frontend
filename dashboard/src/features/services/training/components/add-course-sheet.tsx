@@ -1,5 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+	CourseLocationMode,
+	CourseType,
+} from "@sanad/contracts/runtime/server/training/training.type";
+import {
 	IconAlertCircle,
 	IconArrowsDiagonal,
 	IconArrowsDiagonalMinimize2,
@@ -61,7 +65,6 @@ import {
 } from "@/features/services/training/hooks/use-courses";
 import { useFormProgress } from "@/hooks/use-form-progress";
 import { cn } from "@/lib/utils";
-import { CourseLocationMode, CourseType } from "@sanad/contracts/runtime/server/training/training.type";
 
 // خطوات اللوحة: 1 معلومات، 2 باني الدورة، 3 المتدربون + وقت الدورة، 4 الإكمال والنشر
 type Step = 1 | 2 | 3 | 4;

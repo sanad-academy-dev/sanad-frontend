@@ -5,6 +5,9 @@ import { api } from "@/lib/api";
 import type { InsuranceProductFormInput } from "@/server/accounting/insurance/insurance-product.type";
 import type { InsurerFormInput } from "@/server/accounting/insurance/insurer.type";
 import type { PatientPolicyFormInput } from "@/server/accounting/insurance/patient-policy.type";
+import type { InsurerResponse } from "@/server/accounting/insurance/insurer.type";
+import type { InsuranceProductResponse } from "@/server/accounting/insurance/insurance-product.type";
+import type { PatientPolicyResponse } from "@/server/accounting/insurance/patient-policy.type";
 
 /**
  * [MI-P3] Hooks for «التأمين» (MI BRD §11) — insurers + products + policies, one file
@@ -34,12 +37,12 @@ export type PatientPolicyBody = Omit<PatientPolicyFormInput, "policyStart" | "po
 /* ── insurers (MI §8.1) ───────────────────────────────────────────────────────────────── */
 
 export const useInsurers = () => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<InsurerResponse[]>({
 		queryKey: key("insurers"),
 		queryFn: async () => {
 			const { data, error } = await api.accounting.insurers.get();
 			if (error) throw new Error("تعذّر تحميل شركات التأمين");
-			return data;
+			return data as InsurerResponse[];
 		},
 		staleTime: 1000 * 30,
 	});
@@ -101,12 +104,12 @@ export const useSetInsurerActive = () => {
 /* ── products (MI §8.2) ───────────────────────────────────────────────────────────────── */
 
 export const useInsuranceProducts = () => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<InsuranceProductResponse[]>({
 		queryKey: key("products"),
 		queryFn: async () => {
 			const { data, error } = await api.accounting["insurance-products"].get({ query: {} });
 			if (error) throw new Error("تعذّر تحميل منتجات التأمين");
-			return data;
+			return data as InsuranceProductResponse[];
 		},
 		staleTime: 1000 * 30,
 	});
@@ -168,14 +171,14 @@ export const useSetInsuranceProductActive = () => {
 /* ── patient policies (MI §8.3) ───────────────────────────────────────────────────────── */
 
 export const usePatientPolicies = (patientId?: string) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<PatientPolicyResponse[]>({
 		queryKey: key("policies", patientId ?? "all"),
 		queryFn: async () => {
 			const { data, error } = await api.accounting["patient-policies"].get({
 				query: patientId ? { patientId } : {},
 			});
 			if (error) throw new Error("تعذّر تحميل البوالص");
-			return data;
+			return data as PatientPolicyResponse[];
 		},
 		staleTime: 1000 * 30,
 	});

@@ -1,17 +1,12 @@
-import type React from "react";
 import {
-	IconPhone,
+	IconBrandWhatsapp,
 	IconMail,
 	IconMapPin,
+	IconPhone,
 	IconUsers,
-	IconBrandWhatsapp,
 } from "@tabler/icons-react";
-import {
-	HoverCard,
-	HoverCardContent,
-	HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import { cn } from "@/lib/utils";
+import type React from "react";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 export interface GuardianHoverData {
 	id?: string | number;
@@ -55,7 +50,10 @@ export function GuardianHoverCard({
 	const rel = guardian.relationship || "ولي أمر";
 
 	return (
-		<HoverCard openDelay={openDelay} closeDelay={closeDelay}>
+		<HoverCard
+			openDelay={openDelay}
+			closeDelay={closeDelay}
+		>
 			<HoverCardTrigger asChild>{children}</HoverCardTrigger>
 			<HoverCardContent
 				align={align}
@@ -76,9 +74,7 @@ export function GuardianHoverCard({
 							<h4 className="text-xs font-bold text-foreground truncate leading-tight">
 								{guardian.name}
 							</h4>
-							<span className="text-[10px] text-muted-foreground truncate">
-								{rel}
-							</span>
+							<span className="text-[10px] text-muted-foreground truncate">{rel}</span>
 						</div>
 					</div>
 
@@ -152,21 +148,16 @@ export function GuardianHoverCard({
 					)}
 
 					{/* عدد الطلاب التابعين */}
-					{guardian.studentsCount !== undefined &&
-						guardian.studentsCount !== null && (
-							<div className="flex items-center justify-between text-[11px]">
-								<span className="text-muted-foreground flex items-center gap-1.5">
-									<IconUsers className="size-3.5 text-muted-foreground shrink-0" />
-									<span>الأبناء المسجلون:</span>
-								</span>
-								<span className="font-semibold text-primary">
-									{guardian.studentsCount} طلاب
-								</span>
-							</div>
-						)}
+					{guardian.studentsCount !== undefined && guardian.studentsCount !== null && (
+						<div className="flex items-center justify-between text-[11px]">
+							<span className="text-muted-foreground flex items-center gap-1.5">
+								<IconUsers className="size-3.5 text-muted-foreground shrink-0" />
+								<span>الأبناء المسجلون:</span>
+							</span>
+							<span className="font-semibold text-primary">{guardian.studentsCount} طلاب</span>
+						</div>
+					)}
 				</div>
-
-				
 			</HoverCardContent>
 		</HoverCard>
 	);

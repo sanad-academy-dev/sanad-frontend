@@ -1,13 +1,14 @@
-import { useSession } from "@/lib/auth/client";
+import { readDashboardSessionFields, useSession } from "@/lib/auth/client";
 
 export const usePermissions = () => {
 	const { data: session } = useSession();
-	const role = session?.session.role;
+	const sessionFields = readDashboardSessionFields(session?.session);
+	const role = sessionFields.role;
 	const isAdmin = role === "ADMIN";
 
 	const permissions: string[] = (() => {
 		if (isAdmin) return [];
-		const raw = session?.session.permissions;
+		const raw = sessionFields.permissions;
 		if (!raw) return [];
 		try {
 			return JSON.parse(raw) as string[];

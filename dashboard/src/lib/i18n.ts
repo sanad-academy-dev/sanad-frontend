@@ -11,10 +11,10 @@ export type Translations = typeof ar;
 
 export const getTranslations = (lang: Language): Translations => {
 	if (!LANGUAGES.includes(lang)) {
-		return DEFAULT_LANGUAGE === "en" ? en : ar;
+		return (DEFAULT_LANGUAGE === "en" ? en : ar) as Translations;
 	}
 
-	return lang === "en" ? en : ar;
+	return (lang === "en" ? en : ar) as Translations;
 };
 
 export const getDirection = (lang: Language) => {

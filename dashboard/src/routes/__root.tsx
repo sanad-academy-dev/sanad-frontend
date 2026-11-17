@@ -69,7 +69,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootDocument({ children }: { children: ReactNode }) {
-	const { isRtl, lang } = useI18n();
+	const { lang } = useI18n();
 	const dir = getDirection(lang);
 
 	/**
@@ -107,9 +107,7 @@ function RootDocument({ children }: { children: ReactNode }) {
 				<HeadContent />
 			</head>
 			<body suppressHydrationWarning>
-				<TooltipProvider delayDuration={200}>
-					{children}
-				</TooltipProvider>
+				<TooltipProvider delayDuration={200}>{children}</TooltipProvider>
 				{Devtools ? (
 					<Suspense fallback={null}>
 						<Devtools />

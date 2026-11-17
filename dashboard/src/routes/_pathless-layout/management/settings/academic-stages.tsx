@@ -1,7 +1,6 @@
 import {
 	IconBriefcase,
 	IconChevronLeft,
-	IconChevronRight,
 	IconDots,
 	IconFolders,
 	IconRoute,
@@ -24,9 +23,7 @@ import { computeStagesStats } from "@/features/settings/academic-stages/data/sta
 import { useAcademicStages } from "@/features/settings/academic-stages/hooks/use-academic-stages";
 import { usePageHeaderTakeover } from "@/hooks/use-page-header-takeover";
 
-export const Route = createFileRoute(
-	"/_pathless-layout/management/settings/academic-stages",
-)({
+export const Route = createFileRoute("/_pathless-layout/management/settings/academic-stages")({
 	component: RouteComponent,
 });
 
@@ -48,7 +45,10 @@ function RouteComponent() {
 	}, [setTitleSuppressed]);
 
 	const headerContent = (
-		<div className="flex items-center gap-2" dir="rtl">
+		<div
+			className="flex items-center gap-2"
+			dir="rtl"
+		>
 			<Link
 				to="/management/settings"
 				className="whitespace-nowrap text-xs font-semibold text-foreground hover:underline"
@@ -144,8 +144,6 @@ function RouteComponent() {
 			/>
 
 			<StagesTable />
-			
 		</div>
 	);
 }
-

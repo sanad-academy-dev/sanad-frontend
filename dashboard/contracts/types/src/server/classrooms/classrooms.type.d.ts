@@ -22,6 +22,7 @@ export interface ClassroomStudentInfo {
 	active?: boolean;
 	age?: number | null;
 	birthDate?: string | Date | null;
+	ageGroup?: string | null;
 	guardianName?: string | null;
 	guardianPhone?: string | null;
 	guardianRelationship?: string | null;

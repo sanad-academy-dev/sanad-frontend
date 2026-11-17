@@ -4,7 +4,6 @@ import {
 	IconEdit,
 	IconUserPlus,
 	IconTrash,
-	IconUsers,
 	IconCalendar,
 	IconClock,
 	IconSparkles,
@@ -129,26 +128,6 @@ const COLOR_STYLES: Record<string, { bg: string; text: string; border: string }>
 	},
 };
 
-// باليتة ألوان أفاتار المعلمين في أسفل البطاقة مطابقة للصورة بدقة
-const AVATAR_COLORS = [
-	"bg-[#ECE9FE] text-[#6941C6] border-card dark:bg-purple-950/60 dark:text-purple-300",
-	"bg-[#FFE4E8] text-[#C01048] border-card dark:bg-rose-950/60 dark:text-rose-300",
-	"bg-[#E0F2FE] text-[#026AA2] border-card dark:bg-sky-950/60 dark:text-sky-300",
-	"bg-[#D1FADF] text-[#05603A] border-card dark:bg-emerald-950/60 dark:text-emerald-300",
-	"bg-[#FEF0C7] text-[#B54708] border-card dark:bg-amber-950/60 dark:text-amber-300",
-	"bg-[#EBE9FE] text-[#5925DC] border-card dark:bg-indigo-950/60 dark:text-indigo-300",
-];
-
-// استخراج الحروف الأولى لاسم المعلم
-function getInitials(name?: string | null): string {
-	if (!name) return "م";
-	const parts = name.trim().split(/\s+/).filter(Boolean);
-	if (parts.length >= 2) {
-		return `${parts[0].charAt(0)}.${parts[1].charAt(0)}`;
-	}
-	return parts[0]?.slice(0, 2) || "م";
-}
-
 // استخراج البيانات المرئية من الملاحظات
 function getClassroomVisuals(classroom: ClassroomResponse) {
 	const rawNotes = classroom.notes || "";
@@ -162,7 +141,12 @@ function getClassroomVisuals(classroom: ClassroomResponse) {
 	const colorId = matchColor?.[1]?.trim() || "blue";
 
 	let description = matchDesc?.[1]?.trim() || "";
-	if (!description && rawNotes && !rawNotes.includes("رمز_الفصل:") && !rawNotes.includes("التصنيف:")) {
+	if (
+		!description &&
+		rawNotes &&
+		!rawNotes.includes("رمز_الفصل:") &&
+		!rawNotes.includes("التصنيف:")
+	) {
 		description = rawNotes;
 	}
 
@@ -269,9 +253,7 @@ export function ClassroomsGrid({
 					<div className="size-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20">
 						<IconSchool className="size-7 stroke-[1.8]" />
 					</div>
-					<h3 className="text-base font-bold text-foreground">
-						لا توجد فصول دراسية حتى الآن
-					</h3>
+					<h3 className="text-base font-bold text-foreground">لا توجد فصول دراسية حتى الآن</h3>
 					<p className="text-xs text-muted-foreground leading-relaxed">
 						قم بإنشاء الفصول لتنظيم الطلاب ومجموعات التعلم وتعيين المعلمين والمشرفين
 					</p>
@@ -381,9 +363,7 @@ function ClassroomCard({
 							)}
 						>
 							{visuals.iconType === "emoji" ? (
-								<span className="text-base leading-none select-none">
-									{visuals.iconId}
-								</span>
+								<span className="text-base leading-none select-none">{visuals.iconId}</span>
 							) : (
 								<IconComp className="size-4.5 stroke-[1.8]" />
 							)}
@@ -407,9 +387,7 @@ function ClassroomCard({
 						onClick={(e) => e.stopPropagation()}
 					>
 						{/* شارة الحالة بالنقطة الملونة مطابقة للصورة */}
-						<span
-							className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium border border-border/80 bg-background/80 text-foreground shadow-2xs"
-						>
+						<span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium border border-border/80 bg-background/80 text-foreground shadow-2xs">
 							<span className={cn("size-1.5 rounded-full", statusBadge.dotClass)} />
 							<span>{statusBadge.label}</span>
 						</span>
@@ -427,12 +405,21 @@ function ClassroomCard({
 									<IconDots className="size-3.5" />
 								</Button>
 							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end" className="w-36">
-								<DropdownMenuItem onClick={onEdit} className="gap-2 text-xs cursor-pointer">
+							<DropdownMenuContent
+								align="end"
+								className="w-36"
+							>
+								<DropdownMenuItem
+									onClick={onEdit}
+									className="gap-2 text-xs cursor-pointer"
+								>
 									<IconEdit className="size-3.5 text-muted-foreground" />
 									تعديل الفصل
 								</DropdownMenuItem>
-								<DropdownMenuItem onClick={onAssignStaff} className="gap-2 text-xs cursor-pointer">
+								<DropdownMenuItem
+									onClick={onAssignStaff}
+									className="gap-2 text-xs cursor-pointer"
+								>
 									<IconUserPlus className="size-3.5 text-muted-foreground" />
 									تعيين موظف
 								</DropdownMenuItem>
@@ -466,10 +453,10 @@ function ClassroomCard({
 								percent === 100
 									? "bg-emerald-500"
 									: percent >= 80
-									? "bg-amber-500"
-									: percent > 0
-									? "bg-primary"
-									: "bg-transparent",
+										? "bg-amber-500"
+										: percent > 0
+											? "bg-primary"
+											: "bg-transparent",
 							)}
 							style={{ width: `${percent}%` }}
 						/>
@@ -543,9 +530,7 @@ function ClassroomCard({
 							maxVisible={3}
 						/>
 					) : (
-						<span className="text-[10px] text-muted-foreground/50 font-normal">
-							بلا معلم
-						</span>
+						<span className="text-[10px] text-muted-foreground/50 font-normal">بلا معلم</span>
 					)}
 				</div>
 			</div>

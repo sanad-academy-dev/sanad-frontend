@@ -5,7 +5,6 @@ import {
 	IconCertificate,
 	IconClock,
 	IconCompass,
-	IconMapPin,
 	IconPlus,
 	IconSchool,
 } from "@tabler/icons-react";
@@ -13,14 +12,11 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import { useCurrentTimeMs, useQuickUpdateRequest } from "../../hooks/use-digital-registration";
 import { backendFetch } from "@/lib/backend-fetch";
+import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
 import { REGISTRATION_TRACKS } from "../../utils/registration-tracks";
 import {
 	formatAppointmentDate,
@@ -38,20 +34,23 @@ interface RequestBasicInfoGridProps {
 }
 
 export function RequestBasicInfoGrid({
-
 	request,
 	campaignId = "",
 	onOpenReschedule,
 }: RequestBasicInfoGridProps) {
 	const [classPopoverOpen, setClassPopoverOpen] = useState(false);
 	const [trackPopoverOpen, setTrackPopoverOpen] = useState(false);
-	const [classrooms, setClassrooms] = useState<Array<{ id: string; name: string; category?: string | null }>>([]);
+	const [classrooms, setClassrooms] = useState<
+		Array<{ id: string; name: string; category?: string | null }>
+	>([]);
 	const quickUpdateMutation = useQuickUpdateRequest(campaignId);
 
 	useEffect(() => {
 		backendFetch("/api/classrooms")
 			.then(async (response) => (response.ok ? response.json() : []))
-			.then((items) => setClassrooms(Array.isArray(items) ? items.filter((item) => item?.name) : []))
+			.then((items) =>
+				setClassrooms(Array.isArray(items) ? items.filter((item) => item?.name) : []),
+			)
 			.catch(() => setClassrooms([]));
 	}, []);
 
@@ -63,7 +62,7 @@ export function RequestBasicInfoGrid({
 			},
 			{
 				onSuccess: () => {
-				toast.success(`تم تعيين الفصل: ${classroom.name}`);
+					toast.success(`تم تعيين الفصل: ${classroom.name}`);
 					setClassPopoverOpen(false);
 				},
 				onError: (err: any) => {
@@ -98,10 +97,13 @@ export function RequestBasicInfoGrid({
 	const displayAge = computeAgeLabel(request.birthDate, request.ageLabel);
 	const displayLevel = getStudentLevel(request);
 
-	const effectiveAppointmentDate = request.appointmentDate || request.assessmentAppointment?.startsAt;
+	const effectiveAppointmentDate =
+		request.appointmentDate || request.assessmentAppointment?.startsAt;
 	const effectiveDurationMinutes =
 		request.assessmentAppointment?.durationMinutes ?? request.interviewDurationMinutes ?? 60;
-	const isInterviewStage = ["INTERVIEW", "IN_EVALUATION", "EVALUATION"].includes(request.status);
+	const isInterviewStage = ["INTERVIEW", "IN_EVALUATION", "EVALUATION"].includes(
+		request.status,
+	);
 	const isOngoing = isInterviewOngoing({
 		isInterviewStage,
 		appointmentDate: effectiveAppointmentDate,
@@ -114,8 +116,10 @@ export function RequestBasicInfoGrid({
 				year: "numeric",
 				month: "long",
 				day: "numeric",
-		  })} (${displayAge})`
-		: (displayAge !== "غير محدد" ? displayAge : "غير محدد");
+			})} (${displayAge})`
+		: displayAge !== "غير محدد"
+			? displayAge
+			: "غير محدد";
 
 	const appointmentTimeFormatted = effectiveAppointmentDate
 		? `${formatAppointmentDate(effectiveAppointmentDate, clinicTimezone, "ar-EG", { month: "short", day: "numeric", weekday: undefined, year: undefined })} • ${formatAppointmentTime(effectiveAppointmentDate, clinicTimezone, "ar-EG")}`
@@ -202,13 +206,18 @@ export function RequestBasicInfoGrid({
 				</div>
 
 				{/* الفصل المقترح (المقابلة/السداد) أو الفصل الدراسي (المقبول) */}
-				{(request.status === "INTERVIEW" || request.status === "AWAITING_PAYMENT" || request.status === "ACCEPTED") && (
+				{(request.status === "INTERVIEW" ||
+					request.status === "AWAITING_PAYMENT" ||
+					request.status === "ACCEPTED") && (
 					<div className="flex items-center justify-between py-0.5">
 						<span className="text-zinc-500 dark:text-zinc-400 flex items-center gap-1 text-[10px]">
 							<IconSchool className="size-3 text-zinc-400" />
 							<span>{request.status === "ACCEPTED" ? "الفصل الدراسي" : "الفصل المقترح"}</span>
 						</span>
-						<Popover open={classPopoverOpen} onOpenChange={setClassPopoverOpen}>
+						<Popover
+							open={classPopoverOpen}
+							onOpenChange={setClassPopoverOpen}
+						>
 							<PopoverTrigger asChild>
 								{request.targetClass ? (
 									<Button
@@ -229,23 +238,33 @@ export function RequestBasicInfoGrid({
 									</Button>
 								)}
 							</PopoverTrigger>
-							<PopoverContent align="end" className="w-48 p-1.5" dir="rtl">
+							<PopoverContent
+								align="end"
+								className="w-48 p-1.5"
+								dir="rtl"
+							>
 								<p className="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 px-1.5 py-0.5">
-									{request.status === "ACCEPTED" ? "تسكين الطالب في فصل" : "اختر الفصل المناسب للطالب"}
+									{request.status === "ACCEPTED"
+										? "تسكين الطالب في فصل"
+										: "اختر الفصل المناسب للطالب"}
 								</p>
 								<div className="space-y-0.5 mt-0.5">
 									{classrooms.length === 0 ? (
-										<p className="px-1.5 py-2 text-[10px] text-muted-foreground">لا توجد فصول مضافة في النظام</p>
-									) : classrooms.map((cls) => (
-										<button
-											key={cls.id}
-											type="button"
-											onClick={() => handleAssignClass(cls)}
-											className="w-full text-right text-[11px] px-1.5 py-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium transition-colors"
-										>
-											{cls.name}
-										</button>
-									))}
+										<p className="px-1.5 py-2 text-[10px] text-muted-foreground">
+											لا توجد فصول مضافة في النظام
+										</p>
+									) : (
+										classrooms.map((cls) => (
+											<button
+												key={cls.id}
+												type="button"
+												onClick={() => handleAssignClass(cls)}
+												className="w-full text-right text-[11px] px-1.5 py-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 font-medium transition-colors"
+											>
+												{cls.name}
+											</button>
+										))
+									)}
 								</div>
 							</PopoverContent>
 						</Popover>
@@ -258,7 +277,10 @@ export function RequestBasicInfoGrid({
 						<IconCompass className="size-3 text-zinc-400" />
 						<span>المسار المقترح</span>
 					</span>
-					<Popover open={trackPopoverOpen} onOpenChange={setTrackPopoverOpen}>
+					<Popover
+						open={trackPopoverOpen}
+						onOpenChange={setTrackPopoverOpen}
+					>
 						<PopoverTrigger asChild>
 							{request.proposedTrack ? (
 								<Button
@@ -279,7 +301,11 @@ export function RequestBasicInfoGrid({
 								</Button>
 							)}
 						</PopoverTrigger>
-						<PopoverContent align="end" className="w-52 p-1.5" dir="rtl">
+						<PopoverContent
+							align="end"
+							className="w-52 p-1.5"
+							dir="rtl"
+						>
 							<p className="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 px-1.5 py-0.5">
 								اختر المسار الأكاديمي
 							</p>

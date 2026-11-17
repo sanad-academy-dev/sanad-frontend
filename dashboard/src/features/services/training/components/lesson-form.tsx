@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
 	type CreateLessonFormInput,
 	createLessonSchema,
-	type LessonContentItem,
 	type LessonFormValues,
 	type LessonResponse,
 	type LessonType,
@@ -10,7 +9,7 @@ import {
 	parseQuizContent,
 	REQUIRE_LESSON_MEDIA,
 } from "@sanad/contracts/runtime/server/training/training.type";
-import { IconFileTextSpark, IconInfoCircle, IconPlus } from "@tabler/icons-react";
+import { IconFileTextSpark, IconInfoCircle, IconPlus, IconTrash } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -27,7 +26,6 @@ import {
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import { CourseLessonContentsField } from "@/features/services/training/components/course-lesson-contents-field";
 import {
 	CoursePageBlocksField,
 	readPages,
@@ -87,7 +85,7 @@ const FIELD_LABELS: Record<string, string> = {
 };
 
 // تسمية الحقل — في RTL: النص ← «مطلوب» ← أيقونة المعلومات
-function FieldLabel({ label, required = false }: { label: string; required?: boolean }) {
+function FieldLabel({ label, info, required = false }: { label: string; info?: string; required?: boolean }) {
 	return (
 		<div className="flex items-center gap-1.5">
 			<span className="text-[11px] font-medium leading-4 text-[#08090A]">{label}</span>
@@ -96,7 +94,7 @@ function FieldLabel({ label, required = false }: { label: string; required?: boo
 					مطلوب
 				</span>
 			)}
-			<IconInfoCircle className="size-2.5 shrink-0 text-[#9B9B9D] opacity-50" />
+			<IconInfoCircle title={info} className="size-2.5 shrink-0 text-[#9B9B9D] opacity-50" />
 		</div>
 	);
 }
@@ -131,6 +129,7 @@ export function LessonForm({
 	onActivePageChange,
 	cancelSignal = 0,
 	initialType = "VIDEO",
+	onDeleteContent,
 }: {
 	// يستقبل القيم غير المحفوظة عند «تجاهل وخروج» لتمكين «تراجع» من استرجاعها
 	onCancel: (discarded?: CreateLessonFormInput) => void;
@@ -150,44 +149,90 @@ export function LessonForm({
 	onActivePageChange?: (pageId: string) => void;
 	cancelSignal?: number;
 	initialType?: LessonType;
+	onDeleteContent?: () => void;
 }) {
 	const isEditing = !!lesson;
-	const draftKey = getLessonDraftKey({ lessonId: lesson?.id, courseId, unitId });
+	const selectedContentIndex =
+		selectedContentId && lesson?.contents
+			? lesson.contents.findIndex((item) => item.id === selectedContentId)
+			: -1;
+	const activeContentItem =
+		selectedContentIndex > 0 && lesson?.contents
+			? lesson.contents[selectedContentIndex]
+			: undefined;
+	const draftKey = getLessonDraftKey({
+		lessonId: lesson?.id,
+		contentId: activeContentItem ? selectedContentId : undefined,
+		courseId,
+		unitId,
+	});
 	const [initialDraft] = useState<StoredLessonDraft | null>(() =>
 		restored ? null : readLessonDraft(draftKey),
 	);
 	const [restoredDraftBanner, setRestoredDraftBanner] = useState(() => Boolean(initialDraft));
 	const [confirmingDiscard, setConfirmingDiscard] = useState(false);
 	const [fileName, setFileName] = useState(() =>
-		fileNameFromKey(initialDraft?.values.mediaKey ?? lesson?.mediaKey),
+		fileNameFromKey(
+			initialDraft?.values.mediaKey ?? activeContentItem?.mediaKey ?? lesson?.mediaKey,
+		),
 	);
 	const { upload, reset: resetUpload, progress, isUploading } = useUploadMedia();
 	const busy = isSaving || isUploading;
 
-	const baselineValues: CreateLessonFormInput = lesson
+	const baselineValues: CreateLessonFormInput = activeContentItem
 		? {
-				title: lesson.title,
-				type: lesson.type,
-				description: lesson.description ?? "",
-				mediaSource: lesson.mediaSource ?? "DEVICE",
-				mediaKey: lesson.mediaKey ?? undefined,
-				mediaUrl: lesson.mediaUrl ?? undefined,
-				content: lesson.type === "QUIZ" ? "" : (lesson.content ?? ""),
-				questions: lesson.type === "QUIZ" ? parseQuizContent(lesson.content) : [],
-				contents: lesson.contents?.slice(1) ?? [],
-				...splitDuration(lesson.durationSeconds),
+				lessonTitle: lesson?.title || "",
+				title: activeContentItem.title || "",
+				type: activeContentItem.type,
+				description: activeContentItem.description ?? "",
+				mediaSource: activeContentItem.mediaSource ?? "DEVICE",
+				mediaKey: activeContentItem.mediaKey ?? undefined,
+				mediaUrl: activeContentItem.mediaUrl ?? undefined,
+				content:
+					activeContentItem.type === "QUIZ" || activeContentItem.type === "SURVEY"
+						? ""
+						: (activeContentItem.content ?? ""),
+				questions:
+					activeContentItem.type === "QUIZ" || activeContentItem.type === "SURVEY"
+						? parseQuizContent(activeContentItem.content)
+						: [],
+				contents: lesson?.contents?.slice(1) ?? [],
+				...splitDuration(activeContentItem.durationSeconds),
 			}
-		: {
-				title: "",
-				type: initialType || "VIDEO",
-				description: "",
-				mediaSource: "DEVICE",
-				contents: [],
-				// تُترك فارغة ليظهر نص ساعة/دقيقة/ثانية كـ placeholder مطابقًا للتصميم
-				hours: undefined,
-				minutes: undefined,
-				seconds: undefined,
-			};
+		: lesson
+			? {
+					lessonTitle: lesson.title || "",
+					title: lesson.contents?.[0]?.title || lesson.title || "",
+					type:
+						lesson.type === "TEXT" &&
+						lesson.content?.trim().startsWith('{"version":1,"pages":')
+							? "PAGE"
+							: lesson.type,
+					description: lesson.description ?? "",
+					mediaSource: lesson.mediaSource ?? "DEVICE",
+					mediaKey: lesson.mediaKey ?? undefined,
+					mediaUrl: lesson.mediaUrl ?? undefined,
+					content:
+						lesson.type === "QUIZ" || lesson.type === "SURVEY" ? "" : (lesson.content ?? ""),
+					questions:
+						lesson.type === "QUIZ" || lesson.type === "SURVEY"
+							? parseQuizContent(lesson.content)
+							: [],
+					contents: lesson.contents?.slice(1) ?? [],
+					...splitDuration(lesson.durationSeconds),
+				}
+			: {
+					lessonTitle: "",
+					title: "",
+					type: initialType || "VIDEO",
+					description: "",
+					mediaSource: "DEVICE",
+					contents: [],
+					// تُترك فارغة ليظهر نص ساعة/دقيقة/ثانية كـ placeholder مطابقًا للتصميم
+					hours: undefined,
+					minutes: undefined,
+					seconds: undefined,
+				};
 
 	const {
 		register,
@@ -317,7 +362,6 @@ export function LessonForm({
 	const type = watch("type");
 	const mediaSource = watch("mediaSource");
 	const contentValue = watch("content");
-	const lessonContents = watch("contents") ?? [];
 	const questions = watch("questions") ?? [];
 
 	// أول سؤال يبدأ بخيار واحد محدَّد كإجابة صحيحة
@@ -333,7 +377,36 @@ export function LessonForm({
 
 	// في وضع التعديل التسميات تتبع نوع المادة نفسها («عنوان الملف»، «وصف الصوت»...)
 	const mediaNoun = MEDIA_NOUN[type];
-	const titleLabel = type === "QUIZ" ? "عنوان التقييم" : "اسم الدرس";
+	const contentTitleLabel =
+		type === "PAGE"
+			? "اسم الصفحة"
+			: type === "VIDEO"
+				? "اسم الفيديو"
+				: type === "DOCUMENT"
+					? "اسم المستند"
+					: type === "QUIZ"
+						? "اسم التقييم"
+						: type === "SURVEY"
+							? "اسم الاستبيان"
+							: type === "AUDIO"
+								? "اسم المقطع الصوتي"
+								: "اسم المحتوى";
+
+	const contentTitlePlaceholder =
+		type === "PAGE"
+			? "مثال: نظرة عامة وشرح الخطوات"
+			: type === "VIDEO"
+				? "مثال: فيديو توضيحي للتطبيق العملي"
+				: type === "DOCUMENT"
+					? "مثال: دليل العمل السريري المرفق"
+					: type === "QUIZ"
+						? "مثال: تقييم سريع عن الوحدة"
+						: type === "SURVEY"
+							? "مثال: استبيان تقييم الفهم"
+							: type === "AUDIO"
+								? "مثال: تسجيل صوتي للمحاضرة"
+								: "مثال: عنوان المحتوى";
+
 	const sourceLabel =
 		isEditing && mediaNoun ? `مصدر ملف ${mediaNoun}` : (SOURCE_LABEL[type] ?? "مصدر الملف");
 	const descriptionLabel =
@@ -345,7 +418,8 @@ export function LessonForm({
 
 	const fieldLabels: Record<string, string> = {
 		...FIELD_LABELS,
-		title: titleLabel,
+		lessonTitle: "اسم الدرس",
+		title: contentTitleLabel,
 		mediaSource: sourceLabel,
 		description: descriptionLabel,
 	};
@@ -375,9 +449,21 @@ export function LessonForm({
 
 	const executeSubmit = handleSubmit(
 		async (values) => {
+			const effectiveLesson = values.lessonTitle?.trim() || values.title?.trim() || "";
+			const effectiveItem =
+				values.title?.trim() || values.lessonTitle?.trim() || "المحتوى الأساسي";
+			if (!effectiveLesson) {
+				toast.error("يرجى إدخال اسم الدرس");
+				return;
+			}
+			const finalValues: LessonFormValues = {
+				...values,
+				lessonTitle: effectiveLesson,
+				title: effectiveItem,
+			};
 			skipUnmountDraftRef.current = true;
 			try {
-				const result = await onSave(values);
+				const result = await onSave(finalValues);
 				if (result === false) {
 					skipUnmountDraftRef.current = false;
 					return;
@@ -393,12 +479,23 @@ export function LessonForm({
 		},
 		(validationErrors) => {
 			console.error("LessonForm validation errors:", validationErrors);
+			const findFirstErrorMessage = (err: unknown): string | null => {
+				if (!err || typeof err !== "object") return null;
+				if (typeof Element !== "undefined" && err instanceof Element) return null;
+				if ("message" in err && typeof (err as { message?: unknown }).message === "string") {
+					const msg = (err as { message: string }).message;
+					if (msg.trim()) return msg;
+				}
+				for (const [key, val] of Object.entries(err)) {
+					if (key === "ref") continue;
+					const found = findFirstErrorMessage(val);
+					if (found) return found;
+				}
+				return null;
+			};
 			const firstKey = Object.keys(validationErrors)[0] as keyof typeof validationErrors;
-			const firstError = validationErrors[firstKey];
-			const rootMsg = (firstError as { root?: { message?: string } })?.root?.message;
 			const message =
-				firstError?.message ||
-				rootMsg ||
+				findFirstErrorMessage(validationErrors) ||
 				`يرجى التحقق من حقل: ${fieldLabels[firstKey] ?? String(firstKey)}`;
 			toast.error(String(message));
 		},
@@ -417,7 +514,7 @@ export function LessonForm({
 		if (draftTimerRef.current) clearTimeout(draftTimerRef.current);
 		clearLessonDraft(draftKey);
 		reset(baselineValues);
-		setFileName(fileNameFromKey(lesson?.mediaKey));
+		setFileName(fileNameFromKey(activeContentItem?.mediaKey ?? lesson?.mediaKey));
 		setRestoredDraftBanner(false);
 		setHasUnsaved(false);
 		onValuesChange?.(baselineValues);
@@ -470,7 +567,9 @@ export function LessonForm({
 				<div className="flex items-center justify-between gap-2">
 					<div className="flex items-center gap-1.5">
 						<span className="text-[11px] font-medium leading-3 text-[#08090A]">
-							تعديل الدرس
+							{selectedContentId && activeContentItem
+								? `تعديل محتوى: ${activeContentItem.title || "محتوى إضافي"}`
+								: "تعديل الدرس"}
 						</span>
 						<ChangesBadge count={lesson?.editsCount ?? 0} />
 					</div>
@@ -504,35 +603,33 @@ export function LessonForm({
 						</span>
 					</div>
 				)}
-				{/* 1. عنوان الدرس أو الصفحة */}
+				{/* 1. اسم الدرس العام في أعلى النموذج */}
 				<Field
 					className="gap-[5px]"
-					data-invalid={!!errors.title}
+					data-invalid={!!errors.lessonTitle}
 				>
 					<FieldLabel
-						label={type === "QUIZ" ? "عنوان التقييم" : titleLabel}
+						label="اسم الدرس"
+						info="الاسم الرئيسي للدرس الذي يظهر في قائمة الدروس وهيكل الدورة"
 						required
 					/>
 					<Input
 						autoFocus={!isEditing}
-						placeholder={
-							type === "QUIZ"
-								? "مثال: تقييم سريع عن الوحدة الأولى"
-								: type === "PAGE"
-									? "مثال: خطوات تجهيز قاعة العمليات قبل الجراحة"
-									: "مثال: خطوات تجهيز قاعة العمليات قبل الجراحة"
-						}
+						placeholder="مثال: مقدمة عن أساسيات البرمجة"
 						className="h-[34px] text-[11px]"
-						aria-invalid={!!errors.title}
+						aria-invalid={!!errors.lessonTitle}
 						disabled={busy}
-						{...register("title")}
+						{...register("lessonTitle")}
 					/>
-					<FieldError errors={[errors.title]} />
+					<FieldError errors={[errors.lessonTitle]} />
 				</Field>
 
-				{/* المحتوى الأساسي للدرس */}
-				<div className={cn("flex flex-col gap-2", isEditing && "hidden")}>
-					<FieldLabel label="المحتوى الأساسي للدرس" />
+				{/* المحتوى الأساسي للدرس — ثابت وأساسي دائمًا في الإضافة والتعديل */}
+				<div className="flex flex-col gap-2">
+					<FieldLabel
+						label="المحتوى الأساسي للدرس"
+						info="اختاري نوع المحتوى المطلوب إضافته أو تعديله داخل هذا الدرس"
+					/>
 					<Controller
 						name="type"
 						control={control}
@@ -540,7 +637,12 @@ export function LessonForm({
 							<div className="flex flex-wrap items-start gap-[6px]">
 								{LESSON_TYPE_OPTIONS.filter((opt) => opt.value !== "TEXT").map((opt) => {
 									const Icon = LESSON_TYPE_ICONS[opt.value];
-									const active = field.value === opt.value;
+									const normalizedValue =
+										field.value === "TEXT" &&
+										contentValue?.trim().startsWith('{"version":1,"pages":')
+											? "PAGE"
+											: field.value;
+									const active = normalizedValue === opt.value;
 									return (
 										<button
 											key={opt.value}
@@ -587,8 +689,28 @@ export function LessonForm({
 					/>
 				</div>
 
+				{/* 2. اسم المحتوى التابع للدرس (اسم الصفحة / اسم الفيديو / اسم التقييم ...) */}
+				<Field
+					className="gap-[5px]"
+					data-invalid={!!errors.title}
+				>
+					<FieldLabel
+						label={contentTitleLabel}
+						info={`اسم ${contentTitleLabel} المخصص التابع لهذا الدرس`}
+						required
+					/>
+					<Input
+						placeholder={contentTitlePlaceholder}
+						className="h-[34px] text-[11px]"
+						aria-invalid={!!errors.title}
+						disabled={busy}
+						{...register("title")}
+					/>
+					<FieldError errors={[errors.title]} />
+				</Field>
+
 				{/* 3. تفاصيل المحتوى ثالثاً */}
-				{type === "QUIZ" ? (
+				{type === "QUIZ" || type === "SURVEY" ? (
 					/* باني التقييم — الحالة الفارغة حتى يُضاف أول سؤال */
 					questions.length === 0 ? (
 						<div className="flex h-[161px] flex-col items-center justify-center gap-[11px] rounded-[4px] border-[0.75px] border-[#E5E5E5] bg-[#9B9B9D]/[0.09] px-1.5 py-[4.5px]">
@@ -693,10 +815,7 @@ export function LessonForm({
 								className="gap-[5px]"
 								data-invalid={!!errors.content}
 							>
-								<FieldLabel
-									label="محتوى الدرس"
-									required
-								/>
+								<FieldLabel label="محتوى الدرس" />
 								<Textarea
 									placeholder="اكتب محتوى الدرس هنا..."
 									className="min-h-[120px] text-[13px]"
@@ -716,10 +835,7 @@ export function LessonForm({
 								className="gap-[5px]"
 								data-invalid={!!errors.content}
 							>
-								<FieldLabel
-									label="محتوى الصفحة"
-									required
-								/>
+								<FieldLabel label="محتوى الصفحة" />
 								<CoursePageBlocksField
 									value={contentValue}
 									onActivePageChange={onActivePageChange}
@@ -734,15 +850,6 @@ export function LessonForm({
 								<FieldError errors={[errors.content]} />
 							</Field>
 						)}
-
-						<CourseLessonContentsField
-							value={lessonContents as LessonContentItem[]}
-							selectedContentId={selectedContentId}
-							disabled={busy}
-							onChange={(contents) =>
-								setValue("contents", contents, { shouldDirty: true, shouldValidate: true })
-							}
-						/>
 
 						{/* المدة الزمنية — في RTL: ساعة يمينًا ثم دقيقة ثم ثانية */}
 						{showDuration && (
@@ -792,15 +899,29 @@ export function LessonForm({
 
 				{/* 5. أزرار البطاقة — في RTL: إلغاء يمين، حفظ الدرس يسار */}
 				<div className="sticky bottom-0 z-20 -mx-3 -mb-3 flex items-center justify-between border-t border-[#E5E5E5] bg-white px-3 py-2.5 shadow-[0_-2px_10px_rgba(0,0,0,0.06)] rounded-b-[4px]">
-					<Button
-						type="button"
-						variant="outline"
-						onClick={handleCancel}
-						disabled={busy}
-						className="h-[27px] rounded-[4px] px-3 text-[11px] font-medium cursor-pointer"
-					>
-						إلغاء وتراجع
-					</Button>
+					<div className="flex items-center gap-2">
+						<Button
+							type="button"
+							variant="outline"
+							onClick={handleCancel}
+							disabled={busy}
+							className="h-[27px] rounded-[4px] px-3 text-[11px] font-medium cursor-pointer"
+						>
+							إلغاء وتراجع
+						</Button>
+						{isEditing && selectedContentId && onDeleteContent && (
+							<Button
+								type="button"
+								variant="ghost"
+								onClick={onDeleteContent}
+								disabled={busy}
+								className="h-[27px] gap-1 rounded-[4px] px-2 text-[11px] font-medium text-destructive hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+							>
+								<IconTrash className="size-3.5" />
+								<span>حذف هذا المحتوى</span>
+							</Button>
+						)}
+					</div>
 					<Button
 						type="button"
 						onClick={submit}
@@ -826,7 +947,7 @@ export function LessonForm({
 				open={confirmingDiscard}
 				onOpenChange={setConfirmingDiscard}
 				unitTitle={unitTitle}
-				lessonTitle={getValues("title") || lesson?.title || ""}
+				lessonTitle={getValues("lessonTitle") || getValues("title") || lesson?.title || ""}
 				changedFields={changedFields}
 				onSave={submit}
 				onKeepDraft={onKeepDraft ? handleKeepDraftAndClose : undefined}

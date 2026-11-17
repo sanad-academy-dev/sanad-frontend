@@ -39,7 +39,6 @@ import {
 	SidebarMenuItem,
 	SidebarRail,
 } from "@/components/ui/sidebar";
-import { CRM_NAV_ITEMS, CRM_NAV_READ_PERMISSIONS } from "@/features/crm/navigation/crm-nav";
 import {
 	FINANCE_NAV_READ_PERMISSIONS,
 	type FinanceNavItem,
@@ -70,18 +69,6 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 	// [CRM-P1] §11.1 — «إدارة العملاء» is its own top-level group and SELF-HIDES entirely for
 	// a user holding no CRM permission: with none of these, the group never renders, so the
 	// module is invisible rather than visible-but-empty.
-	const canSeeCrm = hasAnyPermission(CRM_NAV_READ_PERMISSIONS);
-	const crmItems = useMemo(
-		() =>
-			CRM_NAV_ITEMS.filter((item) => hasAnyPermission(item.read)).map((item) => ({
-				title: t(item.titleKey),
-				url: item.url,
-				icon: <item.icon className="size-[14px]" />,
-				// detail pages live under the list route — keep the row lit while inside one
-				isActive: pathname.startsWith(item.url),
-			})),
-		[hasAnyPermission, t, pathname],
-	);
 	// [NAV-2] entering «المالية» lands on the last-visited (still-permitted) destination
 	const lastGroupKey = useFinanceWorkspaceStore((s) => s.lastGroupKey);
 	const lastByGroup = useFinanceWorkspaceStore((s) => s.lastByGroup);
@@ -183,7 +170,9 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 						title: t("sidebar.items.training"),
 						url: "/services/training",
 						icon: <IconCertificate className="size-[14px]" />,
-						isActive: pathname.startsWith("/services/training") || pathname.startsWith("/services/quizzes"),
+						isActive:
+							pathname.startsWith("/services/training") ||
+							pathname.startsWith("/services/quizzes"),
 					},
 					{
 						title: t("sidebar.items.shifts"),
@@ -203,7 +192,10 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 				title: t("sidebar.sections.care"),
 				items: [
 					{
-						title: t("sidebar.items.digitalRegistration") !== "sidebar.items.digitalRegistration" ? t("sidebar.items.digitalRegistration") : "التسجيل الرقمي",
+						title:
+							t("sidebar.items.digitalRegistration") !== "sidebar.items.digitalRegistration"
+								? t("sidebar.items.digitalRegistration")
+								: "التسجيل الرقمي",
 						url: "/digital-registration",
 						icon: <IconFileDescription className="size-[14px]" />,
 						isActive: isActive("/digital-registration"),

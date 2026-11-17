@@ -8,7 +8,7 @@ import {
 	historyTimeLabel,
 } from "@/features/services/patients/utils/patient-history";
 import { cn } from "@/lib/utils";
-import type { PatientHistoryEntry } from "@/server/patients/patients.type";
+import type { PatientHistoryEntry } from "@sanad/contracts/runtime/server/patients/patients.type";
 
 interface PatientHistoryRowProps {
 	entry: PatientHistoryEntry;

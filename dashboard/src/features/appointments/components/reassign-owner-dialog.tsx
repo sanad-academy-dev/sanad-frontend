@@ -9,6 +9,7 @@ import {
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -37,11 +38,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useReassignOwner } from "@/features/appointments/hooks/use-reassign-owner";
 import { useOwners } from "@/features/services/patients/hooks/use-owners";
 import { useI18n } from "@/hooks/use-i18n";
-import {
-	type ReassignOwnerFormInput,
-	type ReassignOwnerFormValues,
-	reassignOwnerSchema,
-} from "@sanad/contracts/runtime/server/appointments/appointments.type";
+
+const reassignOwnerSchema = z.object({
+	ownerId: z.string().min(1),
+	comment: z.string().max(2000).optional(),
+});
+type ReassignOwnerFormInput = z.input<typeof reassignOwnerSchema>;
+type ReassignOwnerFormValues = z.output<typeof reassignOwnerSchema>;
 
 interface ReassignOwnerDialogProps {
 	appointmentId: string;

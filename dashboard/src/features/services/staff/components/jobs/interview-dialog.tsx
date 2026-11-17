@@ -34,7 +34,7 @@ import {
 	guestCallUrl,
 	interviewRoomName,
 } from "@/features/services/staff/utils/interview-room";
-import { useSession } from "@/lib/auth/client";
+import { readDashboardSessionFields, useSession } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 
 // مناطق زمنية مختصرة كما في التصميم — قائمة واجهة إلى حين ربط الـ backend
@@ -170,7 +170,7 @@ export function InterviewDialog({
 
 	// قاعة المقابلة ثابتة (الأكاديمية + كود الوظيفة + معرّف المرشّح)، والرابط يُبنى منها
 	// محليًا فيظهر فورًا ولا يتعلّق بتهيئة دورة المكالمات.
-	const clinicId = session?.session?.activeClinicId ?? null;
+	const clinicId = readDashboardSessionFields(session?.session).activeClinicId ?? null;
 	const selected = candidates.find((c) => c.id === selectedId);
 
 	useEffect(() => {

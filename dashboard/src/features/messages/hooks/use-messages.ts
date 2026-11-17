@@ -82,7 +82,7 @@ export function useMessages() {
 
 	const allConversations: Conversation[] = useMemo(
 		() =>
-			(conversationsQuery.data ?? []).map((row) => mapConversation(row, myId, directoryById)),
+			(conversationsQuery.data ?? []).map((row: Parameters<typeof mapConversation>[0]) => mapConversation(row, myId, directoryById)),
 		[conversationsQuery.data, directoryById, myId],
 	);
 

@@ -188,16 +188,34 @@ export const useWeightHistory = (patientId?: string) => {
 // حالة النموذج في هذه اللحظة، وتخزينها يعني عرض حساب لمعطيات تغيّرت.
 
 type CalculateBody = Parameters<typeof api.nutrition.calculate.post>[0];
-export type NutritionCalculation = Awaited<
-	ReturnType<typeof api.nutrition.calculate.post>
->["data"];
+export type NutritionCalculation = Omit<
+	ReturnType<typeof import("@/server/nutrition/nutrition-energy").computeEnergyPlan>,
+	"items"
+> & {
+		suggestedIdealWeightKg: number | null;
+		idealWeightKg: number | null;
+		estimatedBodyFatPercent: number | null;
+		percentOverIdeal: number | null;
+		mealsPerDay: number;
+		items: {
+			nameSnapshot: string;
+			dietFoodId: string | null;
+			isTreat: boolean;
+			energySharePercent: number;
+			kcalPerDay: number;
+			householdUnit: string;
+			amount: ReturnType<typeof import("@/server/nutrition/nutrition-energy").foodAmountFor>;
+		}[];
+		totalSharePercent: number;
+		treatKcal: number;
+	};
 
 export const useNutritionCalculator = () => {
-	const { mutateAsync, data, isPending, reset } = useMutation({
+	const { mutateAsync, data, isPending, reset } = useMutation<NutritionCalculation, Error, CalculateBody>({
 		mutationFn: async (body: CalculateBody) => {
 			const res = await api.nutrition.calculate.post(body);
 			if (res.error) throw new Error("فشل حساب الطاقة");
-			return res.data;
+			return res.data as NutritionCalculation;
 		},
 	});
 	return { calculate: mutateAsync, calculation: data, isCalculating: isPending, reset };

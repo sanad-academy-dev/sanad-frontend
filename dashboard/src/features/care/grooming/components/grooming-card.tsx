@@ -105,9 +105,7 @@ export function GroomingCard({
     card.promisedReadyAt != null &&
     card.readyAt == null &&
     new Date(card.promisedReadyAt) < new Date();
-  const heatRisk =
-    card.intake?.heatDryProhibitedSnapshot === true ||
-    card.patient.animalStrain?.isBrachycephalic === true;
+  const heatRisk = card.intake?.heatDryProhibitedSnapshot === true;
   const parasites =
     card.intake?.parasiteFinding != null &&
     card.intake.parasiteFinding !== ParasiteFinding.NONE;

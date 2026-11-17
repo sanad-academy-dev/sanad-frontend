@@ -3,6 +3,10 @@ import { toast } from "sonner";
 
 import type { InsuranceClaimStatus } from "@/generated/prisma/enums";
 import { api } from "@/lib/api";
+import type {
+	InsuranceClaimDetailResponse,
+	InsuranceClaimListResponse,
+} from "@/server/accounting/insurance/insurance-claim.type";
 
 /** [MI-P4] Hooks for «المطالبات التأمينية» (MI §9) — list/detail + submit/cancel. */
 
@@ -23,7 +27,7 @@ export const useInsuranceClaims = (filter?: {
 	status?: InsuranceClaimStatus;
 	insurerId?: string;
 }) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<InsuranceClaimListResponse[]>({
 		queryKey: key("list", filter?.status ?? "all", filter?.insurerId ?? "all"),
 		queryFn: async () => {
 			const { data, error } = await api.accounting["insurance-claims"].get({
@@ -33,7 +37,7 @@ export const useInsuranceClaims = (filter?: {
 				},
 			});
 			if (error) throw new Error("تعذّر تحميل المطالبات");
-			return data;
+			return data as InsuranceClaimListResponse[];
 		},
 		staleTime: 1000 * 30,
 	});
@@ -41,14 +45,14 @@ export const useInsuranceClaims = (filter?: {
 };
 
 export const useInsuranceClaim = (id: string | null) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<InsuranceClaimDetailResponse | null>({
 		queryKey: key("detail", id ?? "none"),
 		enabled: !!id,
 		queryFn: async () => {
 			if (!id) return null;
 			const { data, error } = await api.accounting["insurance-claims"]({ id }).get();
 			if (error) throw new Error("تعذّر تحميل المطالبة");
-			return data;
+			return data as InsuranceClaimDetailResponse;
 		},
 	});
 	return { claim: data ?? null, isLoading };

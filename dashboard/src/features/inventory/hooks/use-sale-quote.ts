@@ -10,6 +10,13 @@ type QuoteItem = {
 	quantity: number;
 };
 
+type SaleQuoteResponse = {
+	totals: { total: string };
+	loyalty: { points: number; discount: string; redemptionRate: string } | null;
+	membership: { membershipId: string; discountTotal: string; couponSuppressed: boolean } | null;
+	taxRows: { idx: number; description: string; rate: string; taxAmount: string; includedInPrintRate: boolean }[];
+};
+
 /**
  * [P12B.3] تسعير السلة من الخادم.
  *
@@ -28,7 +35,7 @@ export const useSaleQuote = (params: {
 }) => {
 	const { items, discount, partyId, redeemPoints } = params;
 
-	const { data, isLoading, error } = useQuery({
+	const { data, isLoading, error } = useQuery<SaleQuoteResponse>({
 		// المفتاح يحمل السلة كاملة — أي تغيّر في صنف أو كمية أو خصم يعيد التسعير
 		queryKey: ["sales", "quote", items, discount, partyId ?? null, redeemPoints ?? 0],
 		enabled: items.length > 0,
@@ -38,7 +45,7 @@ export const useSaleQuote = (params: {
 				const message = (res.error.value as { message?: string })?.message;
 				throw new Error(message || "تعذّر تسعير الفاتورة");
 			}
-			return res.data;
+			return res.data as SaleQuoteResponse;
 		},
 		// لا إعادة محاولة: أشيع خطأ هنا هو «لا قالب ضريبة»، وهو إعداد ناقص لا عُطل عابر
 		retry: false,

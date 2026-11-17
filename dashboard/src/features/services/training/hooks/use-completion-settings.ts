@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { api } from "@/lib/api";
-import type { CompletionSettingsInput } from "@/server/training/training.type";
+import type { CompletionSettingsInput } from "@sanad/contracts/runtime/server/training/training.type";
 
 // حفظ إعدادات الإكمال (الخطوة 4) — PUT /training/courses/:id/completion. يُبطل كاش الدورة.
 export const useCompletionSettings = (courseId: string | null) => {

@@ -35,8 +35,8 @@ import { cn } from "@/lib/utils";
 import type {
 	AssignmentResponse,
 	AssignmentStatus,
-} from "@/server/course-assignments/course-assignments.type";
-import type { CourseDetailResponse, UnitResponse } from "@/server/training/training.type";
+} from "@sanad/contracts/runtime/server/course-assignments/course-assignments.type";
+import type { CourseDetailResponse, UnitResponse } from "@sanad/contracts/runtime/server/training/training.type";
 
 // تبويبات لوحة المتدرّب — الترتيب هو ترتيب DOM في RTL: «نظرة عامة» يمينًا
 const TRAINEE_TABS = [
@@ -419,7 +419,7 @@ function TraineeSideDetails({
 					label="تكلفة الدورة"
 					icon={IconCoin}
 				>
-					<SideValue>{formatTrainingCost(course.trainingCost) ?? "مجانية"}</SideValue>
+					<SideValue>{formatTrainingCost(course.trainingCost, course) ?? "مجانية"}</SideValue>
 				</SideRow>
 			</div>
 		</aside>

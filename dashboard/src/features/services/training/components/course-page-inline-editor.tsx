@@ -11,6 +11,7 @@ import {
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -370,14 +371,7 @@ export function CoursePageBlocksField({
 						onChange={(content) => updatePage(activePage.id, { content })}
 					/>
 				) : (
-					<div
-						className={cn(
-							"flex items-center justify-center ps-[54px] pe-3 text-xs text-[#9B9B9D]",
-							minEditorHeightClassName,
-						)}
-					>
-						جاري تجهيز المحرر...
-					</div>
+					<Spinner containerClassName={cn("py-8 min-h-0", minEditorHeightClassName)} />
 				)}
 			</div>
 		</div>

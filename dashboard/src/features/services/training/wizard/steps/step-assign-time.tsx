@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import type { CourseDetailResponse } from "@/server/training/training.type";
+import type { CourseDetailResponse } from "@sanad/contracts/runtime/server/training/training.type";
 import { useAssignTime } from "../../hooks/use-assign-time";
 
 // منطقة زمنية افتراضية من المتصفح (المسار ssr:false فالحساب على العميل)

@@ -53,10 +53,10 @@ export const useTracks = (
 	search?: string,
 	page?: number,
 	pageSize?: number,
-	includeStudents = false,
+	includeStudents: boolean | "preview" = false,
 	enabled = true,
 ) => {
-	const { data, isLoading, refetch } = useQuery<TrackPage | TrackRow[]>({
+	const { data, isLoading, isError, error, refetch } = useQuery<TrackPage | TrackRow[]>({
 		queryKey: ["tracks", search, page, pageSize, includeStudents],
 		queryFn: async () => {
 			const params = new URLSearchParams();
@@ -64,6 +64,7 @@ export const useTracks = (
 			if (page) params.set("page", String(page));
 			if (pageSize) params.set("pageSize", String(pageSize));
 			if (includeStudents) params.set("includeStudents", "true");
+			if (includeStudents === "preview") params.set("studentPreview", "true");
 			const queryParam = params.toString() ? `?${params.toString()}` : "";
 			const res = await backendFetch(`/api/tracks${queryParam}`);
 			if (!res.ok) throw new Error("فشل جلب قائمة المسارات التدريبية");
@@ -85,6 +86,8 @@ export const useTracks = (
 		pageSize: Array.isArray(data) ? tracks.length : (data?.pageSize ?? tracks.length),
 		totalPages: Array.isArray(data) ? 1 : (data?.totalPages ?? 1),
 		isLoading,
+		isError,
+		error,
 		refetch,
 	};
 };

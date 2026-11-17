@@ -1,4 +1,4 @@
-import { IconActivity, IconCalendar, IconCheck, IconClock, IconUser } from "@tabler/icons-react";
+import { IconActivity, IconClock, IconUser } from "@tabler/icons-react";
 import { Badge } from "@/components/ui/badge";
 import { useCampaignRequests } from "../hooks/use-digital-registration";
 
@@ -25,7 +25,10 @@ export function RegistrationActivityLog({ campaignId }: { campaignId?: string })
 
 	if (allActivities.length === 0) {
 		return (
-			<div className="flex flex-col items-center justify-center gap-2 p-12 text-center" dir="rtl">
+			<div
+				className="flex flex-col items-center justify-center gap-2 p-12 text-center"
+				dir="rtl"
+			>
 				<IconActivity className="size-8 text-muted-foreground/50" />
 				<h4 className="text-sm font-semibold text-foreground">لا يوجد نشاط مسجل حتى الآن</h4>
 				<p className="text-xs text-muted-foreground">
@@ -36,7 +39,10 @@ export function RegistrationActivityLog({ campaignId }: { campaignId?: string })
 	}
 
 	return (
-		<div className="max-w-4xl mx-auto w-full p-4 mt-2 flex flex-col gap-3" dir="rtl">
+		<div
+			className="max-w-4xl mx-auto w-full p-4 mt-2 flex flex-col gap-3"
+			dir="rtl"
+		>
 			<h3 className="text-sm font-bold text-foreground mb-2 flex items-center gap-2">
 				<IconActivity className="size-4 text-primary" />
 				<span>سجل الأنشطة والمتابعة المباشرة</span>
@@ -55,7 +61,10 @@ export function RegistrationActivityLog({ campaignId }: { campaignId?: string })
 							<div className="flex flex-col text-start">
 								<div className="flex items-center gap-2">
 									<span className="font-bold text-foreground">{act.studentName}</span>
-									<span className="font-mono text-[10px] text-muted-foreground" dir="ltr">
+									<span
+										className="font-mono text-[10px] text-muted-foreground"
+										dir="ltr"
+									>
 										#{act.studentCode}
 									</span>
 								</div>
@@ -65,7 +74,10 @@ export function RegistrationActivityLog({ campaignId }: { campaignId?: string })
 
 						<div className="flex items-center gap-2 shrink-0">
 							{act.statusBadge && (
-								<Badge variant="outline" className="text-[10px] font-semibold py-0.5">
+								<Badge
+									variant="outline"
+									className="text-[10px] font-semibold py-0.5"
+								>
 									{act.statusBadge}
 								</Badge>
 							)}

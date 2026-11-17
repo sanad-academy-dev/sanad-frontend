@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 
 import { api } from "@/lib/api";
-import type { AiCoursePreview, AiGenerateOptions } from "@/server/training/training.type";
+import type { AiCoursePreview, AiGenerateOptions } from "@sanad/contracts/runtime/server/training/training.type";
 
 // رسالة خطأ من استجابة treaty (error.value قد يحمل { message })
 const errMsg = (value: unknown, fallback: string) =>

@@ -7,7 +7,7 @@
  * - دعم كامل للغة العربية والـ RTL مع خط متناسق
  */
 import { useQuery } from "@tanstack/react-query";
-import { Spinner } from "@/components/ui/spinner";
+import { Spinner } from "@/components/common/spinner";
 import { backendUrl } from "@/lib/backend-fetch";
 import { type PageDocument, pageKey } from "../hooks/use-page-editor";
 import { PageEditor } from "./page-editor";
@@ -42,14 +42,7 @@ export function PageStudentView({ pageId, initialTitle, onBack }: PageStudentVie
 	});
 
 	if (isLoading) {
-		return (
-			<div className="flex h-full min-h-[350px] items-center justify-center">
-				<div className="flex flex-col items-center gap-3 text-muted-foreground">
-					<Spinner className="size-6 text-purple-600" />
-					<span className="text-sm">جاري تحميل الدرس...</span>
-				</div>
-			</div>
-		);
+		return <Spinner containerClassName="min-h-[350px] h-full" />;
 	}
 
 	if (error || !page) {

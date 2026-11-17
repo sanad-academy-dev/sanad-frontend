@@ -1,5 +1,4 @@
 import {
-	IconAward,
 	IconBan,
 	IconCheck,
 	IconCircleX,
@@ -14,7 +13,6 @@ import {
 	IconPlus,
 	IconSchool,
 	IconTrash,
-	IconUsers,
 } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
@@ -30,7 +28,7 @@ import { TableDataView } from "@/components/common/table-data-view";
 import { TableToolbar } from "@/components/common/table-toolbar";
 import { type FilterGroup, FiltersMenu } from "@/components/common/filters-menu";
 import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
-import { GuardianHoverCard, StudentHoverCard } from "@/components/common/hover-cards";
+import { StudentHoverCard } from "@/components/common/hover-cards";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -184,7 +182,9 @@ function StatusSelect({
 						className="text-xs"
 					>
 						{s.value === "active" ? (
-							<span className="text-emerald-600 dark:text-emerald-400 font-medium">{s.label}</span>
+							<span className="text-emerald-600 dark:text-emerald-400 font-medium">
+								{s.label}
+							</span>
 						) : s.value === "blocked" ? (
 							<span className="text-rose-600 dark:text-rose-400 font-medium">{s.label}</span>
 						) : (
@@ -203,19 +203,23 @@ const RELATIONSHIP_CONFIG: Record<
 > = {
 	OWNER: {
 		label: "وليّ أمر",
-		className: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900",
+		className:
+			"bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900",
 	},
 	GUARDIAN: {
 		label: "وصي",
-		className: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-900",
+		className:
+			"bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-900",
 	},
 	DELEGATE: {
 		label: "مفوض",
-		className: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900",
+		className:
+			"bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900",
 	},
 	EMERGENCY: {
 		label: "طوارئ",
-		className: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900",
+		className:
+			"bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-900",
 	},
 };
 
@@ -306,23 +310,23 @@ export function OwnersTable() {
 					// 		patients: row.original.patients,
 					// 	}}
 					// >
-						<div className="flex items-center gap-2.5 min-w-[170px] group cursor-pointer">
-							<OwnerAvatar name={row.original.name} />
-							<div className="flex flex-col min-w-0">
-								<Link
-									to="/services/owners/$ownerId"
-									params={{ ownerId: row.original.id }}
-									className="font-semibold text-xs text-foreground group-hover:underline truncate"
-									onClick={(e) => e.stopPropagation()}
-									title={row.original.name}
-								>
-									{row.original.name}
-								</Link>
-								<span className="font-mono text-[10px] text-muted-foreground tabular-nums">
-									{row.original.code}
-								</span>
-							</div>
+					<div className="flex items-center gap-2.5 min-w-[170px] group cursor-pointer">
+						<OwnerAvatar name={row.original.name} />
+						<div className="flex flex-col min-w-0">
+							<Link
+								to="/services/owners/$ownerId"
+								params={{ ownerId: row.original.id }}
+								className="font-semibold text-xs text-foreground group-hover:underline truncate"
+								onClick={(e) => e.stopPropagation()}
+								title={row.original.name}
+							>
+								{row.original.name}
+							</Link>
+							<span className="font-mono text-[10px] text-muted-foreground tabular-nums">
+								{row.original.code}
+							</span>
 						</div>
+					</div>
 					// </GuardianHoverCard>
 				),
 			},
@@ -384,14 +388,20 @@ export function OwnersTable() {
 				header: "الإنفاق",
 				size: 90,
 				minSize: 80,
-				cell: () => <span className="text-xs font-mono tabular-nums text-muted-foreground">0.00 ر.س</span>,
+				cell: () => (
+					<span className="text-xs font-mono tabular-nums text-muted-foreground">
+						0.00 ر.س
+					</span>
+				),
 			},
 			{
 				id: "appointments",
 				header: "عدد الزيارات",
 				size: 85,
 				minSize: 75,
-				cell: () => <span className="text-xs font-mono tabular-nums text-muted-foreground">0</span>,
+				cell: () => (
+					<span className="text-xs font-mono tabular-nums text-muted-foreground">0</span>
+				),
 			},
 			{
 				accessorKey: "active",
@@ -504,7 +514,8 @@ export function OwnersTable() {
 				if (!selectedStatuses.includes(statusKey)) return false;
 			}
 			if (selectedRelationships.length > 0) {
-				if (!owner.relationship || !selectedRelationships.includes(owner.relationship)) return false;
+				if (!owner.relationship || !selectedRelationships.includes(owner.relationship))
+					return false;
 			}
 			if (selectedStudentFilters.length > 0) {
 				const hasStudents = Boolean(owner.patients && owner.patients.length > 0);
@@ -592,7 +603,6 @@ export function OwnersTable() {
 						prev.includes(val) ? prev.filter((v) => v !== val) : [...prev, val],
 					),
 			},
-			
 		];
 
 		if (uniqueCities.length > 0) {

@@ -53,7 +53,7 @@ function RouteComponent() {
 			name: data.name,
 			email: data.email,
 			password: data.password,
-			phone: data.phone,
+			fetchOptions: { body: { phone: data.phone } },
 		});
 
 		if (error) {

@@ -9,16 +9,15 @@ import {
 	IconBrain,
 	IconBrandWhatsapp,
 	IconCheck,
-	IconClock,
 	IconCode,
 	IconCopy,
 	IconCpu,
 	IconCube,
-	IconDots,
 	IconFileDescription,
 	IconGlobe,
 	IconHeart,
 	IconLayoutGrid,
+	IconMapPin,
 	IconPlus,
 	IconRobot,
 	IconRocket,
@@ -41,6 +40,7 @@ import { FormFooter } from "@/components/common/form-footer";
 import { FormHeader } from "@/components/common/form-header";
 import { RichNotesEditor } from "@/components/common/rich-notes-editor";
 import { SanadLogo } from "@/components/common/sanad-logo";
+import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
@@ -55,7 +55,6 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useAcademicStageOptions } from "@/features/services/classrooms/hooks/use-classrooms";
@@ -157,6 +156,7 @@ const cleanTrackDescription = (text?: string | null): string => {
 		.replace(/(?:\[icon:[^\]]+\])/gi, "")
 		.replace(/(?:\[color:[^\]]+\])/gi, "")
 		.replace(/(?:\[notes:[^\]]+\])/gi, "")
+		.replace(/(?:\[(?:duration|مدة):[^\]]+\])/gi, "")
 		.replace(/&#91;courses:[^&]*&#93;/gi, "");
 
 	// 3. كشف وحذف أي شظايا JSON مسربة أو يتيمة حتى لو بدون وسم البداية
@@ -258,16 +258,6 @@ const DEFAULT_CLASSIFICATIONS = [
 	"البرمجة والمنطق",
 	"طبي وتأهيلي",
 	"تدريب تربوي",
-];
-
-const DURATION_PRESETS = [
-	"4 أسابيع",
-	"6 أسابيع",
-	"8 أسابيع",
-	"10 أسابيع",
-	"12 أسبوع",
-	"16 أسبوع",
-	"6 أشهر",
 ];
 
 const TRACK_TEMPLATES = [
@@ -425,9 +415,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 	const [duration, setDuration] = useState("");
 	const [coursesCount, setCoursesCount] = useState(4);
 	const [price, setPrice] = useState(7000);
-	const [locationMode, setLocationMode] = useState<"ONLINE" | "IN_PERSON" | "HYBRID">(
-		"ONLINE",
-	);
+	const [locationMode, setLocationMode] = useState<"ONLINE" | "IN_PERSON" | "HYBRID" | "">("");
 
 	// استخراج المراحل الدراسية النشطة مع قيم قياسية تضمن عدم ظهور القائمة فارغة نهائياً
 	const activeAcademicStages = useMemo(() => {
@@ -515,7 +503,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 				setDuration(track.duration || "");
 				setCoursesCount(track.coursesCount);
 				setPrice(track.price);
-				setLocationMode(track.locationMode);
+				setLocationMode(track.locationMode || "");
 				setSelectedTrainer(track.trainers?.[0]?.name ?? "");
 				setSelectedStaffIds((track.trainers || []).map((t) => t.id));
 				setSelectedStaffMembers(track.trainers || []);
@@ -585,7 +573,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 				setDuration("");
 				setCoursesCount(4);
 				setPrice(7000);
-				setLocationMode("ONLINE");
+				setLocationMode("");
 				setSelectedTrainer("");
 				setSelectedStaffIds([]);
 				setSelectedStaffMembers([]);
@@ -781,7 +769,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 			setSelectedColor("blue");
 			setCoursesCount(4);
 			setPrice(7000);
-			setLocationMode("ONLINE");
+			setLocationMode("");
 			setTemplateMenuOpen(false);
 			toast.info("تم تفريغ الحقول والبدء بدون قالب");
 			return;
@@ -868,10 +856,11 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 
 		setIsSubmitting(true);
 
-		const locLabelMap = {
+		const locLabelMap: Record<string, string> = {
 			ONLINE: "أونلاين",
 			IN_PERSON: "حضوري",
 			HYBRID: "مدمج",
+			"": "بدون مكان",
 		};
 
 		// ضمان عدم تكرار أي دورة داخل المسار نهائياً
@@ -883,7 +872,9 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 		const courseTag =
 			uniqueSelectedIds.length > 0 ? `[courses:${uniqueSelectedIds.join(",")}]` : "";
 
-		let stagesToSave = structureData?.stages || (trackStages && trackStages.length > 0 ? trackStages : undefined);
+		let stagesToSave =
+			structureData?.stages ||
+			(trackStages && trackStages.length > 0 ? trackStages : undefined);
 		if (stagesToSave && Array.isArray(stagesToSave)) {
 			const validCourseSet = new Set(uniqueSelectedIds);
 			const seenCourseIds = new Set<string>();
@@ -943,8 +934,8 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 			category: category.trim(),
 			academicStage: academicStage.trim() || undefined,
 			coursesCount: effectiveCoursesCount,
-			locationMode,
-			locationLabel: locLabelMap[locationMode],
+			locationMode: (locationMode as "ONLINE" | "IN_PERSON" | "HYBRID") || "ONLINE",
+			locationLabel: locLabelMap[locationMode] || "أونلاين",
 			staffIds: selectedStaffIds,
 			duration: effectiveDuration,
 			price,
@@ -1613,9 +1604,10 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 														{/* قائمة المراحل المتاحة */}
 														<div className="max-h-48 overflow-y-auto space-y-0.5">
 															{isStagesLoading && activeAcademicStages.length === 0 ? (
-																<div className="py-2 text-center text-xs text-muted-foreground">
-																	جاري التحميل...
-																</div>
+																<Spinner
+																	containerClassName="py-3 min-h-0"
+																	className="size-4 text-primary"
+																/>
 															) : (
 																activeAcademicStages.map((item) => (
 																	// biome-ignore lint/a11y/noStaticElementInteractions: stage option
@@ -1734,9 +1726,10 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 														<div className="max-h-48 overflow-y-auto space-y-0.5">
 															{isClassificationsLoading &&
 															activeTrackClassifications.length === 0 ? (
-																<div className="py-2 text-center text-xs text-muted-foreground">
-																	جاري التحميل...
-																</div>
+																<Spinner
+																	containerClassName="py-3 min-h-0"
+																	className="size-4 text-primary"
+																/>
 															) : (
 																activeTrackClassifications.map((item) => (
 																	// biome-ignore lint/a11y/noStaticElementInteractions: dropdown option
@@ -1789,7 +1782,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 													title="فترة المسار التدريبي"
 												/>
 
-												{/* 5. زر النقاط الإضافية (...) */}
+												{/* 5. مكان التعلم */}
 												<DropdownMenu
 													dir="rtl"
 													modal={false}
@@ -1797,89 +1790,67 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 													<DropdownMenuTrigger asChild>
 														<Button
 															type="button"
-															variant="outline"
-															size="icon-sm"
-															className="size-8"
-															title="خيارات إضافية للمسار"
+															variant={locationMode ? "secondary" : "outline"}
+															size="sm"
+															className="gap-1.5 h-8 text-xs font-normal cursor-pointer"
 														>
-															<IconDots className="size-4 text-muted-foreground" />
+															<IconMapPin className="size-3.5 text-muted-foreground/70 shrink-0" />
+															<span>
+																{locationMode === "ONLINE"
+																	? "أونلاين"
+																	: locationMode === "IN_PERSON"
+																		? "حضوري"
+																		: locationMode === "HYBRID"
+																			? "مدمج"
+																			: "مكان التعلم"}
+															</span>
 														</Button>
 													</DropdownMenuTrigger>
 													<DropdownMenuContent
-														align="start"
-														className="w-52! min-w-52 p-2 space-y-2"
+														align="end"
+														className="w-40! min-w-40 p-1"
 													>
-														{/* <div className="space-y-1">
-											<span className="text-[11px] font-semibold text-muted-foreground block">
-												مكان المسار
-											</span>
-											<div className="grid grid-cols-3 gap-1">
-												{(["ONLINE", "IN_PERSON", "HYBRID"] as const).map((mode) => (
-													<button
-														key={mode}
-														type="button"
-														onClick={() => setLocationMode(mode)}
-														className={cn(
-															"text-[10px] py-1 px-1.5 rounded border transition-colors",
-															locationMode === mode
-																? "bg-primary text-primary-foreground border-primary font-semibold"
-																: "bg-muted/40 text-muted-foreground hover:text-foreground",
-														)}
-													>
-														{mode === "ONLINE" ? "أونلاين" : mode === "IN_PERSON" ? "حضوري" : "مدمج"}
-													</button>
-												))}
-											</div>
-										</div>
+														<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
+															مكان التعلم
+														</DropdownMenuLabel>
 
-										<div className="space-y-1 pt-1 border-t">
-											<span className="text-[11px] font-semibold text-muted-foreground block">
-												عدد الدورات
-											</span>
-											<Input
-												type="number"
-												min={1}
-												value={coursesCount}
-												onChange={(e) => setCoursesCount(Number.parseInt(e.target.value, 10) || 1)}
-												className="h-7 text-xs"
-											/>
-										</div> */}
+														{/* خيار بدون مكان التعلم */}
+														<DropdownMenuItem
+															onClick={() => setLocationMode("")}
+															className={cn(
+																"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md mb-1",
+																!locationMode && "bg-muted font-medium text-foreground",
+															)}
+														>
+															<span>بدون مكان التعلم</span>
+															{!locationMode && (
+																<IconCheck className="size-3.5 text-primary" />
+															)}
+														</DropdownMenuItem>
+														<DropdownMenuSeparator className="my-1" />
 
-														{/* <div className="space-y-1 pt-1 border-t">
-													<span className="text-[11px] font-semibold text-muted-foreground block">
-														السعر (ج.م)
-													</span>
-													<Input
-														type="number"
-														min={0}
-														value={price}
-														onChange={(e) =>
-															setPrice(Number.parseInt(e.target.value, 10) || 0)
-														}
-														className="h-7 text-xs"
-													/>
-												</div> */}
-
-														<div className="pt-1 border-t">
-															<button
-																type="button"
-																onClick={() => setIsStaffSheetOpen(true)}
-																className="w-full flex items-center justify-between text-xs py-1.5 px-2 rounded hover:bg-accent text-right cursor-pointer"
-															>
-																<span className="font-semibold text-foreground">
-																	تعيين موظف
-																</span>
-																{selectedStaffIds.length > 0 ? (
-																	<span className="text-[10px] bg-primary/10 text-primary font-medium px-1.5 py-0.5 rounded">
-																		{selectedStaffIds.length} محدد
-																	</span>
-																) : (
-																	<span className="text-[10px] text-muted-foreground">
-																		0 محدد
-																	</span>
+														{(
+															[
+																{ value: "ONLINE", label: "أونلاين" },
+																{ value: "IN_PERSON", label: "حضوري" },
+																{ value: "HYBRID", label: "مدمج" },
+															] as const
+														).map((opt) => (
+															<DropdownMenuItem
+																key={opt.value}
+																onClick={() => setLocationMode(opt.value)}
+																className={cn(
+																	"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md",
+																	locationMode === opt.value &&
+																		"bg-muted font-medium text-foreground",
 																)}
-															</button>
-														</div>
+															>
+																<span>{opt.label}</span>
+																{locationMode === opt.value && (
+																	<IconCheck className="size-3.5 text-primary" />
+																)}
+															</DropdownMenuItem>
+														))}
 													</DropdownMenuContent>
 												</DropdownMenu>
 											</div>
@@ -1968,7 +1939,8 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 											if (data.price !== undefined) setPrice(data.price);
 											if (data.selectedTrainer !== undefined)
 												setSelectedTrainer(data.selectedTrainer);
-											if (data.locationMode !== undefined) setLocationMode(data.locationMode);
+										if (data.locationMode !== undefined)
+											setLocationMode(data.locationMode || "");
 										}}
 										currentValues={{
 											name,
@@ -1981,7 +1953,7 @@ export function TrackDialog({ open, onOpenChange, track, onSuccess }: TrackDialo
 											coursesCount,
 											price,
 											selectedTrainer,
-											locationMode,
+											locationMode: locationMode || undefined,
 										}}
 									/>
 								)}

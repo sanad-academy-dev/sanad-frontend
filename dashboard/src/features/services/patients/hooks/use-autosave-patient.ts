@@ -9,6 +9,7 @@ import type {
 
 export type PatientAutosaveInput = Omit<UpdatePatientInput, "ownerId" | "birthDate"> & {
 	birthDate?: string | null;
+	guardianRelationships?: Record<string, string>;
 };
 
 function applyOptimisticUpdate(
@@ -29,7 +30,9 @@ function applyOptimisticUpdate(
 		birthDate:
 			birthDate === undefined
 				? patient.birthDate
-				: birthDate || null,
+				: birthDate
+					? new Date(birthDate)
+					: null,
 	};
 }
 
@@ -38,7 +41,8 @@ export const useAutosavePatient = (patientId: string) => {
 
 	const mutation = useMutation({
 		mutationFn: async (data: PatientAutosaveInput) => {
-			const res = await api.patients({ id: patientId }).patch(data);
+			const { guardianRelationships: _guardianRelationships, ...payload } = data;
+			const res = await api.patients({ id: patientId }).patch(payload);
 			if (res.error) {
 				const message =
 					(res.error.value as { message?: string } | undefined)?.message ?? "فشل الحفظ";

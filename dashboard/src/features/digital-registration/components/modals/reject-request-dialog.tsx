@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import {
 	IconAlertTriangle,
-	IconArrowRight,
 	IconCheck,
 	IconChevronDown,
 	IconFileText,
@@ -10,14 +9,8 @@ import {
 	IconUser,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
-
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -119,7 +112,7 @@ export function RejectRequestDialog({
 
 	const hasActiveAppointment = Boolean(
 		request.appointmentId ||
-		(request.assessmentAppointment && request.assessmentAppointment.status !== "CANCELLED")
+			(request.assessmentAppointment && request.assessmentAppointment.status !== "CANCELLED"),
 	);
 
 	const handleGenerateAI = () => {
@@ -182,7 +175,10 @@ export function RejectRequestDialog({
 		<aside
 			data-slot="reject-drawer"
 			onWheel={handleDrawerWheel}
-			className={cn("fixed z-50 w-full lg:w-[28vw]! lg:min-w-[20rem]! lg:max-w-[28rem]!  lg:right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background h-[calc(100dvh-1rem)]! max-h-[calc(100dvh-1rem)]! inset-y-2! rounded-lg animate-in fade-in-0 duration-200 select-text", isExpanded ? "lg:left-[calc(65vw+0.75rem)]!" : "lg:left-[calc(60vw+0.75rem)]!")}
+			className={cn(
+				"fixed z-50 w-full lg:w-[28vw]! lg:min-w-[20rem]! lg:max-w-[28rem]!  lg:right-auto! p-0 gap-0 overflow-hidden font-sans border border-zinc-200 dark:border-zinc-800 shadow-2xl flex flex-col bg-background h-[calc(100dvh-1rem)]! max-h-[calc(100dvh-1rem)]! inset-y-2! rounded-lg animate-in fade-in-0 duration-200 select-text",
+				isExpanded ? "lg:left-[calc(65vw+0.75rem)]!" : "lg:left-[calc(60vw+0.75rem)]!",
+			)}
 			dir="rtl"
 		>
 			{/* رأس اللوحة الموحد */}
@@ -217,8 +213,8 @@ export function RejectRequestDialog({
 								سيتم إلغاء موعد المقابلة المرتبط
 								{request.assessmentAppointment?.startsAt
 									? ` (${new Date(request.assessmentAppointment.startsAt).toLocaleDateString("ar-SA")})`
-									: ""}
-								{" "}وتفريغ القاعة والأخصائي تلقائياً فور تأكيد الرفض.
+									: ""}{" "}
+								وتفريغ القاعة والأخصائي تلقائياً فور تأكيد الرفض.
 							</span>
 						</div>
 					</div>
@@ -234,7 +230,9 @@ export function RejectRequestDialog({
 							تضمين رسالة لولي الأمر
 						</label>
 						<span className="text-[10px] text-muted-foreground">
-							{enableMessage ? "سيتم توثيق الرسالة وإشعار ولي الأمر بالاعتذار" : "لن يتم إرسال أي نص مكتوب"}
+							{enableMessage
+								? "سيتم توثيق الرسالة وإشعار ولي الأمر بالاعتذار"
+								: "لن يتم إرسال أي نص مكتوب"}
 						</span>
 					</div>
 					<Switch
@@ -276,7 +274,10 @@ export function RejectRequestDialog({
 					<label className="block text-xs font-bold text-zinc-800 dark:text-zinc-200">
 						سبب الرفض والاعتذار <span className="text-destructive">*</span>
 					</label>
-					<Popover open={reasonPopoverOpen} onOpenChange={setReasonPopoverOpen}>
+					<Popover
+						open={reasonPopoverOpen}
+						onOpenChange={setReasonPopoverOpen}
+					>
 						<PopoverTrigger asChild>
 							<Button
 								variant="outline"
@@ -289,8 +290,14 @@ export function RejectRequestDialog({
 								<IconChevronDown className="size-3 opacity-60 shrink-0" />
 							</Button>
 						</PopoverTrigger>
-						<PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-1.5" dir="rtl">
-							<p className="text-[11px] font-bold text-muted-foreground p-1.5">اختر سبب الرفض والاعتذار</p>
+						<PopoverContent
+							align="start"
+							className="w-[var(--radix-popover-trigger-width)] p-1.5"
+							dir="rtl"
+						>
+							<p className="text-[11px] font-bold text-muted-foreground p-1.5">
+								اختر سبب الرفض والاعتذار
+							</p>
 							<div className="space-y-0.5">
 								{REJECTION_REASONS.map((r) => (
 									<button
@@ -328,7 +335,10 @@ export function RejectRequestDialog({
 			<div className="p-2.5 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
 				<div className="grid grid-cols-4 gap-2 w-full">
 					<div className="min-w-0">
-						<Popover open={staffPopoverOpen} onOpenChange={setStaffPopoverOpen}>
+						<Popover
+							open={staffPopoverOpen}
+							onOpenChange={setStaffPopoverOpen}
+						>
 							<PopoverTrigger asChild>
 								<Button
 									variant="outline"
@@ -346,15 +356,23 @@ export function RejectRequestDialog({
 									<IconChevronDown className="size-3 opacity-60 shrink-0" />
 								</Button>
 							</PopoverTrigger>
-							<PopoverContent align="start" className="w-56 p-1.5 z-50 bg-popover border border-border shadow-xl rounded-xl" dir="rtl">
+							<PopoverContent
+								align="start"
+								className="w-56 p-1.5 z-50 bg-popover border border-border shadow-xl rounded-xl"
+								dir="rtl"
+							>
 								<p className="text-[10.5px] font-bold text-zinc-900 dark:text-zinc-100 p-1 border-b border-border/50">
 									إسناد الملف إلى...
 								</p>
 								<div className="max-h-48 overflow-y-auto space-y-0.5 pt-1">
 									{isStaffLoading ? (
-										<p className="text-[10px] p-2 text-center text-muted-foreground">جاري التحميل...</p>
+										<p className="text-[10px] p-2 text-center text-muted-foreground">
+											جاري التحميل...
+										</p>
 									) : staff.length === 0 ? (
-										<p className="text-[10px] p-2 text-center text-muted-foreground">لا يوجد موظفون متاحون</p>
+										<p className="text-[10px] p-2 text-center text-muted-foreground">
+											لا يوجد موظفون متاحون
+										</p>
 									) : (
 										<>
 											<button
@@ -365,14 +383,18 @@ export function RejectRequestDialog({
 												}}
 												className={cn(
 													"w-full text-right text-xs p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-muted-foreground flex items-center justify-between transition-colors cursor-pointer",
-													!assignedStaffId && "bg-zinc-100 dark:bg-zinc-800 font-semibold text-foreground",
+													!assignedStaffId &&
+														"bg-zinc-100 dark:bg-zinc-800 font-semibold text-foreground",
 												)}
 											>
 												<span>بدون مراجع (إلغاء التعيين)</span>
-												{!assignedStaffId && <IconCheck className="size-3.5 text-zinc-600 dark:text-zinc-400 shrink-0" />}
+												{!assignedStaffId && (
+													<IconCheck className="size-3.5 text-zinc-600 dark:text-zinc-400 shrink-0" />
+												)}
 											</button>
 											{staff.map((s) => {
-												const isSelected = s.id === assignedStaffId || s.staffId === assignedStaffId;
+												const isSelected =
+													s.id === assignedStaffId || s.staffId === assignedStaffId;
 												return (
 													<button
 														key={s.id}
@@ -383,7 +405,8 @@ export function RejectRequestDialog({
 														}}
 														className={cn(
 															"w-full text-right text-xs p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-between gap-2 transition-colors cursor-pointer",
-															isSelected && "bg-blue-50/80 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold",
+															isSelected &&
+																"bg-blue-50/80 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-semibold",
 														)}
 													>
 														<div className="flex items-center gap-2 min-w-0 flex-1">
@@ -450,7 +473,11 @@ export function RejectRequestDialog({
 					<Button
 						size="sm"
 						onClick={handleSubmit}
-						disabled={rejectMutation.isPending || !capabilities.canAcceptOrReject || (enableMessage && !messageText.trim())}
+						disabled={
+							rejectMutation.isPending ||
+							!capabilities.canAcceptOrReject ||
+							(enableMessage && !messageText.trim())
+						}
 						className="h-8 text-xs font-semibold px-4 gap-1.5 bg-blue-600 hover:bg-blue-700 text-white cursor-pointer shadow-2xs disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						<IconTrash className="size-3.5" />

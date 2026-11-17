@@ -21,8 +21,9 @@ export const Route = createFileRoute("/_pathless-layout/care/mobile-clinic")({
 	// الحارس يُخفي الصفحة؛ التأمين الفعلي في mobile-units.controller
 	beforeLoad: async () => {
 		const { session } = await getSession();
-		if (session?.session.role === "MEMBER") {
-			const perms: string[] = JSON.parse(session.session.permissions ?? "[]");
+		const currentSession = session?.session;
+		if (currentSession?.role === "MEMBER") {
+			const perms: string[] = JSON.parse(currentSession.permissions ?? "[]");
 			const canView =
 				perms.includes(PERMISSIONS.MOBILE_CLINICS_VIEW_LIMITED) ||
 				perms.includes(PERMISSIONS.MOBILE_CLINICS_VIEW_FULL);

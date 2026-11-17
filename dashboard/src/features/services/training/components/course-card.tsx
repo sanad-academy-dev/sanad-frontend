@@ -1,5 +1,4 @@
 import {
-	IconBolt,
 	IconDots,
 	IconLayersSubtract,
 	IconPencil,
@@ -7,7 +6,8 @@ import {
 	IconTrash,
 	IconWorld,
 } from "@tabler/icons-react";
-
+import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
+import { StaffHoverCard, type StaffHoverData } from "@/components/common/hover-cards";
 import { CompletionRing } from "@/components/ui/completion-ring";
 import {
 	DropdownMenu,
@@ -15,14 +15,17 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+	courseLocationLabel,
+	formatTrainingCost,
+} from "@/features/services/training/data/training";
+import {
+	extractCourseAcademicStage,
+	resolveCourseAppearance,
+} from "@/features/services/training/utils/course-meta";
 import { resolveCover } from "@/features/services/training/utils/cover";
-import { avatarColor, initialsOf } from "@/lib/avatar-color";
-import { getFileUrl } from "@/lib/file-url";
 import { cn } from "@/lib/utils";
-import type { CourseListItemResponse } from "@/server/training/training.type";
-
-const PRIORITY_LABEL = { URGENT: "عاجل", NORMAL: "غير عاجل" } as const;
-const LANGUAGE_LABEL = { AR: "العربية", EN: "الإنجليزية" } as const;
+import type { CourseListItemResponse } from "@sanad/contracts/runtime/server/training/training.type";
 
 const fmtDate = (d: Date | string) =>
 	new Date(d).toLocaleDateString("ar", { day: "numeric", month: "short", year: "numeric" });
@@ -40,76 +43,91 @@ function Chip({ children, className }: { children: React.ReactNode; className?: 
 	);
 }
 
-// مكدّس صور المتدربين + عدّاد الزائد
+type AssigneeWithExtra = {
+	id: string;
+	name: string;
+	avatar?: string | null;
+	phone?: string | null;
+	email?: string | null;
+	role?: string | null;
+	branch?: string | null;
+	employmentType?: string | null;
+	active?: boolean;
+};
+
+// مكدّس صور المدربين + عدّاد الزائد مع بطاقة التحويم
 export function AssigneeStack({ course }: { course: CourseListItemResponse }) {
-	const extra = course.assignedCount - course.assignees.length;
+	const trainers = (
+		course.trainers && course.trainers.length > 0 ? course.trainers : course.assignees || []
+	) as AssigneeWithExtra[];
+	const totalCount = course.assignedCount || trainers.length;
+
+	if (!trainers.length && !totalCount) {
+		return <span className="text-[11px] text-muted-foreground select-none">—</span>;
+	}
+
+	const items = trainers.map((s) => {
+		const staffData: StaffHoverData = {
+			id: s.id,
+			name: s.name,
+			image: s.avatar || null,
+			phone: s.phone || null,
+			email: s.email || null,
+			role: s.role || "TEACHER",
+			branch: s.branch || null,
+			employmentType: s.employmentType || null,
+			active: s.active !== false,
+		};
+
+		return {
+			id: s.id,
+			name: s.name,
+			title: s.name,
+			image: s.avatar || null,
+			data: staffData,
+		};
+		
+	});
+
 	return (
-		<div className="flex items-center isolate" dir="rtl">
-			<div className="flex items-center">
-				{course.assignees.map((s, idx) => {
-					const color = avatarColor(s.name);
-					const url = getFileUrl(s.avatar);
-					const isFirst = idx === 0;
-					return (
-						<span
-							key={s.id}
-							title={s.name}
-							className={cn(
-								"flex size-6 items-center justify-center overflow-hidden rounded-full border-2 border-background text-[9px] font-semibold",
-								!isFirst && "-ms-2",
-							)}
-							style={{
-								zIndex: idx + 1,
-								marginInlineStart: isFirst ? 0 : "-8px",
-								...(url ? {} : { backgroundColor: color.bg, color: color.fg }),
-							}}
-						>
-							{url ? (
-								<img
-									src={url}
-									alt={s.name}
-									className="size-full object-cover"
-								/>
-							) : (
-								initialsOf(s.name)
-							)}
-						</span>
-					);
-				})}
-			</div>
-			{extra > 0 && (
-				<span
-					style={{ zIndex: 0, marginInlineStart: "-8px" }}
-					className="-ms-2 flex size-6 items-center justify-center rounded-full border-2 border-background bg-muted text-[9px] font-semibold text-muted-foreground select-none"
-				>
-					+{extra}
-				</span>
-			)}
-			{course.assignedCount === 0 && (
-				<span className="text-[11px] text-muted-foreground">لا متدربون</span>
-			)}
-		</div>
+		<AvatarCirclesStack
+			items={items}
+			totalCount={totalCount}
+			variant="mauve"
+			maxVisible={3}
+			renderItem={(item, element) => {
+				const staff = (item.data as StaffHoverData) || {
+					id: String(item.id),
+					name: item.name,
+				};
+				return <StaffHoverCard staff={staff}>{element}</StaffHoverCard>;
+			}}
+		/>
 	);
 }
 
 function CardTags({ course }: { course: CourseListItemResponse }) {
+	const stage = extractCourseAcademicStage(course);
+	const category = course.category?.trim() || course.department?.trim();
+	const location = courseLocationLabel(course.locationMode);
 	return (
 		<div className="flex flex-wrap items-center gap-1">
-			{course.targetRole && <Chip>{course.targetRole.name}</Chip>}
-			{course.category && <Chip>{course.category}</Chip>}
-			<Chip>
-				<IconBolt
-					className={cn(
-						"size-2.5",
-						course.priority === "URGENT" ? "text-destructive" : "text-muted-foreground",
-					)}
-				/>
-				{PRIORITY_LABEL[course.priority]}
-			</Chip>
-			<Chip>
-				<IconWorld className="size-2.5" />
-				{LANGUAGE_LABEL[course.language]}
-			</Chip>
+			{stage && (
+				<Chip className="bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800">
+					<IconSchool className="size-2.5" />
+					{stage}
+				</Chip>
+			)}
+			{category && <Chip>{category}</Chip>}
+			{location && (
+				<Chip>
+					<IconWorld className="size-2.5" />
+					{location}
+				</Chip>
+			)}
+			{course.trainingCost != null && (
+				<Chip>{formatTrainingCost(course.trainingCost, course)}</Chip>
+			)}
 		</div>
 	);
 }
@@ -157,6 +175,7 @@ export function CourseCard({
 	onEdit?: (id: string) => void;
 }) {
 	const cover = resolveCover(course.coverKey);
+	const { Icon: CourseIcon, colorClass } = resolveCourseAppearance(course.description);
 	return (
 		<div className="flex flex-col overflow-hidden rounded-lg border bg-card">
 			{/* الغلاف */}
@@ -171,7 +190,14 @@ export function CourseCard({
 						className="size-full object-cover"
 					/>
 				) : cover?.type === "color" ? null : (
-					<IconSchool className="size-8 text-muted-foreground" />
+					<div
+						className={cn(
+							"flex size-12 items-center justify-center rounded-xl border",
+							colorClass,
+						)}
+					>
+						<CourseIcon className="size-6" />
+					</div>
 				)}
 			</div>
 

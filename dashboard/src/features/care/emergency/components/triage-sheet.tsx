@@ -33,6 +33,7 @@ import {
 } from "@sanad/contracts/runtime/server/emergency/emergency.rules";
 import { STABILITY_LABELS } from "@sanad/contracts/runtime/server/emergency/emergency.workflow";
 import type { VitalSignsRecordResponse } from "@/server/vital-signs/vital-signs.type";
+import type { TriageSystem } from "@/server/emergency/triage-discriminators.data";
 
 /**
  * [E1] ورقة الفرز.
@@ -173,7 +174,7 @@ export const TriageSheet = ({
 							{isLoading ? (
 								<p className="text-muted-foreground text-sm">جارٍ تحميل المُميِّزات…</p>
 							) : (
-								systems.map((system) => (
+				systems.map((system: { key: TriageSystem; label: string; items: { code: string; labelAr: string; category: TriageCategory }[] }) => (
 									<section
 										key={system.key}
 										className="flex flex-col gap-2"

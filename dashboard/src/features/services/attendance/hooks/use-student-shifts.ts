@@ -108,7 +108,7 @@ export function useUpsertStudentShift() {
 				});
 
 				if (res.ok) {
-					record = await res.json();
+					record = (await res.json()) as ShiftAssignmentResponse;
 				}
 			} catch (e) {
 				console.warn("Backend student shift upsert failed, saving locally:", e);
@@ -126,7 +126,6 @@ export function useUpsertStudentShift() {
 			const existing = idx >= 0 ? all[idx] : undefined;
 			const localRecord: ShiftAssignmentResponse = record ?? {
 				id: existing?.id ?? `std-shift-${args.staffId}-${dayStr}`,
-				clinicId: "students",
 				staffId: args.staffId,
 				date: dayStr as unknown as Date,
 				type: args.type,
@@ -134,8 +133,6 @@ export function useUpsertStudentShift() {
 				endMinute: args.endMinute !== undefined ? args.endMinute : (existing?.endMinute ?? null),
 				hours: args.hours ?? existing?.hours ?? 8,
 				notes: args.notes ?? existing?.notes ?? null,
-				createdAt: existing?.createdAt ?? new Date(),
-				updatedAt: new Date(),
 			};
 
 			if (idx >= 0) {

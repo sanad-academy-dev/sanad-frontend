@@ -5,7 +5,7 @@ export interface AvatarCircleItem {
 	name: string;
 	title?: string;
 	image?: string | null;
-	data?: any;
+	data?: unknown;
 }
 
 // ألوان الباستيل الناعمة للطلاب مطابقة تماماً للتصميم المرفق (خوخي، وردي، نعناعي، حشيشي، بنفسجي، كهرماني)
@@ -68,6 +68,7 @@ function getPastelColor(index: number, name?: string) {
 
 export interface AvatarCirclesStackProps {
 	items: AvatarCircleItem[];
+	totalCount?: number;
 	maxVisible?: number;
 	variant?: "pastel" | "mauve";
 	className?: string;
@@ -78,6 +79,7 @@ export interface AvatarCirclesStackProps {
 
 export function AvatarCirclesStack({
 	items,
+	totalCount,
 	maxVisible = 3,
 	variant = "mauve",
 	className,
@@ -90,7 +92,10 @@ export function AvatarCirclesStack({
 	}
 
 	const visible = items.slice(0, maxVisible);
-	const overflow = items.length - visible.length;
+	const overflow =
+		totalCount !== undefined
+			? Math.max(0, totalCount - visible.length)
+			: Math.max(0, items.length - visible.length);
 
 	return (
 		<div
@@ -104,10 +109,11 @@ export function AvatarCirclesStack({
 					const isFirst = idx === 0;
 					const zIndex = idx + 1;
 
-					const color =
-						variant === "mauve" ? null : getPastelColor(idx, item.name);
+					const color = variant === "mauve" ? null : getPastelColor(idx, item.name);
 
 					const circleEl = (
+						// biome-ignore lint/a11y/noStaticElementInteractions: optional item click handler
+						// biome-ignore lint/a11y/useKeyWithClickEvents: optional item click handler
 						<div
 							key={item.id ?? idx}
 							style={
@@ -126,12 +132,7 @@ export function AvatarCirclesStack({
 								],
 								variant === "mauve"
 									? "bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#7C3AED]/25 dark:text-[#DDD6FE]"
-									: cn(
-											color?.bg,
-											color?.text,
-											color?.darkBg,
-											color?.darkText,
-										),
+									: cn(color?.bg, color?.text, color?.darkBg, color?.darkText),
 							)}
 							title={renderItem ? undefined : tooltip}
 							onClick={(e) => {
@@ -158,7 +159,7 @@ export function AvatarCirclesStack({
 							<div
 								key={item.id ?? idx}
 								className={cn(
-									"relative shrink-0 transition-transform hover:scale-115 hover:z-30",
+									"relative shrink-0 transition-transform hover:scale-115 hover:z-30 cursor-pointer",
 									!isFirst && "-ms-2.5",
 								)}
 								style={{
@@ -177,7 +178,10 @@ export function AvatarCirclesStack({
 			{overflow > 0 && (
 				<span
 					className="text-xs font-semibold text-muted-foreground select-none tabular-nums"
-					title={items.slice(maxVisible).map((it) => it.name).join("، ")}
+					title={items
+						.slice(maxVisible)
+						.map((it) => it.name)
+						.join("، ")}
 				>
 					+{overflow}
 				</span>

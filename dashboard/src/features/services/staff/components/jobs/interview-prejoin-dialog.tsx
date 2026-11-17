@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/u
 import { guestCallUrl } from "@/features/services/staff/utils/interview-room";
 import { useVideoCallToken } from "@/features/video-calls/hooks/use-video-call-token";
 import { useVideoSessionStore } from "@/features/video-calls/stores/video-session.store";
-import { useSession } from "@/lib/auth/client";
+import { readDashboardSessionFields, useSession } from "@/lib/auth/client";
 
 // شاشة الاستعداد قبل الانضمام لمقابلة عبر اتصال — نفس تصميم وسير عمل
 // «جلسة عن بعد» في الزيارات (session-prejoin-dialog)، مربوطة بقاعة المقابلة.
@@ -91,7 +91,7 @@ export function InterviewPrejoinDialog({
 
 	// رابط الدعوة: من اسم القاعة الذي يعيده الخادم إن جهز، وإلا يُبنى محليًا من
 	// الأكاديمية النشطة (نفس الصيغة) فيبقى الرابط ظاهرًا وقابلًا للنسخ دائمًا.
-	const clinicId = session?.session?.activeClinicId ?? null;
+	const clinicId = readDashboardSessionFields(session?.session).activeClinicId ?? null;
 	const roomName = call?.roomName ?? (clinicId && roomCode ? `${clinicId}:${roomCode}` : null);
 	const inviteLink = roomName ? guestCallUrl(roomName) : null;
 

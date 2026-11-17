@@ -10,7 +10,7 @@ import {
 	COURSE_TYPE_OPTIONS,
 	formatTrainingCost,
 } from "@/features/services/training/data/training";
-import type { CourseListItemResponse } from "@/server/training/training.type";
+import type { CourseListItemResponse } from "@sanad/contracts/runtime/server/training/training.type";
 
 const typeLabel = (t: CourseListItemResponse["type"]) =>
 	COURSE_TYPE_OPTIONS.find((o) => o.value === t)?.label ?? t;
@@ -64,7 +64,7 @@ function CourseStatusDialog({
 	onClose,
 	onConfirm,
 }: CourseStatusDialogProps & { copy: StatusCopy }) {
-	const cost = course ? formatTrainingCost(course.trainingCost) : null;
+	const cost = course ? formatTrainingCost(course.trainingCost, course) : null;
 	const trainerName = course?.trainers[0]?.name ?? "—";
 
 	return (

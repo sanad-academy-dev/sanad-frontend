@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
-import { StaffHoverCard } from "@/components/common/hover-cards";
+import { StaffHoverCard, type StaffHoverData } from "@/components/common/hover-cards";
 import { TableDataView } from "@/components/common/table-data-view";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -66,7 +66,7 @@ function TeachersCell({ teachers }: { teachers: ClassroomTeacher[] }) {
 			variant="mauve"
 			maxVisible={3}
 			renderItem={(item, element) => (
-				<StaffHoverCard staff={item.data || { id: String(item.id), name: item.name }}>
+				<StaffHoverCard staff={item.data as StaffHoverData}>
 					{element}
 				</StaffHoverCard>
 			)}

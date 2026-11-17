@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import type {
 	AssignmentResponse,
 	AssignmentStatus,
-} from "@/server/course-assignments/course-assignments.type";
+} from "@sanad/contracts/runtime/server/course-assignments/course-assignments.type";
 
 // تسمية حالة التعيين (مطابقة لعمود «الحالة» في جدول المعيّنين)
 const STATUS_LABEL: Record<AssignmentStatus, string> = {

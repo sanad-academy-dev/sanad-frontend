@@ -20,7 +20,6 @@ import {
 	IconPrinter,
 	IconShare,
 	IconSparkles,
-	IconCopy,
 	IconVideo,
 	IconX,
 } from "@tabler/icons-react";
@@ -52,7 +51,13 @@ function IconCopyId({ className = "size-3.5" }: { className?: string }) {
 			className={className}
 		>
 			<path d="M16 3H6a2 2 0 0 0-2 2v12" />
-			<rect x="6" y="6" width="14" height="15" rx="2.5" />
+			<rect
+				x="6"
+				y="6"
+				width="14"
+				height="15"
+				rx="2.5"
+			/>
 			<path d="M9.5 11.5v4" />
 			<path d="M12.5 11.5v4h1.5a2 2 0 0 0 0-4h-1.5z" />
 		</svg>
@@ -102,21 +107,17 @@ export function RequestHeaderActions({
 	onOpenShortlist,
 	onOpenWaitlist,
 	onOpenSchedule,
-	onOpenReschedule,
 	onOpenReject,
 	onOpenDelete,
-	onAcceptDirect,
 	onOpenCashPayment,
 	onEnrollStudent,
 	isEnrollingStudent,
 	onOpenContract,
 	capabilities: capabilitiesProp,
 	onOpenEdit,
-	onOpenRefer,
 	onOpenPrint,
 	onMoveToQueue,
 	onMoveToAwaitingPayment,
-	onMarkDuplicate,
 	isExpanded,
 	onToggleExpand,
 }: RequestHeaderActionsProps) {
@@ -160,24 +161,31 @@ export function RequestHeaderActions({
 		const rejectItem = canReject
 			? {
 					label: "قائمة الرفض",
-					icon: <IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+					icon: (
+						<IconCalendarX className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+					),
 					action: onOpenReject,
-			  }
+				}
 			: null;
 
-		let rawItems: Array<{ label: string; icon: React.ReactNode; action?: () => void } | null> = [];
+		let rawItems: Array<{ label: string; icon: React.ReactNode; action?: () => void } | null> =
+			[];
 
 		switch (request.status) {
 			case "QUEUE":
 				rawItems = [
 					{
 						label: "القائمة المختصرة",
-						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						icon: (
+							<IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+						),
 						action: onOpenShortlist,
 					},
 					{
 						label: "قائمة الإنتظار",
-						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						icon: (
+							<IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+						),
 						action: onOpenWaitlist,
 					},
 					rejectItem,
@@ -187,12 +195,16 @@ export function RequestHeaderActions({
 				rawItems = [
 					{
 						label: "جدولة مقابلة",
-						icon: <IconActivity className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						icon: (
+							<IconActivity className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+						),
 						action: onOpenSchedule,
 					},
 					{
 						label: "قائمة الإنتظار",
-						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						icon: (
+							<IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+						),
 						action: onOpenWaitlist,
 					},
 					rejectItem,
@@ -202,7 +214,9 @@ export function RequestHeaderActions({
 				rawItems = [
 					{
 						label: "جدولة مقابلة",
-						icon: <IconActivity className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						icon: (
+							<IconActivity className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+						),
 						action: onOpenSchedule,
 					},
 					rejectItem,
@@ -236,7 +250,9 @@ export function RequestHeaderActions({
 					},
 					{
 						label: "القائمة المختصرة",
-						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						icon: (
+							<IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+						),
 						action: onOpenShortlist,
 					},
 					rejectItem,
@@ -246,12 +262,16 @@ export function RequestHeaderActions({
 				rawItems = [
 					{
 						label: "القائمة المختصرة",
-						icon: <IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						icon: (
+							<IconClipboardCheck className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+						),
 						action: onOpenShortlist,
 					},
 					{
 						label: "قائمة الإنتظار",
-						icon: <IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />,
+						icon: (
+							<IconHourglass className="size-3.5 text-zinc-500 dark:text-zinc-400 shrink-0" />
+						),
 						action: onOpenWaitlist,
 					},
 					rejectItem,
@@ -266,7 +286,9 @@ export function RequestHeaderActions({
 
 	const isRemoteInterview = Boolean(
 		request.status === "INTERVIEW" &&
-		(request.interviewMode ? request.interviewMode === "REMOTE" : request.channel === "CALL")
+			(request.interviewMode
+				? request.interviewMode === "REMOTE"
+				: request.channel === "CALL"),
 	);
 	const dynamicListItems = getDynamicListItems();
 
@@ -276,10 +298,10 @@ export function RequestHeaderActions({
 	const enrollTitle = isEnrollingStudent
 		? "جاري إضافة الطالب لقائمة الطلاب..."
 		: lacksEnrollPermission
-		? "صلاحيات حسابك الحالية للعرض فقط ولا تسمح بإضافة الطالب"
-		: !onEnrollStudent
-		? "يرجى تحديث الصفحة (F5) لتفعيل زر إضافة الطالب"
-		: "إضافة الطالب لقائمة الطلاب وإنشاء أو ربط ملف ولي الأمر";
+			? "صلاحيات حسابك الحالية للعرض فقط ولا تسمح بإضافة الطالب"
+			: !onEnrollStudent
+				? "يرجى تحديث الصفحة (F5) لتفعيل زر إضافة الطالب"
+				: "إضافة الطالب لقائمة الطلاب وإنشاء أو ربط ملف ولي الأمر";
 
 	return (
 		<div
@@ -326,7 +348,10 @@ export function RequestHeaderActions({
 							<IconDots className="size-3.5" />
 						</button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align="start" className="w-36 p-1 text-xs z-[100] bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg rounded-xl">
+					<DropdownMenuContent
+						align="start"
+						className="w-36 p-1 text-xs z-[100] bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg rounded-xl"
+					>
 						{/* 1. تعديل */}
 						{onOpenEdit && (
 							<DropdownMenuItem
@@ -494,7 +519,10 @@ export function RequestHeaderActions({
 										<IconChevronDown className="size-3 opacity-90" />
 									</Button>
 								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end" className="w-52 p-1 text-xs z-[100] bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg rounded-xl">
+								<DropdownMenuContent
+									align="end"
+									className="w-52 p-1 text-xs z-[100] bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-lg rounded-xl"
+								>
 									{dynamicListItems.map((item, idx) => (
 										<DropdownMenuItem
 											key={`${item.label}-${idx}`}
@@ -546,7 +574,7 @@ export function RequestHeaderActions({
 							"size-7 rounded-md flex items-center justify-center transition-colors cursor-pointer",
 							isExpanded
 								? "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100"
-								: "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+								: "text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800",
 						)}
 						title={isExpanded ? "استعادة العرض الافتراضي (-5%)" : "توسيع العرض (+5%)"}
 					>

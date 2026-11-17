@@ -27,32 +27,9 @@ export const pageKey = (id: string) => ["training", "page", id] as const;
 // ─── Fetch Page ───────────────────────────────────────────────────────────────
 
 async function fetchPage(id: string): Promise<PageDocument> {
-	try {
-		const res = await fetch(backendUrl(`/api/training/pages/${id}`), {
-			credentials: "include",
-		});
-		if (res.ok) return await res.json();
-	} catch {
-		// Endpoint might not exist yet, fallback to localStorage
-	}
-
-	if (typeof window !== "undefined") {
-		try {
-			const cached = localStorage.getItem(`sanad_page_${id}`);
-			if (cached) return JSON.parse(cached);
-		} catch {
-			// ignore
-		}
-	}
-
-	return {
-		id,
-		title: "مقدمة عن أساسيات البرمجة",
-		content: null,
-		status: "DRAFT",
-		readingTimeMinutes: 5,
-		updatedAt: new Date().toISOString().slice(0, 10),
-	};
+	const res = await fetch(backendUrl(`/api/training/pages/${id}`), { credentials: "include" });
+	if (!res.ok) throw new Error("تعذّر تحميل الصفحة");
+	return res.json();
 }
 
 // ─── Save Page ───────────────────────────────────────────────────────────────
@@ -61,41 +38,14 @@ async function savePage(
 	id: string,
 	payload: { title?: string; content?: BlockNoteDocument },
 ): Promise<PageDocument> {
-	let doc: PageDocument | null = null;
-	try {
-		const res = await fetch(backendUrl(`/api/training/pages/${id}`), {
-			method: "PUT",
-			credentials: "include",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(payload),
-		});
-		if (res.ok) {
-			doc = await res.json();
-		}
-	} catch {
-		// fallback to local storage
-	}
-
-	if (!doc) {
-		doc = {
-			id,
-			title: payload.title ?? "مقدمة عن أساسيات البرمجة",
-			content: payload.content ?? null,
-			status: "DRAFT",
-			readingTimeMinutes: 5,
-			updatedAt: new Date().toISOString().slice(0, 10),
-		};
-	}
-
-	if (typeof window !== "undefined") {
-		try {
-			localStorage.setItem(`sanad_page_${id}`, JSON.stringify(doc));
-		} catch {
-			// ignore
-		}
-	}
-
-	return doc;
+	const res = await fetch(backendUrl(`/api/training/pages/${id}`), {
+		method: "PUT",
+		credentials: "include",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(payload),
+	});
+	if (!res.ok) throw new Error("تعذّر حفظ الصفحة");
+	return res.json();
 }
 
 // ─── Upload File ──────────────────────────────────────────────────────────────

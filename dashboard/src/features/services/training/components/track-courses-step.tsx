@@ -18,23 +18,24 @@ import {
 } from "@tabler/icons-react";
 import { type ComponentType, useMemo, useState } from "react";
 import { type FilterGroup, FiltersMenu } from "@/components/common/filters-menu";
+import { Spinner } from "@/components/common/spinner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import {
 	INITIAL_RESOURCES,
 	type LibraryItem,
 	TYPE_CONFIG,
 } from "@/features/services/training/components/my-library-view";
-import {
-	INITIAL_PAGES,
-	type PageItem,
-} from "@/features/services/training/components/pages-view";
 import { formatCourseDuration } from "@/features/services/training/data/training";
 import { useCourses } from "@/features/services/training/hooks/use-courses";
 import { useQuizzes } from "@/features/services/training/hooks/use-quizzes";
+import {
+	type TrainingPage,
+	useTrainingPages,
+} from "@/features/services/training/hooks/use-training-pages";
+import { resolveCourseAppearance } from "@/features/services/training/utils/course-meta";
 import { resolveCover } from "@/features/services/training/utils/cover";
 import { useAcademicStages } from "@/features/settings/academic-stages/hooks/use-academic-stages";
 import { useTrackClassifications } from "@/features/settings/tracks/hooks/use-track-classifications";
@@ -156,7 +157,7 @@ export interface TrackCoursesStepProps {
 }
 
 // مكوّن عرض غلاف الدورة الأصلي (صورة محملة، لون خالص، أو أيقونة بديلة)
-function CourseCoverThumbnail({
+export function CourseCoverThumbnail({
 	course,
 	className,
 }: {
@@ -164,9 +165,10 @@ function CourseCoverThumbnail({
 		coverKey?: string | null;
 		name: string;
 		icon?: ComponentType<{ className?: string }>;
+		description?: string | null;
 	};
 	className?: string;
-}) { 
+}) {
 	const cover = resolveCover(course.coverKey);
 	const [imageError, setImageError] = useState(false);
 
@@ -202,11 +204,13 @@ function CourseCoverThumbnail({
 		);
 	}
 
-	const IconComp = course.icon || IconSchool;
+	const { Icon: CourseIcon, colorClass } = resolveCourseAppearance(course.description);
+	const IconComp = course.icon || CourseIcon;
 	return (
 		<div
 			className={cn(
-				"size-7.5 rounded-md bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 border border-purple-100 dark:border-purple-900/40 shadow-2xs",
+				"size-7.5 rounded-md flex items-center justify-center shrink-0 border shadow-2xs",
+				colorClass,
 				className,
 			)}
 		>
@@ -243,7 +247,9 @@ export function TrackCoursesStep({
 	const { courses: serverCourses, isLoading: isCoursesLoading } = useCourses();
 	// 2. جلب التقييمات الحقيقية من الباك إند
 	const { quizzes: serverQuizzes, isLoading: isQuizzesLoading } = useQuizzes();
-	// 3. المراحل الدراسية والتصنيفات
+	// 3. جلب الصفحات والمستندات الحقيقية من الباك إند
+	const { pages: serverPages, isLoading: isPagesLoading } = useTrainingPages();
+	// 4. المراحل الدراسية والتصنيفات
 	const { stages: serverStages } = useAcademicStages();
 	const { trackClassifications } = useTrackClassifications();
 
@@ -299,7 +305,12 @@ export function TrackCoursesStep({
 				coverKey: c.coverKey || null,
 				durationWeeks: c.estimatedDurationWeeks ?? null,
 				durationText:
-					formatCourseDuration(c.startDate, c.dueDate, c.estimatedDurationWeeks) ||
+					formatCourseDuration(
+						c.startDate,
+						c.dueDate,
+						c.estimatedDurationWeeks,
+						c.description,
+					) ||
 					(c.estimatedDurationWeeks
 						? `${toArabicNumerals(c.estimatedDurationWeeks)} أسابيع`
 						: null),
@@ -437,8 +448,8 @@ export function TrackCoursesStep({
 		}
 	};
 
-	// دالة إضافة / إزالة صفحة إلى المسار
-	const handleTogglePage = (page: PageItem) => {
+	// دالة إضافة / إزالة صفحة حقيقية إلى المسار
+	const handleTogglePage = (page: TrainingPage) => {
 		if (!onStagesChange) return;
 		const itemId = `item-page-${page.id}`;
 		const isCurrentlySelected = selectedPageIds.includes(page.id);
@@ -455,10 +466,10 @@ export function TrackCoursesStep({
 				refId: page.id,
 				type: "PAGE",
 				title: page.title,
-				durationText: `${toArabicNumerals(page.readingTimeMinutes)} دقائق`,
+				durationText: "صفحة تدريبية",
 				durationWeeks: 0,
 				lessonsCount: 1,
-				description: page.summary,
+				description: page.summary || "محتوى صفحة تعليمية ومستند تدريبي",
 				status: page.status,
 				iconColor: "blue",
 				updatedDate: formatArabicDate(page.updatedAt),
@@ -648,23 +659,25 @@ export function TrackCoursesStep({
 		});
 	}, [serverQuizzes, searchQuery]);
 
-	// 4. تصفية الصفحات
+	// 4. تصفية الصفحات الحقيقية من قاعدة البيانات
 	const filteredPages = useMemo(() => {
 		const query = searchQuery.trim().toLowerCase();
-		return INITIAL_PAGES.filter((p) => {
+		return (serverPages || []).filter((p) => {
 			const matchesQuery =
 				!query ||
 				p.title.toLowerCase().includes(query) ||
-				p.summary.toLowerCase().includes(query) ||
-				p.author.toLowerCase().includes(query);
+				Boolean(p.summary?.toLowerCase().includes(query)) ||
+				Boolean(p.category?.toLowerCase().includes(query));
 
 			const matchesCategory =
 				selectedCategories.length === 0 ||
-				selectedCategories.some((cat) => p.category.includes(cat) || cat.includes(p.category));
+				selectedCategories.some(
+					(cat) => p.category?.includes(cat) || cat?.includes(p.category),
+				);
 
 			return matchesQuery && matchesCategory;
 		});
-	}, [searchQuery, selectedCategories]);
+	}, [serverPages, searchQuery, selectedCategories]);
 
 	// تجميع المحتوى المختار الكلي لعرضه في العمود الأيسر
 	const selectedSummaryItems = useMemo<SelectedItemSummary[]>(() => {
@@ -730,14 +743,14 @@ export function TrackCoursesStep({
 
 		// الصفحات
 		for (const pageId of selectedPageIds) {
-			const p = INITIAL_PAGES.find((item) => item.id === pageId);
+			const p = (serverPages || []).find((item) => item.id === pageId);
 			if (p) {
 				list.push({
 					id: `page-${p.id}`,
 					title: p.title,
 					type: "PAGE",
 					typeLabel: "صفحة ومستند",
-					durationText: `${toArabicNumerals(p.readingTimeMinutes)} دقائق`,
+					durationText: "صفحة تدريبية",
 					durationWeeks: 0,
 					category: p.category,
 					iconComp: IconFileText,
@@ -753,6 +766,7 @@ export function TrackCoursesStep({
 		selectedPageIds,
 		allCourses,
 		serverQuizzes,
+		serverPages,
 	]);
 
 	// إجمالي المدة والتكلفة
@@ -780,7 +794,7 @@ export function TrackCoursesStep({
 			if (res) handleToggleLibraryItem(res);
 		} else if (summaryItem.type === "PAGE") {
 			const pageId = summaryItem.id.replace(/^page-/, "");
-			const p = INITIAL_PAGES.find((item) => item.id === pageId);
+			const p = (serverPages || []).find((item) => item.id === pageId);
 			if (p) handleTogglePage(p);
 		}
 	};
@@ -866,12 +880,10 @@ export function TrackCoursesStep({
 								{openSections.courses && (
 									<div className="border-t border-border/50 divide-y divide-border/40 bg-card/60">
 										{isCoursesLoading ? (
-											<div className="flex flex-col items-center justify-center py-6 gap-2">
-												<Spinner className="size-4 text-purple-600" />
-												<span className="text-xs text-muted-foreground">
-													جارٍ تحميل الدورات...
-												</span>
-											</div>
+											<Spinner
+												containerClassName="py-6 min-h-0"
+												className="size-6 text-primary"
+											/>
 										) : filteredCourses.length === 0 ? (
 											<div className="py-6 text-center text-xs text-muted-foreground">
 												لا توجد دورات مطابقة للبحث أو الفلتر
@@ -889,7 +901,11 @@ export function TrackCoursesStep({
 																: "hover:bg-muted/30",
 														)}
 													>
-														<div className="flex items-center gap-2.5 min-w-0 text-right">
+														<button
+															type="button"
+															onClick={() => onToggleCourse(course.id)}
+															className="flex items-center gap-2.5 min-w-0 text-right bg-transparent border-0 p-0 cursor-pointer flex-1"
+														>
 															<CourseCoverThumbnail course={course} />
 															<div className="min-w-0">
 																<h4 className="text-xs font-semibold text-foreground truncate">
@@ -916,25 +932,27 @@ export function TrackCoursesStep({
 																	<span>{formatLessonsCount(course.lessonsCount)}</span>
 																</div>
 															</div>
-														</div>
-
-														<button
-															type="button"
-															onClick={() => onToggleCourse(course.id)}
-															className={cn(
-																"size-6.5 rounded-full flex items-center justify-center transition-all shrink-0 cursor-pointer",
-																isSelected
-																	? "bg-purple-600 text-white shadow-2xs hover:bg-purple-700"
-																	: "border border-border/80 text-muted-foreground hover:text-foreground hover:border-foreground/40 hover:bg-muted/60",
-															)}
-															title={isSelected ? "إزالة من الاختيار" : "إضافة إلى المسار"}
-														>
-															{isSelected ? (
-																<IconCheck className="size-3 stroke-[2.5]" />
-															) : (
-																<IconPlus className="size-3.5 stroke-[2]" />
-															)}
 														</button>
+
+														<div className="flex items-center gap-1.5 shrink-0">
+															<button
+																type="button"
+																onClick={() => onToggleCourse(course.id)}
+																className={cn(
+																	"size-6.5 rounded-full flex items-center justify-center transition-all shrink-0 cursor-pointer",
+																	isSelected
+																		? "bg-purple-600 text-white shadow-2xs hover:bg-purple-700"
+																		: "border border-border/80 text-muted-foreground hover:text-foreground hover:border-foreground/40 hover:bg-muted/60",
+																)}
+																title={isSelected ? "إزالة من الاختيار" : "إضافة إلى المسار"}
+															>
+																{isSelected ? (
+																	<IconCheck className="size-3 stroke-[2.5]" />
+																) : (
+																	<IconPlus className="size-3.5 stroke-[2]" />
+																)}
+															</button>
+														</div>
 													</div>
 												);
 											})
@@ -999,7 +1017,11 @@ export function TrackCoursesStep({
 																: "hover:bg-muted/30",
 														)}
 													>
-														<div className="flex items-center gap-2.5 min-w-0 text-right">
+														<button
+															type="button"
+															onClick={() => handleToggleLibraryItem(res)}
+															className="flex items-center gap-2.5 min-w-0 text-right bg-transparent border-0 p-0 cursor-pointer flex-1"
+														>
 															<div
 																className={cn(
 																	"size-7.5 rounded-lg flex items-center justify-center shrink-0 border shadow-2xs",
@@ -1023,25 +1045,27 @@ export function TrackCoursesStep({
 																	<span>{res.size}</span>
 																</div>
 															</div>
-														</div>
-
-														<button
-															type="button"
-															onClick={() => handleToggleLibraryItem(res)}
-															className={cn(
-																"size-6.5 rounded-full flex items-center justify-center transition-all shrink-0 cursor-pointer",
-																isSelected
-																	? "bg-purple-600 text-white shadow-2xs hover:bg-purple-700"
-																	: "border border-border/80 text-muted-foreground hover:text-foreground hover:border-foreground/40 hover:bg-muted/60",
-															)}
-															title={isSelected ? "إزالة من الاختيار" : "إضافة إلى المسار"}
-														>
-															{isSelected ? (
-																<IconCheck className="size-3 stroke-[2.5]" />
-															) : (
-																<IconPlus className="size-3.5 stroke-[2]" />
-															)}
 														</button>
+
+														<div className="flex items-center gap-1.5 shrink-0">
+															<button
+																type="button"
+																onClick={() => handleToggleLibraryItem(res)}
+																className={cn(
+																	"size-6.5 rounded-full flex items-center justify-center transition-all shrink-0 cursor-pointer",
+																	isSelected
+																		? "bg-purple-600 text-white shadow-2xs hover:bg-purple-700"
+																		: "border border-border/80 text-muted-foreground hover:text-foreground hover:border-foreground/40 hover:bg-muted/60",
+																)}
+																title={isSelected ? "إزالة من الاختيار" : "إضافة إلى المسار"}
+															>
+																{isSelected ? (
+																	<IconCheck className="size-3 stroke-[2.5]" />
+																) : (
+																	<IconPlus className="size-3.5 stroke-[2]" />
+																)}
+															</button>
+														</div>
 													</div>
 												);
 											})
@@ -1087,12 +1111,10 @@ export function TrackCoursesStep({
 								{openSections.quizzes && (
 									<div className="border-t border-border/50 divide-y divide-border/40 bg-card/60">
 										{isQuizzesLoading ? (
-											<div className="flex flex-col items-center justify-center py-6 gap-2">
-												<Spinner className="size-4 text-amber-600" />
-												<span className="text-xs text-muted-foreground">
-													جارٍ تحميل التقييمات...
-												</span>
-											</div>
+											<Spinner
+												containerClassName="py-6 min-h-0"
+												className="size-6 text-primary"
+											/>
 										) : filteredQuizzes.length === 0 ? (
 											<div className="py-6 text-center text-xs text-muted-foreground">
 												لا توجد تقييمات مطابقة للبحث
@@ -1110,7 +1132,11 @@ export function TrackCoursesStep({
 																: "hover:bg-muted/30",
 														)}
 													>
-														<div className="flex items-center gap-2.5 min-w-0 text-right">
+														<button
+															type="button"
+															onClick={() => handleToggleQuiz(quiz)}
+															className="flex items-center gap-2.5 min-w-0 text-right bg-transparent border-0 p-0 cursor-pointer flex-1"
+														>
 															<div className="size-7.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-200/60 dark:border-amber-800/40 shadow-2xs">
 																<IconRosetteDiscountCheck className="size-3.5" />
 															</div>
@@ -1134,25 +1160,27 @@ export function TrackCoursesStep({
 																	</span>
 																</div>
 															</div>
-														</div>
-
-														<button
-															type="button"
-															onClick={() => handleToggleQuiz(quiz)}
-															className={cn(
-																"size-6.5 rounded-full flex items-center justify-center transition-all shrink-0 cursor-pointer",
-																isSelected
-																	? "bg-purple-600 text-white shadow-2xs hover:bg-purple-700"
-																	: "border border-border/80 text-muted-foreground hover:text-foreground hover:border-foreground/40 hover:bg-muted/60",
-															)}
-															title={isSelected ? "إزالة من الاختيار" : "إضافة إلى المسار"}
-														>
-															{isSelected ? (
-																<IconCheck className="size-3 stroke-[2.5]" />
-															) : (
-																<IconPlus className="size-3.5 stroke-[2]" />
-															)}
 														</button>
+
+														<div className="flex items-center gap-1.5 shrink-0">
+															<button
+																type="button"
+																onClick={() => handleToggleQuiz(quiz)}
+																className={cn(
+																	"size-6.5 rounded-full flex items-center justify-center transition-all shrink-0 cursor-pointer",
+																	isSelected
+																		? "bg-purple-600 text-white shadow-2xs hover:bg-purple-700"
+																		: "border border-border/80 text-muted-foreground hover:text-foreground hover:border-foreground/40 hover:bg-muted/60",
+																)}
+																title={isSelected ? "إزالة من الاختيار" : "إضافة إلى المسار"}
+															>
+																{isSelected ? (
+																	<IconCheck className="size-3 stroke-[2.5]" />
+																) : (
+																	<IconPlus className="size-3.5 stroke-[2]" />
+																)}
+															</button>
+														</div>
 													</div>
 												);
 											})
@@ -1162,7 +1190,7 @@ export function TrackCoursesStep({
 							</div>
 						)}
 
-						{/* ================= 4. قسم الصفحات والمستندات ================= */}
+						{/* ================= 4. قسم الصفحات والمستندات الحقيقية ================= */}
 						{(selectedContentTypes.length === 0 || selectedContentTypes.includes("pages")) && (
 							<div className="rounded-xl border border-border/60 bg-muted/20 hover:bg-muted/30 transition-all overflow-hidden">
 								<button
@@ -1196,7 +1224,12 @@ export function TrackCoursesStep({
 
 								{openSections.pages && (
 									<div className="border-t border-border/50 divide-y divide-border/40 bg-card/60">
-										{filteredPages.length === 0 ? (
+										{isPagesLoading ? (
+											<Spinner
+												containerClassName="py-6 min-h-0"
+												className="size-6 text-primary"
+											/>
+										) : filteredPages.length === 0 ? (
 											<div className="py-6 text-center text-xs text-muted-foreground">
 												لا توجد صفحات مطابقة للبحث
 											</div>
@@ -1213,7 +1246,11 @@ export function TrackCoursesStep({
 																: "hover:bg-muted/30",
 														)}
 													>
-														<div className="flex items-center gap-2.5 min-w-0 text-right">
+														<button
+															type="button"
+															onClick={() => handleTogglePage(page)}
+															className="flex items-center gap-2.5 min-w-0 text-right bg-transparent border-0 p-0 cursor-pointer flex-1"
+														>
 															<div className="size-7.5 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-200/60 dark:border-sky-800/40 shadow-2xs">
 																<IconFileDescription className="size-3.5" />
 															</div>
@@ -1223,33 +1260,44 @@ export function TrackCoursesStep({
 																</h4>
 																<div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5 truncate">
 																	<span className="text-sky-600 dark:text-sky-400 font-medium">
-																		{toArabicNumerals(page.readingTimeMinutes)} دقائق
+																		{page.category || "عام"}
 																	</span>
 																	<span>•</span>
-																	<span>{page.category}</span>
+																	<span
+																		className={cn(
+																			"font-medium",
+																			page.status === "PUBLISHED"
+																				? "text-emerald-600 dark:text-emerald-400"
+																				: "text-amber-600 dark:text-amber-400",
+																		)}
+																	>
+																		{page.status === "PUBLISHED" ? "منشورة" : "مسودة"}
+																	</span>
 																	<span>•</span>
-																	<span>{page.author}</span>
+																	<span>{formatArabicDate(page.updatedAt)}</span>
 																</div>
 															</div>
-														</div>
-
-														<button
-															type="button"
-															onClick={() => handleTogglePage(page)}
-															className={cn(
-																"size-6.5 rounded-full flex items-center justify-center transition-all shrink-0 cursor-pointer",
-																isSelected
-																	? "bg-purple-600 text-white shadow-2xs hover:bg-purple-700"
-																	: "border border-border/80 text-muted-foreground hover:text-foreground hover:border-foreground/40 hover:bg-muted/60",
-															)}
-															title={isSelected ? "إزالة من الاختيار" : "إضافة إلى المسار"}
-														>
-															{isSelected ? (
-																<IconCheck className="size-3 stroke-[2.5]" />
-															) : (
-																<IconPlus className="size-3.5 stroke-[2]" />
-															)}
 														</button>
+
+														<div className="flex items-center gap-1.5 shrink-0">
+															<button
+																type="button"
+																onClick={() => handleTogglePage(page)}
+																className={cn(
+																	"size-6.5 rounded-full flex items-center justify-center transition-all shrink-0 cursor-pointer",
+																	isSelected
+																		? "bg-purple-600 text-white shadow-2xs hover:bg-purple-700"
+																		: "border border-border/80 text-muted-foreground hover:text-foreground hover:border-foreground/40 hover:bg-muted/60",
+																)}
+																title={isSelected ? "إزالة من الاختيار" : "إضافة إلى المسار"}
+															>
+																{isSelected ? (
+																	<IconCheck className="size-3 stroke-[2.5]" />
+																) : (
+																	<IconPlus className="size-3.5 stroke-[2]" />
+																)}
+															</button>
+														</div>
 													</div>
 												);
 											})
@@ -1261,15 +1309,18 @@ export function TrackCoursesStep({
 					</div>
 				</div>
 
-				{/* ================= الجانب الأيسر: المحتوى المختار (Selected Content) ================= */}
+				{/* ================= الجانب الأيسر: المحتوى المختار ================= */}
 				<div className="flex flex-col w-full md:w-1/2 flex-1 min-w-0 bg-muted/10 overflow-hidden">
-					{/* ترويسة الجانب الأيسر: Selected Content مع العداد */}
-					<div className="px-3.5 py-2.5 border-b border-border/60 bg-muted/15 flex items-center justify-between shrink-0">
+					{/* ترويسة الجانب الأيسر: المحتوى المختار + عداد + إفراغ الكل */}
+					<div className="px-3.5 py-2.5 border-b border-border/60 bg-muted/15 flex items-center justify-between shrink-0 gap-2">
 						<div className="flex items-center gap-2">
-							<span className="text-sm font-bold text-foreground">المحتوى المختار</span>
-							<span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-muted border border-border/60 text-foreground">
+							<h3 className="text-xs sm:text-sm font-bold text-foreground">المحتوى المختار</h3>
+							<Badge
+								variant="secondary"
+								className="text-[10px] h-4.5 px-2 font-bold rounded-full bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300"
+							>
 								{toArabicNumerals(selectedTotals.count)}
-							</span>
+							</Badge>
 						</div>
 
 						{selectedTotals.count > 0 && (
@@ -1327,7 +1378,7 @@ export function TrackCoursesStep({
 							</div>
 
 							<div>
-								<h4 className="text-sm font-bold text-foreground">لا يوجد محتوى</h4>
+								<h4 className="text-sm font-bold text-foreground">لا يوجد محتوى مختار</h4>
 								<p className="text-xs text-muted-foreground mt-1 max-w-[230px] leading-relaxed">
 									يرجى اختيار العناصر التي ترغب في إضافتها إلى المسار من القائمة المقابلة.
 								</p>
@@ -1351,7 +1402,7 @@ export function TrackCoursesStep({
 										key={item.id}
 										className="px-3 py-2 rounded-xl border border-border/70 bg-card hover:border-purple-300 dark:hover:border-purple-800 transition-all flex items-center justify-between gap-2.5 shadow-2xs"
 									>
-										<div className="flex items-center gap-2.5 min-w-0 text-right">
+										<div className="flex items-center gap-2.5 min-w-0 text-right flex-1">
 											<div
 												className={cn(
 													"size-7.5 rounded-lg flex items-center justify-center shrink-0 border shadow-2xs",
@@ -1418,7 +1469,6 @@ export function TrackCoursesStep({
 					)}
 				</div>
 			</div>
-
 			{/* ================= التذييل السفلي: الإرشاد + الإجراءات (مطابق للفوتر في التصميم) ================= */}
 			<div className="pt-3 flex items-center justify-between gap-3 shrink-0 flex-wrap">
 				{/* الطرف الأيمن: النص الإرشادي ⓘ Select at least 1 content to add to the learning path */}
@@ -1468,6 +1518,7 @@ export function TrackCoursesStep({
 					</Button>
 				</div>
 			</div>
+			;
 		</div>
 	);
 }

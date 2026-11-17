@@ -50,6 +50,10 @@ const PageShell = ({
 	extra?: React.ReactNode;
 }) => (
 	<div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+		<div className="border-b px-4 py-3">
+			<h1 className="font-semibold text-sm">{title}</h1>
+			<p className="text-muted-foreground text-xs">{hint}</p>
+		</div>
 		<div className="flex flex-wrap items-center gap-2 border-b px-4 py-2">
 			<DateField
 				value={from}

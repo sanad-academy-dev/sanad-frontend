@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 
 export interface DiscardConfirmDialogProps {
 	open: boolean;
+	onOpenChange?: (open: boolean) => void;
 	filledFields?: string[];
 	onDiscard?: () => void;
 	onResume?: () => void;
@@ -29,6 +30,7 @@ export interface DiscardConfirmDialogProps {
  */
 export function DiscardConfirmDialog({
 	open,
+	onOpenChange,
 	filledFields = [],
 	onDiscard,
 	onResume,
@@ -48,6 +50,7 @@ export function DiscardConfirmDialog({
 		<Dialog
 			open={open}
 			onOpenChange={(isOpen) => {
+				onOpenChange?.(isOpen);
 				if (!isOpen) handleResume();
 			}}
 		>

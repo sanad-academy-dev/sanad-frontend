@@ -3,18 +3,19 @@ import {
 	IconDownload,
 	IconMapPin,
 	IconPlus,
+	IconSchool,
 	IconUser,
 	IconX,
 } from "@tabler/icons-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-
+import { Spinner } from "@/components/common/spinner";
 import { Stats } from "@/components/common/stats";
 import { TableToolbar } from "@/components/common/table-toolbar";
 import { Button } from "@/components/ui/button";
+import { useAcademicStageOptions } from "@/features/services/classrooms/hooks/use-classrooms";
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
-import { AddCourseSheet } from "@/features/services/training/components/add-course-sheet";
 import { AssignEmployeeDialog } from "@/features/services/training/components/assign-employee-dialog";
 import { CloneSuccessToast } from "@/features/services/training/components/clone-success-toast";
 import { CourseCard } from "@/features/services/training/components/course-card";
@@ -45,8 +46,13 @@ import {
 	useDeleteCourse,
 	useDuplicateCourse,
 	useRestoreCourse,
+	useUpdateCourseStatus,
 } from "@/features/services/training/hooks/use-courses";
 import type { TrainingTab } from "@/features/services/training/types/training-tabs.types";
+import {
+	extractCourseAcademicStage,
+	stripSystemTags,
+} from "@/features/services/training/utils/course-meta";
 import { exportCoursesCsv } from "@/features/services/training/utils/export-courses";
 import {
 	readCourseDialogSession,
@@ -57,7 +63,8 @@ import type {
 	CourseLocationMode,
 	CourseStatsResponse,
 	CourseType,
-} from "@/server/training/training.type";
+} from "@sanad/contracts/runtime/server/training/training.type";
+import { ContentLoadError } from "./content-load-error";
 
 // إضافة/إزالة قيمة من قائمة تصفية متعدّدة الاختيار
 const toggleValue = <T extends string>(list: T[], value: T) =>
@@ -86,18 +93,28 @@ const buildStats = (s?: CourseStatsResponse) => [
 export function TrainingView({ tab }: { tab: TrainingTab }) {
 	const navigate = useNavigate();
 	const { stats } = useCourseStats();
-	const { courses, isLoading } = useCourses();
+	const {
+		courses,
+		isLoading,
+		isError: coursesLoadError,
+		error: coursesError,
+		refetch: refetchCourses,
+	} = useCourses();
 	const { deleteCourse } = useDeleteCourse();
 	const { duplicateCourse } = useDuplicateCourse();
 	const { archiveCourse } = useArchiveCourse();
 	const { restoreCourse } = useRestoreCourse();
+	const { updateCourseStatus } = useUpdateCourseStatus();
 	const { staff } = useStaff();
+	const { academicStages } = useAcademicStageOptions();
 
 	const [search, setSearch] = useState("");
 	// فلاتر متعدّدة الاختيار — قائمة فارغة = بلا تصفية
 	const [typeFilters, setTypeFilters] = useState<CourseType[]>([]);
 	const [locationFilters, setLocationFilters] = useState<CourseLocationMode[]>([]);
 	const [trainerFilters, setTrainerFilters] = useState<string[]>([]);
+	const [stageFilters, setStageFilters] = useState<string[]>([]);
+	const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
 	const [view, setView] = useState<CoursesView>("list");
 	const [oldestFirst, setOldestFirst] = useState(false);
 	const [deleting, setDeleting] = useState<CourseListItemResponse | null>(null);
@@ -156,15 +173,46 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 		}
 	};
 
-	// مجموعات «التصفية» — كل مجموعة قائمة فرعية بخانات اختيار
+	const categoryOptions = useMemo(() => {
+		const seen = new Set<string>();
+		for (const c of courses) {
+			const cat = (c.category || c.department || "").trim();
+			if (cat) seen.add(cat);
+		}
+		return Array.from(seen).map((value) => ({ value, label: value }));
+	}, [courses]);
+
+	const stageOptions = useMemo(() => {
+		const seen = new Set<string>(academicStages);
+		for (const c of courses) {
+			const stage = extractCourseAcademicStage(c);
+			if (stage) seen.add(stage);
+		}
+		return Array.from(seen).map((value) => ({ value, label: value }));
+	}, [academicStages, courses]);
+
+	// مجموعات «التصفية» — متطابقة مع بيانات الدورات الفعلية
 	const filterGroups: FilterGroup[] = [
 		{
-			key: "type",
-			label: "النوع",
+			key: "stage",
+			label: "المرحلة الدراسية",
+			Icon: IconSchool,
+			options: stageOptions,
+			selected: stageFilters,
+			onToggle: (v) => setStageFilters((prev) => toggleValue(prev, v)),
+			emptyLabel: "لا توجد مراحل",
+		},
+		{
+			key: "category",
+			label: "التصنيف",
 			Icon: IconCategory,
-			options: COURSE_TYPE_OPTIONS,
-			selected: typeFilters,
-			onToggle: (v) => setTypeFilters((prev) => toggleValue(prev, v as CourseType)),
+			options: categoryOptions.length > 0 ? categoryOptions : COURSE_TYPE_OPTIONS,
+			selected: categoryOptions.length > 0 ? categoryFilters : typeFilters,
+			onToggle: (v) =>
+				categoryOptions.length > 0
+					? setCategoryFilters((prev) => toggleValue(prev, v))
+					: setTypeFilters((prev) => toggleValue(prev, v as CourseType)),
+			emptyLabel: "لا توجد تصنيفات",
 		},
 		{
 			key: "location",
@@ -197,17 +245,41 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 
 	const resetFilters = () => {
 		setTypeFilters([]);
+		setCategoryFilters([]);
+		setStageFilters([]);
 		setLocationFilters([]);
 		setTrainerFilters([]);
 		setSearch("");
 	};
 
 	const filtered = useMemo(() => {
-		const q = search.trim();
+		const q = search.trim().toLowerCase();
 		const list = courses
 			// «مكتبة الدورات» = المنشورة فقط؛ «الكل» = بلا تصفية حالة (قرار مقفل #4)
 			.filter((c) => (tab === "library" ? c.status === "PUBLISHED" : true))
-			.filter((c) => (q ? c.name.includes(q) || c.code.includes(q) : true))
+			.filter((c) => {
+				if (!q) return true;
+				const stage = extractCourseAcademicStage(c).toLowerCase();
+				const category = (c.category || c.department || "").toLowerCase();
+				const desc = stripSystemTags(c.description).toLowerCase();
+				return (
+					c.name.toLowerCase().includes(q) ||
+					c.code.toLowerCase().includes(q) ||
+					category.includes(q) ||
+					stage.includes(q) ||
+					desc.includes(q)
+				);
+			})
+			.filter((c) =>
+				stageFilters.length === 0
+					? true
+					: stageFilters.includes(extractCourseAcademicStage(c)),
+			)
+			.filter((c) =>
+				categoryFilters.length === 0
+					? true
+					: categoryFilters.includes((c.category || c.department || "").trim()),
+			)
 			.filter((c) => (typeFilters.length === 0 ? true : typeFilters.includes(c.type)))
 			.filter((c) =>
 				locationFilters.length === 0
@@ -221,7 +293,17 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 			);
 		// القائمة تأتي مرتبة تنازليًّا حسب الإنشاء؛ عكسها للأقدم أولًا
 		return oldestFirst ? [...list].reverse() : list;
-	}, [courses, tab, search, typeFilters, locationFilters, trainerFilters, oldestFirst]);
+	}, [
+		courses,
+		tab,
+		search,
+		stageFilters,
+		categoryFilters,
+		typeFilters,
+		locationFilters,
+		trainerFilters,
+		oldestFirst,
+	]);
 
 	return (
 		<div
@@ -344,9 +426,16 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 			{/* المحتوى */}
 			<div className="min-h-0 flex-1 overflow-auto bg-background py-3">
 				{isLoading ? (
-					<p className="px-3 py-16 text-center text-[13px] text-muted-foreground">
-						جارٍ تحميل الدورات...
-					</p>
+					<Spinner containerClassName="py-24 min-h-0" />
+				) : coursesLoadError ? (
+					<ContentLoadError
+						message={
+							coursesError instanceof Error
+								? coursesError.message
+								: "تعذّر تحميل الدورات التدريبية."
+						}
+						onRetry={() => void refetchCourses()}
+					/>
 				) : filtered.length === 0 ? (
 					<div className="flex flex-col items-center gap-3 px-3 py-16 text-center">
 						<img
@@ -388,6 +477,7 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 						courses={filtered}
 						isLoading={false}
 						cloningCourseId={cloning?.id}
+						onRowOpen={handleEdit}
 						onOpen={(c) => navigate({ to: `/services/training/course/${c.id}` })}
 						onEdit={handleEdit}
 						onDuplicate={handleDuplicate}
@@ -395,6 +485,7 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 						onEnable={setEnabling}
 						onDelete={setDeleting}
 						onAssign={setAssigning}
+						onStatusChange={(course, newStatus) => updateCourseStatus(course.id, newStatus)}
 					/>
 				)}
 			</div>

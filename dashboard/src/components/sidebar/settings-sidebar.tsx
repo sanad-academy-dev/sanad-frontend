@@ -3,7 +3,6 @@
 import {
 	IconBell,
 	IconBolt,
-	IconBriefcase,
 	IconBuildingHospital,
 	IconCalendar,
 	IconCategory,
@@ -12,7 +11,6 @@ import {
 	IconCreditCardPay,
 	IconFileInvoice,
 	IconLock,
-	IconPaw,
 	IconPlugConnected,
 	IconShield,
 	IconSparkles,

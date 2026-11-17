@@ -24,7 +24,7 @@ import type {
 	LevelResponse,
 	ReorderContentInput,
 	UnitResponse,
-} from "@/server/training/training.type";
+} from "@sanad/contracts/runtime/server/training/training.type";
 import type { CourseContentActions } from "../../hooks/use-course-content";
 import { ContentCard } from "./content-card";
 import { LevelHeading } from "./level-heading";

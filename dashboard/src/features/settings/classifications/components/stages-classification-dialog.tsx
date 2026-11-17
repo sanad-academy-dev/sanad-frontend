@@ -1,6 +1,6 @@
 "use client";
 
-import { IconPlus, IconTrash, IconX } from "@tabler/icons-react";
+import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,7 +44,10 @@ export function StagesClassificationDialog({
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
+		<Dialog
+			open={open}
+			onOpenChange={onOpenChange}
+		>
 			<DialogContent className="max-w-md">
 				<DialogHeader>
 					<DialogTitle>المراحل الدراسية والمستويات التعليمية</DialogTitle>
@@ -53,7 +56,10 @@ export function StagesClassificationDialog({
 					</DialogDescription>
 				</DialogHeader>
 
-				<form onSubmit={handleAdd} className="flex items-center gap-2 pt-2">
+				<form
+					onSubmit={handleAdd}
+					className="flex items-center gap-2 pt-2"
+				>
 					<Input
 						value={newName}
 						onChange={(e) => setNewName(e.target.value)}
@@ -106,4 +112,3 @@ export function StagesClassificationDialog({
 		</Dialog>
 	);
 }
-

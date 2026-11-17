@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { IconCopy, IconCheck, IconExternalLink, IconFileCheck, IconShieldCheck, IconInfoCircle } from "@tabler/icons-react";
+import {
+	IconCopy,
+	IconCheck,
+	IconExternalLink,
+	IconFileCheck,
+	IconShieldCheck,
+	IconInfoCircle,
+} from "@tabler/icons-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,14 +15,11 @@ import { useCampaignDetails } from "../hooks/use-digital-registration";
 import { getRegistrationFormUrl } from "../utils/registration-urls";
 
 export function CampaignInfo({ campaignId }: { campaignId?: string }) {
-	const { data: campaign, isLoading } = useCampaignDetails(campaignId || "");
+	const { data: campaign } = useCampaignDetails(campaignId || "");
 	const [copied, setCopied] = useState(false);
 	const [linkType, setLinkType] = useState<"general" | "campaign">("general");
 
-	const registrationUrl = getRegistrationFormUrl(
-		campaign?.code,
-		linkType === "campaign",
-	);
+	const registrationUrl = getRegistrationFormUrl(campaign?.code, linkType === "campaign");
 
 	const handleCopy = () => {
 		navigator.clipboard.writeText(registrationUrl);
@@ -25,13 +29,18 @@ export function CampaignInfo({ campaignId }: { campaignId?: string }) {
 	};
 
 	return (
-		<div className="flex w-full flex-col gap-5 p-4 mt-2 max-w-5xl mx-auto" dir="rtl">
+		<div
+			className="flex w-full flex-col gap-5 p-4 mt-2 max-w-5xl mx-auto"
+			dir="rtl"
+		>
 			{/* Public Link Card */}
 			<div className="flex flex-col gap-3 rounded-lg border border-primary/20 bg-primary/5 p-5 text-start shadow-2xs">
 				<div className="flex items-center justify-between flex-wrap gap-2">
 					<div className="flex items-center gap-2">
 						<IconInfoCircle className="size-5 text-primary" />
-						<h3 className="text-sm font-bold text-foreground">رابط استمارة التسجيل الإلكتروني لأولياء الأمور</h3>
+						<h3 className="text-sm font-bold text-foreground">
+							رابط استمارة التسجيل الإلكتروني لأولياء الأمور
+						</h3>
 					</div>
 					{campaign?.code && (
 						<div className="flex items-center gap-1.5 bg-background/80 p-0.5 rounded-lg border border-border/60 text-xs">
@@ -63,7 +72,8 @@ export function CampaignInfo({ campaignId }: { campaignId?: string }) {
 					)}
 				</div>
 				<p className="text-xs text-muted-foreground leading-relaxed">
-					شارك هذا الرابط مع أولياء الأمور لفتح استمارة التقديم على موقع المركز وتعبئة بيانات الطالب ورفع المرفقات مباشرة.
+					شارك هذا الرابط مع أولياء الأمور لفتح استمارة التقديم على موقع المركز وتعبئة بيانات
+					الطالب ورفع المرفقات مباشرة.
 				</p>
 				<div className="flex items-center gap-2 pt-1">
 					<Input
@@ -78,7 +88,11 @@ export function CampaignInfo({ campaignId }: { campaignId?: string }) {
 						onClick={handleCopy}
 						className="bg-background hover:bg-muted text-foreground px-4 text-xs font-semibold gap-1.5 h-9 cursor-pointer"
 					>
-						{copied ? <IconCheck className="size-3.5 text-emerald-600" /> : <IconCopy className="size-3.5" />}
+						{copied ? (
+							<IconCheck className="size-3.5 text-emerald-600" />
+						) : (
+							<IconCopy className="size-3.5" />
+						)}
 						{copied ? "تم النسخ" : "نسخ الرابط"}
 					</Button>
 					<Button
@@ -87,7 +101,12 @@ export function CampaignInfo({ campaignId }: { campaignId?: string }) {
 						asChild
 						className="bg-background hover:bg-muted text-foreground px-3 text-xs h-9 cursor-pointer"
 					>
-						<a href={registrationUrl} target="_blank" rel="noopener noreferrer" title="فتح استمارة التسجيل في تبويب جديد">
+						<a
+							href={registrationUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							title="فتح استمارة التسجيل في تبويب جديد"
+						>
 							<IconExternalLink className="size-3.5" />
 						</a>
 					</Button>

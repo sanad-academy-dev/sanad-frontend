@@ -27,7 +27,7 @@ import type {
 	LessonResponse,
 	LessonType,
 	RestoredLessonInput,
-} from "@/server/training/training.type";
+} from "@sanad/contracts/runtime/server/training/training.type";
 import { createInitialPageContent } from "../../components/course-page-inline-editor";
 import { LessonPreview } from "../../components/lesson-preview";
 import { COURSE_TYPE_OPTIONS } from "../../data/training";
@@ -35,6 +35,7 @@ import { useCourseContent } from "../../hooks/use-course-content";
 import { useCourseLevels } from "../../hooks/use-course-levels";
 import { useUpdateCourse } from "../../hooks/use-courses";
 import { useReorderContents } from "../../hooks/use-reorder-contents";
+import { stripSystemTags } from "../../utils/course-meta";
 import { ContentDnd } from "./content-dnd";
 import { ContentTypeDialog } from "./content-type-dialog";
 
@@ -145,6 +146,7 @@ export function StepContent({
 								?.order ?? 0)
 						: draftUnit.lessons.length,
 					editsCount: 0,
+					contents: livePreviewDraft.values.contents ?? null,
 					createdAt: new Date(),
 				}
 			: null;
@@ -198,9 +200,9 @@ export function StepContent({
 								{typeLabel}
 							</span>
 						</div>
-						{course.description && (
+						{stripSystemTags(course.description) && (
 							<p className="line-clamp-2 text-[12px] leading-5 text-[#6B6B67]">
-								{course.description}
+								{stripSystemTags(course.description)}
 							</p>
 						)}
 						<div className="flex flex-wrap items-center gap-1.5 pt-0.5">

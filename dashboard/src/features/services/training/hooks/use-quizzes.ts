@@ -7,6 +7,7 @@ import type {
 	QuizListItemResponse,
 	QuizResponse,
 	QuizStatsResponse,
+	QuizStatus,
 	UpdateQuizFormInput,
 } from "@/server/quizzes/quizzes.type";
 
@@ -19,7 +20,7 @@ const errMessage = (error: unknown, fallback: string) =>
 	(error as { value?: { message?: string } })?.value?.message || fallback;
 
 export const useQuizzes = () => {
-	const { data, isLoading } = useQuery<QuizListItemResponse[]>({
+	const { data, isLoading, isError, error, refetch } = useQuery<QuizListItemResponse[]>({
 		queryKey: QUIZZES_KEY,
 		queryFn: async () => {
 			const { data, error } = await api.quizzes.get();
@@ -27,7 +28,7 @@ export const useQuizzes = () => {
 			return data as QuizListItemResponse[];
 		},
 	});
-	return { quizzes: data ?? [], isLoading };
+	return { quizzes: data ?? [], isLoading, isError, error, refetch };
 };
 
 export const useQuizStats = () => {
@@ -143,6 +144,44 @@ export const useUnpublishQuiz = () => {
 		return promise;
 	};
 	return { unpublishQuiz, isPending: mutation.isPending };
+};
+
+export const useUpdateQuizStatus = () => {
+	const qc = useQueryClient();
+	const mutation = useMutation({
+		mutationFn: async ({ id, status }: { id: string; status: QuizStatus }) => {
+			let resError: unknown = null;
+			if (status === "PUBLISHED") {
+				const { error } = await api.quizzes({ id }).publish.post();
+				resError = error;
+			} else if (status === "ARCHIVED") {
+				const { error } = await api.quizzes({ id }).archive.post();
+				resError = error;
+			} else {
+				const { error } = await api.quizzes({ id }).unpublish.post();
+				resError = error;
+			}
+			if (resError) throw new Error(errMessage(resError, "تعذّر تغيير حالة التقييم"));
+		},
+		onSuccess: () => {
+			qc.invalidateQueries({ queryKey: QUIZZES_KEY });
+			qc.invalidateQueries({ queryKey: STATS_KEY });
+		},
+	});
+
+	const updateQuizStatus = (id: string, status: QuizStatus) => {
+		const label =
+			status === "PUBLISHED" ? "نشر" : status === "ARCHIVED" ? "أرشفة" : "تحويل إلى مسودة";
+		const promise = mutation.mutateAsync({ id, status });
+		toast.promise(promise, {
+			loading: "جارٍ تحديث حالة التقييم...",
+			success: `تم ${label} التقييم بنجاح`,
+			error: (e: Error) => e.message || "تعذّر تحديث حالة التقييم",
+		});
+		return promise;
+	};
+
+	return { updateQuizStatus, isUpdating: mutation.isPending };
 };
 
 export const useDeleteQuiz = () => {

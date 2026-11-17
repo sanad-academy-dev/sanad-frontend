@@ -1,7 +1,7 @@
 import { IconArrowRight, IconChevronLeft, IconSparkles, IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-
+import { Spinner } from "@/components/common/spinner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -145,10 +145,7 @@ function RosterView({
 	onGrade: (attemptId: string) => void;
 	onResult: (attemptId: string) => void;
 }) {
-	if (isLoading)
-		return (
-			<p className="py-16 text-center text-[13px] text-muted-foreground">جارٍ التحميل...</p>
-		);
+	if (isLoading) return <Spinner containerClassName="py-16 min-h-0" />;
 	if (rows.length === 0)
 		return (
 			<p className="py-16 text-center text-[13px] text-muted-foreground">
@@ -240,10 +237,7 @@ function GradingView({ attemptId, onGraded }: { attemptId: string; onGraded: () 
 		setPoints(init);
 	}, [grading]);
 
-	if (isLoading || !grading)
-		return (
-			<p className="py-16 text-center text-[13px] text-muted-foreground">جارٍ التحميل...</p>
-		);
+	if (isLoading || !grading) return <Spinner containerClassName="py-16 min-h-0" />;
 
 	if (grading.textAnswers.length === 0)
 		return (
@@ -364,9 +358,6 @@ function GradingView({ attemptId, onGraded }: { attemptId: string; onGraded: () 
 
 function ResultView({ attemptId }: { attemptId: string }) {
 	const { result, isLoading } = useAttemptResult(attemptId);
-	if (isLoading || !result)
-		return (
-			<p className="py-16 text-center text-[13px] text-muted-foreground">جارٍ التحميل...</p>
-		);
+	if (isLoading || !result) return <Spinner containerClassName="py-16 min-h-0" />;
 	return <QuizResultView result={result} />;
 }

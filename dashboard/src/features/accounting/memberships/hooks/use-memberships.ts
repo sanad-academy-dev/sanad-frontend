@@ -4,6 +4,8 @@ import { toast } from "sonner";
 import type { MembershipPlanStatus, MembershipStatus } from "@/generated/prisma/enums";
 import { api } from "@/lib/api";
 import type { CreateMembershipPlanFormInput } from "@/server/accounting/membership/membership-plan.type";
+import type { MembershipPlanResponse } from "@/server/accounting/membership/membership-plan.type";
+import type { MembershipDetailResponse, MembershipResponse } from "@/server/accounting/membership/membership.type";
 
 /**
  * [MI-P1] Hooks for «العضويات» (MI BRD §11) — plans + members, one file (the extended-hub
@@ -27,14 +29,14 @@ const useAccountingInvalidator = () => {
 /* ── plans (FR-M4.1) ──────────────────────────────────────────────────────────────────── */
 
 export const useMembershipPlans = (status?: MembershipPlanStatus) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<MembershipPlanResponse[]>({
 		queryKey: key("plans", status ?? "all"),
 		queryFn: async () => {
 			const { data, error } = await api.accounting["membership-plans"].get({
 				query: status ? { status } : {},
 			});
 			if (error) throw new Error("تعذّر تحميل خطط العضويات");
-			return data;
+			return data as MembershipPlanResponse[];
 		},
 		staleTime: 1000 * 30,
 	});
@@ -95,7 +97,7 @@ export const useSetMembershipPlanStatus = () => {
 /* ── memberships (FR-M5) ──────────────────────────────────────────────────────────────── */
 
 export const useMemberships = (filters: { status?: MembershipStatus; planId?: string }) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<MembershipResponse[]>({
 		queryKey: key("list", filters.status ?? "all", filters.planId ?? "all"),
 		queryFn: async () => {
 			const { data, error } = await api.accounting.memberships.get({
@@ -105,7 +107,7 @@ export const useMemberships = (filters: { status?: MembershipStatus; planId?: st
 				},
 			});
 			if (error) throw new Error("تعذّر تحميل العضويات");
-			return data;
+			return data as MembershipResponse[];
 		},
 		staleTime: 1000 * 15,
 	});
@@ -113,12 +115,12 @@ export const useMemberships = (filters: { status?: MembershipStatus; planId?: st
 };
 
 export const useMembership = (id: string | null) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<MembershipDetailResponse | null>({
 		queryKey: key("detail", id ?? ""),
 		queryFn: async () => {
 			const { data, error } = await api.accounting.memberships({ id: id as string }).get();
 			if (error) throw new Error("تعذّر تحميل العضوية");
-			return data;
+			return data as MembershipDetailResponse | null;
 		},
 		enabled: Boolean(id),
 		staleTime: 1000 * 10,
@@ -128,14 +130,14 @@ export const useMembership = (id: string | null) => {
 
 /** the owner-profile badge read (§2.7) */
 export const useOwnerMembership = (ownerId: string | null) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<{ membership: MembershipDetailResponse | null }>({
 		queryKey: key("by-owner", ownerId ?? ""),
 		queryFn: async () => {
 			const { data, error } = await api.accounting.memberships["by-owner"]({
 				ownerId: ownerId as string,
 			}).get();
 			if (error) throw new Error("تعذّر تحميل عضوية وليّ الأمر");
-			return data;
+			return data as { membership: MembershipDetailResponse | null };
 		},
 		enabled: Boolean(ownerId),
 		staleTime: 1000 * 30,

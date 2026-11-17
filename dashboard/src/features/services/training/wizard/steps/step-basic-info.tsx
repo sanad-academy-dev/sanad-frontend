@@ -1,8 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import {
+	type CourseDetailResponse,
+	type CreateCourseFormInput,
+	createCourseSchema,
+} from "@sanad/contracts/runtime/server/training/training.type";
 import { IconInfoCircle, IconPhotoPlus, IconX } from "@tabler/icons-react";
 import { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-
 import { Button } from "@/components/ui/button";
 import {
 	Combobox,
@@ -28,11 +32,6 @@ import { useStaffRoles } from "@/features/settings/roles-permissions/hooks/use-s
 import { useI18n } from "@/hooks/use-i18n";
 import { getFileUrl } from "@/lib/file-url";
 import { cn } from "@/lib/utils";
-import {
-	type CourseDetailResponse,
-	type CreateCourseFormInput,
-	createCourseSchema,
-} from "@sanad/contracts/runtime/server/training/training.type";
 import { COURSE_TYPE_OPTIONS } from "../../data/training";
 import { useUploadMedia } from "../../hooks/use-upload-media";
 

@@ -28,7 +28,7 @@ import type {
 	CreateLessonFormInput,
 	LessonFormValues,
 	QuizAnswerType,
-} from "@/server/training/training.type";
+} from "@sanad/contracts/runtime/server/training/training.type";
 
 type QuizProps = {
 	control: Control<CreateLessonFormInput, unknown, LessonFormValues>;

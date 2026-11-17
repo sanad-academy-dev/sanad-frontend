@@ -1,7 +1,7 @@
 import { IconPlus } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-
+import { Spinner } from "@/components/common/spinner";
 import { Stats } from "@/components/common/stats";
 import { TableToolbar } from "@/components/common/table-toolbar";
 import { Button } from "@/components/ui/button";
@@ -23,8 +23,10 @@ import {
 	useQuizStats,
 	useQuizzes,
 	useUnpublishQuiz,
+	useUpdateQuizStatus,
 } from "@/features/services/training/hooks/use-quizzes";
 import type { QuizListItemResponse, QuizStatsResponse } from "@/server/quizzes/quizzes.type";
+import { ContentLoadError } from "./content-load-error";
 
 const buildQuizStats = (s?: QuizStatsResponse) => [
 	{ title: "إجمالي التقييمات", value: s?.total ?? 0, tooltip: "العدد الكلي للتقييمات" },
@@ -33,11 +35,18 @@ const buildQuizStats = (s?: QuizStatsResponse) => [
 ];
 
 export function QuizzesView() {
-	const { quizzes, isLoading: quizzesLoading } = useQuizzes();
+	const {
+		quizzes,
+		isLoading: quizzesLoading,
+		isError: quizzesLoadError,
+		error: quizzesError,
+		refetch: refetchQuizzes,
+	} = useQuizzes();
 	const { stats: quizStats } = useQuizStats();
 	const { deleteQuiz } = useDeleteQuiz();
 	const { publishQuiz } = usePublishQuiz();
 	const { unpublishQuiz } = useUnpublishQuiz();
+	const { updateQuizStatus } = useUpdateQuizStatus();
 
 	const [quizAddOpen, setQuizAddOpen] = useState(false);
 	const [quizEditId, setQuizEditId] = useState<string | null>(null);
@@ -151,15 +160,18 @@ export function QuizzesView() {
 
 			<div className="min-h-0 flex-1 overflow-auto bg-background py-3">
 				{quizzesLoading ? (
-					<p className="px-3 py-16 text-center text-[13px] text-muted-foreground">
-						جارٍ تحميل التقييمات...
-					</p>
+					<Spinner containerClassName="py-24 min-h-0" />
+				) : quizzesLoadError ? (
+					<ContentLoadError
+						message={
+							quizzesError instanceof Error ? quizzesError.message : "تعذّر تحميل التقييمات."
+						}
+						onRetry={() => void refetchQuizzes()}
+					/>
 				) : filteredQuizzes.length === 0 ? (
 					<div className="flex flex-col items-center gap-3 px-3 py-16 text-center">
 						<h2 className="text-[14px] font-bold text-foreground">
-							{quizzes.length === 0
-								? "لا يوجد أي تقييمات حتى الآن"
-								: "لا توجد تقييمات مطابقة"}
+							{quizzes.length === 0 ? "لا يوجد أي تقييمات حتى الآن" : "لا توجد تقييمات مطابقة"}
 						</h2>
 						<p className="max-w-[280px] text-[12px] text-muted-foreground">
 							أنشئ تقييماً لقياس معرفة موظفيك ورصد نتائجهم.
@@ -201,6 +213,7 @@ export function QuizzesView() {
 						onPlay={(q) => setPreStartQuizId(q.id)}
 						onResults={(q) => setResultsQuizId(q.id)}
 						onRowOpen={(q) => setResultsQuizId(q.id)}
+						onStatusChange={(quiz, newStatus) => updateQuizStatus(quiz.id, newStatus)}
 					/>
 				)}
 			</div>

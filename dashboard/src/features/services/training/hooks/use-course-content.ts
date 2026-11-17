@@ -15,7 +15,7 @@ import type {
 	RestoredLessonInput,
 	UnitResponse,
 	UpdateLessonPayload,
-} from "@/server/training/training.type";
+} from "@sanad/contracts/runtime/server/training/training.type";
 
 // التصميم يسمّي المحتوى المحفوظ حسب نوعه في رسائل التوست («الدرس» / «التقييم»)
 const SAVED_LABELS: Partial<Record<LessonType, string>> = {

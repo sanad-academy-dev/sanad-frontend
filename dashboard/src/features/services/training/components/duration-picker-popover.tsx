@@ -150,13 +150,6 @@ export function DurationPickerPopover({
 		setOpen(false);
 	};
 
-	const handlePresetClick = (presetVal: number, presetUnit: DurationUnit) => {
-		setNumValue(presetVal);
-		setUnit(presetUnit);
-		const formatted = formatDuration(presetVal, presetUnit);
-		onChange(formatted);
-	};
-
 	const buttonText = React.useMemo(() => {
 		if (value) {
 			return label ? `${label}: ${value}` : value;

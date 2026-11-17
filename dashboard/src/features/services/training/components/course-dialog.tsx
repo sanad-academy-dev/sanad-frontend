@@ -1,3 +1,4 @@
+import type { LessonResponse } from "@sanad/contracts/runtime/server/training/training.type";
 import {
 	IconAlertCircle,
 	IconArrowLeft,
@@ -11,14 +12,13 @@ import {
 	IconBrain,
 	IconBrandWhatsapp,
 	IconCheck,
-	IconClock,
 	IconCode,
 	IconCopy,
 	IconCpu,
 	IconCube,
-	IconDots,
 	IconGlobe,
 	IconHeart,
+	IconMapPin,
 	IconPlus,
 	IconRobot,
 	IconRocket,
@@ -34,13 +34,13 @@ import {
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-
 import { DiscardConfirmDialog } from "@/components/common/discard-confirm-dialog";
 import { FieldLabel } from "@/components/common/field-label";
 import { FormFooter } from "@/components/common/form-footer";
 import { FormHeader } from "@/components/common/form-header";
 import { RichNotesEditor } from "@/components/common/rich-notes-editor";
 import { SanadLogo } from "@/components/common/sanad-logo";
+import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -57,15 +57,18 @@ import { Input } from "@/components/ui/input";
 import { Kbd } from "@/components/ui/kbd";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useAcademicStageOptions } from "@/features/services/classrooms/hooks/use-classrooms";
-import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import { useAcademicStages } from "@/features/settings/academic-stages/hooks/use-academic-stages";
 import { useTrackClassifications } from "@/features/settings/tracks/hooks/use-track-classifications";
 import { cn } from "@/lib/utils";
-import type { CourseLocationMode, CourseType } from "@/server/training/training.type";
+import type {
+	CourseDetailResponse,
+	CourseListItemResponse,
+	CourseLocationMode,
+	CourseType,
+} from "@sanad/contracts/runtime/server/training/training.type";
 import { useAssignTime } from "../hooks/use-assign-time";
 import {
 	useCourse,
@@ -74,23 +77,16 @@ import {
 	useSetTrainers,
 	useUpdateCourse,
 } from "../hooks/use-courses";
-import {
-	readCourseDialogSession,
-	writeCourseDialogSession,
-} from "../utils/lesson-draft";
+import { writeCourseDialogSession } from "../utils/lesson-draft";
 import { AiCourseSheet } from "./ai-course-sheet";
-import { AssignLearnersStep } from "./assign-learners-step";
 import { AssignTrackStaffSheet } from "./assign-track-staff-sheet";
 import { CourseBuilderStep } from "./course-builder-step";
-import { CourseCompletionStep } from "./course-completion-step";
+import { type CourseAccessMode, CourseCompletionStep } from "./course-completion-step";
 import { CourseSheetStepper } from "./course-sheet-stepper";
-import {
-	CourseTimeSection,
-	type CourseTimeValue,
-	isCourseTimeValid,
-	LOCAL_TZ,
-} from "./course-time-section";
-import { DurationPickerPopover } from "./duration-picker-popover";
+import { type CourseTimeValue, isCourseTimeValid, LOCAL_TZ } from "./course-time-section";
+import { DurationPickerPopover, parseDuration } from "./duration-picker-popover";
+import type { LessonSupplyItem } from "./lesson-supplies-sheet";
+import { TrainersCell } from "./trainers-cell";
 
 // تجريد الملاحظات من أي وسوم داخلية لحفظ المرحلة أو البيانات لكي لا تظهر للمستخدم كنص مشوه
 const stripSystemTags = (text?: string | null): string => {
@@ -101,6 +97,7 @@ const stripSystemTags = (text?: string | null): string => {
 		.replace(/\[courses:[^\]]*\]/gi, "")
 		.replace(/(?:\[(?:المرحلة|stage):[^\]]+\]|\n?(?:المرحلة|stage):[^\n]+)/gi, "")
 		.replace(/(?:\[(?:notes|ملاحظات):[\s\S]*?\])/gi, "")
+		.replace(/(?:\[(?:duration|مدة):[^\]]+\])/gi, "")
 		.replace(/(?:\[icon:[^\]]+\])/gi, "")
 		.replace(/(?:\[color:[^\]]+\])/gi, "")
 		.replace(/&#91;courses:[^&]*&#93;/gi, "")
@@ -293,7 +290,7 @@ const COURSE_FIELD_LABELS: Record<string, string> = {
 	lessonDraft: "محتوى الدرس / الصفحة",
 };
 
-type Step = 1 | 2 | 3 | 4;
+type Step = 1 | 2 | 3;
 type PublishError = { step: Step; message: string };
 
 export interface CourseDialogProps {
@@ -311,20 +308,23 @@ export function CourseDialog({
 }: CourseDialogProps) {
 	const isEdit = Boolean(editCourseId);
 
-	// خطوات المعالج: 1 المعلومات الأساسية، 2 باني المحتوى (الكبير)، 3 تعيين المتدربين، 4 الإكمال والنشر
+	// خطوات المعالج: 1 المعلومات الأساسية، 2 باني المحتوى (الكبير)، 3 الإكمال والنشر
 	const [step, setStep] = useState<Step>(1);
 	const [furthest, setFurthest] = useState<number>(1);
 	const [activeCourseId, setActiveCourseId] = useState<string | null>(editCourseId || null);
 
+	// المعرّف الفعلي للدورة الحالية سواء كانت قيد التعديل أو تم إنشاؤها حديثاً
+	const currentCourseId = editCourseId ?? activeCourseId ?? null;
+
 	// جلب بيانات الدورة عند التعديل
-	const { course, isLoading: isCourseLoading } = useCourse(activeCourseId || null);
+	const { course } = useCourse(currentCourseId);
 	const { courses } = useCourses();
 
 	// الإجراءات البرمجية من الـ hooks
 	const { createCourse, isPending: isCreatingCourse } = useCreateCourse();
-	const { updateCourse, isUpdating: isUpdatingCourse } = useUpdateCourse(activeCourseId);
-	const { setTrainers, isSavingTrainers } = useSetTrainers();
-	const { saveTime } = useAssignTime(activeCourseId);
+	const { updateCourse, isUpdating: isUpdatingCourse } = useUpdateCourse(currentCourseId);
+	const { setTrainers } = useSetTrainers();
+	const { saveTime } = useAssignTime(currentCourseId);
 
 	// المراحل الدراسية من الإعدادات
 	const {
@@ -336,14 +336,11 @@ export function CourseDialog({
 
 	// التصنيفات من إعدادات المسارات
 	const {
-		classifications: trackClassifications,
+		trackClassifications,
 		isLoading: isClassificationsLoading,
 		addClassification: addClassificationMutation,
 		isAdding: isAddingClassification,
 	} = useTrackClassifications();
-
-	// المدربون والموظفون
-	const { staff } = useStaff();
 
 	// حالات النموذج الأساسية
 	const [name, setName] = useState("");
@@ -355,22 +352,24 @@ export function CourseDialog({
 		if (!trimmed) return false;
 		return (
 			courses?.some(
-				(c) => c.name.trim().toLowerCase() === trimmed && c.id !== activeCourseId,
+				(c) => c.name.trim().toLowerCase() === trimmed && c.id !== currentCourseId,
 			) ?? false
 		);
-	}, [courses, name, activeCourseId]);
+	}, [courses, name, currentCourseId]);
 	const [notes, setNotes] = useState("");
 	const [category, setCategory] = useState("");
 	const [academicStage, setAcademicStage] = useState("");
 	const [duration, setDuration] = useState("");
 	const [price, setPrice] = useState<number | undefined>(undefined);
+	const [accessType, setAccessType] = useState<CourseAccessMode>("PUBLIC");
+	const [currency, setCurrency] = useState<string>("EGP");
 	const [institution, setInstitution] = useState("");
-	const [locationMode, setLocationMode] = useState<CourseLocationMode>("ONLINE");
+	const [locationMode, setLocationMode] = useState<CourseLocationMode | "">("");
 	const [courseType, setCourseType] = useState<CourseType>("ONLINE");
 
 	// وقت وتعيين الدورة للخطوة 3
 	const [time, setTime] = useState<CourseTimeValue>({ start: null, due: null });
-	const [timeError, setTimeError] = useState<string | undefined>(undefined);
+	const [_timeError, setTimeError] = useState<string | undefined>(undefined);
 	const [publishError, setPublishError] = useState<PublishError | null>(null);
 
 	// تخصيص الأيقونة واللون
@@ -390,9 +389,8 @@ export function CourseDialog({
 	const [newStageInput, setNewStageInput] = useState("");
 	const [isAddingStage, setIsAddingStage] = useState(false);
 	const [newClassificationInput, setNewClassificationInput] = useState("");
-	const [classificationsList, setClassificationsList] = useState<string[]>(
-		DEFAULT_CLASSIFICATIONS,
-	);
+	const [classificationsList, setClassificationsList] =
+		useState<string[]>(DEFAULT_CLASSIFICATIONS);
 
 	// القوالب والذكاء الاصطناعي
 	const [templateMenuOpen, setTemplateMenuOpen] = useState(false);
@@ -409,96 +407,235 @@ export function CourseDialog({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [hasBuilderUnsaved, setHasBuilderUnsaved] = useState(false);
 
+	// المستلزمات المخصصة للدروس (تظهر كـ Side-Sheet بجانب بوب اب المحتوى تماماً كما في الخطط التعليمية)
+	const [activeSuppliesLesson, setActiveSuppliesLesson] = useState<LessonResponse | null>(
+		null,
+	);
+	const [lessonSupplies, setLessonSupplies] = useState<Record<string, LessonSupplyItem[]>>(
+		() => {
+			if (typeof window !== "undefined" && currentCourseId) {
+				try {
+					const stored = localStorage.getItem(`sanad_course_supplies_${currentCourseId}`);
+					if (stored) return JSON.parse(stored);
+				} catch {}
+			}
+			return {};
+		},
+	);
+
+	useEffect(() => {
+		if (!currentCourseId || typeof window === "undefined") return;
+		try {
+			const stored = localStorage.getItem(`sanad_course_supplies_${currentCourseId}`);
+			if (stored) setLessonSupplies(JSON.parse(stored));
+		} catch {}
+	}, [currentCourseId]);
+
+	const handleSaveLessonSupplies = (lessonId: string, items: LessonSupplyItem[]) => {
+		setLessonSupplies((prev) => {
+			const updated = { ...prev, [lessonId]: items };
+			if (typeof window !== "undefined" && currentCourseId) {
+				try {
+					localStorage.setItem(
+						`sanad_course_supplies_${currentCourseId}`,
+						JSON.stringify(updated),
+					);
+				} catch {}
+			}
+			return updated;
+		});
+	};
+
 	// توليد كود تلقائي
 	const generateAutoCode = useCallback(() => {
 		const num = Math.floor(10 + Math.random() * 90);
 		return `CRS-${num}`;
 	}, []);
 
-	// متابعة حالة الفتح لضمان التهيئة عند فتح النافذة فقط وعدم إعادة التهيئة أثناء التنقل بين الخطوات
+	// دالة تعبئة بيانات النموذج بدقة من كائن الدورة (تُستخدم فوراً من القائمة أو عند وصول تفاصيل الخادم)
+	const populateFormFromCourse = useCallback(
+		(targetCourse: CourseListItemResponse | CourseDetailResponse) => {
+			setName(targetCourse.name || "");
+			setCode(targetCourse.code || generateAutoCode());
+
+			const rawDesc = targetCourse.description || "";
+			const parsedNotes = extractNotesTag(rawDesc);
+			const parsedStage =
+				(targetCourse as unknown as { academicStage?: string }).academicStage ||
+				extractSystemTag(rawDesc, "stage") ||
+				extractSystemTag(rawDesc, "المرحلة");
+			const parsedIcon = extractSystemTag(rawDesc, "icon");
+			const parsedColor = extractSystemTag(rawDesc, "color");
+
+			setDescription(stripSystemTags(rawDesc));
+			setNotes(parsedNotes);
+			setCategory(
+				targetCourse.category || (targetCourse as { department?: string }).department || "",
+			);
+			setAcademicStage(parsedStage);
+
+			const tagDuration =
+				extractSystemTag(rawDesc, "duration") || extractSystemTag(rawDesc, "مدة");
+			if (tagDuration) {
+				setDuration(tagDuration);
+			} else if (targetCourse.estimatedDurationWeeks) {
+				const w = targetCourse.estimatedDurationWeeks;
+				if (w % 4 === 0 && w >= 4) {
+					const m = w / 4;
+					setDuration(
+						m === 1 ? "شهر واحد" : m === 2 ? "شهران" : m <= 10 ? `${m} أشهر` : `${m} شهراً`,
+					);
+				} else {
+					setDuration(
+						w === 1
+							? "أسبوع واحد"
+							: w === 2
+								? "أسبوعان"
+								: w <= 10
+									? `${w} أسابيع`
+									: `${w} أسبوعاً`,
+					);
+				}
+			} else {
+				setDuration("");
+			}
+
+			setPrice(targetCourse.trainingCost ?? undefined);
+			if (targetCourse.institution) {
+				try {
+					if (targetCourse.institution.startsWith("{")) {
+						const meta = JSON.parse(targetCourse.institution);
+						if (meta.accessType) setAccessType(meta.accessType);
+						if (meta.currency) setCurrency(meta.currency || "EGP");
+						setInstitution(meta.name || "");
+					} else {
+						setInstitution(targetCourse.institution || "");
+					}
+				} catch {
+					setInstitution(targetCourse.institution || "");
+				}
+			} else {
+				setInstitution("");
+			}
+			setLocationMode(targetCourse.locationMode || "");
+			setCourseType(targetCourse.type || "ONLINE");
+
+			setSelectedIcon(parsedIcon || "cube");
+			setSelectedColor(parsedColor || "blue");
+
+			setTime({
+				start: targetCourse.startDate ? new Date(targetCourse.startDate) : null,
+				due: targetCourse.dueDate ? new Date(targetCourse.dueDate) : null,
+			});
+
+			const trainersList = (targetCourse.trainers || []).map((t) => {
+				const staffObj = t as unknown as {
+					id?: string;
+					staffId?: string;
+					name?: string;
+					avatar?: string;
+					staff?: { id?: string; name?: string; avatar?: string };
+				};
+				const id = staffObj.id || staffObj.staffId || staffObj.staff?.id || "";
+				const memberName = staffObj.name || staffObj.staff?.name || "مدرب";
+				const avatar = staffObj.avatar || staffObj.staff?.avatar;
+				return { id, name: memberName, avatar };
+			});
+
+			setSelectedStaffIds(trainersList.map((t) => t.id).filter(Boolean));
+			setSelectedStaffMembers(trainersList);
+		},
+		[generateAutoCode],
+	);
+
+	// دالة تصفير النموذج بالكامل عند وضع الإنشاء الجديد أو الإغلاق
+	const resetFormFields = useCallback(() => {
+		setName("");
+		setCode(generateAutoCode());
+		setDescription("");
+		setNotes("");
+		setCategory("");
+		setAcademicStage("");
+		setDuration("");
+		setPrice(undefined);
+		setAccessType("PUBLIC");
+		setCurrency("EGP");
+		setInstitution("");
+		setLocationMode("");
+		setCourseType("ONLINE");
+		setSelectedIcon("cube");
+		setSelectedColor("blue");
+		setSelectedStaffIds([]);
+		setSelectedStaffMembers([]);
+		setTime({ start: null, due: null });
+		setTimeError(undefined);
+		setPublishError(null);
+		setSelectedTemplateId("none");
+		setTemplateSearch("");
+		setShowNotice(true);
+		setIsExpanded(false);
+		setIsSubmitting(false);
+		setActiveCourseId(null);
+	}, [generateAutoCode]);
+
+	// متابعة حالة فتح النافذة ومعرّف الدورة قيد التعديل
 	const prevOpenRef = useRef(false);
-	const initializedForEditRef = useRef<string | null>(null);
+	const currentEditingIdRef = useRef<string | null>(null);
+	const hasPopulatedFromDetailRef = useRef<string | null>(null);
 
 	useEffect(() => {
-		// عندما تتغير النافذة من مغلقة إلى مفتوحة
-		if (open && !prevOpenRef.current) {
-			prevOpenRef.current = true;
-			initializedForEditRef.current = null;
-			setSelectedTemplateId("none");
-			setTemplateSearch("");
-			setShowNotice(true);
-			setIsDiscardOpen(false);
-			setIsExpanded(false);
-			setIsSubmitting(false);
-			setTimeError(undefined);
-			setPublishError(null);
-			setHasBuilderUnsaved(false);
+		const wasOpen = prevOpenRef.current;
+		prevOpenRef.current = open;
 
-			const savedSession = readCourseDialogSession();
-			const matchesSession =
-				savedSession &&
-				(!editCourseId ||
-					savedSession.editCourseId === editCourseId ||
-					savedSession.activeCourseId === editCourseId);
+		if (open) {
+			const justOpened = !wasOpen;
+			const targetId = editCourseId || null;
+			const courseIdChanged = currentEditingIdRef.current !== targetId;
 
-			if (matchesSession && savedSession) {
-				setActiveCourseId(savedSession.activeCourseId ?? editCourseId ?? null);
-				setStep(savedSession.step || 1);
-				setFurthest(savedSession.furthest || 1);
-				if (!savedSession.activeCourseId) {
-					setName(savedSession.name ?? "");
-					setCode(savedSession.code ?? generateAutoCode());
-					setDescription(savedSession.description ?? "");
-					setNotes(savedSession.notes ?? "");
-					setCategory(savedSession.category ?? "");
-					setAcademicStage(savedSession.academicStage ?? "");
-					setDuration(savedSession.duration ?? "");
-					setPrice(savedSession.price);
-					setInstitution(savedSession.institution ?? "");
-					setLocationMode(savedSession.locationMode ?? "ONLINE");
-					setCourseType(savedSession.courseType ?? "ONLINE");
-					setSelectedIcon(savedSession.selectedIcon ?? "cube");
-					setSelectedColor(savedSession.selectedColor ?? "blue");
+			// لا نُعيد تعيين الخطوة أو الحقول إلا عند الفتح الفعلي للنافذة أو تغيير الدورة المراد تعديلها
+			if (justOpened || (editCourseId && courseIdChanged)) {
+				setIsDiscardOpen(false);
+				setHasBuilderUnsaved(false);
+
+				if (editCourseId) {
+					// وضع التعديل لدورة موجودة
+					currentEditingIdRef.current = editCourseId;
+					hasPopulatedFromDetailRef.current = null;
+					setActiveCourseId(editCourseId);
+					setStep(1);
+					setFurthest(3);
+
+					const existingInList = courses?.find((c) => c.id === editCourseId);
+					if (existingInList) {
+						populateFormFromCourse(existingInList);
+					} else {
+						resetFormFields();
+						setActiveCourseId(editCourseId);
+					}
+				} else {
+					// وضع إنشاء جديد
+					currentEditingIdRef.current = null;
+					hasPopulatedFromDetailRef.current = null;
+					setStep(1);
+					setFurthest(1);
+					resetFormFields();
 				}
-			} else if (editCourseId) {
-				setActiveCourseId(editCourseId);
-				setStep(1);
-				setFurthest(4);
-			} else {
-				// وضع إنشاء جديد
-				setActiveCourseId(null);
-				setStep(1);
-				setFurthest(1);
-				setName("");
-				setCode(generateAutoCode());
-				setDescription("");
-				setNotes("");
-				setCategory("");
-				setAcademicStage("");
-				setDuration("");
-				setPrice(undefined);
-				setInstitution("");
-				setLocationMode("ONLINE");
-				setCourseType("ONLINE");
-				setSelectedIcon("cube");
-				setSelectedColor("blue");
-				setSelectedStaffIds([]);
-				setSelectedStaffMembers([]);
-				setTime({ start: null, due: null });
 			}
-		} else if (!open) {
-			prevOpenRef.current = false;
-			initializedForEditRef.current = null;
+		} else {
+			// عند إغلاق النافذة
+			currentEditingIdRef.current = null;
+			hasPopulatedFromDetailRef.current = null;
+			setActiveCourseId(null);
 			setHasBuilderUnsaved(false);
 		}
-	}, [open, editCourseId, generateAutoCode]);
+	}, [open, editCourseId, courses, populateFormFromCourse, resetFormFields]);
 
-	// حفظ جلسة النافذة في sessionStorage لاستعادة الخطوة والمحتوى عند إعادة تحميل المتصفح بالخطأ
+	// حفظ جلسة النافذة في sessionStorage لاستعادة الخطوة والمحتوى عند الحاجة
 	useEffect(() => {
 		if (!open) return;
 		writeCourseDialogSession({
 			editCourseId: editCourseId ?? null,
-			activeCourseId,
+			activeCourseId: currentCourseId,
 			step,
 			furthest,
 			name,
@@ -510,7 +647,7 @@ export function CourseDialog({
 			duration,
 			price,
 			institution,
-			locationMode,
+			locationMode: locationMode || undefined,
 			courseType,
 			selectedIcon,
 			selectedColor,
@@ -519,7 +656,7 @@ export function CourseDialog({
 	}, [
 		open,
 		editCourseId,
-		activeCourseId,
+		currentCourseId,
 		step,
 		furthest,
 		name,
@@ -537,65 +674,16 @@ export function CourseDialog({
 		selectedColor,
 	]);
 
-	// تعبئة البيانات عند جلب الدورة في وضع التعديل
+	// تحديث واستكمال البيانات عند وصول كائن تفاصيل الدورة الكامل من الخادم (لمرة واحدة فقط عند فتح التعديل لمنع مسح تعديلات المستخدم)
 	useEffect(() => {
 		if (!open || !editCourseId || !course) return;
-		if (initializedForEditRef.current === editCourseId) return;
-		initializedForEditRef.current = editCourseId;
+		// التأكد الصارم أن كائن الدورة المحمّل من الكاش أو الخادم يطابق الدورة المطلوبة حالياً!
+		if (course.id !== editCourseId) return;
+		if (hasPopulatedFromDetailRef.current === editCourseId) return;
 
-		setName(course.name || "");
-		setCode(course.code || generateAutoCode());
-
-		const rawDesc = course.description || "";
-		const parsedNotes = extractNotesTag(rawDesc);
-		const parsedStage =
-			(course as unknown as { academicStage?: string }).academicStage ||
-			extractSystemTag(rawDesc, "stage") ||
-			extractSystemTag(rawDesc, "المرحلة");
-		const parsedIcon = extractSystemTag(rawDesc, "icon");
-		const parsedColor = extractSystemTag(rawDesc, "color");
-
-		setDescription(stripSystemTags(rawDesc));
-		setNotes(parsedNotes);
-		setCategory(course.category || course.department || "");
-		setAcademicStage(parsedStage);
-
-		if (course.estimatedDurationWeeks) {
-			setDuration(`${course.estimatedDurationWeeks} أسابيع`);
-		} else {
-			setDuration("");
-		}
-
-		setPrice(course.trainingCost ?? undefined);
-		setInstitution(course.institution || "");
-		setLocationMode(course.locationMode || "ONLINE");
-		setCourseType(course.type || "ONLINE");
-
-		setSelectedIcon(parsedIcon || "cube");
-		setSelectedColor(parsedColor || "blue");
-
-		setTime({
-			start: course.startDate ? new Date(course.startDate) : null,
-			due: course.dueDate ? new Date(course.dueDate) : null,
-		});
-
-		const trainersList = (course.trainers || []).map((t) => {
-			const staffObj = t as unknown as {
-				id?: string;
-				staffId?: string;
-				name?: string;
-				avatar?: string;
-				staff?: { name?: string; avatar?: string };
-			};
-			const id = staffObj.id || staffObj.staffId || "";
-			const memberName = staffObj.name || staffObj.staff?.name || "مدرب";
-			const avatar = staffObj.avatar || staffObj.staff?.avatar;
-			return { id, name: memberName, avatar };
-		});
-
-		setSelectedStaffIds(trainersList.map((t) => t.id).filter(Boolean));
-		setSelectedStaffMembers(trainersList);
-	}, [open, editCourseId, course, generateAutoCode]);
+		hasPopulatedFromDetailRef.current = editCourseId;
+		populateFormFromCourse(course);
+	}, [open, editCourseId, course, populateFormFromCourse]);
 
 	// تتبع أقصى خطوة تم الوصول إليها
 	useEffect(() => {
@@ -700,7 +788,7 @@ export function CourseDialog({
 		if (step > 2) return false;
 		if (isEdit && course) {
 			const originalStaffKey = (course.trainers || [])
-				.map((t) => (t as unknown as { staffId?: string; id?: string }).staffId || t.id)
+				.map((trainer) => trainer.staffId)
 				.sort()
 				.join(",");
 			const currentStaffKey = [...selectedStaffIds].sort().join(",");
@@ -751,6 +839,30 @@ export function CourseDialog({
 		return list;
 	}, [name, description, notes, category, academicStage, selectedStaffIds, duration, price]);
 
+	// قائمة المدربين المعينين للدورة لعرضها في مكدّس الأفاتار أعلى النافذة
+	const headerTrainers = useMemo(() => {
+		if (selectedStaffMembers && selectedStaffMembers.length > 0) {
+			return selectedStaffMembers;
+		}
+		if (course?.trainers && course.trainers.length > 0) {
+			return course.trainers.map((t) => {
+				const staffObj = t as unknown as {
+					id?: string;
+					staffId?: string;
+					name?: string;
+					avatar?: string;
+					staff?: { id?: string; name?: string; avatar?: string };
+				};
+				return {
+					id: staffObj.id || staffObj.staffId || staffObj.staff?.id || "",
+					name: staffObj.name || staffObj.staff?.name || "مدرب",
+					avatar: staffObj.avatar || staffObj.staff?.avatar,
+				};
+			});
+		}
+		return [];
+	}, [selectedStaffMembers, course?.trainers]);
+
 	// تطبيق قالب جاهز
 	const handleSelectTemplate = (tpl: (typeof COURSE_TEMPLATES)[0] | null) => {
 		if (!tpl) {
@@ -762,7 +874,7 @@ export function CourseDialog({
 			setAcademicStage("");
 			setDuration("");
 			setPrice(undefined);
-			setLocationMode("ONLINE");
+			setLocationMode("");
 			setSelectedIcon("cube");
 			setSelectedColor("blue");
 			setTemplateMenuOpen(false);
@@ -786,6 +898,7 @@ export function CourseDialog({
 	};
 
 	const closeDialogCleanly = useCallback(() => {
+		setActiveSuppliesLesson(null);
 		writeCourseDialogSession(null);
 		onOpenChange(false);
 	}, [onOpenChange]);
@@ -828,11 +941,7 @@ export function CourseDialog({
 		if (!trimmed) return;
 		setIsAddingStage(true);
 		try {
-			await addStageMutation({
-				name: trimmed,
-				order: activeAcademicStages.length + 1,
-				description: "",
-			});
+			await addStageMutation(trimmed, "");
 			setAcademicStage(trimmed);
 			setNewStageInput("");
 			toast.success(`تمت إضافة المرحلة الدراسية "${trimmed}" بنجاح`);
@@ -847,7 +956,7 @@ export function CourseDialog({
 
 	// حفظ وتثبيت وقت الدورة للخطوة 3
 	const persistTime = () => {
-		if (!activeCourseId) return;
+		if (!currentCourseId) return;
 		saveTime({
 			startDate: time.start ? time.start.toISOString() : null,
 			dueDate: time.due ? time.due.toISOString() : null,
@@ -861,11 +970,14 @@ export function CourseDialog({
 			throw new Error("اسم الدورة التدريبية مسجّل مسبقاً، يرجى اختيار اسم آخر");
 		}
 		let estimatedWeeks: number | undefined;
-		if (duration) {
-			const match = duration.match(/(\d+)/);
-			if (match?.[1]) {
-				const parsed = Number.parseInt(match[1], 10);
-				if (!Number.isNaN(parsed) && parsed > 0) estimatedWeeks = parsed;
+		if (duration?.trim()) {
+			const parsed = parseDuration(duration);
+			if (typeof parsed.value === "number" && parsed.value > 0) {
+				if (parsed.unit === "WEEK") estimatedWeeks = parsed.value;
+				else if (parsed.unit === "MONTH") estimatedWeeks = parsed.value * 4;
+				else if (parsed.unit === "YEAR") estimatedWeeks = parsed.value * 52;
+				else if (parsed.unit === "DAY")
+					estimatedWeeks = Math.max(1, Math.round(parsed.value / 7));
 			}
 		}
 
@@ -876,6 +988,9 @@ export function CourseDialog({
 		if (academicStage.trim()) {
 			finalDescription += `\n[stage:${academicStage.trim()}]`;
 		}
+		if (duration?.trim()) {
+			finalDescription += `\n[duration:${duration.trim()}]`;
+		}
 		if (selectedIcon) {
 			finalDescription += `\n[icon:${selectedIcon}]`;
 		}
@@ -884,9 +999,17 @@ export function CourseDialog({
 		}
 
 		const parsedPrice =
-			price != null && !Number.isNaN(price) ? Math.max(0, Math.round(Number(price))) : undefined;
+			price != null && !Number.isNaN(price)
+				? Math.max(0, Math.round(Number(price)))
+				: undefined;
 
-		let currentId = activeCourseId;
+		const institutionMeta = JSON.stringify({
+			accessType,
+			currency,
+			name: institution.trim() || undefined,
+		});
+
+		let currentId = currentCourseId;
 		if (currentId) {
 			await updateCourse({
 				name: name.trim(),
@@ -894,9 +1017,9 @@ export function CourseDialog({
 				category: category.trim() || undefined,
 				department: category.trim() || "",
 				type: courseType,
-				locationMode,
+				locationMode: (locationMode as CourseLocationMode) || undefined,
 				trainingCost: parsedPrice,
-				institution: institution.trim() || undefined,
+				institution: institutionMeta,
 				estimatedDurationWeeks: estimatedWeeks,
 			});
 			if (selectedStaffIds.length > 0) {
@@ -911,9 +1034,9 @@ export function CourseDialog({
 			description: finalDescription || undefined,
 			category: category.trim() || undefined,
 			department: category.trim() || "",
-			locationMode,
+			locationMode: locationMode || undefined,
 			trainingCost: parsedPrice,
-			institution: institution.trim() || undefined,
+			institution: institutionMeta,
 			estimatedDurationWeeks: estimatedWeeks,
 		});
 
@@ -927,7 +1050,7 @@ export function CourseDialog({
 		return createdId;
 	};
 
-	// حفظ معلومات الخطوة الأولى والانتقال للخطوة الثانية (بدون إنشاء مسبق في DB)
+	// حفظ معلومات الخطوة الأولى والانتقال للخطوة الثانية (مع حفظ الدورة في DB)
 	const handleSaveAndGoToBuilder = async (directSaveOnly = false) => {
 		if (!name.trim()) {
 			toast.error("يرجى إدخال اسم الدورة التدريبية");
@@ -939,37 +1062,25 @@ export function CourseDialog({
 			return;
 		}
 
-		if (directSaveOnly) {
-			setIsSubmitting(true);
-			try {
-				const createdId = await ensureCourseCreated();
+		setIsSubmitting(true);
+		try {
+			const savedId = await ensureCourseCreated();
+			if (directSaveOnly) {
 				toast.success("تم حفظ بيانات الدورة بنجاح");
-				onSuccess?.(createdId);
+				onSuccess?.(savedId);
 				closeDialogCleanly();
-			} catch (err: unknown) {
-				const errorMsg =
-					err instanceof Error ? err.message : "حدث خطأ أثناء حفظ الدورة التدريبية";
-				toast.error(errorMsg);
-			} finally {
-				setIsSubmitting(false);
+				return;
 			}
-			return;
+			toast.success(isEdit ? "تم حفظ تعديلات الدورة بنجاح" : "تم حفظ بيانات الدورة بنجاح");
+			setStep(2);
+			setFurthest((f) => Math.max(f, 2));
+		} catch (err: unknown) {
+			const errorMsg =
+				err instanceof Error ? err.message : "حدث خطأ أثناء حفظ بيانات الدورة التدريبية";
+			toast.error(errorMsg);
+		} finally {
+			setIsSubmitting(false);
 		}
-
-		// الانتقال للخطوة الثانية فوراً بدون استدعاء createCourse في قاعدة البيانات
-		setStep(2);
-		setFurthest((f) => Math.max(f, 2));
-	};
-
-	// الانتقال من الخطوة 3 إلى الخطوة 4
-	const handleGoFromStep3 = () => {
-		if (!isCourseTimeValid(time)) {
-			setTimeError("تاريخ الاستحقاق يجب أن يكون بعد تاريخ البدء.");
-			return;
-		}
-		setTimeError(undefined);
-		persistTime();
-		setStep(4);
 	};
 
 	// التحقق قبل النشر
@@ -981,7 +1092,7 @@ export function CourseDialog({
 				message: "أضف وحدة واحدة تحتوي على درس واحد على الأقل قبل نشر الدورة.",
 			};
 		if (!isCourseTimeValid(time))
-			return { step: 3, message: "تاريخ الاستحقاق يجب أن يكون بعد تاريخ البدء." };
+			return { step: 1, message: "تاريخ الاستحقاق يجب أن يكون بعد تاريخ البدء." };
 		return null;
 	};
 
@@ -989,7 +1100,7 @@ export function CourseDialog({
 	const handlePublish = async () => {
 		const problem = validateForPublish();
 		if (problem) {
-			if (problem.step === 3) setTimeError(problem.message);
+			if (problem.step === 1) setTimeError(problem.message);
 			setPublishError(problem);
 			setStep(problem.step);
 			toast.error(problem.message);
@@ -1021,8 +1132,7 @@ export function CourseDialog({
 			onSuccess?.();
 			closeDialogCleanly();
 		} catch (err: unknown) {
-			const errorMsg =
-				err instanceof Error ? err.message : "حدث خطأ أثناء حفظ المسودة";
+			const errorMsg = err instanceof Error ? err.message : "حدث خطأ أثناء حفظ المسودة";
 			toast.error(errorMsg);
 		} finally {
 			setIsSubmitting(false);
@@ -1048,7 +1158,7 @@ export function CourseDialog({
 							? isExpanded
 								? "w-[99vw] max-w-[99vw] sm:max-w-[99vw] h-[99vh] max-h-[99vh] rounded-none"
 								: "w-[98vw] max-w-[98vw] sm:max-w-[98vw] md:max-w-[1720px] h-[98vh] max-h-[98vh]"
-							: step === 3 || step === 4
+							: step === 3
 								? "w-[90vw] max-w-[860px] sm:max-w-[860px] h-[95vh] max-h-[95vh]"
 								: isExpanded
 									? "w-[96vw] max-w-[96vw] sm:max-w-[96vw] h-[96vh] max-h-[96vh]"
@@ -1065,6 +1175,11 @@ export function CourseDialog({
 						}
 					}}
 					onEscapeKeyDown={(e) => {
+						if (activeSuppliesLesson) {
+							e.preventDefault();
+							setActiveSuppliesLesson(null);
+							return;
+						}
 						if (isStaffSheetOpen || isAiSheetOpen) {
 							e.preventDefault();
 							return;
@@ -1098,34 +1213,43 @@ export function CourseDialog({
 										: "أنشئ دورة جديدة"
 									: step === 2
 										? "إضافة وبناء محتوى الدورة"
-										: step === 3
-											? "تعيين المتدربين والوقت"
-											: "الإكمال والنشر"
+										: "الإكمال والنشر"
 							}
 							identity={
 								step === 1
 									? isEdit && course
 										? { name: course.name, code: course.code }
 										: null
-									: { name: name || course?.name || "دورة جديدة", code: code || course?.code }
+									: {
+											name: name || course?.name || "دورة جديدة",
+											code: code || course?.code,
+										}
 							}
 							progress={step === 1 ? formProgress : undefined}
 							onClose={handleCloseAttempt}
 							actions={
-								<Button
-									type="button"
-									variant="ghost"
-									size="icon-xs"
-									className="size-7 text-muted-foreground hover:text-foreground hidden sm:flex cursor-pointer rounded-md transition-colors"
-									onClick={() => setIsExpanded((prev) => !prev)}
-									title={isExpanded ? "تصغير النافذة" : "توسيع النافذة"}
-								>
-									{isExpanded ? (
-										<IconArrowsDiagonalMinimize2 className="size-3.5" />
-									) : (
-										<IconArrowsDiagonal className="size-3.5" />
+								<div className="flex items-center gap-2">
+									{step === 1 && headerTrainers.length > 0 && (
+										<TrainersCell
+											trainers={headerTrainers}
+											maxVisible={3}
+										/>
 									)}
-								</Button>
+									<Button
+										type="button"
+										variant="ghost"
+										size="icon-xs"
+										className="size-7 text-muted-foreground hover:text-foreground hidden sm:flex cursor-pointer rounded-md transition-colors"
+										onClick={() => setIsExpanded((prev) => !prev)}
+										title={isExpanded ? "تصغير النافذة" : "توسيع النافذة"}
+									>
+										{isExpanded ? (
+											<IconArrowsDiagonalMinimize2 className="size-3.5" />
+										) : (
+											<IconArrowsDiagonal className="size-3.5" />
+										)}
+									</Button>
+								</div>
 							}
 							titleActions={
 								step === 1 ? (
@@ -1219,9 +1343,22 @@ export function CourseDialog({
 											className="h-6 px-2 text-[11px] gap-1 rounded-full border border-border bg-white dark:bg-card hover:bg-muted font-medium cursor-pointer flex items-center shrink-0 transition-all"
 											title="أنشئ مع مدير بالذكاء الاصطناعي"
 										>
-											<SanadLogo iconOnly className="h-3 w-auto shrink-0" />
+											<SanadLogo
+												iconOnly
+												className="h-3 w-auto shrink-0"
+											/>
 											<span className="whitespace-nowrap">أنشئ مع مدير</span>
 										</Button>
+									</div>
+								) : step === 2 && headerTrainers.length > 0 ? (
+									<div className="flex items-center gap-1.5 ms-2">
+										<span className="text-[11px] font-medium text-muted-foreground hidden sm:inline">
+											المدربون:
+										</span>
+										<TrainersCell
+											trainers={headerTrainers}
+											maxVisible={4}
+										/>
 									</div>
 								) : undefined
 							}
@@ -1280,12 +1417,21 @@ export function CourseDialog({
 											</div>
 
 											{/* فراغ محاذاة للأيقونة */}
-											<div className="w-10 shrink-0" aria-hidden="true" />
+											<div
+												className="w-10 shrink-0"
+												aria-hidden="true"
+											/>
 
 											{/* تسمية اسم الدورة يساراً */}
 											<div className="flex-1 min-w-0">
-												<FieldLabel required info="اسم الدورة التدريبية">
-													<Label htmlFor="crs-name" className="text-xs font-semibold">
+												<FieldLabel
+													required
+													info="اسم الدورة التدريبية"
+												>
+													<Label
+														htmlFor="crs-name"
+														className="text-xs font-semibold"
+													>
 														اسم الدورة
 													</Label>
 												</FieldLabel>
@@ -1307,7 +1453,10 @@ export function CourseDialog({
 
 											{/* زر الأيقونة المنبثق لاختيار رمز ولون الدورة */}
 											<div className="shrink-0 w-10 flex items-center justify-center">
-												<Popover open={iconPickerOpen} onOpenChange={setIconPickerOpen}>
+												<Popover
+													open={iconPickerOpen}
+													onOpenChange={setIconPickerOpen}
+												>
 													<PopoverTrigger asChild>
 														<button
 															type="button"
@@ -1411,7 +1560,8 @@ export function CourseDialog({
 													placeholder="مثال: البرمجه للأطفال"
 													className={cn(
 														"w-full h-10 text-xs text-right font-medium",
-														isDuplicateName && "border-destructive focus-visible:ring-destructive",
+														isDuplicateName &&
+															"border-destructive focus-visible:ring-destructive",
 													)}
 													required
 													autoFocus
@@ -1429,7 +1579,10 @@ export function CourseDialog({
 									{/* السطر الثاني: وصف الدورة */}
 									<Field className="space-y-1.5">
 										<FieldLabel info="وصف شامل لأهداف الدورة ومحتواها">
-											<Label htmlFor="crs-desc" className="text-xs font-semibold">
+											<Label
+												htmlFor="crs-desc"
+												className="text-xs font-semibold"
+											>
 												وصف الدورة
 											</Label>
 										</FieldLabel>
@@ -1481,7 +1634,10 @@ export function CourseDialog({
 									{/* ب) شريط شرائح الخطوات الإضافية (بدون الفئة العمرية) */}
 									<div className="flex items-center gap-2 flex-wrap justify-start px-5 py-2.5 bg-background">
 										{/* 1. المرحلة الدراسية */}
-										<DropdownMenu dir="rtl" modal={false}>
+										<DropdownMenu
+											dir="rtl"
+											modal={false}
+										>
 											<DropdownMenuTrigger asChild>
 												<Button
 													type="button"
@@ -1493,12 +1649,16 @@ export function CourseDialog({
 													<span>{academicStage || "المرحلة الدراسية"}</span>
 												</Button>
 											</DropdownMenuTrigger>
-											<DropdownMenuContent align="end" className="w-56! min-w-56 p-1.5">
+											<DropdownMenuContent
+												align="end"
+												className="w-56! min-w-56 p-1.5"
+											>
 												<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
 													المرحلة الدراسية
 												</DropdownMenuLabel>
 
 												{/* حقل إضافة مرحلة دراسية جديدة */}
+												{/* biome-ignore lint/a11y/noStaticElementInteractions: popover input container */}
 												<div
 													className="p-1 mb-1.5 border-b"
 													onClickCapture={(e) => e.stopPropagation()}
@@ -1554,14 +1714,15 @@ export function CourseDialog({
 												{/* قائمة المراحل المتاحة */}
 												<div className="max-h-48 overflow-y-auto space-y-0.5">
 													{isStagesLoading && activeAcademicStages.length === 0 ? (
-														<div className="py-2 text-center text-xs text-muted-foreground">
-															جاري التحميل...
-														</div>
+														<Spinner
+															containerClassName="py-3 min-h-0"
+															className="size-4 text-primary"
+														/>
 													) : (
 														activeAcademicStages.map((item) => (
-															<div
+															<DropdownMenuItem
 																key={item}
-																onClick={() => setAcademicStage(item)}
+																onSelect={() => setAcademicStage(item)}
 																className={cn(
 																	"relative flex cursor-pointer select-none items-center justify-between rounded-sm px-2 py-1.5 text-xs outline-none transition-colors hover:bg-accent hover:text-accent-foreground group",
 																	academicStage === item && "bg-accent/60 font-medium",
@@ -1573,7 +1734,7 @@ export function CourseDialog({
 																		<IconCheck className="size-3.5 text-primary shrink-0" />
 																	)}
 																</div>
-															</div>
+															</DropdownMenuItem>
 														))
 													)}
 												</div>
@@ -1581,7 +1742,10 @@ export function CourseDialog({
 										</DropdownMenu>
 
 										{/* 2. التصنيف */}
-										<DropdownMenu dir="rtl" modal={false}>
+										<DropdownMenu
+											dir="rtl"
+											modal={false}
+										>
 											<DropdownMenuTrigger asChild>
 												<Button
 													type="button"
@@ -1593,12 +1757,16 @@ export function CourseDialog({
 													<span>{category || "التصنيف"}</span>
 												</Button>
 											</DropdownMenuTrigger>
-											<DropdownMenuContent align="end" className="w-56! min-w-56 p-1.5">
+											<DropdownMenuContent
+												align="end"
+												className="w-56! min-w-56 p-1.5"
+											>
 												<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
 													التصنيف
 												</DropdownMenuLabel>
 
 												{/* حقل إضافة تصنيف جديد */}
+												{/* biome-ignore lint/a11y/noStaticElementInteractions: popover input container */}
 												<div
 													className="p-1 mb-1.5 border-b"
 													onClickCapture={(e) => e.stopPropagation()}
@@ -1657,9 +1825,10 @@ export function CourseDialog({
 												<div className="max-h-48 overflow-y-auto space-y-0.5">
 													{isClassificationsLoading &&
 													activeTrackClassifications.length === 0 ? (
-														<div className="py-2 text-center text-xs text-muted-foreground">
-															جاري التحميل...
-														</div>
+														<Spinner
+															containerClassName="py-3 min-h-0"
+															className="size-4 text-primary"
+														/>
 													) : (
 														activeTrackClassifications.map((item) => (
 															// biome-ignore lint/a11y/noStaticElementInteractions: dropdown option
@@ -1711,98 +1880,73 @@ export function CourseDialog({
 											title="فترة الدورة التدريبية"
 										/>
 
-										{/* 5. زر الخيارات الإضافية (...) */}
-										<DropdownMenu dir="rtl" modal={false}>
+										{/* 5. مكان التعلم */}
+										<DropdownMenu
+											dir="rtl"
+											modal={false}
+										>
 											<DropdownMenuTrigger asChild>
 												<Button
 													type="button"
-													variant="outline"
-													size="icon-sm"
-													className="size-8"
-													title="خيارات إضافية للدورة"
+													variant={locationMode ? "secondary" : "outline"}
+													size="sm"
+													className="gap-1.5 h-8 text-xs font-normal cursor-pointer"
 												>
-													<IconDots className="size-4 text-muted-foreground" />
+													<IconMapPin className="size-3.5 text-muted-foreground/70 shrink-0" />
+													<span>
+														{locationMode === "ONLINE"
+															? "أونلاين"
+															: locationMode === "ONSITE"
+																? "حضوري"
+																: locationMode === "HYBRID"
+																	? "مدمج"
+																	: "مكان التعلم"}
+													</span>
 												</Button>
 											</DropdownMenuTrigger>
-											<DropdownMenuContent align="start" className="w-56! min-w-56 p-2 space-y-2">
-												<div className="space-y-1">
-													<span className="text-[11px] font-semibold text-muted-foreground block">
-														مكان الدورة
-													</span>
-													<div className="grid grid-cols-3 gap-1">
-														{(["ONLINE", "ONSITE", "HYBRID"] as const).map((mode) => (
-															<button
-																key={mode}
-																type="button"
-																onClick={() => setLocationMode(mode)}
-																className={cn(
-																	"text-[10px] py-1 px-1.5 rounded border transition-colors",
-																	locationMode === mode
-																		? "bg-primary text-primary-foreground border-primary font-semibold"
-																		: "bg-muted/40 text-muted-foreground hover:text-foreground",
-																)}
-															>
-																{mode === "ONLINE"
-																	? "أونلاين"
-																	: mode === "ONSITE"
-																		? "حضوري"
-																		: "مدمج"}
-															</button>
-														))}
-													</div>
-												</div>
+											<DropdownMenuContent
+												align="end"
+												className="w-40! min-w-40 p-1"
+											>
+												<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
+													مكان التعلم
+												</DropdownMenuLabel>
 
-												<div className="space-y-1 pt-1 border-t">
-													<span className="text-[11px] font-semibold text-muted-foreground block">
-														التكلفة / السعر (ج.م)
-													</span>
-													<Input
-														type="number"
-														min={0}
-														value={price ?? ""}
-														onChange={(e) => {
-															const val = e.target.value.trim();
-															setPrice(
-																val === ""
-																	? undefined
-																	: Math.max(0, Number.parseInt(val, 10) || 0),
-															);
-														}}
-														placeholder="مثال: 5000"
-														className="h-7 text-xs"
-													/>
-												</div>
+												{/* خيار بدون مكان التعلم */}
+												<DropdownMenuItem
+													onClick={() => setLocationMode("")}
+													className={cn(
+														"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md mb-1",
+														!locationMode && "bg-muted font-medium text-foreground",
+													)}
+												>
+													<span>بدون مكان التعلم</span>
+													{!locationMode && <IconCheck className="size-3.5 text-primary" />}
+												</DropdownMenuItem>
+												<DropdownMenuSeparator className="my-1" />
 
-												<div className="space-y-1 pt-1 border-t">
-													<span className="text-[11px] font-semibold text-muted-foreground block">
-														المؤسسة / الجهة المنظمة
-													</span>
-													<Input
-														value={institution}
-														onChange={(e) => setInstitution(e.target.value)}
-														placeholder="اسم الجهة أو المركز..."
-														className="h-7 text-xs"
-													/>
-												</div>
-
-												<div className="pt-1 border-t">
-													<button
-														type="button"
-														onClick={() => setIsStaffSheetOpen(true)}
-														className="w-full flex items-center justify-between text-xs py-1.5 px-2 rounded hover:bg-accent text-right cursor-pointer"
-													>
-														<span className="font-semibold text-foreground">
-															تعيين موظف / مدرب
-														</span>
-														{selectedStaffIds.length > 0 ? (
-															<span className="text-[10px] bg-primary/10 text-primary font-medium px-1.5 py-0.5 rounded">
-																{selectedStaffIds.length} محدد
-															</span>
-														) : (
-															<span className="text-[10px] text-muted-foreground">0 محدد</span>
+												{(
+													[
+														{ value: "ONLINE", label: "أونلاين" },
+														{ value: "ONSITE", label: "حضوري" },
+														{ value: "HYBRID", label: "مدمج" },
+													] as const
+												).map((opt) => (
+													<DropdownMenuItem
+														key={opt.value}
+														onClick={() => setLocationMode(opt.value)}
+														className={cn(
+															"cursor-pointer text-xs flex items-center justify-between px-2.5 py-1.5 rounded-md",
+															locationMode === opt.value &&
+																"bg-muted font-medium text-foreground",
 														)}
-													</button>
-												</div>
+													>
+														<span>{opt.label}</span>
+														{locationMode === opt.value && (
+															<IconCheck className="size-3.5 text-primary" />
+														)}
+													</DropdownMenuItem>
+												))}
 											</DropdownMenuContent>
 										</DropdownMenu>
 									</div>
@@ -1882,10 +2026,15 @@ export function CourseDialog({
 							<div className="flex flex-col flex-1 min-h-0 overflow-hidden bg-background">
 								<div className="flex-1 min-h-0 overflow-hidden flex flex-col">
 									<CourseBuilderStep
-										courseId={activeCourseId}
+										courseId={currentCourseId}
+										trainers={headerTrainers}
 										onGenerateAI={() => setIsAiSheetOpen(true)}
 										onEnsureCourseCreated={ensureCourseCreated}
 										onDirtyChange={setHasBuilderUnsaved}
+										activeSuppliesLesson={activeSuppliesLesson}
+										onOpenSuppliesLesson={setActiveSuppliesLesson}
+										lessonSupplies={lessonSupplies}
+										onSaveLessonSupplies={handleSaveLessonSupplies}
 									/>
 								</div>
 
@@ -1956,7 +2105,7 @@ export function CourseDialog({
 											}}
 											className="gap-1.5 text-xs font-semibold cursor-pointer"
 										>
-											<span>التالي: تعيين المتدربين</span>
+											<span>التالي: الإكمال والنشر</span>
 											<IconArrowLeft className="size-4" />
 										</Button>
 									</div>
@@ -1964,20 +2113,20 @@ export function CourseDialog({
 							</div>
 						)}
 
-						{/* الخطوة 3: تعيين المتدربين + وقت الدورة */}
-						{step === 3 && activeCourseId && (
+						{/* الخطوة 3: الإكمال والنشر */}
+						{step === 3 && currentCourseId && (
 							<div className="flex flex-col flex-1 min-h-0 overflow-hidden bg-background">
 								<div className="flex-1 min-h-0 overflow-y-auto px-4 py-3">
-									<AssignLearnersStep courseId={activeCourseId}>
-										<CourseTimeSection
-											value={time}
-											onChange={(v) => {
-												setTime(v);
-												if (timeError) setTimeError(undefined);
-											}}
-											error={timeError}
-										/>
-									</AssignLearnersStep>
+									<CourseCompletionStep
+										course={course ?? undefined}
+										courseId={currentCourseId}
+										price={price}
+										onPriceChange={setPrice}
+										accessType={accessType}
+										onAccessTypeChange={setAccessType}
+										currency={currency}
+										onCurrencyChange={setCurrency}
+									/>
 								</div>
 
 								{/* فوتر الخطوة 3 */}
@@ -1991,51 +2140,6 @@ export function CourseDialog({
 									>
 										<IconArrowRight className="size-4" />
 										<span>رجوع لباني المحتوى</span>
-									</Button>
-
-									<div className="flex items-center gap-2">
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											onClick={handleSaveDraft}
-											className="text-xs font-medium"
-										>
-											حفظ كمسودة
-										</Button>
-
-										<Button
-											type="button"
-											size="sm"
-											onClick={handleGoFromStep3}
-											className="gap-1.5 text-xs font-semibold cursor-pointer"
-										>
-											<span>التالي: الإكمال والنشر</span>
-											<IconArrowLeft className="size-4" />
-										</Button>
-									</div>
-								</div>
-							</div>
-						)}
-
-						{/* الخطوة 4: الإكمال والنشر */}
-						{step === 4 && activeCourseId && course && (
-							<div className="flex flex-col flex-1 min-h-0 overflow-hidden bg-background">
-								<div className="flex-1 min-h-0 overflow-y-auto px-4 py-3">
-									<CourseCompletionStep course={course} courseId={activeCourseId} />
-								</div>
-
-								{/* فوتر الخطوة 4 */}
-								<div className="flex shrink-0 items-center justify-between border-t border-border bg-background px-4 py-2.5 shadow-[0_-4px_12px_rgba(0,0,0,0.03)] z-10">
-									<Button
-										type="button"
-										variant="ghost"
-										size="sm"
-										onClick={() => setStep(3)}
-										className="gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground cursor-pointer"
-									>
-										<IconArrowRight className="size-4" />
-										<span>رجوع لتعيين المتدربين</span>
 									</Button>
 
 									<div className="flex items-center gap-2">

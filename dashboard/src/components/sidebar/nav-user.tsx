@@ -52,8 +52,6 @@ export function NavUser() {
 		null;
 
 	const user = session?.user;
-	const role = session?.session?.role;
-	const roleLabel = role ? t(`sidebar.user.roles.${role}`, { defaultValue: role }) : "";
 	const name = user?.name ?? "";
 	const email = user?.email ?? "";
 	const avatar = user?.image ?? "";
@@ -86,7 +84,7 @@ export function NavUser() {
 							</Avatar>
 							<div className="grid flex-1 text-start text-sm leading-tight">
 								<span className="truncate font-medium">{name}</span>
-								<span className="truncate text-xs text-muted-foreground">{roleLabel}</span>
+								<span className="truncate text-xs text-muted-foreground">{email}</span>
 							</div>
 							<IconSelector className="ms-auto size-4" />
 						</SidebarMenuButton>

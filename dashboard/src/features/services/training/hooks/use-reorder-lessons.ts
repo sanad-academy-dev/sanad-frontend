@@ -4,7 +4,7 @@ import { api } from "@/lib/api";
 import type {
 	CourseDetailResponse,
 	ReorderLessonInput,
-} from "@/server/training/training.type";
+} from "@sanad/contracts/runtime/server/training/training.type";
 
 export function useReorderLessons(courseId: string | null) {
 	const queryClient = useQueryClient();

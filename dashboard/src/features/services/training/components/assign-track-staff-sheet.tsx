@@ -8,7 +8,7 @@ import {
 } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-
+import { Spinner } from "@/components/common/spinner";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
 	DropdownMenu,
@@ -17,7 +17,6 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { Spinner } from "@/components/ui/spinner";
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import { cn } from "@/lib/utils";
 import { useAssignTrackStaff, useTracks } from "../hooks/use-tracks";
@@ -310,9 +309,7 @@ export function AssignTrackStaffSheet({
 					dir="rtl"
 				>
 					{isStaffLoading ? (
-						<div className="py-12 text-center text-xs text-muted-foreground">
-							جاري تحميل قائمة الموظفين...
-						</div>
+						<Spinner containerClassName="py-12 min-h-0" />
 					) : filteredStaff.length === 0 ? (
 						<div className="py-12 text-center text-xs text-muted-foreground">
 							لا يوجد موظفون مطابقون

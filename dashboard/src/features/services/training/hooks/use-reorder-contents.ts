@@ -5,7 +5,7 @@ import { api } from "@/lib/api";
 import type {
 	CourseDetailResponse,
 	ReorderContentInput,
-} from "@/server/training/training.type";
+} from "@sanad/contracts/runtime/server/training/training.type";
 
 // إعادة ترتيب بطاقات المحتوى — تحديث متفائل لكاش الدورة مع تراجع عند الفشل (يطابق نمط الريبو).
 export const useReorderContents = (courseId: string | null) => {

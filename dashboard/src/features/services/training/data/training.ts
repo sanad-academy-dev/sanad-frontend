@@ -17,7 +17,7 @@ import type {
 	CourseType,
 	LessonType,
 	QuizAnswerType,
-} from "@/server/training/training.type";
+} from "@sanad/contracts/runtime/server/training/training.type";
 
 // خيارات تجريبية حتى تتوفر جداول الأقسام من الـ API
 export const COURSE_DEPARTMENT_OPTIONS: { value: string; label: string }[] = [
@@ -144,14 +144,14 @@ export const LESSON_ACCEPT: Partial<Record<LessonType, string>> = {
 
 // مكان الدورة (عمود «مكان الدورة» + فلتر + منتقي اللوحة)
 export const COURSE_LOCATION_OPTIONS: { value: CourseLocationMode; label: string }[] = [
+	{ value: "ONLINE", label: "أونلاين" },
 	{ value: "ONSITE", label: "حضوري" },
-	{ value: "ONLINE", label: "عن بُعد" },
 	{ value: "HYBRID", label: "مدمج" },
 ];
 
 const COURSE_LOCATION_LABELS: Record<CourseLocationMode, string> = {
+	ONLINE: "أونلاين",
 	ONSITE: "حضوري",
-	ONLINE: "عن بُعد",
 	HYBRID: "مدمج",
 };
 export const courseLocationLabel = (m: CourseLocationMode | null) =>
@@ -163,27 +163,103 @@ const COURSE_LANGUAGE_LABELS: Record<CourseLanguage, string> = {
 };
 export const courseLanguageLabel = (l: CourseLanguage) => COURSE_LANGUAGE_LABELS[l];
 
-// تكلفة التدريب — عدد صحيح بالريال (لا كسور)؛ «—» عند الغياب يُدار في الخلية
-export const formatTrainingCost = (cost: number | null) =>
-	cost == null ? null : `${cost.toLocaleString("ar-SA")} ريال`;
+// استخراج رمز وعملة الدورة من قاعدة البيانات
+export function getCourseCurrency(
+	course?: { currency?: string | null; institution?: string | null } | null,
+): string {
+	if (!course) return "EGP";
+	const rawCurr = (course as { currency?: string | null }).currency;
+	if (rawCurr && typeof rawCurr === "string" && rawCurr.trim()) {
+		return rawCurr.trim();
+	}
+	if (course.institution) {
+		try {
+			if (course.institution.startsWith("{")) {
+				const meta = JSON.parse(course.institution);
+				if (meta.currency) return meta.currency;
+			}
+		} catch {}
+	}
+	return "EGP";
+}
 
-// فترة الدورة: تُشتقّ من (البدء→الاستحقاق) أو تسقط إلى المدة المتوقعة بالأسابيع.
-// تُعرض بالأشهر إن ≥ 4 أسابيع، وإلا بالأسابيع. تُعيد null عند غياب المصدرين (تُعرض «—»).
+// الرمز المختصر للعملة المعروضة
+export function getCurrencySymbol(currencyCode?: string | null): string {
+	switch (currencyCode) {
+		case "SAR":
+			return "ر.س";
+		case "USD":
+			return "$";
+		case "AED":
+			return "د.إ";
+		default:
+			return "ج.م";
+	}
+}
+
+// تكلفة التدريب / السعر مع دعم عملة الدورة المحددة في قاعدة البيانات
+export const formatTrainingCost = (
+	cost: number | null,
+	courseOrCurrency?: string | { currency?: string | null; institution?: string | null } | null,
+): string | null => {
+	if (cost == null) return null;
+	if (cost === 0) return "مجانية";
+	const currency =
+		typeof courseOrCurrency === "string"
+			? courseOrCurrency
+			: getCourseCurrency(courseOrCurrency);
+	const symbol = getCurrencySymbol(currency);
+	if (currency === "USD") {
+		return `$${cost.toLocaleString("ar-EG")}`;
+	}
+	return `${cost.toLocaleString("ar-EG")} ${symbol}`;
+};
+
+// فترة الدورة: تُشتقّ أولاً من وسم [duration:...] في الوصف، أو من (البدء→الاستحقاق)، أو من المدة المتوقعة.
+// لا يتم تقريب الأسابيع قسراً لأشهر إلا إذا كانت مضاعفات صريحة للأشهر (4، 8، 12...).
 export function formatCourseDuration(
 	startDate: Date | string | null,
 	dueDate: Date | string | null,
 	estimatedWeeks: number | null,
+	description?: string | null,
 ): string | null {
+	// 1. إذا وجد وسم مدة صريح في الوصف تم حفظه من الخطوة الأولى
+	if (description) {
+		const match = description.match(/\[(?:duration|مدة):([^\]]+)\]/i);
+		if (match?.[1]?.trim()) {
+			return match[1].trim();
+		}
+	}
+
+	// 2. اعتماد المدة المقدرة بالأسابيع المحددة في الخطوة الأولى أولاً
 	let weeks: number | null = null;
-	if (startDate && dueDate) {
+	if (estimatedWeeks && estimatedWeeks > 0) {
+		weeks = estimatedWeeks;
+	} else if (startDate && dueDate) {
+		// حساب الأسابيع من تاريخ البدء وتاريخ الاستحقاق عند غياب المدة المقدرة
 		const ms = new Date(dueDate).getTime() - new Date(startDate).getTime();
 		if (ms > 0) weeks = Math.max(1, Math.round(ms / (7 * 24 * 60 * 60 * 1000)));
 	}
-	if (weeks == null && estimatedWeeks && estimatedWeeks > 0) weeks = estimatedWeeks;
 	if (weeks == null) return null;
-	if (weeks >= 4) {
-		const months = Math.round(weeks / 4.345);
-		return months <= 1 ? "شهر" : months === 2 ? "شهران" : `${months} أشهر`;
+
+	// 3. إن كانت مضاعفاً صريحاً للأشهر (4، 8، 12...)
+	if (weeks % 4 === 0 && weeks >= 4) {
+		const months = weeks / 4;
+		return months === 1
+			? "شهر"
+			: months === 2
+				? "شهران"
+				: months <= 10
+					? `${months} أشهر`
+					: `${months} شهراً`;
 	}
-	return weeks === 1 ? "أسبوع" : weeks === 2 ? "أسبوعان" : `${weeks} أسابيع`;
+
+	// 4. الحفاظ على الأسابيع بدقة (مثلاً: 6 أسابيع، 5 أسابيع، 7 أسابيع)
+	return weeks === 1
+		? "أسبوع واحد"
+		: weeks === 2
+			? "أسبوعان"
+			: weeks <= 10
+				? `${weeks} أسابيع`
+				: `${weeks} أسبوعاً`;
 }

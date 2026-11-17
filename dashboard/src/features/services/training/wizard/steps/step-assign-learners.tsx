@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Spinner } from "@/components/common/spinner";
 import {
 	Select,
 	SelectContent,
@@ -12,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import type { EligibleLearnerResponse } from "@/server/course-assignments/course-assignments.type";
+import type { EligibleLearnerResponse } from "@sanad/contracts/runtime/server/course-assignments/course-assignments.type";
 import {
 	useAssignmentActions,
 	useAutoAssignRules,
@@ -209,7 +210,7 @@ export function StepAssignLearners({ courseId }: { courseId: string }) {
 
 				{/* الشبكة */}
 				{isLoading ? (
-					<p className="py-12 text-center text-[12px] text-[#9B9B9D]">جارٍ التحميل...</p>
+					<Spinner containerClassName="py-12 min-h-0" />
 				) : filtered.length === 0 ? (
 					<p className="py-12 text-center text-[12px] text-[#9B9B9D]">
 						لا يوجد موظفون مطابقون.

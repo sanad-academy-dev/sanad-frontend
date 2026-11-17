@@ -9,8 +9,9 @@ export const Route = createFileRoute("/_pathless-layout/services/owners")({
 	component: RouteComponent,
 	beforeLoad: async () => {
 		const { session } = await getSession();
-		if (session?.session.role === "MEMBER") {
-			const perms: string[] = JSON.parse(session.session.permissions ?? "[]");
+		const currentSession = session?.session;
+		if (currentSession?.role === "MEMBER") {
+			const perms: string[] = JSON.parse(currentSession.permissions ?? "[]");
 			const canView =
 				perms.includes(PERMISSIONS.PATIENTS_OWNERS_VIEW_LIMITED) ||
 				perms.includes(PERMISSIONS.PATIENTS_OWNERS_VIEW_FULL);

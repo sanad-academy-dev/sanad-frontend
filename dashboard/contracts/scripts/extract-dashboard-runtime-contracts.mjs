@@ -20,6 +20,8 @@ const supportModules = new Map([
 	["lib/validation/phone", join(backendSource, "lib", "validation", "phone.ts")],
 	["lib/rbac/rbac-registry", join(backendSource, "lib", "rbac", "rbac-registry.ts")],
 	["lib/rbac/rbac-catalogue", join(backendSource, "lib", "rbac", "rbac-catalogue.ts")],
+	["lib/rbac/rbac-role-templates", join(backendSource, "lib", "rbac", "rbac-role-templates.ts")],
+	["server/course-assignments/course-assignments.type", join(backendSource, "server", "course-assignments", "course-assignments.type.ts")],
 ]);
 const supportImportRewrites = new Map(
 	[...supportModules.keys()].map((module) => [`@/${module}`, `@sanad/contracts/runtime/${module}`]),

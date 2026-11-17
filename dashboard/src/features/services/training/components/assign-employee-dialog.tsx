@@ -1,337 +1,605 @@
-import { IconCheck, IconSearch, IconUserPlus, IconUsersGroup } from "@tabler/icons-react";
-import { useEffect, useMemo, useRef, useState } from "react";
-
-import { showSuccessToast } from "@/components/common/success-toast";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+	IconArrowsDiagonal,
+	IconCheck,
+	IconChevronDown,
+	IconChevronLeft,
+	IconSearch,
+	IconX,
+} from "@tabler/icons-react";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { Spinner } from "@/components/common/spinner";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { Spinner } from "@/components/ui/spinner";
+import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import {
 	useAssignmentActions,
+	useCourseRoster,
 	useEligibleLearners,
 } from "@/features/services/training/hooks/use-course-assignments";
+import { useCourses } from "@/features/services/training/hooks/use-courses";
 import { useBranches } from "@/features/settings/branches/hooks/use-branches";
 import { getFileUrl } from "@/lib/file-url";
 import { cn } from "@/lib/utils";
-import type { CourseListItemResponse } from "@/server/training/training.type";
+import type { CourseListItemResponse } from "@sanad/contracts/runtime/server/training/training.type";
 
 const ALL = "__ALL__";
 
-const initials = (name: string) =>
-	name
-		.split(/\s+/)
-		.filter(Boolean)
-		.slice(0, 2)
-		.map((w) => w[0])
-		.join("")
-		.toUpperCase() || "؟";
+type FilterKey = "all" | "assigned" | "unassigned" | "other";
 
-// دائرة صورة الموظف (بادئة الاسم أو الصورة)
-function StaffAvatar({ name, avatar }: { name: string; avatar: string | null }) {
-	const url = getFileUrl(avatar);
-	return (
-		<span className="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary text-[9px] font-medium text-primary-foreground">
-			{url ? (
-				<img
-					src={url}
-					alt={name}
-					className="size-full object-cover"
-				/>
-			) : (
-				initials(name)
-			)}
-		</span>
-	);
+const FILTER_LABELS: Record<FilterKey, string> = {
+	all: "كل الموظفين",
+	assigned: "المعينون في هذه الدورة",
+	unassigned: "بدون أي دورات",
+	other: "معينين في دورات أخرى",
+};
+
+function initialsOf(name: string) {
+	if (!name) return "—";
+	const parts = name.trim().split(/\s+/);
+	if (parts.length === 1) return parts[0].slice(0, 2);
+	return (parts[0][0] || "") + (parts[1][0] || "");
 }
 
-// لوحة «تعيين موظف» — تنزلق من اليسار. اختيار مرحلي (بلا حفظ فوري) ثم يُلتزم بزر «تعيين».
+export interface AssignEmployeeDialogProps {
+	course: CourseListItemResponse | null;
+	onClose: () => void;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
+}
+
+/**
+ * شيت تعيين وتعديل الموظفين على الدورات التدريبية
+ * مطابقة تماماً لشيت تعيين موظفي المسارات والفصول بالثيم الموحد لمنصة سند
+ */
 export function AssignEmployeeDialog({
 	course,
 	onClose,
-}: {
-	course: CourseListItemResponse | null;
-	onClose: () => void;
-}) {
+	open: controlledOpen,
+	onOpenChange,
+}: AssignEmployeeDialogProps) {
+	const isOpen = controlledOpen !== undefined ? controlledOpen : Boolean(course);
 	const courseId = course?.id ?? null;
-	const [search, setSearch] = useState("");
-	// فلتر «كل الموظفين» حسب الفرع — يُطبَّق على الخادم
-	const [branchFilter, setBranchFilter] = useState(ALL);
-	// الاختيار المرحلي: staffId → الاسم (بلا حفظ حتى الضغط على «تعيين»)
-	const [selected, setSelected] = useState<Map<string, string>>(new Map());
 
-	const { learners, isLoading } = useEligibleLearners(
-		courseId,
-		branchFilter === ALL ? undefined : branchFilter,
-	);
-	const { assignMany, isAssigning } = useAssignmentActions(courseId);
+	const { staff, isLoading: isStaffLoading } = useStaff();
+	const { courses } = useCourses();
 	const { branches } = useBranches();
+	const { roster, isLoading: isRosterLoading } = useCourseRoster(courseId);
+	const { assignMany, unassign } = useAssignmentActions(courseId);
+	const { learners } = useEligibleLearners(courseId);
 
-	// إعادة تهيئة الحالة عند فتح اللوحة لدورة جديدة
-	const openedFor = useRef<string | null>(null);
-	useEffect(() => {
-		if (course && openedFor.current !== course.id) {
-			openedFor.current = course.id;
-			setSelected(new Map());
-			setSearch("");
-			setBranchFilter(ALL);
+	const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
+	const [search, setSearch] = useState("");
+	const [filter, setFilter] = useState<FilterKey>("all");
+	const [branchFilter, setBranchFilter] = useState(ALL);
+	const [roleFilter, setRoleFilter] = useState(ALL);
+	const [isExpanded, setIsExpanded] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	// خريطة لمعرفة التعيينات الأصلية لتحديد التعديلات (إضافة / إزالة)
+	const initialAssignedMap = useMemo(() => {
+		const map = new Map<string, string>(); // staffId -> assignmentId
+		for (const r of roster) {
+			if (r.staffId) {
+				map.set(r.staffId, r.id);
+			}
 		}
-		if (!course) openedFor.current = null;
-	}, [course]);
+		// أيضاً من assignees كاحتياط
+		for (const a of course?.assignees || []) {
+			if (a.id && !map.has(a.id)) {
+				map.set(a.id, a.id);
+			}
+		}
+		return map;
+	}, [roster, course?.assignees]);
 
-	// أقسام (أدوار) الموظفين المؤهلين — تُستخدم في «تحديد سريع»
+	// إعادة ضبط الحالة عند فتح الشيت
+	useEffect(() => {
+		if (isOpen) {
+			const currentIds = Array.from(initialAssignedMap.keys());
+			setSelectedStaffIds(currentIds);
+			setSearch("");
+			setFilter("all");
+			setBranchFilter(ALL);
+			setRoleFilter(ALL);
+		}
+	}, [isOpen, initialAssignedMap]);
+
+	// خريطة لتحديد الدورات المرتبطة بكل موظف
+	const staffCoursesMap = useMemo(() => {
+		const map = new Map<string, CourseListItemResponse[]>();
+		for (const c of courses) {
+			for (const a of c.assignees || []) {
+				const existing = map.get(a.id) || [];
+				if (!existing.some((item) => item.id === c.id)) {
+					existing.push(c);
+					map.set(a.id, existing);
+				}
+			}
+		}
+		return map;
+	}, [courses]);
+
+	// قائمة الموظفين الفعليين مع دمج بيانات التأهيل والأدوار
+	const allStaffList = useMemo(() => {
+		if (staff && staff.length > 0) return staff;
+		return learners || [];
+	}, [staff, learners]);
+
+	// قائمة الأدوار الوظيفية المتاحة للفلترة
 	const roleOptions = useMemo(() => {
 		const m = new Map<string, string>();
-		for (const l of learners) if (l.role) m.set(l.role.id, l.role.name);
-		return [...m.entries()];
-	}, [learners]);
+		for (const s of allStaffList) {
+			const r = s.role;
+			if (r && typeof r === "object" && r.id && r.name) {
+				m.set(r.id, r.name);
+			}
+		}
+		return Array.from(m.entries());
+	}, [allStaffList]);
 
-	// البحث فقط يُصفّي القائمة (بالاسم أو المعرّف)
-	const filtered = useMemo(() => {
-		const q = search.trim();
-		return learners
-			.filter((l) => (q ? l.name.includes(q) || l.code.includes(q) : true))
-			.sort((a, b) => a.name.localeCompare(b.name, "ar"));
-	}, [learners, search]);
+	// تصفية الموظفين بناءً على البحث والفلتر والفرع والدور
+	const filteredStaff = useMemo(() => {
+		const q = search.trim().toLowerCase();
 
-	const allFilteredSelected = filtered.length > 0 && filtered.every((l) => selected.has(l.id));
+		return allStaffList.filter((s) => {
+			// فلتر البحث
+			if (q) {
+				const nameMatch = s.name?.toLowerCase().includes(q);
+				const codeMatch = s.code?.toLowerCase().includes(q);
+				const phoneMatch = "phone" in s && s.phone?.includes(q);
+				if (!nameMatch && !codeMatch && !phoneMatch) return false;
+			}
 
-	const toggle = (id: string, name: string) =>
-		setSelected((prev) => {
-			const next = new Map(prev);
-			if (next.has(id)) next.delete(id);
-			else next.set(id, name);
-			return next;
+			// فلتر الفرع
+			if (branchFilter !== ALL) {
+				const bId = s.branch?.id || (s as { branchId?: string }).branchId;
+				if (bId !== branchFilter) return false;
+			}
+
+			// فلتر الدور
+			if (roleFilter !== ALL) {
+				const rId = s.role?.id || (s as { roleId?: string }).roleId;
+				if (rId !== roleFilter) return false;
+			}
+
+			// تبويب التصفية الأساسي
+			const assignedCourses = staffCoursesMap.get(s.id) || [];
+			const isAssignedHere = selectedStaffIds.includes(s.id);
+			const hasNoCourses = assignedCourses.length === 0;
+
+			if (filter === "assigned") return isAssignedHere;
+			if (filter === "unassigned") return hasNoCourses && !isAssignedHere;
+			if (filter === "other") return !hasNoCourses && !isAssignedHere;
+
+			return true;
 		});
+	}, [
+		allStaffList,
+		search,
+		branchFilter,
+		roleFilter,
+		filter,
+		staffCoursesMap,
+		selectedStaffIds,
+	]);
 
-	const toggleAll = () =>
-		setSelected((prev) => {
-			const next = new Map(prev);
-			if (allFilteredSelected) for (const l of filtered) next.delete(l.id);
-			else for (const l of filtered) next.set(l.id, l.name);
-			return next;
+	const allChecked =
+		filteredStaff.length > 0 && filteredStaff.every((s) => selectedStaffIds.includes(s.id));
+
+	const toggleAll = (checked: boolean) => {
+		setSelectedStaffIds((prev) => {
+			const filteredIds = new Set(filteredStaff.map((s) => s.id));
+			if (checked) {
+				return Array.from(new Set([...prev, ...filteredIds]));
+			}
+			return prev.filter((id) => !filteredIds.has(id));
 		});
+	};
 
-	// تحديد سريع: إضافة جميع موظفي القسم إلى الاختيار (بلا حفظ فوري)
-	const selectDept = (roleId: string) =>
-		setSelected((prev) => {
-			const next = new Map(prev);
-			for (const l of learners) if (l.role?.id === roleId) next.set(l.id, l.name);
-			return next;
-		});
+	const toggleStaff = (id: string) => {
+		setSelectedStaffIds((prev) =>
+			prev.includes(id) ? prev.filter((sId) => sId !== id) : [...prev, id],
+		);
+	};
 
-	// الالتزام: يحفظ التعيينات فعليًا في قاعدة البيانات ثم يعرض توست نجاح ويغلق اللوحة
-	const commit = async () => {
-		if (selected.size === 0) return;
-		const names = [...selected.values()];
-		try {
-			await assignMany([...selected.keys()]);
-			const label =
-				names.length === 1 ? `(${names[0]})` : `(${names[0]} و ${names.length - 1} آخرين)`;
-			showSuccessToast(`تم تعيين دورة تدريبية لـ ${label} بنجاح`, { iconAtStart: true });
+	// إغلاق الشيت
+	const handleClose = () => {
+		if (onOpenChange) {
+			onOpenChange(false);
+		} else {
 			onClose();
-		} catch {
-			// الخطأ معروض كتوست داخل الـ mutation
+		}
+	};
+
+	// حفظ التعيينات
+	const handleSave = async () => {
+		if (!courseId) {
+			handleClose();
+			return;
+		}
+
+		setIsSubmitting(true);
+		try {
+			// الموظفون الجدد الذين سيتم تعيينهم
+			const toAdd = selectedStaffIds.filter((id) => !initialAssignedMap.has(id));
+			// الموظفون الذين تم إلغاء تعيينهم
+			const toRemoveStaffIds = Array.from(initialAssignedMap.keys()).filter(
+				(id) => !selectedStaffIds.includes(id),
+			);
+
+			if (toAdd.length > 0) {
+				await assignMany(toAdd);
+			}
+
+			if (toRemoveStaffIds.length > 0) {
+				for (const sId of toRemoveStaffIds) {
+					const assignmentId = initialAssignedMap.get(sId);
+					if (assignmentId && assignmentId !== sId) {
+						unassign(assignmentId);
+					}
+				}
+			}
+
+			toast.success(`تم حفظ تعيينات المدربين (${selectedStaffIds.length}) بنجاح!`);
+			handleClose();
+		} catch (_error) {
+			toast.error("تعذّر حفظ تعيينات المدربين");
+		} finally {
+			setIsSubmitting(false);
 		}
 	};
 
 	return (
 		<Sheet
-			open={!!course}
-			onOpenChange={(o) => !o && onClose()}
+			open={isOpen}
+			onOpenChange={(o) => !o && handleClose()}
 		>
-			{/* لوحة تنزلق من اليسار (side=left) بعرض 643px بحسب التصميم */}
 			<SheetContent
 				side="left"
-				dir="rtl"
-				className="flex w-full! flex-col gap-0 p-0 sm:max-w-[643px]!"
+				showCloseButton={false}
+				className={cn(
+					"flex w-full flex-col gap-0 p-0 transition-all duration-300 dark:bg-card z-[9999]",
+					isExpanded ? "sm:max-w-[850px]!" : "sm:max-w-[643px]!",
+				)}
 			>
-				{/* الهيدر — في RTL أول عنصر يمين: العنوان ثم اسم الدورة */}
-				<div className="flex shrink-0 items-center gap-2 border-b px-4 py-2">
-					<SheetTitle className="text-[13px] font-bold text-foreground">تعيين موظف</SheetTitle>
-					<span className="text-[#9B9B9D]">·</span>
-					<span className="truncate text-[13px] font-bold text-foreground">
-						{course?.name}
-					</span>
-				</div>
-
-				{/* شريط البحث (يمين) + فلتر «كل الموظفين» حسب الفرع (يسار) */}
-				<div className="flex shrink-0 items-center gap-2 px-3 pt-3">
-					<div className="relative flex-1">
-						<IconSearch className="pointer-events-none absolute start-2.5 top-1/2 size-3.5 -translate-y-1/2 text-[#9B9B9D]" />
-						<Input
-							value={search}
-							onChange={(e) => setSearch(e.target.value)}
-							placeholder="بحث بالاسم الموظف أو بالمعرّف..."
-							className="h-[34px] ps-8 text-[11px]"
-						/>
+				{/* 1. الشريط العلوي: مسار التنقل + أزرار التكبير والإغلاق */}
+				<div
+					className="flex items-center justify-between border-b border-[#E5E5E5] px-4 py-2 dark:border-border"
+					dir="rtl"
+				>
+					<div className="flex items-center gap-1.5">
+						<span className="text-[10px] font-bold text-[#08090A] dark:text-foreground">
+							الدورات التدريبية
+						</span>
+						<IconChevronLeft className="size-[9px] text-[#272829] dark:text-muted-foreground" />
+						<SheetTitle className="inline-block p-0 m-0 text-[10px] font-bold text-[#08090A] dark:text-foreground">
+							تعيين مدربي الدورة
+						</SheetTitle>
+						{course?.name && (
+							<span className="mr-1 text-[10px] font-medium text-muted-foreground truncate max-w-[220px]">
+								· {course.name}
+							</span>
+						)}
 					</div>
-					<Select
-						dir="rtl"
-						value={branchFilter}
-						onValueChange={setBranchFilter}
-					>
-						<SelectTrigger className="h-[34px]! w-[160px] text-[11px]">
-							<SelectValue placeholder="كل الموظفين" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value={ALL}>كل الموظفين</SelectItem>
-							{branches.map((b) => (
-								<SelectItem
-									key={b.id}
-									value={b.id}
-								>
-									{b.name}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</div>
-
-				{/* تحديد سريع: يضيف موظفي القسم إلى الاختيار (يعيد المنتقي لحالته الأصلية) */}
-				<div className="flex shrink-0 flex-col gap-1.5 px-3 pt-3">
-					<span className="text-[11px] font-medium text-foreground">
-						تحديد سريع · القسم المستهدف
-					</span>
-					<Select
-						dir="rtl"
-						value=""
-						onValueChange={(roleId) => roleId && selectDept(roleId)}
-					>
-						<SelectTrigger className="h-[34px]! w-full text-[11px]">
-							<SelectValue placeholder="حدد القسم..." />
-						</SelectTrigger>
-						<SelectContent>
-							{roleOptions.map(([id, name]) => (
-								<SelectItem
-									key={id}
-									value={id}
-								>
-									{name}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</div>
-
-				{/* رأس القائمة: العنوان + تحديد الكل */}
-				<div className="flex shrink-0 items-center justify-between px-3 pt-3">
-					<span className="text-[13px] font-bold text-foreground">الموظفون</span>
-					<div
-						role="button"
-						tabIndex={0}
-						onClick={toggleAll}
-						onKeyDown={(e) => {
-							if (e.key === "Enter" || e.key === " ") {
-								e.preventDefault();
-								toggleAll();
-							}
-						}}
-						className="flex items-center gap-1.5 text-[10px] font-medium text-foreground cursor-pointer select-none"
-					>
-						<span>تحديد كل الموظفين ({filtered.length})</span>
-						<div
-							className={cn(
-								"flex size-4 shrink-0 items-center justify-center rounded-[4px] border-[1.5px] transition-colors",
-								allFilteredSelected
-									? "border-primary bg-primary text-primary-foreground"
-									: "border-[#E5E5E5] bg-transparent",
-							)}
+					<div className="flex items-center gap-1.5">
+						<button
+							type="button"
+							onClick={() => setIsExpanded((prev) => !prev)}
+							aria-label={isExpanded ? "تصغير" : "توسيع"}
+							className="flex size-[21px] items-center justify-center rounded-[4px] text-[#9B9B9D] hover:bg-muted transition-colors cursor-pointer"
 						>
-							{allFilteredSelected && <IconCheck className="size-3" />}
-						</div>
+							<IconArrowsDiagonal className="size-3" />
+						</button>
+						<button
+							type="button"
+							onClick={handleClose}
+							aria-label="إغلاق"
+							className="flex size-[21px] items-center justify-center rounded-[4px] text-[#9B9B9D] hover:bg-muted transition-colors cursor-pointer"
+						>
+							<IconX className="size-3.5" />
+						</button>
 					</div>
 				</div>
 
-				{/* قائمة الموظفين */}
-				<div className="mt-2 min-h-0 flex-1 overflow-y-auto px-3 pb-3">
-					{isLoading ? (
-						<div className="flex justify-center py-10">
-							<Spinner />
+				{/* 2. شريط البحث والفلاتر */}
+				<div
+					className="flex flex-col gap-2 p-3 border-b border-[#E5E5E5] dark:border-border"
+					dir="rtl"
+				>
+					<div className="flex items-center gap-2">
+						{/* حقل البحث */}
+						<div className="relative flex-1">
+							<IconSearch className="pointer-events-none absolute right-2.5 top-1/2 size-3.5 -translate-y-1/2 text-[#9B9B9D]" />
+							<input
+								value={search}
+								onChange={(e) => setSearch(e.target.value)}
+								placeholder="بحث باسم الموظف، المعرّف، أو رقم الهاتف..."
+								className="h-[29px] w-full rounded-[4px] border border-[#E5E5E5] bg-white pr-8 pl-2 text-right text-[11px] text-[#08090A] outline-none placeholder:text-[#08090A]/50 dark:border-border dark:bg-background dark:text-foreground dark:placeholder:text-muted-foreground"
+							/>
 						</div>
-					) : filtered.length === 0 ? (
-						<div className="flex flex-col items-center gap-2 py-10 text-center">
-							<IconUsersGroup className="size-6 text-[#9B9B9D]" />
-							<p className="text-[12px] text-muted-foreground">لا يوجد موظفون مطابقون</p>
+
+						{/* فلتر حالة التعيين الموحد */}
+						<DropdownMenu dir="rtl">
+							<DropdownMenuTrigger asChild>
+								<button
+									type="button"
+									className="flex h-[29px] shrink-0 items-center gap-1.5 rounded-[4px] border border-[#E5E5E5] bg-white px-2.5 text-[11px] font-medium text-[#08090A] cursor-pointer dark:border-border dark:bg-background dark:text-foreground hover:bg-muted/50"
+								>
+									{FILTER_LABELS[filter]}
+									<IconChevronDown className="size-3 text-[#9B9B9D]" />
+								</button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent
+								align="end"
+								className="min-w-[150px] p-1"
+							>
+								{(Object.keys(FILTER_LABELS) as FilterKey[]).map((key) => (
+									<DropdownMenuItem
+										key={key}
+										onSelect={() => setFilter(key)}
+										className="h-7 justify-start rounded-[4px] px-2 text-[11px] cursor-pointer"
+									>
+										{FILTER_LABELS[key]}
+									</DropdownMenuItem>
+								))}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
+
+					{/* صف فلاتر إضافية: الفرع والقسم */}
+					<div className="flex items-center gap-2">
+						{branches && branches.length > 0 && (
+							<DropdownMenu dir="rtl">
+								<DropdownMenuTrigger asChild>
+									<button
+										type="button"
+										className="flex h-[26px] items-center gap-1 rounded-[4px] border border-[#E5E5E5] bg-white px-2 text-[10px] font-medium text-muted-foreground hover:text-foreground cursor-pointer dark:border-border dark:bg-background"
+									>
+										<span>
+											{branchFilter === ALL
+												? "كل الفروع"
+												: (branches.find((b) => b.id === branchFilter)?.name ?? "فرع محدد")}
+										</span>
+										<IconChevronDown className="size-2.5 text-[#9B9B9D]" />
+									</button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									align="start"
+									className="min-w-[140px] p-1"
+								>
+									<DropdownMenuItem
+										onSelect={() => setBranchFilter(ALL)}
+										className="h-6 text-[10.5px] cursor-pointer"
+									>
+										كل الفروع
+									</DropdownMenuItem>
+									{branches.map((b) => (
+										<DropdownMenuItem
+											key={b.id}
+											onSelect={() => setBranchFilter(b.id)}
+											className="h-6 text-[10.5px] cursor-pointer"
+										>
+											{b.name}
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
+						)}
+
+						{roleOptions.length > 0 && (
+							<DropdownMenu dir="rtl">
+								<DropdownMenuTrigger asChild>
+									<button
+										type="button"
+										className="flex h-[26px] items-center gap-1 rounded-[4px] border border-[#E5E5E5] bg-white px-2 text-[10px] font-medium text-muted-foreground hover:text-foreground cursor-pointer dark:border-border dark:bg-background"
+									>
+										<span>
+											{roleFilter === ALL
+												? "كل الأقسام"
+												: (roleOptions.find(([id]) => id === roleFilter)?.[1] ?? "قسم محدد")}
+										</span>
+										<IconChevronDown className="size-2.5 text-[#9B9B9D]" />
+									</button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent
+									align="start"
+									className="min-w-[140px] p-1"
+								>
+									<DropdownMenuItem
+										onSelect={() => setRoleFilter(ALL)}
+										className="h-6 text-[10.5px] cursor-pointer"
+									>
+										كل الأقسام
+									</DropdownMenuItem>
+									{roleOptions.map(([id, name]) => (
+										<DropdownMenuItem
+											key={id}
+											onSelect={() => setRoleFilter(id)}
+											className="h-6 text-[10.5px] cursor-pointer"
+										>
+											{name}
+										</DropdownMenuItem>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
+						)}
+
+						{(branchFilter !== ALL || roleFilter !== ALL || filter !== "all" || search) && (
+							<button
+								type="button"
+								onClick={() => {
+									setSearch("");
+									setFilter("all");
+									setBranchFilter(ALL);
+									setRoleFilter(ALL);
+								}}
+								className="text-[10px] text-primary hover:underline cursor-pointer mr-auto"
+							>
+								إعادة تعيين الفلاتر
+							</button>
+						)}
+					</div>
+				</div>
+
+				{/* 3. شريط تحديد الكل وإحصاء المحددين */}
+				<div
+					className="flex items-center justify-between border-b border-[#E5E5E5] px-3 py-2 dark:border-border"
+					dir="rtl"
+				>
+					<div className="flex items-center gap-2">
+						<Checkbox
+							checked={allChecked}
+							onCheckedChange={(c) => toggleAll(c === true)}
+							aria-label="تحديد الكل"
+							className="size-4 rounded-[4px] border-[1.5px] border-[#E5E5E5] dark:border-border"
+						/>
+						<span className="text-[10.5px] font-semibold text-[#08090A] dark:text-foreground">
+							تحديد الكل ({filteredStaff.length})
+						</span>
+					</div>
+
+					<span className="text-[10px] font-medium text-muted-foreground">
+						محدد: <strong className="text-primary">{selectedStaffIds.length}</strong> موظف
+					</span>
+				</div>
+
+				{/* 4. قائمة الموظفين */}
+				<div
+					className="flex min-h-0 flex-1 flex-col gap-[2px] overflow-y-auto px-3 py-2"
+					dir="rtl"
+				>
+					{isStaffLoading || isRosterLoading ? (
+						<Spinner containerClassName="py-16 min-h-0" />
+					) : filteredStaff.length === 0 ? (
+						<div className="py-16 text-center text-xs text-muted-foreground">
+							لا يوجد موظفون مطابقون لشروط البحث
 						</div>
 					) : (
-						<ul className="flex flex-col">
-							{filtered.map((l) => {
-								const isSel = selected.has(l.id);
-								return (
-									<li key={l.id}>
+						filteredStaff.map((s) => {
+							const isSelected = selectedStaffIds.includes(s.id);
+							const isInitiallyAssigned = initialAssignedMap.has(s.id);
+							const assignedCourses = staffCoursesMap.get(s.id) || [];
+							const hasNoCourses = assignedCourses.length === 0 && !isInitiallyAssigned;
+
+							const roleName =
+								typeof s.role === "string" ? s.role : (s.role?.name ?? "موظف الأكاديمية");
+
+							return (
+								<button
+									type="button"
+									key={s.id}
+									onClick={() => toggleStaff(s.id)}
+									className={cn(
+										"flex h-[46px] w-full cursor-pointer items-center justify-between rounded-[4px] px-2 text-right transition-colors hover:bg-[#F9FAFB] dark:hover:bg-muted/40 select-none",
+										isSelected && "bg-[#F4F7FF] dark:bg-muted/20",
+									)}
+								>
+									{/* الجانب الأيمن: شيك بوكس + أفاتار + بيانات الموظف */}
+									<div className="flex items-center gap-2.5 min-w-0 flex-1">
 										<div
-											role="button"
-											tabIndex={0}
-											onClick={() => toggle(l.id, l.name)}
-											onKeyDown={(e) => {
-												if (e.key === "Enter" || e.key === " ") {
-													e.preventDefault();
-													toggle(l.id, l.name);
-												}
-											}}
-											className="flex w-full items-center gap-2 rounded-[4px] px-2 py-1.5 text-start hover:bg-muted cursor-pointer select-none"
+											className={cn(
+												"size-4 rounded-[4px] border-[1.5px] flex items-center justify-center transition-colors shrink-0",
+												isSelected
+													? "bg-primary border-primary text-primary-foreground"
+													: "border-[#E5E5E5] dark:border-border bg-white dark:bg-background",
+											)}
 										>
-											{/* في RTL أول عنصر يمين: مربّع الاختيار ثم الصورة ثم الاسم/الوصف */}
-											<div
-												className={cn(
-													"flex size-4 shrink-0 items-center justify-center rounded-[4px] border-[1.5px] transition-colors",
-													isSel
-														? "border-primary bg-primary text-primary-foreground"
-														: "border-[#E5E5E5] bg-transparent",
-												)}
-											>
-												{isSel && <IconCheck className="size-3" />}
-											</div>
-											<StaffAvatar
-												name={l.name}
-												avatar={l.avatar}
-											/>
-											<div className="flex min-w-0 flex-1 flex-col">
-												<span className="truncate text-[11px] font-medium text-foreground">
-													{l.name}
-												</span>
-												<span className="truncate text-[9px] text-[#9B9B9D]">
-													{[l.role?.name, l.code].filter(Boolean).join(" · ")}
-												</span>
-											</div>
+											{isSelected && <IconCheck className="size-3 text-white stroke-[3]" />}
 										</div>
-									</li>
-								);
-							})}
-						</ul>
+
+										<span className="flex size-[28px] shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white bg-[#4F6AE0] overflow-hidden">
+											{s.avatar ? (
+												<img
+													src={getFileUrl(s.avatar) || s.avatar}
+													alt={s.name}
+													className="size-full object-cover"
+												/>
+											) : (
+												initialsOf(s.name)
+											)}
+										</span>
+
+										<div className="flex min-w-0 flex-1 flex-col text-right">
+											<span className="truncate text-[11px] font-semibold text-[#08090A] dark:text-foreground">
+												{s.name}
+											</span>
+											<span className="truncate text-[9.5px] text-[#9B9B9D]">
+												{roleName} {s.code ? `· ${s.code}` : ""}
+												{s.branch?.name ? ` · ${s.branch.name}` : ""}
+											</span>
+										</div>
+									</div>
+
+									{/* الجانب الأيسر: شارة التعيين والدورات */}
+									<div className="flex items-center gap-1.5 shrink-0 pr-2">
+										{isInitiallyAssigned ? (
+											<span className="shrink-0 rounded-[4px] bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900 px-1.5 py-0.5 text-[8.5px] font-semibold">
+												معين بالدورة
+											</span>
+										) : hasNoCourses ? (
+											<span className="shrink-0 rounded-[4px] bg-[#F3E8FF] px-1.5 py-0.5 text-[8.5px] font-semibold text-[#9333EA] dark:bg-purple-950/40 dark:text-purple-300">
+												بدون أي دورات
+											</span>
+										) : (
+											<div className="flex items-center gap-1">
+												<span
+													title={assignedCourses.map((c) => c.name).join(" • ")}
+													className="shrink-0 rounded-[4px] bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#7C3AED]/25 dark:text-[#DDD6FE] px-1.5 py-0.5 text-[9px] font-bold truncate max-w-[120px]"
+												>
+													{assignedCourses[0].name}
+												</span>
+												{assignedCourses.length > 1 && (
+													<span className="shrink-0 rounded-[4px] bg-muted px-1 py-0.5 text-[8.5px] font-bold text-muted-foreground">
+														+{assignedCourses.length - 1}
+													</span>
+												)}
+											</div>
+										)}
+									</div>
+								</button>
+							);
+						})
 					)}
 				</div>
 
-				{/* الفوتر — في RTL أول عنصر يمين: «إلغاء» يمينًا و«تعيين» يسارًا (space-between) */}
-				<div className="flex shrink-0 items-center justify-between border-t px-4 py-2">
-					<Button
+				{/* 5. الفوتر */}
+				<div
+					className="flex items-center justify-between border-t border-[#E5E5E5] px-4 py-2.5 dark:border-border"
+					dir="rtl"
+				>
+					<button
 						type="button"
-						size="sm"
-						variant="outline"
-						onClick={onClose}
-						className="h-[27px] rounded-[4px] px-[9px] text-[11px] font-medium"
+						onClick={handleClose}
+						className="flex h-[28px] items-center rounded-[4px] border border-[#E5E5E5] bg-white px-3 text-[11px] font-medium text-[#08090A] hover:bg-muted cursor-pointer transition-colors dark:border-border dark:bg-background dark:text-foreground"
 					>
 						إلغاء
-					</Button>
-					<Button
+					</button>
+
+					<button
 						type="button"
-						size="sm"
-						onClick={commit}
-						disabled={selected.size === 0 || isAssigning}
-						className="h-[26px] gap-1.5 rounded-[4px] px-3 text-[11px] font-semibold"
+						disabled={isSubmitting}
+						onClick={handleSave}
+						className="flex h-[28px] items-center gap-1.5 rounded-[4px] bg-primary px-4 text-[11px] font-semibold text-primary-foreground hover:bg-primary/90 disabled:opacity-50 cursor-pointer transition-colors shadow-xs"
 					>
-						<IconUserPlus className="size-3.5" />
-						تعيين{selected.size > 0 ? ` (${selected.size})` : ""}
-					</Button>
+						{isSubmitting ? (
+							<Spinner className="size-3 text-primary-foreground" />
+						) : (
+							<IconChevronLeft className="size-3" />
+						)}
+						حفظ وتعيين ({selectedStaffIds.length})
+					</button>
 				</div>
 			</SheetContent>
 		</Sheet>
 	);
 }
+
+// تصدير باسم بديل للتوافق المباشر
+export const AssignCourseStaffSheet = AssignEmployeeDialog;

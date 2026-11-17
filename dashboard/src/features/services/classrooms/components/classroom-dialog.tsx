@@ -10,11 +10,9 @@ import {
 	IconBuilding,
 	IconBulb,
 	IconCalculator,
-	IconCalendarPlus,
 	IconCertificate,
 	IconCheck,
 	IconChess,
-	IconCircle,
 	IconCode,
 	IconCompass,
 	IconCopy,
@@ -31,8 +29,6 @@ import {
 	IconHeart,
 	IconLanguage,
 	IconMapPinFilled,
-	IconArrowsDiagonal,
-	IconArrowsDiagonalMinimize2,
 	IconArrowsMaximize,
 	IconArrowsMinimize,
 	IconMoodHappy,
@@ -86,11 +82,7 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import {
-	AGE_GROUPS,
-	CATEGORIES,
-	LEARNING_MODES,
-} from "@/features/services/classrooms/data/constants";
+import { CATEGORIES, LEARNING_MODES } from "@/features/services/classrooms/data/constants";
 import {
 	useCreateClassroom,
 	useUpdateClassroom,
@@ -730,7 +722,8 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 		if (code.trim()) fields.push("code");
 		if (description.trim()) fields.push("description");
 		if (category) fields.push("category");
-		if (capacity !== "" && capacity !== undefined && capacity !== null) fields.push("capacity");
+		if (capacity !== "" && capacity !== undefined && capacity !== null)
+			fields.push("capacity");
 		if (notes.trim()) fields.push("notes");
 		if (branch) fields.push("branch");
 		if (classification) fields.push("classification");
@@ -766,31 +759,6 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 			onClose();
 		}
 	}, [isEdit, filledFields.length, resetForm, onClose]);
-
-	const handleSaveDraft = () => {
-		const draftData = {
-			name,
-			code,
-			description,
-			category,
-			capacity,
-			notes,
-			branch,
-			classification,
-			learningMode,
-			selectedStaffIds,
-			selectedIcon,
-			selectedIconType,
-			selectedColor,
-			savedAt: new Date().toISOString(),
-		};
-		localStorage.setItem("sanad_classroom_draft", JSON.stringify(draftData));
-		setHasDraft(true);
-		setShowDraftConfirm(false);
-		toast.success("تم حفظ المسودة بنجاح، يمكنك إكمالها لاحقاً");
-		resetForm();
-		onClose();
-	};
 
 	const handleDiscardDraft = () => {
 		localStorage.removeItem("sanad_classroom_draft");
@@ -1759,25 +1727,40 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 
 										{/* ب) شريط أزرار الخطوات الإضافية (الدروب داونز الأربعة + زر النقاط) */}
 										<div className="flex items-center gap-2 flex-wrap justify-start px-5 py-2.5 bg-background">
-							<DropdownMenu dir="rtl" modal={false}>
-								<DropdownMenuTrigger asChild>
-									<Button type="button" variant={academicStage ? "secondary" : "outline"} size="sm" className="gap-1.5">
-										<IconSchool className="size-3.5 shrink-0" />
-										<span>{academicStage || "المرحلة الدراسية"}</span>
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align="end" className="w-56">
-									<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
-										اختر المرحلة الدراسية
-									</DropdownMenuLabel>
-									<DropdownMenuSeparator />
-									{academicStages.map((stage) => (
-										<DropdownMenuItem key={stage} onClick={() => setAcademicStage(stage)} className="cursor-pointer text-xs">
-											{stage}
-										</DropdownMenuItem>
-									))}
-								</DropdownMenuContent>
-							</DropdownMenu>
+											<DropdownMenu
+												dir="rtl"
+												modal={false}
+											>
+												<DropdownMenuTrigger asChild>
+													<Button
+														type="button"
+														variant={academicStage ? "secondary" : "outline"}
+														size="sm"
+														className="gap-1.5"
+													>
+														<IconSchool className="size-3.5 shrink-0" />
+														<span>{academicStage || "المرحلة الدراسية"}</span>
+													</Button>
+												</DropdownMenuTrigger>
+												<DropdownMenuContent
+													align="end"
+													className="w-56"
+												>
+													<DropdownMenuLabel className="px-2 py-1 text-[11px] font-semibold text-muted-foreground">
+														اختر المرحلة الدراسية
+													</DropdownMenuLabel>
+													<DropdownMenuSeparator />
+													{academicStages.map((stage) => (
+														<DropdownMenuItem
+															key={stage}
+															onClick={() => setAcademicStage(stage)}
+															className="cursor-pointer text-xs"
+														>
+															{stage}
+														</DropdownMenuItem>
+													))}
+												</DropdownMenuContent>
+											</DropdownMenu>
 											{/* 1. الفئة العمرية */}
 											{/* <DropdownMenu
 												dir="rtl"
@@ -1911,7 +1894,9 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 																			<span
 																				className={cn(
 																					"text-xs font-mono ms-auto",
-																					isSelected ? "text-primary/70" : "text-muted-foreground",
+																					isSelected
+																						? "text-primary/70"
+																						: "text-muted-foreground",
 																				)}
 																			>
 																				{b.branchCode}
@@ -1998,9 +1983,7 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 																	handleAddCustomClassification(e);
 																}}
 																onClick={handleAddCustomClassification}
-																disabled={
-																	!newClassificationInput.trim() || isAddingTrack
-																}
+																disabled={!newClassificationInput.trim() || isAddingTrack}
 																className="h-7 px-2 text-xs shrink-0 gap-1 cursor-pointer"
 															>
 																{isAddingTrack ? (
@@ -2036,7 +2019,9 @@ export function ClassroomDialog({ open, onClose, classroom }: ClassroomDialogPro
 															</div>
 														) : (
 															activeTrackNames.map((item) => {
-																const trackObj = (trackClassifications || []).find((t) => t.name === item);
+																const trackObj = (trackClassifications || []).find(
+																	(t) => t.name === item,
+																);
 																const isCustom = trackObj ? !trackObj.isDefault : true;
 																return (
 																	// biome-ignore lint/a11y/noStaticElementInteractions: dropdown option

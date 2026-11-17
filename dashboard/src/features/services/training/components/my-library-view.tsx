@@ -4,20 +4,17 @@ import {
 	IconEye,
 	IconFile,
 	IconFileTypePdf,
-	IconFilter,
 	IconFolder,
 	IconPlus,
 	IconPresentation,
-	IconShare,
 	IconTrash,
 	IconVideo,
 } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-
+import { type FilterGroup, FiltersMenu } from "@/components/common/filters-menu";
 import { Stats } from "@/components/common/stats";
 import { TableToolbar } from "@/components/common/table-toolbar";
-import { type FilterGroup, FiltersMenu } from "@/components/common/filters-menu";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -182,7 +179,12 @@ export function MyLibraryView() {
 	const filteredResources = useMemo(() => {
 		const q = search.trim().toLowerCase();
 		return resources.filter((r) => {
-			if (q && !r.title.toLowerCase().includes(q) && !r.description.toLowerCase().includes(q) && !r.author.toLowerCase().includes(q)) {
+			if (
+				q &&
+				!r.title.toLowerCase().includes(q) &&
+				!r.description.toLowerCase().includes(q) &&
+				!r.author.toLowerCase().includes(q)
+			) {
 				return false;
 			}
 			if (selectedTypes.length > 0 && !selectedTypes.includes(r.type)) {
@@ -195,64 +197,71 @@ export function MyLibraryView() {
 		});
 	}, [resources, search, selectedTypes, selectedCategories]);
 
-	const statsData = useMemo(() => [
-		{
-			title: "إجمالي المواد",
-			value: resources.length,
-			tooltip: "العدد الكلي للمواد المضافة بمكتبتي",
-		},
-		{
-			title: "مستندات وكتب",
-			value: resources.filter((r) => r.type === "pdf" || r.type === "book").length,
-			tooltip: "ملفات PDF والكتب التدريبية",
-		},
-		{
-			title: "وسائط وفيديوهات",
-			value: resources.filter((r) => r.type === "video").length,
-			tooltip: "المقاطع المرئية والمحاضرات المسجلة",
-		},
-		{
-			title: "قوالب وعروض",
-			value: resources.filter((r) => r.type === "template" || r.type === "presentation").length,
-			tooltip: "قوالب العمل والعروض التقديمية",
-		},
-	], [resources]);
+	const statsData = useMemo(
+		() => [
+			{
+				title: "إجمالي المواد",
+				value: resources.length,
+				tooltip: "العدد الكلي للمواد المضافة بمكتبتي",
+			},
+			{
+				title: "مستندات وكتب",
+				value: resources.filter((r) => r.type === "pdf" || r.type === "book").length,
+				tooltip: "ملفات PDF والكتب التدريبية",
+			},
+			{
+				title: "وسائط وفيديوهات",
+				value: resources.filter((r) => r.type === "video").length,
+				tooltip: "المقاطع المرئية والمحاضرات المسجلة",
+			},
+			{
+				title: "قوالب وعروض",
+				value: resources.filter((r) => r.type === "template" || r.type === "presentation")
+					.length,
+				tooltip: "قوالب العمل والعروض التقديمية",
+			},
+		],
+		[resources],
+	);
 
-	const filterGroups: FilterGroup[] = useMemo(() => [
-		{
-			key: "type",
-			label: "نوع الملف",
-			Icon: IconFile,
-			options: [
-				{ value: "pdf", label: "مستند PDF" },
-				{ value: "video", label: "مقطع فيديو" },
-				{ value: "book", label: "كتاب ودليل" },
-				{ value: "presentation", label: "عرض تقديمي" },
-				{ value: "template", label: "قالب ونموذج" },
-			],
-			selected: selectedTypes,
-			onToggle: (v) =>
-				setSelectedTypes((prev) =>
-					prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
-				),
-		},
-		{
-			key: "category",
-			label: "التصنيف",
-			Icon: IconFolder,
-			options: [
-				{ value: "rehab", label: "طبي وتأهيلي" },
-				{ value: "educational", label: "تربوي وسلوكي" },
-				{ value: "admin", label: "إداري وتشغيلي" },
-				{ value: "general", label: "عام" },
-			],
-			selected: selectedCategories,
-			onToggle: (v) =>
-				setSelectedCategories((prev) =>
-					prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
-				),
-		},
-	], [selectedTypes, selectedCategories]);
+	const filterGroups: FilterGroup[] = useMemo(
+		() => [
+			{
+				key: "type",
+				label: "نوع الملف",
+				Icon: IconFile,
+				options: [
+					{ value: "pdf", label: "مستند PDF" },
+					{ value: "video", label: "مقطع فيديو" },
+					{ value: "book", label: "كتاب ودليل" },
+					{ value: "presentation", label: "عرض تقديمي" },
+					{ value: "template", label: "قالب ونموذج" },
+				],
+				selected: selectedTypes,
+				onToggle: (v) =>
+					setSelectedTypes((prev) =>
+						prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
+					),
+			},
+			{
+				key: "category",
+				label: "التصنيف",
+				Icon: IconFolder,
+				options: [
+					{ value: "rehab", label: "طبي وتأهيلي" },
+					{ value: "educational", label: "تربوي وسلوكي" },
+					{ value: "admin", label: "إداري وتشغيلي" },
+					{ value: "general", label: "عام" },
+				],
+				selected: selectedCategories,
+				onToggle: (v) =>
+					setSelectedCategories((prev) =>
+						prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
+					),
+			},
+		],
+		[selectedTypes, selectedCategories],
+	);
 
 	const handleAddResource = () => {
 		if (!newTitle.trim()) {
@@ -349,7 +358,12 @@ export function MyLibraryView() {
 									<div>
 										{/* الرأس: الأيقونة والوسوم */}
 										<div className="flex items-start justify-between gap-2 mb-3">
-											<div className={cn("flex size-9 shrink-0 items-center justify-center rounded-md border", cfg.bg)}>
+											<div
+												className={cn(
+													"flex size-9 shrink-0 items-center justify-center rounded-md border",
+													cfg.bg,
+												)}
+											>
 												<TypeIcon className={cn("size-5", cfg.color)} />
 											</div>
 											<div className="flex items-center gap-1.5">
@@ -417,8 +431,14 @@ export function MyLibraryView() {
 			</div>
 
 			{/* نافذة إضافة مورد جديد */}
-			<Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-				<DialogContent className="max-w-md" dir="rtl">
+			<Dialog
+				open={isAddOpen}
+				onOpenChange={setIsAddOpen}
+			>
+				<DialogContent
+					className="max-w-md"
+					dir="rtl"
+				>
 					<DialogHeader>
 						<DialogTitle>إضافة مورد جديد إلى مكتبتي</DialogTitle>
 						<DialogDescription>
@@ -489,12 +509,13 @@ export function MyLibraryView() {
 					</div>
 
 					<DialogFooter className="gap-2">
-						<Button variant="outline" onClick={() => setIsAddOpen(false)}>
+						<Button
+							variant="outline"
+							onClick={() => setIsAddOpen(false)}
+						>
 							إلغاء
 						</Button>
-						<Button onClick={handleAddResource}>
-							إضافة للمكتبة
-						</Button>
+						<Button onClick={handleAddResource}>إضافة للمكتبة</Button>
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>

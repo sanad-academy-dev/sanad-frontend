@@ -4,6 +4,25 @@ import { toast } from "sonner";
 import type { PaymentMethod } from "@/generated/prisma/enums";
 import { api } from "@/lib/api";
 
+type PosProfile = {
+	id: string;
+	name: string;
+	disabled: boolean;
+	writeOffLimit: string | number;
+	writeOffAccountId: string | null;
+	warehouseId: string | null;
+	users: { userId: string }[];
+};
+type ShiftExpectation = Awaited<
+	ReturnType<typeof import("@/server/accounting/pos-shift/pos-shift.service").shiftExpectation>
+>;
+type CurrentShift = {
+	id: string;
+	openedAt: Date | string;
+	profile: { id: string; name: string };
+	balances: { paymentMethod: PaymentMethod; amount: string | number }[];
+} | null;
+
 /**
  * [P12.15] Data hooks for the POS shift — the custody half of §16.
  *
@@ -35,12 +54,12 @@ const useShiftInvalidator = () => {
 /* ── POS profiles (the master a shift opens against) ──────────────────────────────────── */
 
 export const usePosProfiles = () => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<PosProfile[]>({
 		queryKey: [...SHIFT_KEY, "profiles"],
 		queryFn: async () => {
 			const { data, error } = await api.accounting["pos-shifts"].profiles.get();
 			if (error) throw new Error("تعذّر تحميل ملفات نقطة البيع");
-			return data;
+			return data as PosProfile[];
 		},
 		staleTime: 1000 * 60,
 	});
@@ -83,12 +102,12 @@ export const useCreatePosProfile = () => {
  * see a "close" button for a shift that no longer exists.
  */
 export const useCurrentShift = () => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<CurrentShift>({
 		queryKey: [...SHIFT_KEY, "current"],
 		queryFn: async () => {
 			const { data, error } = await api.accounting["pos-shifts"].current.get();
 			if (error) throw new Error("تعذّر قراءة حالة الوردية");
-			return data;
+			return data as CurrentShift;
 		},
 		staleTime: 0,
 	});
@@ -129,14 +148,14 @@ export const useOpenShift = () => {
  * the cashier is still selling would be showing an expectation that is already out of date.
  */
 export const useShiftExpectation = (openingId: string | null) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<ShiftExpectation>({
 		queryKey: [...SHIFT_KEY, "expectation", openingId ?? ""],
 		queryFn: async () => {
 			const { data, error } = await api.accounting["pos-shifts"]({
 				id: openingId as string,
 			}).expectation.get();
 			if (error) throw new Error("تعذّر حساب المتوقَّع في الدرج");
-			return data;
+			return data as ShiftExpectation;
 		},
 		enabled: Boolean(openingId),
 		staleTime: 0,

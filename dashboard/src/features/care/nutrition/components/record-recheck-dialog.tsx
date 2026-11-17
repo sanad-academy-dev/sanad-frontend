@@ -19,6 +19,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import type { CatalogSpecies } from "@/generated/prisma/enums";
 import { Textarea } from "@/components/ui/textarea";
 import { BcsScale } from "@/features/care/nutrition/components/bcs-scale";
 import {
@@ -117,7 +118,9 @@ export function RecordRecheckDialog({
 		return assessRecheck({
 			// النوع من الطفل نفسه — بدونه تُقاس القطّة على مدى الكلب فتختلف
 			// المعاينة عن قرار الخادم، وهو أسوأ من غياب المعاينة أصلًا
-			species: energySpeciesOf(plan.patient.animalType?.species ?? null),
+			species: energySpeciesOf(
+				((plan.patient as { animalType?: { species: CatalogSpecies } | null }).animalType?.species ?? null) as CatalogSpecies | null,
+			),
 			goal: plan.goal,
 			previousWeightKg,
 			currentWeightKg: weightKg,
