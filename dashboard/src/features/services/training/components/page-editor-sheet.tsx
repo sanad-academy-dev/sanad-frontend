@@ -4,8 +4,8 @@
  * يُفتح من ContentCard عند اختيار نوع محتوى PAGE
  */
 import { useCallback } from "react";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Spinner } from "@/components/ui/spinner";
+import { Spinner } from "@/components/common/spinner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { uploadFileForEditor, usePageEditor } from "../hooks/use-page-editor";
 import { PageEditor } from "./page-editor";
 
@@ -26,27 +26,22 @@ export function PageEditorSheet({ pageId, editable = true, onClose }: PageEditor
 	}, []);
 
 	return (
-		<Sheet
+		<Dialog
 			open={!!pageId}
 			onOpenChange={(open) => !open && onClose()}
 		>
-			<SheetContent
-				side="bottom"
-				// نجعل الـ Sheet يملأ 95% من الشاشة كصفحة كاملة
-				className="h-[95dvh] p-0 flex flex-col rounded-t-2xl overflow-hidden"
+			<DialogContent
+				dir="rtl"
+				showCloseButton={false}
+				className="h-[92dvh] w-[96vw] max-w-[1500px] overflow-hidden p-0 flex flex-col gap-0"
 			>
 				{/* Hidden title for accessibility */}
-				<SheetHeader className="sr-only">
-					<SheetTitle>محرر الصفحة</SheetTitle>
-				</SheetHeader>
+				<DialogHeader className="sr-only">
+					<DialogTitle>محرر الصفحة</DialogTitle>
+				</DialogHeader>
 
 				{isLoading ? (
-					<div className="flex flex-1 items-center justify-center">
-						<div className="flex flex-col items-center gap-3 text-muted-foreground">
-							<Spinner className="size-6 text-purple-600" />
-							<span className="text-sm">جاري تحميل الصفحة...</span>
-						</div>
-					</div>
+					<Spinner containerClassName="py-24 min-h-0 flex-1" />
 				) : !page ? (
 					<div className="flex flex-1 items-center justify-center text-muted-foreground text-sm">
 						تعذّر تحميل الصفحة
@@ -62,9 +57,10 @@ export function PageEditorSheet({ pageId, editable = true, onClose }: PageEditor
 						onContentChange={onContentChange}
 						onBack={onClose}
 						uploadFile={handleUpload}
+						splitPreview
 					/>
 				)}
-			</SheetContent>
-		</Sheet>
+			</DialogContent>
+		</Dialog>
 	);
 }

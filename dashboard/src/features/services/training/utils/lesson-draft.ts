@@ -50,10 +50,15 @@ function hasStorage(): boolean {
 
 export function getLessonDraftKey(opts: {
 	lessonId?: string;
+	contentId?: string;
 	courseId?: string | null;
 	unitId?: string | null;
 }): string {
-	if (opts.lessonId) return `${DRAFT_PREFIX}edit:${opts.lessonId}`;
+	if (opts.lessonId) {
+		return opts.contentId
+			? `${DRAFT_PREFIX}edit:${opts.lessonId}:${opts.contentId}`
+			: `${DRAFT_PREFIX}edit:${opts.lessonId}`;
+	}
 	return `${DRAFT_PREFIX}add:${opts.courseId || "pending"}:${opts.unitId || "default"}`;
 }
 
@@ -109,8 +114,8 @@ export function listAddLessonDraftsForCourse(
 	return result;
 }
 
-export function hasEditLessonDraft(lessonId: string): boolean {
-	return readLessonDraft(getLessonDraftKey({ lessonId })) !== null;
+export function hasEditLessonDraft(lessonId: string, contentId?: string): boolean {
+	return readLessonDraft(getLessonDraftKey({ lessonId, contentId })) !== null;
 }
 
 /** Check whether form values represent meaningful user-entered data worth preserving as a draft. */
@@ -125,6 +130,8 @@ export function hasMeaningfulLessonInput(
 			(Number(values.seconds) || 0);
 		const origDuration = baseline.durationSeconds ?? 0;
 		return (
+			(values.lessonTitle ?? "") !==
+				((baseline as unknown as { lessonTitle?: string }).lessonTitle ?? "") ||
 			(values.title ?? "") !== baseline.title ||
 			(values.type ?? baseline.type) !== baseline.type ||
 			(values.description ?? "") !== (baseline.description ?? "") ||
@@ -134,12 +141,14 @@ export function hasMeaningfulLessonInput(
 			(baseline.type === "QUIZ" &&
 				JSON.stringify(values.questions ?? []) !==
 					JSON.stringify(parseQuizContent(baseline.content))) ||
-			JSON.stringify(values.contents ?? []) !== JSON.stringify(baseline.contents?.slice(1) ?? []) ||
+			JSON.stringify(values.contents ?? []) !==
+				JSON.stringify(baseline.contents?.slice(1) ?? []) ||
 			durSeconds !== origDuration
 		);
 	}
 	return Boolean(
-		values.title?.trim() ||
+		values.lessonTitle?.trim() ||
+			values.title?.trim() ||
 			values.content?.trim() ||
 			values.description?.trim() ||
 			values.mediaKey ||

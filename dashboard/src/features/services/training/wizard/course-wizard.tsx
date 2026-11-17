@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { showSuccessToast } from "@/components/common/success-toast";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
-import type { CreateCourseFormInput } from "@/server/training/training.type";
+import type { CreateCourseFormInput } from "@sanad/contracts/runtime/server/training/training.type";
 import { useCourse, useCreateCourse, useUpdateCourse } from "../hooks/use-courses";
 import { CloseDraftDialog } from "./components/close-draft-dialog";
 import { WizardProgress } from "./components/wizard-progress";

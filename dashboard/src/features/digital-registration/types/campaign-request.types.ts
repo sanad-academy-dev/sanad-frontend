@@ -1,5 +1,3 @@
-import type { AppointmentColumnId } from "@/features/appointments/types/appointment.types";
-
 export interface RegistrationDocumentItem {
 	id: string;
 	title: string;
@@ -39,6 +37,8 @@ export interface AssessmentQuestionAnswer {
 
 export interface AssessmentDataPayload {
 	submittedAt: string;
+	score?: number;
+	candidate?: { name?: string; id?: string } | null;
 	proposedTrack?: string | null;
 	overallScore?: number;
 	attendanceProbability?: number;
@@ -50,6 +50,8 @@ export interface AssessmentDataPayload {
 
 export interface CampaignRequestItem {
 	id: string;
+	createdAt?: string;
+	childName?: string;
 	code: string;
 	name: string;
 	column: string;
@@ -106,6 +108,7 @@ export interface CampaignRequestItem {
 	experienceLevel?: string | null;
 	priority?: string | null;
 	appointmentDate?: string | null;
+	interviewAppointmentDate?: string | null;
 	appointmentId?: string | null;
 	roomId?: string | null;
 	roomName?: string | null;
@@ -155,10 +158,20 @@ export interface CampaignRequestItem {
 	estimatedWait?: string;
 }
 
+/** Compatibility name retained for the local campaign fixtures. */
+export type CampaignRequest = CampaignRequestItem;
+
 export interface RequestNotificationItem {
 	id: string;
 	channel: "WHATSAPP" | "EMAIL" | "SMS" | "INBOX" | "PUSH";
-	status: "QUEUED" | "SENDING" | "SENT" | "FAILED" | "SKIPPED" | "CANCELLED" | "AWAITING_MANUAL";
+	status:
+		| "QUEUED"
+		| "SENDING"
+		| "SENT"
+		| "FAILED"
+		| "SKIPPED"
+		| "CANCELLED"
+		| "AWAITING_MANUAL";
 	toAddress: string | null;
 	subject: string | null;
 	body: string;
@@ -192,4 +205,3 @@ export interface RegistrationPaymentReceiptData {
 	notes?: string | null;
 	clinicName?: string | null;
 }
-

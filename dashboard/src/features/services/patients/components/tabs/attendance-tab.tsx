@@ -3,7 +3,6 @@ import { IconCalendarCheck, IconClockHour4 } from "@tabler/icons-react";
 
 import { AttendanceView } from "@/features/services/staff/components/attendance/attendance-view";
 import { ShiftsView } from "@/features/services/staff/components/shifts/shifts-view";
-import { usePatient } from "@/features/services/patients/hooks/use-patient";
 import type { PatientTabProps } from "@/features/services/patients/types/tabs.types";
 import { TabsContent } from "@/components/ui/tabs";
 import {
@@ -12,8 +11,6 @@ import {
 } from "@/components/common/schedule-date-range-filter";
 
 export function AttendanceTab({ patientId }: PatientTabProps) {
-	const { patient } = usePatient(patientId);
-
 	// نطاق العرض الموحّد لكلا الجدولين (أسبوع / شهر مع التقويم)
 	const [dateRange, setDateRange] = useState<ScheduleDateRange>(() => ({
 		mode: "week",
@@ -32,9 +29,7 @@ export function AttendanceTab({ patientId }: PatientTabProps) {
 				<div className="flex items-center justify-between px-1">
 					<div className="flex items-center gap-2">
 						<IconCalendarCheck className="size-4 text-emerald-600 shrink-0" />
-						<h3 className="text-sm font-bold text-foreground">
-							سجل الحضور والانصراف
-						</h3>
+						<h3 className="text-sm font-bold text-foreground">سجل الحضور والانصراف</h3>
 					</div>
 					{/* الفلتر الموحّد (أسبوع / شهر مع التقويم) */}
 					<ScheduleDateRangeFilter
@@ -64,9 +59,7 @@ export function AttendanceTab({ patientId }: PatientTabProps) {
 				<div className="flex items-center justify-between px-1">
 					<div className="flex items-center gap-2">
 						<IconClockHour4 className="size-4 text-[#6366F1] shrink-0" />
-						<h3 className="text-sm font-bold text-foreground">
-							جدول المناوبات
-						</h3>
+						<h3 className="text-sm font-bold text-foreground">جدول المناوبات</h3>
 					</div>
 					{/* الفلتر الموحّد (أسبوع / شهر مع التقويم) */}
 					<ScheduleDateRangeFilter

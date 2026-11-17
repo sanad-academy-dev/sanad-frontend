@@ -19,9 +19,10 @@ import {
 	formatCourseDuration,
 	formatTrainingCost,
 } from "@/features/services/training/data/training";
+import { stripSystemTags } from "@/features/services/training/utils/course-meta";
 import { cn } from "@/lib/utils";
-import type { AssignmentResponse } from "@/server/course-assignments/course-assignments.type";
-import type { CourseDetailResponse } from "@/server/training/training.type";
+import type { AssignmentResponse } from "@sanad/contracts/runtime/server/course-assignments/course-assignments.type";
+import type { CourseDetailResponse } from "@sanad/contracts/runtime/server/training/training.type";
 
 const typeLabel = (t: CourseDetailResponse["type"]) =>
 	COURSE_TYPE_OPTIONS.find((o) => o.value === t)?.label ?? t;
@@ -116,8 +117,9 @@ export function CourseDetailsSheet({
 		course.startDate,
 		course.dueDate,
 		course.estimatedDurationWeeks,
+		course.description,
 	);
-	const cost = formatTrainingCost(course.trainingCost);
+	const cost = formatTrainingCost(course.trainingCost, course);
 	const trainerName = course.trainers[0]?.staff.name ?? "—";
 	const status = assignment?.status;
 	const primaryLabel =
@@ -260,7 +262,7 @@ export function CourseDetailsSheet({
 							وصف الدورة
 						</span>
 						<p className="w-full text-start text-[14px] font-medium leading-[21px] text-[#08090A]">
-							{course.description?.trim() || "لا يوجد وصف لهذه الدورة."}
+							{stripSystemTags(course.description) || "لا يوجد وصف لهذه الدورة."}
 						</p>
 					</div>
 

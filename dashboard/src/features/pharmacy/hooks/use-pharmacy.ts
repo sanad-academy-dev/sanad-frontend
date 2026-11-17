@@ -2,7 +2,86 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/lib/api";
-import type { PrescriptionListResponse } from "@/server/pharmacy/prescriptions.type";
+import type {
+	PrescriptionListResponse,
+	PrescriptionResponse,
+} from "@/server/pharmacy/prescriptions.type";
+
+type DispenseBatch = {
+	id: string;
+	batchNo: string;
+	qty: number;
+	expired: boolean;
+	expiryDate: Date | string | null;
+};
+type WitnessCandidate = { id: string; name: string };
+type DrugOption = Awaited<
+	ReturnType<typeof import("@/server/pharmacy/prescriptions.dao").prescriptionsDao.drugOptions>
+>[number];
+type MonographListRow = {
+	id: string;
+	genericKey: string;
+	genericName: string;
+	genericNameAr: string | null;
+	sourceCitation: string;
+	reviewedBy: string | null;
+	reviewedAt: Date | null;
+	_count: { doses: number };
+};
+type MonographDetail = Omit<MonographListRow, "_count"> & {
+	summaryAr: string | null;
+	summaryEn: string | null;
+	doses: {
+		id: string;
+		species: string;
+		contraindicated: boolean;
+		doseMin: string | null;
+		doseMax: string | null;
+		doseUnit: string | null;
+		route: string | null;
+		frequency: string | null;
+		durationNote: string | null;
+		warningAr: string | null;
+		warningEn: string | null;
+	}[];
+};
+type DoseContextResponse = {
+	speciesMapped: boolean;
+	species: string | null;
+	monographExistsForDrug: boolean;
+	monograph: unknown;
+	weightKg: string | null;
+	weightRecordedAt: Date | string | null;
+	plan: ReturnType<typeof import("@/server/pharmacy/prescribing-plan.service").buildPrescribingPlan>;
+};
+type ExpiredBatchRows = Awaited<
+	ReturnType<typeof import("@/server/pharmacy/disposal.service").listExpiredBatches>
+>;
+type DispensingReport = {
+	totalEvents: number;
+	byDrug: { name: string; quantity: number }[];
+	byPrescriber: { name: string; quantity: number }[];
+};
+type OverrideReportRow = {
+	id: string;
+	nameSnapshot: string;
+	doseAmount: string | number | null;
+	doseUnit: string | null;
+	overrideReasonAr: string | null;
+	prescription: {
+		code: string;
+		patient: { id: string; name: string } | null;
+		prescriber: { id: string; name: string } | null;
+	};
+};
+type PharmacyExpiringRow = {
+	id: string;
+	batchNo: string;
+	expiryDate: Date | string | null;
+	qty: number;
+	expired: boolean;
+	item: { id: string; name: string };
+};
 
 /**
  * رسالة الخطأ من الخادم بنصّها.
@@ -112,13 +191,13 @@ export const usePrescriptions = (
 	/** الوحدة مطفأة ⇒ لا نداء أصلًا: النقطة تردّ 404 وهو ليس خطأً يستحق العرض */
 	enabled = true,
 ) => {
-	const { data, isLoading, refetch } = useQuery({
+	const { data, isLoading, refetch } = useQuery<PrescriptionListResponse[]>({
 		enabled,
 		queryKey: pharmacyKeys.prescriptions(filters),
 		queryFn: async () => {
 			const { data, error } = await api.prescriptions.get({ query: filters });
 			if (error) throw new Error("تعذّر تحميل الوصفات");
-			return data;
+			return data as PrescriptionListResponse[];
 		},
 	});
 
@@ -161,13 +240,13 @@ export const usePrescriptionsSummary = (enabled = true) => {
 	};
 };
 export const usePrescription = (id: string | null) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<PrescriptionResponse | null>({
 		queryKey: pharmacyKeys.prescription(id ?? ""),
 		enabled: !!id,
 		queryFn: async () => {
 			const { data, error } = await api.prescriptions({ id: id as string }).get();
 			if (error) throw new Error("تعذّر تحميل الوصفة");
-			return data;
+			return data as PrescriptionResponse | null;
 		},
 	});
 
@@ -187,7 +266,7 @@ export const useDoseContext = (params: {
 }) => {
 	const ready = !!params.patientId && !!params.genericKey;
 
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<DoseContextResponse>({
 		queryKey: pharmacyKeys.doseContext(params),
 		enabled: ready,
 		queryFn: async () => {
@@ -201,7 +280,7 @@ export const useDoseContext = (params: {
 				},
 			});
 			if (error) throw new Error("تعذّر حساب الجرعة");
-			return data;
+			return data as DoseContextResponse;
 		},
 	});
 
@@ -211,7 +290,7 @@ export const useDoseContext = (params: {
 export const useDispenseBatches = (params: { itemId?: string; warehouseId?: string }) => {
 	const ready = !!params.itemId && !!params.warehouseId;
 
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<DispenseBatch[]>({
 		queryKey: pharmacyKeys.batches(params),
 		enabled: ready,
 		queryFn: async () => {
@@ -219,7 +298,7 @@ export const useDispenseBatches = (params: { itemId?: string; warehouseId?: stri
 				query: { itemId: params.itemId as string, warehouseId: params.warehouseId as string },
 			});
 			if (error) throw new Error("تعذّر تحميل الدفعات");
-			return data;
+			return data as DispenseBatch[];
 		},
 	});
 
@@ -228,14 +307,14 @@ export const useDispenseBatches = (params: { itemId?: string; warehouseId?: stri
 
 /** أصناف المخزون القابلة للوصف — المربوطة بمستحضر مسجَّل وحدها */
 export const useDrugOptions = (search?: string) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<DrugOption[]>({
 		queryKey: pharmacyKeys.drugOptions(search),
 		queryFn: async () => {
 			const { data, error } = await api.prescriptions["drug-options"].get({
 				query: search ? { search } : {},
 			});
 			if (error) throw new Error("تعذّر تحميل الأدوية");
-			return data;
+			return data as DrugOption[];
 		},
 		staleTime: 1000 * 60 * 5,
 	});
@@ -259,7 +338,7 @@ export const useContextPrescription = (
 	const key: { appointmentId?: string; inpatientStayId?: string } = ctx.inpatientStayId
 		? { inpatientStayId: ctx.inpatientStayId }
 		: { appointmentId: ctx.appointmentId };
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<PrescriptionResponse | null>({
 		enabled: enabled && Boolean(ctx.appointmentId || ctx.inpatientStayId),
 		queryKey: pharmacyKeys.prescriptions(key),
 		queryFn: async () => {
@@ -271,7 +350,7 @@ export const useContextPrescription = (
 			// القائمة مختصرة بلا بنود — التفاصيل تحتاج قراءة المستند نفسه
 			const detail = await api.prescriptions({ id: first.id }).get();
 			if (detail.error) throw new Error("تعذّر تحميل الوصفة");
-			return detail.data;
+			return detail.data as PrescriptionResponse;
 		},
 	});
 
@@ -315,25 +394,25 @@ export const useDraftSig = () => {
 // ── الطبقة الثانية: تأليف النشرات وتغطيتها (§3، §11.3) ──────────────────────
 
 export const useFormulary = (search?: string) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<MonographListRow[]>({
 		queryKey: pharmacyKeys.formulary({ search }),
 		queryFn: async () => {
 			const { data, error } = await api.formulary.get({ query: search ? { search } : {} });
 			if (error) throw new Error("تعذّر تحميل النشرات");
-			return data;
+			return data as MonographListRow[];
 		},
 	});
 	return { monographs: data ?? [], isLoading };
 };
 
 export const useMonograph = (id: string | null) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<MonographDetail | null>({
 		enabled: !!id,
 		queryKey: pharmacyKeys.monograph(id ?? ""),
 		queryFn: async () => {
 			const { data, error } = await api.formulary({ id: id as string }).get();
 			if (error) throw new Error("تعذّر تحميل النشرة");
-			return data;
+			return data as MonographDetail | null;
 		},
 	});
 	return { monograph: data ?? null, isLoading };
@@ -484,26 +563,26 @@ export const useDispenseCounterSale = () => {
 // خطّاف لكل تقرير: معامل تمييزٍ واحد كان يُرجِع اتّحاد الأنواع الثلاثة، فلا يضيق
 // النوع عند أي استدعاء ويحسب المستهلك أن كل الحقول متاحة في كل تقرير.
 export const useDispensingReport = (enabled = true) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<DispensingReport>({
 		enabled,
 		queryKey: pharmacyKeys.reports("dispensing"),
 		queryFn: async () => {
 			const r = await api["pharmacy-reports"].dispensing.get({ query: {} });
 			if (r.error) throw new Error("تعذّر تحميل التقرير");
-			return r.data;
+			return r.data as DispensingReport;
 		},
 	});
 	return { report: data, isLoading };
 };
 
 export const useOverridesReport = (enabled = true) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<OverrideReportRow[]>({
 		enabled,
 		queryKey: pharmacyKeys.reports("overrides"),
 		queryFn: async () => {
 			const r = await api["pharmacy-reports"].overrides.get({ query: {} });
 			if (r.error) throw new Error("تعذّر تحميل التقرير");
-			return r.data;
+			return r.data as OverrideReportRow[];
 		},
 	});
 	return { report: data, isLoading };
@@ -512,13 +591,13 @@ export const useOverridesReport = (enabled = true) => {
 // ── المواد المنتهية والإتلاف [PH17] ─────────────────────────────────────────
 
 export const useExpiredReport = (enabled = true) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<ExpiredBatchRows>({
 		enabled,
 		queryKey: pharmacyKeys.reports("expired"),
 		queryFn: async () => {
 			const r = await api["pharmacy-reports"].expired.get();
 			if (r.error) throw new Error("تعذّر تحميل المواد المنتهية");
-			return r.data;
+			return r.data as ExpiredBatchRows;
 		},
 	});
 	return { expired: data ?? [], isLoading };
@@ -526,13 +605,13 @@ export const useExpiredReport = (enabled = true) => {
 
 /** مستخدمو الأكاديمية الصالحون شهودًا على الإتلاف — مستخدمون حقيقيّون لا أسماء حرّة */
 export const useWitnessCandidates = (enabled = true) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<WitnessCandidate[]>({
 		enabled,
 		queryKey: [...pharmacyKeys.all, "witness-candidates"] as const,
 		queryFn: async () => {
 			const r = await api["pharmacy-reports"]["witness-candidates"].get();
 			if (r.error) throw new Error("تعذّر تحميل قائمة الشهود");
-			return r.data;
+			return r.data as WitnessCandidate[];
 		},
 	});
 	return { candidates: data ?? [], isLoading };
@@ -562,13 +641,13 @@ export const useDisposeBatch = () => {
 };
 
 export const useExpiringReport = (enabled = true) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<PharmacyExpiringRow[]>({
 		enabled,
 		queryKey: pharmacyKeys.reports("expiring"),
 		queryFn: async () => {
 			const r = await api["pharmacy-reports"].expiring.get();
 			if (r.error) throw new Error("تعذّر تحميل التقرير");
-			return r.data;
+			return r.data as PharmacyExpiringRow[];
 		},
 	});
 	return { report: data, isLoading };

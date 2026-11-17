@@ -3,6 +3,10 @@ import type { CampaignRequest } from "../types/campaign-request.types";
 export const mockCampaignRequests: CampaignRequest[] = [
     {
         id: "1",
+        name: "ليان محمد",
+        status: "QUEUE",
+        gender: "FEMALE",
+        guardianPhone: "01000000001",
         code: "APP-1001",
         column: "WAITING",
         statusLabel: "معلق",
@@ -19,6 +23,10 @@ export const mockCampaignRequests: CampaignRequest[] = [
     },
     {
         id: "2",
+        name: "ليان محمد",
+        status: "REVIEW",
+        gender: "MALE",
+        guardianPhone: "01000000002",
         code: "APP-1016",
         column: "REVIEW",
         statusLabel: "قيد التنفيذ",
@@ -34,6 +42,10 @@ export const mockCampaignRequests: CampaignRequest[] = [
     },
     {
         id: "3",
+        name: "يوسف عبدالله",
+        status: "WAITLIST",
+        gender: "FEMALE",
+        guardianPhone: "01000000003",
         code: "APP-1011",
         column: "WAITING_REPLY",
         statusLabel: "معلق",

@@ -10,6 +10,7 @@ import { Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { Spinner } from "@/components/common/spinner";
 import { Stats } from "@/components/common/stats";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,15 +21,19 @@ import { CoursePlayerDialog } from "@/features/services/training/components/cour
 import { CourseRosterTable } from "@/features/services/training/components/course-roster-table";
 import { CourseTraineeSheet } from "@/features/services/training/components/course-trainee-sheet";
 import { UnassignConfirmDialog } from "@/features/services/training/components/unassign-confirm-dialog";
-import { formatTrainingCost } from "@/features/services/training/data/training";
+import {
+	formatTrainingCost,
+	getCourseCurrency,
+	getCurrencySymbol,
+} from "@/features/services/training/data/training";
 import {
 	useAssignmentActions,
 	useCourseRoster,
 } from "@/features/services/training/hooks/use-course-assignments";
 import { useCourse } from "@/features/services/training/hooks/use-courses";
 import { cn } from "@/lib/utils";
-import type { AssignmentResponse } from "@/server/course-assignments/course-assignments.type";
-import type { CourseListItemResponse } from "@/server/training/training.type";
+import type { AssignmentResponse } from "@sanad/contracts/runtime/server/course-assignments/course-assignments.type";
+import type { CourseListItemResponse } from "@sanad/contracts/runtime/server/training/training.type";
 
 type DetailTab = "overview" | "roster" | "settings";
 
@@ -82,11 +87,11 @@ export function CourseDetailView({ courseId }: { courseId: string }) {
 			{
 				title: "# إجمالي الإيرادات",
 				value: revenue,
-				valueLabel: "ريال",
+				valueLabel: getCurrencySymbol(getCourseCurrency(course)),
 				tooltip: "تكلفة التدريب مضروبة في عدد المعيّنين",
 			},
 		];
-	}, [roster, course?.trainingCost]);
+	}, [roster, course]);
 
 	const filteredRoster = useMemo(() => {
 		const q = search.trim();
@@ -102,7 +107,7 @@ export function CourseDetailView({ courseId }: { courseId: string }) {
 				dir="rtl"
 				className="flex flex-1 items-center justify-center"
 			>
-				<p className="text-[13px] text-muted-foreground">جارٍ تحميل الدورة...</p>
+				<Spinner containerClassName="py-24 min-h-0 flex-1" />
 			</div>
 		);
 	}
@@ -235,7 +240,7 @@ export function CourseDetailView({ courseId }: { courseId: string }) {
 							{ label: "# المعيّنين", value: String(roster.length) },
 							{
 								label: "سعر الدورة",
-								value: formatTrainingCost(course.trainingCost) ?? "مجانية",
+								value: formatTrainingCost(course.trainingCost, course) ?? "مجانية",
 							},
 						].map((r) => (
 							<div

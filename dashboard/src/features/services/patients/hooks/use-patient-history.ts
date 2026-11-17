@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { api } from "@/lib/api";
-import type { PatientHistoryEntry } from "@/server/patients/patients.type";
+import type { PatientHistoryEntry } from "@sanad/contracts/runtime/server/patients/patients.type";
 
 export const patientHistoryKey = (patientId: string) => ["patient-history", patientId];
 

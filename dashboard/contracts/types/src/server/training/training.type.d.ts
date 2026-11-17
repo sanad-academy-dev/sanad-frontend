@@ -109,6 +109,7 @@ export declare const lessonContentItemSchema: z.ZodObject<{
 export type LessonContentItem = z.infer<typeof lessonContentItemSchema>;
 export declare function parseQuizContent(content: string | null | undefined): QuizContent["questions"];
 export declare const createLessonSchema: z.ZodObject<{
+    lessonTitle: z.ZodOptional<z.ZodString>;
     title: z.ZodString;
     type: z.ZodEnum<{
         readonly TEXT: "TEXT";

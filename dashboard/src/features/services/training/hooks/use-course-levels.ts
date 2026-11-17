@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { api } from "@/lib/api";
-import type { LevelResponse } from "@/server/training/training.type";
+import type { LevelResponse } from "@sanad/contracts/runtime/server/training/training.type";
 
 // عمليات المستويات (طبقة التجميع فوق الوحدات) — تُبطل كاش الدورة لإعادة جلب الشجرة
 export const useCourseLevels = (courseId: string | null) => {

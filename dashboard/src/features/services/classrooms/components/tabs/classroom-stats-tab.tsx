@@ -7,7 +7,6 @@ import {
 	IconClock,
 	IconDeviceLaptop,
 	IconFileDescription,
-	IconGenderBigender,
 	IconSchool,
 	IconStar,
 	IconTag,
@@ -242,7 +241,10 @@ export function ClassroomStatsTab({ classroom }: ClassroomStatsTabProps) {
 			dir="rtl"
 		>
 			{/* 1. صف البطاقات الإحصائية المعتمد للمنصة */}
-			<Stats stats={statsItems} className="py-0" />
+			<Stats
+				stats={statsItems}
+				className="py-0"
+			/>
 
 			{/* 2. قسم بيانات الطاقة الاستيعابية والتسجيل */}
 			<div className="flex flex-col gap-3">

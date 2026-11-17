@@ -23,6 +23,6 @@ export function showSuccessToast(
 		});
 	}
 	return toast.success(message, {
-		duration: opts.duration ?? 5000,
+		duration: opts?.duration ?? 5000,
 	});
 }

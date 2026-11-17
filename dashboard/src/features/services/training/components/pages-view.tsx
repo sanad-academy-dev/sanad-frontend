@@ -1,49 +1,40 @@
 import {
-	IconClock,
-	IconDots,
-	IconEye,
-	IconFileDescription,
+	IconCheck,
 	IconFileText,
-	IconLayoutGrid,
-	IconList,
-	IconPencil,
+	IconMapPin,
 	IconPlus,
-	IconSparkles,
-	IconTrash,
+	IconRoute,
+	IconSchool,
+	IconX,
 } from "@tabler/icons-react";
-import type React from "react";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { type FilterGroup, FiltersMenu } from "@/components/common/filters-menu";
+import { Spinner } from "@/components/common/spinner";
 import { Stats } from "@/components/common/stats";
-import { Badge } from "@/components/ui/badge";
+import { TableToolbar } from "@/components/common/table-toolbar";
 import { Button } from "@/components/ui/button";
+import { useAcademicStageOptions } from "@/features/services/classrooms/hooks/use-classrooms";
+import { useAcademicStages } from "@/features/settings/academic-stages/hooks/use-academic-stages";
+import { useTrackClassifications } from "@/features/settings/tracks/hooks/use-track-classifications";
 import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
+	type TrainingPage,
+	type TrainingPagePayload,
+	useTrainingPages,
+} from "../hooks/use-training-pages";
+import { ContentLoadError } from "./content-load-error";
+import { DeletePageDialog } from "./delete-page-dialog";
+import { PageCard } from "./page-card";
 import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
-import { PageEditorSheet } from "./page-editor-sheet";
-import { toArabicNumerals } from "./track-courses-step";
+	cleanPageSummary,
+	DEFAULT_ACADEMIC_STAGES,
+	DEFAULT_CLASSIFICATIONS,
+	extractSystemTag,
+	PageDialog,
+} from "./page-dialog";
+import { PagePreviewDialog } from "./page-preview-dialog";
+import { PagesTable } from "./pages-table";
+import { type CoursesView, ViewOptionsMenu } from "./view-options-menu";
 
 export interface PageItem {
 	id: string;
@@ -58,12 +49,12 @@ export interface PageItem {
 	viewsCount: number;
 }
 
+// صفحات نموذجية لضمان التوافق مع أي شاشات قديمة
 export const INITIAL_PAGES: PageItem[] = [
 	{
 		id: "page-1",
 		title: "المقدمة والتعليمات العامة للمسار التدريبي",
-		summary:
-			"دليل توجيهي شامل للمتدربين يوضح آلية التقدم في المسار والالتزامات الأكاديمية وشروط التخرج.",
+		summary: "دليل توجيهي شامل للمتدربين.",
 		readingTimeMinutes: 5,
 		category: "عام وتوجيهي",
 		author: "الإدارة الأكاديمية",
@@ -74,8 +65,7 @@ export const INITIAL_PAGES: PageItem[] = [
 	{
 		id: "page-2",
 		title: "دليل أفضل الممارسات ومنهجية العمل الإكلينيكي",
-		summary:
-			"مستند تعريفي بأحدث معايير الجودة والممارسات السريرية والتأهيلية المعتمدة في مراكز سند.",
+		summary: "معايير الجودة والممارسات السريرية.",
 		readingTimeMinutes: 10,
 		category: "طبي وتأهيلي",
 		author: "د. هدى السعيد",
@@ -86,8 +76,7 @@ export const INITIAL_PAGES: PageItem[] = [
 	{
 		id: "page-3",
 		title: "ميثاق السلوك المهني ومعايير التقييم والاعتماد",
-		summary:
-			"المبادئ التوجيهية لأخلاقيات المهنة وآليات حساب الدرجات ونسب الحضور والالتزام المطلوبة.",
+		summary: "أخلاقيات المهنة وآليات التقييم.",
 		readingTimeMinutes: 8,
 		category: "إداري وتنظيمي",
 		author: "قسم الجودة والاعتماد",
@@ -98,8 +87,7 @@ export const INITIAL_PAGES: PageItem[] = [
 	{
 		id: "page-4",
 		title: "الملخص التنفيذي وخارطة المهارات المكتسبة",
-		summary:
-			"مخطط هيكلي للمخرجات التعليمية والمهارات التطبيقية التي سيكتسبها المتدرب بعد اجتياز محاور المسار.",
+		summary: "المخرجات التعليمية والمهارات التطبيقية.",
 		readingTimeMinutes: 7,
 		category: "تربوي وأكاديمي",
 		author: "فريق الإشراف التربوي",
@@ -110,609 +98,507 @@ export const INITIAL_PAGES: PageItem[] = [
 ];
 
 export function PagesView() {
-	const [pages, setPages] = useState<PageItem[]>(INITIAL_PAGES);
-	const [searchQuery, setSearchQuery] = useState("");
-	const [activeCategory, setActiveCategory] = useState("ALL");
-	const [activeStatus, setActiveStatus] = useState<"ALL" | "PUBLISHED" | "DRAFT">("ALL");
-	const [viewMode, setViewMode] = useState<"grid" | "table">("grid");
+	const {
+		pages,
+		isLoading,
+		isError: pagesLoadError,
+		error: pagesError,
+		refetch,
+		createPage,
+		updatePage,
+		duplicatePage,
+		publishPage,
+		unpublishPage,
+		deletePage,
+	} = useTrainingPages();
 
-	// حالة إنشاء صفحة جديدة
-	const [isCreateOpen, setIsCreateOpen] = useState(false);
-	const [newPageTitle, setNewPageTitle] = useState("");
-	const [newPageSummary, setNewPageSummary] = useState("");
-	const [newPageCategory, setNewPageCategory] = useState("عام وتوجيهي");
-	const [newPageReadingTime, setNewPageReadingTime] = useState(5);
+	const [search, setSearch] = useState("");
+	const [view, setView] = useState<CoursesView>("list");
+	const [oldestFirst, setOldestFirst] = useState(false);
 
-	// حالة محرر Notion (الـ Sheet المباشر)
-	const [editorPageId, setEditorPageId] = useState<string | null>(null);
+	// فلاتر التصفية المتعددة
+	const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+	const [selectedAcademicStages, setSelectedAcademicStages] = useState<string[]>([]);
+	const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+	const [selectedLocations, setSelectedLocations] = useState<string[]>([]);
 
-	// حالة معاينة الصفحة
-	const [previewPage, setPreviewPage] = useState<PageItem | null>(null);
+	// المراحل والتصنيفات من الـ hooks
+	const { stages: apiStages } = useAcademicStages();
+	const { academicStages: optionsStages } = useAcademicStageOptions();
+	const { trackClassifications } = useTrackClassifications();
 
-	// إحصائيات سريعة للبطاقات العلوية
+	// استخراج خيارات المراحل الدراسية المتاحة
+	const availableStages = useMemo(() => {
+		const set = new Set<string>();
+		for (const s of DEFAULT_ACADEMIC_STAGES) {
+			set.add(s);
+		}
+		if (Array.isArray(optionsStages)) {
+			for (const s of optionsStages) {
+				if (typeof s === "string" && s.trim()) set.add(s.trim());
+			}
+		}
+		if (Array.isArray(apiStages)) {
+			for (const s of apiStages) {
+				if (s?.isActive && typeof s?.name === "string" && s.name.trim()) {
+					set.add(s.name.trim());
+				}
+			}
+		}
+		for (const p of pages) {
+			const st =
+				(p as { academicStage?: string }).academicStage ||
+				extractSystemTag(p.summary, "stage") ||
+				extractSystemTag(p.summary, "المرحلة");
+			if (st?.trim() && st !== "بدون مرحلة دراسية" && st !== "بدون مرحلة") {
+				set.add(st.trim());
+			}
+		}
+		return Array.from(set);
+	}, [apiStages, optionsStages, pages]);
+
+	// استخراج خيارات التصنيفات المتاحة
+	const availableCategories = useMemo(() => {
+		const set = new Set<string>();
+		for (const c of DEFAULT_CLASSIFICATIONS) {
+			set.add(c);
+		}
+		if (Array.isArray(trackClassifications)) {
+			for (const tc of trackClassifications) {
+				if (tc?.name?.trim()) set.add(tc.name.trim());
+			}
+		}
+		for (const p of pages) {
+			if (p.category?.trim()) set.add(p.category.trim());
+		}
+		return Array.from(set);
+	}, [trackClassifications, pages]);
+
+	// مجموعات الفلاتر لقائمة التصفية الموحدة
+	const filterGroups: FilterGroup[] = useMemo(
+		() => [
+			{
+				key: "status",
+				label: "الحالة",
+				Icon: IconCheck,
+				options: [
+					{ value: "PUBLISHED", label: "منشورة" },
+					{ value: "DRAFT", label: "مسودة" },
+				],
+				selected: selectedStatuses,
+				onToggle: (v) =>
+					setSelectedStatuses((prev) =>
+						prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
+					),
+			},
+			{
+				key: "academicStage",
+				label: "المرحلة الدراسية",
+				Icon: IconSchool,
+				options: availableStages.map((st) => ({ value: st, label: st })),
+				selected: selectedAcademicStages,
+				onToggle: (v) =>
+					setSelectedAcademicStages((prev) =>
+						prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
+					),
+			},
+			{
+				key: "category",
+				label: "التصنيف",
+				Icon: IconRoute,
+				options: availableCategories.map((c) => ({ value: c, label: c })),
+				selected: selectedCategories,
+				onToggle: (v) =>
+					setSelectedCategories((prev) =>
+						prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
+					),
+			},
+			{
+				key: "location",
+				label: "مكان التعلم",
+				Icon: IconMapPin,
+				options: [
+					{ value: "ONLINE", label: "أونلاين" },
+					{ value: "IN_PERSON", label: "حضوري" },
+					{ value: "HYBRID", label: "مدمج" },
+				],
+				selected: selectedLocations,
+				onToggle: (v) =>
+					setSelectedLocations((prev) =>
+						prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v],
+					),
+			},
+		],
+		[
+			selectedStatuses,
+			availableStages,
+			selectedAcademicStages,
+			availableCategories,
+			selectedCategories,
+			selectedLocations,
+		],
+	);
+
+	const clearAllFilters = useCallback(() => {
+		setSelectedStatuses([]);
+		setSelectedAcademicStages([]);
+		setSelectedCategories([]);
+		setSelectedLocations([]);
+	}, []);
+
+	// الشرائح النشطة للفلاتر المختارة
+	const activeFilters = useMemo(() => {
+		const list: { key: string; label: string; value: string; onRemove: () => void }[] = [];
+		for (const s of selectedStatuses) {
+			list.push({
+				key: `status-${s}`,
+				label: "الحالة",
+				value: s === "PUBLISHED" ? "منشورة" : "مسودة",
+				onRemove: () => setSelectedStatuses((prev) => prev.filter((x) => x !== s)),
+			});
+		}
+		for (const st of selectedAcademicStages) {
+			list.push({
+				key: `stage-${st}`,
+				label: "المرحلة",
+				value: st,
+				onRemove: () => setSelectedAcademicStages((prev) => prev.filter((x) => x !== st)),
+			});
+		}
+		for (const c of selectedCategories) {
+			list.push({
+				key: `cat-${c}`,
+				label: "التصنيف",
+				value: c,
+				onRemove: () => setSelectedCategories((prev) => prev.filter((x) => x !== c)),
+			});
+		}
+		for (const loc of selectedLocations) {
+			list.push({
+				key: `loc-${loc}`,
+				label: "المكان",
+				value: loc === "ONLINE" ? "أونلاين" : loc === "IN_PERSON" ? "حضوري" : "مدمج",
+				onRemove: () => setSelectedLocations((prev) => prev.filter((x) => x !== loc)),
+			});
+		}
+		return list;
+	}, [selectedStatuses, selectedAcademicStages, selectedCategories, selectedLocations]);
+
+	// نوافذ الحوار
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const [editingPage, setEditingPage] = useState<TrainingPage | null>(null);
+	const [previewingPage, setPreviewingPage] = useState<TrainingPage | null>(null);
+	const [deletingPage, setDeletingPage] = useState<TrainingPage | null>(null);
+
+	// إحصائيات الصفحات
 	const statsData = useMemo(() => {
 		const total = pages.length;
 		const published = pages.filter((p) => p.status === "PUBLISHED").length;
 		const drafts = pages.filter((p) => p.status === "DRAFT").length;
-		const totalViews = pages.reduce((sum, p) => sum + p.viewsCount, 0);
-
 		return [
-			{
-				title: "إجمالي الصفحات والمستندات",
-				value: total,
-				tooltip: "العدد الكلي للمستندات والصفحات التعليمية",
-			},
-			{
-				title: "الصفحات المنشورة",
-				value: published,
-				tooltip: "الصفحات المفعلة والمتاحة للمتدربين",
-			},
-			{
-				title: "المسودات",
-				value: drafts,
-				tooltip: "صفحات قيد الصياغة والإعداد",
-			},
-			{
-				title: "إجمالي المشاهدات والقراءات",
-				value: totalViews,
-				tooltip: "عدد مرات فتح وقراءة الصفحات من قبل المتدربين",
-			},
+			{ title: "إجمالي الصفحات", value: total, tooltip: "العدد الكلي للصفحات التدريبية" },
+			{ title: "صفحات منشورة", value: published, tooltip: "الصفحات المتاحة للمتدربين" },
+			{ title: "مسودّات", value: drafts, tooltip: "الصفحات قيد الإعداد والمراجعة" },
 		];
 	}, [pages]);
 
-	// تصفية الصفحات حسب البحث والتصنيف
+	// تصفية وبحث الصفحات
 	const filteredPages = useMemo(() => {
-		const query = searchQuery.trim().toLowerCase();
-		return pages.filter((p) => {
-			const matchesQuery =
-				!query ||
-				p.title.toLowerCase().includes(query) ||
-				p.summary.toLowerCase().includes(query) ||
-				p.author.toLowerCase().includes(query);
-
-			const matchesCategory = activeCategory === "ALL" || p.category === activeCategory;
-			const matchesStatus = activeStatus === "ALL" || p.status === activeStatus;
-
-			return matchesQuery && matchesCategory && matchesStatus;
+		const q = search.trim().toLowerCase();
+		const list = pages.filter((p) => {
+			// فلتر الحالة
+			if (selectedStatuses.length > 0 && !selectedStatuses.includes(p.status)) {
+				return false;
+			}
+			// فلتر التصنيف
+			if (
+				selectedCategories.length > 0 &&
+				(!p.category || !selectedCategories.includes(p.category))
+			) {
+				return false;
+			}
+			// فلتر المرحلة الدراسية
+			if (selectedAcademicStages.length > 0) {
+				const pageStage =
+					(p as { academicStage?: string }).academicStage ||
+					extractSystemTag(p.summary, "stage") ||
+					extractSystemTag(p.summary, "المرحلة");
+				if (!pageStage || !selectedAcademicStages.includes(pageStage)) {
+					return false;
+				}
+			}
+			// فلتر مكان التعلم
+			if (selectedLocations.length > 0) {
+				const pageLocation = extractSystemTag(p.summary, "location");
+				if (!pageLocation || !selectedLocations.includes(pageLocation)) {
+					return false;
+				}
+			}
+			// البحث النصي
+			if (q) {
+				const titleMatch = (p.title || "").toLowerCase().includes(q);
+				const categoryMatch = (p.category || "").toLowerCase().includes(q);
+				const summaryMatch = cleanPageSummary(p.summary).toLowerCase().includes(q);
+				const pageStage =
+					(p as { academicStage?: string }).academicStage ||
+					extractSystemTag(p.summary, "stage") ||
+					extractSystemTag(p.summary, "المرحلة");
+				const stageMatch = pageStage ? pageStage.toLowerCase().includes(q) : false;
+				if (!titleMatch && !categoryMatch && !summaryMatch && !stageMatch) {
+					return false;
+				}
+			}
+			return true;
 		});
-	}, [pages, searchQuery, activeCategory, activeStatus]);
+		return oldestFirst ? [...list].reverse() : list;
+	}, [
+		pages,
+		search,
+		selectedStatuses,
+		selectedCategories,
+		selectedAcademicStages,
+		selectedLocations,
+		oldestFirst,
+	]);
 
-	const handleCreatePage = (e: React.FormEvent) => {
-		e.preventDefault();
-		if (!newPageTitle.trim()) {
-			toast.error("يرجى إدخال عنوان الصفحة");
-			return;
-		}
-
-		const newPage: PageItem = {
-			id: `page-${Date.now()}`,
-			title: newPageTitle.trim(),
-			summary: newPageSummary.trim() || "مستند تعليمي وإرشادي للمتدربين.",
-			readingTimeMinutes: newPageReadingTime || 5,
-			category: newPageCategory,
-			author: "الإدارة الأكاديمية",
-			status: "PUBLISHED",
-			updatedAt: new Date().toISOString().slice(0, 10),
-			viewsCount: 0,
-		};
-
-		setPages((prev) => [newPage, ...prev]);
-		setIsCreateOpen(false);
-		setNewPageTitle("");
-		setNewPageSummary("");
-		toast.success("تم إنشاء الصفحة التعليمية بنجاح");
+	// فتح إنشاء صفحة جديدة
+	const handleCreateNew = () => {
+		setEditingPage(null);
+		setDialogOpen(true);
 	};
 
-	const handleDeletePage = (id: string) => {
-		setPages((prev) => prev.filter((p) => p.id !== id));
-		toast.info("تم حذف الصفحة بنجاح");
+	// فتح تعديل صفحة
+	const handleEditPage = (page: TrainingPage) => {
+		setEditingPage(page);
+		setDialogOpen(true);
+	};
+
+	// حفظ صفحة (إنشاء أو تعديل)
+	const handleSavePage = async (payload: TrainingPagePayload) => {
+		if (editingPage) {
+			return await updatePage(editingPage.id, payload);
+		}
+		return await createPage(payload);
+	};
+
+	// تبديل حالة النشر
+	const handlePublishToggle = async (page: TrainingPage) => {
+		if (page.status === "PUBLISHED") {
+			await unpublishPage(page.id);
+		} else {
+			await publishPage(page.id);
+		}
+	};
+
+	// تغيير حالة الصفحة مباشرة من القائمة المنسدلة في الجدول
+	const handleStatusChange = async (
+		page: TrainingPage,
+		newStatus: "PUBLISHED" | "DRAFT" | "ARCHIVED",
+	) => {
+		try {
+			await updatePage(page.id, { status: newStatus });
+			toast.success(
+				newStatus === "PUBLISHED"
+					? "تم نشر الصفحة بنجاح"
+					: newStatus === "ARCHIVED"
+						? "تمت أرشفة الصفحة بنجاح"
+						: "تم تحويل الصفحة إلى مسودة",
+			);
+		} catch {
+			// الخطأ يُعرض عبر toast
+		}
+	};
+
+	// تأكيد الحذف
+	const handleConfirmDelete = async () => {
+		if (!deletingPage) return;
+		try {
+			await deletePage(deletingPage.id);
+		} finally {
+			setDeletingPage(null);
+		}
 	};
 
 	return (
 		<div
+			className="flex min-h-0 flex-1 flex-col"
 			dir="rtl"
-			className="flex flex-1 flex-col overflow-y-auto bg-background p-4 sm:p-6 space-y-5"
 		>
-			{/* شريط الإحصائيات العلوية */}
-			<Stats stats={statsData} />
+			{/* شريط الإحصائيات العلوي */}
+			<Stats
+				className="grid-cols-3 gap-3 px-3"
+				stats={statsData}
+				variant="compact"
+			/>
 
-			{/* شريط الأدوات والبحث والإجراءات */}
-			<div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-card p-3.5 rounded-xl border border-border shadow-2xs">
-				<div className="flex items-center gap-2.5 flex-1 min-w-0">
-					<Input
-						type="search"
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
-						placeholder="ابحث في الصفحات بالعنوان أو الملخص أو الكاتب..."
-						className="h-9 text-xs flex-1 max-w-sm"
+			{/* شريط أدوات الجدول والبحث مع الفلترة الموحدة للمنصة */}
+			<TableToolbar
+				className="border-y"
+				searchPlaceholder="ابحث عن اسم الصفحة / التصنيف / النبذة..."
+				searchClassName="w-[320px]"
+				searchValue={search}
+				onSearchChange={setSearch}
+				showFilter={true}
+				filterMenu={
+					<FiltersMenu
+						groups={filterGroups}
+						size="sm"
+						label="فلترة"
+						onReset={clearAllFilters}
 					/>
-
-					<Select
-						value={activeCategory}
-						onValueChange={setActiveCategory}
-					>
-						<SelectTrigger className="h-9 text-xs w-[140px]">
-							<SelectValue placeholder="كافة التصنيفات" />
-						</SelectTrigger>
-						<SelectContent align="end">
-							<SelectItem
-								value="ALL"
-								className="text-xs"
-							>
-								كافة التصنيفات
-							</SelectItem>
-							<SelectItem
-								value="عام وتوجيهي"
-								className="text-xs"
-							>
-								عام وتوجيهي
-							</SelectItem>
-							<SelectItem
-								value="طبي وتأهيلي"
-								className="text-xs"
-							>
-								طبي وتأهيلي
-							</SelectItem>
-							<SelectItem
-								value="إداري وتنظيمي"
-								className="text-xs"
-							>
-								إداري وتنظيمي
-							</SelectItem>
-							<SelectItem
-								value="تربوي وأكاديمي"
-								className="text-xs"
-							>
-								تربوي وأكاديمي
-							</SelectItem>
-						</SelectContent>
-					</Select>
-
-					<Select
-						value={activeStatus}
-						onValueChange={(v) => setActiveStatus(v as "ALL" | "PUBLISHED" | "DRAFT")}
-					>
-						<SelectTrigger className="h-9 text-xs w-[120px]">
-							<SelectValue placeholder="الحالة" />
-						</SelectTrigger>
-						<SelectContent align="end">
-							<SelectItem
-								value="ALL"
-								className="text-xs"
-							>
-								كافة الحالات
-							</SelectItem>
-							<SelectItem
-								value="PUBLISHED"
-								className="text-xs"
-							>
-								منشور
-							</SelectItem>
-							<SelectItem
-								value="DRAFT"
-								className="text-xs"
-							>
-								مسودة
-							</SelectItem>
-						</SelectContent>
-					</Select>
-				</div>
-
-				<div className="flex items-center gap-2 shrink-0">
-					{/* تبديل نمط العرض (شبكة / جدول) */}
-					<div className="flex items-center rounded-lg border border-border p-0.5 bg-muted/40">
-						<button
-							type="button"
-							onClick={() => setViewMode("grid")}
-							className={cn(
-								"p-1.5 rounded-md transition-colors cursor-pointer",
-								viewMode === "grid"
-									? "bg-background text-foreground shadow-2xs"
-									: "text-muted-foreground hover:text-foreground",
-							)}
-							title="عرض شبكي"
-						>
-							<IconLayoutGrid className="size-4" />
-						</button>
-						<button
-							type="button"
-							onClick={() => setViewMode("table")}
-							className={cn(
-								"p-1.5 rounded-md transition-colors cursor-pointer",
-								viewMode === "table"
-									? "bg-background text-foreground shadow-2xs"
-									: "text-muted-foreground hover:text-foreground",
-							)}
-							title="عرض جدولي"
-						>
-							<IconList className="size-4" />
-						</button>
-					</div>
-
+				}
+				showExport={false}
+				showView={false}
+				leftExtra={
+					<ViewOptionsMenu
+						view={view}
+						onViewChange={setView}
+						oldestFirst={oldestFirst}
+						onOldestFirstChange={setOldestFirst}
+					/>
+				}
+				actions={
 					<Button
 						type="button"
 						size="sm"
-						onClick={() => setEditorPageId(`new-page-${Date.now()}`)}
-						className="h-9 gap-1.5 text-xs font-semibold bg-linear-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-lg shadow-2xs cursor-pointer"
-					>
-						<IconSparkles className="size-4" />
-						<span>إنشاء بمحرر Notion</span>
-					</Button>
-
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						onClick={() => setIsCreateOpen(true)}
-						className="h-9 gap-1.5 text-xs font-medium rounded-lg shadow-2xs cursor-pointer"
-					>
-						<IconPlus className="size-4" />
-						<span>بيانات سريعة</span>
-					</Button>
-				</div>
-			</div>
-
-			{/* محتوى الصفحات */}
-			{filteredPages.length === 0 ? (
-				<div className="flex flex-col items-center justify-center py-20 text-center bg-card rounded-xl border border-dashed border-border p-6 space-y-3">
-					<div className="size-14 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/40 flex items-center justify-center text-purple-600 dark:text-purple-400 shadow-2xs">
-						<IconFileText className="size-7 stroke-[1.8]" />
-					</div>
-					<div className="space-y-1 max-w-sm">
-						<h3 className="text-sm font-bold text-foreground">لا توجد صفحات مطابقة</h3>
-						<p className="text-xs text-muted-foreground">
-							لم يتم العثور على أي صفحات تطابق خيارات البحث الحالية. يمكنك إنشاء صفحة جديدة أو
-							تعديل الفلتر.
-						</p>
-					</div>
-					<Button
-						type="button"
-						size="sm"
-						onClick={() => setIsCreateOpen(true)}
-						className="h-8 text-xs font-semibold gap-1.5 bg-purple-600 hover:bg-purple-700 text-white cursor-pointer mt-1"
+						className="h-8 gap-1.5 text-xs font-bold"
+						onClick={handleCreateNew}
 					>
 						<IconPlus className="size-3.5" />
-						<span>إنشاء أول صفحة تعليمية</span>
+						صفحة جديدة
 					</Button>
-				</div>
-			) : viewMode === "grid" ? (
-				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-					{filteredPages.map((page) => (
-						<div
-							key={page.id}
-							className="group relative flex flex-col justify-between rounded-xl border border-border bg-card p-4 hover:border-purple-300 dark:hover:border-purple-800 transition-all duration-200 shadow-2xs hover:shadow-xs space-y-3"
+				}
+			/>
+
+			{/* شرائح الفلاتر النشطة */}
+			{activeFilters.length > 0 && (
+				<div className="flex flex-wrap items-center gap-2 border-b-[0.5px] border-border px-3 py-2 bg-muted/10">
+					{activeFilters.map((f) => (
+						<span
+							key={f.key}
+							className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary shadow-2xs"
 						>
-							<div className="space-y-2">
-								<div className="flex items-start justify-between gap-2">
-									<div className="size-9 rounded-lg bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-100 dark:border-sky-900/40">
-										<IconFileDescription className="size-5" />
-									</div>
-
-									<div className="flex items-center gap-1.5">
-										<Badge
-											variant={page.status === "PUBLISHED" ? "default" : "secondary"}
-											className={cn(
-												"text-[9px] font-semibold h-4 px-1.5",
-												page.status === "PUBLISHED"
-													? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/40"
-													: "bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800/40",
-											)}
-										>
-											{page.status === "PUBLISHED" ? "منشور" : "مسودة"}
-										</Badge>
-
-										<DropdownMenu dir="rtl">
-											<DropdownMenuTrigger
-												aria-label="إجراءات الصفحة"
-												className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted cursor-pointer transition-colors"
-											>
-												<IconDots className="size-4" />
-											</DropdownMenuTrigger>
-											<DropdownMenuContent align="end">
-												<DropdownMenuItem onClick={() => setEditorPageId(page.id)}>
-													<IconPencil className="size-3.5 ml-1.5 text-purple-600" />
-													<span>تحرير بمحرر Notion</span>
-												</DropdownMenuItem>
-												<DropdownMenuItem onClick={() => setPreviewPage(page)}>
-													<IconEye className="size-3.5 ml-1.5" />
-													<span>معاينة المحتوى</span>
-												</DropdownMenuItem>
-												<DropdownMenuItem
-													className="text-destructive focus:text-destructive"
-													onClick={() => handleDeletePage(page.id)}
-												>
-													<IconTrash className="size-3.5 ml-1.5" />
-													<span>حذف</span>
-												</DropdownMenuItem>
-											</DropdownMenuContent>
-										</DropdownMenu>
-									</div>
-								</div>
-
-								<h4 className="text-sm font-bold text-foreground line-clamp-1 group-hover:text-purple-600 transition-colors">
-									{page.title}
-								</h4>
-
-								<p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-									{page.summary}
-								</p>
-							</div>
-
-							<div className="pt-3 border-t border-border/60 flex items-center justify-between text-[11px] text-muted-foreground">
-								<div className="flex items-center gap-1">
-									<IconClock className="size-3 text-muted-foreground/70" />
-									<span>{toArabicNumerals(page.readingTimeMinutes)} دقائق قراءة</span>
-								</div>
-								<Badge
-									variant="outline"
-									className="text-[10px] font-medium border-border/80"
-								>
-									{page.category}
-								</Badge>
-							</div>
-						</div>
+							<span className="text-muted-foreground">{f.label}:</span>
+							<span>{f.value}</span>
+							<button
+								type="button"
+								onClick={f.onRemove}
+								className="hover:text-primary/70 cursor-pointer p-0.5 rounded-full hover:bg-primary/10 transition-colors"
+								title="إزالة الفلتر"
+							>
+								<IconX className="size-3" />
+							</button>
+						</span>
 					))}
-				</div>
-			) : (
-				<div className="rounded-xl border border-border bg-card overflow-hidden">
-					<table className="w-full text-right text-xs">
-						<thead>
-							<tr className="border-b border-border bg-muted/30 text-muted-foreground font-semibold">
-								<th className="p-3">عنوان الصفحة والمستند</th>
-								<th className="p-3">التصنيف</th>
-								<th className="p-3">وقت القراءة</th>
-								<th className="p-3">الكاتب / المصدر</th>
-								<th className="p-3">الحالة</th>
-								<th className="p-3 text-center">الإجراءات</th>
-							</tr>
-						</thead>
-						<tbody className="divide-y divide-border/60">
-							{filteredPages.map((page) => (
-								<tr
-									key={page.id}
-									className="hover:bg-muted/30 transition-colors"
-								>
-									<td className="p-3 font-semibold text-foreground max-w-xs truncate">
-										{page.title}
-									</td>
-									<td className="p-3 text-muted-foreground">{page.category}</td>
-									<td className="p-3 text-muted-foreground">
-										{toArabicNumerals(page.readingTimeMinutes)} دقائق
-									</td>
-									<td className="p-3 text-muted-foreground">{page.author}</td>
-									<td className="p-3">
-										<Badge
-											variant="secondary"
-											className={cn(
-												"text-[9px] font-semibold h-4 px-1.5",
-												page.status === "PUBLISHED"
-													? "bg-emerald-50 text-emerald-600 border border-emerald-200"
-													: "bg-amber-50 text-amber-600 border border-amber-200",
-											)}
-										>
-											{page.status === "PUBLISHED" ? "منشور" : "مسودة"}
-										</Badge>
-									</td>
-									<td className="p-3 text-center">
-										<div className="flex items-center justify-center gap-1">
-											<Button
-												type="button"
-												variant="ghost"
-												size="sm"
-												onClick={() => setEditorPageId(page.id)}
-												className="h-7 px-2 text-xs text-purple-600 hover:bg-purple-50"
-												title="تحرير بمحرر Notion"
-											>
-												<IconPencil className="size-3.5" />
-											</Button>
-											<Button
-												type="button"
-												variant="ghost"
-												size="sm"
-												onClick={() => setPreviewPage(page)}
-												className="h-7 px-2 text-xs"
-											>
-												<IconEye className="size-3.5" />
-											</Button>
-											<Button
-												type="button"
-												variant="ghost"
-												size="sm"
-												onClick={() => handleDeletePage(page.id)}
-												className="h-7 px-2 text-xs text-destructive hover:bg-destructive/10"
-											>
-												<IconTrash className="size-3.5" />
-											</Button>
-										</div>
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
+					<button
+						type="button"
+						onClick={clearAllFilters}
+						className="text-[11px] font-medium text-destructive hover:underline cursor-pointer px-1.5"
+					>
+						إعادة تعيين
+					</button>
 				</div>
 			)}
 
-			{/* حوار إنشاء صفحة جديدة */}
-			<Dialog
-				open={isCreateOpen}
-				onOpenChange={setIsCreateOpen}
-			>
-				<DialogContent
-					dir="rtl"
-					className="sm:max-w-md"
-				>
-					<DialogHeader>
-						<DialogTitle className="text-sm font-bold text-foreground">
-							إنشاء صفحة أو مستند تعليمي جديد
-						</DialogTitle>
-						<DialogDescription className="text-xs text-muted-foreground">
-							أضف صفحة جديدة يمكن ربطها واستخدامها كمادة تعليمية في المسارات والدورات.
-						</DialogDescription>
-					</DialogHeader>
-
-					<form
-						onSubmit={handleCreatePage}
-						className="space-y-3.5 py-2 text-right"
-					>
-						<div className="space-y-1.5">
-							<Label className="text-xs font-semibold">عنوان الصفحة</Label>
-							<Input
-								value={newPageTitle}
-								onChange={(e) => setNewPageTitle(e.target.value)}
-								placeholder="مثال: المقدمة والتوجيهات التنفيذية..."
-								className="h-9 text-xs"
-							/>
-						</div>
-
-						<div className="grid grid-cols-2 gap-3">
-							<div className="space-y-1.5">
-								<Label className="text-xs font-semibold">التصنيف</Label>
-								<Select
-									value={newPageCategory}
-									onValueChange={setNewPageCategory}
-								>
-									<SelectTrigger className="h-9 text-xs">
-										<SelectValue />
-									</SelectTrigger>
-									<SelectContent align="end">
-										<SelectItem
-											value="عام وتوجيهي"
-											className="text-xs"
-										>
-											عام وتوجيهي
-										</SelectItem>
-										<SelectItem
-											value="طبي وتأهيلي"
-											className="text-xs"
-										>
-											طبي وتأهيلي
-										</SelectItem>
-										<SelectItem
-											value="إداري وتنظيمي"
-											className="text-xs"
-										>
-											إداري وتنظيمي
-										</SelectItem>
-										<SelectItem
-											value="تربوي وأكاديمي"
-											className="text-xs"
-										>
-											تربوي وأكاديمي
-										</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-
-							<div className="space-y-1.5">
-								<Label className="text-xs font-semibold">
-									وقت القراءة التقديري (بالدقائق)
-								</Label>
-								<Input
-									type="number"
-									min={1}
-									max={180}
-									value={newPageReadingTime}
-									onChange={(e) => setNewPageReadingTime(Number(e.target.value))}
-									className="h-9 text-xs"
-								/>
-							</div>
-						</div>
-
-						<div className="space-y-1.5">
-							<Label className="text-xs font-semibold">ملخص ووصف الصفحة</Label>
-							<Textarea
-								value={newPageSummary}
-								onChange={(e) => setNewPageSummary(e.target.value)}
-								placeholder="ملخص محتوى وأهداف هذا المستند للمتدربين..."
-								rows={3}
-								className="text-xs resize-none"
-							/>
-						</div>
-
-						<DialogFooter className="pt-2">
+			{/* محتوى الصفحات: شبكة أو جدول */}
+			<div className="min-h-0 flex-1 overflow-auto bg-background py-3">
+				{isLoading ? (
+					<Spinner containerClassName="py-24 min-h-0" />
+				) : pagesLoadError ? (
+					<ContentLoadError
+						message={
+							pagesError instanceof Error
+								? pagesError.message
+								: "تعذّر تحميل الصفحات التدريبية."
+						}
+						onRetry={() => void refetch()}
+					/>
+				) : filteredPages.length === 0 ? (
+					<div className="flex flex-col items-center gap-3 px-3 py-16 text-center">
+						<span className="flex size-12 items-center justify-center rounded-2xl bg-muted/80 text-muted-foreground">
+							<IconFileText className="size-6" />
+						</span>
+						<h2 className="text-[14px] font-bold text-foreground">
+							{pages.length === 0
+								? "لا توجد صفحات تدريبية بعد"
+								: "لا توجد صفحات مطابقة للبحث أو الفلترة"}
+						</h2>
+						<p className="max-w-[320px] text-[12px] text-muted-foreground leading-relaxed">
+							{pages.length === 0
+								? "أنشئ صفحات معرفية ومحتوى تفاعلي مستقل يمكنك مشاركته مع المتدربين أو ربطه بالدورات لاحقاً."
+								: "جرب تغيير معايير البحث أو إعادة ضبط خيارات الفلترة لعرض النتائج."}
+						</p>
+						{pages.length === 0 ? (
+							<Button
+								type="button"
+								onClick={handleCreateNew}
+								className="h-9 gap-1.5 rounded-lg px-4 text-[12px] font-bold mt-1"
+							>
+								<IconPlus className="size-4" />
+								إنشاء صفحة جديدة
+							</Button>
+						) : (
 							<Button
 								type="button"
 								variant="outline"
 								size="sm"
-								onClick={() => setIsCreateOpen(false)}
-								className="h-8 text-xs cursor-pointer"
+								onClick={clearAllFilters}
+								className="gap-1.5 text-xs font-semibold mt-1 cursor-pointer"
 							>
-								إلغاء
+								إعادة ضبط الفلاتر
 							</Button>
-							<Button
-								type="submit"
-								size="sm"
-								className="h-8 text-xs font-semibold bg-purple-600 hover:bg-purple-700 text-white cursor-pointer"
-							>
-								حفظ ونشر الصفحة
-							</Button>
-						</DialogFooter>
-					</form>
-				</DialogContent>
-			</Dialog>
+						)}
+					</div>
+				) : view === "grid" ? (
+					<div className="grid grid-cols-1 gap-3 px-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+						{filteredPages.map((page) => (
+							<PageCard
+								key={page.id}
+								page={page}
+								onEdit={() => handleEditPage(page)}
+								onPreview={() => setPreviewingPage(page)}
+								onDuplicate={() => void duplicatePage(page.id)}
+								onPublishToggle={() => void handlePublishToggle(page)}
+								onDelete={() => setDeletingPage(page)}
+							/>
+						))}
+					</div>
+				) : (
+					<div className="px-3">
+						<PagesTable
+							pages={filteredPages}
+							isLoading={false}
+							onEdit={handleEditPage}
+							onPreview={(p) => setPreviewingPage(p)}
+							onDuplicate={(p) => void duplicatePage(p.id)}
+							onPublishToggle={(p) => void handlePublishToggle(p)}
+							onDelete={(p) => setDeletingPage(p)}
+							onStatusChange={handleStatusChange}
+						/>
+					</div>
+				)}
+			</div>
 
-			{/* حوار معاينة الصفحة */}
-			{previewPage && (
-				<Dialog
-					open={!!previewPage}
-					onOpenChange={(v) => !v && setPreviewPage(null)}
-				>
-					<DialogContent
-						dir="rtl"
-						className="sm:max-w-lg"
-					>
-						<DialogHeader>
-							<div className="flex items-center gap-2 mb-1">
-								<Badge
-									variant="outline"
-									className="text-[10px]"
-								>
-									{previewPage.category}
-								</Badge>
-								<span className="text-[11px] text-muted-foreground">
-									{toArabicNumerals(previewPage.readingTimeMinutes)} دقائق قراءة
-								</span>
-							</div>
-							<DialogTitle className="text-sm font-bold text-foreground">
-								{previewPage.title}
-							</DialogTitle>
-						</DialogHeader>
+			{/* نافذة إنشاء / تعديل الصفحة المكونة من خطوتين مع المحرر والمعاينة اللايف */}
+			<PageDialog
+				open={dialogOpen}
+				page={editingPage}
+				onClose={() => setDialogOpen(false)}
+				onSave={handleSavePage}
+			/>
 
-						<div className="py-3 text-xs leading-relaxed text-foreground/90 space-y-3">
-							<p className="bg-muted/40 p-3 rounded-lg border border-border/60">
-								{previewPage.summary}
-							</p>
-							<div className="p-4 rounded-xl border border-dashed border-border bg-card space-y-2 text-muted-foreground text-[11px]">
-								<p>
-									هذا نموذج لمعاينة الصفحة التعليمية. سيتمكن منشئ المسار والمتدرب من استعراض
-									النصوص الكاملة والمرفقات الداعمة بداخلها أثناء دراسة محاور المسار.
-								</p>
-								<div className="flex items-center justify-between text-[10px] pt-2 border-t border-border/50">
-									<span>الكاتب: {previewPage.author}</span>
-									<span>تاريخ النشر: {previewPage.updatedAt}</span>
-								</div>
-							</div>
-						</div>
+			{/* نافذة المعاينة المباشرة الكاملة */}
+			<PagePreviewDialog
+				open={!!previewingPage}
+				page={previewingPage}
+				onClose={() => setPreviewingPage(null)}
+			/>
 
-						<DialogFooter>
-							<Button
-								type="button"
-								size="sm"
-								onClick={() => setPreviewPage(null)}
-								className="h-8 text-xs"
-							>
-								إغلاق المعاينة
-							</Button>
-						</DialogFooter>
-					</DialogContent>
-				</Dialog>
-			)}
-
-			{/* محرر Notion المتكامل للصفحات */}
-			<PageEditorSheet
-				pageId={editorPageId}
-				editable={true}
-				onClose={() => setEditorPageId(null)}
+			{/* نافذة تأكيد حذف الصفحة */}
+			<DeletePageDialog
+				page={deletingPage}
+				onClose={() => setDeletingPage(null)}
+				onConfirm={handleConfirmDelete}
 			/>
 		</div>
 	);

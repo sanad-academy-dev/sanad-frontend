@@ -1,17 +1,17 @@
 import {
 	IconAward,
-	IconCalendar,
 	IconCheck,
 	IconDots,
 	IconEdit,
 	IconEye,
 	IconMapPin,
 	IconPlus,
+	IconRoute,
 	IconSchool,
-	IconStarFilled,
 	IconTrash,
 	IconUserPlus,
 	IconUsers,
+	IconX,
 } from "@tabler/icons-react";
 import type { ColumnDef } from "@tanstack/react-table";
 import {
@@ -23,11 +23,9 @@ import {
 } from "@tanstack/react-table";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-
-import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
 import { type FilterGroup, FiltersMenu } from "@/components/common/filters-menu";
+import { Spinner } from "@/components/common/spinner";
 import { Stats } from "@/components/common/stats";
-import type { StatItem } from "@/features/dashboard/types/dashboard.types";
 import { TableDataView } from "@/components/common/table-data-view";
 import { TablePagination } from "@/components/common/table-pagination";
 import { TableToolbar } from "@/components/common/table-toolbar";
@@ -48,8 +46,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Spinner } from "@/components/ui/spinner";
-import { AGE_GROUPS } from "@/features/services/classrooms/data/constants";
+import type { StatItem } from "@/features/dashboard/types/dashboard.types";
 import { useAcademicStageOptions } from "@/features/services/classrooms/hooks/use-classrooms";
 import { cn } from "@/lib/utils";
 import {
@@ -61,8 +58,13 @@ import {
 } from "../hooks/use-tracks";
 import { AssignTrackStaffSheet } from "./assign-track-staff-sheet";
 import { AssignTrackStudentsSheet } from "./assign-track-students-sheet";
+import { ContentLoadError } from "./content-load-error";
+import { StudentsCell } from "./students-cell";
+import { TrackCard } from "./track-card";
 import { TrackDialog } from "./track-dialog";
 import { TrackStatusSelect } from "./track-status-select";
+import { TrainersCell } from "./trainers-cell";
+import { type CoursesView, ViewOptionsMenu } from "./view-options-menu";
 
 export type TrackStatus = "ACTIVE" | "PENDING" | "COMPLETED" | "DRAFT";
 export type TrackLocationMode = "ONLINE" | "IN_PERSON" | "HYBRID";
@@ -75,7 +77,17 @@ export type TrackRow = {
 	coursesCount: number;
 	locationMode: TrackLocationMode;
 	locationLabel: string;
-	trainers: { id: string; name: string; avatar?: string }[];
+	trainers: {
+		id: string;
+		name: string;
+		avatar?: string;
+		phone?: string;
+		email?: string;
+		role?: string;
+		branch?: string;
+		employmentType?: string;
+		active?: boolean;
+	}[];
 	students?: { id: string; name?: string; code?: string; gender?: string; avatar?: string }[];
 	studentIds?: string[];
 	duration: string;
@@ -95,6 +107,8 @@ export type TrackRow = {
 
 export function TracksView() {
 	const [search, setSearch] = useState("");
+	const [view, setView] = useState<CoursesView>("list");
+	const [oldestFirst, setOldestFirst] = useState(false);
 	const [page, setPage] = useState(1);
 	const pageSize = 100;
 	const {
@@ -102,8 +116,10 @@ export function TracksView() {
 		total: totalTracks,
 		totalPages: totalTrackPages,
 		isLoading: isTracksLoading,
+		isError: tracksLoadError,
+		error: tracksError,
 		refetch: refetchTracks,
-	} = useTracks(search, page, pageSize);
+	} = useTracks(search, page, pageSize, "preview");
 	useEffect(() => {
 		if (page > totalTrackPages) setPage(totalTrackPages);
 	}, [page, totalTrackPages]);
@@ -176,9 +192,9 @@ export function TracksView() {
 		];
 	}, [serverStats]);
 
-	// تصفية المسارات
+	// تصفية وترتيب المسارات
 	const filteredTracks = useMemo(() => {
-		return tracks.filter((t) => {
+		const list = tracks.filter((t) => {
 			if (selectedStatuses.length > 0 && !selectedStatuses.includes(t.status)) {
 				return false;
 			}
@@ -194,9 +210,75 @@ export function TracksView() {
 			) {
 				return false;
 			}
+			if (search.trim()) {
+				const s = search.toLowerCase().trim();
+				const matchesName = t.name.toLowerCase().includes(s);
+				const matchesCode = t.code.toLowerCase().includes(s);
+				const matchesCategory = t.category.toLowerCase().includes(s);
+				const matchesStage = t.academicStage?.toLowerCase().includes(s) ?? false;
+				const matchesLoc = t.locationLabel?.toLowerCase().includes(s) ?? false;
+				if (!matchesName && !matchesCode && !matchesCategory && !matchesStage && !matchesLoc) {
+					return false;
+				}
+			}
 			return true;
 		});
-	}, [tracks, selectedStatuses, selectedCategories, selectedLocations, selectedAcademicStages]);
+
+		return oldestFirst ? [...list].reverse() : list;
+	}, [
+		tracks,
+		selectedStatuses,
+		selectedCategories,
+		selectedLocations,
+		selectedAcademicStages,
+		search,
+		oldestFirst,
+	]);
+
+	// الشرائح النشطة للفلاتر المختارة
+	const activeFilters = useMemo(() => {
+		const list: { key: string; label: string; value: string; onRemove: () => void }[] = [];
+		for (const s of selectedStatuses) {
+			list.push({
+				key: `status-${s}`,
+				label: "الحالة",
+				value:
+					s === "ACTIVE"
+						? "نشط"
+						: s === "PENDING"
+							? "جاري"
+							: s === "COMPLETED"
+								? "مكتمل"
+								: "مسودة",
+				onRemove: () => setSelectedStatuses((prev) => prev.filter((x) => x !== s)),
+			});
+		}
+		for (const st of selectedAcademicStages) {
+			list.push({
+				key: `stage-${st}`,
+				label: "المرحلة",
+				value: st,
+				onRemove: () => setSelectedAcademicStages((prev) => prev.filter((x) => x !== st)),
+			});
+		}
+		for (const c of selectedCategories) {
+			list.push({
+				key: `cat-${c}`,
+				label: "المسار",
+				value: c,
+				onRemove: () => setSelectedCategories((prev) => prev.filter((x) => x !== c)),
+			});
+		}
+		for (const loc of selectedLocations) {
+			list.push({
+				key: `loc-${loc}`,
+				label: "المكان",
+				value: loc === "ONLINE" ? "أونلاين" : loc === "IN_PERSON" ? "حضوري" : "مدمج",
+				onRemove: () => setSelectedLocations((prev) => prev.filter((x) => x !== loc)),
+			});
+		}
+		return list;
+	}, [selectedStatuses, selectedAcademicStages, selectedCategories, selectedLocations]);
 
 	// فلاتر قائمة التصفية
 	const filterGroups: FilterGroup[] = useMemo(
@@ -262,7 +344,13 @@ export function TracksView() {
 					),
 			},
 		],
-		[selectedStatuses, selectedAcademicStages, academicStages, selectedLocations, selectedCategories],
+		[
+			selectedStatuses,
+			selectedAcademicStages,
+			academicStages,
+			selectedLocations,
+			selectedCategories,
+		],
 	);
 
 	const clearAllFilters = useCallback(() => {
@@ -272,24 +360,27 @@ export function TracksView() {
 		setSelectedAcademicStages([]);
 	}, []);
 
-	const handleStatusChange = useCallback((trackId: string, newStatus: TrackStatus) => {
-		setLocalTracks((prev) =>
-			prev.map((t) => (t.id === trackId ? { ...t, status: newStatus } : t)),
-		);
-		updateTrackMutation(
-			{ id: trackId, data: { status: newStatus } },
-			{
-				onSuccess: () => {
-					refetchTracks();
-					refetchStats();
-					toast.success("تم تحديث حالة المسار بنجاح");
+	const handleStatusChange = useCallback(
+		(trackId: string, newStatus: TrackStatus) => {
+			setLocalTracks((prev) =>
+				prev.map((t) => (t.id === trackId ? { ...t, status: newStatus } : t)),
+			);
+			updateTrackMutation(
+				{ id: trackId, data: { status: newStatus } },
+				{
+					onSuccess: () => {
+						refetchTracks();
+						refetchStats();
+						toast.success("تم تحديث حالة المسار بنجاح");
+					},
+					onError: () => {
+						refetchTracks();
+					},
 				},
-				onError: () => {
-					refetchTracks();
-				},
-			},
-		);
-	}, [refetchStats, refetchTracks, updateTrackMutation]);
+			);
+		},
+		[refetchStats, refetchTracks, updateTrackMutation],
+	);
 
 	// أعمدة الجدول مطابقة للتصميم المرفق تماماً
 	const columns = useMemo<ColumnDef<TrackRow>[]>(
@@ -308,6 +399,8 @@ export function TracksView() {
 					/>
 				),
 				cell: ({ row }) => (
+					// biome-ignore lint/a11y/noStaticElementInteractions: stop propagation
+					// biome-ignore lint/a11y/useKeyWithClickEvents: stop propagation
 					<div onClick={(e) => e.stopPropagation()}>
 						<Checkbox
 							checked={row.getIsSelected()}
@@ -329,6 +422,8 @@ export function TracksView() {
 				cell: ({ row }) => {
 					const tr = row.original;
 					return (
+						// biome-ignore lint/a11y/noStaticElementInteractions: open track edit
+						// biome-ignore lint/a11y/useKeyWithClickEvents: open track edit
 						<div
 							className="flex flex-col min-w-0 group cursor-pointer"
 							onClick={() => setEditingTrack(tr)}
@@ -426,19 +521,10 @@ export function TracksView() {
 				size: 130,
 				minSize: 110,
 				cell: ({ row }) => {
-					const trainers = row.original.trainers || [];
-					if (trainers.length === 0) {
-						return <span className="text-xs text-muted-foreground">بدون مدرب</span>;
-					}
 					return (
-						<AvatarCirclesStack
-							items={trainers.map((t) => ({
-								id: t.id,
-								name: t.name,
-								title: t.name,
-							}))}
-							variant="mauve"
-							maxVisible={4}
+						<TrainersCell
+							trainers={row.original.trainers}
+							maxVisible={3}
 						/>
 					);
 				},
@@ -464,36 +550,22 @@ export function TracksView() {
 			},
 			{
 				id: "students",
-				header: "# الطلاب",
-				size: 140,
-				minSize: 120,
+				header: "الطلاب",
+				size: 130,
+				minSize: 110,
 				cell: ({ row }) => {
 					const tr = row.original;
 					return (
-						<div
-							className="flex items-center gap-1.5 text-xs cursor-pointer group"
+						<StudentsCell
+							students={tr.students}
+							studentIds={tr.studentIds}
+							totalCount={tr.studentsCount}
+							maxVisible={3}
 							onClick={(e) => {
 								e.stopPropagation();
 								setAssigningTrack(tr);
 							}}
-							title="تسجيل وتعيين الطلاب في المسار"
-						>
-							<span className="font-medium text-foreground group-hover:text-primary group-hover:underline tabular-nums">
-								{tr.studentsCount} طالب
-							</span>
-							{/* {tr.rating > 0 && (
-								<>
-									<span className="text-muted-foreground">•</span>
-									<span className="flex items-center gap-1 text-[11px] font-medium text-amber-600 dark:text-amber-400">
-										<IconStarFilled className="size-3 text-amber-500 fill-amber-500 shrink-0" />
-										<span>{tr.rating}</span>
-										<span className="text-muted-foreground tabular-nums">
-											({tr.reviewsCount})
-										</span>
-									</span>
-								</>
-							)} */}
-						</div>
+						/>
 					);
 				},
 			},
@@ -539,6 +611,8 @@ export function TracksView() {
 				cell: ({ row }) => {
 					const tr = row.original;
 					return (
+						// biome-ignore lint/a11y/noStaticElementInteractions: actions container
+						// biome-ignore lint/a11y/useKeyWithClickEvents: actions container
 						<div
 							className="flex items-center gap-1.5"
 							onClick={(e) => e.stopPropagation()}
@@ -580,7 +654,7 @@ export function TracksView() {
 									</DropdownMenuItem>
 									<DropdownMenuItem
 										className="gap-2 text-xs cursor-pointer"
-										onSelect={() => toast.info(`فتح تفاصيل المسار: ${tr.name}`)}
+										onSelect={() => setEditingTrack(tr)}
 									>
 										<IconEye className="size-3.5" />
 										فتح المسار
@@ -618,19 +692,6 @@ export function TracksView() {
 		getFilteredRowModel: getFilteredRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		getPaginationRowModel: getPaginationRowModel(),
-		globalFilterFn: (row, _columnId, filterValue) => {
-			const s = String(filterValue).toLowerCase().trim();
-			if (!s) return true;
-			const tr = row.original;
-			return (
-				(tr.name || "").toLowerCase().includes(s) ||
-				(tr.code || "").toLowerCase().includes(s) ||
-				(tr.category || "").toLowerCase().includes(s) ||
-				(tr.academicStage || "").toLowerCase().includes(s) ||
-				(tr.ageGroup || "").toLowerCase().includes(s) ||
-				(tr.locationLabel || "").toLowerCase().includes(s)
-			);
-		},
 	});
 
 	// حذف مسار من قاعدة البيانات
@@ -676,12 +737,21 @@ export function TracksView() {
 						onReset={clearAllFilters}
 					/>
 				}
-				onExport={() => toast.success("تم تصدير قائمة المسارات التدريبية بنجاح")}
+				showExport={false}
+				showView={false}
+				leftExtra={
+					<ViewOptionsMenu
+						view={view}
+						onViewChange={setView}
+						oldestFirst={oldestFirst}
+						onOldestFirstChange={setOldestFirst}
+					/>
+				}
 				actions={
 					<Button
 						size="sm"
 						onClick={() => setIsAddOpen(true)}
-						className="gap-1.5"
+						className="gap-1.5 font-bold cursor-pointer"
 					>
 						<IconPlus className="size-4" />
 						إضافة مسار جديد
@@ -689,22 +759,110 @@ export function TracksView() {
 				}
 			/>
 
-			{/* جدول بيانات المسارات بالثيم الرسمي للمنصة */}
-			<TableDataView
-				table={table}
-				columns={columns}
-				isPending={isTracksLoading}
-				tableClassName="w-full min-w-[1250px]"
-				pagination={false}
-				emptyState={{
-					title: "لا توجد مسارات تدريبية مطابقة",
-					description: "يمكنك إضافة مسار تدريبي جديد أو إعادة ضبط خيارات البحث والفلترة.",
-					action: {
-						label: "إضافة مسار جديد",
-						onClick: () => setIsAddOpen(true),
-					},
-				}}
-			/>
+			{/* شرائح الفلاتر النشطة */}
+			{activeFilters.length > 0 && (
+				<div className="flex flex-wrap items-center gap-2 border-b-[0.5px] border-border px-3 py-2 bg-muted/10">
+					{activeFilters.map((f) => (
+						<span
+							key={f.key}
+							className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary shadow-2xs"
+						>
+							<span className="text-muted-foreground">{f.label}:</span>
+							<span>{f.value}</span>
+							<button
+								type="button"
+								onClick={f.onRemove}
+								className="hover:text-primary/70 cursor-pointer p-0.5 rounded-full hover:bg-primary/10 transition-colors"
+								title="إزالة الفلتر"
+							>
+								<IconX className="size-3" />
+							</button>
+						</span>
+					))}
+					<button
+						type="button"
+						onClick={clearAllFilters}
+						className="text-[11px] font-medium text-destructive hover:underline cursor-pointer px-1.5"
+					>
+						إعادة تعيين
+					</button>
+				</div>
+			)}
+
+			{/* محتوى المسارات: جدول أو بطاقات بالثيم الموحد */}
+			<div className="min-h-0 flex-1 overflow-auto bg-background">
+				{isTracksLoading && tracks.length === 0 ? (
+					<Spinner containerClassName="py-24 min-h-0" />
+				) : tracksLoadError ? (
+					<ContentLoadError
+						message={
+							tracksError instanceof Error
+								? tracksError.message
+								: "تعذّر تحميل المسارات التدريبية."
+						}
+						onRetry={() => void refetchTracks()}
+					/>
+				) : filteredTracks.length === 0 ? (
+					<div className="flex flex-col items-center gap-3 px-3 py-16 text-center">
+						<span className="flex size-12 items-center justify-center rounded-2xl bg-muted/80 text-muted-foreground">
+							<IconRoute className="size-6" />
+						</span>
+						<h2 className="text-[14px] font-bold text-foreground">
+							{tracks.length === 0
+								? "لا توجد مسارات تدريبية بعد"
+								: "لا توجد مسارات مطابقة للبحث أو الفلترة"}
+						</h2>
+						<p className="max-w-[320px] text-[12px] text-muted-foreground leading-relaxed">
+							{tracks.length === 0
+								? "أنشئ مسارات تدريبية متكاملة لربط الدورات والمستندات والتقييمات ضمن خطة تعليمية واحدة."
+								: "جرب تغيير معايير البحث أو إعادة ضبط خيارات الفلترة لعرض النتائج."}
+						</p>
+						{tracks.length === 0 ? (
+							<Button
+								type="button"
+								onClick={() => setIsAddOpen(true)}
+								className="h-9 gap-1.5 rounded-lg px-4 text-[12px] font-bold mt-1 cursor-pointer"
+							>
+								<IconPlus className="size-4" />
+								إضافة مسار جديد
+							</Button>
+						) : (
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								onClick={clearAllFilters}
+								className="gap-1.5 text-xs font-semibold mt-1 cursor-pointer"
+							>
+								إعادة ضبط الفلاتر
+							</Button>
+						)}
+					</div>
+				) : view === "grid" ? (
+					<div className="p-3">
+						<div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+							{filteredTracks.map((tr) => (
+								<TrackCard
+									key={tr.id}
+									track={tr}
+									onEdit={() => setEditingTrack(tr)}
+									onDelete={() => setDeletingTrack(tr)}
+									onAssignStaff={() => setAssigningStaffTrack(tr)}
+									onAssignStudent={() => setAssigningTrack(tr)}
+								/>
+							))}
+						</div>
+					</div>
+				) : (
+					<TableDataView
+						table={table}
+						columns={columns}
+						isPending={isTracksLoading}
+						tableClassName="w-full min-w-[1250px]"
+						pagination={false}
+					/>
+				)}
+			</div>
 			<TablePagination
 				page={page - 1}
 				pageCount={totalTrackPages}

@@ -3,7 +3,7 @@ import { IconX } from "@tabler/icons-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { CONTENT_TYPE_OPTIONS } from "@/features/services/training/data/training";
 import { cn } from "@/lib/utils";
-import type { CourseContentType } from "@/server/training/training.type";
+import type { CourseContentType } from "@sanad/contracts/runtime/server/training/training.type";
 
 // منتقي «إنشاء محتوى جديد» — يعرض بطاقات أنواع المحتوى (صفحة/درس/اختبار) بنظام تصميم التطبيق.
 // متمركز، بتخطيط RTL؛ اختيار بطاقة يستدعي onSelect بالنوع، والإغلاق يستدعي onClose.

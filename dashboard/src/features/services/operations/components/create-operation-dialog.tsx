@@ -58,13 +58,19 @@ import {
 import { SEDATION_LABELS } from "@sanad/contracts/runtime/server/radiology/radiology-procedure.type";
 
 // غرف العمليات والفحص المتاحة — من نقطة theatres في وحدة العمليات
+type OperationTheatre = {
+	id: string;
+	name: string;
+	type: "OPERATING" | "EXAMINATION";
+	branch: { name: string };
+};
 const useOperationTheatres = () => {
-  const { data } = useQuery({
+	const { data } = useQuery<OperationTheatre[]>({
     queryKey: ["operations", "theatres"],
     queryFn: async () => {
       const res = await api.operations.theatres.get();
       if (res.error) throw new Error("فشل جلب غرف العمليات");
-      return res.data;
+		return res.data as OperationTheatre[];
     },
     staleTime: 60_000,
   });

@@ -42,8 +42,10 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { useAcademicStageOptions, useClassrooms } from "@/features/services/classrooms/hooks/use-classrooms";
-import { AGE_GROUPS } from "@/features/services/classrooms/data/constants";
+import {
+	useAcademicStageOptions,
+	useClassrooms,
+} from "@/features/services/classrooms/hooks/use-classrooms";
 import {
 	calculateAge,
 	getAgeGroupFromAge,
@@ -110,7 +112,14 @@ export function PatientFormContent({
 	const watchedAcademicStage = watch("academicStage");
 	const watchedClassroom = watch("classroom");
 	const availableAcademicStages = useMemo(
-		() => Array.from(new Set([...academicStages, watchedAcademicStage].filter((stage): stage is string => Boolean(stage)))),
+		() =>
+			Array.from(
+				new Set(
+					[...academicStages, watchedAcademicStage].filter((stage): stage is string =>
+						Boolean(stage),
+					),
+				),
+			),
 		[academicStages, watchedAcademicStage],
 	);
 
@@ -132,20 +141,22 @@ export function PatientFormContent({
 		}
 	}, [watchedBirthDate, watchedAgeGroup, setValue]);
 
-	const effectiveAgeGroup =
-		watchedAgeGroup ||
-		(watchedBirthDate ? getAgeGroupFromAge(calculateAge(watchedBirthDate)) : "");
-
 	const normalizeStage = (value?: string | null) => value?.trim().toLocaleLowerCase() || null;
 	// الفصول المتاحة مرتبطة بالمرحلة الدراسية؛ الفئة العمرية للمعلومة فقط.
 	const availableClassrooms = useMemo(() => {
-		return classrooms.filter((classroom) => normalizeStage(classroom.academicStage) === normalizeStage(watchedAcademicStage));
+		return classrooms.filter(
+			(classroom) =>
+				normalizeStage(classroom.academicStage) === normalizeStage(watchedAcademicStage),
+		);
 	}, [classrooms, watchedAcademicStage]);
 
 	useEffect(() => {
 		if (!watchedClassroom) return;
 		const current = classrooms.find((classroom) => classroom.name === watchedClassroom);
-		if (current && normalizeStage(current.academicStage) !== normalizeStage(watchedAcademicStage)) {
+		if (
+			current &&
+			normalizeStage(current.academicStage) !== normalizeStage(watchedAcademicStage)
+		) {
 			setValue("classroom", "", { shouldDirty: true, shouldValidate: true });
 		}
 	}, [classrooms, watchedAcademicStage, watchedClassroom, setValue]);
@@ -266,8 +277,14 @@ export function PatientFormContent({
 										value={field.value || ""}
 										onValueChange={(value) => {
 											field.onChange(value);
-											const current = classrooms.find((classroom) => classroom.name === watchedClassroom);
-											if (current && normalizeStage(current.academicStage || current.classification) !== normalizeStage(value)) {
+											const current = classrooms.find(
+												(classroom) => classroom.name === watchedClassroom,
+											);
+											if (
+												current &&
+												normalizeStage(current.academicStage || current.classification) !==
+													normalizeStage(value)
+											) {
 												setValue("classroom", "", { shouldDirty: true, shouldValidate: true });
 											}
 										}}
@@ -282,7 +299,12 @@ export function PatientFormContent({
 										</SelectTrigger>
 										<SelectContent dir="rtl">
 											{availableAcademicStages.map((stage) => (
-												<SelectItem key={stage} value={stage}>{stage}</SelectItem>
+												<SelectItem
+													key={stage}
+													value={stage}
+												>
+													{stage}
+												</SelectItem>
 											))}
 										</SelectContent>
 									</Select>
@@ -425,7 +447,9 @@ export function PatientFormContent({
 									{watchedAcademicStage ? (
 										<p className="text-[11px] text-muted-foreground mt-0.5">
 											معروضة الفصول المتوافقة مع المرحلة الدراسية:{" "}
-											<span className="font-semibold text-primary">{watchedAcademicStage}</span>
+											<span className="font-semibold text-primary">
+												{watchedAcademicStage}
+											</span>
 										</p>
 									) : (
 										<p className="text-[11px] text-amber-600 dark:text-amber-400 mt-0.5">

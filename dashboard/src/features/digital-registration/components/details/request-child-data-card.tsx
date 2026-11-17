@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-	IconCalendar,
 	IconCash,
 	IconCheck,
 	IconCopy,
@@ -15,8 +14,6 @@ import {
 	IconX,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
-
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
 import {
@@ -40,11 +37,7 @@ import { AssessmentDetailsDrawer } from "./assessment-details-drawer";
 import { FillAssessmentDrawer } from "./fill-assessment-drawer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { backendFetch } from "@/lib/backend-fetch";
@@ -59,7 +52,10 @@ import {
 interface RequestChildDataCardProps {
 	request: CampaignRequestItem;
 	campaignId?: string;
-	onStatusChange?: (request: CampaignRequestItem, status: CampaignRequestItem["status"]) => void;
+	onStatusChange?: (
+		request: CampaignRequestItem,
+		status: CampaignRequestItem["status"],
+	) => void;
 	onOpenReschedule?: () => void;
 	onOpenAssignPlan?: () => void;
 	onOpenCashPayment?: () => void;
@@ -111,7 +107,7 @@ export function RequestChildDataCard({
 				onError: (err: any) => {
 					toast.error(err?.message || "فشل اعتماد السداد");
 				},
-			}
+			},
 		);
 	};
 
@@ -146,38 +142,37 @@ export function RequestChildDataCard({
 
 	const displayAge = computeAgeLabel(request.birthDate, request.ageLabel);
 	const displayLevel = getStudentLevel(request);
-
 	const attendanceProb = getAttendanceProbability(request);
-	const attendanceProbability = attendanceProb.percentage;
+
 
 	// مؤشرات الحالة المنطقية
 	const status = request.status;
-	const isQueue = status === "QUEUE";
 	const isShortlist = status === "SHORTLIST" || status === "REVIEW";
-	const isInterview = status === "INTERVIEW" || status === "IN_EVALUATION" || status === "EVALUATION";
-	const isWaitlist = status === "WAITLIST";
+	const isInterview =
+		status === "INTERVIEW" || status === "IN_EVALUATION" || status === "EVALUATION";
 	const isAwaitingPayment = status === "AWAITING_PAYMENT";
 	const isAccepted = status === "ACCEPTED";
 	const isRejected = status === "REJECTED";
 	const isDuplicate = status === "DUPLICATE";
 
 	// قاعدة الحيادية المطلقة: بطاقة نتائج التقييم تظهر حصراً بعد الفرز الأولي (المقابلة، انتظار الدفع، القبول، والرفض)
-	const isPostScreening = isInterview || isAwaitingPayment || isAccepted || isRejected;
 
 	// التحقق من اكتمال التقييم الأولي (سواء عبر الحقل المهيكل الجديد أو النص الموروث)
 	const isAssessmentDone = Boolean(
 		(request.assessmentData &&
-			((Array.isArray(request.assessmentData.answers) && request.assessmentData.answers.length > 0) ||
+			((Array.isArray(request.assessmentData.answers) &&
+				request.assessmentData.answers.length > 0) ||
 				request.assessmentData.score !== undefined ||
 				request.assessmentData.candidate)) ||
-		(request.notes &&
-			(request.notes.includes("إجابات التقييم:") ||
-				request.notes.includes("تم التقييم حضورياً") ||
-				request.notes.includes("استبيان التقييم الأولي")))
+			(request.notes &&
+				(request.notes.includes("إجابات التقييم:") ||
+					request.notes.includes("تم التقييم حضورياً") ||
+					request.notes.includes("استبيان التقييم الأولي"))),
 	);
 
 	const assessmentFormattedDate = (() => {
-		const rawDate = request.assessmentData?.submittedAt || request.submittedAt || request.createdAt;
+		const rawDate =
+			request.assessmentData?.submittedAt || request.submittedAt || request.createdAt;
 		if (!rawDate) return "مؤخراً";
 		const d = new Date(rawDate);
 		if (isNaN(d.getTime())) return "مؤخراً";
@@ -191,12 +186,6 @@ export function RequestChildDataCard({
 		}).format(d);
 	})();
 
-	const handleCopyAssessmentLink = () => {
-		const url = getChildAssessmentUrl(request.code);
-		navigator.clipboard.writeText(url);
-		toast.success("تم نسخ رابط التقييم الأولي المخصص للطالب بنجاح");
-	};
-
 	const handleSendAssessmentLink = () => {
 		const url = getChildAssessmentUrl(request.code);
 		navigator.clipboard.writeText(url);
@@ -208,7 +197,9 @@ export function RequestChildDataCard({
 
 		const cleanPhone = request.guardianPhone.replace(/\D/g, "");
 		const childDisplayName = request.patientName || request.childName || "الطفل";
-		const guardianDisplayName = request.guardianName ? `أ/ ${request.guardianName}` : "ولي الأمر";
+		const guardianDisplayName = request.guardianName
+			? `أ/ ${request.guardianName}`
+			: "ولي الأمر";
 		const message = `السلام عليكم ورحمة الله وبركاته،\nأهلاً بحضرتك ${guardianDisplayName}،\nنرجو منكم التكرم بتعبئة التقييم الأولي للطالب (${childDisplayName}) لاستكمال إجراءات القبول في الأكاديمية:\n${url}\n\nشاكرين ومقدرين حسن تعاونكم.`;
 		const waUrl = getWhatsAppUrl(cleanPhone, message);
 		if (waUrl) {
@@ -221,7 +212,7 @@ export function RequestChildDataCard({
 
 	const hasAppointment = Boolean(
 		request.appointmentDate ||
-		(request.assessmentAppointment && request.assessmentAppointment.status !== "CANCELLED")
+			(request.assessmentAppointment && request.assessmentAppointment.status !== "CANCELLED"),
 	);
 
 	// Date formatters
@@ -240,17 +231,17 @@ export function RequestChildDataCard({
 		? request.preferredShift === "MORNING"
 			? "صباحي"
 			: request.preferredShift === "EVENING"
-			? "مسائي"
-			: request.preferredShift
+				? "مسائي"
+				: request.preferredShift
 		: null;
 	const learningModeLabel = request.learningMode
 		? request.learningMode === "IN_PERSON"
 			? "حضوري"
 			: request.learningMode === "REMOTE"
-			? "عن بعد"
-			: request.learningMode === "HYBRID"
-			? "مدمج"
-			: request.learningMode
+				? "عن بعد"
+				: request.learningMode === "HYBRID"
+					? "مدمج"
+					: request.learningMode
 		: null;
 	const studyPeriodDisplay =
 		[shiftLabel, learningModeLabel].filter(Boolean).join(" • ") || "غير محدد";
@@ -278,16 +269,18 @@ export function RequestChildDataCard({
 		: "لم يُحدد بعد";
 
 	// Allergies list
-	const allergies: string[] = Array.isArray(request.allergiesList) && request.allergiesList.length > 0
-		? (request.allergiesList as string[])
-		: request.allergies
-		? [request.allergies]
-		: [];
+	const allergies: string[] =
+		Array.isArray(request.allergiesList) && request.allergiesList.length > 0
+			? (request.allergiesList as string[])
+			: request.allergies
+				? [request.allergies]
+				: [];
 
 	// Medications list
-	const medications: string[] = Array.isArray(request.medications) && request.medications.length > 0
-		? request.medications.map((m: any) => typeof m === "string" ? m : m.name)
-		: [];
+	const medications: string[] =
+		Array.isArray(request.medications) && request.medications.length > 0
+			? request.medications.map((m: any) => (typeof m === "string" ? m : m.name))
+			: [];
 
 	// Handlers
 	const handleSendWhatsappReminder = () => {
@@ -302,7 +295,7 @@ export function RequestChildDataCard({
 					day: "numeric",
 					month: "long",
 					year: "numeric",
-			  })
+				})
 			: "";
 		const timeFormatted = request.appointmentDate
 			? formatAppointmentTime(request.appointmentDate, clinicTimezone, "ar-EG-u-nu-latn")
@@ -438,7 +431,8 @@ export function RequestChildDataCard({
 		quickUpdateMutation.mutate(
 			{ requestId: request.id, data: { includeMeals: val } },
 			{
-				onSuccess: () => toast.success(val ? "تم تفعيل تضمين الوجبات" : "تم إلغاء تضمين الوجبات"),
+				onSuccess: () =>
+					toast.success(val ? "تم تفعيل تضمين الوجبات" : "تم إلغاء تضمين الوجبات"),
 			},
 		);
 	};
@@ -448,13 +442,17 @@ export function RequestChildDataCard({
 		quickUpdateMutation.mutate(
 			{ requestId: request.id, data: { enableDailyStipend: val } },
 			{
-				onSuccess: () => toast.success(val ? "تم تفعيل المصروف اليومي" : "تم إلغاء المصروف اليومي"),
+				onSuccess: () =>
+					toast.success(val ? "تم تفعيل المصروف اليومي" : "تم إلغاء المصروف اليومي"),
 			},
 		);
 	};
 
 	return (
-		<div className="space-y-1.5 font-sans" dir="rtl">
+		<div
+			className="space-y-1.5 font-sans"
+			dir="rtl"
+		>
 			{/* عنوان القسم الخارجي */}
 			<h3 className="text-[13.5px] font-bold text-zinc-900 dark:text-zinc-100">
 				بيانات الطالب
@@ -475,9 +473,7 @@ export function RequestChildDataCard({
 						{request.gender === "MALE" ? "ذكر" : "أنثى"}
 					</span>
 					<span className="text-zinc-300 dark:text-zinc-600 font-bold">•</span>
-					<span className="text-zinc-500 text-xs shrink-0">
-						{displayAge}
-					</span>
+					<span className="text-zinc-500 text-xs shrink-0">{displayAge}</span>
 					{displayLevel && (
 						<>
 							<span className="text-zinc-300 dark:text-zinc-600 font-bold">•</span>
@@ -493,10 +489,14 @@ export function RequestChildDataCard({
 					<div
 						className={cn(
 							"flex items-center justify-between gap-2 rounded-md border px-3 py-1.5 text-xs transition-colors",
-							attendanceProb.variant === "emerald" && "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/40 text-emerald-800 dark:text-emerald-300",
-							attendanceProb.variant === "blue" && "bg-[#EEF2FF] dark:bg-indigo-950/40 border-[#E0E7FF] dark:border-indigo-900/40 text-[#4F46E5] dark:text-indigo-300",
-							attendanceProb.variant === "amber" && "bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/40 text-amber-800 dark:text-amber-300",
-							attendanceProb.variant === "rose" && "bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/40 text-rose-800 dark:text-rose-300",
+							attendanceProb.variant === "emerald" &&
+								"bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-900/40 text-emerald-800 dark:text-emerald-300",
+							attendanceProb.variant === "blue" &&
+								"bg-[#EEF2FF] dark:bg-indigo-950/40 border-[#E0E7FF] dark:border-indigo-900/40 text-[#4F46E5] dark:text-indigo-300",
+							attendanceProb.variant === "amber" &&
+								"bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-900/40 text-amber-800 dark:text-amber-300",
+							attendanceProb.variant === "rose" &&
+								"bg-rose-50 dark:bg-rose-950/40 border-rose-200 dark:border-rose-900/40 text-rose-800 dark:text-rose-300",
 						)}
 					>
 						<div className="flex items-center gap-1.5 font-medium">
@@ -509,7 +509,10 @@ export function RequestChildDataCard({
 									attendanceProb.variant === "rose" && "text-rose-600",
 								)}
 							/>
-							<span>{attendanceProb.label}{attendanceProb.reason ? ` (${attendanceProb.reason})` : ""}</span>
+							<span>
+								{attendanceProb.label}
+								{attendanceProb.reason ? ` (${attendanceProb.reason})` : ""}
+							</span>
 						</div>
 						{isInterview && hasAppointment && request.guardianPhone && (
 							<button
@@ -524,8 +527,12 @@ export function RequestChildDataCard({
 				)}
 
 				{/* 2.5 قسم التقييم الأولي - لا يظهر في الطابور ولا القائمة المختصرة ولا قائمة الانتظار، ويظهر فقط في المقابلة وانتظار الدفع والقبول والرفض */}
-				{!isDuplicate && !(["QUEUE", "SHORTLIST", "WAITLIST"].includes(request.status) || ["queue", "shortlist", "waitlist"].includes((request as any).column)) && (
-					isAssessmentDone ? (
+				{!isDuplicate &&
+					!(
+						["QUEUE", "SHORTLIST", "WAITLIST"].includes(request.status) ||
+						["queue", "shortlist", "waitlist"].includes((request as any).column)
+					) &&
+					(isAssessmentDone ? (
 						<div className="flex items-center justify-between gap-2 rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 px-3 py-2 shadow-2xs">
 							{/* الطرف الأيمن: الأيقونة والعنوان وشارة الحالة */}
 							<div className="flex items-center gap-2 min-w-0">
@@ -587,14 +594,15 @@ export function RequestChildDataCard({
 								</button>
 							</div>
 						</div>
-					)
-				)}
+					))}
 
 				{/* 3. ملاحظات المراجع */}
 				<div className="space-y-1.5">
 					<div className="flex items-center justify-between">
 						<div className="flex items-center gap-1.5">
-							<span className="font-bold text-xs text-zinc-900 dark:text-zinc-100">ملاحظات المراجع</span>
+							<span className="font-bold text-xs text-zinc-900 dark:text-zinc-100">
+								ملاحظات المراجع
+							</span>
 							<span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 rounded text-[10px] text-zinc-400 dark:text-zinc-500 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
 								<IconPaperclip className="size-2.5 rotate-45" />
 								<span>داخلية</span>
@@ -648,7 +656,9 @@ export function RequestChildDataCard({
 							{request.notes ? (
 								<span>{request.notes}</span>
 							) : (
-								<span className="text-zinc-400 italic text-[11px]">لا توجد ملاحظات مراجع مسجلة.</span>
+								<span className="text-zinc-400 italic text-[11px]">
+									لا توجد ملاحظات مراجع مسجلة.
+								</span>
 							)}
 						</div>
 					)}
@@ -659,12 +669,16 @@ export function RequestChildDataCard({
 					{/* تاريخ الميلاد */}
 					<div className="flex items-center justify-between py-1">
 						<span className="font-medium text-zinc-600 dark:text-zinc-400">تاريخ الميلاد</span>
-						<span className="font-semibold text-zinc-900 dark:text-zinc-100">{birthDateFormatted}</span>
+						<span className="font-semibold text-zinc-900 dark:text-zinc-100">
+							{birthDateFormatted}
+						</span>
 					</div>
 
 					{/* المسار المطلوب */}
 					<div className="flex items-center justify-between py-1">
-						<span className="font-medium text-zinc-600 dark:text-zinc-400">المسار المطلوب</span>
+						<span className="font-medium text-zinc-600 dark:text-zinc-400">
+							المسار المطلوب
+						</span>
 						<span className="font-semibold text-zinc-900 dark:text-zinc-100">
 							{request.proposedTrack || request.targetClass || "مسار عام"}
 						</span>
@@ -681,7 +695,9 @@ export function RequestChildDataCard({
 					{/* موعد المقابلة - منطق ذكي متخصص لكل مرحلة */}
 					{isShortlist && !hasAppointment && (
 						<div className="flex items-center justify-between py-1">
-							<span className="font-medium text-zinc-600 dark:text-zinc-400">موعد المقابلة</span>
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">
+								موعد المقابلة
+							</span>
 							<div className="flex items-center gap-2">
 								{capabilities.canSchedule && onOpenReschedule && (
 									<button
@@ -702,7 +718,9 @@ export function RequestChildDataCard({
 					{isInterview && (
 						<>
 							<div className="flex items-center justify-between py-1">
-								<span className="font-medium text-zinc-600 dark:text-zinc-400">موعد المقابلة</span>
+								<span className="font-medium text-zinc-600 dark:text-zinc-400">
+									موعد المقابلة
+								</span>
 								<div className="flex items-center gap-2">
 									{capabilities.canSchedule && onOpenReschedule && (
 										<button
@@ -738,7 +756,9 @@ export function RequestChildDataCard({
 							)}
 
 							<div className="flex items-center justify-between py-1">
-								<span className="font-medium text-zinc-600 dark:text-zinc-400">مدة المقابلة</span>
+								<span className="font-medium text-zinc-600 dark:text-zinc-400">
+									مدة المقابلة
+								</span>
 								<span className="font-semibold text-zinc-900 dark:text-zinc-100">
 									{effectiveDurationMinutes} دقيقة
 								</span>
@@ -749,7 +769,9 @@ export function RequestChildDataCard({
 					{(isAwaitingPayment || isAccepted) && hasAppointment && (
 						<>
 							<div className="flex items-center justify-between py-1">
-								<span className="font-medium text-zinc-600 dark:text-zinc-400">تاريخ المقابلة</span>
+								<span className="font-medium text-zinc-600 dark:text-zinc-400">
+									تاريخ المقابلة
+								</span>
 								<span className="font-semibold text-emerald-700 dark:text-emerald-400">
 									{appointmentTimeFormatted} (تمت المقابلة)
 								</span>
@@ -773,7 +795,10 @@ export function RequestChildDataCard({
 								{isAccepted ? "الفصل الدراسي" : "الفصل المقترح"}
 							</span>
 							{capabilities.canEdit && !isRejected && !isDuplicate ? (
-								<Popover open={classPopoverOpen} onOpenChange={setClassPopoverOpen}>
+								<Popover
+									open={classPopoverOpen}
+									onOpenChange={setClassPopoverOpen}
+								>
 									<PopoverTrigger asChild>
 										{request.targetClass ? (
 											<button
@@ -792,7 +817,11 @@ export function RequestChildDataCard({
 											</button>
 										)}
 									</PopoverTrigger>
-									<PopoverContent align="end" className="w-52 p-1.5" dir="rtl">
+									<PopoverContent
+										align="end"
+										className="w-52 p-1.5"
+										dir="rtl"
+									>
 										<p className="text-[10px] font-bold text-zinc-800 dark:text-zinc-200 px-1.5 py-0.5">
 											{isAccepted ? "تسكين الطالب في فصل" : "اختر الفصل المناسب للطالب"}
 										</p>
@@ -821,7 +850,9 @@ export function RequestChildDataCard({
 
 				{/* 5. المعلومات الطبية: فاصل علوي واضح بين السكاشن */}
 				<div className="space-y-2 border-t border-zinc-200 dark:border-zinc-700 pt-3 text-xs">
-					<h4 className="font-bold text-xs text-zinc-900 dark:text-zinc-100 pb-0.5">المعلومات الطبية</h4>
+					<h4 className="font-bold text-xs text-zinc-900 dark:text-zinc-100 pb-0.5">
+						المعلومات الطبية
+					</h4>
 
 					{/* الحساسية */}
 					<div className="space-y-1.5 py-0.5">
@@ -829,7 +860,10 @@ export function RequestChildDataCard({
 							<span className="font-medium text-zinc-600 dark:text-zinc-400">الحساسية</span>
 							<div className="flex items-center gap-1">
 								{capabilities.canEdit && (
-									<Popover open={allergyPopoverOpen} onOpenChange={setAllergyPopoverOpen}>
+									<Popover
+										open={allergyPopoverOpen}
+										onOpenChange={setAllergyPopoverOpen}
+									>
 										<PopoverTrigger asChild>
 											<button
 												type="button"
@@ -839,7 +873,11 @@ export function RequestChildDataCard({
 												<span>إضافة حساسية</span>
 											</button>
 										</PopoverTrigger>
-										<PopoverContent align="end" className="w-56 p-2" dir="rtl">
+										<PopoverContent
+											align="end"
+											className="w-56 p-2"
+											dir="rtl"
+										>
 											<p className="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 mb-1.5">
 												اسم الحساسية أو المسبب
 											</p>
@@ -856,7 +894,11 @@ export function RequestChildDataCard({
 													placeholder="مثال: الفول السوداني"
 													className="h-6.5 text-[10.5px] flex-1"
 												/>
-												<Button size="sm" className="h-6.5 text-[10.5px] px-2" onClick={handleAddAllergy}>
+												<Button
+													size="sm"
+													className="h-6.5 text-[10.5px] px-2"
+													onClick={handleAddAllergy}
+												>
 													إضافة
 												</Button>
 											</div>
@@ -900,7 +942,10 @@ export function RequestChildDataCard({
 							<span className="font-medium text-zinc-600 dark:text-zinc-400">الأدوية</span>
 							<div className="flex items-center gap-1">
 								{capabilities.canEdit && (
-									<Popover open={medicationPopoverOpen} onOpenChange={setMedicationPopoverOpen}>
+									<Popover
+										open={medicationPopoverOpen}
+										onOpenChange={setMedicationPopoverOpen}
+									>
 										<PopoverTrigger asChild>
 											<button
 												type="button"
@@ -910,7 +955,11 @@ export function RequestChildDataCard({
 												<span>إضافة دواء</span>
 											</button>
 										</PopoverTrigger>
-										<PopoverContent align="end" className="w-56 p-2" dir="rtl">
+										<PopoverContent
+											align="end"
+											className="w-56 p-2"
+											dir="rtl"
+										>
 											<p className="text-[10px] font-bold text-zinc-900 dark:text-zinc-100 mb-1.5">
 												اسم الدواء والجرعة
 											</p>
@@ -927,7 +976,11 @@ export function RequestChildDataCard({
 													placeholder="مثال: بخاخ فنتولين"
 													className="h-6.5 text-[10.5px] flex-1"
 												/>
-												<Button size="sm" className="h-6.5 text-[10.5px] px-2" onClick={handleAddMedication}>
+												<Button
+													size="sm"
+													className="h-6.5 text-[10.5px] px-2"
+													onClick={handleAddMedication}
+												>
 													إضافة
 												</Button>
 											</div>
@@ -975,7 +1028,9 @@ export function RequestChildDataCard({
 
 						{/* اختيار الباقة */}
 						<div className="flex items-center justify-between py-1">
-							<span className="font-medium text-zinc-600 dark:text-zinc-400">اختيار الباقة</span>
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">
+								اختيار الباقة
+							</span>
 							{capabilities.canEdit && !isAccepted ? (
 								request.subscriptionPlanName ? (
 									<button
@@ -985,7 +1040,9 @@ export function RequestChildDataCard({
 										title="انقر لتعديل باقة الاشتراك"
 									>
 										<span>{request.subscriptionPlanName}</span>
-										<span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-normal">تغيير</span>
+										<span className="text-[10px] text-zinc-500 dark:text-zinc-400 font-normal">
+											تغيير
+										</span>
 									</button>
 								) : (
 									<button
@@ -1019,35 +1076,58 @@ export function RequestChildDataCard({
 
 						{/* تضمين الوجبات */}
 						<div className="flex items-center justify-between py-1">
-							<span className="font-medium text-zinc-600 dark:text-zinc-400">تضمين الوجبات (ضمن مشمولات الباقة)</span>
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">
+								تضمين الوجبات (ضمن مشمولات الباقة)
+							</span>
 							<Switch
 								checked={request.includeMeals ?? false}
 								onCheckedChange={handleToggleMeals}
-								disabled={!capabilities.canEdit || isAccepted || Boolean(request.paidAt) || quickUpdateMutation.isPending}
+								disabled={
+									!capabilities.canEdit ||
+									isAccepted ||
+									Boolean(request.paidAt) ||
+									quickUpdateMutation.isPending
+								}
 								className="scale-85"
 							/>
 						</div>
 
 						{/* تفعيل المصروف اليومي */}
 						<div className="flex items-center justify-between py-1">
-							<span className="font-medium text-zinc-600 dark:text-zinc-400">تفعيل المصروف اليومي (ضمن مشمولات الباقة)</span>
+							<span className="font-medium text-zinc-600 dark:text-zinc-400">
+								تفعيل المصروف اليومي (ضمن مشمولات الباقة)
+							</span>
 							<Switch
 								checked={request.enableDailyStipend ?? false}
 								onCheckedChange={handleToggleStipend}
-								disabled={!capabilities.canEdit || isAccepted || Boolean(request.paidAt) || quickUpdateMutation.isPending}
+								disabled={
+									!capabilities.canEdit ||
+									isAccepted ||
+									Boolean(request.paidAt) ||
+									quickUpdateMutation.isPending
+								}
 								className="scale-85"
 							/>
 						</div>
 
 						{/* حالة السداد والفاتورة (يبقى ظاهراً بعد القبول لعرض الوسيلة وطباعة الإيصال) */}
-						{(isAwaitingPayment || isAccepted || Boolean(request.paymentToken) || Boolean(request.paidAt) || Boolean(request.paymentReceiptUrl)) && (
+						{(isAwaitingPayment ||
+							isAccepted ||
+							Boolean(request.paymentToken) ||
+							Boolean(request.paidAt) ||
+							Boolean(request.paymentReceiptUrl)) && (
 							<div className="pt-2 border-t border-zinc-200/80 dark:border-zinc-700/80 space-y-2.5">
 								<div className="flex items-center justify-between gap-2">
-									<span className="font-semibold text-zinc-700 dark:text-zinc-300">سداد الرسوم:</span>
+									<span className="font-semibold text-zinc-700 dark:text-zinc-300">
+										سداد الرسوم:
+									</span>
 									<div className="flex items-center gap-1.5 flex-wrap">
 										{(request.paidAt || isAccepted) && (
 											<span className="inline-flex items-center gap-1 rounded bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/70 px-2 py-0.5 text-[10.5px] font-bold text-blue-700 dark:text-blue-300">
-												{formatPaymentMethodLabelArabic(request.paymentMethodType, request.paymentGateway)}
+												{formatPaymentMethodLabelArabic(
+													request.paymentMethodType,
+													request.paymentGateway,
+												)}
 											</span>
 										)}
 										{request.paidAt || isAccepted ? (
@@ -1068,76 +1148,91 @@ export function RequestChildDataCard({
 								</div>
 
 								{/* ملخص الإيصال الدائم بعد السداد وزر فتح/طباعة الفاتورة */}
-								{(request.paidAt || isAccepted) && (() => {
-									const cur = resolveClinicCurrencySymbol(clinicInfo?.currencyCode);
-									const meta = parseRegistrationPaymentMetadata(request.paymentNotes);
-									const paidDateText = request.paidAt
-										? new Intl.DateTimeFormat("ar-EG-u-nu-latn", {
-												day: "numeric",
-												month: "long",
-												year: "numeric",
-										  }).format(new Date(request.paidAt))
-										: null;
-									return (
-										<div className="rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 p-2.5 space-y-2">
-											<div className="flex items-center justify-between gap-3 flex-wrap text-[11px]">
-												<div className="flex items-center gap-5 flex-wrap">
-													{request.paymentReference && (
-														<div>
-															<span className="text-muted-foreground block text-[10px]">معرف الإيصال</span>
-															<span className="font-semibold text-zinc-900 dark:text-zinc-100" dir="ltr">
-																{request.paymentReference}
-															</span>
-														</div>
-													)}
-													{paidDateText && (
-														<div>
-															<span className="text-muted-foreground block text-[10px]">تاريخ السداد</span>
-															<span className="font-semibold text-zinc-900 dark:text-zinc-100">{paidDateText}</span>
-														</div>
+								{(request.paidAt || isAccepted) &&
+									(() => {
+										const cur = resolveClinicCurrencySymbol(clinicInfo?.currencyCode);
+										const meta = parseRegistrationPaymentMetadata(request.paymentNotes);
+										const paidDateText = request.paidAt
+											? new Intl.DateTimeFormat("ar-EG-u-nu-latn", {
+													day: "numeric",
+													month: "long",
+													year: "numeric",
+												}).format(new Date(request.paidAt))
+											: null;
+										return (
+											<div className="rounded-lg border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-900/40 p-2.5 space-y-2">
+												<div className="flex items-center justify-between gap-3 flex-wrap text-[11px]">
+													<div className="flex items-center gap-5 flex-wrap">
+														{request.paymentReference && (
+															<div>
+																<span className="text-muted-foreground block text-[10px]">
+																	معرف الإيصال
+																</span>
+																<span
+																	className="font-semibold text-zinc-900 dark:text-zinc-100"
+																	dir="ltr"
+																>
+																	{request.paymentReference}
+																</span>
+															</div>
+														)}
+														{paidDateText && (
+															<div>
+																<span className="text-muted-foreground block text-[10px]">
+																	تاريخ السداد
+																</span>
+																<span className="font-semibold text-zinc-900 dark:text-zinc-100">
+																	{paidDateText}
+																</span>
+															</div>
+														)}
+													</div>
+
+													{onOpenViewReceipt && (
+														<Button
+															type="button"
+															size="sm"
+															variant="outline"
+															onClick={onOpenViewReceipt}
+															className="h-7 px-2.5 text-[11px] font-semibold gap-1.5 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 shrink-0 cursor-pointer"
+														>
+															<IconReceipt className="size-3.5 text-zinc-500" />
+															<span>عرض / طباعة الفاتورة</span>
+														</Button>
 													)}
 												</div>
 
-												{onOpenViewReceipt && (
-													<Button
-														type="button"
-														size="sm"
-														variant="outline"
-														onClick={onOpenViewReceipt}
-														className="h-7 px-2.5 text-[11px] font-semibold gap-1.5 bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 shrink-0 cursor-pointer"
-													>
-														<IconReceipt className="size-3.5 text-zinc-500" />
-														<span>عرض / طباعة الفاتورة</span>
-													</Button>
+												{meta.changeAmount !== undefined && meta.changeAmount > 0 && (
+													<div className="flex items-center justify-between pt-1.5 border-t border-zinc-200/70 dark:border-zinc-800 text-[10.5px]">
+														<span className="text-muted-foreground">
+															المستلم نقداً: {formatMoneyNumber(meta.cashReceived)} {cur}
+														</span>
+														<span className="font-semibold text-zinc-700 dark:text-zinc-300">
+															الباقي المرتجع: {formatMoneyNumber(meta.changeAmount)} {cur}
+														</span>
+													</div>
 												)}
 											</div>
-
-											{meta.changeAmount !== undefined && meta.changeAmount > 0 && (
-												<div className="flex items-center justify-between pt-1.5 border-t border-zinc-200/70 dark:border-zinc-800 text-[10.5px]">
-													<span className="text-muted-foreground">
-														المستلم نقداً: {formatMoneyNumber(meta.cashReceived)} {cur}
-													</span>
-													<span className="font-semibold text-zinc-700 dark:text-zinc-300">
-														الباقي المرتجع: {formatMoneyNumber(meta.changeAmount)} {cur}
-													</span>
-												</div>
-											)}
-										</div>
-									);
-								})()}
+										);
+									})()}
 
 								{/* رابط الدفع الإلكتروني وزر الدفع كاش في مرحلة بانتظار الدفع */}
 								{!isAccepted && !request.paidAt && (
 									<>
 										{request.paymentToken && (
 											<div className="flex items-center justify-between gap-1.5 rounded bg-zinc-50 dark:bg-zinc-800/80 p-1.5 border border-zinc-200 dark:border-zinc-700">
-												<span className="text-[10px] text-muted-foreground truncate font-mono select-all flex-1" dir="ltr">
+												<span
+													className="text-[10px] text-muted-foreground truncate font-mono select-all flex-1"
+													dir="ltr"
+												>
 													{getPublicPaymentUrl(request.paymentToken)}
 												</span>
 												<button
 													type="button"
 													onClick={() => {
-														navigator.clipboard.writeText(getPublicPaymentUrl(request.paymentToken!));
+														navigator.clipboard.writeText(
+															getPublicPaymentUrl(request.paymentToken!),
+														);
 														toast.success("تم نسخ رابط سداد الرسوم");
 													}}
 													className="inline-flex items-center gap-1 h-5 px-1.5 text-[10px] font-semibold bg-white dark:bg-zinc-700 border border-zinc-200 dark:border-zinc-600 rounded hover:bg-zinc-100 dark:hover:bg-zinc-600 transition-colors cursor-pointer"
@@ -1148,7 +1243,9 @@ export function RequestChildDataCard({
 												</button>
 												<button
 													type="button"
-													onClick={() => window.open(getPublicPaymentUrl(request.paymentToken!), "_blank")}
+													onClick={() =>
+														window.open(getPublicPaymentUrl(request.paymentToken!), "_blank")
+													}
 													className="inline-flex items-center h-5 px-1 text-[10px] text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer"
 													title="معاينة"
 												>

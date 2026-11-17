@@ -6,10 +6,11 @@ import {
 	IconUser,
 } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
-import { formatAppointmentDate, formatAppointmentTime, DEFAULT_CLINIC_TIMEZONE } from "../../utils/date-format";
+import { formatAppointmentDate, formatAppointmentTime } from "../../utils/date-format";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
+import { useClinicInfo } from "@/features/settings/services/hooks/use-clinic-info";
+import { DEFAULT_CLINIC_TIMEZONE } from "../../utils/date-format";
 
 interface CancelAppointmentConfirmDialogProps {
 	open: boolean;
@@ -30,6 +31,8 @@ export function CancelAppointmentConfirmDialog({
 	onCancel,
 	isLoading = false,
 }: CancelAppointmentConfirmDialogProps) {
+	const { clinicInfo } = useClinicInfo();
+	const clinicTimezone = clinicInfo?.timezone || DEFAULT_CLINIC_TIMEZONE;
 	if (!request) return null;
 
 	const studentName = request.patientName || request.name || "الطالب";

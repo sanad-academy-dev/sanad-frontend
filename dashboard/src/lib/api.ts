@@ -15,4 +15,5 @@ const baseUrl = backendUrl("");
 
 export const api = treaty<App>(baseUrl, {
 	fetch: { credentials: "include" },
+// @ts-expect-error The transitional `App = any` contract omits the server's `/api` group.
 }).api;

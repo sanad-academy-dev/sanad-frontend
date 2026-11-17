@@ -1,27 +1,24 @@
 import {
-	COURSE_TYPE_OPTIONS,
-	courseLanguageLabel,
 	courseLocationLabel,
 	formatCourseDuration,
 } from "@/features/services/training/data/training";
+import { extractCourseAcademicStage } from "@/features/services/training/utils/course-meta";
 import { downloadCsv } from "@/lib/csv";
-import type { CourseListItemResponse } from "@/server/training/training.type";
+import type { CourseListItemResponse } from "@sanad/contracts/runtime/server/training/training.type";
 
-// أعمدة تصدير CSV مطابقة لأعمدة جدول القائمة (بيانات حقيقية فقط؛ الفارغ يُترك فارغًا)
+// أعمدة تصدير CSV مطابقة لأعمدة جدول الدورات الحالي
 const HEADERS = [
 	"اسم الدورة",
 	"المعرّف",
-	"تكلفة التدريب",
-	"عدد المحتوى",
-	"نوع الدورة",
-	"الجهة",
-	"اللغة",
+	"المرحلة الدراسية",
+	"التصنيف",
+	"عدد الوحدات",
 	"مكان الدورة",
 	"المدربون",
 	"فترة الدورة",
-	"عدد المستفيدين",
-	"متوسط التقييم",
-	"عدد التقييمات",
+	"عدد المتدربين",
+	"السعر (ج.م)",
+	"الجهة المنظمة",
 	"آخر تحديث",
 	"تاريخ الإنشاء",
 	"الحالة",
@@ -30,10 +27,8 @@ const HEADERS = [
 const STATUS_LABEL: Record<string, string> = {
 	PUBLISHED: "منشور",
 	DRAFT: "مسودة",
-	ARCHIVED: "مؤرشفة",
+	ARCHIVED: "معطلة",
 };
-
-const typeLabel = (t: string) => COURSE_TYPE_OPTIONS.find((o) => o.value === t)?.label ?? t;
 
 const iso = (d: Date | string) => new Date(d).toISOString().slice(0, 10);
 
@@ -41,17 +36,16 @@ function toRow(c: CourseListItemResponse): (string | number | null)[] {
 	return [
 		c.name,
 		c.code,
-		c.trainingCost ?? "",
+		extractCourseAcademicStage(c),
+		c.category?.trim() || c.department?.trim() || "",
 		c.contentCount,
-		typeLabel(c.type),
-		c.institution ?? "",
-		courseLanguageLabel(c.language),
 		courseLocationLabel(c.locationMode) ?? "",
 		c.trainers.map((t) => t.name).join(" / "),
-		formatCourseDuration(c.startDate, c.dueDate, c.estimatedDurationWeeks) ?? "",
+		formatCourseDuration(c.startDate, c.dueDate, c.estimatedDurationWeeks, c.description) ??
+			"",
 		c.assignedCount,
-		c.reviewCount > 0 ? (c.avgRating?.toFixed(1) ?? "") : "",
-		c.reviewCount,
+		c.trainingCost ?? "",
+		c.institution ?? "",
 		iso(c.updatedAt),
 		iso(c.createdAt),
 		STATUS_LABEL[c.status] ?? c.status,

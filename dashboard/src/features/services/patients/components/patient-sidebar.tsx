@@ -7,7 +7,6 @@ import {
 	IconCertificate,
 	IconClockHour4,
 	IconCoin,
-	IconCopy,
 	IconDeviceLaptop,
 	IconDots,
 	IconEdit,
@@ -16,7 +15,6 @@ import {
 	IconHeartRateMonitor,
 	IconId,
 	IconMapPin,
-	IconPhone,
 	IconPhoneCall,
 	IconPill,
 	IconPlus,
@@ -24,7 +22,6 @@ import {
 	IconSchool,
 	IconStethoscope,
 	IconToolsKitchen2,
-	IconUser,
 	IconUserPlus,
 	IconUsers,
 } from "@tabler/icons-react";
@@ -120,7 +117,6 @@ export function PatientSidebar({ patient, onEdit, onNavigateTab }: PatientSideba
 		return patientEnrollments.find((e) => e.status === "ACTIVE") || patientEnrollments[0];
 	}, [enrollments, patient.id]);
 
-
 	// تاريخ الميلاد
 	const birthDateText = useMemo(() => {
 		return formatArabicDate(patient.birthDate, "14 أبريل، 2025");
@@ -152,7 +148,9 @@ export function PatientSidebar({ patient, onEdit, onNavigateTab }: PatientSideba
 	// نسبة تقدم المسار الحالي
 	const progressPercentage = useMemo(() => {
 		if (activeEnrollment && activeEnrollment.visitsTotal > 0) {
-			return Math.round((activeEnrollment.visitsCompleted / activeEnrollment.visitsTotal) * 100);
+			return Math.round(
+				(activeEnrollment.visitsCompleted / activeEnrollment.visitsTotal) * 100,
+			);
 		}
 		return 45;
 	}, [activeEnrollment]);
@@ -246,9 +244,7 @@ export function PatientSidebar({ patient, onEdit, onNavigateTab }: PatientSideba
 							<IconSchool className="size-4 shrink-0 text-muted-foreground/70" />
 							<span>الفصل الحالي</span>
 						</div>
-						<span className="font-semibold text-foreground text-start">
-							{classroomText}
-						</span>
+						<span className="font-semibold text-foreground text-start">{classroomText}</span>
 					</div>
 
 					{/* المستوى */}
@@ -382,9 +378,7 @@ export function PatientSidebar({ patient, onEdit, onNavigateTab }: PatientSideba
 							<IconStethoscope className="size-4 shrink-0 text-muted-foreground/70" />
 							<span>الحالة النمائية</span>
 						</div>
-						<span className="font-semibold text-foreground">
-							{developmentStatusText}
-						</span>
+						<span className="font-semibold text-foreground">{developmentStatusText}</span>
 					</div>
 
 					{/* الحساسية */}
@@ -393,7 +387,9 @@ export function PatientSidebar({ patient, onEdit, onNavigateTab }: PatientSideba
 							<IconAlertCircle className="size-4 shrink-0 text-muted-foreground/70" />
 							<span>الحساسية</span>
 						</div>
-						{patient.allergies && patient.allergies !== "لا يوجد" && patient.allergies !== "لا" ? (
+						{patient.allergies &&
+						patient.allergies !== "لا يوجد" &&
+						patient.allergies !== "لا" ? (
 							<span className="font-semibold text-foreground bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800 px-2 py-0.5 rounded text-[11px]">
 								{patient.allergies}
 							</span>
@@ -415,7 +411,10 @@ export function PatientSidebar({ patient, onEdit, onNavigateTab }: PatientSideba
 							<IconHeart className="size-4 shrink-0 text-muted-foreground/70" />
 							<span>حالات صحية خاصة</span>
 						</div>
-						<span className="font-semibold text-foreground text-start truncate max-w-[170px]" title={patient.healthConditions || "لا يوجد"}>
+						<span
+							className="font-semibold text-foreground text-start truncate max-w-[170px]"
+							title={patient.healthConditions || "لا يوجد"}
+						>
 							{patient.healthConditions && patient.healthConditions !== "لا يوجد"
 								? patient.healthConditions
 								: "لا توجد حالات خاصة"}
@@ -455,7 +454,10 @@ export function PatientSidebar({ patient, onEdit, onNavigateTab }: PatientSideba
 							<IconPhoneCall className="size-4 shrink-0 text-muted-foreground/70" />
 							<span>جهة الطوارئ</span>
 						</div>
-						<span className="font-semibold text-foreground text-start truncate max-w-[170px]" title={emergencyContactText}>
+						<span
+							className="font-semibold text-foreground text-start truncate max-w-[170px]"
+							title={emergencyContactText}
+						>
 							{emergencyContactText}
 						</span>
 					</div>
@@ -535,7 +537,10 @@ export function PatientSidebar({ patient, onEdit, onNavigateTab }: PatientSideba
 					</div>
 
 					{/* زر التعيين مع القائمة المنسدلة (Popover) مباشرة تحته */}
-					<Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+					<Popover
+						open={popoverOpen}
+						onOpenChange={setPopoverOpen}
+					>
 						<PopoverTrigger asChild>
 							<button
 								type="button"
@@ -605,7 +610,7 @@ export function PatientSidebar({ patient, onEdit, onNavigateTab }: PatientSideba
 													"w-full flex items-center justify-between p-2 rounded-xl transition-all cursor-pointer text-right group",
 													isAssigned
 														? "bg-primary/10 border border-primary/20 cursor-default"
-														: "hover:bg-muted/80 active:scale-[0.99]"
+														: "hover:bg-muted/80 active:scale-[0.99]",
 												)}
 											>
 												<div className="flex items-center gap-3 min-w-0">

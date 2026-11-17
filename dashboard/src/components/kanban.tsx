@@ -31,7 +31,6 @@ import {
 import { createPortal } from "react-dom";
 import tunnel from "tunnel-rat";
 import { Card } from "@/components/ui/card";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
 const t = tunnel();
@@ -42,12 +41,12 @@ type KanbanItemProps = {
 	id: string;
 	name: string;
 	column: string;
-} & Record<string, unknown>;
+};
 
 type KanbanColumnProps = {
 	id: string;
 	name: string;
-} & Record<string, unknown>;
+};
 
 type KanbanContextProps<
 	T extends KanbanItemProps = KanbanItemProps,
@@ -103,7 +102,9 @@ export const KanbanCard = <T extends KanbanItemProps = KanbanItemProps>({
 	className,
 	disabled,
 }: KanbanCardProps<T>) => {
-	const { activeCardId, disabled: contextDisabled } = useContext(KanbanContext) as KanbanContextProps;
+	const { activeCardId, disabled: contextDisabled } = useContext(
+		KanbanContext,
+	) as KanbanContextProps;
 	const isCardDisabled = disabled ?? contextDisabled ?? false;
 
 	const { attributes, listeners, setNodeRef, transition, transform, isDragging } = useSortable(
@@ -208,6 +209,7 @@ export type KanbanProviderProps<
 	className?: string;
 	columns: C[];
 	data: T[];
+	disabled?: boolean;
 	/**
 	 * Some boards persist a column change as soon as `onDataChange` fires.  They
 	 * must opt out of the temporary cross-column update emitted while dragging,
@@ -280,9 +282,7 @@ export const KanbanProvider = <
 			const activeIndex = newData.findIndex((item) => item.id === active.id);
 			if (activeIndex !== -1) {
 				newData[activeIndex] = { ...newData[activeIndex], column: overColumn };
-				const overIndex = overItem
-					? newData.findIndex((item) => item.id === over.id)
-					: -1;
+				const overIndex = overItem ? newData.findIndex((item) => item.id === over.id) : -1;
 
 				if (overIndex !== -1) {
 					newData = arrayMove(newData, activeIndex, overIndex);

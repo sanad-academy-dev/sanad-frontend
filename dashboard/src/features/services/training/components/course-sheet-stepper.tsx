@@ -1,8 +1,20 @@
-import { SheetStepper } from "@/features/services/training/components/sheet-stepper";
-import { STEP_META } from "@/features/services/training/wizard/wizard.types";
+import {
+	IconClipboardCheck,
+	IconLayoutGrid,
+	IconRosetteDiscountCheck,
+} from "@tabler/icons-react";
+import {
+	type SheetStep,
+	SheetStepper,
+} from "@/features/services/training/components/sheet-stepper";
 
-// شريط تقدّم خطوات إنشاء الدورة داخل اللوحة الجانبية — غلاف رفيع حول المؤشّر المشترك
-// الذي تستخدمه أيضًا لوحة إنشاء الاختبار.
+export const COURSE_STEPS: readonly SheetStep[] = [
+	{ step: 1, title: "المعلومات الأساسية", icon: IconLayoutGrid },
+	{ step: 2, title: "إضافة المحتوى", icon: IconClipboardCheck },
+	{ step: 3, title: "الإكمال والنشر", icon: IconRosetteDiscountCheck },
+] as const;
+
+// شريط تقدّم خطوات إنشاء الدورة داخل اللوحة — 3 خطوات بعد دمج تعيين الموظفين في الخطوة الأولى
 export function CourseSheetStepper({
 	step,
 	furthest,
@@ -14,7 +26,7 @@ export function CourseSheetStepper({
 }) {
 	return (
 		<SheetStepper
-			steps={STEP_META}
+			steps={COURSE_STEPS}
 			step={step}
 			furthest={furthest}
 			onStepChange={onStepChange}

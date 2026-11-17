@@ -102,9 +102,14 @@ function buildContacts(item: InboxItemResponse | InboxItemDetailResponse): Inbox
 // شكل الطفل للواجهة (من علاقة patient)
 function mapPatient(item: InboxItemResponse | InboxItemDetailResponse) {
 	if (!item.patient) return undefined;
+	const patient = item.patient as unknown as {
+		animalType?: { arName?: string | null; enName?: string | null } | null;
+	};
 	return {
 		code: item.patient.code,
 		name: item.patient.name,
+		species:
+			patient.animalType?.arName ?? patient.animalType?.enName ?? "غير محدد",
 	};
 }
 

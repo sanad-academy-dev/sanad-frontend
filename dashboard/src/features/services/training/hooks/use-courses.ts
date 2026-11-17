@@ -6,9 +6,10 @@ import type {
 	CourseDetailResponse,
 	CourseListItemResponse,
 	CourseStatsResponse,
+	CourseStatus,
 	CreateCourseFormInput,
 	UpdateCourseInput,
-} from "@/server/training/training.type";
+} from "@sanad/contracts/runtime/server/training/training.type";
 
 const COURSES_KEY = ["training", "courses"] as const;
 const STATS_KEY = ["training", "courses", "stats"] as const;
@@ -16,7 +17,7 @@ const courseKey = (id: string) => ["training", "course", id] as const;
 const EMPTY_COURSES: CourseListItemResponse[] = [];
 
 export const useCourses = () => {
-	const { data, isLoading } = useQuery<CourseListItemResponse[]>({
+	const { data, isLoading, isError, error, refetch } = useQuery<CourseListItemResponse[]>({
 		queryKey: COURSES_KEY,
 		queryFn: async () => {
 			const { data, error } = await api.training.courses.get();
@@ -25,7 +26,7 @@ export const useCourses = () => {
 		},
 	});
 
-	return { courses: data ?? EMPTY_COURSES, isLoading };
+	return { courses: data ?? EMPTY_COURSES, isLoading, isError, error, refetch };
 };
 
 export const useCourseStats = () => {
@@ -60,6 +61,9 @@ export const useCourse = (id: string | null) => {
 type CreateCoursePayload = Omit<CreateCourseFormInput, "targetRoleId"> & {
 	targetRoleId?: string;
 	coverKey?: string | null;
+	locationMode?: import("@sanad/contracts/runtime/server/training/training.type").CourseLocationMode;
+	trainingCost?: number;
+	institution?: string;
 };
 
 export const useCreateCourse = () => {
@@ -69,7 +73,8 @@ export const useCreateCourse = () => {
 		mutationFn: async (values: CreateCoursePayload) => {
 			const { data, error } = await api.training.courses.post(values);
 			if (error) {
-				const errorMsg = (error.value as any)?.message || "تعذّر إنشاء الدورة";
+				const errorMsg =
+					(error.value as { message?: string } | null)?.message || "تعذّر إنشاء الدورة";
 				throw new Error(errorMsg);
 			}
 			return data;
@@ -156,6 +161,40 @@ export const useArchiveCourse = () => {
 	return { archiveCourse, isArchiving: mutation.isPending };
 };
 
+// تغيير حالة الدورة مباشرة (نشر / مسودة / تعطيل) — يُبطل كاش القائمة والإحصائيات
+export const useUpdateCourseStatus = () => {
+	const qc = useQueryClient();
+	const mutation = useMutation({
+		mutationFn: async ({ id, status }: { id: string; status: CourseStatus }) => {
+			const { data, error } = await api.training.courses({ id }).patch({ status });
+			if (error) {
+				const errorMsg =
+					(error.value as { message?: string })?.message || "تعذّر تغيير حالة الدورة";
+				throw new Error(errorMsg);
+			}
+			return data;
+		},
+		onSuccess: () => {
+			qc.invalidateQueries({ queryKey: COURSES_KEY });
+			qc.invalidateQueries({ queryKey: STATS_KEY });
+		},
+	});
+
+	const updateCourseStatus = (id: string, status: CourseStatus) => {
+		const label =
+			status === "PUBLISHED" ? "نشر" : status === "ARCHIVED" ? "تعطيل" : "تحويل إلى مسودة";
+		const promise = mutation.mutateAsync({ id, status });
+		toast.promise(promise, {
+			loading: "جارٍ تحديث حالة الدورة...",
+			success: `تم ${label} الدورة بنجاح`,
+			error: (e: Error) => e.message || "تعذّر تحديث حالة الدورة",
+		});
+		return promise;
+	};
+
+	return { updateCourseStatus, isUpdating: mutation.isPending };
+};
+
 // إلغاء تعطيل دورة — إعادتها إلى «منشورة» عبر PATCH الحالة؛ يُبطل كاش القائمة والإحصائيات
 export const useRestoreCourse = () => {
 	const qc = useQueryClient();
@@ -189,14 +228,18 @@ export const useUpdateCourse = (courseId: string | null) => {
 				.courses({ id: courseId })
 				.patch(values as Record<string, unknown>);
 			if (error) {
-				const errorMsg = (error.value as any)?.message || "تعذّر حفظ التغييرات";
+				const errorMsg =
+					(error.value as { message?: string } | null)?.message || "تعذّر حفظ التغييرات";
 				throw new Error(errorMsg);
 			}
 			return data;
 		},
-		onSuccess: () => {
-			if (courseId) qc.invalidateQueries({ queryKey: courseKey(courseId) });
-			qc.invalidateQueries({ queryKey: COURSES_KEY });
+		onSuccess: async () => {
+			if (courseId) {
+				await qc.invalidateQueries({ queryKey: courseKey(courseId), refetchType: "all" });
+			}
+			await qc.invalidateQueries({ queryKey: COURSES_KEY, refetchType: "all" });
+			await qc.refetchQueries({ queryKey: COURSES_KEY });
 			qc.invalidateQueries({ queryKey: STATS_KEY });
 		},
 	});

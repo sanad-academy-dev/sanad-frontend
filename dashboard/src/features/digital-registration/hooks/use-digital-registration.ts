@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { backendFetch } from "@/lib/backend-fetch";
 import type { Campaign, CampaignSummaryStats } from "../types/campaign.types";
-import type { CampaignRequestItem, RegistrationCommentItem, RequestNotificationItem } from "../types/campaign-request.types";
+import type {
+	CampaignRequestItem,
+	RegistrationCommentItem,
+	RequestNotificationItem,
+} from "../types/campaign-request.types";
 
 const CAMPAIGNS_QUERY_KEY = ["digital-registration", "campaigns"];
 const SUMMARY_QUERY_KEY = ["digital-registration", "summary"];
@@ -130,7 +134,9 @@ export function useUpdateCampaign() {
 		onSuccess: (_, variables) => {
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", variables.id] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "campaign", variables.id],
+			});
 		},
 	});
 }
@@ -158,7 +164,9 @@ export function useCampaignRequests(campaignId: string, sortBy?: string) {
 	return useQuery<CampaignRequestItem[]>({
 		queryKey: ["digital-registration", "requests", campaignId, sortBy],
 		queryFn: async () => {
-			const url = sortBy ? `/api/digital-registration/requests?sortBy=${encodeURIComponent(sortBy)}` : "/api/digital-registration/requests";
+			const url = sortBy
+				? `/api/digital-registration/requests?sortBy=${encodeURIComponent(sortBy)}`
+				: "/api/digital-registration/requests";
 			const res = await backendFetch(url);
 			if (!res.ok) throw new Error("فشل جلب طلبات الحملة");
 			return res.json();
@@ -182,11 +190,14 @@ export function useUpdateRequestStatus(campaignId: string) {
 			status: string;
 			note?: string;
 		}) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/status`, {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ status, note }),
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/status`,
+				{
+					method: "PATCH",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ status, note }),
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل تحديث حالة الطلب");
@@ -194,8 +205,12 @@ export function useUpdateRequestStatus(campaignId: string) {
 			return res.json();
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "requests", campaignId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "campaign", campaignId],
+			});
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "notifications"] });
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
@@ -212,11 +227,14 @@ export function useAddRequestComment(campaignId: string, defaultRequestId?: stri
 			const content = typeof payload === "string" ? payload : payload.content;
 			if (!requestId) throw new Error("معرف الطلب غير متوفر لإضافة التعليق");
 			if (!content?.trim()) throw new Error("محتوى التعليق لا يمكن أن يكون فارغاً");
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/comments`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ content: content.trim() }),
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/comments`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ content: content.trim() }),
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل إضافة التعليق");
@@ -225,9 +243,13 @@ export function useAddRequestComment(campaignId: string, defaultRequestId?: stri
 		},
 		onSuccess: (_newComment, payload) => {
 			const reqId = typeof payload === "string" ? defaultRequestId : payload.requestId;
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "requests", campaignId],
+			});
 			if (reqId) {
-				queryClient.invalidateQueries({ queryKey: ["digital-registration", "request", reqId] });
+				queryClient.invalidateQueries({
+					queryKey: ["digital-registration", "request", reqId],
+				});
 			}
 		},
 	});
@@ -250,18 +272,20 @@ export function useDeleteRequestComment(campaignId: string, _defaultRequestId?: 
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
 			if (campaignId) {
-				queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+				queryClient.invalidateQueries({
+					queryKey: ["digital-registration", "requests", campaignId],
+				});
 			}
 		},
 	});
 }
-
 
 // ─── إنشاء طلب تسجيل يدوي جديد من الداشبورد ──────────────────────────────────
 export function useCreateRequest(campaignId: string) {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async (payload: {
+			requestId?: string;
 			campaignId: string;
 			studentName: string;
 			gender: "MALE" | "FEMALE" | "UNKNOWN";
@@ -285,7 +309,13 @@ export function useCreateRequest(campaignId: string) {
 			preferredShift?: string | null;
 			experienceLevel?: string | null;
 			priority?: string | null;
-			initialStatus?: "QUEUE" | "SHORTLIST" | "WAITLIST" | "INTERVIEW" | "AWAITING_PAYMENT" | "DUPLICATE";
+			initialStatus?:
+				| "QUEUE"
+				| "SHORTLIST"
+				| "WAITLIST"
+				| "INTERVIEW"
+				| "AWAITING_PAYMENT"
+				| "DUPLICATE";
 			status?: string | null;
 			columnStatus?: string | null;
 			appointmentDate?: string | null;
@@ -313,7 +343,9 @@ export function useCreateRequest(campaignId: string) {
 				});
 			} catch (error) {
 				if (error instanceof TypeError) {
-					throw new Error("تعذر الاتصال بخادم النظام. تأكد من تشغيل خدمة الباك ثم أعد المحاولة.");
+					throw new Error(
+						"تعذر الاتصال بخادم النظام. تأكد من تشغيل خدمة الباك ثم أعد المحاولة.",
+					);
 				}
 				throw error;
 			}
@@ -325,13 +357,19 @@ export function useCreateRequest(campaignId: string) {
 		},
 		onSuccess: (_data, variables) => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "requests", campaignId],
+			});
 			queryClient.invalidateQueries({ queryKey: ["campaign-requests"] });
 			queryClient.invalidateQueries({ queryKey: ["campaign-requests", campaignId] });
 			if (variables?.requestId) {
-				queryClient.invalidateQueries({ queryKey: ["registration-request", variables.requestId] });
+				queryClient.invalidateQueries({
+					queryKey: ["registration-request", variables.requestId],
+				});
 			}
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "campaign", campaignId],
+			});
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: ["patients"] });
@@ -356,8 +394,12 @@ export function useDeleteRegistrationRequest(campaignId: string) {
 			return res.json();
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "requests", campaignId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "campaign", campaignId],
+			});
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
 		},
@@ -422,7 +464,9 @@ export function useUpdateRequest(campaignId: string) {
 			} catch (error) {
 				// لا نعرض رسالة المتصفح العامة Failed to fetch؛ فهي غالباً تعني أن API غير متاح.
 				if (error instanceof TypeError) {
-					throw new Error("تعذر الاتصال بخادم النظام. تأكد من تشغيل خدمة الباك ثم أعد المحاولة.");
+					throw new Error(
+						"تعذر الاتصال بخادم النظام. تأكد من تشغيل خدمة الباك ثم أعد المحاولة.",
+					);
 				}
 				throw error;
 			}
@@ -434,13 +478,19 @@ export function useUpdateRequest(campaignId: string) {
 		},
 		onSuccess: (_data, variables) => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "requests", campaignId],
+			});
 			queryClient.invalidateQueries({ queryKey: ["campaign-requests"] });
 			queryClient.invalidateQueries({ queryKey: ["campaign-requests", campaignId] });
 			if (variables?.requestId) {
-				queryClient.invalidateQueries({ queryKey: ["registration-request", variables.requestId] });
+				queryClient.invalidateQueries({
+					queryKey: ["registration-request", variables.requestId],
+				});
 			}
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "campaign", campaignId],
+			});
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: ["patients"] });
@@ -469,11 +519,14 @@ export function useScheduleAssessmentAppointment(campaignId: string) {
 				roomName?: string;
 			};
 		}) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/schedule-assessment`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/schedule-assessment`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(data),
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل جدولة وحجز موعد الفحص والتقييم");
@@ -481,8 +534,12 @@ export function useScheduleAssessmentAppointment(campaignId: string) {
 			return res.json();
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "requests", campaignId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "campaign", campaignId],
+			});
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "notifications"] });
 			queryClient.invalidateQueries({ queryKey: ["appointments"] });
 		},
@@ -494,7 +551,9 @@ export function useRequestNotifications(requestId: string) {
 	return useQuery<RequestNotificationItem[]>({
 		queryKey: ["digital-registration", "notifications", requestId],
 		queryFn: async () => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/notifications`);
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/notifications`,
+			);
 			if (!res.ok) throw new Error("فشل جلب إشعارات المتقدم");
 			return res.json();
 		},
@@ -521,14 +580,15 @@ export function useMarkNotificationSent(campaignId: string, requestId: string) {
 			return res.json();
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "notifications", requestId] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "notifications", requestId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "requests", campaignId],
+			});
 		},
 	});
 }
-
-
-
 
 // ─── Phase 1: Action Hooks ───────────────────────────────────────────────────
 
@@ -560,8 +620,12 @@ export function useQueueRequest(campaignId: string) {
 			return res.json();
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "requests", campaignId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "campaign", campaignId],
+			});
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "summary"] });
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
@@ -585,11 +649,14 @@ export function useShortlistRequest(campaignId: string) {
 				notifyEmail?: boolean;
 			};
 		}) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/shortlist`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/shortlist`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(data),
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل تسجيل الطالب بالقائمة المختصرة");
@@ -598,9 +665,15 @@ export function useShortlistRequest(campaignId: string) {
 		},
 		onSuccess: (_data, variables) => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "request", variables.requestId] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "requests", campaignId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "request", variables.requestId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "campaign", campaignId],
+			});
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "notifications"] });
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
@@ -626,11 +699,14 @@ export function useWaitlistRequest(campaignId: string) {
 				notifyEmail?: boolean;
 			};
 		}) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/waitlist`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/waitlist`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(data),
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل إدراج الطالب في قائمة الانتظار");
@@ -639,9 +715,15 @@ export function useWaitlistRequest(campaignId: string) {
 		},
 		onSuccess: (_data, variables) => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "request", variables.requestId] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "requests", campaignId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "request", variables.requestId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "campaign", campaignId],
+			});
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "notifications"] });
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
@@ -672,11 +754,14 @@ export function useAwaitingPaymentRequest(campaignId: string) {
 				notes?: string;
 			};
 		}) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/awaiting-payment`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/awaiting-payment`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(data),
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل نقل الطلب إلى بانتظار الدفع");
@@ -685,9 +770,15 @@ export function useAwaitingPaymentRequest(campaignId: string) {
 		},
 		onSuccess: (_data, variables) => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "request", variables.requestId] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "requests", campaignId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "request", variables.requestId],
+			});
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "campaign", campaignId],
+			});
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "notifications"] });
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
@@ -714,13 +805,17 @@ export function useRescheduleRequest(campaignId: string) {
 				subject?: string;
 				customMessage?: string;
 				notifyEmail?: boolean;
+				priority?: string | null;
 			};
 		}) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/reschedule`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/reschedule`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(data),
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل إعادة جدولة الموعد");
@@ -728,7 +823,9 @@ export function useRescheduleRequest(campaignId: string) {
 			return res.json();
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "requests", campaignId],
+			});
 			queryClient.invalidateQueries({ queryKey: ["appointments"] });
 		},
 	});
@@ -748,13 +845,18 @@ export function useRejectRequest(campaignId: string) {
 				subject?: string;
 				customMessage?: string;
 				notifyEmail?: boolean;
+				assignedStaffId?: string | null;
+				priority?: string | null;
 			};
 		}) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/reject`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/reject`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(data),
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل إرسال قرار الرفض");
@@ -764,8 +866,12 @@ export function useRejectRequest(campaignId: string) {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
 			if (campaignId) {
-				queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
-				queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+				queryClient.invalidateQueries({
+					queryKey: ["digital-registration", "requests", campaignId],
+				});
+				queryClient.invalidateQueries({
+					queryKey: ["digital-registration", "campaign", campaignId],
+				});
 			}
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
@@ -805,12 +911,13 @@ export function useReferRequest(campaignId: string) {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
 			if (campaignId) {
-				queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+				queryClient.invalidateQueries({
+					queryKey: ["digital-registration", "requests", campaignId],
+				});
 			}
 		},
 	});
 }
-
 
 export function useDeleteRequestWithReason(campaignId: string) {
 	const queryClient = useQueryClient();
@@ -826,11 +933,14 @@ export function useDeleteRequestWithReason(campaignId: string) {
 				notifyEmail?: boolean;
 			};
 		}) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/delete-with-reason`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/delete-with-reason`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(data),
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل حذف طلب التسجيل");
@@ -840,8 +950,12 @@ export function useDeleteRequestWithReason(campaignId: string) {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
 			if (campaignId) {
-				queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
-				queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+				queryClient.invalidateQueries({
+					queryKey: ["digital-registration", "requests", campaignId],
+				});
+				queryClient.invalidateQueries({
+					queryKey: ["digital-registration", "campaign", campaignId],
+				});
 			}
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
@@ -875,11 +989,14 @@ export function useQuickUpdateRequest(campaignId: string) {
 				attendanceProbability?: number;
 			};
 		}) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/quick-update`, {
-				method: "PATCH",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/quick-update`,
+				{
+					method: "PATCH",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(data),
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل التحديث السريع للطلب");
@@ -889,22 +1006,29 @@ export function useQuickUpdateRequest(campaignId: string) {
 		onSuccess: (_data, variables) => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
 			if (campaignId) {
-				queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+				queryClient.invalidateQueries({
+					queryKey: ["digital-registration", "requests", campaignId],
+				});
 			}
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "request", variables.requestId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "request", variables.requestId],
+			});
 		},
 	});
 }
 
-export function useAssignReviewer(campaignId: string = "") {
+export function useAssignReviewer() {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async ({ requestId, staffId }: { requestId: string; staffId: string }) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/assign-reviewer`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ staffId }),
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/assign-reviewer`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ staffId }),
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل تعيين المراجع");
@@ -933,11 +1057,12 @@ export function useAssignReviewer(campaignId: string = "") {
 			);
 			// 2. إبطال الكاش بشكل عام لضمان إعادة الجلب والمزامنة
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "request", variables.requestId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "request", variables.requestId],
+			});
 		},
 	});
 }
-
 
 // ─── ميزة المشاركة والوصول للوحة التسجيل (Share Modal) ────────────────────────
 
@@ -999,7 +1124,10 @@ export function useRegistrationShareAccessAudit(enabled = true) {
 export function useInviteCollaborator() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: async (payload: { staffId: string; accessLevel: "full" | "can_edit" | "can_view" }) => {
+		mutationFn: async (payload: {
+			staffId: string;
+			accessLevel: "full" | "can_edit" | "can_view";
+		}) => {
 			const res = await backendFetch("/api/digital-registration/share-access/invite", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -1053,11 +1181,7 @@ export function useUpdateMemberAccess() {
 export function useUpdateGeneralAccess() {
 	const queryClient = useQueryClient();
 	return useMutation({
-		mutationFn: async ({
-			level,
-		}: {
-			level: "restricted";
-		}) => {
+		mutationFn: async ({ level }: { level: "restricted" }) => {
 			const res = await backendFetch("/api/digital-registration/share-access/general", {
 				method: "PATCH",
 				headers: { "Content-Type": "application/json" },
@@ -1079,9 +1203,12 @@ export function usePreparePaymentToken(campaignId: string = "") {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async ({ requestId }: { requestId: string }) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/prepare-payment-token`, {
-				method: "POST",
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/prepare-payment-token`,
+				{
+					method: "POST",
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "تعذر تجهيز رابط السداد");
@@ -1091,7 +1218,9 @@ export function usePreparePaymentToken(campaignId: string = "") {
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
 			if (campaignId) {
-				queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+				queryClient.invalidateQueries({
+					queryKey: ["digital-registration", "requests", campaignId],
+				});
 			}
 		},
 	});
@@ -1101,11 +1230,14 @@ export function useRenewPaymentToken(campaignId: string = "") {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async ({ requestId, hours = 72 }: { requestId: string; hours?: number }) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/renew-payment-token`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ hours }),
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/renew-payment-token`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({ hours }),
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل تجديد رابط السداد");
@@ -1115,9 +1247,13 @@ export function useRenewPaymentToken(campaignId: string = "") {
 		onSuccess: (_data, variables) => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
 			if (campaignId) {
-				queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
+				queryClient.invalidateQueries({
+					queryKey: ["digital-registration", "requests", campaignId],
+				});
 			}
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "request", variables.requestId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "request", variables.requestId],
+			});
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
 		},
@@ -1144,18 +1280,21 @@ export function useConfirmPaymentManually(campaignId: string = "") {
 			reference?: string;
 			notes?: string;
 		}) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/confirm-payment`, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					method,
-					gateway,
-					amount,
-					receivedAmount,
-					reference,
-					notes,
-				}),
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/confirm-payment`,
+				{
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify({
+						method,
+						gateway,
+						amount,
+						receivedAmount,
+						reference,
+						notes,
+					}),
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "فشل تأكيد عملية السداد");
@@ -1165,10 +1304,16 @@ export function useConfirmPaymentManually(campaignId: string = "") {
 		onSuccess: (_data, variables) => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
 			if (campaignId) {
-				queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
-				queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+				queryClient.invalidateQueries({
+					queryKey: ["digital-registration", "requests", campaignId],
+				});
+				queryClient.invalidateQueries({
+					queryKey: ["digital-registration", "campaign", campaignId],
+				});
 			}
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "request", variables.requestId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "request", variables.requestId],
+			});
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "notifications"] });
 			queryClient.invalidateQueries({ queryKey: CAMPAIGNS_QUERY_KEY });
 			queryClient.invalidateQueries({ queryKey: SUMMARY_QUERY_KEY });
@@ -1180,9 +1325,12 @@ export function useEnrollAcceptedStudent(campaignId: string = "") {
 	const queryClient = useQueryClient();
 	return useMutation({
 		mutationFn: async ({ requestId }: { requestId: string }) => {
-			const res = await backendFetch(`/api/digital-registration/requests/${requestId}/enroll-student`, {
-				method: "POST",
-			});
+			const res = await backendFetch(
+				`/api/digital-registration/requests/${requestId}/enroll-student`,
+				{
+					method: "POST",
+				},
+			);
 			if (!res.ok) {
 				const err = await res.json().catch(() => ({}));
 				throw new Error(err.message || "تعذر إضافة الطالب لقائمة الطلاب");
@@ -1192,10 +1340,16 @@ export function useEnrollAcceptedStudent(campaignId: string = "") {
 		onSuccess: (_data, variables) => {
 			queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests"] });
 			if (campaignId) {
-				queryClient.invalidateQueries({ queryKey: ["digital-registration", "requests", campaignId] });
-				queryClient.invalidateQueries({ queryKey: ["digital-registration", "campaign", campaignId] });
+				queryClient.invalidateQueries({
+					queryKey: ["digital-registration", "requests", campaignId],
+				});
+				queryClient.invalidateQueries({
+					queryKey: ["digital-registration", "campaign", campaignId],
+				});
 			}
-			queryClient.invalidateQueries({ queryKey: ["digital-registration", "request", variables.requestId] });
+			queryClient.invalidateQueries({
+				queryKey: ["digital-registration", "request", variables.requestId],
+			});
 			queryClient.invalidateQueries({ queryKey: ["patients"] });
 			queryClient.invalidateQueries({ queryKey: ["owners"] });
 			queryClient.invalidateQueries({ queryKey: ["classrooms"] });

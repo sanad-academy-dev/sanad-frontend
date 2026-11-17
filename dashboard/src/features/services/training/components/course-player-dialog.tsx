@@ -14,8 +14,8 @@ import {
 	useMarkLesson,
 } from "@/features/services/training/hooks/use-course-assignments";
 import { cn } from "@/lib/utils";
-import type { AssignmentResponse } from "@/server/course-assignments/course-assignments.type";
-import type { CourseDetailResponse, UnitResponse } from "@/server/training/training.type";
+import type { AssignmentResponse } from "@sanad/contracts/runtime/server/course-assignments/course-assignments.type";
+import type { CourseDetailResponse, UnitResponse } from "@sanad/contracts/runtime/server/training/training.type";
 import { LessonContentsPreview } from "./lesson-preview";
 
 type Lesson = UnitResponse["lessons"][number];

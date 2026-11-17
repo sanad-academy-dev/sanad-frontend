@@ -3,7 +3,6 @@ import {
 	IconCircleCheckFilled,
 	IconClock,
 	IconHelpCircle,
-	IconInfoCircle,
 	IconLogin,
 	IconPlus,
 	IconX,
@@ -135,7 +134,9 @@ export function AttendanceRegisterDialog({
 			}
 
 			setCheckInTime(defaultCheckInTime ?? (shift ? shiftStartStr : "09:00"));
-			setCheckOutTime(defaultCheckOutTime ?? (defaultShowCheckOut || shift ? shiftEndStr : ""));
+			setCheckOutTime(
+				defaultCheckOutTime ?? (defaultShowCheckOut || shift ? shiftEndStr : ""),
+			);
 			setShowCheckOut(defaultShowCheckOut || !!shift);
 			setNotifyManager(false);
 		}
@@ -191,8 +192,7 @@ export function AttendanceRegisterDialog({
 		}
 
 		// تحديد الحالة تلقائيًا: إذا تأخر بأكثر من 15 دقيقة سماح
-		const statusToSave: "PRESENT" | "LATE" =
-			lateDiffMinutes > 15 ? "LATE" : "PRESENT";
+		const statusToSave: "PRESENT" | "LATE" = lateDiffMinutes > 15 ? "LATE" : "PRESENT";
 
 		const time12 = format(new Date(`2000-01-01T${summaryTime}:00`), "hh:mm");
 		try {

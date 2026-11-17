@@ -27,7 +27,7 @@ import {
 } from "@/features/services/training/data/training";
 import { useAiCourse } from "@/features/services/training/hooks/use-ai-course";
 import { cn } from "@/lib/utils";
-import type { AiCoursePreview, AiGenerateOptions } from "@/server/training/training.type";
+import type { AiCoursePreview, AiGenerateOptions } from "@sanad/contracts/runtime/server/training/training.type";
 
 const LANG_OPTIONS = [
 	{ value: "AR", label: "العربية" },

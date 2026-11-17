@@ -45,8 +45,7 @@ export const useQuizPlayer = () => {
 			const { data, error } = await api["quiz-attempts"]({ id: attemptId }).submit.post({
 				answers,
 			});
-			if (error)
-				throw new AttemptError(msg(error, "تعذّر تسليم التقييم"), error.status ?? 500);
+			if (error) throw new AttemptError(msg(error, "تعذّر تسليم التقييم"), error.status ?? 500);
 			return data as AttemptResultResponse;
 		},
 		onSuccess: () => {

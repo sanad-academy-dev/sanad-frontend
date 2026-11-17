@@ -16,6 +16,7 @@ import {
 } from "@tabler/icons-react";
 import type { ReactNode } from "react";
 
+import { Spinner } from "@/components/common/spinner";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { QUIZ_ANSWER_TYPE_OPTIONS } from "@/features/services/training/data/training";
 import { useQuiz } from "@/features/services/training/hooks/use-quizzes";
@@ -136,9 +137,7 @@ export function QuizDetailsSheet({
 					</SheetTitle>
 
 					{isLoading || !quiz ? (
-						<p className="py-16 text-center text-[13px] text-muted-foreground">
-							جارٍ تحميل التقييم...
-						</p>
+						<Spinner containerClassName="py-16 min-h-0" />
 					) : (
 						<>
 							{/* شارات علوية */}
@@ -221,9 +220,7 @@ export function QuizDetailsSheet({
 							</SheetTitle>
 
 							{questions.length === 0 ? (
-								<p className="text-[11px] text-[#9B9B9D]">
-									لا توجد أسئلة في هذا التقييم بعد.
-								</p>
+								<p className="text-[11px] text-[#9B9B9D]">لا توجد أسئلة في هذا التقييم بعد.</p>
 							) : (
 								<div className="flex flex-col gap-2">
 									{questions.map((q, i) => (

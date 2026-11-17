@@ -10,7 +10,7 @@ import type {
 	PairDeviceFormInput,
 	PairedDeviceWithQrResponse,
 	UpdateMobileUnitFormInput,
-} from "@/server/mobile-clinics/mobile-units/mobile-units.type";
+} from "@sanad/contracts/runtime/server/mobile-clinics/mobile-units/mobile-units.type";
 
 const errMsg = (e: unknown, fallback: string) =>
 	(e as { value?: { message?: string } })?.value?.message || fallback;

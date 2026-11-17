@@ -64,7 +64,6 @@ export const ClinicalNoteTab = ({ appointmentId }: { appointmentId: string }) =>
 	// يتدبّر الغياب — القالب المقيَّد بنوع يُستبعد، والعامّ يبقى مُرشَّحًا.
 	const { template: suggested } = useResolvedTemplate(
 		appointment?.reason ?? null,
-		null,
 		appointment?.consultationType?.id ?? null,
 		!!appointment,
 	);

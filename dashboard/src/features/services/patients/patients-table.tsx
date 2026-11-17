@@ -15,7 +15,6 @@ import {
 	IconSchool,
 	IconTrash,
 	IconUser,
-	IconUsers,
 	IconX,
 } from "@tabler/icons-react";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -49,11 +48,6 @@ import { PatientSheet } from "@/features/services/patients/components/patient-sh
 import { TransferOwnershipDialog } from "@/features/services/patients/components/transfer-ownership-dialog";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { useUpdatePatient } from "@/features/services/patients/hooks/use-update-patient";
-import { AGE_GROUPS } from "@/features/services/classrooms/data/constants";
-import {
-	calculateAge,
-	getStudentAgeGroup,
-} from "@/features/services/classrooms/utils/age-group-utils";
 import { cn } from "@/lib/utils";
 
 function formatDate(dateVal?: string | Date | null) {
@@ -309,7 +303,7 @@ export function PatientsTable() {
 							maxVisible={3}
 							renderItem={(item, element) => (
 								<GuardianHoverCard
-									guardian={item.data || { name: item.name }}
+								guardian={item.data as GuardianHoverData}
 									align="center"
 									side="top"
 								>
@@ -588,7 +582,11 @@ export function PatientsTable() {
 			}
 			if (selectedStatuses.length > 0) {
 				const isPendingOrSuspended = p.status === "SUSPENDED" || p.status === "PENDING";
-				const statusKey = isPendingOrSuspended ? "SUSPENDED" : p.active ? "ACTIVE" : "INACTIVE";
+				const statusKey = isPendingOrSuspended
+					? "SUSPENDED"
+					: p.active
+						? "ACTIVE"
+						: "INACTIVE";
 				if (!selectedStatuses.includes(statusKey)) return false;
 			}
 			if (selectedClassrooms.length > 0) {
@@ -688,10 +686,7 @@ export function PatientsTable() {
 				key: "classroom",
 				label: "الفصل الدراسي",
 				Icon: IconSchool,
-				options: [
-					...uniqueClassrooms,
-					{ value: "NO_CLASSROOM", label: "بدون فصل دراسي" },
-				],
+				options: [...uniqueClassrooms, { value: "NO_CLASSROOM", label: "بدون فصل دراسي" }],
 				selected: selectedClassrooms,
 				onToggle: (val) =>
 					setSelectedClassrooms((prev) =>
@@ -699,7 +694,6 @@ export function PatientsTable() {
 					),
 				emptyLabel: "لا توجد فصول",
 			},
-			
 		];
 	}, [
 		patients,

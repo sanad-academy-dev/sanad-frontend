@@ -2,12 +2,23 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import type { StatItem } from "@/features/dashboard/types/dashboard.types";
-import type {
-	ArrivalStatus,
-	EmergencyStability,
-	TriageCategory,
-} from "@/generated/prisma/enums";
+import type { EmergencyStability } from "@/generated/prisma/enums";
 import { api } from "@/lib/api";
+import type { ArrivalStatus, TriageCategory } from "@/generated/prisma/enums";
+import type { TriageSystem } from "@/server/emergency/triage-discriminators.data";
+
+type DiscriminatorSystem = {
+	key: TriageSystem;
+	label: string;
+	items: { code: string; labelAr: string; labelEn: string; category: TriageCategory; reviewed: boolean }[];
+};
+type DiscriminatorReference = {
+	systems: DiscriminatorSystem[];
+	categories: { key: string; label: string; targetMinutes: number; queueRank: number; reviewed: boolean }[];
+};
+type EmergencyBoardResponse = Awaited<
+	ReturnType<typeof import("@/server/emergency/emergency.dao").emergencyDao.listBoard>
+>;
 
 /**
  * [E2] استعلامات وطفرات وحدة الطوارئ.
@@ -51,12 +62,12 @@ export const useEmergencySettings = () => {
 };
 
 export const useEmergencyBoard = () => {
-	const { data, isLoading, isError, failureCount } = useQuery({
+	const { data, isLoading, isError, failureCount } = useQuery<EmergencyBoardResponse>({
 		queryKey: emergencyKeys.board(),
 		queryFn: async () => {
 			const { data, error } = await api.emergency.board.get();
 			if (error) throw new Error("تعذّر تحميل لوحة الطوارئ");
-			return data;
+			return data as EmergencyBoardResponse;
 		},
 		refetchInterval: EMERGENCY_POLL_MS,
 	});
@@ -149,12 +160,12 @@ export const useArrivals = (filters: { view?: string; q?: string }) => {
 };
 
 export const useDiscriminators = () => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<DiscriminatorReference>({
 		queryKey: emergencyKeys.discriminators(),
 		queryFn: async () => {
 			const { data, error } = await api.emergency.discriminators.get();
 			if (error) throw new Error("تعذّر تحميل مُميِّزات الفرز");
-			return data;
+			return data as DiscriminatorReference;
 		},
 		// مرجع سريري ثابت في الشيفرة — يُجلب مرّة ويُخزَّن
 		staleTime: Number.POSITIVE_INFINITY,

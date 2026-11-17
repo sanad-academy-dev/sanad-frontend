@@ -1,5 +1,5 @@
-import { ALL_CATALOGUE_PERMISSIONS, findCataloguePermission } from "./rbac-catalogue";
-import type { PermissionScope, RbacGroup } from "./rbac-registry";
+import { ALL_CATALOGUE_PERMISSIONS, findCataloguePermission } from "@sanad/contracts/runtime/lib/rbac/rbac-catalogue";
+import type { PermissionScope, RbacGroup } from "@sanad/contracts/runtime/lib/rbac/rbac-registry";
 
 /**
  * [RBAC P6] Ready-made roles, one or more per module.

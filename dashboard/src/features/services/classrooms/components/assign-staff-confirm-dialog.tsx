@@ -2,19 +2,13 @@ import { useState } from "react";
 import {
 	IconArrowsDiagonal,
 	IconArrowsMinimize,
-	IconMail,
 	IconSend,
 	IconSparkles,
 	IconX,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
@@ -104,7 +98,10 @@ export function AssignStaffConfirmDialog({
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
+		<Dialog
+			open={open}
+			onOpenChange={onOpenChange}
+		>
 			<DialogContent
 				showCloseButton={false}
 				className={cn(
@@ -227,9 +224,7 @@ export function AssignStaffConfirmDialog({
 							{/* حقل نص الرسالة مع زر الذكاء الاصطناعي */}
 							<div className="space-y-2 text-right">
 								<div className="flex items-center justify-between">
-									<label className="text-xs font-bold text-foreground">
-										نص رسالة
-									</label>
+									<label className="text-xs font-bold text-foreground">نص رسالة</label>
 									<Button
 										type="button"
 										variant="outline"
@@ -277,7 +272,9 @@ export function AssignStaffConfirmDialog({
 						type="button"
 						size="sm"
 						onClick={handleFormSubmit}
-						disabled={isPending || selectedStaff.length === 0 || (enableMessage && !message.trim())}
+						disabled={
+							isPending || selectedStaff.length === 0 || (enableMessage && !message.trim())
+						}
 						className="gap-2 px-5 font-semibold text-xs shadow-sm cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						{enableMessage ? (

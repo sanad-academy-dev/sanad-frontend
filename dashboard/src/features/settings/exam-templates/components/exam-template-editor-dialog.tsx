@@ -7,13 +7,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
 
 import { ExamBlockEditor } from "@/features/settings/exam-templates/components/exam-block-editor";
 import {
@@ -29,8 +22,6 @@ import {
 	parseExamBlocks,
 	SOAP_SECTIONS,
 } from "@sanad/contracts/runtime/server/clinical-notes/clinical-notes.type";
-
-const ANY_SPECIES = "__any__";
 
 export type TemplateDraft = {
 	key: string;
@@ -83,7 +74,6 @@ export const ExamTemplateEditorDialog = ({
 	draft: TemplateDraft | null;
 	onClose: () => void;
 }) => {
-
 	const { saveTemplate, isPending } = useExamTemplateMutations();
 	const [form, setForm] = useState<TemplateDraft | null>(draft);
 	const [error, setError] = useState<string | null>(null);
@@ -197,7 +187,6 @@ export const ExamTemplateEditorDialog = ({
 								onChange={(event) => patch({ presentingComplaint: event.target.value })}
 							/>
 						</div>
-
 					</div>
 
 					<div className="flex flex-wrap items-center gap-4">

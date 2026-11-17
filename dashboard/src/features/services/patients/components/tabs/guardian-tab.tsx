@@ -3,24 +3,16 @@ import {
 	IconArrowsExchange,
 	IconBrandWhatsapp,
 	IconCheck,
-	IconChevronLeft,
 	IconCopy,
 	IconDots,
 	IconEdit,
 	IconExternalLink,
-	IconEye,
 	IconHeartHandshake,
-	IconLayoutGrid,
 	IconMail,
 	IconMapPin,
 	IconPhone,
 	IconPhoneCall,
-	IconPlus,
 	IconSchool,
-	IconShieldCheck,
-	IconTable,
-	IconUser,
-	IconUserCheck,
 	IconUserOff,
 	IconUserPlus,
 	IconUsers,
@@ -29,7 +21,6 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { InitialsAvatar } from "@/components/common/initials-avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
@@ -40,7 +31,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TabsContent } from "@/components/ui/tabs";
-import { PatientPolicyCard } from "@/features/accounting/insurance/components/patient-policy-card";
 import { usePatient } from "@/features/services/patients/hooks/use-patient";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import type { PatientTabProps } from "@/features/services/patients/types/tabs.types";
@@ -78,42 +68,49 @@ function formatRelationship(rel?: string | null): { text: string; colorClass: st
 	if (u === "FATHER" || rel === "أب") {
 		return {
 			text: "الأب",
-			colorClass: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800",
+			colorClass:
+				"bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-800",
 		};
 	}
 	if (u === "MOTHER" || rel === "أم") {
 		return {
 			text: "الأم",
-			colorClass: "bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-950/40 dark:text-pink-300 dark:border-pink-800",
+			colorClass:
+				"bg-pink-50 text-pink-700 border-pink-200 dark:bg-pink-950/40 dark:text-pink-300 dark:border-pink-800",
 		};
 	}
 	if (u === "GUARDIAN" || rel.includes("وصي") || rel.includes("كفيل")) {
 		return {
 			text: "وصي / كفيل",
-			colorClass: "bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800",
+			colorClass:
+				"bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/40 dark:text-purple-300 dark:border-purple-800",
 		};
 	}
 	if (u === "DELEGATE" || rel === "مفوض") {
 		return {
 			text: "مفوض رسمي",
-			colorClass: "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800",
+			colorClass:
+				"bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-800",
 		};
 	}
 	if (u === "BROTHER" || rel === "أخ") {
 		return {
 			text: "الأخ",
-			colorClass: "bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-300 dark:border-cyan-800",
+			colorClass:
+				"bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-950/40 dark:text-cyan-300 dark:border-cyan-800",
 		};
 	}
 	if (u === "SISTER" || rel === "أخت") {
 		return {
 			text: "الأخت",
-			colorClass: "bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800",
+			colorClass:
+				"bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/40 dark:text-rose-300 dark:border-rose-800",
 		};
 	}
 	return {
 		text: rel,
-		colorClass: "bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300",
+		colorClass:
+			"bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300",
 	};
 }
 
@@ -127,7 +124,7 @@ export function GuardianTab({
 	const { patients: allPatients } = usePatients();
 
 	const [copiedKey, setCopiedKey] = useState<string | null>(null);
-	const [viewMode, setViewMode] = useState<"table" | "cards">("table");
+	const [viewMode, _setViewMode] = useState<"table" | "cards">("table");
 
 	const handleCopy = (text: string, label: string, key: string) => {
 		if (!text) return;
@@ -152,10 +149,7 @@ export function GuardianTab({
 						phone: g.owner.phone || null,
 						email: g.owner.email || null,
 						relationship:
-							g.relationship ||
-							g.owner.relationship ||
-							patient.guardianRelationship ||
-							null,
+							g.relationship || g.owner.relationship || patient.guardianRelationship || null,
 						active: g.owner.active !== false,
 						address: g.owner.address || null,
 						city: g.owner.city || null,
@@ -173,10 +167,7 @@ export function GuardianTab({
 				name: patient.owner.name,
 				phone: patient.owner.phone || null,
 				email: patient.owner.email || null,
-				relationship:
-					patient.guardianRelationship ||
-					patient.owner.relationship ||
-					null,
+				relationship: patient.guardianRelationship || patient.owner.relationship || null,
 				active: patient.owner.active !== false,
 				address: patient.owner.address || null,
 				city: patient.owner.city || null,
@@ -212,15 +203,24 @@ export function GuardianTab({
 		return allPatients.filter((p) => {
 			if (p.id === patient?.id) return false;
 			if (guardianId !== "direct" && p.owner?.id === guardianId) return true;
-			if (guardianId !== "direct" && p.guardians?.some((g) => g.owner?.id === guardianId)) return true;
-			if (guardianPhone && (p.owner?.phone === guardianPhone || p.guardianPhone === guardianPhone)) return true;
+			if (guardianId !== "direct" && p.guardians?.some((g) => g.owner?.id === guardianId))
+				return true;
+			if (
+				guardianPhone &&
+				(p.owner?.phone === guardianPhone || p.guardianPhone === guardianPhone)
+			)
+				return true;
 			return false;
 		}).length;
 	};
 
 	if (isLoading && !patient) {
 		return (
-			<TabsContent value="guardian" className="m-0 p-4" dir="rtl">
+			<TabsContent
+				value="guardian"
+				className="m-0 p-4"
+				dir="rtl"
+			>
 				<div className="flex flex-col gap-4">
 					<Skeleton className="h-14 w-full rounded-xl" />
 					<Skeleton className="h-64 w-full rounded-xl" />
@@ -231,11 +231,17 @@ export function GuardianTab({
 
 	if (!patient) {
 		return (
-			<TabsContent value="guardian" className="m-0 p-6" dir="rtl">
+			<TabsContent
+				value="guardian"
+				className="m-0 p-6"
+				dir="rtl"
+			>
 				<div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
 					<IconAlertCircle className="size-10 text-amber-500" />
 					<p className="font-semibold text-foreground">تعذر العثور على بيانات الطالب</p>
-					<p className="text-xs text-muted-foreground">تأكد من صحة معرّف الطالب والمحاولة مجدداً</p>
+					<p className="text-xs text-muted-foreground">
+						تأكد من صحة معرّف الطالب والمحاولة مجدداً
+					</p>
 				</div>
 			</TabsContent>
 		);
@@ -352,13 +358,22 @@ export function GuardianTab({
 
 					<div className="flex items-center gap-2.5 pt-2">
 						{onTransferOwnership && (
-							<Button size="sm" onClick={onTransferOwnership} className="gap-1.5 shadow-xs">
+							<Button
+								size="sm"
+								onClick={onTransferOwnership}
+								className="gap-1.5 shadow-xs"
+							>
 								<IconUserPlus className="size-4" />
 								<span>ربط ولي أمر الآن</span>
 							</Button>
 						)}
 						{onEditPatient && (
-							<Button size="sm" variant="outline" onClick={onEditPatient} className="gap-1.5">
+							<Button
+								size="sm"
+								variant="outline"
+								onClick={onEditPatient}
+								className="gap-1.5"
+							>
 								<IconEdit className="size-4" />
 								<span>إضافة بيانات الاتصال</span>
 							</Button>
@@ -385,9 +400,7 @@ export function GuardianTab({
 									const rel = formatRelationship(g.relationship);
 									const cleanPhone = (g.phone || "").replace(/\D/g, "");
 									const fullAddress =
-										g.address ||
-										[g.city, g.country].filter(Boolean).join("، ") ||
-										"—";
+										g.address || [g.city, g.country].filter(Boolean).join("، ") || "—";
 									const siblingCount = getSiblingCount(g.id, g.phone);
 
 									return (
@@ -464,7 +477,10 @@ export function GuardianTab({
 											</td>
 
 											{/* 3. التواصل المباشر (أزرار لايف) */}
-											<td className="py-3 px-4 align-middle" onClick={(e) => e.stopPropagation()}>
+											<td
+												className="py-3 px-4 align-middle"
+												onClick={(e) => e.stopPropagation()}
+											>
 												<div className="flex flex-col gap-1">
 													{g.phone ? (
 														<div className="flex items-center gap-1.5">
@@ -476,7 +492,9 @@ export function GuardianTab({
 															</span>
 														</div>
 													) : (
-														<span className="text-muted-foreground text-[11px]">لا يوجد هاتف</span>
+														<span className="text-muted-foreground text-[11px]">
+															لا يوجد هاتف
+														</span>
 													)}
 
 													{g.email && (
@@ -497,7 +515,10 @@ export function GuardianTab({
 
 											{/* 4. العنوان ومكان الإقامة */}
 											<td className="py-3 px-3 align-middle text-muted-foreground">
-												<div className="flex items-center gap-1 max-w-[140px]" title={fullAddress}>
+												<div
+													className="flex items-center gap-1 max-w-[140px]"
+													title={fullAddress}
+												>
 													<IconMapPin className="size-3.5 shrink-0 text-muted-foreground/70" />
 													<span className="truncate">{fullAddress}</span>
 												</div>
@@ -516,7 +537,9 @@ export function GuardianTab({
 													<span
 														className={cn(
 															"size-1.5 rounded-full",
-															g.active ? "bg-emerald-500 animate-pulse" : "bg-muted-foreground/60",
+															g.active
+																? "bg-emerald-500 animate-pulse"
+																: "bg-muted-foreground/60",
 														)}
 													/>
 													<span>{g.active ? "نشط" : "غير نشط"}</span>
@@ -524,7 +547,10 @@ export function GuardianTab({
 											</td>
 
 											{/* 6. الإجراءات التفاعلية */}
-											<td className="py-3 px-4 align-middle" onClick={(e) => e.stopPropagation()}>
+											<td
+												className="py-3 px-4 align-middle"
+												onClick={(e) => e.stopPropagation()}
+											>
 												<div className="flex items-center justify-end gap-1.5">
 													{!g.isDirectOnly && (
 														<Button
@@ -532,9 +558,7 @@ export function GuardianTab({
 															size="sm"
 															variant="outline"
 															className="h-7 text-xs px-2.5 gap-1 text-primary hover:text-primary hover:bg-primary/10 border-primary/20 shrink-0 font-medium"
-														>
-															
-														</Button>
+														></Button>
 													)}
 
 													<DropdownMenu dir="rtl">
@@ -547,7 +571,10 @@ export function GuardianTab({
 																<IconDots className="size-3.5" />
 															</Button>
 														</DropdownMenuTrigger>
-														<DropdownMenuContent align="start" className="w-48">
+														<DropdownMenuContent
+															align="start"
+															className="w-48"
+														>
 															{/* {!g.isDirectOnly && (
 																<DropdownMenuItem
 																	className="gap-2 text-xs cursor-pointer font-medium text-primary"
@@ -567,7 +594,9 @@ export function GuardianTab({
 																<>
 																	<DropdownMenuItem
 																		className="gap-2 text-xs cursor-pointer text-emerald-600"
-																		onSelect={() => window.open(`https://wa.me/${cleanPhone}`, "_blank")}
+																		onSelect={() =>
+																			window.open(`https://wa.me/${cleanPhone}`, "_blank")
+																		}
 																	>
 																		<IconBrandWhatsapp className="size-3.5" />
 																		<span>مراسلة واتساب</span>
@@ -581,7 +610,9 @@ export function GuardianTab({
 																	</DropdownMenuItem>
 																	<DropdownMenuItem
 																		className="gap-2 text-xs cursor-pointer"
-																		onSelect={() => handleCopy(g.phone!, "رقم الهاتف", `ph-dd-${g.id}`)}
+																		onSelect={() =>
+																			handleCopy(g.phone!, "رقم الهاتف", `ph-dd-${g.id}`)
+																		}
 																	>
 																		<IconCopy className="size-3.5" />
 																		<span>نسخ رقم الهاتف</span>
@@ -592,14 +623,18 @@ export function GuardianTab({
 															{g.email && (
 																<DropdownMenuItem
 																	className="gap-2 text-xs cursor-pointer"
-																	onSelect={() => handleCopy(g.email!, "البريد الإلكتروني", `em-dd-${g.id}`)}
+																	onSelect={() =>
+																		handleCopy(g.email!, "البريد الإلكتروني", `em-dd-${g.id}`)
+																	}
 																>
 																	<IconCopy className="size-3.5" />
 																	<span>نسخ البريد الإلكتروني</span>
 																</DropdownMenuItem>
 															)}
 
-															{(onTransferOwnership || onEditPatient) && <DropdownMenuSeparator />}
+															{(onTransferOwnership || onEditPatient) && (
+																<DropdownMenuSeparator />
+															)}
 
 															{onTransferOwnership && (
 																<DropdownMenuItem
@@ -638,9 +673,7 @@ export function GuardianTab({
 						const rel = formatRelationship(g.relationship);
 						const cleanPhone = (g.phone || "").replace(/\D/g, "");
 						const fullAddress =
-							g.address ||
-							[g.city, g.country].filter(Boolean).join("، ") ||
-							"غير مسجل";
+							g.address || [g.city, g.country].filter(Boolean).join("، ") || "غير مسجل";
 						const siblingCount = getSiblingCount(g.id, g.phone);
 
 						return (
@@ -719,7 +752,10 @@ export function GuardianTab({
 											<div className="flex items-center justify-between p-2 rounded-xl bg-muted/40 border border-border/50">
 												<div className="flex items-center gap-2 tabular-nums">
 													<IconPhone className="size-3.5 text-primary shrink-0" />
-													<span className="font-mono font-semibold" dir="ltr">
+													<span
+														className="font-mono font-semibold"
+														dir="ltr"
+													>
 														{g.phone}
 													</span>
 												</div>
@@ -728,7 +764,9 @@ export function GuardianTab({
 														size="sm"
 														variant="ghost"
 														className="h-6 px-2 text-[11px] gap-1 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-														onClick={() => window.open(`https://wa.me/${cleanPhone}`, "_blank")}
+														onClick={() =>
+															window.open(`https://wa.me/${cleanPhone}`, "_blank")
+														}
 													>
 														<IconBrandWhatsapp className="size-3.5" />
 														<span>واتساب</span>
@@ -750,7 +788,10 @@ export function GuardianTab({
 											<div className="flex items-center justify-between p-2 rounded-xl bg-muted/40 border border-border/50">
 												<div className="flex items-center gap-2 min-w-0">
 													<IconMail className="size-3.5 text-muted-foreground shrink-0" />
-													<span className="truncate text-[11px]" dir="ltr">
+													<span
+														className="truncate text-[11px]"
+														dir="ltr"
+													>
 														{g.email}
 													</span>
 												</div>
@@ -758,7 +799,9 @@ export function GuardianTab({
 													size="sm"
 													variant="ghost"
 													className="h-6 px-2 text-[11px] text-muted-foreground"
-													onClick={() => handleCopy(g.email!, "البريد الإلكتروني", `c-em-${g.id}`)}
+													onClick={() =>
+														handleCopy(g.email!, "البريد الإلكتروني", `c-em-${g.id}`)
+													}
 												>
 													<IconCopy className="size-3" />
 												</Button>
@@ -821,8 +864,10 @@ export function GuardianTab({
 
 			{/* ── بطاقة جهة الاتصال في حالات الطوارئ (بتصميم حيّ وأنيق) ── */}
 			{(() => {
-				const emergencyName = patient.owner?.emergencyContactName || patient.emergencyContactName;
-				const emergencyPhone = patient.owner?.emergencyContactPhone || patient.emergencyContactPhone;
+				const emergencyName =
+					patient.owner?.emergencyContactName || patient.emergencyContactName;
+				const emergencyPhone =
+					patient.owner?.emergencyContactPhone || patient.emergencyContactPhone;
 				const hasEmergency = Boolean(emergencyName || emergencyPhone);
 
 				return (
@@ -833,7 +878,9 @@ export function GuardianTab({
 									<IconHeartHandshake className="size-4.5" />
 								</div>
 								<div className="flex flex-col">
-									<h4 className="text-sm font-bold text-foreground">جهة الاتصال في حالات الطوارئ</h4>
+									<h4 className="text-sm font-bold text-foreground">
+										جهة الاتصال في حالات الطوارئ
+									</h4>
 									<span className="text-[11px] text-muted-foreground">
 										للتواصل الفوري في الحالات العاجلة المسجلة لوليّ الأمر
 									</span>
@@ -871,7 +918,9 @@ export function GuardianTab({
 						{hasEmergency ? (
 							<div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
 								<div className="p-3 rounded-xl border border-rose-100 bg-rose-50/40 dark:border-rose-900/40 dark:bg-rose-950/20 flex flex-col gap-1">
-									<span className="text-[11px] text-muted-foreground font-medium">اسم جهة / شخص الطوارئ</span>
+									<span className="text-[11px] text-muted-foreground font-medium">
+										اسم جهة / شخص الطوارئ
+									</span>
 									<span className="text-xs font-bold text-foreground">
 										{emergencyName || "غير محدد"}
 									</span>
@@ -879,9 +928,14 @@ export function GuardianTab({
 
 								<div className="p-3 rounded-xl border border-rose-100 bg-rose-50/40 dark:border-rose-900/40 dark:bg-rose-950/20 flex items-center justify-between gap-2">
 									<div className="flex flex-col gap-0.5">
-										<span className="text-[11px] text-muted-foreground font-medium">رقم هاتف الطوارئ</span>
+										<span className="text-[11px] text-muted-foreground font-medium">
+											رقم هاتف الطوارئ
+										</span>
 										{emergencyPhone ? (
-											<span className="font-mono text-xs font-bold text-rose-600 dark:text-rose-400 tabular-nums" dir="ltr">
+											<span
+												className="font-mono text-xs font-bold text-rose-600 dark:text-rose-400 tabular-nums"
+												dir="ltr"
+											>
 												{emergencyPhone}
 											</span>
 										) : (
@@ -904,7 +958,9 @@ export function GuardianTab({
 												size="sm"
 												variant="ghost"
 												className="size-7 p-0 text-muted-foreground"
-												onClick={() => handleCopy(emergencyPhone!, "رقم هاتف الطوارئ", "em-ph")}
+												onClick={() =>
+													handleCopy(emergencyPhone!, "رقم هاتف الطوارئ", "em-ph")
+												}
 											>
 												{copiedKey === "em-ph" ? (
 													<IconCheck className="size-3 text-emerald-600" />
@@ -965,7 +1021,6 @@ export function GuardianTab({
 
 				<PatientPolicyCard patientId={patient.id} />
 			</div> */}
-			
 		</TabsContent>
 	);
 }

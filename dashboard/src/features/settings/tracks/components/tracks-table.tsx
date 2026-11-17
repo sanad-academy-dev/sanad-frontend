@@ -2,7 +2,6 @@
 
 import {
 	IconAlertTriangle,
-	IconCompass,
 	IconDots,
 	IconPlus,
 	IconRoute,
@@ -49,10 +48,7 @@ import {
 import { ConfirmDiscard } from "@/features/settings/components/confirm-discard";
 import { cn } from "@/lib/utils";
 import { useTrackClassifications } from "../hooks/use-track-classifications";
-import type {
-	TrackClassificationDraft,
-	TrackClassificationItem,
-} from "../types/tracks.types";
+import type { TrackClassificationDraft, TrackClassificationItem } from "../types/tracks.types";
 
 const COLS = "grid-cols-[240px_1fr_120px_150px_90px_70px]" as const;
 const COL_COUNT = 6;
@@ -133,6 +129,7 @@ function TrackAddRow({ isAdding, onClose, onAdd, isPending }: TrackAddRowProps) 
 					<ConfirmDiscard
 						onConfirm={handleConfirm}
 						onDiscard={handleDiscard}
+						disabled={isPending}
 						confirmDisabled={!draft.name.trim() || isPending}
 					/>
 				</TableCell>
@@ -258,7 +255,10 @@ export function TracksTable() {
 					{isLoading ? (
 						<TableBody>
 							{Array.from({ length: 6 }).map((_, i) => (
-								<TableRow key={i} className={cn("grid", COLS)}>
+								<TableRow
+									key={i}
+									className={cn("grid", COLS)}
+								>
 									<TableCell className="px-3 py-3">
 										<Skeleton className="h-4 w-3/4" />
 									</TableCell>
@@ -344,9 +344,8 @@ export function TracksTable() {
 									{/* الطلاب والاستخدام */}
 									<TableCell className="px-3 py-3">
 										<UsageBar
-											value={item.usageCount}
+							count={item.usageCount}
 											max={maxUsage}
-											unit="طالب"
 										/>
 									</TableCell>
 
@@ -390,14 +389,20 @@ export function TracksTable() {
 			</div>
 
 			{/* تأكيد الحذف */}
-			<Dialog open={Boolean(deletingItem)} onOpenChange={(open) => !open && setDeletingItem(null)}>
-				<DialogContent className="max-w-md" dir="rtl">
+			<Dialog
+				open={Boolean(deletingItem)}
+				onOpenChange={(open) => !open && setDeletingItem(null)}
+			>
+				<DialogContent
+					className="max-w-md"
+					dir="rtl"
+				>
 					<DialogHeader>
 						<DialogTitle>حذف تصنيف المسار</DialogTitle>
 						<DialogDescription>
 							هل أنت متأكد من حذف تصنيف{" "}
-							<span className="font-bold text-foreground">({deletingItem?.name})</span>؟ سيتم فك
-							ارتباط المسارات التدريبية الحالية التابعة لهذا التصنيف.
+							<span className="font-bold text-foreground">({deletingItem?.name})</span>؟ سيتم
+							فك ارتباط المسارات التدريبية الحالية التابعة لهذا التصنيف.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter className="gap-2 sm:gap-0">
@@ -423,7 +428,10 @@ export function TracksTable() {
 				open={Boolean(itemToDisable)}
 				onOpenChange={(open) => !open && setItemToDisable(null)}
 			>
-				<DialogContent className="max-w-md" dir="rtl">
+				<DialogContent
+					className="max-w-md"
+					dir="rtl"
+				>
 					<DialogHeader className="gap-2">
 						<div className="flex items-center gap-2">
 							<span className="inline-flex size-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
@@ -439,7 +447,8 @@ export function TracksTable() {
 							<span className="font-bold text-amber-600 dark:text-amber-400 font-mono">
 								({itemToDisable?.tracksCount} مسارات)
 							</span>{" "}
-							مرتبطة به حالياً. يرجى اختيار تصنيف مسار بديل لنقل المسارات والبرامج التدريبية إليه تلقائياً قبل التعطيل.
+							مرتبطة به حالياً. يرجى اختيار تصنيف مسار بديل لنقل المسارات والبرامج التدريبية
+							إليه تلقائياً قبل التعطيل.
 						</DialogDescription>
 					</DialogHeader>
 
@@ -456,7 +465,10 @@ export function TracksTable() {
 								<SelectTrigger className="w-full h-10 text-xs">
 									<SelectValue placeholder="اختر تصنيف المسار البديل..." />
 								</SelectTrigger>
-								<SelectContent dir="rtl" className="max-h-56">
+								<SelectContent
+									dir="rtl"
+									className="max-h-56"
+								>
 									{otherActiveTracks.map((t) => (
 										<SelectItem
 											key={t.id}
@@ -475,7 +487,8 @@ export function TracksTable() {
 							</Select>
 						) : (
 							<div className="p-3 text-xs rounded-lg border border-destructive/30 bg-destructive/5 text-destructive">
-								لا توجد تصنيفات مسارات نشطة أخرى حالياً لنقل المسارات إليها. يرجى تفعيل أو إنشاء تصنيف آخر أولاً.
+								لا توجد تصنيفات مسارات نشطة أخرى حالياً لنقل المسارات إليها. يرجى تفعيل أو إنشاء
+								تصنيف آخر أولاً.
 							</div>
 						)}
 					</div>
@@ -503,4 +516,3 @@ export function TracksTable() {
 		</div>
 	);
 }
-

@@ -14,8 +14,6 @@ import {
 	IconClipboardCheck,
 	IconClock,
 	IconCopy,
-	IconDots,
-	IconFileDescription,
 	IconFlag,
 	IconHourglass,
 	IconIdBadge2,
@@ -23,21 +21,13 @@ import {
 	IconMessage2,
 	IconMessageCircle,
 	IconPhone,
-	IconPlayerPlayFilled,
 	IconPlus,
 	IconSparkles,
-	IconUser,
 	IconVideo,
 	IconX,
 } from "@tabler/icons-react";
 
-import {
-	KanbanBoard,
-	KanbanCard,
-	KanbanCards,
-	KanbanProvider,
-} from "@/components/kanban";
-import { Badge } from "@/components/ui/badge";
+import { KanbanBoard, KanbanCard, KanbanCards, KanbanProvider } from "@/components/kanban";
 import { Card } from "@/components/ui/card";
 import {
 	DropdownMenu,
@@ -47,7 +37,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { AppointmentColumnHeader } from "@/features/appointments/components/appointment-column-header";
-import type { AppointmentColumn, AppointmentColumnId } from "@/features/appointments/types/appointment.types";
+import type {
+	AppointmentColumn,
+	AppointmentColumnId,
+} from "@/features/appointments/types/appointment.types";
 import { toast } from "sonner";
 import { CampaignRequestSheet, type ActiveActionDrawer } from "./campaign-request-sheet";
 import { CancelAppointmentConfirmDialog } from "./modals/cancel-appointment-confirm-dialog";
@@ -85,14 +78,62 @@ const collisionDetection: CollisionDetection = (args) => {
 };
 
 const CAMPAIGN_COLUMNS: AppointmentColumn[] = [
-	{ id: "queue" as AppointmentColumnId, name: "طابور", count: 0, icon: <IconClock className="size-3.5" />, accent: "blue" },
-	{ id: "shortlist" as AppointmentColumnId, name: "قائمة مختصرة", count: 0, icon: <IconClipboardCheck className="size-3.5" />, accent: "neutral" },
-	{ id: "waitlist" as AppointmentColumnId, name: "قائمة الانتظار", count: 0, icon: <IconClock className="size-3.5" />, accent: "amber" },
-	{ id: "interview" as AppointmentColumnId, name: "المقابلة الشخصية", count: 0, icon: <IconActivity className="size-3.5" />, accent: "indigo" },
-	{ id: "awaiting-payment" as AppointmentColumnId, name: "بانتظار الدفع", count: 0, icon: <IconHourglass className="size-3.5" />, accent: "purple" },
-	{ id: "accepted" as AppointmentColumnId, name: "مقبول", count: 0, icon: <IconCheck className="size-3.5" />, accent: "emerald" },
-	{ id: "rejected" as AppointmentColumnId, name: "مرفوض", count: 0, icon: <IconX className="size-3.5" />, accent: "red" },
-	{ id: "duplicate" as AppointmentColumnId, name: "مكرر", count: 0, icon: <IconCopy className="size-3.5" />, accent: "orange" },
+	{
+		id: "queue" as AppointmentColumnId,
+		name: "طابور",
+		count: 0,
+		icon: <IconClock className="size-3.5" />,
+		accent: "blue",
+	},
+	{
+		id: "shortlist" as AppointmentColumnId,
+		name: "قائمة مختصرة",
+		count: 0,
+		icon: <IconClipboardCheck className="size-3.5" />,
+		accent: "neutral",
+	},
+	{
+		id: "waitlist" as AppointmentColumnId,
+		name: "قائمة الانتظار",
+		count: 0,
+		icon: <IconClock className="size-3.5" />,
+		accent: "amber",
+	},
+	{
+		id: "interview" as AppointmentColumnId,
+		name: "المقابلة الشخصية",
+		count: 0,
+		icon: <IconActivity className="size-3.5" />,
+		accent: "indigo",
+	},
+	{
+		id: "awaiting-payment" as AppointmentColumnId,
+		name: "بانتظار الدفع",
+		count: 0,
+		icon: <IconHourglass className="size-3.5" />,
+		accent: "purple",
+	},
+	{
+		id: "accepted" as AppointmentColumnId,
+		name: "مقبول",
+		count: 0,
+		icon: <IconCheck className="size-3.5" />,
+		accent: "emerald",
+	},
+	{
+		id: "rejected" as AppointmentColumnId,
+		name: "مرفوض",
+		count: 0,
+		icon: <IconX className="size-3.5" />,
+		accent: "red",
+	},
+	{
+		id: "duplicate" as AppointmentColumnId,
+		name: "مكرر",
+		count: 0,
+		icon: <IconCopy className="size-3.5" />,
+		accent: "orange",
+	},
 ];
 
 const COLUMN_STATUS_MAP: Record<
@@ -108,7 +149,11 @@ const COLUMN_STATUS_MAP: Record<
 	waitlist: { status: "WAITLIST", label: "قائمة الانتظار", variant: "warning" },
 	interview: { status: "INTERVIEW", label: "المقابلة الشخصية", variant: "info" },
 	accepted: { status: "ACCEPTED", label: "مقبول", variant: "default" },
-	"awaiting-payment": { status: "AWAITING_PAYMENT", label: "بانتظار الدفع", variant: "warning" },
+	"awaiting-payment": {
+		status: "AWAITING_PAYMENT",
+		label: "بانتظار الدفع",
+		variant: "warning",
+	},
 	awaiting_payment: { status: "AWAITING_PAYMENT", label: "بانتظار الدفع", variant: "warning" },
 	rejected: { status: "REJECTED", label: "مرفوض", variant: "destructive" },
 	duplicate: { status: "DUPLICATE", label: "مكرر", variant: "destructive" },
@@ -125,23 +170,35 @@ const EMPTY_REQUESTS: CampaignRequestItem[] = [];
 /** توليد حرفين من الاسم للأفاتار العربي الدائري كما بالصورة (مثال: محمد الصالح -> ما) */
 function getArabicInitials(name?: string | null): string {
 	if (!name) return "ط";
-	const clean = name.trim().replace(/^(د\.|أ\.|م\.|مهندس|دكتور)\s*/i, "").split(/\s+/);
+	const clean = name
+		.trim()
+		.replace(/^(د\.|أ\.|م\.|مهندس|دكتور)\s*/i, "")
+		.split(/\s+/);
 	if (clean.length === 0 || !clean[0]) return "ط";
 	if (clean.length === 1) return clean[0].slice(0, 2);
 	return `${clean[0][0]}${clean[1][0]}`;
 }
 
 /** حساب مرحلة الطلب ونسبة شريط التقدم عبر قمع القبول المكون من 5 مراحل رئيسية */
-function getStageProgress(column: string): { current: number; total: number; percent: number } {
+function getStageProgress(column: string): {
+	current: number;
+	total: number;
+	percent: number;
+} {
 	const total = 5;
 	let current = 1;
 	const col = (column || "").toLowerCase();
 	if (col === "shortlist" || col === "قائمة مختصرة") current = 2;
-	else if (col === "waitlist" || col === "قائمة الانتظار") current = 2; // حالة تعليق مؤقتة وليست مرحلة تقدم
-	else if (col === "interview" || col === "المقابلة الشخصية" || col === "المقابله الشخصيه") current = 3;
-	else if (col === "awaiting-payment" || col === "awaiting_payment" || col === "بانتظار الدفع") current = 4;
-	else if (col === "accepted" || col === "مقبول") current = 5; // القرار النهائي بالقبول
-	else if (col === "rejected" || col === "مرفوض") current = 5; // القرار النهائي بالرفض
+	else if (col === "waitlist" || col === "قائمة الانتظار")
+		current = 2; // حالة تعليق مؤقتة وليست مرحلة تقدم
+	else if (col === "interview" || col === "المقابلة الشخصية" || col === "المقابله الشخصيه")
+		current = 3;
+	else if (col === "awaiting-payment" || col === "awaiting_payment" || col === "بانتظار الدفع")
+		current = 4;
+	else if (col === "accepted" || col === "مقبول")
+		current = 5; // القرار النهائي بالقبول
+	else if (col === "rejected" || col === "مرفوض")
+		current = 5; // القرار النهائي بالرفض
 	else if (col === "duplicate" || col === "مكرر") current = 1; // مكرر تنظيمي
 	const percent = Math.min(100, Math.round((current / total) * 100));
 	return { current, total, percent };
@@ -167,14 +224,18 @@ export function CampaignRequestsKanban({
 	const { clinicInfo } = useClinicInfo();
 	const clinicTimezone = clinicInfo?.timezone || DEFAULT_CLINIC_TIMEZONE;
 	const currencySymbol = resolveClinicCurrencySymbol(clinicInfo?.currencyCode);
-	const { data: serverRequests = EMPTY_REQUESTS, isLoading } = useCampaignRequests(campaignId);
+	const { data: serverRequests = EMPTY_REQUESTS } = useCampaignRequests(campaignId);
 	const updateStatusMutation = useUpdateRequestStatus(campaignId);
 	const updateRequestMutation = useUpdateRequest(campaignId);
 
 	const [data, setData] = useState<CampaignRequestItem[]>([]);
-	const lastKnownColumns = useRef<Map<string, AppointmentColumnId>>(new Map());
-	const [internalSelectedRequestId, setInternalSelectedRequestId] = useState<string | null>(null);
-	const [scheduleWorkflowRequestId, setScheduleWorkflowRequestId] = useState<string | null>(null);
+	const lastKnownColumns = useRef<Map<string, string>>(new Map());
+	const [internalSelectedRequestId, setInternalSelectedRequestId] = useState<string | null>(
+		null,
+	);
+	const [scheduleWorkflowRequestId, setScheduleWorkflowRequestId] = useState<string | null>(
+		null,
+	);
 	const [targetActionDrawer, setTargetActionDrawer] = useState<ActiveActionDrawer>(null);
 	const [isDraggingCard, setIsDraggingCard] = useState(false);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -186,7 +247,11 @@ export function CampaignRequestsKanban({
 		maxSpeed: 24,
 		onDragStop: () => setIsDraggingCard(false),
 	});
-	const openRequestWithDrawer = (requestId: string, drawer: ActiveActionDrawer, toastNotice?: string) => {
+	const openRequestWithDrawer = (
+		requestId: string,
+		drawer: ActiveActionDrawer,
+		toastNotice?: string,
+	) => {
 		setSelectedRequestId(requestId);
 		setTargetActionDrawer(drawer);
 		if (toastNotice) {
@@ -196,12 +261,15 @@ export function CampaignRequestsKanban({
 	const [pendingCancelAppointmentDrag, setPendingCancelAppointmentDrag] = useState<{
 		request: CampaignRequestItem;
 		targetColumn: string;
-		prevColumn: AppointmentColumnId;
+		prevColumn: string;
 		targetStatus: CampaignRequestItem["status"];
 		targetLabel: string;
 		targetVariant: CampaignRequestItem["statusVariant"];
 	} | null>(null);
-	const selectedRequestId = externalSelectedRequestId !== undefined ? externalSelectedRequestId : internalSelectedRequestId;
+	const selectedRequestId =
+		externalSelectedRequestId !== undefined
+			? externalSelectedRequestId
+			: internalSelectedRequestId;
 	const setSelectedRequestId = externalOnSelectRequest || setInternalSelectedRequestId;
 	const startScheduleWorkflow = (request: CampaignRequestItem) => {
 		setScheduleWorkflowRequestId(request.id);
@@ -233,7 +301,8 @@ export function CampaignRequestsKanban({
 			}
 			if (searchQuery && searchQuery.trim()) {
 				const q = searchQuery.trim().toLowerCase();
-				const matchName = item.patientName?.toLowerCase().includes(q) || item.name?.toLowerCase().includes(q);
+				const matchName =
+					item.patientName?.toLowerCase().includes(q) || item.name?.toLowerCase().includes(q);
 				const matchCode = item.code?.toLowerCase().includes(q);
 				const matchPhone = item.guardianPhone?.toLowerCase().includes(q);
 				const matchGuardian = item.guardianName?.toLowerCase().includes(q);
@@ -260,18 +329,21 @@ export function CampaignRequestsKanban({
 	}, [data, searchQuery, genderFilter]);
 
 	// مستويات ترتيب الأولوية تنازلياً
-	const priorityRanks: Record<string, number> = useMemo(() => ({
-		urgent: 4,
-		عاجلة: 4,
-		high: 3,
-		مرتفعة: 3,
-		medium: 2,
-		متوسطة: 2,
-		low: 1,
-		منخفضة: 1,
-		none: 0,
-		"بدون أولوية": 0,
-	}), []);
+	const priorityRanks: Record<string, number> = useMemo(
+		() => ({
+			urgent: 4,
+			عاجلة: 4,
+			high: 3,
+			مرتفعة: 3,
+			medium: 2,
+			متوسطة: 2,
+			low: 1,
+			منخفضة: 1,
+			none: 0,
+			"بدون أولوية": 0,
+		}),
+		[],
+	);
 
 	// تطبيق التصفية والفرز المختار (تاريخ / أولوية / أبجدي)
 	const sortedAndFilteredData = useMemo(() => {
@@ -338,7 +410,9 @@ export function CampaignRequestsKanban({
 
 		if (newStatus === "INTERVIEW" && !hasActiveAppointment) {
 			if (req.status === "QUEUE") {
-				toast.error("لا يمكن جدولة مقابلة للطالب مباشرة من الطابور؛ يجب إدراجه ضمن القائمة المختصرة أولاً.");
+				toast.error(
+					"لا يمكن جدولة مقابلة للطالب مباشرة من الطابور؛ يجب إدراجه ضمن القائمة المختصرة أولاً.",
+				);
 				return;
 			}
 			startScheduleWorkflow(req);
@@ -360,7 +434,9 @@ export function CampaignRequestsKanban({
 					"يرجى إتمام التحصيل الكاش قبل اعتماد القبول النهائي.",
 				);
 			} else {
-				toast.error("لا يمكن اعتماد وقبول الطالب قبل الانتقال لمرحلة بانتظار الدفع وتوثيق السداد.");
+				toast.error(
+					"لا يمكن اعتماد وقبول الطالب قبل الانتقال لمرحلة بانتظار الدفع وتوثيق السداد.",
+				);
 			}
 			return;
 		}
@@ -396,7 +472,7 @@ export function CampaignRequestsKanban({
 							statusLabel: meta?.label || item.statusLabel,
 							statusVariant: meta?.variant || item.statusVariant,
 							assessmentAppointment: isBackwardDrag ? null : item.assessmentAppointment,
-					  }
+						}
 					: item,
 			),
 		);
@@ -421,7 +497,7 @@ export function CampaignRequestsKanban({
 										status: req.status,
 										statusLabel: req.statusLabel,
 										statusVariant: req.statusVariant,
-								  }
+									}
 								: item,
 						),
 					);
@@ -489,12 +565,19 @@ export function CampaignRequestsKanban({
 			if (prevCol === "queue" && oldItem) {
 				// 1. الوجهات الممنوعة نهائياً: بانتظار الدفع أو القبول النهائي
 				if (targetColumn === "accepted" || meta.status === "ACCEPTED") {
-					toast.error("لا يمكن اعتماد وقبول الطالب مباشرة من الطابور؛ يجب المرور بمسار المقابلة والتقييم وسداد الرسوم أولاً.");
+					toast.error(
+						"لا يمكن اعتماد وقبول الطالب مباشرة من الطابور؛ يجب المرور بمسار المقابلة والتقييم وسداد الرسوم أولاً.",
+					);
 					committed.push({ ...item, column: prevCol });
 					continue;
 				}
-				if (["awaiting-payment", "awaiting_payment"].includes(targetColumn) || meta.status === "AWAITING_PAYMENT") {
-					toast.error("لا يمكن نقل الطلب من الطابور إلى مرحلة انتظار الدفع مباشرة؛ يجب إجراء المقابلة والتقييم أولاً.");
+				if (
+					["awaiting-payment", "awaiting_payment"].includes(targetColumn) ||
+					meta.status === "AWAITING_PAYMENT"
+				) {
+					toast.error(
+						"لا يمكن نقل الطلب من الطابور إلى مرحلة انتظار الدفع مباشرة؛ يجب إجراء المقابلة والتقييم أولاً.",
+					);
 					committed.push({ ...item, column: prevCol });
 					continue;
 				}
@@ -522,7 +605,9 @@ export function CampaignRequestsKanban({
 
 				if (targetColumn === "interview" || meta.status === "INTERVIEW") {
 					committed.push({ ...item, column: prevCol });
-					toast.error("لا يمكن جدولة مقابلة للطالب مباشرة من الطابور؛ يجب إدراجه ضمن القائمة المختصرة أولاً.");
+					toast.error(
+						"لا يمكن جدولة مقابلة للطالب مباشرة من الطابور؛ يجب إدراجه ضمن القائمة المختصرة أولاً.",
+					);
 					continue;
 				}
 
@@ -546,12 +631,19 @@ export function CampaignRequestsKanban({
 					continue;
 				}
 				if (targetColumn === "accepted" || meta.status === "ACCEPTED") {
-					toast.error("لا يمكن اعتماد وقبول الطالب مباشرة من القائمة المختصرة؛ يجب المرور بمسار المقابلة والتقييم وسداد الرسوم أولاً.");
+					toast.error(
+						"لا يمكن اعتماد وقبول الطالب مباشرة من القائمة المختصرة؛ يجب المرور بمسار المقابلة والتقييم وسداد الرسوم أولاً.",
+					);
 					committed.push({ ...item, column: prevCol });
 					continue;
 				}
-				if (["awaiting-payment", "awaiting_payment"].includes(targetColumn) || meta.status === "AWAITING_PAYMENT") {
-					toast.error("لا يمكن نقل الطلب من القائمة المختصرة إلى مرحلة انتظار الدفع مباشرة؛ يجب إجراء وجدولة المقابلة الشخصية والتقييم أولاً.");
+				if (
+					["awaiting-payment", "awaiting_payment"].includes(targetColumn) ||
+					meta.status === "AWAITING_PAYMENT"
+				) {
+					toast.error(
+						"لا يمكن نقل الطلب من القائمة المختصرة إلى مرحلة انتظار الدفع مباشرة؛ يجب إجراء وجدولة المقابلة الشخصية والتقييم أولاً.",
+					);
 					committed.push({ ...item, column: prevCol });
 					continue;
 				}
@@ -588,12 +680,19 @@ export function CampaignRequestsKanban({
 			if (prevCol === "waitlist" && oldItem) {
 				// 1. الوجهات الممنوعة نهائياً: بانتظار الدفع أو القبول النهائي
 				if (targetColumn === "accepted" || meta.status === "ACCEPTED") {
-					toast.error("لا يمكن اعتماد وقبول الطالب مباشرة من قائمة الانتظار؛ يجب المرور بمسار المقابلة والتقييم وسداد الرسوم أولاً.");
+					toast.error(
+						"لا يمكن اعتماد وقبول الطالب مباشرة من قائمة الانتظار؛ يجب المرور بمسار المقابلة والتقييم وسداد الرسوم أولاً.",
+					);
 					committed.push({ ...item, column: prevCol });
 					continue;
 				}
-				if (["awaiting-payment", "awaiting_payment"].includes(targetColumn) || meta.status === "AWAITING_PAYMENT") {
-					toast.error("لا يمكن نقل الطلب من قائمة الانتظار إلى مرحلة انتظار الدفع مباشرة؛ يجب إجراء وجدولة المقابلة الشخصية والتقييم أولاً.");
+				if (
+					["awaiting-payment", "awaiting_payment"].includes(targetColumn) ||
+					meta.status === "AWAITING_PAYMENT"
+				) {
+					toast.error(
+						"لا يمكن نقل الطلب من قائمة الانتظار إلى مرحلة انتظار الدفع مباشرة؛ يجب إجراء وجدولة المقابلة الشخصية والتقييم أولاً.",
+					);
 					committed.push({ ...item, column: prevCol });
 					continue;
 				}
@@ -640,13 +739,18 @@ export function CampaignRequestsKanban({
 			if (prevCol === "interview" && oldItem) {
 				// 1. الوجهات الممنوعة نهائياً: القبول المباشر دون سداد
 				if (targetColumn === "accepted" || meta.status === "ACCEPTED") {
-					toast.error("لا يمكن اعتماد وقبول الطالب مباشرة من المقابلة الشخصية؛ يجب نقله إلى مرحلة «بانتظار الدفع» لتحديد الباقة وتأكيد سداد الرسوم أولاً.");
+					toast.error(
+						"لا يمكن اعتماد وقبول الطالب مباشرة من المقابلة الشخصية؛ يجب نقله إلى مرحلة «بانتظار الدفع» لتحديد الباقة وتأكيد سداد الرسوم أولاً.",
+					);
 					committed.push({ ...item, column: prevCol });
 					continue;
 				}
 
 				// 2. السحب للأمام إلى بانتظار الدفع:
-				if (["awaiting-payment", "awaiting_payment"].includes(targetColumn) || meta.status === "AWAITING_PAYMENT") {
+				if (
+					["awaiting-payment", "awaiting_payment"].includes(targetColumn) ||
+					meta.status === "AWAITING_PAYMENT"
+				) {
 					committed.push({ ...item, column: prevCol });
 					openRequestWithDrawer(
 						oldItem.id,
@@ -718,13 +822,17 @@ export function CampaignRequestsKanban({
 
 				// 2. الوجهات الممنوعة نهائياً: العودة إلى المقابلة أو القائمة المختصرة
 				if (targetColumn === "interview" || meta.status === "INTERVIEW") {
-					toast.error("لا يمكن إعادة الطلب إلى المقابلة الشخصية بعد الوصول لمرحلة الدفع؛ يمكنك نقله لقائمة الانتظار أو الرفض أو إعادته للطابور.");
+					toast.error(
+						"لا يمكن إعادة الطلب إلى المقابلة الشخصية بعد الوصول لمرحلة الدفع؛ يمكنك نقله لقائمة الانتظار أو الرفض أو إعادته للطابور.",
+					);
 					committed.push({ ...item, column: prevCol });
 					continue;
 				}
 
 				if (targetColumn === "shortlist") {
-					toast.error("لا يمكن نقل الطلب من انتظار الدفع إلى القائمة المختصرة؛ يمكنك نقله لقائمة الانتظار أو الرفض أو إعادته للطابور.");
+					toast.error(
+						"لا يمكن نقل الطلب من انتظار الدفع إلى القائمة المختصرة؛ يمكنك نقله لقائمة الانتظار أو الرفض أو إعادته للطابور.",
+					);
 					committed.push({ ...item, column: prevCol });
 					continue;
 				}
@@ -787,7 +895,9 @@ export function CampaignRequestsKanban({
 				}
 
 				// 2. سائر الوجهات ممنوعة نهائياً (المقابلة، الانتظار، الدفع، القبول):
-				toast.error("لا يمكن نقل الطلب المرفوض إلى هذه المرحلة مباشرة؛ يمكنك فقط إعادته إلى «الطابور» أو «القائمة المختصرة» لإعادة دراسة طلبه.");
+				toast.error(
+					"لا يمكن نقل الطلب المرفوض إلى هذه المرحلة مباشرة؛ يمكنك فقط إعادته إلى «الطابور» أو «القائمة المختصرة» لإعادة دراسة طلبه.",
+				);
 				committed.push({ ...item, column: prevCol });
 				continue;
 			}
@@ -824,7 +934,9 @@ export function CampaignRequestsKanban({
 					continue;
 				}
 
-				toast.error("لا يمكن نقل الطلب المكرر إلى هذه المرحلة مباشرة؛ يمكنك نقله إلى «الطابور» أو «القائمة المختصرة» أو «الرفض».");
+				toast.error(
+					"لا يمكن نقل الطلب المكرر إلى هذه المرحلة مباشرة؛ يمكنك نقله إلى «الطابور» أو «القائمة المختصرة» أو «الرفض».",
+				);
 				committed.push({ ...item, column: prevCol });
 				continue;
 			}
@@ -834,14 +946,21 @@ export function CampaignRequestsKanban({
 				oldItem?.assessmentAppointment && oldItem.assessmentAppointment.status !== "CANCELLED",
 			);
 			const isBackwardToQueueOrShortlist = ["queue", "shortlist"].includes(targetColumn);
-			const wasInInterviewOrLater = ["interview", "awaiting-payment", "accepted"].includes(prevCol);
+			const wasInInterviewOrLater = ["interview", "awaiting-payment", "accepted"].includes(
+				prevCol,
+			);
 			if (meta.status === "INTERVIEW" && !hasActiveAppointment && oldItem) {
 				committed.push({ ...item, column: prevCol });
 				startScheduleWorkflow(oldItem);
 				continue;
 			}
 
-			if (hasActiveAppointment && isBackwardToQueueOrShortlist && wasInInterviewOrLater && oldItem) {
+			if (
+				hasActiveAppointment &&
+				isBackwardToQueueOrShortlist &&
+				wasInInterviewOrLater &&
+				oldItem
+			) {
 				committed.push({ ...item, column: prevCol });
 				setPendingCancelAppointmentDrag({
 					request: oldItem,
@@ -888,7 +1007,7 @@ export function CampaignRequestsKanban({
 											status: oldItem?.status || d.status,
 											statusLabel: oldItem?.statusLabel || d.statusLabel,
 											statusVariant: oldItem?.statusVariant || d.statusVariant,
-									  }
+										}
 									: d,
 							),
 						);
@@ -919,7 +1038,7 @@ export function CampaignRequestsKanban({
 							statusLabel: targetLabel,
 							statusVariant: targetVariant,
 							assessmentAppointment: null,
-					  }
+						}
 					: d,
 			),
 		);
@@ -942,7 +1061,7 @@ export function CampaignRequestsKanban({
 										statusLabel: request.statusLabel,
 										statusVariant: request.statusVariant,
 										assessmentAppointment: request.assessmentAppointment,
-								  }
+									}
 								: d,
 						),
 					);
@@ -954,9 +1073,15 @@ export function CampaignRequestsKanban({
 	};
 
 	return (
-		<div ref={scrollContainerRef} className="min-h-0 flex-1 overflow-x-auto overscroll-x-contain [scrollbar-gutter:stable] px-3 lg:px-4 mt-3 pb-3">
+		<div
+			ref={scrollContainerRef}
+			className="min-h-0 flex-1 overflow-x-auto overscroll-x-contain [scrollbar-gutter:stable] px-3 lg:px-4 mt-3 pb-3"
+		>
 			{filteredData.length === 0 && data.length > 0 && (
-				<div className="flex items-center justify-between gap-2 rounded-md border border-amber-200 bg-amber-50/70 px-4 py-2 text-xs text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300 mb-3" dir="rtl">
+				<div
+					className="flex items-center justify-between gap-2 rounded-md border border-amber-200 bg-amber-50/70 px-4 py-2 text-xs text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300 mb-3"
+					dir="rtl"
+				>
 					<span>لا توجد طلبات تطابق شروط البحث والفلترة المحددة.</span>
 					<span className="text-[11px] opacity-75">إجمالي الطلبات بالحملة: {data.length}</span>
 				</div>
@@ -982,15 +1107,24 @@ export function CampaignRequestsKanban({
 						className="bg-muted/40 w-full min-w-[18.5rem] max-w-[20rem] min-h-[calc(60vh+200px)] h-fit self-start rounded-lg border border-border/60 shadow-none transition-all"
 					>
 						<AppointmentColumnHeader column={column as AppointmentColumn} />
-						<KanbanCards id={column.id} className="w-full gap-2 px-2 pb-3">
+						<KanbanCards
+							id={column.id}
+							className="w-full gap-2 px-2 pb-3"
+						>
 							{(item: CampaignRequestItem) => {
 								const stage = getStageProgress(item.column);
 								const studentInitials = getArabicInitials(item.patientName || item.name);
 								const guardianInitials = getArabicInitials(item.guardianName);
-								const reviewerName = item.assignedStaff?.name || item.assessmentAppointment?.staffName || item.reviewerName || null;
+								const reviewerName =
+									item.assignedStaff?.name ||
+									item.assessmentAppointment?.staffName ||
+									item.reviewerName ||
+									null;
 								const reviewerInitials = getArabicInitials(reviewerName);
 								const submittedAt = item.submittedAt ? new Date(item.submittedAt) : null;
-								const appointmentAt = item.assessmentAppointment?.startsAt ? new Date(item.assessmentAppointment.startsAt) : null;
+								const appointmentAt = item.assessmentAppointment?.startsAt
+									? new Date(item.assessmentAppointment.startsAt)
+									: null;
 								// مصدر الطلب وطريقة الدراسة لا يحددان مكان مقابلة القبول.
 								// القرار الوحيد هو interviewMode المثبت مع الموعد.
 								const isRemoteInterview = item.interviewMode === "REMOTE";
@@ -1000,7 +1134,10 @@ export function CampaignRequestsKanban({
 								const isAppointmentOngoing = isInterviewOngoing({
 									isInterviewStage,
 									appointmentDate: appointmentAt || item.appointmentDate,
-									durationMinutes: item.assessmentAppointment?.durationMinutes ?? item.interviewDurationMinutes ?? 60,
+									durationMinutes:
+										item.assessmentAppointment?.durationMinutes ??
+										item.interviewDurationMinutes ??
+										60,
 									nowMs,
 								});
 
@@ -1016,7 +1153,9 @@ export function CampaignRequestsKanban({
 										<Card
 											className={cn(
 												"w-full group/card flex flex-col gap-2 rounded-lg border border-zinc-200/90 dark:border-zinc-800 bg-white dark:bg-card p-2.5 shadow-2xs text-start hover:border-primary/40 hover:shadow-xs transition-all select-none",
-												(!capabilities.canChangeStatus || item.status === "ACCEPTED") ? "cursor-pointer" : "cursor-grab active:cursor-grabbing"
+												!capabilities.canChangeStatus || item.status === "ACCEPTED"
+													? "cursor-pointer"
+													: "cursor-grab active:cursor-grabbing",
 											)}
 											dir="rtl"
 											onClick={() => setSelectedRequestId(item.id)}
@@ -1038,29 +1177,29 @@ export function CampaignRequestsKanban({
 													<IconSparkles className="size-3 text-amber-500/80 shrink-0" />
 
 													{/* أيقونة وشارة معبرة عن (اتصال) أو (في الأكاديمية) كما طلب المستخدم */}
-											{isRemoteInterview ? (
+													{isRemoteInterview ? (
 														<span
 															className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[8.5px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40 shrink-0"
-													title="نوع المقابلة: عبر اتصال"
+															title="نوع المقابلة: عبر اتصال"
 														>
 															<IconPhone className="size-2.5" />
-													<span>عبر اتصال</span>
+															<span>عبر اتصال</span>
 														</span>
 													) : (
 														<span
 															className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[8.5px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/40 shrink-0"
-													title="نوع المقابلة: في الأكاديمية"
+															title="نوع المقابلة: في الأكاديمية"
 														>
 															<IconBuildingCommunity className="size-2.5" />
-													<span>في الأكاديمية</span>
+															<span>في الأكاديمية</span>
 														</span>
 													)}
 												</div>
 
-														{/* كود الطلب يعرض قيمة المصدر فقط ولا ينشئ قيمة افتراضية مضللة. */}
-														<span className="font-mono text-[9.5px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wide font-medium">
-															{item.code || "—"}
-														</span>
+												{/* كود الطلب يعرض قيمة المصدر فقط ولا ينشئ قيمة افتراضية مضللة. */}
+												<span className="font-mono text-[9.5px] text-zinc-400 dark:text-zinc-500 uppercase tracking-wide font-medium">
+													{item.code || "—"}
+												</span>
 											</div>
 
 											{/* 2. جدول الحقول المنظم (Key - Value Rows) المطابق للصورة 651ca278 بأحجام متناسقة تماماً */}
@@ -1081,7 +1220,10 @@ export function CampaignRequestsKanban({
 																<div className="size-4.5 rounded-full bg-[#3B82F6] text-white flex items-center justify-center text-[8.5px] font-bold shrink-0">
 																	{guardianInitials}
 																</div>
-																<span className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100 truncate max-w-[110px]" title={item.guardianName || undefined}>
+																<span
+																	className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100 truncate max-w-[110px]"
+																	title={item.guardianName || undefined}
+																>
 																	{item.guardianName || "غير محدد"}
 																</span>
 																{/* زر مراسلة ولي الأمر عبر الواتساب بإطار مربع دائري ناعم كما بالصورة */}
@@ -1128,62 +1270,124 @@ export function CampaignRequestsKanban({
 															</div>
 														)}
 
-												{/* الصف 3: تاريخ التقديم */}
-												<div className="flex items-center justify-between gap-1 w-full">
-													<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
-														<IconCalendar className="size-3 shrink-0" />
-														<span>تاريخ التقديم</span>
-													</div>
-													<div className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-900 dark:text-zinc-100" dir="rtl">
-														<span>{submittedAt ? submittedAt.toLocaleDateString("ar-EG") : "غير محدد"}</span>
-														{submittedAt && <><span className="text-zinc-300 dark:text-zinc-600 font-normal">•</span><IconClock className="size-2.5 text-zinc-400 shrink-0" /><span className="font-mono text-[9.5px]">{submittedAt.toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })}</span></>}
-													</div>
-												</div>
+														{/* الصف 3: تاريخ التقديم */}
+														<div className="flex items-center justify-between gap-1 w-full">
+															<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
+																<IconCalendar className="size-3 shrink-0" />
+																<span>تاريخ التقديم</span>
+															</div>
+															<div
+																className="flex items-center gap-1.5 text-[10px] font-bold text-zinc-900 dark:text-zinc-100"
+																dir="rtl"
+															>
+																<span>
+																	{submittedAt
+																		? submittedAt.toLocaleDateString("ar-EG")
+																		: "غير محدد"}
+																</span>
+																{submittedAt && (
+																	<>
+																		<span className="text-zinc-300 dark:text-zinc-600 font-normal">
+																			•
+																		</span>
+																		<IconClock className="size-2.5 text-zinc-400 shrink-0" />
+																		<span className="font-mono text-[9.5px]">
+																			{submittedAt.toLocaleTimeString("ar-EG", {
+																				hour: "2-digit",
+																				minute: "2-digit",
+																			})}
+																		</span>
+																	</>
+																)}
+															</div>
+														</div>
 
-												{/* الصف 4: موعد الحضور */}
-												<div className="flex items-center justify-between gap-1 w-full">
-													<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
-														<IconCalendarEvent className="size-3 shrink-0" />
-														<span>موعد الحضور</span>
-													</div>
-													<div
-														className={cn(
-															"flex items-center gap-1.5 text-[10px] font-bold transition-colors",
-															isAppointmentOngoing
-																? "text-red-600 dark:text-red-400"
-																: "text-zinc-900 dark:text-zinc-100",
-														)}
-														dir="rtl"
-													>
-														<span>{appointmentAt ? formatAppointmentDate(appointmentAt, clinicTimezone, "ar-EG", { month: "numeric", day: "numeric", weekday: undefined, year: undefined }) : "غير محدد"}</span>
-														{appointmentAt && <><span className={cn("font-normal", isAppointmentOngoing ? "text-red-400 dark:text-red-500" : "text-zinc-300 dark:text-zinc-600")}>•</span><IconClock className={cn("size-2.5 shrink-0", isAppointmentOngoing ? "text-red-500" : "text-zinc-400")} /><span className="font-mono text-[9.5px]">{formatAppointmentTime(appointmentAt, clinicTimezone, "ar-EG")}</span></>}
-													</div>
-												</div>
+														{/* الصف 4: موعد الحضور */}
+														<div className="flex items-center justify-between gap-1 w-full">
+															<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
+																<IconCalendarEvent className="size-3 shrink-0" />
+																<span>موعد الحضور</span>
+															</div>
+															<div
+																className={cn(
+																	"flex items-center gap-1.5 text-[10px] font-bold transition-colors",
+																	isAppointmentOngoing
+																		? "text-red-600 dark:text-red-400"
+																		: "text-zinc-900 dark:text-zinc-100",
+																)}
+																dir="rtl"
+															>
+																<span>
+																	{appointmentAt
+																		? formatAppointmentDate(
+																				appointmentAt,
+																				clinicTimezone,
+																				"ar-EG",
+																				{
+																					month: "numeric",
+																					day: "numeric",
+																					weekday: undefined,
+																					year: undefined,
+																				},
+																			)
+																		: "غير محدد"}
+																</span>
+																{appointmentAt && (
+																	<>
+																		<span
+																			className={cn(
+																				"font-normal",
+																				isAppointmentOngoing
+																					? "text-red-400 dark:text-red-500"
+																					: "text-zinc-300 dark:text-zinc-600",
+																			)}
+																		>
+																			•
+																		</span>
+																		<IconClock
+																			className={cn(
+																				"size-2.5 shrink-0",
+																				isAppointmentOngoing
+																					? "text-red-500"
+																					: "text-zinc-400",
+																			)}
+																		/>
+																		<span className="font-mono text-[9.5px]">
+																			{formatAppointmentTime(
+																				appointmentAt,
+																				clinicTimezone,
+																				"ar-EG",
+																			)}
+																		</span>
+																	</>
+																)}
+															</div>
+														</div>
 
-												{/* الصف 5: المدينة */}
-												<div className="flex items-center justify-between gap-1 w-full">
-													<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
-														<IconMapPin className="size-3 shrink-0" />
-														<span>الغرفة</span>
-													</div>
-													<span className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100">
-														{item.roomName || "غير محددة"}
-													</span>
-												</div>
+														{/* الصف 5: المدينة */}
+														<div className="flex items-center justify-between gap-1 w-full">
+															<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
+																<IconMapPin className="size-3 shrink-0" />
+																<span>الغرفة</span>
+															</div>
+															<span className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100">
+																{item.roomName || "غير محددة"}
+															</span>
+														</div>
 
-												{/* الصف 6: طريقة التسجيل */}
-												<div className="flex items-center justify-between gap-1 w-full">
-													<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
-														<IconCalendarTime className="size-3 shrink-0" />
-														<span>نوع المقابلة</span>
+														{/* الصف 6: طريقة التسجيل */}
+														<div className="flex items-center justify-between gap-1 w-full">
+															<div className="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500 text-[10px]">
+																<IconCalendarTime className="size-3 shrink-0" />
+																<span>نوع المقابلة</span>
+															</div>
+															<span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-[#EEF2FF] text-[#4F6BF5] dark:bg-indigo-950/60 dark:text-indigo-300 border border-[#E0E7FF]/70">
+																{isRemoteInterview ? "عبر اتصال" : "في الأكاديمية"}
+															</span>
+														</div>
 													</div>
-													<span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-[#EEF2FF] text-[#4F6BF5] dark:bg-indigo-950/60 dark:text-indigo-300 border border-[#E0E7FF]/70">
-														{isRemoteInterview ? "عبر اتصال" : "في الأكاديمية"}
-													</span>
-												</div>
-											</div>
-										);
-									})()}
+												);
+											})()}
 
 											{/* خط فاصل ناعم */}
 											<div className="border-t border-zinc-100 dark:border-zinc-800 my-0.5 w-full" />
@@ -1196,7 +1400,7 @@ export function CampaignRequestsKanban({
 													</div>
 													<div className="flex flex-col leading-tight min-w-0">
 														<span className="font-bold text-[10.5px] text-zinc-900 dark:text-zinc-100 truncate">
-														{reviewerName || "غير معين"}
+															{reviewerName || "غير معين"}
 														</span>
 														<span className="text-[8.5px] text-zinc-400 dark:text-zinc-500 font-normal">
 															المراجع
@@ -1221,7 +1425,10 @@ export function CampaignRequestsKanban({
 											<div className="border-t border-zinc-100 dark:border-zinc-800 my-0.5 w-full" />
 
 											{/* 4. شريط التقدم (1/5 مرحلة أو 3/5 مرحلة) مع تمييز الرفض بالأحمر */}
-											<div className="flex items-center justify-between gap-2 text-zinc-400 dark:text-zinc-500 w-full" dir="rtl">
+											<div
+												className="flex items-center justify-between gap-2 text-zinc-400 dark:text-zinc-500 w-full"
+												dir="rtl"
+											>
 												<div className="flex-1 h-1 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
 													<div
 														className={cn(
@@ -1229,14 +1436,25 @@ export function CampaignRequestsKanban({
 															item.column === "rejected" || item.status === "REJECTED"
 																? "bg-rose-500"
 																: item.column === "waitlist" || item.status === "WAITLIST"
-																? "bg-amber-500"
-																: "bg-[#3B82F6]",
+																	? "bg-amber-500"
+																	: "bg-[#3B82F6]",
 														)}
-														style={{ width: item.column === "rejected" || item.status === "REJECTED" ? "100%" : `${stage.percent}%` }}
+														style={{
+															width:
+																item.column === "rejected" || item.status === "REJECTED"
+																	? "100%"
+																	: `${stage.percent}%`,
+														}}
 													/>
 												</div>
 												<span className="shrink-0 font-medium font-mono text-[9px] text-zinc-400">
-													{item.column === "rejected" || item.status === "REJECTED" ? "مرفوض (5/5)" : item.column === "waitlist" || item.status === "WAITLIST" ? "قيد الانتظار" : item.column === "duplicate" || item.status === "DUPLICATE" ? "مكرر" : `${stage.current}/${stage.total} مرحلة`}
+													{item.column === "rejected" || item.status === "REJECTED"
+														? "مرفوض (5/5)"
+														: item.column === "waitlist" || item.status === "WAITLIST"
+															? "قيد الانتظار"
+															: item.column === "duplicate" || item.status === "DUPLICATE"
+																? "مكرر"
+																: `${stage.current}/${stage.total} مرحلة`}
 												</span>
 											</div>
 
@@ -1264,7 +1482,9 @@ export function CampaignRequestsKanban({
 														<div className="w-full rounded-md bg-amber-50 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/40 py-1 px-2.5 flex items-center justify-between text-[10px] font-semibold text-amber-700 dark:text-amber-400 select-none shadow-2xs">
 															<div className="flex items-center gap-1.5">
 																<IconClock className="size-3 text-amber-600 shrink-0" />
-																<span>قائمة الانتظار {item.queueRank ? `(#${item.queueRank})` : ""}</span>
+																<span>
+																	قائمة الانتظار {item.queueRank ? `(#${item.queueRank})` : ""}
+																</span>
 															</div>
 															{item.estimatedWait && (
 																<span className="text-[9px] font-medium text-amber-600/80 dark:text-amber-400/80">
@@ -1280,10 +1500,14 @@ export function CampaignRequestsKanban({
 														<div
 															className={cn(
 																"w-full rounded-md py-1 px-2.5 flex items-center justify-center gap-1.5 text-[10px] font-semibold select-none shadow-2xs transition-colors",
-																attendanceProb.variant === "emerald" && "bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/40 text-emerald-700 dark:text-emerald-400",
-																attendanceProb.variant === "blue" && "bg-[#EFF6FF] dark:bg-blue-950/30 border border-[#DBEAFE]/80 dark:border-blue-900/40 text-[#3B82F6] dark:text-blue-400",
-																attendanceProb.variant === "amber" && "bg-amber-50 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/40 text-amber-700 dark:text-amber-400",
-																attendanceProb.variant === "rose" && "bg-rose-50 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/40 text-rose-600 dark:text-rose-400",
+																attendanceProb.variant === "emerald" &&
+																	"bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-900/40 text-emerald-700 dark:text-emerald-400",
+																attendanceProb.variant === "blue" &&
+																	"bg-[#EFF6FF] dark:bg-blue-950/30 border border-[#DBEAFE]/80 dark:border-blue-900/40 text-[#3B82F6] dark:text-blue-400",
+																attendanceProb.variant === "amber" &&
+																	"bg-amber-50 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-900/40 text-amber-700 dark:text-amber-400",
+																attendanceProb.variant === "rose" &&
+																	"bg-rose-50 dark:bg-rose-950/30 border border-rose-200/80 dark:border-rose-900/40 text-rose-600 dark:text-rose-400",
 															)}
 															title={attendanceProb.reason}
 														>
@@ -1305,7 +1529,11 @@ export function CampaignRequestsKanban({
 											})()}
 
 											{isInterviewStage && isRemoteInterview && (
-												<div className="w-full" onClick={(event) => event.stopPropagation()} onPointerDown={(event) => event.stopPropagation()}>
+												<div
+													className="w-full"
+													onClick={(event) => event.stopPropagation()}
+													onPointerDown={(event) => event.stopPropagation()}
+												>
 													<Link
 														to="/video-call"
 														search={{ registrationRequestId: item.id }}
@@ -1320,7 +1548,9 @@ export function CampaignRequestsKanban({
 
 											{/* ملخص الباقة والسداد في مراحل بانتظار الدفع والقبول */}
 											{(item.status === "AWAITING_PAYMENT" || item.status === "ACCEPTED") &&
-												(item.subscriptionPlanName || item.subscriptionAmount || item.paidAt) && (
+												(item.subscriptionPlanName ||
+													item.subscriptionAmount ||
+													item.paidAt) && (
 													<div
 														className={cn(
 															"w-full rounded-md py-1 px-2 flex items-center justify-between gap-1.5 text-[9.5px] font-semibold border",
@@ -1346,7 +1576,11 @@ export function CampaignRequestsKanban({
 												)}
 
 											{/* 6. شريط الإجراءات السفلي: جميع الأزرار مصفوفة على اليمين مباشرة دون فراغ فاصل */}
-											<div className="flex items-center justify-start gap-1 pt-0.5 w-full overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden" dir="rtl" onClick={(e) => e.stopPropagation()}>
+											<div
+												className="flex items-center justify-start gap-1 pt-0.5 w-full overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+												dir="rtl"
+												onClick={(e) => e.stopPropagation()}
+											>
 												{/* زر 💬 (المحادثات / الملاحظات) */}
 												<button
 													type="button"
@@ -1355,7 +1589,9 @@ export function CampaignRequestsKanban({
 													title="المحادثات والملاحظات"
 												>
 													<IconMessageCircle className="size-2.5 text-zinc-400" />
-													<span className="font-mono text-[9px]">{item.comments?.length ?? 0}</span>
+													<span className="font-mono text-[9px]">
+														{item.comments?.length ?? 0}
+													</span>
 												</button>
 
 												{/* زر + إضافة ملاحظة */}
@@ -1372,7 +1608,10 @@ export function CampaignRequestsKanban({
 												)}
 
 												{/* زر الأولوية */}
-												<div onPointerDown={(event) => event.stopPropagation()} className="shrink-0">
+												<div
+													onPointerDown={(event) => event.stopPropagation()}
+													className="shrink-0"
+												>
 													{capabilities.canChangeStatus ? (
 														<PriorityPickerPopover
 															value={item.priority || "بدون أولوية"}
@@ -1388,106 +1627,121 @@ export function CampaignRequestsKanban({
 
 												{/* زر ⚑ تحديد كـ... لتغيير المرحلة بنقرة واحدة */}
 												{capabilities.canChangeStatus && (
-												<DropdownMenu dir="rtl">
-													<DropdownMenuTrigger asChild>
-														<button
-															type="button"
-															className="inline-flex items-center gap-1 px-2 h-6.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-600 hover:text-zinc-900 text-[9.5px] font-medium transition-colors cursor-pointer shrink-0"
-															title="تحديد مرحلة الطلب السريعة"
+													<DropdownMenu dir="rtl">
+														<DropdownMenuTrigger asChild>
+															<button
+																type="button"
+																className="inline-flex items-center gap-1 px-2 h-6.5 rounded border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-600 hover:text-zinc-900 text-[9.5px] font-medium transition-colors cursor-pointer shrink-0"
+																title="تحديد مرحلة الطلب السريعة"
+															>
+																<IconFlag className="size-2.5 text-zinc-500" />
+																<span>
+																	{item.column === "rejected" || item.status === "REJECTED"
+																		? "تقييم"
+																		: "تحديد كـ..."}
+																</span>
+															</button>
+														</DropdownMenuTrigger>
+														<DropdownMenuContent
+															align="start"
+															className="w-44 text-xs z-[99]"
 														>
-															<IconFlag className="size-2.5 text-zinc-500" />
-															<span>{item.column === "rejected" || item.status === "REJECTED" ? "تقييم" : "تحديد كـ..."}</span>
-														</button>
-													</DropdownMenuTrigger>
-													<DropdownMenuContent align="start" className="w-44 text-xs z-[99]">
-														{(item.status === "WAITLIST" || item.column === "waitlist") ? (
-															<>
-																<DropdownMenuItem
-																	onClick={() => handleStatusChange(item, "INTERVIEW")}
-																	className="gap-2 text-xs cursor-pointer"
-																>
-																	<IconActivity className="size-3.5 text-indigo-600" />
-																	<span>جدولة مقابلة</span>
-																</DropdownMenuItem>
-																<DropdownMenuItem
-																	onClick={() => handleStatusChange(item, "REJECTED")}
-																	className="gap-2 text-xs text-destructive cursor-pointer"
-																>
-																	<IconX className="size-3.5" />
-																	<span>قائمة الرفض</span>
-																</DropdownMenuItem>
-															</>
-														) : (item.status === "INTERVIEW" || item.column === "interview") ? (
-															<>
-																<DropdownMenuItem
-																	onClick={() => handleStatusChange(item, "AWAITING_PAYMENT")}
-																	className="gap-2 text-xs cursor-pointer"
-																>
-																	<IconHourglass className="size-3.5 text-purple-600" />
-																	<span>نقل: بانتظار الدفع</span>
-																</DropdownMenuItem>
-																<DropdownMenuItem
-																	onClick={() => handleStatusChange(item, "REJECTED")}
-																	className="gap-2 text-xs text-destructive cursor-pointer"
-																>
-																	<IconX className="size-3.5" />
-																	<span>قائمة الرفض</span>
-																</DropdownMenuItem>
-															</>
-														) : (
-															<>
-																<DropdownMenuItem
-																	disabled={item.status === "ACCEPTED"}
-																	onClick={() => handleStatusChange(item, "SHORTLIST")}
-																	className="gap-2 text-xs cursor-pointer"
-																>
-																	<IconClipboardCheck className="size-3.5 text-blue-600" />
-																	<span>نقل: قائمة مختصرة</span>
-																</DropdownMenuItem>
-																<DropdownMenuItem
-																	disabled={item.status === "ACCEPTED"}
-																	onClick={() => handleStatusChange(item, "WAITLIST")}
-																	className="gap-2 text-xs cursor-pointer"
-																>
-																	<IconClock className="size-3.5 text-amber-600" />
-																	<span>نقل: قائمة الانتظار</span>
-																</DropdownMenuItem>
-																<DropdownMenuItem
-																	disabled={item.status === "ACCEPTED"}
-																	onClick={() => handleStatusChange(item, "INTERVIEW")}
-																	className="gap-2 text-xs cursor-pointer"
-																>
-																	<IconActivity className="size-3.5 text-indigo-600" />
-																	<span>نقل: المقابلة الشخصية</span>
-																</DropdownMenuItem>
-																<DropdownMenuItem
-																	disabled={item.status === "ACCEPTED"}
-																	onClick={() => handleStatusChange(item, "AWAITING_PAYMENT")}
-																	className="gap-2 text-xs cursor-pointer"
-																>
-																	<IconHourglass className="size-3.5 text-purple-600" />
-																	<span>نقل: بانتظار الدفع</span>
-																</DropdownMenuItem>
-																<DropdownMenuItem
-																	disabled={item.status !== "AWAITING_PAYMENT" || Boolean(item.paidAt)}
-																	onClick={() => handleStatusChange(item, "ACCEPTED")}
-																	className="gap-2 text-xs cursor-pointer"
-																>
-																	<IconCash className="size-3.5 text-emerald-600" />
-																	<span>تحصيل كاش وقبول نهائي</span>
-																</DropdownMenuItem>
-																<DropdownMenuItem
-																	disabled={item.status === "ACCEPTED"}
-																	onClick={() => handleStatusChange(item, "REJECTED")}
-																	className="gap-2 text-xs text-destructive cursor-pointer"
-																>
-																	<IconX className="size-3.5" />
-																	<span>استبعاد / مرفوض</span>
-																</DropdownMenuItem>
-															</>
-														)}
-													</DropdownMenuContent>
-												</DropdownMenu>
+															{item.status === "WAITLIST" || item.column === "waitlist" ? (
+																<>
+																	<DropdownMenuItem
+																		onClick={() => handleStatusChange(item, "INTERVIEW")}
+																		className="gap-2 text-xs cursor-pointer"
+																	>
+																		<IconActivity className="size-3.5 text-indigo-600" />
+																		<span>جدولة مقابلة</span>
+																	</DropdownMenuItem>
+																	<DropdownMenuItem
+																		onClick={() => handleStatusChange(item, "REJECTED")}
+																		className="gap-2 text-xs text-destructive cursor-pointer"
+																	>
+																		<IconX className="size-3.5" />
+																		<span>قائمة الرفض</span>
+																	</DropdownMenuItem>
+																</>
+															) : item.status === "INTERVIEW" ||
+																item.column === "interview" ? (
+																<>
+																	<DropdownMenuItem
+																		onClick={() =>
+																			handleStatusChange(item, "AWAITING_PAYMENT")
+																		}
+																		className="gap-2 text-xs cursor-pointer"
+																	>
+																		<IconHourglass className="size-3.5 text-purple-600" />
+																		<span>نقل: بانتظار الدفع</span>
+																	</DropdownMenuItem>
+																	<DropdownMenuItem
+																		onClick={() => handleStatusChange(item, "REJECTED")}
+																		className="gap-2 text-xs text-destructive cursor-pointer"
+																	>
+																		<IconX className="size-3.5" />
+																		<span>قائمة الرفض</span>
+																	</DropdownMenuItem>
+																</>
+															) : (
+																<>
+																	<DropdownMenuItem
+																		disabled={item.status === "ACCEPTED"}
+																		onClick={() => handleStatusChange(item, "SHORTLIST")}
+																		className="gap-2 text-xs cursor-pointer"
+																	>
+																		<IconClipboardCheck className="size-3.5 text-blue-600" />
+																		<span>نقل: قائمة مختصرة</span>
+																	</DropdownMenuItem>
+																	<DropdownMenuItem
+																		disabled={item.status === "ACCEPTED"}
+																		onClick={() => handleStatusChange(item, "WAITLIST")}
+																		className="gap-2 text-xs cursor-pointer"
+																	>
+																		<IconClock className="size-3.5 text-amber-600" />
+																		<span>نقل: قائمة الانتظار</span>
+																	</DropdownMenuItem>
+																	<DropdownMenuItem
+																		disabled={item.status === "ACCEPTED"}
+																		onClick={() => handleStatusChange(item, "INTERVIEW")}
+																		className="gap-2 text-xs cursor-pointer"
+																	>
+																		<IconActivity className="size-3.5 text-indigo-600" />
+																		<span>نقل: المقابلة الشخصية</span>
+																	</DropdownMenuItem>
+																	<DropdownMenuItem
+																		disabled={item.status === "ACCEPTED"}
+																		onClick={() =>
+																			handleStatusChange(item, "AWAITING_PAYMENT")
+																		}
+																		className="gap-2 text-xs cursor-pointer"
+																	>
+																		<IconHourglass className="size-3.5 text-purple-600" />
+																		<span>نقل: بانتظار الدفع</span>
+																	</DropdownMenuItem>
+																	<DropdownMenuItem
+																		disabled={
+																			item.status !== "AWAITING_PAYMENT" ||
+																			Boolean(item.paidAt)
+																		}
+																		onClick={() => handleStatusChange(item, "ACCEPTED")}
+																		className="gap-2 text-xs cursor-pointer"
+																	>
+																		<IconCash className="size-3.5 text-emerald-600" />
+																		<span>تحصيل كاش وقبول نهائي</span>
+																	</DropdownMenuItem>
+																	<DropdownMenuItem
+																		disabled={item.status === "ACCEPTED"}
+																		onClick={() => handleStatusChange(item, "REJECTED")}
+																		className="gap-2 text-xs text-destructive cursor-pointer"
+																	>
+																		<IconX className="size-3.5" />
+																		<span>استبعاد / مرفوض</span>
+																	</DropdownMenuItem>
+																</>
+															)}
+														</DropdownMenuContent>
+													</DropdownMenu>
 												)}
 											</div>
 										</Card>
@@ -1515,12 +1769,26 @@ export function CampaignRequestsKanban({
 				initialDrawer={targetActionDrawer}
 				isUpdating={updateStatusMutation.isPending}
 				onStatusChange={capabilities.canChangeStatus ? handleStatusChange : undefined}
-				onAccept={capabilities.canAcceptOrReject ? (req) => handleStatusChange(req, "ACCEPTED") : undefined}
-				onWaitlist={capabilities.canChangeStatus ? (req) => handleStatusChange(req, "QUEUE") : undefined}
-				onReject={capabilities.canAcceptOrReject ? (req) => handleStatusChange(req, "REJECTED") : undefined}
-				onDelete={capabilities.canDeleteRequest ? () => {
-					setSelectedRequestId(null);
-				} : undefined}
+				onAccept={
+					capabilities.canAcceptOrReject
+						? (req) => handleStatusChange(req, "ACCEPTED")
+						: undefined
+				}
+				onWaitlist={
+					capabilities.canChangeStatus ? (req) => handleStatusChange(req, "QUEUE") : undefined
+				}
+				onReject={
+					capabilities.canAcceptOrReject
+						? (req) => handleStatusChange(req, "REJECTED")
+						: undefined
+				}
+				onDelete={
+					capabilities.canDeleteRequest
+						? () => {
+								setSelectedRequestId(null);
+							}
+						: undefined
+				}
 			/>
 
 			<CancelAppointmentConfirmDialog

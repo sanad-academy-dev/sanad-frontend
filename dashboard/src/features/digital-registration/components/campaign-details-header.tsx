@@ -9,8 +9,6 @@ export type CampaignView = RegistrationView | "stats";
 export function CampaignDetailsHeader({
 	activeView,
 	onChangeView,
-	requestsCount = 0,
-	campaignId,
 }: {
 	activeView: RegistrationView | CampaignView;
 	onChangeView: (view: any) => void;

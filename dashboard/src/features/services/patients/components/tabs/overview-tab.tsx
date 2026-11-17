@@ -5,7 +5,6 @@ import {
 	IconCoins,
 	IconDeviceLaptop,
 	IconMapPin,
-	IconScale,
 	IconSchool,
 	IconShieldCheck,
 	IconUser,
@@ -34,7 +33,6 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { TRANSPORT_OPTIONS } from "@/features/services/patients/data/patient-form-constants";
-import { AGE_GROUPS } from "@/features/services/classrooms/data/constants";
 import { useAcademicStageOptions } from "@/features/services/classrooms/hooks/use-classrooms";
 import { getStudentAgeGroup } from "@/features/services/classrooms/utils/age-group-utils";
 import type { PatientTabProps } from "@/features/services/patients/types/tabs.types";
@@ -285,9 +283,7 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 
 	const visitsCount = useMemo(() => {
 		return history.filter(
-			(h) =>
-				h.kind === "VISIT" ||
-				(h as unknown as { kind: string }).kind === "APPOINTMENT",
+			(h) => h.kind === "VISIT" || (h as unknown as { kind: string }).kind === "APPOINTMENT",
 		).length;
 	}, [history]);
 
@@ -370,7 +366,10 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 			</div>
 
 			{/* إحصائيات الطالب المعتمدة للمنصة */}
-			<Stats stats={statsItems} className="py-0" />
+			<Stats
+				stats={statsItems}
+				className="py-0"
+			/>
 
 			{/* نظرة عامة */}
 			<div className="flex flex-col gap-3">
@@ -394,12 +393,16 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 							<SelectContent dir="rtl">
 								{Array.from(
 									new Set(
-										[...academicStages, patient.academicStage].filter(
-											(s): s is string => Boolean(s),
+										[...academicStages, patient.academicStage].filter((s): s is string =>
+											Boolean(s),
 										),
 									),
 								).map((st) => (
-									<SelectItem key={st} value={st} className="text-xs">
+									<SelectItem
+										key={st}
+										value={st}
+										className="text-xs"
+									>
 										{st}
 									</SelectItem>
 								))}
@@ -536,7 +539,6 @@ export function OverviewTab({ patientId }: PatientTabProps) {
 					</InfoField>
 				</div>
 			</div>
-
 
 			{/* بطاقة وثيقة التأمين */}
 			<div className="flex flex-col gap-3">

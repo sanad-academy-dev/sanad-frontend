@@ -85,7 +85,6 @@ const dashboardAppointmentSelect = {
 		select: {
 			id: true,
 			name: true,
-			animalType: { select: { enName: true } },
 		},
 	},
 	services: {
@@ -105,7 +104,6 @@ const criticalAlertSelect = {
 		select: {
 			id: true,
 			name: true,
-			animalType: { select: { enName: true } },
 		},
 	},
 } satisfies Prisma.AppointmentSelect;
@@ -215,6 +213,9 @@ export type StaffForServicesResponse = Prisma.StaffGetPayload<{
 
 const staffForBookingSelect = {
 	id: true,
+	// `id` هو Staff ID ويستعمل فقط في Appointment.staffId. نعيد userId صراحةً
+	// حتى لا يُخزن Staff ID بالخطأ في حقول المراجع المرتبطة بجدول User.
+	userId: true,
 	name: true,
 	prefix: true,
 	code: true,

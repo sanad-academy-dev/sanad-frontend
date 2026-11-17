@@ -15,7 +15,7 @@ import {
 } from "@/features/services/vital-signs/data/vitals-fields";
 import type { CarePlanEnrollmentStatus, VitalSignsSource } from "@/generated/prisma/enums";
 import { deriveOrderStatus, LAB_STATUS_LABELS } from "@sanad/contracts/runtime/server/lab-tests/lab-tests.workflow";
-import type { PatientHistoryEntry, PatientHistoryKind } from "@/server/patients/patients.type";
+import type { PatientHistoryEntry, PatientHistoryKind } from "@sanad/contracts/runtime/server/patients/patients.type";
 import {
 	deriveRadiologyOrderStatus,
 	RADIOLOGY_STATUS_LABELS,

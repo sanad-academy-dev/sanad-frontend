@@ -1,29 +1,15 @@
-import React, { useState, useMemo } from "react";
-import {
-	IconCopy,
-	IconCheck,
-	IconQrcode,
-	IconX,
-	IconMaximize,
-	IconBrandWhatsapp,
-	IconDownload,
-	IconShare,
-} from "@tabler/icons-react";
+import { useState, useMemo } from "react";
+import { IconCopy, IconCheck, IconQrcode, IconX, IconDownload } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Spinner } from "@/components/ui/spinner";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useStaff } from "@/features/services/staff/hooks/use-staff";
 import { useBranches } from "@/features/settings/branches/hooks/use-branches";
 import { LEARNING_MODES } from "@/features/services/classrooms/data/constants";
 import type { ClassroomResponse, LearningMode } from "@/server/classrooms/classrooms.type";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 export interface ClassroomReviewStepProps {
 	isEdit: boolean;
@@ -56,8 +42,6 @@ export function ClassroomReviewStep({
 	learningMode,
 	branch,
 	capacity,
-	notes,
-	description,
 	selectedStaffIds,
 	notifyWhatsApp,
 	onNotifyWhatsAppChange,
@@ -71,7 +55,7 @@ export function ClassroomReviewStep({
 	const { branches } = useBranches();
 
 	// 1. تحديد اسم المسؤول (المشرف / المعلم)
-	
+
 	const managerName = useMemo(() => {
 		if (selectedStaffIds.length > 0 && staff) {
 			const assigned = staff.filter((s) => selectedStaffIds.includes(s.id));
@@ -80,7 +64,8 @@ export function ClassroomReviewStep({
 		}
 		if (classroom?.teachers?.length) {
 			const t = classroom.teachers[0];
-			if (classroom.teachers.length > 1) return `${t.name} (+${classroom.teachers.length - 1})`;
+			if (classroom.teachers.length > 1)
+				return `${t.name} (+${classroom.teachers.length - 1})`;
 			return t.name;
 		}
 		return "أحمد علي"; // قيمة افتراضية نموذجية تطابق التصميم
@@ -132,8 +117,13 @@ export function ClassroomReviewStep({
 
 	// 6. توليد رابط المشاركة
 	const shareUrl = useMemo(() => {
-		const origin = typeof window !== "undefined" ? window.location.origin : "https://sanad.app";
-		const slug = code ? code.toLowerCase() : name ? encodeURIComponent(name.trim().replace(/\s+/g, "-")) : "cls-c";
+		const origin =
+			typeof window !== "undefined" ? window.location.origin : "https://sanad.app";
+		const slug = code
+			? code.toLowerCase()
+			: name
+				? encodeURIComponent(name.trim().replace(/\s+/g, "-"))
+				: "cls-c";
 		return `${origin}/classrooms/${classroom?.id || slug}`;
 	}, [classroom?.id, code, name]);
 
@@ -187,7 +177,9 @@ export function ClassroomReviewStep({
 						{/* 1. اسم الفصل */}
 						<div className="flex items-center justify-between">
 							<span className="text-muted-foreground">اسم الفصل</span>
-							<span className="font-bold text-foreground text-xs">{name || "المبرمجين الصغار C"}</span>
+							<span className="font-bold text-foreground text-xs">
+								{name || "المبرمجين الصغار C"}
+							</span>
 						</div>
 
 						{/* 2. مسار التعلم */}
@@ -217,28 +209,32 @@ export function ClassroomReviewStep({
 						{/* 6. فئة الفصل */}
 						<div className="flex items-center justify-between">
 							<span className="text-muted-foreground">فئة الفصل</span>
-							<span className="font-semibold text-foreground text-xs">{category || "مختلط"}</span>
+							<span className="font-semibold text-foreground text-xs">
+								{category || "مختلط"}
+							</span>
 						</div>
 
 						{/* 7. السعة القصوى */}
 						<div className="flex items-center justify-between">
 							<span className="text-muted-foreground">السعة القصوى</span>
-							<span className="font-semibold text-foreground text-xs">{capacity ? `${capacity} طالب` : "10 طلاب"}</span>
+							<span className="font-semibold text-foreground text-xs">
+								{capacity ? `${capacity} طالب` : "10 طلاب"}
+							</span>
 						</div>
 
 						{/* 8. تاريخ الإنشاء */}
 						<div className="flex items-center justify-between">
 							<span className="text-muted-foreground">تاريخ الإنشاء</span>
-							<span className="font-semibold text-foreground text-xs">{creationDateFormatted}</span>
+							<span className="font-semibold text-foreground text-xs">
+								{creationDateFormatted}
+							</span>
 						</div>
 					</div>
 				</div>
 
 				{/* قسم رابط المشاركة */}
 				<div className="space-y-2">
-					<label className="text-xs font-bold text-foreground block">
-						رابط المشاركة
-					</label>
+					<label className="text-xs font-bold text-foreground block">رابط المشاركة</label>
 
 					<div className="flex items-center gap-2">
 						{/* حقل الرابط (في اليمين بنمط RTL) */}
@@ -285,7 +281,9 @@ export function ClassroomReviewStep({
 								className="w-68 p-4 rounded-2xl shadow-xl border border-border/80 bg-popover text-center space-y-3"
 							>
 								<div className="flex items-center justify-between pb-2 border-b border-border/50">
-									<span className="text-xs font-bold text-foreground">رمز QR للفصل الدراسي</span>
+									<span className="text-xs font-bold text-foreground">
+										رمز QR للفصل الدراسي
+									</span>
 									<span className="text-[10px] text-muted-foreground">امسح للوصول</span>
 								</div>
 

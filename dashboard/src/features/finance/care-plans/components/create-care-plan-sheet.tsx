@@ -62,6 +62,8 @@ import {
 } from "@/features/finance/care-plans/data/care-plans";
 import { useCarePlan } from "@/features/finance/care-plans/hooks/use-care-plan";
 import { useCarePlanMutations } from "@/features/finance/care-plans/hooks/use-care-plan-mutations";
+import { useAnimalTypes } from "@/features/settings/animals/hooks/use-animal-types";
+import { useAnimalStrains } from "@/features/settings/animals/hooks/use-animal-strains";
 import { cn } from "@/lib/utils";
 import type { CarePlanListItemResponse } from "@/server/care-plans/care-plans.type";
 
@@ -285,6 +287,9 @@ export function CreateCarePlanSheet({
     isLoading: servicesLoading,
   } = useServicesForPicker();
   const selectedService = services.find((s) => s.id === values.serviceId);
+  const { animalTypes } = useAnimalTypes();
+  const { strains } = useAnimalStrains();
+  const availableStrains = strains.filter((strain) => strain.animalTypeId === values.animalTypeId);
   const { create, update, isCreating, isUpdating } = useCarePlanMutations();
   const { plan: planDetail, isLoading: isLoadingDetail } = useCarePlan(
     isEditing ? plan.id : undefined,
@@ -559,6 +564,35 @@ export function CreateCarePlanSheet({
                     disabled={readOnly}
                     onChange={(e) => setField("name", e.target.value)}
                   />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Field>
+                  <Label className="justify-start gap-1.5">نوع الحيوان <RequiredMark /></Label>
+                  <Select
+                    value={values.animalTypeId}
+                    disabled={readOnly}
+                    onValueChange={(animalTypeId) => setValues((current) => ({ ...current, animalTypeId, animalStrainId: "" }))}
+                  >
+                    <SelectTrigger><SelectValue placeholder="اختر النوع..." /></SelectTrigger>
+                    <SelectContent>
+                      {animalTypes.map((type) => <SelectItem key={type.id} value={type.id}>{type.arName}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field>
+                  <Label className="justify-start gap-1.5">السلالة <RequiredMark /></Label>
+                  <Select
+                    value={values.animalStrainId}
+                    disabled={readOnly || !values.animalTypeId}
+                    onValueChange={(animalStrainId) => setField("animalStrainId", animalStrainId)}
+                  >
+                    <SelectTrigger><SelectValue placeholder="اختر السلالة..." /></SelectTrigger>
+                    <SelectContent>
+                      {availableStrains.map((strain) => <SelectItem key={strain.id} value={strain.id}>{strain.arName}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                 </Field>
               </div>
 

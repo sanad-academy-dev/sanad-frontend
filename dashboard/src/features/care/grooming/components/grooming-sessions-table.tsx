@@ -112,9 +112,7 @@ export function GroomingSessionsTable({
         header: "تنبيهات",
         cell: ({ row }) => {
           const c = row.original;
-          const heat =
-            c.intake?.heatDryProhibitedSnapshot === true ||
-            c.patient.animalStrain?.isBrachycephalic === true;
+          const heat = c.intake?.heatDryProhibitedSnapshot === true;
           const parasites =
             c.intake?.parasiteFinding != null &&
             c.intake.parasiteFinding !== ParasiteFinding.NONE;

@@ -24,7 +24,7 @@ import type {
 	AutoAssignEntity,
 	AutoAssignRuleFormInput,
 	AutoAssignRuleResponse,
-} from "@/server/course-assignments/course-assignments.type";
+} from "@sanad/contracts/runtime/server/course-assignments/course-assignments.type";
 
 const ALL = "__ALL__"; // قيمة «الكل» → entityId = null
 

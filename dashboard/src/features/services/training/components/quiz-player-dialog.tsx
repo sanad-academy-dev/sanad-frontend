@@ -1,7 +1,7 @@
 import { IconAlertTriangle, IconClock, IconX } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-
+import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
@@ -182,9 +182,7 @@ export function QuizPlayerDialog({
 					<DialogTitle className="text-[14px] font-bold text-[#08090A]">
 						{phase === "result" ? "نتيجة التقييم" : (player?.quiz.title ?? "التقييم")}
 					</DialogTitle>
-					<DialogDescription className="sr-only">
-						أداء التقييم وعرض النتيجة.
-					</DialogDescription>
+					<DialogDescription className="sr-only">أداء التقييم وعرض النتيجة.</DialogDescription>
 					<div className="flex items-center gap-2">
 						{phase === "playing" && remaining != null && (
 							<span
@@ -215,11 +213,7 @@ export function QuizPlayerDialog({
 					dir="rtl"
 					className="min-h-0 flex-1 overflow-y-auto p-4"
 				>
-					{phase === "loading" && (
-						<p className="py-16 text-center text-[13px] text-muted-foreground">
-							جارٍ تحميل التقييم...
-						</p>
-					)}
+					{phase === "loading" && <Spinner containerClassName="py-16 min-h-0" />}
 
 					{phase === "error" && (
 						<div className="flex flex-col items-center gap-2 py-16 text-center">

@@ -27,7 +27,7 @@ import type {
 	LessonFormValues,
 	LessonResponse,
 	UnitResponse,
-} from "@/server/training/training.type";
+} from "@sanad/contracts/runtime/server/training/training.type";
 import { DeleteConfirmDialog } from "../../components/delete-confirm-dialog";
 import { LessonForm } from "../../components/lesson-form";
 import { LESSON_TYPE_ICONS } from "../../data/training";

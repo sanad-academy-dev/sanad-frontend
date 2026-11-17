@@ -1,4 +1,3 @@
-import React from "react";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import { computeAgeLabel } from "../../utils/date-format";
 
@@ -107,7 +106,9 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 						</div>
 						<div className="flex justify-between items-center gap-2">
 							<span className="font-semibold text-zinc-600 text-[11px]">تاريخ الطباعة:</span>
-							<span className="text-zinc-800 text-[10px] font-mono">{currentDateFormatted}</span>
+							<span className="text-zinc-800 text-[10px] font-mono">
+								{currentDateFormatted}
+							</span>
 						</div>
 						<div className="flex justify-between items-center gap-2 pt-1 border-t border-zinc-200">
 							<span className="font-semibold text-zinc-600 text-[11px]">حالة الطلب:</span>
@@ -124,7 +125,9 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 			{/* ═══════════════════════════════════════════════════════════════ */}
 			<div className="grid grid-cols-4 gap-2 mb-4 bg-zinc-100 p-2.5 rounded border border-zinc-300 text-xs">
 				<div className="text-center border-l border-zinc-300 pl-2">
-					<span className="block text-zinc-500 text-[10px] font-semibold">المسار التعليمي</span>
+					<span className="block text-zinc-500 text-[10px] font-semibold">
+						المسار التعليمي
+					</span>
 					<span className="font-bold text-zinc-900 text-[11.5px]">
 						{request.targetClass || request.proposedTrack || "البرمجة والمنطق"}
 					</span>
@@ -142,7 +145,9 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 					</span>
 				</div>
 				<div className="text-center">
-					<span className="block text-zinc-500 text-[10px] font-semibold">مؤشر الجدية والحضور</span>
+					<span className="block text-zinc-500 text-[10px] font-semibold">
+						مؤشر الجدية والحضور
+					</span>
 					<span className="font-bold text-zinc-900 font-mono text-[11.5px]">
 						{request.attendanceProbability ?? 92}%
 					</span>
@@ -173,8 +178,8 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 								{request.gender === "MALE"
 									? "ذكر"
 									: request.gender === "FEMALE"
-									? "أنثى"
-									: "غير محدد"}
+										? "أنثى"
+										: "غير محدد"}
 							</td>
 						</tr>
 						<tr className="border-b border-zinc-200">
@@ -187,9 +192,7 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 							<td className="bg-zinc-50 font-semibold p-2 text-zinc-700 border-l border-zinc-200">
 								العمر المحسوب:
 							</td>
-							<td className="p-2 text-zinc-900">
-								{computeAge()}
-							</td>
+							<td className="p-2 text-zinc-900">{computeAge()}</td>
 						</tr>
 						<tr className="border-b border-zinc-200">
 							<td className="bg-zinc-50 font-semibold p-2 text-zinc-700 border-l border-zinc-200">
@@ -201,9 +204,7 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 							<td className="bg-zinc-50 font-semibold p-2 text-zinc-700 border-l border-zinc-200">
 								مستوى الخبرة:
 							</td>
-							<td className="p-2 text-zinc-900">
-								{request.experienceLevel || "مبتدئ"}
-							</td>
+							<td className="p-2 text-zinc-900">{request.experienceLevel || "مبتدئ"}</td>
 						</tr>
 						<tr>
 							<td className="bg-zinc-50 font-semibold p-2 text-zinc-700 border-l border-zinc-200">
@@ -215,9 +216,7 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 							<td className="bg-zinc-50 font-semibold p-2 text-zinc-700 border-l border-zinc-200">
 								الفترة / المناوبة المفضلة:
 							</td>
-							<td className="p-2 text-zinc-900">
-								{request.preferredShift || "صباحي"}
-							</td>
+							<td className="p-2 text-zinc-900">{request.preferredShift || "صباحي"}</td>
 						</tr>
 					</tbody>
 				</table>
@@ -243,21 +242,25 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 							<td className="bg-zinc-50 font-semibold p-2 w-[18%] text-zinc-700 border-l border-zinc-200">
 								صلة القرابة:
 							</td>
-							<td className="p-2 text-zinc-900 w-[32%]">
-								ولي أمر الطالب
-							</td>
+							<td className="p-2 text-zinc-900 w-[32%]">ولي أمر الطالب</td>
 						</tr>
 						<tr className="border-b border-zinc-200">
 							<td className="bg-zinc-50 font-semibold p-2 text-zinc-700 border-l border-zinc-200">
 								رقم الجوال للتواصل:
 							</td>
-							<td className="p-2 font-mono text-zinc-900 font-semibold border-l border-zinc-200" dir="ltr">
+							<td
+								className="p-2 font-mono text-zinc-900 font-semibold border-l border-zinc-200"
+								dir="ltr"
+							>
 								{request.guardianPhone || "غير مسجل"}
 							</td>
 							<td className="bg-zinc-50 font-semibold p-2 text-zinc-700 border-l border-zinc-200">
 								البريد الإلكتروني:
 							</td>
-							<td className="p-2 font-mono text-zinc-800 text-[11px]" dir="ltr">
+							<td
+								className="p-2 font-mono text-zinc-800 text-[11px]"
+								dir="ltr"
+							>
 								{request.guardianEmail || "لا يوجد بريد مسجل"}
 							</td>
 						</tr>
@@ -265,9 +268,7 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 							<td className="bg-zinc-50 font-semibold p-2 text-zinc-700 border-l border-zinc-200">
 								المدينة والموقع:
 							</td>
-							<td className="p-2 text-zinc-900 border-l border-zinc-200">
-								مكة المكرمة
-							</td>
+							<td className="p-2 text-zinc-900 border-l border-zinc-200">مكة المكرمة</td>
 							<td className="bg-zinc-50 font-semibold p-2 text-zinc-700 border-l border-zinc-200">
 								حالة السجل بالنظام:
 							</td>
@@ -376,7 +377,9 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 								</td>
 								<td className="p-2 text-zinc-900">
 									{request.medications && request.medications.length > 0
-										? request.medications.map((m) => (typeof m === "string" ? m : m.name)).join("، ")
+										? request.medications
+												.map((m) => (typeof m === "string" ? m : m.name))
+												.join("، ")
 										: "لا توجد أدوية منتظمة"}
 								</td>
 							</tr>
@@ -405,7 +408,9 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 									المبلغ التقديري:
 								</td>
 								<td className="p-2 font-mono font-bold text-zinc-900">
-									{request.subscriptionAmount ? `${request.subscriptionAmount} ر.س` : "يحدد بعد اعتماد الباقة"}
+									{request.subscriptionAmount
+										? `${request.subscriptionAmount} ر.س`
+										: "يحدد بعد اعتماد الباقة"}
 								</td>
 							</tr>
 							<tr className="border-b border-zinc-200">
@@ -441,7 +446,9 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 					<thead>
 						<tr className="bg-zinc-100 border-b border-zinc-300 text-zinc-700">
 							<th className="p-1.5 text-center w-12 border-l border-zinc-300">#</th>
-							<th className="p-1.5 text-right border-l border-zinc-300">اسم المستند / المرفق</th>
+							<th className="p-1.5 text-right border-l border-zinc-300">
+								اسم المستند / المرفق
+							</th>
 							<th className="p-1.5 text-center w-28 border-l border-zinc-300">الحجم</th>
 							<th className="p-1.5 text-center w-28">حالة الاعتماد</th>
 						</tr>
@@ -449,8 +456,13 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 					<tbody>
 						{request.documents?.items && request.documents.items.length > 0 ? (
 							request.documents.items.map((doc, idx) => (
-								<tr key={doc.id || idx} className="border-b border-zinc-200">
-									<td className="p-1.5 text-center font-mono border-l border-zinc-200">{idx + 1}</td>
+								<tr
+									key={doc.id || idx}
+									className="border-b border-zinc-200"
+								>
+									<td className="p-1.5 text-center font-mono border-l border-zinc-200">
+										{idx + 1}
+									</td>
 									<td className="p-1.5 font-semibold text-zinc-900 border-l border-zinc-200">
 										{doc.title || "مستند رسمي"}
 									</td>
@@ -506,7 +518,8 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 					<div>
 						<span className="font-bold text-zinc-800">ملاحظات الطلب المسجلة: </span>
 						<span className="text-zinc-700">
-							{request.notes || "يحتاج متابعة خاصة في التكيف الأكاديمي والاجتماعي خلال الأسبوع الأول."}
+							{request.notes ||
+								"يحتاج متابعة خاصة في التكيف الأكاديمي والاجتماعي خلال الأسبوع الأول."}
 						</span>
 					</div>
 					{request.comments && request.comments.length > 0 && (
@@ -529,7 +542,8 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 			{/* ═══════════════════════════════════════════════════════════════ */}
 			<footer className="border-t-2 border-zinc-900 pt-4 mt-6">
 				<div className="text-[10px] text-zinc-500 mb-4 text-center">
-					إقرار: أقر أنا ولي أمر الطالب بصحة كافة البيانات والمعلومات الواردة أعلاه، وأوافق على سياسات ولوائح القبول والتسجيل بالأكاديمية.
+					إقرار: أقر أنا ولي أمر الطالب بصحة كافة البيانات والمعلومات الواردة أعلاه، وأوافق على
+					سياسات ولوائح القبول والتسجيل بالأكاديمية.
 				</div>
 
 				<div className="grid grid-cols-3 gap-6 text-center text-xs">
@@ -537,7 +551,9 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 					<div className="border border-zinc-300 rounded p-3 bg-zinc-50 flex flex-col justify-between min-h-[95px]">
 						<span className="font-bold text-zinc-800">توقيع ولي الأمر</span>
 						<div className="border-b border-dashed border-zinc-400 my-3"></div>
-						<span className="text-[10px] text-zinc-500 font-mono">التاريخ: ___ / ___ / 2026</span>
+						<span className="text-[10px] text-zinc-500 font-mono">
+							التاريخ: ___ / ___ / 2026
+						</span>
 					</div>
 
 					{/* Reviewer Signature */}
@@ -558,7 +574,8 @@ export function StudentRequestPrintDocument({ request }: StudentRequestPrintDocu
 				</div>
 
 				<div className="mt-4 text-center text-[9px] text-zinc-400 border-t border-zinc-200 pt-2 font-mono">
-					وثيقة رسمية صادرة عن نظام سند الإلكتروني لإدارة التسجيل الأكاديمي الموحد • رقم التحقق: {request.id}
+					وثيقة رسمية صادرة عن نظام سند الإلكتروني لإدارة التسجيل الأكاديمي الموحد • رقم
+					التحقق: {request.id}
 				</div>
 			</footer>
 		</div>

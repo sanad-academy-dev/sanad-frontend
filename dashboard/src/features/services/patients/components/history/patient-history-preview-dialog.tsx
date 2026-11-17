@@ -21,7 +21,7 @@ import type {
   PatientHistoryLabOrder,
   PatientHistoryRadiologyOrder,
   PatientHistoryVisit,
-} from "@/server/patients/patients.type";
+} from "@sanad/contracts/runtime/server/patients/patients.type";
 import { LATERALITY_LABELS } from "@sanad/contracts/runtime/server/radiology/radiology.type";
 import { RADIOLOGY_STATUS_LABELS } from "@sanad/contracts/runtime/server/radiology/radiology.workflow";
 

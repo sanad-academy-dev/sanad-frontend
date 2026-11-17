@@ -9,6 +9,7 @@ import {
 } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { Spinner } from "@/components/common/spinner";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
 	DropdownMenu,
@@ -135,10 +136,8 @@ export function AssignTrackStudentsSheet({
 			if (q) {
 				const nameMatch = p.name?.toLowerCase().includes(q);
 				const codeMatch = p.code?.toLowerCase().includes(q);
-				const guardianMatch =
-					p.guardianName?.toLowerCase().includes(q) ||
-					p.owner?.name?.toLowerCase().includes(q);
-				const phoneMatch = p.guardianPhone?.includes(q) || p.owner?.phone?.includes(q);
+				const guardianMatch = p.owner?.name?.toLowerCase().includes(q);
+				const phoneMatch = p.owner?.phone?.includes(q);
 
 				if (!nameMatch && !codeMatch && !guardianMatch && !phoneMatch) return false;
 			}
@@ -378,9 +377,7 @@ export function AssignTrackStudentsSheet({
 						dir="rtl"
 					>
 						{isPatientsLoading ? (
-							<div className="py-12 text-center text-xs text-muted-foreground">
-								جاري تحميل قائمة الطلاب...
-							</div>
+							<Spinner containerClassName="py-12 min-h-0" />
 						) : filteredStudents.length === 0 ? (
 							<div className="py-12 text-center text-xs text-muted-foreground space-y-1">
 								<p>
@@ -463,7 +460,9 @@ export function AssignTrackStudentsSheet({
 													{p.gender === "FEMALE" ? " • أنثى" : " • ذكر"}
 													{" • "}
 													<span className="font-semibold text-purple-700 dark:text-purple-300">
-														{p.academicStage ? `المرحلة: ${p.academicStage}` : "بدون مرحلة دراسية"}
+														{p.academicStage
+															? `المرحلة: ${p.academicStage}`
+															: "بدون مرحلة دراسية"}
 													</span>
 												</span>
 											</div>

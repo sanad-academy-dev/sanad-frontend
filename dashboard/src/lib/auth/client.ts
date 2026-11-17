@@ -23,3 +23,14 @@ export const authClient = createAuthClient({
 });
 
 export const { signIn, signOut, signUp, useSession } = authClient;
+
+/** Extra session fields supplied by the backend's active-clinic session hook. */
+export type DashboardSessionFields = {
+	activeClinicId?: string | null;
+	currencyCode?: string | null;
+	role?: string | null;
+	permissions?: string | null;
+};
+
+export const readDashboardSessionFields = (session: unknown): DashboardSessionFields =>
+	(session && typeof session === "object" ? session : {}) as DashboardSessionFields;

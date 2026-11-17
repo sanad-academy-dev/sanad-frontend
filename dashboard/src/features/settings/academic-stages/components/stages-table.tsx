@@ -9,7 +9,6 @@ import {
 } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { TableToolbar } from "@/components/common/table-toolbar";
-import { UsageBar } from "@/components/common/usage-bar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -116,8 +115,12 @@ function StageAddRow({ isAdding, onClose, onAdd, isPending }: StageAddRowProps) 
 						onKeyDown={handleKeyDown}
 					/>
 				</TableCell>
-				<TableCell className="px-3 py-2 text-center text-xs text-muted-foreground">—</TableCell>
-				<TableCell className="px-3 py-2 text-center text-xs text-muted-foreground">—</TableCell>
+				<TableCell className="px-3 py-2 text-center text-xs text-muted-foreground">
+					—
+				</TableCell>
+				<TableCell className="px-3 py-2 text-center text-xs text-muted-foreground">
+					—
+				</TableCell>
 				<TableCell className="px-3 py-2 flex items-center justify-center">
 					<ConfirmDiscard
 						onConfirm={handleConfirm}
@@ -170,12 +173,6 @@ export function StagesTable() {
 		setTargetStage("");
 	};
 
-	const maxUsage = useMemo(() => {
-		if (stages.length === 0) return 10;
-		const max = Math.max(...stages.map((s) => s.usageCount));
-		return max > 0 ? max : 10;
-	}, [stages]);
-
 	const isSearching = search.trim().length > 0;
 	const filteredStages = useMemo(() => {
 		if (!isSearching) return stages;
@@ -225,7 +222,7 @@ export function StagesTable() {
 							<TableHead className="p-3 text-center font-semibold text-foreground text-sm">
 								الفصول التابعة
 							</TableHead>
-							
+
 							<TableHead className="p-3 font-semibold text-foreground text-sm text-center">
 								الحالة
 							</TableHead>
@@ -246,7 +243,10 @@ export function StagesTable() {
 					{isLoading ? (
 						<TableBody>
 							{Array.from({ length: 5 }).map((_, i) => (
-								<TableRow key={i} className={cn("grid", COLS)}>
+								<TableRow
+									key={i}
+									className={cn("grid", COLS)}
+								>
 									<TableCell className="px-3 py-3">
 										<Skeleton className="h-4 w-3/4" />
 									</TableCell>
@@ -275,7 +275,7 @@ export function StagesTable() {
 									لا توجد مراحل دراسية مسجلة حالياً
 								</TableCell>
 							</TableRow>
-						</TableBody> 
+						</TableBody>
 					) : filteredStages.length === 0 && !isAddingRow ? (
 						<TableBody>
 							<TableRow className={cn("grid", COLS)}>
@@ -327,7 +327,6 @@ export function StagesTable() {
 									</TableCell>
 
 									{/* شريط الاستخدام */}
-									
 
 									{/* الحالة */}
 									<TableCell className="px-3 py-3 flex items-center justify-center">
@@ -369,14 +368,20 @@ export function StagesTable() {
 			</div>
 
 			{/* تأكيد الحذف */}
-			<Dialog open={Boolean(deletingStage)} onOpenChange={(open) => !open && setDeletingStage(null)}>
-				<DialogContent className="max-w-md" dir="rtl">
+			<Dialog
+				open={Boolean(deletingStage)}
+				onOpenChange={(open) => !open && setDeletingStage(null)}
+			>
+				<DialogContent
+					className="max-w-md"
+					dir="rtl"
+				>
 					<DialogHeader>
 						<DialogTitle>حذف المرحلة الدراسية</DialogTitle>
 						<DialogDescription>
 							هل أنت متأكد من حذف مرحلة{" "}
-							<span className="font-bold text-foreground">({deletingStage?.name})</span>؟ سيتم فك
-							ارتباط الفصول الحالية التابعة لهذه المرحلة.
+							<span className="font-bold text-foreground">({deletingStage?.name})</span>؟ سيتم
+							فك ارتباط الفصول الحالية التابعة لهذه المرحلة.
 						</DialogDescription>
 					</DialogHeader>
 					<DialogFooter className="gap-2 sm:gap-0">
@@ -402,7 +407,10 @@ export function StagesTable() {
 				open={Boolean(stageToDisable)}
 				onOpenChange={(open) => !open && setStageToDisable(null)}
 			>
-				<DialogContent className="max-w-md" dir="rtl">
+				<DialogContent
+					className="max-w-md"
+					dir="rtl"
+				>
 					<DialogHeader className="gap-2">
 						<div className="flex items-center gap-2">
 							<span className="inline-flex size-8 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
@@ -418,7 +426,8 @@ export function StagesTable() {
 							<span className="font-bold text-amber-600 dark:text-amber-400 font-mono">
 								({stageToDisable?.classroomsCount} فصول)
 							</span>{" "}
-							مرتبطة بها حالياً. يرجى اختيار مرحلة دراسية بديلة لنقل الفصول إليها تلقائياً قبل التعطيل.
+							مرتبطة بها حالياً. يرجى اختيار مرحلة دراسية بديلة لنقل الفصول إليها تلقائياً قبل
+							التعطيل.
 						</DialogDescription>
 					</DialogHeader>
 
@@ -435,7 +444,10 @@ export function StagesTable() {
 								<SelectTrigger className="w-full h-10 text-xs">
 									<SelectValue placeholder="اختر المرحلة الدراسية البديلة..." />
 								</SelectTrigger>
-								<SelectContent dir="rtl" className="max-h-56">
+								<SelectContent
+									dir="rtl"
+									className="max-h-56"
+								>
 									{otherActiveStages.map((s) => (
 										<SelectItem
 											key={s.id}
@@ -454,7 +466,8 @@ export function StagesTable() {
 							</Select>
 						) : (
 							<div className="p-3 text-xs rounded-lg border border-destructive/30 bg-destructive/5 text-destructive">
-								لا توجد مراحل دراسية نشطة أخرى حالياً لنقل الفصول إليها. يرجى تفعيل أو إنشاء مرحلة أخرى أولاً.
+								لا توجد مراحل دراسية نشطة أخرى حالياً لنقل الفصول إليها. يرجى تفعيل أو إنشاء
+								مرحلة أخرى أولاً.
 							</div>
 						)}
 					</div>
@@ -482,4 +495,3 @@ export function StagesTable() {
 		</div>
 	);
 }
-

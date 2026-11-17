@@ -89,7 +89,7 @@ export function PriorityPickerPopover({
 	// الخيار المختار حالياً
 	const currentOption = useMemo(() => {
 		const val = (value || "").trim().toLowerCase();
-		const mapEnToId = {
+		const mapEnToId: Record<string, string> = {
 			urgent: "urgent",
 			high: "high",
 			medium: "medium",

@@ -8,23 +8,28 @@ import {
 	IconDots,
 	IconEdit,
 	IconEye,
+	IconFileDescription,
 	IconFileText,
 	IconFlag,
 	IconGripVertical,
 	IconHelpCircle,
 	IconPencil,
-	IconPlayerPlayFilled,
 	IconPlus,
+	IconRosetteDiscountCheck,
 	IconRoute,
+	IconSearch,
 	IconTrash,
+	IconX,
 } from "@tabler/icons-react";
 import React, { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { Spinner } from "@/components/common/spinner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
+	DialogDescription,
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
@@ -45,15 +50,18 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
 import { CoverPicker } from "@/features/services/training/components/cover-picker";
 import { formatCourseDuration } from "@/features/services/training/data/training";
 import { useCourses } from "@/features/services/training/hooks/use-courses";
+import { useQuizzes } from "@/features/services/training/hooks/use-quizzes";
+import { useTrainingPages } from "@/features/services/training/hooks/use-training-pages";
 import { resolveCover } from "@/features/services/training/utils/cover";
 import { cn } from "@/lib/utils";
 import { DurationPickerPopover } from "./duration-picker-popover";
+import { TrackStageItemLivePreview } from "./track-content-preview";
 import {
+	CourseCoverThumbnail,
 	formatArabicDate,
 	formatLessonsCount,
 	toArabicNumerals,
@@ -309,7 +317,6 @@ export function TrackStructureStep({
 	stages: passedStages,
 	onStagesChange,
 	priorityPath: passedPriorityPath,
-	onPriorityPathChange,
 	coverKey: initialCoverKey,
 	onCoverKeyChange,
 	notes,
@@ -323,18 +330,7 @@ export function TrackStructureStep({
 }: TrackStructureStepProps) {
 	const { courses: serverCourses } = useCourses();
 	const [coverKey, setCoverKey] = useState<string | null>(initialCoverKey ?? null);
-	const [internalPriorityPath, setInternalPriorityPath] = useState<"SEQUENTIAL" | "FLEXIBLE">(
-		"SEQUENTIAL",
-	);
-
-	const priorityPath = passedPriorityPath ?? internalPriorityPath;
-	const setPriorityPath = useCallback(
-		(val: "SEQUENTIAL" | "FLEXIBLE") => {
-			setInternalPriorityPath(val);
-			onPriorityPathChange?.(val);
-		},
-		[onPriorityPathChange],
-	);
+	const priorityPath = passedPriorityPath ?? "SEQUENTIAL";
 
 	// جلب الدورات الحقيقية المتاحة فقط من الخادم بدون أي بيانات وهمية
 	const allAvailableCourses = useMemo(() => {
@@ -344,7 +340,12 @@ export function TrackStructureStep({
 
 		return serverCourses.map((c) => {
 			const formattedDuration =
-				formatCourseDuration(c.startDate, c.dueDate, c.estimatedDurationWeeks) ||
+				formatCourseDuration(
+					c.startDate,
+					c.dueDate,
+					c.estimatedDurationWeeks,
+					c.description,
+				) ||
 				(c.estimatedDurationWeeks
 					? `${toArabicNumerals(c.estimatedDurationWeeks)} أسابيع`
 					: "تحديد المدة");
@@ -564,7 +565,7 @@ export function TrackStructureStep({
 							item.durationText !== "3 أسابيع" &&
 							item.durationText !== "تحديد المدة"
 								? item.durationText
-								: (c.durationText || item.durationText);
+								: c.durationText || item.durationText;
 
 						return {
 							...item,
@@ -620,11 +621,6 @@ export function TrackStructureStep({
 	);
 
 	// الانتقال لخطوة اختيار الدورات (الخطوة 2) لاختيار دورات جديدة
-	const handleGoToSelectCourses = useCallback(() => {
-		onBackToCourses();
-		toast.info("اختر الدورات المطلوبة من هذه الخطوة، وستُضاف تلقائياً إلى المرحلة في المسار");
-	}, [onBackToCourses]);
-
 	// تبويب لوحة المعاينة (العمود الأيسر): الخارطة أو المعاينة الحية للدرس المختار
 	const [leftPreviewTab, setLeftPreviewTab] = useState<"roadmap" | "live">("roadmap");
 	const [selectedPreviewItem, setSelectedPreviewItem] = useState<TrackStageItem | null>(null);
@@ -699,6 +695,221 @@ export function TrackStructureStep({
 		onCoverKeyChange?.(newCover);
 	};
 
+	// حالة نافذة اختيار المحتوى (دورات، تقييمات، صفحات)
+	const [pickerState, setPickerState] = useState<{
+		open: boolean;
+		type: TrackItemType;
+		stageId?: string;
+		afterItemId?: string;
+		createNewStageAfterStageId?: string;
+	}>({
+		open: false,
+		type: "COURSE",
+	});
+
+	// معالجة اختيار محتوى من النافذة المنبثقة
+	// biome-ignore lint/suspicious/noExplicitAny: raw item from picker
+	const handlePickerSelect = ({ type, rawItem }: { type: TrackItemType; rawItem: any }) => {
+		let newItem: TrackStageItem;
+
+		if (type === "COURSE") {
+			const course =
+				rawItem as import("@/server/training/training.type").CourseListItemResponse;
+			const durationText =
+				formatCourseDuration(
+					course.startDate,
+					course.dueDate,
+					course.estimatedDurationWeeks,
+					course.description,
+				) ||
+				(course.estimatedDurationWeeks
+					? `${toArabicNumerals(course.estimatedDurationWeeks)} أسابيع`
+					: "أسبوعان");
+
+			const rawCourseObj = course as unknown as {
+				contentCount?: number;
+				lessonsCount?: number;
+				chaptersCount?: number;
+			};
+
+			newItem = {
+				id: `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+				refId: course.id,
+				courseId: course.id,
+				type: "COURSE",
+				title: course.name,
+				durationText,
+				durationWeeks: course.estimatedDurationWeeks ?? undefined,
+				lessonsCount: rawCourseObj.contentCount ?? rawCourseObj.lessonsCount ?? 0,
+				chaptersCount: rawCourseObj.chaptersCount ?? undefined,
+				description: cleanCourseDescription(course.description),
+				status: (course.status as "PUBLISHED" | "DRAFT") || "PUBLISHED",
+				iconColor: "blue",
+				updatedDate: formatArabicDate(course.updatedAt),
+				coverKey: course.coverKey ?? null,
+			};
+			if (!selectedCourseIds.includes(course.id)) {
+				selectedCourseIdsRef.current = [...selectedCourseIds, course.id];
+				onSelectedCourseIdsChange?.([...selectedCourseIds, course.id]);
+			}
+		} else if (type === "QUIZ") {
+			const quiz = rawItem as import("@/server/quizzes/quizzes.type").QuizListItemResponse;
+			newItem = {
+				id: `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+				refId: quiz.id,
+				type: "QUIZ",
+				title: quiz.title,
+				durationText: quiz.timeLimitMinutes
+					? `${toArabicNumerals(quiz.timeLimitMinutes)} دقيقة`
+					: "30 دقيقة",
+				lessonsCount: quiz._count?.questions ?? 0,
+				description: `اختبار وتقييم - كود: ${quiz.code}`,
+				status: (quiz.status as "PUBLISHED" | "DRAFT") || "PUBLISHED",
+				iconColor: "yellow",
+				updatedDate: formatArabicDate(quiz.updatedAt),
+			};
+		} else {
+			const page = rawItem as import("../hooks/use-training-pages").TrainingPage;
+			newItem = {
+				id: `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+				refId: page.id,
+				type: "PAGE",
+				title: page.title,
+				durationText: "يوم واحد",
+				lessonsCount: 1,
+				description: page.category || "صفحة تدريبية ومستند",
+				status: (page.status as "PUBLISHED" | "DRAFT") || "PUBLISHED",
+				iconColor: "orange",
+				updatedDate: formatArabicDate(page.updatedAt),
+			};
+		}
+
+		if (pickerState.createNewStageAfterStageId) {
+			const newStageNumber = stages.length + 1;
+			const defaultName =
+				newStageNumber === 1
+					? "المستوى التأسيسي"
+					: newStageNumber === 2
+						? "المستوى المتوسط"
+						: newStageNumber === 3
+							? "المستوى المتقدم"
+							: `المرحلة ${newStageNumber}`;
+
+			const newStage: TrackStage = {
+				id: `stage-${Date.now()}`,
+				title: defaultName,
+				description: `محتوى وأهداف المرحلة ${newStageNumber}`,
+				items: [newItem],
+			};
+
+			setStages((prev) => {
+				const idx = prev.findIndex((s) => s.id === pickerState.createNewStageAfterStageId);
+				if (idx === -1) return [...prev, newStage];
+				const next = [...prev];
+				next.splice(idx + 1, 0, newStage);
+				return next;
+			});
+			toast.success(`تمت إضافة ${defaultName} مع "${newItem.title}" بنجاح`);
+		} else if (pickerState.stageId) {
+			setStages((prev) =>
+				prev.map((stage) => {
+					if (stage.id !== pickerState.stageId) return stage;
+					if (!pickerState.afterItemId) {
+						return { ...stage, items: [...stage.items, newItem] };
+					}
+					const idx = stage.items.findIndex((it) => it.id === pickerState.afterItemId);
+					if (idx === -1) return { ...stage, items: [...stage.items, newItem] };
+					const nextItems = [...stage.items];
+					nextItems.splice(idx + 1, 0, newItem);
+					return { ...stage, items: nextItems };
+				}),
+			);
+			toast.success(`تمت إضافة "${newItem.title}" إلى المرحلة بنجاح`);
+		}
+
+		setSelectedPreviewItem(newItem);
+		setLeftPreviewTab("live");
+		setPickerState((prev) => ({ ...prev, open: false }));
+	};
+
+	// مجموعات العناصر المضافة مسبقاً في المسار لمعرفة حالة كل عنصر
+	const addedCourseIds = useMemo(() => {
+		return new Set(selectedCourseIds);
+	}, [selectedCourseIds]);
+
+	const addedQuizIds = useMemo(() => {
+		const set = new Set<string>();
+		for (const st of stages) {
+			for (const it of st.items) {
+				if (it.type === "QUIZ") {
+					if (it.refId) set.add(it.refId);
+					const rawId = it.id.replace(/^item-quiz-/, "").replace(/^item-/, "");
+					if (rawId) set.add(rawId);
+				}
+			}
+		}
+		return set;
+	}, [stages]);
+
+	const addedPageIds = useMemo(() => {
+		const set = new Set<string>();
+		for (const st of stages) {
+			for (const it of st.items) {
+				if (it.type === "PAGE") {
+					if (it.refId) set.add(it.refId);
+					const rawId = it.id.replace(/^item-page-/, "").replace(/^item-/, "");
+					if (rawId) set.add(rawId);
+				}
+			}
+		}
+		return set;
+	}, [stages]);
+
+	// إزالة محتوى من المسار عند الضغط على "إزالة من المسار"
+	const handlePickerRemove = useCallback(
+		({ type, id, title }: { type: TrackItemType; id: string; title: string }) => {
+			if (type === "COURSE") {
+				const nextSelected = selectedCourseIds.filter((cId) => cId !== id);
+				selectedCourseIdsRef.current = nextSelected;
+				onSelectedCourseIdsChange?.(nextSelected);
+
+				setStages((prev) =>
+					prev.map((st) => ({
+						...st,
+						items: st.items.filter(
+							(it) => it.courseId !== id && it.refId !== id && it.id !== `item-${id}`,
+						),
+					})),
+				);
+			} else {
+				setStages((prev) =>
+					prev.map((st) => ({
+						...st,
+						items: st.items.filter(
+							(it) =>
+								it.refId !== id &&
+								it.id !== id &&
+								it.id !== `item-${id}` &&
+								it.id !== `item-quiz-${id}` &&
+								it.id !== `item-page-${id}`,
+						),
+					})),
+				);
+			}
+
+			if (
+				selectedPreviewItem?.refId === id ||
+				selectedPreviewItem?.courseId === id ||
+				selectedPreviewItem?.id.includes(id)
+			) {
+				setSelectedPreviewItem(null);
+			}
+
+			toast.info(`تمت إزالة "${title}" من المسار`);
+		},
+		[selectedCourseIds, onSelectedCourseIdsChange, setStages, selectedPreviewItem],
+	);
+
 	// إضافة مرحلة جديدة
 	const handleAddStage = (afterStageId?: string) => {
 		const newStageNumber = stages.length + 1;
@@ -732,74 +943,6 @@ export function TrackStructureStep({
 		toast.success(`تمت إضافة مرحلة جديدة: ${defaultName}`);
 	};
 
-	// إضافة مرحلة جديدة مع عنصر بداخلها مباشرة بين المرحلتين
-	const handleAddStageWithItem = (afterStageId: string, type: TrackItemType) => {
-		if (type === "COURSE") {
-			handleAddStage(afterStageId);
-			handleGoToSelectCourses();
-			return;
-		}
-
-		const newStageNumber = stages.length + 1;
-		const defaultName =
-			newStageNumber === 1
-				? "المستوى التأسيسي"
-				: newStageNumber === 2
-					? "المستوى المتوسط"
-					: newStageNumber === 3
-						? "المستوى المتقدم"
-						: `المرحلة ${newStageNumber}`;
-
-		const typeLabels = {
-			COURSE: "دورة تدريبية",
-			PAGE: "صفحة تعليمية ومستند",
-			QUIZ: "تقييم واختبار تدريبي",
-		};
-		const defaultDurations = {
-			COURSE: "أسبوعان",
-			PAGE: "يوم واحد",
-			QUIZ: "ساعة واحدة",
-		};
-		const defaultIcons = {
-			COURSE: "blue",
-			PAGE: "orange",
-			QUIZ: "yellow",
-		};
-
-		const newItem: TrackStageItem = {
-			id: `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-			type,
-			title: typeLabels[type],
-			durationText: defaultDurations[type],
-			durationHours: 1,
-			lessonsCount: 1,
-			chaptersCount: undefined,
-			description: "",
-			status: "PUBLISHED",
-			iconColor: defaultIcons[type],
-			updatedDate: "اليوم",
-		};
-
-		const newStage: TrackStage = {
-			id: `stage-${Date.now()}`,
-			title: defaultName,
-			description: `محتوى وأهداف المرحلة ${newStageNumber}`,
-			items: [newItem],
-		};
-
-		setStages((prev) => {
-			const idx = prev.findIndex((s) => s.id === afterStageId);
-			if (idx === -1) return [...prev, newStage];
-			const next = [...prev];
-			next.splice(idx + 1, 0, newStage);
-			return next;
-		});
-
-		toast.success(
-			`تمت إضافة ${defaultName} مع ${type === "PAGE" ? "صفحة ومستند" : "اختبار وتقييم"} بنجاح`,
-		);
-	};
-
 	// حذف مرحلة بالكامل
 	const handleDeleteStage = (stageId: string) => {
 		if (stages.length <= 1) {
@@ -827,60 +970,6 @@ export function TrackStructureStep({
 
 		setStages((prev) => prev.filter((s) => s.id !== stageId));
 		toast.info(`تم حذف المرحلة ${targetStage?.title || ""} بنجاح`);
-	};
-
-	// إضافة عنصر جديد داخل مرحلة معينة
-	const handleAddItem = (stageId: string, type: TrackItemType, afterItemId?: string) => {
-		if (type === "COURSE") {
-			handleGoToSelectCourses();
-			return;
-		}
-
-		const typeLabels = {
-			COURSE: "دورة تدريبية",
-			PAGE: "صفحة تعليمية ومستند",
-			QUIZ: "تقييم واختبار تدريبي",
-		};
-		const defaultDurations = {
-			COURSE: "أسبوعان",
-			PAGE: "يوم واحد",
-			QUIZ: "ساعة واحدة",
-		};
-		const defaultIcons = {
-			COURSE: "blue",
-			PAGE: "orange",
-			QUIZ: "yellow",
-		};
-
-		const newItem: TrackStageItem = {
-			id: `item-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-			type,
-			title: typeLabels[type],
-			durationText: defaultDurations[type],
-			durationHours: 1,
-			lessonsCount: 1,
-			chaptersCount: undefined,
-			description: "",
-			status: "PUBLISHED",
-			iconColor: defaultIcons[type],
-			updatedDate: "اليوم",
-		};
-
-		setStages((prev) =>
-			prev.map((stage) => {
-				if (stage.id !== stageId) return stage;
-				if (!afterItemId) {
-					return { ...stage, items: [...stage.items, newItem] };
-				}
-				const idx = stage.items.findIndex((it) => it.id === afterItemId);
-				if (idx === -1) return { ...stage, items: [...stage.items, newItem] };
-				const nextItems = [...stage.items];
-				nextItems.splice(idx + 1, 0, newItem);
-				return { ...stage, items: nextItems };
-			}),
-		);
-
-		toast.success(`تمت إضافة ${typeLabels[type]} إلى المرحلة`);
 	};
 
 	// حذف عنصر من المرحلة
@@ -1321,35 +1410,6 @@ export function TrackStructureStep({
 									className="h-7 text-xs font-medium"
 								/>
 							)}
-
-							{/* خيار طريقة التقدّم: تتابعي أو مرن */}
-							<div className="flex items-center gap-2">
-								<span className="text-muted-foreground font-medium text-[11px]">
-									طريقة التقدّم:
-								</span>
-								<Select
-									value={priorityPath}
-									onValueChange={(val) => setPriorityPath(val as "SEQUENTIAL" | "FLEXIBLE")}
-								>
-									<SelectTrigger className="h-7 w-36 text-xs font-medium rounded-lg">
-										<SelectValue placeholder="اختر طريقة التقدّم" />
-									</SelectTrigger>
-									<SelectContent align="end">
-										<SelectItem
-											value="SEQUENTIAL"
-											className="text-xs cursor-pointer"
-										>
-											تتابعي (إلزامي بالترتيب)
-										</SelectItem>
-										<SelectItem
-											value="FLEXIBLE"
-											className="text-xs cursor-pointer"
-										>
-											مرن (اختيار حر للمتدرب)
-										</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
 						</div>
 					</div>
 
@@ -1403,7 +1463,7 @@ export function TrackStructureStep({
 											onDragEnd={handleStageDragEnd}
 											className="flex items-center justify-between pb-2 border-b border-border/80 cursor-grab active:cursor-grabbing select-none"
 										>
-											<div className="flex items-center gap-2">
+											<div className="flex items-center gap-2 flex-1 min-w-0">
 												{/* مقبض سحب المرحلة باليد لتغيير ترتيب المراحل */}
 												{/* biome-ignore lint/a11y/noStaticElementInteractions: draggable stage handle */}
 												<div
@@ -1416,79 +1476,146 @@ export function TrackStructureStep({
 													<IconGripVertical className="size-4" />
 												</div>
 
-												<button
-													type="button"
-													onClick={() => toggleEditorStage(stage.id)}
-													className="size-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950/40 transition-colors cursor-pointer shrink-0"
+												{/* مساحة رأس المرحلة التفاعلية القابلة للنقر بالكامل لفتح وطي الدورات */}
+												{/* biome-ignore lint/a11y/noStaticElementInteractions: clickable stage header area */}
+												{/* biome-ignore lint/a11y/useKeyWithClickEvents: clickable stage header area */}
+												<div
+													onClick={(e) => {
+														const target = e.target as HTMLElement;
+														if (target.closest("[data-no-toggle], input, button")) {
+															return;
+														}
+														toggleEditorStage(stage.id);
+													}}
+													className="flex items-center gap-2 flex-1 min-w-0 cursor-pointer select-none group/stage-head"
 													title={
 														isEditorCollapsed ? "إظهار دورات المرحلة" : "طي دورات المرحلة"
 													}
 												>
-													<IconChevronDown
-														className={cn(
-															"size-4 transition-transform duration-200",
-															isEditorCollapsed && "-rotate-90",
-														)}
-													/>
-												</button>
-												<div className="size-7 rounded-lg bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 shadow-2xs">
-													<IconFlag className="size-4" />
-												</div>
-
-												{editingStageId === stage.id ? (
-													<div className="flex items-center gap-1.5">
-														<Input
-															value={editingStageTitle}
-															onChange={(e) => setEditingStageTitle(e.target.value)}
-															placeholder="اسم المرحلة..."
-															className="h-7 text-xs font-bold w-44"
-															autoFocus
+													<div className="size-7 rounded-lg flex items-center justify-center text-muted-foreground group-hover/stage-head:text-purple-600 group-hover/stage-head:bg-purple-50 dark:group-hover/stage-head:bg-purple-950/40 transition-colors shrink-0">
+														<IconChevronDown
+															className={cn(
+																"size-4 transition-transform duration-200",
+																isEditorCollapsed && "-rotate-90",
+															)}
 														/>
-														<Button
-															size="sm"
-															className="h-7 px-2.5 text-xs bg-purple-600 text-white"
-															onClick={() => handleSaveStageTitle(stage.id)}
-														>
-															حفظ
-														</Button>
 													</div>
-												) : (
-													<button
-														type="button"
-														className="flex items-center gap-2 group cursor-pointer bg-transparent border-none p-0 text-right"
-														onClick={() => {
-															setEditingStageId(stage.id);
-															setEditingStageTitle(translateStageTitle(stage.title));
-														}}
-														title="انقر لتعديل اسم المرحلة"
-													>
-														<h3 className="text-sm font-bold text-foreground hover:text-purple-600 transition-colors">
-															{translateStageTitle(stage.title)}
-														</h3>
-														<IconPencil className="size-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-													</button>
-												)}
+													<div className="size-7 rounded-lg bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0 shadow-2xs group-hover/stage-head:scale-105 transition-transform">
+														<IconFlag className="size-4" />
+													</div>
 
-												<Badge
-													variant="secondary"
-													className="text-[10px] font-normal"
-												>
-													{stage.items.length} دورات/مهام
-												</Badge>
+													{editingStageId === stage.id ? (
+														<div
+															data-no-toggle
+															className="flex items-center gap-1.5"
+														>
+															<Input
+																value={editingStageTitle}
+																onChange={(e) => setEditingStageTitle(e.target.value)}
+																placeholder="اسم المرحلة..."
+																className="h-7 text-xs font-bold w-44"
+																autoFocus
+															/>
+															<Button
+																size="sm"
+																className="h-7 px-2.5 text-xs bg-purple-600 text-white cursor-pointer"
+																onClick={(e) => {
+																	e.stopPropagation();
+																	handleSaveStageTitle(stage.id);
+																}}
+															>
+																حفظ
+															</Button>
+														</div>
+													) : (
+														<div className="flex items-center gap-1.5 min-w-0">
+															<h3 className="text-sm font-bold text-foreground group-hover/stage-head:text-purple-600 transition-colors truncate">
+																{translateStageTitle(stage.title)}
+															</h3>
+															<button
+																type="button"
+																data-no-toggle
+																className="size-6 rounded-md flex items-center justify-center text-muted-foreground hover:text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-950/40 transition-all opacity-0 group-hover/stage-head:opacity-100 cursor-pointer"
+																onClick={(e) => {
+																	e.stopPropagation();
+																	setEditingStageId(stage.id);
+																	setEditingStageTitle(translateStageTitle(stage.title));
+																}}
+																title="انقر لتعديل اسم المرحلة"
+															>
+																<IconPencil className="size-3" />
+															</button>
+														</div>
+													)}
+
+													<Badge
+														variant="secondary"
+														className="text-[10px] font-normal transition-colors group-hover/stage-head:bg-purple-100 dark:group-hover/stage-head:bg-purple-950/50 group-hover/stage-head:text-purple-700 dark:group-hover/stage-head:text-purple-300"
+													>
+														{stage.items.length} دورات/مهام
+													</Badge>
+												</div>
 											</div>
 
 											{/* خيارات المرحلة */}
 											<div className="flex items-center gap-1.5">
-												<Button
-													type="button"
-													variant="ghost"
-													size="sm"
-													onClick={() => handleAddItem(stage.id, "COURSE")}
-													className="h-7 px-2 text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-950/40 gap-1 cursor-pointer"
-												>
-													<IconPlus className="size-3" />
-													<span>إضافة دورة</span>
-												</Button>
+												<DropdownMenu dir="rtl">
+													<DropdownMenuTrigger asChild>
+														<Button
+															type="button"
+															variant="ghost"
+															size="sm"
+															className="h-7 px-2 text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-950/40 gap-1 cursor-pointer"
+														>
+															<IconPlus className="size-3" />
+															<span>إضافة محتوى</span>
+														</Button>
+													</DropdownMenuTrigger>
+													<DropdownMenuContent
+														align="start"
+														className="w-48 text-xs p-1 rounded-xl shadow-xl border-border"
+													>
+														<DropdownMenuItem
+															onClick={() =>
+																setPickerState({
+																	open: true,
+																	type: "COURSE",
+																	stageId: stage.id,
+																})
+															}
+															className="cursor-pointer gap-2 py-1.5 rounded-md"
+														>
+															<IconBook className="size-3.5 text-sky-500" />
+															<span>دورة تدريبية</span>
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															onClick={() =>
+																setPickerState({
+																	open: true,
+																	type: "QUIZ",
+																	stageId: stage.id,
+																})
+															}
+															className="cursor-pointer gap-2 py-1.5 rounded-md"
+														>
+															<IconRosetteDiscountCheck className="size-3.5 text-amber-500" />
+															<span>تقييمات</span>
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															onClick={() =>
+																setPickerState({
+																	open: true,
+																	type: "PAGE",
+																	stageId: stage.id,
+																})
+															}
+															className="cursor-pointer gap-2 py-1.5 rounded-md"
+														>
+															<IconFileDescription className="size-3.5 text-sky-500" />
+															<span>صفحات</span>
+														</DropdownMenuItem>
+													</DropdownMenuContent>
+												</DropdownMenu>
 
 												<DropdownMenu dir="rtl">
 													<DropdownMenuTrigger asChild>
@@ -1724,9 +1851,7 @@ export function TrackStructureStep({
 																			<span>{formatLessonsCount(item.lessonsCount)}</span>
 																		)}
 																		<span>•</span>
-																		<span>
-																			آخر تحديث: {item.updatedDate || "اليوم"}
-																		</span>
+																		<span>آخر تحديث: {item.updatedDate || "اليوم"}</span>
 																		{cleanCourseDescription(item.description) && (
 																			<>
 																				<span>•</span>
@@ -1769,15 +1894,6 @@ export function TrackStructureStep({
 																			align="start"
 																			className="w-44 text-xs"
 																		>
-																			<DropdownMenuItem
-																				onClick={() =>
-																					setEditingItem({ stageId: stage.id, item })
-																				}
-																				className="cursor-pointer gap-2 font-medium text-purple-600 dark:text-purple-400"
-																			>
-																				<IconEdit className="size-3.5" />
-																				<span>تعديل المدة والمحتوى</span>
-																			</DropdownMenuItem>
 																			<DropdownMenuSeparator />
 																			<DropdownMenuItem
 																				onClick={() => handleMoveItem(stage.id, item.id, "up")}
@@ -1861,21 +1977,45 @@ export function TrackStructureStep({
 																			<DropdownMenuSeparator />
 																			<DropdownMenuItem
 																				onClick={() =>
-																					handleAddItem(stage.id, "COURSE", item.id)
+																					setPickerState({
+																						open: true,
+																						type: "COURSE",
+																						stageId: stage.id,
+																						afterItemId: item.id,
+																					})
 																				}
 																				className="cursor-pointer gap-2.5 py-1.5 rounded-lg"
 																			>
 																				<IconBook className="size-4 text-sky-500" />
-																				<span>دورة تدريبية (اختيار من الخطوة السابقة)</span>
+																				<span>دورة تدريبية</span>
 																			</DropdownMenuItem>
 																			<DropdownMenuItem
 																				onClick={() =>
-																					handleAddItem(stage.id, "QUIZ", item.id)
+																					setPickerState({
+																						open: true,
+																						type: "QUIZ",
+																						stageId: stage.id,
+																						afterItemId: item.id,
+																					})
 																				}
 																				className="cursor-pointer gap-2.5 py-1.5 rounded-lg"
 																			>
-																				<IconHelpCircle className="size-4 text-yellow-500" />
-																				<span>اختبار وتقييم (Checkpoint)</span>
+																				<IconRosetteDiscountCheck className="size-4 text-amber-500" />
+																				<span>تقييمات</span>
+																			</DropdownMenuItem>
+																			<DropdownMenuItem
+																				onClick={() =>
+																					setPickerState({
+																						open: true,
+																						type: "PAGE",
+																						stageId: stage.id,
+																						afterItemId: item.id,
+																					})
+																				}
+																				className="cursor-pointer gap-2.5 py-1.5 rounded-lg"
+																			>
+																				<IconFileDescription className="size-4 text-sky-500" />
+																				<span>صفحات</span>
 																			</DropdownMenuItem>
 																		</DropdownMenuContent>
 																	</DropdownMenu>
@@ -1903,15 +2043,62 @@ export function TrackStructureStep({
 																? "أفلت الدورة هنا لنقلها إلى هذه المرحلة ✨"
 																: "هذه المرحلة لا تحتوي على دورات بعد، اسحب أي دورة وأفلتها هنا."}
 														</p>
-														<Button
-															size="sm"
-															variant="outline"
-															onClick={() => handleAddItem(stage.id, "COURSE")}
-															className="h-5 text-[10px] font-semibold gap-1 text-purple-600 mt-0.5 px-2"
-														>
-															<IconPlus className="size-2.5" />
-															<span>اختيار دورات من الخطوة السابقة</span>
-														</Button>
+														<DropdownMenu dir="rtl">
+															<DropdownMenuTrigger asChild>
+																<Button
+																	size="sm"
+																	variant="outline"
+																	className="h-6 text-[10px] font-semibold gap-1 text-purple-600 mt-0.5 px-2.5 cursor-pointer"
+																>
+																	<IconPlus className="size-2.5" />
+																	<span>إضافة محتوى للمرحلة</span>
+																</Button>
+															</DropdownMenuTrigger>
+															<DropdownMenuContent
+																align="center"
+																className="w-48 text-xs p-1 rounded-xl shadow-xl border-border"
+															>
+																<DropdownMenuItem
+																	onClick={() =>
+																		setPickerState({
+																			open: true,
+																			type: "COURSE",
+																			stageId: stage.id,
+																		})
+																	}
+																	className="cursor-pointer gap-2 py-1.5 rounded-md"
+																>
+																	<IconBook className="size-3.5 text-sky-500" />
+																	<span>دورة تدريبية</span>
+																</DropdownMenuItem>
+																<DropdownMenuItem
+																	onClick={() =>
+																		setPickerState({
+																			open: true,
+																			type: "QUIZ",
+																			stageId: stage.id,
+																		})
+																	}
+																	className="cursor-pointer gap-2 py-1.5 rounded-md"
+																>
+																	<IconRosetteDiscountCheck className="size-3.5 text-amber-500" />
+																	<span>تقييمات</span>
+																</DropdownMenuItem>
+																<DropdownMenuItem
+																	onClick={() =>
+																		setPickerState({
+																			open: true,
+																			type: "PAGE",
+																			stageId: stage.id,
+																		})
+																	}
+																	className="cursor-pointer gap-2 py-1.5 rounded-md"
+																>
+																	<IconFileDescription className="size-3.5 text-sky-500" />
+																	<span>صفحات</span>
+																</DropdownMenuItem>
+															</DropdownMenuContent>
+														</DropdownMenu>
 													</div>
 												)}
 											</div>
@@ -1946,18 +2133,43 @@ export function TrackStructureStep({
 													</DropdownMenuItem>
 													<DropdownMenuSeparator />
 													<DropdownMenuItem
-														onClick={() => handleAddStageWithItem(stage.id, "COURSE")}
+														onClick={() =>
+															setPickerState({
+																open: true,
+																type: "COURSE",
+																createNewStageAfterStageId: stage.id,
+															})
+														}
 														className="cursor-pointer gap-2.5 py-1.5 rounded-lg"
 													>
 														<IconBook className="size-4 text-sky-500" />
-														<span>دورة تدريبية (اختيار من الخطوة السابقة)</span>
+														<span>دورة تدريبية</span>
 													</DropdownMenuItem>
 													<DropdownMenuItem
-														onClick={() => handleAddStageWithItem(stage.id, "QUIZ")}
+														onClick={() =>
+															setPickerState({
+																open: true,
+																type: "QUIZ",
+																createNewStageAfterStageId: stage.id,
+															})
+														}
 														className="cursor-pointer gap-2.5 py-1.5 rounded-lg"
 													>
-														<IconHelpCircle className="size-4 text-yellow-500" />
-														<span>اختبار وتقييم (Checkpoint)</span>
+														<IconRosetteDiscountCheck className="size-4 text-amber-500" />
+														<span>تقييمات</span>
+													</DropdownMenuItem>
+													<DropdownMenuItem
+														onClick={() =>
+															setPickerState({
+																open: true,
+																type: "PAGE",
+																createNewStageAfterStageId: stage.id,
+															})
+														}
+														className="cursor-pointer gap-2.5 py-1.5 rounded-lg"
+													>
+														<IconFileDescription className="size-4 text-sky-500" />
+														<span>صفحات</span>
 													</DropdownMenuItem>
 												</DropdownMenuContent>
 											</DropdownMenu>
@@ -2041,97 +2253,15 @@ export function TrackStructureStep({
 						</div>
 					</div>
 
-					{/* 1. تبويب المعاينة الحية للمحتوى المختار (مطابق لنموذج التصميم المرفق عند عدم وجود اختيار) */}
+					{/* 1. تبويب المعاينة الحية للمحتوى المختار */}
 					{leftPreviewTab === "live" && (
 						<div className="flex-1 flex flex-col min-h-0">
 							{selectedPreviewItem ? (
-								<div className="p-4 rounded-xl border border-border bg-card space-y-4 animate-in fade-in-50 duration-200">
-									{/* غلاف وبانر المعاينة */}
-									<div className="relative h-40 rounded-lg overflow-hidden bg-gradient-to-br from-purple-700 via-indigo-800 to-purple-950 flex flex-col justify-between p-3.5 text-white shadow-inner">
-										<div className="flex items-center justify-between">
-											<Badge className="bg-black/50 backdrop-blur-xs text-[10px] text-white border-none">
-												{selectedPreviewItem.type === "COURSE"
-													? "دورة تدريبية"
-													: selectedPreviewItem.type === "PAGE"
-														? "صفحة ومستند"
-														: "اختبار وتقييم"}
-											</Badge>
-											<span className="flex items-center gap-1 text-[10px] font-semibold bg-black/40 backdrop-blur-xs px-2 py-0.5 rounded-full">
-												<IconClock className="size-3" />
-												<span>{selectedPreviewItem.durationText}</span>
-											</span>
-										</div>
-
-										<div className="flex items-center justify-center">
-											<div className="size-12 rounded-full bg-white/20 backdrop-blur-xs hover:bg-white/30 flex items-center justify-center transition-transform hover:scale-110 shadow-lg">
-												<IconPlayerPlayFilled className="size-6 text-white ml-0.5" />
-											</div>
-										</div>
-
-										<div className="flex items-center justify-between text-[11px] opacity-90">
-											<span>
-												{selectedPreviewItem.chaptersCount && selectedPreviewItem.chaptersCount > 0
-													? `${toArabicNumerals(selectedPreviewItem.chaptersCount)} فصول كاملة`
-													: `${formatLessonsCount(selectedPreviewItem.lessonsCount)} تفاعلية`}
-											</span>
-											<span>معاينة حية للمتدرب</span>
-										</div>
-									</div>
-
-									{/* تفاصيل المادة */}
-									<div className="space-y-2">
-										<div className="flex items-center justify-between gap-2">
-											<h3 className="text-sm font-bold text-foreground">
-												{selectedPreviewItem.title}
-											</h3>
-											<span
-												className={cn(
-													"inline-flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded-full border",
-													selectedPreviewItem.status === "PUBLISHED"
-														? "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border-emerald-200 dark:border-emerald-800/40"
-														: "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border-amber-200 dark:border-amber-800/40",
-												)}
-											>
-												<span
-													className={cn(
-														"size-1 rounded-full",
-														selectedPreviewItem.status === "PUBLISHED"
-															? "bg-emerald-500 animate-pulse"
-															: "bg-amber-500",
-													)}
-												/>
-												{selectedPreviewItem.status === "PUBLISHED" ? "منشور" : "مسودة"}
-											</span>
-										</div>
-
-										<p className="text-xs text-muted-foreground leading-relaxed">
-											{cleanCourseDescription(selectedPreviewItem.description)}
-										</p>
-									</div>
-
-									{/* زر العودة لخارطة المسار */}
-									<div className="pt-2 border-t border-border flex items-center justify-between">
-										<Button
-											type="button"
-											variant="ghost"
-											size="sm"
-											onClick={() => setSelectedPreviewItem(null)}
-											className="text-xs text-muted-foreground hover:text-foreground h-7"
-										>
-											إلغاء التحديد
-										</Button>
-										<Button
-											type="button"
-											variant="outline"
-											size="sm"
-											onClick={() => setLeftPreviewTab("roadmap")}
-											className="text-xs text-purple-600 border-purple-200 hover:bg-purple-50 dark:hover:bg-purple-950/40 h-7 gap-1"
-										>
-											<IconRoute className="size-3" />
-											<span>عرض خارطة المسار</span>
-										</Button>
-									</div>
-								</div>
+								<TrackStageItemLivePreview
+									item={selectedPreviewItem}
+									onClearSelection={() => setSelectedPreviewItem(null)}
+									onSwitchToRoadmap={() => setLeftPreviewTab("roadmap")}
+								/>
 							) : (
 								/* الحالة الفارغة المطابقة تماماً لتصميم الموكاب المرفق في الصورة 1 */
 								<div className="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-3 min-h-[360px] my-auto">
@@ -2457,6 +2587,18 @@ export function TrackStructureStep({
 					onSave={handleSaveItemEdit}
 				/>
 			)}
+
+			{/* 5. نافذة منبثقة لاختيار المحتوى (دورات، تقييمات، صفحات) بتصميم مطابق للخطوة 2 */}
+			<TrackItemPickerDialog
+				open={pickerState.open}
+				onClose={() => setPickerState((prev) => ({ ...prev, open: false }))}
+				initialType={pickerState.type}
+				onSelect={handlePickerSelect}
+				onRemove={handlePickerRemove}
+				addedCourseIds={addedCourseIds}
+				addedQuizIds={addedQuizIds}
+				addedPageIds={addedPageIds}
+			/>
 		</div>
 	);
 }
@@ -2664,6 +2806,500 @@ function ItemEditDialog({
 						className="bg-purple-600 hover:bg-purple-700 text-white"
 					>
 						حفظ التعديلات
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
+}
+
+// مكوّن النافذة المنبثقة لاختيار المحتوى (دورات، تقييمات، صفحات) مطابق للخطوة 2
+interface TrackItemPickerDialogProps {
+	open: boolean;
+	onClose: () => void;
+	initialType: TrackItemType;
+	// biome-ignore lint/suspicious/noExplicitAny: raw item
+	onSelect: (payload: { type: TrackItemType; rawItem: any }) => void;
+	onRemove: (payload: { type: TrackItemType; id: string; title: string }) => void;
+	addedCourseIds?: Set<string>;
+	addedQuizIds?: Set<string>;
+	addedPageIds?: Set<string>;
+}
+
+function TrackItemPickerDialog({
+	open,
+	onClose,
+	initialType,
+	onSelect,
+	onRemove,
+	addedCourseIds,
+	addedQuizIds,
+	addedPageIds,
+}: TrackItemPickerDialogProps) {
+	const [activeTab, setActiveTab] = useState<TrackItemType>(initialType);
+	const [searchQuery, setSearchQuery] = useState("");
+
+	React.useEffect(() => {
+		if (open) {
+			setActiveTab(initialType);
+			setSearchQuery("");
+		}
+	}, [open, initialType]);
+
+	const { courses = [], isLoading: isCoursesLoading } = useCourses();
+	const { quizzes = [], isLoading: isQuizzesLoading } = useQuizzes();
+	const { pages = [], isLoading: isPagesLoading } = useTrainingPages();
+
+	const filteredCourses = useMemo(() => {
+		const q = searchQuery.trim().toLowerCase();
+		return courses.filter((c) => {
+			if (!q) return true;
+			return (
+				c.name?.toLowerCase().includes(q) ||
+				c.category?.toLowerCase().includes(q) ||
+				c.code?.toLowerCase().includes(q)
+			);
+		});
+	}, [courses, searchQuery]);
+
+	const filteredQuizzes = useMemo(() => {
+		const q = searchQuery.trim().toLowerCase();
+		return quizzes.filter((qz) => {
+			if (!q) return true;
+			return qz.title?.toLowerCase().includes(q) || qz.code?.toLowerCase().includes(q);
+		});
+	}, [quizzes, searchQuery]);
+
+	const filteredPages = useMemo(() => {
+		const q = searchQuery.trim().toLowerCase();
+		return pages.filter((p) => {
+			if (!q) return true;
+			return (
+				p.title?.toLowerCase().includes(q) ||
+				p.category?.toLowerCase().includes(q) ||
+				p.summary?.toLowerCase().includes(q)
+			);
+		});
+	}, [pages, searchQuery]);
+
+	return (
+		<Dialog
+			open={open}
+			onOpenChange={(v) => !v && onClose()}
+		>
+			<DialogContent
+				dir="rtl"
+				className="max-w-3xl sm:max-w-4xl w-[94vw] h-[82vh] max-h-[740px] flex flex-col p-0 overflow-hidden rounded-2xl"
+			>
+				<DialogHeader className="px-6 pt-5 pb-3.5 border-b border-border/60 bg-muted/15 shrink-0 text-right">
+					<DialogTitle className="text-base font-bold text-foreground flex items-center gap-2">
+						{activeTab === "COURSE" && (
+							<>
+								<IconBook className="size-5 text-sky-500" />
+								<span>اختيار دورة تدريبية للمسار</span>
+							</>
+						)}
+						{activeTab === "QUIZ" && (
+							<>
+								<IconRosetteDiscountCheck className="size-5 text-amber-500" />
+								<span>اختيار اختبار أو تقييم للمسار</span>
+							</>
+						)}
+						{activeTab === "PAGE" && (
+							<>
+								<IconFileDescription className="size-5 text-sky-500" />
+								<span>اختيار صفحة أو مستند للمسار</span>
+							</>
+						)}
+					</DialogTitle>
+					<DialogDescription className="text-xs text-muted-foreground mt-0.5">
+						اختر عنصراً من القائمة لإدراجه فوراً داخل المرحلة المحددة في المسار التدريبي.
+					</DialogDescription>
+				</DialogHeader>
+
+				{/* شريط التبويبات والبحث */}
+				<div className="px-6 py-3 border-b border-border/60 bg-muted/10 space-y-3 shrink-0">
+					{/* أزرار التبويبات الثلاثة مع العدادات الحقيقية */}
+					<div className="grid grid-cols-3 gap-2 p-1 bg-muted/40 rounded-xl border border-border/60">
+						<button
+							type="button"
+							onClick={() => setActiveTab("COURSE")}
+							className={cn(
+								"py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer",
+								activeTab === "COURSE"
+									? "bg-background text-purple-600 shadow-xs border border-border/80"
+									: "text-muted-foreground hover:text-foreground",
+							)}
+						>
+							<IconBook className="size-4 text-sky-500 shrink-0" />
+							<span className="truncate">دورات تدريبية</span>
+							<Badge
+								variant="secondary"
+								className="text-[10px] h-4.5 px-2 rounded-full font-medium shrink-0"
+							>
+								{toArabicNumerals(courses.length)}
+							</Badge>
+						</button>
+
+						<button
+							type="button"
+							onClick={() => setActiveTab("QUIZ")}
+							className={cn(
+								"py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer",
+								activeTab === "QUIZ"
+									? "bg-background text-purple-600 shadow-xs border border-border/80"
+									: "text-muted-foreground hover:text-foreground",
+							)}
+						>
+							<IconRosetteDiscountCheck className="size-4 text-amber-500 shrink-0" />
+							<span className="truncate">تقييمات</span>
+							<Badge
+								variant="secondary"
+								className="text-[10px] h-4.5 px-2 rounded-full font-medium shrink-0"
+							>
+								{toArabicNumerals(quizzes.length)}
+							</Badge>
+						</button>
+
+						<button
+							type="button"
+							onClick={() => setActiveTab("PAGE")}
+							className={cn(
+								"py-2 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer",
+								activeTab === "PAGE"
+									? "bg-background text-purple-600 shadow-xs border border-border/80"
+									: "text-muted-foreground hover:text-foreground",
+							)}
+						>
+							<IconFileDescription className="size-4 text-sky-500 shrink-0" />
+							<span className="truncate">صفحات</span>
+							<Badge
+								variant="secondary"
+								className="text-[10px] h-4.5 px-2 rounded-full font-medium shrink-0"
+							>
+								{toArabicNumerals(pages.length)}
+							</Badge>
+						</button>
+					</div>
+
+					{/* حقل البحث السريع */}
+					<div className="relative">
+						<IconSearch className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+						<Input
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+							placeholder={
+								activeTab === "COURSE"
+									? "بحث في الدورات التدريبية بالاسم أو التصنيف أو الكود..."
+									: activeTab === "QUIZ"
+										? "بحث في التقييمات والاختبارات..."
+										: "بحث في الصفحات والمستندات..."
+							}
+							className="h-9.5 pr-9.5 pl-8 text-xs bg-background rounded-xl border-border/70 text-right"
+						/>
+						{searchQuery && (
+							<button
+								type="button"
+								onClick={() => setSearchQuery("")}
+								className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer p-0.5"
+							>
+								<IconX className="size-3.5" />
+							</button>
+						)}
+					</div>
+				</div>
+
+				{/* محتوى القائمة القابل للتمرير بتصميم مطابق للخطوة 2 */}
+				<div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-2.5 min-h-0">
+					{/* تبويب الدورات */}
+					{activeTab === "COURSE" &&
+						(isCoursesLoading ? (
+							<Spinner
+								containerClassName="py-16 min-h-0"
+								className="size-7 text-primary"
+							/>
+						) : filteredCourses.length === 0 ? (
+							<div className="py-16 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+								<IconSearch className="size-9 stroke-[1.5] text-muted-foreground/40" />
+								<p>لا توجد دورات تدريبية مطابقة للبحث</p>
+							</div>
+						) : (
+							filteredCourses.map((c) => {
+								const isAlreadySelected = addedCourseIds?.has(c.id);
+								const durationText =
+									formatCourseDuration(
+										c.startDate,
+										c.dueDate,
+										c.estimatedDurationWeeks,
+										c.description,
+									) ||
+									(c.estimatedDurationWeeks
+										? `${toArabicNumerals(c.estimatedDurationWeeks)} أسابيع`
+										: "بدون مدة");
+
+								return (
+									<div
+										key={c.id}
+										className={cn(
+											"p-3 sm:p-3.5 flex items-center justify-between gap-3.5 rounded-xl transition-all border",
+											isAlreadySelected
+												? "bg-purple-50/30 dark:bg-purple-950/20 border-purple-200/50 dark:border-purple-800/40"
+												: "bg-card hover:bg-muted/40 border-border/60",
+										)}
+									>
+										<div className="flex items-center gap-3 min-w-0 flex-1 text-right">
+											<CourseCoverThumbnail
+												course={c}
+												className="size-10 rounded-lg"
+											/>
+											<div className="min-w-0 flex-1">
+												<div className="flex items-center gap-2">
+													<h4 className="text-xs font-bold text-foreground truncate">
+														{c.name}
+													</h4>
+													{isAlreadySelected && (
+														<Badge
+															variant="secondary"
+															className="text-[9px] h-4 px-1.5 rounded bg-purple-100 text-purple-700 dark:bg-purple-900/50 dark:text-purple-300 font-medium"
+														>
+															مضاف مسبقاً
+														</Badge>
+													)}
+												</div>
+												<div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5 truncate">
+													<span className="font-medium text-foreground/80">
+														{c.category || "عام"}
+													</span>
+													<span>•</span>
+													<span>{durationText}</span>
+													<span>•</span>
+													<span>{formatLessonsCount(c.contentCount)}</span>
+												</div>
+											</div>
+										</div>
+
+										{isAlreadySelected ? (
+											<Button
+												type="button"
+												variant="outline"
+												size="sm"
+												onClick={() => onRemove({ type: "COURSE", id: c.id, title: c.name })}
+												className="h-8 px-3.5 text-xs font-semibold gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/10 hover:border-destructive/60 rounded-lg shrink-0 cursor-pointer shadow-xs transition-colors"
+											>
+												<IconTrash className="size-3.5" />
+												<span>إزالة من المسار</span>
+											</Button>
+										) : (
+											<Button
+												type="button"
+												size="sm"
+												onClick={() => onSelect({ type: "COURSE", rawItem: c })}
+												className="h-8 px-3.5 text-xs font-semibold gap-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg shrink-0 cursor-pointer shadow-xs"
+											>
+												<IconPlus className="size-3.5 stroke-[2.5]" />
+												<span>إضافة للمسار</span>
+											</Button>
+										)}
+									</div>
+								);
+							})
+						))}
+
+					{/* تبويب التقييمات */}
+					{activeTab === "QUIZ" &&
+						(isQuizzesLoading ? (
+							<Spinner
+								containerClassName="py-16 min-h-0"
+								className="size-7 text-primary"
+							/>
+						) : filteredQuizzes.length === 0 ? (
+							<div className="py-16 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+								<IconSearch className="size-9 stroke-[1.5] text-muted-foreground/40" />
+								<p>لا توجد تقييمات أو اختبارات مطابقة للبحث</p>
+							</div>
+						) : (
+							filteredQuizzes.map((quiz) => {
+								const isAlreadySelected = addedQuizIds?.has(quiz.id);
+
+								return (
+									<div
+										key={quiz.id}
+										className={cn(
+											"p-3 sm:p-3.5 flex items-center justify-between gap-3.5 rounded-xl transition-all border",
+											isAlreadySelected
+												? "bg-amber-50/30 dark:bg-amber-950/20 border-amber-200/50 dark:border-amber-800/40"
+												: "bg-card hover:bg-muted/40 border-border/60",
+										)}
+									>
+										<div className="flex items-center gap-3 min-w-0 flex-1 text-right">
+											<div className="size-10 rounded-xl bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0 border border-amber-200/60 dark:border-amber-800/40 shadow-2xs">
+												<IconRosetteDiscountCheck className="size-5 stroke-[2]" />
+											</div>
+											<div className="min-w-0 flex-1">
+												<div className="flex items-center gap-2">
+													<h4 className="text-xs font-bold text-foreground truncate">
+														{quiz.title}
+													</h4>
+													{isAlreadySelected && (
+														<Badge
+															variant="secondary"
+															className="text-[9px] h-4 px-1.5 rounded bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300 font-medium"
+														>
+															مضاف مسبقاً
+														</Badge>
+													)}
+												</div>
+												<div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5 truncate">
+													<span className="text-amber-600 dark:text-amber-400 font-semibold">
+														{quiz.code}
+													</span>
+													<span>•</span>
+													<span>
+														{quiz.timeLimitMinutes
+															? `${toArabicNumerals(quiz.timeLimitMinutes)} دقيقة`
+															: "بدون وقت محدد"}
+													</span>
+													<span>•</span>
+													<span>{toArabicNumerals(quiz._count?.questions || 0)} أسئلة</span>
+												</div>
+											</div>
+										</div>
+
+										{isAlreadySelected ? (
+											<Button
+												type="button"
+												variant="outline"
+												size="sm"
+												onClick={() =>
+													onRemove({
+														type: "QUIZ",
+														id: quiz.id,
+														title: quiz.title,
+													})
+												}
+												className="h-8 px-3.5 text-xs font-semibold gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/10 hover:border-destructive/60 rounded-lg shrink-0 cursor-pointer shadow-xs transition-colors"
+											>
+												<IconTrash className="size-3.5" />
+												<span>إزالة من المسار</span>
+											</Button>
+										) : (
+											<Button
+												type="button"
+												size="sm"
+												onClick={() => onSelect({ type: "QUIZ", rawItem: quiz })}
+												className="h-8 px-3.5 text-xs font-semibold gap-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg shrink-0 cursor-pointer shadow-xs"
+											>
+												<IconPlus className="size-3.5 stroke-[2.5]" />
+												<span>إضافة للمسار</span>
+											</Button>
+										)}
+									</div>
+								);
+							})
+						))}
+
+					{/* تبويب الصفحات */}
+					{activeTab === "PAGE" &&
+						(isPagesLoading ? (
+							<Spinner
+								containerClassName="py-16 min-h-0"
+								className="size-7 text-primary"
+							/>
+						) : filteredPages.length === 0 ? (
+							<div className="py-16 text-center text-xs text-muted-foreground flex flex-col items-center justify-center gap-2">
+								<IconSearch className="size-9 stroke-[1.5] text-muted-foreground/40" />
+								<p>لا توجد صفحات أو مستندات مطابقة للبحث</p>
+							</div>
+						) : (
+							filteredPages.map((page) => {
+								const isAlreadySelected = addedPageIds?.has(page.id);
+
+								return (
+									<div
+										key={page.id}
+										className={cn(
+											"p-3 sm:p-3.5 flex items-center justify-between gap-3.5 rounded-xl transition-all border",
+											isAlreadySelected
+												? "bg-sky-50/30 dark:bg-sky-950/20 border-sky-200/50 dark:border-sky-800/40"
+												: "bg-card hover:bg-muted/40 border-border/60",
+										)}
+									>
+										<div className="flex items-center gap-3 min-w-0 flex-1 text-right">
+											<div className="size-10 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 border border-sky-200/60 dark:border-sky-800/40 shadow-2xs">
+												<IconFileDescription className="size-5 stroke-[2]" />
+											</div>
+											<div className="min-w-0 flex-1">
+												<div className="flex items-center gap-2">
+													<h4 className="text-xs font-bold text-foreground truncate">
+														{page.title}
+													</h4>
+													{isAlreadySelected && (
+														<Badge
+															variant="secondary"
+															className="text-[9px] h-4 px-1.5 rounded bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300 font-medium"
+														>
+															مضاف مسبقاً
+														</Badge>
+													)}
+												</div>
+												<div className="flex items-center gap-1.5 text-[10px] text-muted-foreground mt-0.5 truncate">
+													<span className="text-sky-600 dark:text-sky-400 font-medium">
+														{page.category || "صفحة تدريبية ومستند"}
+													</span>
+													<span>•</span>
+													<span>{formatArabicDate(page.updatedAt)}</span>
+													<span>•</span>
+													<span>1 درس تفاعلي</span>
+												</div>
+											</div>
+										</div>
+
+										{isAlreadySelected ? (
+											<Button
+												type="button"
+												variant="outline"
+												size="sm"
+												onClick={() =>
+													onRemove({
+														type: "PAGE",
+														id: page.id,
+														title: page.title,
+													})
+												}
+												className="h-8 px-3.5 text-xs font-semibold gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/10 hover:border-destructive/60 rounded-lg shrink-0 cursor-pointer shadow-xs transition-colors"
+											>
+												<IconTrash className="size-3.5" />
+												<span>إزالة من المسار</span>
+											</Button>
+										) : (
+											<Button
+												type="button"
+												size="sm"
+												onClick={() => onSelect({ type: "PAGE", rawItem: page })}
+												className="h-8 px-3.5 text-xs font-semibold gap-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg shrink-0 cursor-pointer shadow-xs"
+											>
+												<IconPlus className="size-3.5 stroke-[2.5]" />
+												<span>إضافة للمسار</span>
+											</Button>
+										)}
+									</div>
+								);
+							})
+						))}
+				</div>
+
+				<DialogFooter className="px-6 py-3 border-t border-border/60 bg-muted/10 flex items-center justify-between sm:justify-between shrink-0">
+					<span className="text-xs text-muted-foreground">
+						اختر ما تريده وسيُضاف تلقائياً مع تحديث المعاينة الحية فوراً.
+					</span>
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						onClick={onClose}
+						className="h-8 px-4 text-xs font-semibold"
+					>
+						إغلاق
 					</Button>
 				</DialogFooter>
 			</DialogContent>

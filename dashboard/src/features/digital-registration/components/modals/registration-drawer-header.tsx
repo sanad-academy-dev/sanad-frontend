@@ -18,7 +18,6 @@ interface RegistrationDrawerHeaderProps {
 export function RegistrationDrawerHeader({
 	title,
 	patientName,
-	code,
 	onClose,
 	titleClassName,
 }: RegistrationDrawerHeaderProps) {
@@ -28,7 +27,12 @@ export function RegistrationDrawerHeader({
 		<div className="p-3 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between text-right bg-white dark:bg-zinc-900 shrink-0">
 			{/* جهة اليمين (في RTL): العنوان › الحرف الأول للطالب + الاسم */}
 			<div className="flex items-center gap-1.5 min-w-0">
-				<span className={cn("text-[12px] font-bold text-zinc-900 dark:text-zinc-100 truncate", titleClassName)}>
+				<span
+					className={cn(
+						"text-[12px] font-bold text-zinc-900 dark:text-zinc-100 truncate",
+						titleClassName,
+					)}
+				>
 					{title}
 				</span>
 				<IconChevronLeft className="size-3 text-muted-foreground shrink-0" />
@@ -92,14 +96,15 @@ export function RegistrationDrawerGuardianCard({
 					<p className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
 						{guardianName || "ولي الأمر"}
 					</p>
-					<p className="text-[10px] text-muted-foreground">
-						ولي أمر الطالب: {patientName}
-					</p>
+					<p className="text-[10px] text-muted-foreground">ولي أمر الطالب: {patientName}</p>
 				</div>
 			</div>
 
 			{/* جهة اليسار (في RTL): الهاتف والبريد الإلكتروني */}
-			<div className="space-y-1 text-left" dir="ltr">
+			<div
+				className="space-y-1 text-left"
+				dir="ltr"
+			>
 				{guardianPhone && (
 					<div className="flex items-center gap-1.5 text-[11px] text-zinc-600 dark:text-zinc-400 font-mono">
 						<IconPhone className="size-3 text-zinc-400 shrink-0" />

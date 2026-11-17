@@ -60,122 +60,133 @@ export const createPatientSchema = z.object({
 
 export type CreatePatientFormInput = z.infer<typeof createPatientSchema>;
 
-export type CreatePatientInput = {
-	clinicId?: string;
-	name: string;
-	gender: Gender;
-	ownerId?: string | null;
-	ownerIds?: string[] | null;
-	guardians?: Array<{ ownerId: string; relationship?: string | null }> | null;
-	guardianRelationships?: Record<string, string> | null;
+export type CreatePatientInput = Pick<
+	Prisma.PatientUncheckedCreateInput,
+	| "clinicId"
+	| "name"
+	| "gender"
+	| "ownerId"
+	| "age"
+	| "birthDate"
+	| "weight"
+	| "notes"
+	| "active"
+	| "status"
+	| "nationalId"
+	| "ageGroup"
+	| "academicStage"
+	| "classroom"
+	| "bloodType"
+	| "developmentStatus"
+	| "allergies"
+	| "pocketMoneyEnabled"
+	| "transportation"
+	| "feeType"
+	| "healthConditions"
+	| "previousNursery"
+	| "guardianRelationship"
+	| "emergencyContactPhone"
+	| "emergencyContactName"
+	| "level"
+	| "learningMethod"
+	| "preferredShift"
+	| "address"
+> & {
 	guardianName?: string;
 	guardianPhone?: string;
 	guardianEmail?: string;
-	guardianRelationship?: string | null;
-	emergencyContactPhone?: string | null;
-	emergencyContactName?: string | null;
-	age?: number | null;
-	birthDate?: string | Date | null;
-	nationalId?: string | null;
-	ageGroup?: string | null;
-	academicStage: string;
-	classroom?: string | null;
-	bloodType?: string | null;
-	developmentStatus?: string | null;
-	allergies?: string | null;
-	pocketMoneyEnabled?: boolean;
-	transportation?: string | null;
-	feeType?: string | null;
-	healthConditions?: string | null;
-	previousNursery?: string | null;
-	level?: string | null;
-	learningMethod?: string | null;
-	preferredShift?: string | null;
-	address?: string | null;
-	weight?: number | null;
-	notes?: string | null;
-	active?: boolean;
-	status?: string;
+	ownerIds?: string[];
+	guardians?: Array<{ ownerId: string; relationship?: string }>;
 };
 
 export type UpdatePatientInput = Partial<Omit<CreatePatientInput, "clinicId">>;
 
-export type PatientResponse = {
-	id: string;
-	code: string;
-	name: string;
-	gender: Gender;
-	age: number | null;
-	birthDate: Date | string | null;
-	weight: number | null;
-	notes: string | null;
-	active: boolean;
-	status: string;
-	nationalId?: string | null;
-	ageGroup?: string | null;
-	academicStage?: string | null;
-	classroom?: string | null;
-	bloodType?: string | null;
-	developmentStatus?: string | null;
-	allergies?: string | null;
-	pocketMoneyEnabled?: boolean;
-	transportation?: string | null;
-	feeType?: string | null;
-	healthConditions?: string | null;
-	previousNursery?: string | null;
-	guardianRelationship?: string | null;
-	emergencyContactPhone?: string | null;
-	emergencyContactName?: string | null;
+export type PatientResponse = Prisma.PatientGetPayload<{
+	select: {
+		id: true;
+		code: true;
+		name: true;
+		gender: true;
+		age: true;
+		birthDate: true;
+		weight: true;
+		notes: true;
+		active: true;
+		status: true;
+		nationalId: true;
+		classroom: true;
+		ageGroup: true;
+		academicStage: true;
+		bloodType: true;
+		developmentStatus: true;
+		allergies: true;
+		pocketMoneyEnabled: true;
+		transportation: true;
+		feeType: true;
+		healthConditions: true;
+		previousNursery: true;
+		guardianRelationship: true;
+		emergencyContactPhone: true;
+		emergencyContactName: true;
+		level: true;
+		learningMethod: true;
+		preferredShift: true;
+		address: true;
+		editsCount: true;
+		createdAt: true;
+		updatedAt: true;
+		owner: {
+			select: {
+				id: true;
+				code: true;
+				name: true;
+				phone: true;
+				phoneE164: true;
+				email: true;
+				gender: true;
+				relationship: true;
+				address: true;
+				city: true;
+				country: true;
+				emergencyContactName: true;
+				emergencyContactPhone: true;
+				notes: true;
+				active: true;
+				createdAt: true;
+			};
+		};
+		guardians: {
+			select: {
+				id: true;
+				relationship: true;
+				owner: {
+					select: {
+						id: true;
+						code: true;
+						name: true;
+						phone: true;
+						phoneE164: true;
+						email: true;
+						gender: true;
+						relationship: true;
+						address: true;
+						city: true;
+						country: true;
+						emergencyContactName: true;
+						emergencyContactPhone: true;
+						notes: true;
+						active: true;
+						createdAt: true;
+					};
+				};
+			};
+		};
+	};
+}> & {
+	/** Legacy single-guardian fields are accepted by older Dashboard responses. */
 	guardianName?: string | null;
 	guardianPhone?: string | null;
 	guardianEmail?: string | null;
-	level?: string | null;
-	learningMethod?: string | null;
-	preferredShift?: string | null;
-	address?: string | null;
-	editsCount: number;
-	createdAt: Date | string;
-	updatedAt: Date | string;
-	owner: {
-		id: string;
-		code: string;
-		name: string;
-		phone: string | null;
-		phoneE164?: string | null;
-		email: string | null;
-		gender?: string | null;
-		relationship?: string | null;
-		address?: string | null;
-		city?: string | null;
-		country?: string | null;
-		emergencyContactName?: string | null;
-		emergencyContactPhone?: string | null;
-		notes?: string | null;
-		active?: boolean;
-		createdAt?: Date | string;
-	} | null;
-	guardians?: {
-		id: string;
-		relationship?: string | null;
-		owner: {
-			id: string;
-			code: string;
-			name: string;
-			phone: string | null;
-			phoneE164?: string | null;
-			email: string | null;
-			gender?: string | null;
-			relationship?: string | null;
-			address?: string | null;
-			city?: string | null;
-			country?: string | null;
-			emergencyContactName?: string | null;
-			emergencyContactPhone?: string | null;
-			notes?: string | null;
-			active?: boolean;
-			createdAt?: Date | string;
-		};
-	}[] | null;
 };
 
 export const transferPatientOwnershipSchema = z.object({
@@ -228,7 +239,7 @@ const historyVisitSelect = {
 	clinicalNotes: true,
 	owner: { select: { id: true, name: true } },
 	staff: { select: { id: true, name: true, prefix: true } },
-	patient: { select: { id: true, name: true, animalType: { select: { enName: true } } } },
+	patient: { select: { id: true, name: true } },
 	room: { select: { id: true, name: true } },
 	consultationType: { select: { id: true, name: true } },
 	clinicalExam: { select: { id: true, completedAt: true } },

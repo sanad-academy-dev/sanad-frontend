@@ -1,4 +1,4 @@
-import type { CreateLessonPayload, LessonResponse } from "@/server/training/training.type";
+import type { CreateLessonPayload, LessonResponse } from "@sanad/contracts/runtime/server/training/training.type";
 
 // يحوّل درسًا محفوظًا إلى حمولة إنشاء مطابقة — للاستنساخ داخل نفس الوحدة أو ضمن وحدة منسوخة
 export const lessonToPayload = (

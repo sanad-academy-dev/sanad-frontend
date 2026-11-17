@@ -156,7 +156,6 @@ const recordSelect = {
 			code: true,
 			name: true,
 			birthDate: true,
-			animalType: { select: { id: true, arName: true, species: true } },
 			owner: { select: { id: true, name: true, phone: true } },
 		},
 	},

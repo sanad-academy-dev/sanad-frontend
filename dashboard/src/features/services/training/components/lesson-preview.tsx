@@ -17,7 +17,7 @@ import type {
 	LessonContentItem,
 	LessonResponse,
 	LessonType,
-} from "@/server/training/training.type";
+} from "@sanad/contracts/runtime/server/training/training.type";
 import { CoursePageContent } from "./course-page-content";
 
 const TYPE_META: Record<LessonType, { label: string; Icon: typeof IconAlignRight }> = {

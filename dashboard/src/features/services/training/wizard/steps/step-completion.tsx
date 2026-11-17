@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
-import type { CourseDetailResponse, ReEnrollMode } from "@/server/training/training.type";
+import type { CourseDetailResponse, ReEnrollMode } from "@sanad/contracts/runtime/server/training/training.type";
 import { useCompletionSettings } from "../../hooks/use-completion-settings";
 import { CertificatePreviewModal } from "./certificate-preview-modal";
 

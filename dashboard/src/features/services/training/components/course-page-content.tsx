@@ -2,6 +2,7 @@
 
 import type { PartialBlock } from "@blocknote/core";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Spinner } from "@/components/common/spinner";
 import { cn } from "@/lib/utils";
 import { readPages } from "./course-page-inline-editor";
 
@@ -78,9 +79,10 @@ export function CoursePageContent({
 					{Reader ? (
 						<Reader content={activePage.content as PartialBlock[]} />
 					) : (
-						<div className="py-5 text-center text-xs text-muted-foreground">
-							جاري تحميل المحتوى...
-						</div>
+						<Spinner
+							containerClassName="py-6 min-h-0"
+							className="size-6 text-primary"
+						/>
 					)}
 				</>
 			)}

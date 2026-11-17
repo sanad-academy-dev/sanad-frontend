@@ -4,7 +4,7 @@ import { usePatients } from "@/features/services/patients/hooks/use-patients";
 import { api } from "@/lib/api";
 
 export const usePatient = (patientId?: string) => {
-	const { patients, isLoading: isListLoading } = usePatients();
+	const { patients } = usePatients();
 	const cached = patients.find((p) => p.id === patientId);
 
 	const { data, isLoading, error, refetch } = useQuery({

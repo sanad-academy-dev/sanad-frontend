@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
+import type { LoyaltyLedgerKind, LoyaltyLedgerSourceType } from "@/generated/prisma/enums";
 import { api } from "@/lib/api";
 
 /** [LY-P5] §10.5 — كشف الحركة عبر أولياء الأمور، والتسوية اليدوية (BR-L9.2). */
@@ -15,8 +16,17 @@ export type StatementQuery = {
 	to?: string;
 };
 
+export type LoyaltyLedgerEntry = {
+	earnedAt: Date | string;
+	kind: LoyaltyLedgerKind;
+	sourceType: LoyaltyLedgerSourceType;
+	points: number;
+	note: string | null;
+	owner: { name: string; code: string };
+};
+
 export const useClinicLoyaltyStatement = (enabled: boolean, query: StatementQuery) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<LoyaltyLedgerEntry[]>({
 		queryKey: ["loyalty", "clinic-statement", query],
 		enabled,
 		retry: false,
@@ -30,7 +40,7 @@ export const useClinicLoyaltyStatement = (enabled: boolean, query: StatementQuer
 				},
 			});
 			if (error) throw new Error(errorMessage(error, "تعذّر تحميل كشف الحركة"));
-			return data;
+			return data as LoyaltyLedgerEntry[];
 		},
 	});
 	return { entries: data ?? [], isLoading };

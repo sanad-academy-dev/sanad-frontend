@@ -1,19 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import {
-	IconPrinter,
-	IconX,
-	IconDownload,
-	IconZoomIn,
-	IconZoomOut,
-} from "@tabler/icons-react";
+import { IconPrinter, IconX, IconZoomIn, IconZoomOut } from "@tabler/icons-react";
 import { Button } from "@/components/ui/button";
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import type { CampaignRequestItem } from "../../types/campaign-request.types";
 import { StudentRequestPrintDocument } from "./student-request-print-document";
 
@@ -44,7 +33,10 @@ export function StudentRequestPrintModal({
 	return (
 		<>
 			{/* ─── 1. Print Preview Dialog on Screen ────────────────────────────── */}
-			<Dialog open={open} onOpenChange={onOpenChange}>
+			<Dialog
+				open={open}
+				onOpenChange={onOpenChange}
+			>
 				<DialogContent
 					className="sm:max-w-4xl max-w-[96vw] max-h-[92vh] flex flex-col p-0 gap-0 overflow-hidden bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 shadow-2xl rounded-xl z-[9999]"
 					dir="rtl"

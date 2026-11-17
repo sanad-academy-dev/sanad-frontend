@@ -7,7 +7,7 @@ export const uploadFiles = async (files: File[]): Promise<string[]> => {
 	if (res.error) throw new Error("Failed to upload files");
 
 	await Promise.all(
-		res.data.files.map(({ uploadUrl }, i) =>
+		res.data.files.map(({ uploadUrl }: { uploadUrl: string }, i: number) =>
 			fetch(uploadUrl, {
 				method: "PUT",
 				body: files[i],

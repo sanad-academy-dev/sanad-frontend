@@ -103,7 +103,7 @@ export function HistoryTab({ patientId, onNavigateTab }: HistoryTabProps) {
 		setPreviewEntry(null);
 		switch (entry.kind) {
 			case "VISIT":
-				setVisitCard(mapDashboardAppointmentToCard(entry.record));
+				setVisitCard(mapDashboardAppointmentToCard(entry.record as unknown as import("@/server/appointments/appointments.type").DashboardAppointmentResponse));
 				return;
 			case "LAB":
 				setLabOrderId(entry.id);

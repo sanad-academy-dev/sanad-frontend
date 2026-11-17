@@ -12,6 +12,7 @@
 
 import { IconAlertCircle, IconArrowLeft, IconBook2, IconEye } from "@tabler/icons-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Spinner } from "@/components/common/spinner";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { BlockNoteDocument, SaveState } from "../hooks/use-page-editor";
@@ -23,7 +24,7 @@ import {
 } from "./page-table-of-contents";
 
 // biome-ignore lint/suspicious/noExplicitAny: Dynamic BlockNote editor type
-type BlockNoteEditorType<T = any> = any;
+type BlockNoteEditorType<_T = any> = any;
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -46,6 +47,7 @@ export interface PageEditorProps {
 	onBack?: () => void;
 	/** رفع ملف للمحرر — يُعيد URL */
 	uploadFile?: (file: File) => Promise<string>;
+	splitPreview?: boolean;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -60,6 +62,7 @@ export function PageEditor({
 	onContentChange,
 	onBack,
 	uploadFile,
+	splitPreview = false,
 }: PageEditorProps) {
 	const [title, setTitle] = useState(initialTitle);
 	const [headings, setHeadings] = useState<TocHeading[]>(() =>
@@ -69,6 +72,9 @@ export function PageEditor({
 	const [blockNoteError, setBlockNoteError] = useState(false);
 	const [fallbackContent, setFallbackContent] = useState(() =>
 		typeof initialContent === "string" ? initialContent : "",
+	);
+	const [liveDocument, setLiveDocument] = useState<BlockNoteDocument>(
+		() => initialContent ?? [],
 	);
 
 	// biome-ignore lint/suspicious/noExplicitAny: Dynamic BlockNote types
@@ -202,7 +208,12 @@ export function PageEditor({
 			{/* ─── Body ─── */}
 			<div className="flex-1 flex min-h-0 overflow-hidden">
 				{/* ─── Main Content ─── */}
-				<div className="flex-1 overflow-y-auto">
+				<div
+					className={cn(
+						"overflow-y-auto",
+						splitPreview ? "w-1/2 border-l border-border/60" : "flex-1",
+					)}
+				>
 					<div className="max-w-3xl mx-auto px-6 py-10">
 						{/* Title Input */}
 						{editable ? (
@@ -227,12 +238,7 @@ export function PageEditor({
 
 						{/* BlockNote Editor Loading */}
 						{!BlockNoteLoaded && !blockNoteError && (
-							<div className="flex items-center justify-center py-20">
-								<div className="flex flex-col items-center gap-3 text-muted-foreground">
-									<div className="size-8 rounded-full border-2 border-purple-300 border-t-purple-600 animate-spin" />
-									<span className="text-sm">جاري تحميل المحرر...</span>
-								</div>
-							</div>
+							<Spinner containerClassName="py-20 min-h-0" />
 						)}
 
 						{/* BlockNote Editor Ready */}
@@ -248,6 +254,7 @@ export function PageEditor({
 								onContentChange={(doc) => {
 									const hs = extractHeadings(doc);
 									setHeadings(hs);
+									setLiveDocument(doc);
 									onContentChange?.(doc);
 								}}
 							/>
@@ -292,6 +299,24 @@ export function PageEditor({
 						)}
 					</div>
 				</div>
+
+				{splitPreview && (
+					<section
+						className="w-1/2 overflow-y-auto bg-muted/20 p-6 sm:p-10"
+						aria-label="معاينة مباشرة"
+					>
+						<div className="mx-auto max-w-2xl rounded-xl border border-border bg-card p-6 sm:p-10 shadow-sm">
+							<p className="mb-5 text-xs font-semibold text-muted-foreground">معاينة مباشرة</p>
+							<PageEditor
+								key={`${title}:${JSON.stringify(liveDocument)}`}
+								pageId={`${_pageId}-live-preview`}
+								initialTitle={title}
+								initialContent={liveDocument}
+								editable={false}
+							/>
+						</div>
+					</section>
+				)}
 
 				{/* ─── Sidebar TOC ─── */}
 				{headings.length > 0 && (

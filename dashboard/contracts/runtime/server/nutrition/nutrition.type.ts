@@ -104,8 +104,6 @@ const planPatientSelect = {
 	gender: true,
 	birthDate: true,
 	weight: true,
-	animalType: { select: { id: true, arName: true, enName: true, species: true } },
-	animalStrain: { select: { id: true, arName: true } },
 	owner: { select: { id: true, name: true, phone: true } },
 } as const;
 

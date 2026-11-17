@@ -7,8 +7,6 @@ import {
 	IconCalendarMinus,
 	IconCheck,
 	IconChevronDown,
-	IconChevronLeft,
-	IconChevronRight,
 	IconCircleX,
 	IconClock,
 	IconDeviceDesktop,
@@ -20,7 +18,7 @@ import {
 	IconUser,
 	IconX,
 } from "@tabler/icons-react";
-import { addDays, addWeeks, format, isToday, startOfWeek } from "date-fns";
+import { format, isToday } from "date-fns";
 import { arSA } from "date-fns/locale";
 import type { FC, ReactNode } from "react";
 import { useMemo, useState } from "react";
@@ -118,7 +116,15 @@ function exportAttendanceWeekCsv({
 }: {
 	rows: { id: string; name: string; code?: string }[];
 	days: Date[];
-	recordByCell: Map<string, { status: string; hours: number; checkIn: string | Date | null; checkOut: string | Date | null }>;
+	recordByCell: Map<
+		string,
+		{
+			status: string;
+			hours: number;
+			checkIn: string | Date | null;
+			checkOut: string | Date | null;
+		}
+	>;
 	isStudents: boolean;
 }) {
 	const headers = [
@@ -245,7 +251,6 @@ export function AttendanceView({
 	studentId,
 	hideNameColumn = false,
 	hideToolbar = false,
-	hideStats = false,
 	hidePagination = false,
 	dateRange: externalDateRange,
 	onDateRangeChange,
@@ -291,10 +296,11 @@ export function AttendanceView({
 		}
 	};
 
-	const { start: rangeStart, end: rangeEnd, days, label: weekLabel } = useMemo(
-		() => resolveScheduleRange(dateRange),
-		[dateRange],
-	);
+	const {
+		start: rangeStart,
+		end: rangeEnd,
+		days,
+	} = useMemo(() => resolveScheduleRange(dateRange), [dateRange]);
 
 	// سجلات الحضور للنطاق المعروض (أسبوع أو شهر)
 	const { records: staffRecords } = useAttendance(rangeStart, rangeEnd);
@@ -339,7 +345,8 @@ export function AttendanceView({
 	const { records: todayStudentRecords } = useStudentAttendance(todayDate, todayDate);
 
 	const { upsert: upsertStaff, upsertAsync: upsertStaffAsync } = useUpsertAttendance();
-	const { upsert: upsertStudent, upsertAsync: upsertStudentAsync } = useUpsertStudentAttendance();
+	const { upsert: upsertStudent, upsertAsync: upsertStudentAsync } =
+		useUpsertStudentAttendance();
 	const upsert = isStudents ? upsertStudent : upsertStaff;
 	const upsertAsync = isStudents ? upsertStudentAsync : upsertStaffAsync;
 
@@ -389,9 +396,9 @@ export function AttendanceView({
 	// لوحة اختيار الموظفين/الطلاب للتسجيل الجماعي (تنفتح من اليسار)
 	const [pickerOpen, setPickerOpen] = useState(false);
 	// نيّة اللوحة: تسجيل حضور/انصراف، تسجيل إجازة، تسجيل غياب، أو تسجيل تأخر
-	const [pickerIntent, setPickerIntent] = useState<
-		"register" | "leave" | "absence" | "late"
-	>("register");
+	const [pickerIntent, setPickerIntent] = useState<"register" | "leave" | "absence" | "late">(
+		"register",
+	);
 
 	// نافذة التسجيل الجماعي (الخطوة الثانية بعد اختيار الموظفين)
 	const [bulkStaff, setBulkStaff] = useState<BulkPickedStaff[] | null>(null);
@@ -491,12 +498,14 @@ export function AttendanceView({
 					isStudent={isStudents}
 					customStaff={
 						isStudents
-							? (studentId ? patients.filter((p) => p.id === studentId) : patients).map((p) => ({
-									id: p.id,
-									name: p.name,
-									code: p.code,
-									role: "طالب",
-								}))
+							? (studentId ? patients.filter((p) => p.id === studentId) : patients).map(
+									(p) => ({
+										id: p.id,
+										name: p.name,
+										code: p.code,
+										role: "طالب",
+									}),
+								)
 							: undefined
 					}
 					onClose={() => setShiftPanelPreset(null)}
@@ -655,9 +664,7 @@ export function AttendanceView({
 				<TableToolbar
 					className="border-t"
 					searchPlaceholder={
-						isStudents
-							? "ابحث عن الطالب بالاسم، المعرف..."
-							: "ابحث عن المدرّب بالاسم،المعرف..."
+						isStudents ? "ابحث عن الطالب بالاسم، المعرف..." : "ابحث عن المدرّب بالاسم،المعرف..."
 					}
 					searchValue={search}
 					onSearchChange={setSearch}
@@ -796,7 +803,6 @@ export function AttendanceView({
 					}
 				/>
 			)}
-		
 
 			{/* شبكة الحضور الأسبوعية */}
 			<div className="min-h-0 flex-1 overflow-auto bg-white">
@@ -854,7 +860,10 @@ export function AttendanceView({
 								{!shouldHideName && (
 									<td className="sticky right-0 z-10 h-[34px] border-t border-l border-[#F5F5F6] bg-white px-3">
 										<div className="flex items-center gap-1.5">
-											<StaffAvatar name={s.name} isStudent={isStudents} />
+											<StaffAvatar
+												name={s.name}
+												isStudent={isStudents}
+											/>
 											<span
 												dir="rtl"
 												className="truncate text-right text-[12px] text-[#08090A]"
@@ -1016,7 +1025,9 @@ export function AttendanceView({
 														>
 															<IconClock className="size-2.5 shrink-0" />
 															<span>{SHIFT_TYPE_MAP[shift.type]?.shortLabel ?? "مناوبة"}</span>
-															<span className="opacity-80 tabular-nums">({shift.hours || 8}س)</span>
+															<span className="opacity-80 tabular-nums">
+																({shift.hours || 8}س)
+															</span>
 														</button>
 													) : (
 														// عطلة / لا توجد مناوبة عمل — نمط خطوط مائلة مطابق للتصميم

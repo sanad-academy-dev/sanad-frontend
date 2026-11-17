@@ -105,7 +105,8 @@ export type CreatePublicBookingInput = {
 	ownerPhone: string;
 	ownerEmail?: string;
 	patientName: string;
-	patientAnimalTypeId: string;
+	patientGender: string;
+	patientAnimalTypeId?: string;
 	attachments: File[];
 };
 

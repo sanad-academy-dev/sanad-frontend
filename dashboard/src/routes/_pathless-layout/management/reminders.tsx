@@ -97,11 +97,11 @@ function RouteComponent() {
 
 	const { triggers, channels, templateTags } = useReminderMeta();
 	const triggerLabels = useMemo(
-		() => Object.fromEntries(triggers.map((t) => [t.key, t.label])),
+		() => Object.fromEntries(triggers.map((t: { key: string; label: string }) => [t.key, t.label])),
 		[triggers],
 	);
 	const channelLabels = useMemo(
-		() => Object.fromEntries(channels.map((c) => [c.key, c.label])),
+		() => Object.fromEntries(channels.map((c: { key: string; label: string }) => [c.key, c.label])),
 		[channels],
 	);
 
@@ -179,7 +179,7 @@ function RouteComponent() {
 									{/* position="popper" لازم في RTL — الافتراضي يُصيّر خارج الشاشة */}
 									<SelectContent position="popper">
 										<SelectItem value={ALL_TRIGGERS}>كل الأسباب</SelectItem>
-										{triggers.map((t) => (
+						{triggers.map((t: { key: string; label: string }) => (
 											<SelectItem
 												key={t.key}
 												value={t.key}

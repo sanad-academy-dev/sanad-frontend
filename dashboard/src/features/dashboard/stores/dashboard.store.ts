@@ -33,6 +33,7 @@ export type CardId =
 	| "card-7"
 	| "card-8"
 	| "card-9"
+	| "card-10"
 	| "card-11"
 	| "card-12"
 	| "card-13";
@@ -54,9 +55,10 @@ const createDefaultCards = (): CardLayout[] => [
 	{ id: "card-7", order: 6, expanded: false, hidden: false },
 	{ id: "card-8", order: 7, expanded: false, hidden: false },
 	{ id: "card-9", order: 8, expanded: false, hidden: false },
-	{ id: "card-11", order: 9, expanded: false, hidden: false },
-	{ id: "card-12", order: 10, expanded: false, hidden: false },
-	{ id: "card-13", order: 11, expanded: false, hidden: false },
+	{ id: "card-10", order: 9, expanded: false, hidden: false },
+	{ id: "card-11", order: 10, expanded: false, hidden: false },
+	{ id: "card-12", order: 11, expanded: false, hidden: false },
+	{ id: "card-13", order: 12, expanded: false, hidden: false },
 ];
 
 const normalizeCards = (cards?: Partial<CardLayout>[]) => {

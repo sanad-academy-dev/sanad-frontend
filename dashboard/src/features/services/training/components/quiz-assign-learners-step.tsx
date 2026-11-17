@@ -235,9 +235,7 @@ export function QuizAssignLearnersStep({ quizId }: { quizId: string }) {
 			{/* الترويسة + العدّاد */}
 			<div className="flex flex-col gap-0.5">
 				<h2 className="text-[14px] font-bold text-foreground">تعيين الطلاب</h2>
-				<p className="text-[11px] text-muted-foreground">
-					الطلاب المؤهلون: {learners.length}
-				</p>
+				<p className="text-[11px] text-muted-foreground">الطلاب المؤهلون: {learners.length}</p>
 			</div>
 
 			{/* شريط المعيَّنين المختصر */}

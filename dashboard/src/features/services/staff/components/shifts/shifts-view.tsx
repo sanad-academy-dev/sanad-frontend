@@ -1,8 +1,6 @@
 import {
 	IconCalendarEvent,
 	IconCheck,
-	IconChevronLeft,
-	IconChevronRight,
 	IconClock,
 	IconDownload,
 	IconPlus,
@@ -11,7 +9,7 @@ import {
 	IconUser,
 	IconX,
 } from "@tabler/icons-react";
-import { addDays, addWeeks, format, isToday, startOfWeek } from "date-fns";
+import { format, isToday } from "date-fns";
 import { arSA } from "date-fns/locale";
 import { useMemo, useState } from "react";
 import { FiltersMenu } from "@/components/common/filters-menu";
@@ -21,7 +19,6 @@ import { TableToolbar } from "@/components/common/table-toolbar";
 import { Button } from "@/components/ui/button";
 import type { StatItem } from "@/features/dashboard/types/dashboard.types";
 import { usePatients } from "@/features/services/patients/hooks/use-patients";
-import { AiShiftsDialog } from "@/features/services/staff/components/shifts/ai-shifts-dialog";
 import { ShiftCellPopover } from "@/features/services/staff/components/shifts/shift-cell-popover";
 import { ShiftDetailsPanel } from "@/features/services/staff/components/shifts/shift-details-panel";
 import { SHIFT_LEGEND, SHIFT_TYPE_MAP } from "@/features/services/staff/data/shifts";
@@ -83,7 +80,6 @@ function StaffAvatar({ name, isStudent = false }: { name: string; isStudent?: bo
 export function ShiftsView({
 	initialTarget = "staff",
 	targetType: controlledTarget,
-	onTargetTypeChange,
 	studentId,
 	hideNameColumn = false,
 	hideToolbar = false,
@@ -108,11 +104,7 @@ export function ShiftsView({
 	onWeekStartChange?: (date: Date | ((prev: Date) => Date)) => void;
 } = {}) {
 	const shouldHideName = hideNameColumn || !!studentId;
-	const [internalTarget, setInternalTarget] = useState<"staff" | "students">(
-		studentId ? "students" : initialTarget,
-	);
-	const targetType = controlledTarget ?? internalTarget;
-	const setTargetType = onTargetTypeChange ?? setInternalTarget;
+	const targetType = controlledTarget ?? (studentId ? "students" : initialTarget);
 	const isStudents = studentId ? true : targetType === "students";
 
 	const { staff, isLoading: isStaffLoading } = useStaff();
@@ -150,10 +142,11 @@ export function ShiftsView({
 		}
 	};
 
-	const { start: rangeStart, end: rangeEnd, days, label: weekLabel } = useMemo(
-		() => resolveScheduleRange(dateRange),
-		[dateRange],
-	);
+	const {
+		start: rangeStart,
+		end: rangeEnd,
+		days,
+	} = useMemo(() => resolveScheduleRange(dateRange), [dateRange]);
 
 	// تعيينات المناوبات للنطاق المعروض (للموظفين أو للطلاب)
 	const { shifts: staffShifts } = useShifts(rangeStart, rangeEnd);
@@ -241,7 +234,8 @@ export function ShiftsView({
 		const list = applyStaffFilters(rawItems);
 		if (!q) return list;
 		return list.filter(
-			(s: any) => s.name.toLowerCase().includes(q) || (s.code && s.code.toLowerCase().includes(q)),
+			(s: any) =>
+				s.name.toLowerCase().includes(q) || (s.code && s.code.toLowerCase().includes(q)),
 		);
 	}, [rawItems, search, applyStaffFilters]);
 
@@ -272,10 +266,7 @@ export function ShiftsView({
 	}, [shifts, rows.length, leaveRequests, isStudents]);
 
 	// لوحة الجدولة بالذكاء الاصطناعي — تقترح جدول الأسبوع المعروض ثم يعتمده المستخدم
-	const [aiOpen, setAiOpen] = useState(false);
-	// معرّف الموظف/الطالب → اسمه (لعرض الأسماء في معاينة الاقتراح)
-	const staffNames = useMemo(() => new Map(rawItems.map((s: any) => [s.id, s.name])), [rawItems]);
-
+	const [_aiOpen, _setAiOpen] = useState(false);
 	// ترقيم الصفحات
 	const [pageSize, setPageSize] = useState(15);
 	const [pageIndex, setPageIndex] = useState(0);
@@ -318,12 +309,15 @@ export function ShiftsView({
 				onClose={() => setPanelPreset(null)}
 			/>
 
-
 			{/* شريط الأدوات */}
 			{!hideToolbar && (
 				<TableToolbar
 					className="border-t"
-					searchPlaceholder={isStudents ? "ابحث عن الطالب بالاسم، المعرف..." : "ابحث عن الموظف بالاسم، المعرف..."}
+					searchPlaceholder={
+						isStudents
+							? "ابحث عن الطالب بالاسم، المعرف..."
+							: "ابحث عن الموظف بالاسم، المعرف..."
+					}
 					searchValue={search}
 					onSearchChange={setSearch}
 					buttonSize="xs"
@@ -378,7 +372,6 @@ export function ShiftsView({
 				/>
 			)}
 
-		
 			{/* شبكة المناوبات الأسبوعية */}
 			<div className="min-h-0 flex-1 overflow-auto bg-white">
 				<table className="w-full border-collapse">
@@ -430,7 +423,10 @@ export function ShiftsView({
 								{!shouldHideName && (
 									<td className="sticky right-0 z-10 h-[34px] border-t border-l border-border bg-white px-3">
 										<div className="flex items-center gap-1.5">
-											<StaffAvatar name={s.name} isStudent={isStudents} />
+											<StaffAvatar
+												name={s.name}
+												isStudent={isStudents}
+											/>
 											<span
 												dir="rtl"
 												className="truncate text-right text-[12px] text-[#08090A]"
@@ -544,7 +540,9 @@ export function ShiftsView({
 									colSpan={days.length + (shouldHideName ? 0 : 1)}
 									className="py-12 text-center text-sm text-muted-foreground"
 								>
-									{isStudents ? "لا يوجد طلاب لعرض مناوباتهم" : "لا يوجد موظفين لعرض مناوباتهم"}
+									{isStudents
+										? "لا يوجد طلاب لعرض مناوباتهم"
+										: "لا يوجد موظفين لعرض مناوباتهم"}
 								</td>
 							</tr>
 						)}

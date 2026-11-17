@@ -19,7 +19,7 @@ export const useDayCounts = (month: Date, enabled = true) => {
 	const from = startOfWeek(startOfMonth(month), { weekStartsOn: 0 });
 	const to = endOfWeek(endOfMonth(month), { weekStartsOn: 0 });
 
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<ReadonlyMap<string, DashboardDayCount>>({
 		queryKey: ["dashboard", "day-counts", format(month, "yyyy-MM")],
 		queryFn: async () => {
 			const res = await api.dashboard["day-counts"].get({
@@ -30,7 +30,7 @@ export const useDayCounts = (month: Date, enabled = true) => {
 				},
 			});
 			if (res.error) throw new Error("Failed to fetch day counts");
-			return new Map(res.data.map((day) => [dayKey(day.date), day]));
+			return new Map((res.data as DashboardDayCount[]).map((day) => [dayKey(day.date), day]));
 		},
 		enabled,
 		staleTime: 1000 * 60 * 2,

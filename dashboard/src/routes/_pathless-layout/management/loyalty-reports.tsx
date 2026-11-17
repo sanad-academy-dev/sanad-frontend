@@ -203,7 +203,11 @@ function LoyaltyReportsRoute() {
       {distribution && distribution.rows.length > 0 ? (
         <section className="flex flex-col gap-2">
           <h2 className="font-semibold text-sm">توزيع المستويات</h2>
-          <p className="text-muted-foreground text-xs">{distribution.noteAr}</p>
+          <p className="text-muted-foreground text-xs">
+            {distribution.computedAt
+              ? `آخر تحديث: ${new Date(distribution.computedAt).toLocaleString("ar-EG")}`
+              : "توزيع المستويات الحالي"}
+          </p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="text-muted-foreground text-xs">

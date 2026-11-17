@@ -1,5 +1,4 @@
 import {
-	IconBook,
 	IconCalendar,
 	IconCalendarEvent,
 	IconCalendarStats,
@@ -7,13 +6,10 @@ import {
 	IconCheck,
 	IconEdit,
 	IconFileDescription,
-	IconGenderBigender,
 	IconLayoutGrid,
 	IconRoute,
 	IconSchool,
 	IconUser,
-	IconUserExclamation,
-	IconUserPlus,
 	IconUsers,
 	IconWifi,
 } from "@tabler/icons-react";
@@ -27,7 +23,6 @@ import {
 	startOfWeek,
 } from "date-fns";
 import { useCallback, useMemo } from "react";
-import { Stats } from "@/components/common/stats";
 import { AvatarCirclesStack } from "@/components/common/avatar-circles-stack";
 import { Button } from "@/components/ui/button";
 import type { StatItem } from "@/features/dashboard/types/dashboard.types";
@@ -148,7 +143,6 @@ const AVATAR_PALETTE = [
 export function ClassroomOverviewTab({
 	classroom,
 	onEdit,
-	onAssignStaff,
 	onAssignStudent,
 }: ClassroomOverviewTabProps) {
 	// ==================== 1. الحسابات الأساسية ====================
@@ -266,7 +260,7 @@ export function ClassroomOverviewTab({
 	}, [dailyStats, weekRecords]);
 
 	// ==================== 5. الإحصائيات الشهرية الفعلية ====================
-	const monthlyStats = useMemo(() => {
+	const _monthlyStats = useMemo(() => {
 		const presentMonthCount = monthRecords.filter(
 			(r) => r.status === "PRESENT" || r.status === "LATE",
 		).length;
@@ -316,7 +310,7 @@ export function ClassroomOverviewTab({
 	}, [monthRecords, monthStart, today]);
 
 	// ==================== 6. أكثر الأطفال غياباً هذا الشهر ====================
-	const mostAbsentStudents = useMemo(() => {
+	const _mostAbsentStudents = useMemo(() => {
 		const absenceMap = new Map<string, { count: number; reasons: Map<string, number> }>();
 
 		for (const rec of monthRecords) {
@@ -372,7 +366,7 @@ export function ClassroomOverviewTab({
 	// المشرف المسؤول
 	const leadTeacher = classroom.teachers?.[0] || null;
 
-	const overviewStats: StatItem[] = useMemo(
+	const _overviewStats: StatItem[] = useMemo(
 		() => [
 			{
 				title: "الطلاب المسجلون",
@@ -398,6 +392,9 @@ export function ClassroomOverviewTab({
 		],
 		[enrolledCount, occupancy, capacityConfig.label, availableSeats, classroom.teachers],
 	);
+	void _monthlyStats;
+	void _mostAbsentStudents;
+	void _overviewStats;
 
 	return (
 		<div
@@ -937,8 +934,8 @@ export function ClassroomOverviewTab({
 								</div>
 							</div> */}
 
-							{/* نسبة الإشغال */}
-							{/* <div className="rounded-lg border border-border/70 bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right shadow-2xs">
+						{/* نسبة الإشغال */}
+						{/* <div className="rounded-lg border border-border/70 bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right shadow-2xs">
 								<span className="text-xs text-muted-foreground font-medium text-right">
 									نسبة الإشغال
 								</span>
@@ -952,8 +949,8 @@ export function ClassroomOverviewTab({
 								</div>
 							</div> */}
 
-							{/* متوسط وقت الوصول */}
-							{/* <div className="rounded-[4px] border border-border bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right">
+						{/* متوسط وقت الوصول */}
+						{/* <div className="rounded-[4px] border border-border bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right">
 								<span className="text-xs text-muted-foreground font-medium text-right">متوسط وقت الوصول</span>
 								<div className="text-right">
 									<div className="text-xl font-bold font-mono text-foreground text-right">
@@ -965,8 +962,8 @@ export function ClassroomOverviewTab({
 								</div>
 							</div> */}
 
-							{/* الأنشطة المنفذة */}
-							{/* <div className="rounded-[4px] border border-border bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right">
+						{/* الأنشطة المنفذة */}
+						{/* <div className="rounded-[4px] border border-border bg-card p-3.5 flex flex-col justify-between gap-1.5 min-h-[85px] text-right">
 								<span className="text-xs text-muted-foreground font-medium text-right">الأنشطة المنفذة</span>
 								<div className="text-right">
 									<div className="text-xl font-bold font-mono text-foreground text-right">
@@ -1051,7 +1048,7 @@ export function ClassroomOverviewTab({
 							</div>
 						</div>
 					*/}
-					</div> 
+					</div>
 				</div>
 			</div>
 		</div>

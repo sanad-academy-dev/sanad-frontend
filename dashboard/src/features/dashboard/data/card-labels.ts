@@ -11,6 +11,7 @@ export const getCardLabels = (t: TFunction): Record<CardId, string> => ({
 	"card-7": t("dashboard.cards.labels.criticalAlerts"),
 	"card-8": t("dashboard.cards.labels.inventoryAlerts"),
 	"card-9": t("dashboard.cards.labels.appointmentVolume"),
+	"card-10": t("dashboard.cards.labels.upcomingAppointments"),
 	"card-11": t("dashboard.cards.labels.staffWorkload"),
 	"card-12": t("dashboard.cards.labels.appointmentKpis"),
 	"card-13": t("dashboard.cards.labels.vaccinationDue"),

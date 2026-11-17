@@ -2,6 +2,17 @@ import { useQuery } from "@tanstack/react-query";
 
 import { api } from "@/lib/api";
 
+type LoyaltyTierDistribution = Awaited<
+	ReturnType<
+		typeof import("@/server/loyalty/loyalty-reports/loyalty-reports.dao").loyaltyReportsDao.tierDistribution
+	>
+>;
+type LoyaltyExpiringSoon = Awaited<
+	ReturnType<
+		typeof import("@/server/loyalty/loyalty-reports/loyalty-reports.dao").loyaltyReportsDao.expiringSoon
+	>
+>;
+
 /** [LY-P4] §11 — تقريرا الالتزام والحركة. */
 
 const errorMessage = (error: unknown, fallback: string): string =>
@@ -43,14 +54,14 @@ export const useLoyaltyActivity = (enabled: boolean, from?: string, to?: string)
 
 /** §11.3 — توزيع المستويات (من لقطة المهمّة، ومعه ختم وقتها). */
 export const useLoyaltyTierDistribution = (enabled: boolean) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<LoyaltyTierDistribution | null>({
 		queryKey: ["loyalty", "reports", "tier-distribution"],
 		enabled,
 		retry: false,
 		queryFn: async () => {
 			const { data, error } = await api.loyalty.reports["tier-distribution"].get();
 			if (error) return null;
-			return data;
+			return data as LoyaltyTierDistribution;
 		},
 	});
 	return { distribution: data ?? null, isLoading };
@@ -58,7 +69,7 @@ export const useLoyaltyTierDistribution = (enabled: boolean) => {
 
 /** §11.4 — من توشك نقاطهم أن تنتهي. */
 export const useLoyaltyExpiringSoon = (enabled: boolean, days?: number) => {
-	const { data, isLoading } = useQuery({
+	const { data, isLoading } = useQuery<LoyaltyExpiringSoon | null>({
 		queryKey: ["loyalty", "reports", "expiring-soon", days ?? null],
 		enabled,
 		retry: false,
@@ -67,7 +78,7 @@ export const useLoyaltyExpiringSoon = (enabled: boolean, days?: number) => {
 				query: days ? { days } : {},
 			});
 			if (error) return null;
-			return data;
+			return data as LoyaltyExpiringSoon;
 		},
 	});
 	return { expiring: data ?? null, isLoading };

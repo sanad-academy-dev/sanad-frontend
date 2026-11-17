@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { useSession } from "@/lib/auth/client";
+import { readDashboardSessionFields, useSession } from "@/lib/auth/client";
 import { formatCurrency } from "@/lib/format-currency";
 
 /**
@@ -12,7 +12,7 @@ import { formatCurrency } from "@/lib/format-currency";
  */
 export function useCurrency() {
 	const { data: session } = useSession();
-	const currencyCode = session?.session?.currencyCode ?? "SAR";
+	const currencyCode = readDashboardSessionFields(session?.session).currencyCode ?? "SAR";
 
 	const format = useCallback(
 		(amount: { toString(): string } | number | string | null | undefined) =>
