@@ -40,8 +40,14 @@ import { resolveCover } from "@/features/services/training/utils/cover";
 import { cn } from "@/lib/utils";
 import type { QuizListItemResponse } from "@/server/quizzes/quizzes.type";
 import { CoursePageContent } from "./course-page-content";
-import { formatArabicDate, formatLessonsCount, toArabicNumerals } from "./track-courses-step";
+import {
+	CourseCoverThumbnail,
+	formatArabicDate,
+	formatLessonsCount,
+	toArabicNumerals,
+} from "./track-courses-step";
 import type { TrackStageItem } from "./track-structure-step";
+import { TrainersCell, type TrainerMember } from "./trainers-cell";
 
 type QuizOptionPreview = { id?: string; text: string; isCorrect?: boolean };
 const toQuizOptions = (value: unknown): QuizOptionPreview[] =>
@@ -102,6 +108,7 @@ export function CourseLivePreview({
 		durationText?: string | null;
 		coverKey?: string | null;
 		description?: string;
+		trainers?: TrainerMember[];
 	};
 	isSelected?: boolean;
 	onToggle?: () => void;
@@ -122,6 +129,33 @@ export function CourseLivePreview({
 		(sum, u) => sum + ((u as { lessons?: unknown[] }).lessons?.length || 0),
 		0,
 	);
+
+	// تحويل بيانات المدربين إلى شكل موحد متوافق مع TrainersCell وثيم المنصة
+	const mappedTrainers = useMemo<TrainerMember[]>(() => {
+		const rawList = course?.trainers || fallbackCourse?.trainers || [];
+		if (rawList.length === 0) return [];
+		return rawList.map((t) => {
+			if ("staff" in t && t.staff) {
+				const staffObj = t.staff;
+				return {
+					id: t.staffId || staffObj?.id || "",
+					name: staffObj?.name || "مدرب",
+					avatar: staffObj?.avatar || null,
+					phone: staffObj?.phone || null,
+					email: staffObj?.email || null,
+					role:
+						typeof staffObj?.role === "object"
+							? (staffObj?.role as { name?: string })?.name || null
+							: (staffObj?.role as string | null) || null,
+					branch:
+						typeof staffObj?.branch === "object"
+							? (staffObj?.branch as { name?: string })?.name || null
+							: (staffObj?.branch as string | null) || null,
+				};
+			}
+			return t as TrainerMember;
+		});
+	}, [course?.trainers, fallbackCourse?.trainers]);
 
 	return (
 		<div className="flex flex-col flex-1 min-h-0 overflow-y-auto p-4 space-y-3.5 text-right">
@@ -365,23 +399,18 @@ export function CourseLivePreview({
 				)}
 			</div>
 
-			{/* المدربون المشرفون (إن وجدوا) */}
-			{course?.trainers && course.trainers.length > 0 && (
-				<div className="rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs space-y-2">
+			{/* المدربون المشرفون على الدورة (مكدّس الأفاتار المطابق لثيم المنصة) */}
+			{mappedTrainers.length > 0 && (
+				<div className="rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs flex items-center justify-between gap-3">
 					<h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
 						<IconUsers className="size-3.5 text-purple-600" />
 						<span>المدربون المشرفون على الدورة</span>
 					</h4>
-					<div className="flex flex-wrap gap-2">
-						{course.trainers.map((t) => (
-							<div
-								key={t.staffId}
-								className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg border border-border/70 bg-muted/30 text-xs font-medium"
-							>
-								<IconUser className="size-3 text-muted-foreground" />
-								<span>{t.staff?.name || "مدرب"}</span>
-							</div>
-						))}
+					<div className="flex items-center gap-2">
+						<TrainersCell trainers={mappedTrainers} maxVisible={5} />
+						<span className="text-[11px] font-semibold text-muted-foreground">
+							({toArabicNumerals(mappedTrainers.length)} مدربين)
+						</span>
 					</div>
 				</div>
 			)}
@@ -617,6 +646,8 @@ export function PageLivePreview({
 		return "";
 	}, [page.content]);
 
+	const cleanSummary = useMemo(() => stripSystemTags(page.summary), [page.summary]);
+
 	return (
 		<div className="flex flex-col flex-1 min-h-0 overflow-y-auto p-4 space-y-3.5 text-right">
 			{/* شريط المعاينة المباشرة الحية لمحرر BlockNote */}
@@ -724,14 +755,14 @@ export function PageLivePreview({
 			</div>
 
 			{/* موجز الصفحة */}
-			{page.summary && (
+			{cleanSummary ? (
 				<div className="rounded-xl border border-sky-200/60 dark:border-sky-900/40 bg-sky-50/40 dark:bg-sky-950/20 p-3.5 text-xs leading-relaxed text-foreground space-y-1">
 					<span className="font-bold text-sky-700 dark:text-sky-300 block">
 						وصف وموجز الصفحة:
 					</span>
-					<p className="text-muted-foreground leading-relaxed">{page.summary}</p>
+					<p className="text-muted-foreground leading-relaxed">{cleanSummary}</p>
 				</div>
-			)}
+			) : null}
 
 			{/* المعاينة الحية لمحتوى BlockNote المحفوظ في قاعدة البيانات */}
 			<div className="rounded-xl border border-border/70 bg-card p-4 sm:p-5 shadow-2xs space-y-3">
@@ -769,6 +800,7 @@ export function LibraryLivePreview({
 	isSelected?: boolean;
 	onToggle?: () => void;
 }) {
+	const cleanItemDesc = useMemo(() => stripSystemTags(item.description), [item.description]);
 	return (
 		<div className="flex flex-col flex-1 min-h-0 overflow-y-auto p-4 space-y-3.5 text-right">
 			<div className="rounded-xl border border-border/80 bg-card p-3.5 sm:p-4 shadow-2xs space-y-3">
@@ -841,13 +873,15 @@ export function LibraryLivePreview({
 				</div>
 			</div>
 
-			<div className="rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs space-y-1.5">
-				<h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
-					<IconFileText className="size-3.5 text-teal-600" />
-					<span>وصف المورد</span>
-				</h4>
-				<p className="text-xs text-muted-foreground leading-relaxed">{item.description}</p>
-			</div>
+			{cleanItemDesc ? (
+				<div className="rounded-xl border border-border/70 bg-card p-3.5 shadow-2xs space-y-1.5">
+					<h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+						<IconFileText className="size-3.5 text-teal-600" />
+						<span>وصف المورد</span>
+					</h4>
+					<p className="text-xs text-muted-foreground leading-relaxed">{cleanItemDesc}</p>
+				</div>
+			) : null}
 		</div>
 	);
 }

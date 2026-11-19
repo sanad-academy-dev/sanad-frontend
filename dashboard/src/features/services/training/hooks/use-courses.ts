@@ -43,17 +43,32 @@ export const useCourseStats = () => {
 };
 
 export const useCourse = (id: string | null) => {
-	const { data, isLoading } = useQuery<CourseDetailResponse>({
+	const isValidId = Boolean(
+		id &&
+			!id.startsWith("item-") &&
+			!id.startsWith("stage-") &&
+			!id.startsWith("fake-") &&
+			id.trim().length > 0,
+	);
+
+	const { data, isLoading, isError } = useQuery<CourseDetailResponse | null>({
 		queryKey: courseKey(id ?? ""),
-		enabled: !!id,
+		enabled: isValidId,
+		retry: false,
 		queryFn: async () => {
-			const { data, error } = await api.training.courses({ id: id as string }).get();
-			if (error) throw new Error("تعذّر تحميل الدورة");
-			return data as CourseDetailResponse;
+			try {
+				const { data, error } = await api.training.courses({ id: id as string }).get();
+				if (error) {
+					return null;
+				}
+				return (data as CourseDetailResponse) ?? null;
+			} catch {
+				return null;
+			}
 		},
 	});
 
-	return { course: data, isLoading };
+	return { course: data ?? null, isLoading: isValidId ? isLoading : false, isError };
 };
 
 // حمولة الإنشاء: يقبل مسار المعالج (targetRoleId) ومسار اللوحة الجانبية الأصلي (department نص حر).

@@ -609,13 +609,11 @@ export function TrackStructureStep({
 
 	const setStages = useCallback(
 		(updater: TrackStage[] | ((prev: TrackStage[]) => TrackStage[])) => {
-			setInternalStages(() => {
-				const current = stagesRef.current;
-				const next = typeof updater === "function" ? updater(current) : updater;
-				const sanitized = sanitizeStages(next, selectedCourseIdsRef.current);
-				onStagesChangeRef.current?.(sanitized);
-				return sanitized;
-			});
+			const current = stagesRef.current;
+			const next = typeof updater === "function" ? updater(current) : updater;
+			const sanitized = sanitizeStages(next, selectedCourseIdsRef.current);
+			setInternalStages(sanitized);
+			onStagesChangeRef.current?.(sanitized);
 		},
 		[sanitizeStages],
 	);

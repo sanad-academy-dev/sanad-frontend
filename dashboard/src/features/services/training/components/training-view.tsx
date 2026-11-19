@@ -21,7 +21,6 @@ import { CloneSuccessToast } from "@/features/services/training/components/clone
 import { CourseCard } from "@/features/services/training/components/course-card";
 import { CourseDialog } from "@/features/services/training/components/course-dialog";
 import { CourseTable } from "@/features/services/training/components/course-table";
-import { CreateContentMenu } from "@/features/services/training/components/create-content-menu";
 import { DeleteCourseDialog } from "@/features/services/training/components/delete-course-dialog";
 import {
 	DisableCourseDialog,
@@ -354,25 +353,15 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 					</>
 				}
 				actions={
-					<CreateContentMenu
-						onSelectCourse={handleAdd}
-						onSelectQuiz={() => navigate({ to: "/services/quizzes" })}
-						onSelectPage={() =>
-							navigate({
-								to: "/services/training",
-								search: { tab: "pages" },
-							})
-						}
+					<Button
+						type="button"
+						size="sm"
+						onClick={handleAdd}
+						className="h-8 gap-1.5 text-xs font-bold"
 					>
-						<Button
-							type="button"
-							size="sm"
-							className="h-8 gap-1.5 text-xs font-bold"
-						>
-							<IconPlus className="size-3.5" />
-							إنشاء محتوى
-						</Button>
-					</CreateContentMenu>
+						<IconPlus className="size-3.5" />
+						إنشاء دورة
+					</Button>
 				}
 			/>
 
@@ -425,7 +414,7 @@ export function TrainingView({ tab }: { tab: TrainingTab }) {
 
 			{/* المحتوى */}
 			<div className="min-h-0 flex-1 overflow-auto bg-background py-3">
-				{isLoading ? (
+				{ isLoading ? (
 					<Spinner containerClassName="py-24 min-h-0" />
 				) : coursesLoadError ? (
 					<ContentLoadError
