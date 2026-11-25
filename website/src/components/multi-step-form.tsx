@@ -1,11 +1,9 @@
 "use client";
 
-import { useRef, useState, useEffect, useLayoutEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   AnimatePresence,
-  animate,
   motion,
-  useMotionValue,
   type Variants,
 } from "framer-motion";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -49,41 +47,64 @@ function computeAge(dateStr?: string | null): number | null {
   return years > 0 ? years : null;
 }
 
-const useIsomorphicLayoutEffect =
-  typeof window !== "undefined" ? useLayoutEffect : useEffect;
-
 type Panel = -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18;
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
-const HEIGHT = { type: "spring", duration: 0.32, bounce: 0 } as const;
-const SHIFT = 32;
 const ICON_SWAP = { type: "spring", duration: 0.3, bounce: 0 } as const;
 
-// Asymmetric RTL transitions (xevrion style)
+export const ARABIC_MONTHS = [
+  "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
+  "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"
+];
+
+export const DAYS_OF_WEEK = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
+
+export function formatArabicBirthDate(dateStr?: string | null): string {
+  if (!dateStr) return "";
+  const parts = dateStr.split("-");
+  if (parts.length === 3) {
+    const y = parts[0];
+    const m = parseInt(parts[1], 10);
+    const d = parseInt(parts[2], 10);
+    const mName = ARABIC_MONTHS[m - 1] || parts[1];
+    return `${d} ${mName} ${y}`;
+  }
+  return dateStr;
+}
+
+export const COUNTRY_CODES = [
+  { code: "+20", flag: "🇪🇬", name: "مصر" },
+  { code: "+966", flag: "🇸🇦", name: "السعودية" },
+  { code: "+971", flag: "🇦🇪", name: "الإمارات" },
+  { code: "+965", flag: "🇰🇼", name: "الكويت" },
+  { code: "+974", flag: "🇶🇦", name: "قطر" },
+  { code: "+968", flag: "🇴🇲", name: "عُمان" },
+  { code: "+973", flag: "🇧🇭", name: "البحرين" },
+  { code: "+962", flag: "🇯🇴", name: "الأردن" },
+];
+
+// Clean horizontal slide transitions without vertical shifting
 const slide: Variants = {
   enter: (d: number) => ({
-    x: d * -SHIFT,
+    x: d * 28,
     opacity: 0,
-    filter: "blur(4px)",
   }),
   center: {
     x: 0,
     opacity: 1,
-    filter: "blur(0px)",
-    transition: { duration: 0.28, ease: EASE_OUT },
+    transition: { duration: 0.22, ease: EASE_OUT },
   },
   exit: (d: number) => ({
-    x: d * SHIFT * 0.7,
+    x: d * -28,
     opacity: 0,
-    filter: "blur(4px)",
-    transition: { duration: 0.15, ease: EASE_OUT },
+    transition: { duration: 0.16, ease: EASE_OUT },
   }),
 };
 
 const fade: Variants = {
   enter: { opacity: 0 },
   center: { opacity: 1, transition: { duration: 0.2, ease: EASE_OUT } },
-  exit: { opacity: 0, transition: { duration: 0.12, ease: EASE_OUT } },
+  exit: { opacity: 0, transition: { duration: 0.14, ease: EASE_OUT } },
 };
 
 function getStepMeta(panel: Panel): { stepIndex: number; title: string } {
@@ -258,8 +279,22 @@ export function MultiStepForm({
   const [c6, setC6] = useState<string | null>(null);
   const [c7, setC7] = useState<string | null>(null);
   const [c10, setC10] = useState<string | null>(null);
-  const [bookingDay, setBookingDay] = useState<number | null>(14);
-  const [bookingTime, setBookingTime] = useState<string | null>("4:00 م");
+
+  // Dynamic Calendar & Booking State
+  const [calendarYear, setCalendarYear] = useState(() => new Date().getFullYear());
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date().getMonth());
+  const [bookingDay, setBookingDay] = useState<number | null>(() => {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(now.getDate() + 1);
+    return tomorrow.getDate();
+  });
+  const [bookingMonth, setBookingMonth] = useState<number>(() => new Date().getMonth());
+  const [bookingYear, setBookingYear] = useState<number>(() => new Date().getFullYear());
+  const [bookingTime, setBookingTime] = useState<string | null>("04:00 م");
+
+  // Country code selector
+  const [phoneCountryCode, setPhoneCountryCode] = useState("+20");
   const [parentName, setParentName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -328,29 +363,6 @@ export function MultiStepForm({
     }
   }, []);
 
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const innerRef = useRef<HTMLDivElement>(null);
-  const height = useMotionValue(0);
-  const [measured, setMeasured] = useState(false);
-  const hasMeasured = useRef(false);
-
-  useIsomorphicLayoutEffect(() => {
-    const el = innerRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver(() => {
-      const next = el.offsetHeight;
-      if (!hasMeasured.current || reduceMotion) {
-        height.jump(next);
-        hasMeasured.current = true;
-        setMeasured(true);
-      } else {
-        animate(height, next, HEIGHT);
-      }
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [height, reduceMotion, panel]);
-
   const autoTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const clearAutoTimer = () => {
@@ -360,12 +372,10 @@ export function MultiStepForm({
     }
   };
 
-  const daysOfWeek = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
-  const getDayName = (d: number | null) => {
+  const getDayName = (d: number | null, m: number = bookingMonth, y: number = bookingYear) => {
     if (!d) return "";
-    const blanks = [0, 1, 2, 3];
-    const idx = (d + blanks.length - 1) % 7;
-    return daysOfWeek[idx];
+    const idx = new Date(y, m, d).getDay();
+    return DAYS_OF_WEEK[idx] || "";
   };
 
   const go = (next: Panel, dir: 1 | -1) => {
@@ -601,11 +611,13 @@ export function MultiStepForm({
         targetClass: selectedTrack,
         proposedTrack: selectedTrack,
         guardianName: parentName.trim(),
-        guardianPhone: phone.trim(),
+        guardianPhone: phone.trim().startsWith("+")
+          ? phone.trim()
+          : `${phoneCountryCode}${phone.trim().replace(/^0+/, "")}`,
         guardianEmail: email.trim() || null,
         preferredShift,
         assessmentData,
-        notes: `الموعد/الفترة المفضلة: ${getDayName(bookingDay)} ${bookingDay || ""} - ${bookingTime || "غير محدد"} (${isMorning ? "صباحي" : "مسائي"})`,
+        notes: `الموعد/الفترة المفضلة: ${getDayName(bookingDay, bookingMonth, bookingYear)} ${bookingDay || ""} ${ARABIC_MONTHS[bookingMonth]} ${bookingYear} - ${bookingTime || "غير محدد"} (${isMorning ? "صباحي" : "مسائي"})`,
       };
 
 		const res = await fetch("/api/register", {
@@ -679,9 +691,9 @@ export function MultiStepForm({
   }
 
   return (
-    <div className={cn("w-full max-w-[540px] font-sans mx-auto", className)} dir="rtl">
+    <div className={cn("w-full max-w-[560px] font-sans mx-auto", className)} dir="rtl">
       <div
-        className="bg-card/95 backdrop-blur-md rounded-2xl flex flex-col w-full overflow-hidden text-foreground border border-line shadow-2xl relative"
+        className="bg-card/95 backdrop-blur-md rounded-2xl flex flex-col w-full h-[620px] max-h-[88vh] overflow-hidden text-foreground border border-line shadow-2xl relative"
       >
         {panel === -1 ? (
           <IntroHeader onClose={onClose} />
@@ -704,116 +716,120 @@ export function MultiStepForm({
           </div>
         )}
 
-        <motion.div
-          ref={bodyRef}
-          className="overflow-x-hidden overflow-y-auto custom-scrollbar max-h-[82vh]"
-          style={{ height: measured ? height : "auto" }}
-        >
-          <div ref={innerRef} className="relative w-full">
-            <AnimatePresence mode="popLayout" initial={false} custom={direction}>
-              <motion.div
-                key={panel}
-                data-panel={panel}
-                custom={direction}
-                variants={reduceMotion ? fade : slide}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                className="p-4 sm:p-6 w-full"
-              >
-                <PanelContent
-                  panel={panel}
-                  age={age}
-                  setAge={handleSetAge}
-                  birthDate={birthDate}
-                  setBirthDate={handleBirthDateChange}
-                  selectedTrack={selectedTrack}
-                  setSelectedTrack={setSelectedTrack}
-                  q1={q1}
-                  setQ1={(val) => {
-                    setQ1(val);
-                    scheduleAutoAdvance(3, 500);
-                  }}
-                  q2={q2}
-                  setQ2={(val) => {
-                    setQ2(val);
-                    scheduleAutoAdvance(4, 500);
-                  }}
-                  q3={q3}
-                  setQ3={(val) => {
-                    setQ3(val);
-                    scheduleAutoAdvance(5, 500);
-                  }}
-                  c1={c1}
-                  setC1={(val) => {
-                    setC1(val);
-                    scheduleAutoAdvance(7, 500);
-                  }}
-                  c2={c2}
-                  setC2={(val) => {
-                    setC2(val);
-                    scheduleAutoAdvance(8, 500);
-                  }}
-                  c3={c3}
-                  setC3={(val) => {
-                    setC3(val);
-                    scheduleAutoAdvance(9, 500);
-                  }}
-                  c4={c4}
-                  setC4={(val) => {
-                    setC4(val);
-                    scheduleAutoAdvance(10, 500);
-                  }}
-                  c5={c5}
-                  setC5={(updater) => {
-                    setC5((prev) => {
-                      const next = typeof updater === "function" ? updater(prev) : updater;
-                      if (next.length === 3) {
-                        scheduleAutoAdvance(11, 700);
-                      }
-                      return next;
-                    });
-                  }}
-                  c6={c6}
-                  setC6={(val) => {
-                    setC6(val);
-                    scheduleAutoAdvance(12, 500);
-                  }}
-                  c7={c7}
-                  setC7={(val) => {
-                    setC7(val);
-                    scheduleAutoAdvance(13, 500);
-                  }}
-                  c10={c10}
-                  setC10={(val) => {
-                    setC10(val);
-                    scheduleAutoAdvance(14, 500);
-                  }}
-                  bookingDay={bookingDay}
-                  setBookingDay={setBookingDay}
-                  bookingTime={bookingTime}
-                  setBookingTime={setBookingTime}
-                  parentName={parentName}
-                  setParentName={setParentName}
-                  phone={phone}
-                  setPhone={setPhone}
-                  email={email}
-                  setEmail={setEmail}
-                  childrenList={childrenList}
-                  setChildrenList={setChildrenList}
-                  isSubmitting={isSubmitting}
-                  submitError={submitError}
-                  requestCode={requestCode}
-                  onConfirmBooking={handleConfirmBooking}
-                  go={go}
-                  onCreate={onCreate}
-                  refCode={refCode}
-                  existingStudent={existingStudent}
-                />
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </motion.div>
+        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden custom-scrollbar relative">
+          <AnimatePresence mode="wait" initial={false} custom={direction}>
+            <motion.div
+              key={panel}
+              data-panel={panel}
+              custom={direction}
+              variants={reduceMotion ? fade : slide}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              className="p-4 sm:p-6 w-full min-h-full flex flex-col justify-between"
+            >
+              <PanelContent
+                panel={panel}
+                age={age}
+                setAge={handleSetAge}
+                birthDate={birthDate}
+                setBirthDate={handleBirthDateChange}
+                selectedTrack={selectedTrack}
+                setSelectedTrack={setSelectedTrack}
+                q1={q1}
+                setQ1={(val) => {
+                  setQ1(val);
+                  scheduleAutoAdvance(3, 550);
+                }}
+                q2={q2}
+                setQ2={(val) => {
+                  setQ2(val);
+                  scheduleAutoAdvance(4, 550);
+                }}
+                q3={q3}
+                setQ3={(val) => {
+                  setQ3(val);
+                  scheduleAutoAdvance(5, 550);
+                }}
+                c1={c1}
+                setC1={(val) => {
+                  setC1(val);
+                  scheduleAutoAdvance(7, 550);
+                }}
+                c2={c2}
+                setC2={(val) => {
+                  setC2(val);
+                  scheduleAutoAdvance(8, 550);
+                }}
+                c3={c3}
+                setC3={(val) => {
+                  setC3(val);
+                  scheduleAutoAdvance(9, 550);
+                }}
+                c4={c4}
+                setC4={(val) => {
+                  setC4(val);
+                  scheduleAutoAdvance(10, 550);
+                }}
+                c5={c5}
+                setC5={(updater) => {
+                  setC5((prev) => {
+                    const next = typeof updater === "function" ? updater(prev) : updater;
+                    if (next.length === 3) {
+                      scheduleAutoAdvance(11, 700);
+                    }
+                    return next;
+                  });
+                }}
+                c6={c6}
+                setC6={(val) => {
+                  setC6(val);
+                  scheduleAutoAdvance(12, 550);
+                }}
+                c7={c7}
+                setC7={(val) => {
+                  setC7(val);
+                  scheduleAutoAdvance(13, 550);
+                }}
+                c10={c10}
+                setC10={(val) => {
+                  setC10(val);
+                  scheduleAutoAdvance(14, 550);
+                }}
+                calendarYear={calendarYear}
+                setCalendarYear={setCalendarYear}
+                calendarMonth={calendarMonth}
+                setCalendarMonth={setCalendarMonth}
+                bookingDay={bookingDay}
+                setBookingDay={setBookingDay}
+                bookingMonth={bookingMonth}
+                setBookingMonth={setBookingMonth}
+                bookingYear={bookingYear}
+                setBookingYear={setBookingYear}
+                bookingTime={bookingTime}
+                setBookingTime={setBookingTime}
+                phoneCountryCode={phoneCountryCode}
+                setPhoneCountryCode={setPhoneCountryCode}
+                parentName={parentName}
+                setParentName={setParentName}
+                phone={phone}
+                setPhone={setPhone}
+                email={email}
+                setEmail={setEmail}
+                childrenList={childrenList}
+                setChildrenList={setChildrenList}
+                isSubmitting={isSubmitting}
+                submitError={submitError}
+                requestCode={requestCode}
+                onConfirmBooking={handleConfirmBooking}
+                go={go}
+                onCreate={onCreate}
+                refCode={refCode}
+                existingStudent={existingStudent}
+              />
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );
@@ -835,7 +851,7 @@ function QuestionNav({
 }) {
   return (
     <div
-      className="flex items-center justify-between gap-3 mt-4 pt-3.5 border-t border-line/70"
+      className="flex items-center justify-between gap-3 mt-auto pt-3.5 border-t border-line/70 shrink-0 w-full"
       dir="rtl"
     >
       {onPrev ? (
@@ -871,6 +887,264 @@ function QuestionNav({
   );
 }
 
+function BirthDatePickerModal({
+  isOpen,
+  onClose,
+  initialDate,
+  initialAge,
+  onConfirm,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  initialDate: string;
+  initialAge: number | null;
+  onConfirm: (dateStr: string) => void;
+}) {
+  const currentYear = new Date().getFullYear();
+  const [year, setYear] = useState<number>(() => {
+    if (initialDate && initialDate.includes("-")) {
+      const y = parseInt(initialDate.split("-")[0], 10);
+      if (!isNaN(y)) return y;
+    }
+    return initialAge ? currentYear - initialAge : currentYear - 10;
+  });
+
+  const [month, setMonth] = useState<number>(() => {
+    if (initialDate && initialDate.includes("-")) {
+      const m = parseInt(initialDate.split("-")[1], 10);
+      if (!isNaN(m) && m >= 1 && m <= 12) return m - 1;
+    }
+    return 0;
+  });
+
+  const [day, setDay] = useState<number>(() => {
+    if (initialDate && initialDate.includes("-")) {
+      const d = parseInt(initialDate.split("-")[2], 10);
+      if (!isNaN(d) && d >= 1 && d <= 31) return d;
+    }
+    return 1;
+  });
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialDate && initialDate.includes("-")) {
+        const parts = initialDate.split("-");
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10);
+        const d = parseInt(parts[2], 10);
+        if (!isNaN(y)) setYear(y);
+        if (!isNaN(m) && m >= 1 && m <= 12) setMonth(m - 1);
+        if (!isNaN(d) && d >= 1 && d <= 31) setDay(d);
+      } else if (initialAge) {
+        setYear(currentYear - initialAge);
+        setMonth(0);
+        setDay(1);
+      }
+    }
+  }, [isOpen, initialDate, initialAge, currentYear]);
+
+  if (!isOpen) return null;
+
+  const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
+  const clampedDay = day > totalDaysInMonth ? totalDaysInMonth : day;
+
+  const firstDayOfWeek = new Date(year, month, 1).getDay();
+  const blanks = Array.from({ length: firstDayOfWeek }, (_, i) => i);
+  const daysList = Array.from({ length: totalDaysInMonth }, (_, i) => i + 1);
+
+  const yearsList = Array.from({ length: 17 }, (_, i) => currentYear - 4 - i);
+  if (!yearsList.includes(year)) {
+    yearsList.push(year);
+    yearsList.sort((a, b) => b - a);
+  }
+
+  const handlePrevMonth = () => {
+    if (month === 0) {
+      setMonth(11);
+      setYear((y) => y - 1);
+    } else {
+      setMonth((m) => m - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (month === 11) {
+      setMonth(0);
+      setYear((y) => y + 1);
+    } else {
+      setMonth((m) => m + 1);
+    }
+  };
+
+  const previewDateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(clampedDay).padStart(2, "0")}`;
+  const previewAge = computeAge(previewDateStr);
+
+  const handleSave = () => {
+    onConfirm(previewDateStr);
+    onClose();
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-150"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        className="w-full max-w-sm rounded-2xl border border-line bg-card p-4 sm:p-5 shadow-2xl flex flex-col gap-3 text-right"
+        dir="rtl"
+      >
+        {/* Modal Header */}
+        <div className="flex items-center justify-between border-b border-line pb-2.5">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+              <Calendar className="size-4" />
+            </div>
+            <div>
+              <h3 className="text-sm sm:text-base font-bold text-foreground">
+                تاريخ ميلاد الطفل
+              </h3>
+              <p className="text-[11px] text-muted-foreground">
+                حدد تاريخ الميلاد باليوم والشهر والسنة
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="size-7 rounded-lg border border-line flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors cursor-pointer"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+
+        {/* Selected Date Preview Card */}
+        <div className="flex items-center justify-between p-2.5 rounded-xl bg-primary/10 border border-primary/25 text-primary">
+          <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold">
+            <Sparkles className="size-3.5" />
+            <span>
+              {clampedDay} {ARABIC_MONTHS[month]} {year}
+            </span>
+          </div>
+          {previewAge ? (
+            <span className="text-xs font-mono font-bold bg-primary/20 px-2 py-0.5 rounded-md">
+              {previewAge} سنوات
+            </span>
+          ) : null}
+        </div>
+
+        {/* Month & Year Selectors Header */}
+        <div className="flex items-center justify-between gap-1.5 bg-secondary/30 p-1.5 rounded-xl border border-line">
+          <button
+            type="button"
+            onClick={handlePrevMonth}
+            className="size-7 flex items-center justify-center rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            title="الشهر السابق"
+          >
+            <ChevronRight className="size-4" />
+          </button>
+
+          <div className="flex items-center gap-2">
+            {/* Month Select */}
+            <div className="relative">
+              <select
+                value={month}
+                onChange={(e) => setMonth(parseInt(e.target.value, 10))}
+                className="appearance-none bg-card border border-line rounded-lg px-2.5 py-1 text-xs font-bold text-foreground outline-none cursor-pointer text-center pr-2 pl-5 hover:border-primary/50"
+              >
+                {ARABIC_MONTHS.map((mName, idx) => (
+                  <option key={mName} value={idx} className="bg-card text-foreground">
+                    {mName}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute left-1 top-1/2 -translate-y-1/2 size-3 text-muted-foreground pointer-events-none" />
+            </div>
+
+            {/* Year Select */}
+            <div className="relative">
+              <select
+                value={year}
+                onChange={(e) => setYear(parseInt(e.target.value, 10))}
+                className="appearance-none bg-card border border-line rounded-lg px-2.5 py-1 text-xs font-bold font-mono text-foreground outline-none cursor-pointer text-center pr-2 pl-5 hover:border-primary/50"
+              >
+                {yearsList.map((y) => (
+                  <option key={y} value={y} className="bg-card text-foreground font-mono">
+                    {y}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute left-1 top-1/2 -translate-y-1/2 size-3 text-muted-foreground pointer-events-none" />
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleNextMonth}
+            className="size-7 flex items-center justify-center rounded-lg hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            title="الشهر التالي"
+          >
+            <ChevronLeft className="size-4" />
+          </button>
+        </div>
+
+        {/* Days of Week Header */}
+        <div className="grid grid-cols-7 gap-1 text-center" dir="rtl">
+          {DAYS_OF_WEEK.map((d) => (
+            <div key={d} className="text-[10px] font-semibold text-muted-foreground py-0.5">
+              {d}
+            </div>
+          ))}
+          {/* Leading Blanks */}
+          {blanks.map((b) => (
+            <div key={`b-${b}`} className="h-8"></div>
+          ))}
+          {/* Day Buttons */}
+          {daysList.map((d) => {
+            const isSelected = d === clampedDay;
+            return (
+              <button
+                key={d}
+                type="button"
+                onClick={() => setDay(d)}
+                className={cn(
+                  "h-8 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center justify-center",
+                  isSelected
+                    ? "bg-primary text-primary-foreground font-bold shadow-sm scale-105"
+                    : "text-foreground hover:bg-secondary/70 hover:text-primary"
+                )}
+              >
+                {d}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 pt-2 border-t border-line mt-1">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="flex-1 h-9 rounded-xl text-xs font-semibold border-line bg-secondary/30 hover:bg-secondary/60 text-foreground cursor-pointer"
+          >
+            إلغاء
+          </Button>
+          <Button
+            type="button"
+            onClick={handleSave}
+            className="flex-[1.5] h-9 rounded-xl text-xs font-semibold bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <CheckCircle2 className="size-3.5" />
+            <span>تأكيد وحفظ</span>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PanelContent({
   panel,
   age,
@@ -901,10 +1175,20 @@ function PanelContent({
   setC7,
   c10,
   setC10,
+  calendarYear,
+  setCalendarYear,
+  calendarMonth,
+  setCalendarMonth,
   bookingDay,
   setBookingDay,
+  bookingMonth,
+  setBookingMonth,
+  bookingYear,
+  setBookingYear,
   bookingTime,
   setBookingTime,
+  phoneCountryCode,
+  setPhoneCountryCode,
   parentName,
   setParentName,
   phone,
@@ -951,10 +1235,20 @@ function PanelContent({
   setC7: (q: string) => void;
   c10: string | null;
   setC10: (q: string) => void;
+  calendarYear: number;
+  setCalendarYear: (y: number | ((prev: number) => number)) => void;
+  calendarMonth: number;
+  setCalendarMonth: (m: number | ((prev: number) => number)) => void;
   bookingDay: number | null;
   setBookingDay: (day: number | null) => void;
+  bookingMonth: number;
+  setBookingMonth: (m: number) => void;
+  bookingYear: number;
+  setBookingYear: (y: number) => void;
   bookingTime: string | null;
   setBookingTime: (time: string | null) => void;
+  phoneCountryCode: string;
+  setPhoneCountryCode: (code: string) => void;
   parentName: string;
   setParentName: (v: string) => void;
   phone: string;
@@ -976,49 +1270,52 @@ function PanelContent({
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [agePrompt, setAgePrompt] = useState(false);
   const [bookingPrompt, setBookingPrompt] = useState(false);
+  const [birthDateModalOpen, setBirthDateModalOpen] = useState(false);
 
   // Panel -1: Intro
   if (panel === -1) {
     return (
-      <div className="flex flex-col pt-1 pb-1">
-        <div className="flex items-center justify-between mb-3.5">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-line bg-secondary/60 text-xs font-semibold text-primary font-mono">
-            <Sparkles className="size-3.5 text-primary" />
-            <span>خطوتك الأولى</span>
+      <div className="flex flex-col justify-between min-h-full">
+        <div className="flex flex-col pt-1 pb-1">
+          <div className="flex items-center justify-between mb-3.5">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md border border-line bg-secondary/60 text-xs font-semibold text-primary font-mono">
+              <Sparkles className="size-3.5 text-primary" />
+              <span>خطوتك الأولى</span>
+            </div>
+          </div>
+
+          <h2 className="text-xl sm:text-2xl font-bold font-heading text-foreground mb-1.5 leading-snug text-right">
+            احجز تقييم مستوى طفلك
+          </h2>
+          <p className="text-muted-foreground text-xs sm:text-sm mb-4 text-right font-medium leading-relaxed">
+            سنفهم مستواه واهتماماته، ثم نرشح نقطة البداية الأنسب.
+          </p>
+
+          <div className="flex flex-col rounded-xl border border-line divide-y divide-line bg-secondary/25 overflow-hidden">
+            <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
+              <span className="text-muted-foreground font-medium text-xs sm:text-sm">نحدد</span>
+              <span className="text-foreground font-semibold text-xs sm:text-sm">المسار والمستوى المناسبين</span>
+            </div>
+            <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
+              <span className="text-muted-foreground font-medium text-xs sm:text-sm">نوضح</span>
+              <span className="text-foreground font-semibold text-xs sm:text-sm">المدة وعدد الحصص</span>
+            </div>
+            <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
+              <span className="text-muted-foreground font-medium text-xs sm:text-sm">الفئة العمرية</span>
+              <span className="text-foreground font-semibold font-mono text-xs sm:text-sm">من 6 إلى 18 سنة</span>
+            </div>
+            <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
+              <span className="text-muted-foreground font-medium text-xs sm:text-sm">النتيجة المتوقعة</span>
+              <span className="text-foreground font-semibold text-xs sm:text-sm">مهارات عملية + مشروع</span>
+            </div>
+            <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
+              <span className="text-muted-foreground font-medium text-xs sm:text-sm">السعر</span>
+              <span className="text-foreground font-semibold text-xs sm:text-sm">يُوضح حسب المسار</span>
+            </div>
           </div>
         </div>
 
-        <h2 className="text-xl sm:text-2xl font-bold font-heading text-foreground mb-1.5 leading-snug text-right">
-          احجز تقييم مستوى طفلك
-        </h2>
-        <p className="text-muted-foreground text-xs sm:text-sm mb-4 text-right font-medium leading-relaxed">
-          سنفهم مستواه واهتماماته، ثم نرشح نقطة البداية الأنسب.
-        </p>
-
-        <div className="flex flex-col rounded-xl border border-line divide-y divide-line bg-secondary/25 overflow-hidden">
-          <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
-            <span className="text-muted-foreground font-medium text-xs sm:text-sm">نحدد</span>
-            <span className="text-foreground font-semibold text-xs sm:text-sm">المسار والمستوى المناسبين</span>
-          </div>
-          <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
-            <span className="text-muted-foreground font-medium text-xs sm:text-sm">نوضح</span>
-            <span className="text-foreground font-semibold text-xs sm:text-sm">المدة وعدد الحصص</span>
-          </div>
-          <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
-            <span className="text-muted-foreground font-medium text-xs sm:text-sm">الفئة العمرية</span>
-            <span className="text-foreground font-semibold font-mono text-xs sm:text-sm">من 6 إلى 18 سنة</span>
-          </div>
-          <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
-            <span className="text-muted-foreground font-medium text-xs sm:text-sm">النتيجة المتوقعة</span>
-            <span className="text-foreground font-semibold text-xs sm:text-sm">مهارات عملية + مشروع</span>
-          </div>
-          <div className="flex justify-between items-center px-3.5 sm:px-4 py-2.5">
-            <span className="text-muted-foreground font-medium text-xs sm:text-sm">السعر</span>
-            <span className="text-foreground font-semibold text-xs sm:text-sm">يُوضح حسب المسار</span>
-          </div>
-        </div>
-
-        <div className="mt-5 flex flex-col items-center gap-2 w-full">
+        <div className="mt-auto pt-3.5 border-t border-line/70 flex flex-col items-center gap-2 w-full shrink-0">
           <button
             type="button"
             onClick={() => go(0, 1)}
@@ -1039,64 +1336,64 @@ function PanelContent({
   if (panel === 0) {
     const ages = Array.from({ length: 12 }, (_, i) => i + 6);
     return (
-      <div className="flex flex-col gap-4 text-center pt-1">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">كم عمر ابنك؟</h2>
-          <p className="text-muted-foreground text-xs sm:text-sm">
-            اختر العمر بالتحديد لتكييف صعوبة الأسئلة
-          </p>
-        </div>
+      <div className="flex flex-col justify-between min-h-full text-center">
+        <div className="flex flex-col gap-4 pt-1">
+          <div className="flex flex-col gap-1">
+            <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">كم عمر ابنك؟</h2>
+            <p className="text-muted-foreground text-xs sm:text-sm">
+              اختر العمر بالتحديد لتكييف صعوبة الأسئلة
+            </p>
+          </div>
 
-        <div className="grid grid-cols-4 gap-2 sm:gap-2.5 my-1">
-          {ages.map((a) => (
-            <button
-              key={a}
-              type="button"
-              onClick={() => {
-                setAge(a);
-                const currentYear = new Date().getFullYear();
-                const approxYear = currentYear - a;
-                const newDate = `${approxYear}-01-01`;
-                setBirthDate(newDate);
-                setAgePrompt(false);
-              }}
-              className={cn(
-                "h-11 rounded-xl text-sm sm:text-base font-bold font-mono transition-[scale,border-color,background-color,box-shadow] duration-150 ease-out active:scale-[0.96] border cursor-pointer select-none",
-                age === a
-                  ? "border-primary bg-primary text-primary-foreground ring-2 ring-primary/30 shadow-sm"
-                  : "border-line bg-secondary/35 text-foreground hover:border-line-hover hover:bg-secondary/65"
-              )}
-            >
-              {a}
-            </button>
-          ))}
-        </div>
+          <div className="grid grid-cols-4 gap-2 sm:gap-2.5 my-1">
+            {ages.map((a) => (
+              <button
+                key={a}
+                type="button"
+                onClick={() => {
+                  setAge(a);
+                  setAgePrompt(false);
+                }}
+                className={cn(
+                  "h-11 rounded-xl text-sm sm:text-base font-bold font-mono transition-[scale,border-color,background-color,box-shadow] duration-150 ease-out active:scale-[0.96] border cursor-pointer select-none",
+                  age === a
+                    ? "border-primary bg-primary text-primary-foreground ring-2 ring-primary/30 shadow-sm"
+                    : "border-line bg-secondary/35 text-foreground hover:border-line-hover hover:bg-secondary/65"
+                )}
+              >
+                {a}
+              </button>
+            ))}
+          </div>
 
-        {agePrompt && !age && (
-          <p className="text-destructive text-xs font-medium animate-in fade-in">
-            يرجى اختيار عمر طفلك للمتابعة
-          </p>
-        )}
-
-        <button
-          type="button"
-          onClick={() => {
-            if (age) {
-              go(1, 1);
-            } else {
-              setAgePrompt(true);
-            }
-          }}
-          className={cn(
-            "h-10 sm:h-11 w-full rounded-full text-xs sm:text-sm font-semibold transition-[scale,opacity,background-color] duration-150 ease-out flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98]",
-            age
-              ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
-              : "bg-secondary text-muted-foreground border border-line"
+          {agePrompt && !age && (
+            <p className="text-destructive text-xs font-medium animate-in fade-in">
+              يرجى اختيار عمر طفلك للمتابعة
+            </p>
           )}
-        >
-          <span>التالي</span>
-          <ArrowLeft className="size-4" />
-        </button>
+        </div>
+
+        <div className="mt-auto pt-3.5 border-t border-line/70 shrink-0 w-full">
+          <button
+            type="button"
+            onClick={() => {
+              if (age) {
+                go(1, 1);
+              } else {
+                setAgePrompt(true);
+              }
+            }}
+            className={cn(
+              "h-10 sm:h-11 w-full rounded-full text-xs sm:text-sm font-semibold transition-[scale,opacity,background-color] duration-150 ease-out flex items-center justify-center gap-1.5 cursor-pointer active:scale-[0.98]",
+              age
+                ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
+                : "bg-secondary text-muted-foreground border border-line"
+            )}
+          >
+            <span>التالي</span>
+            <ArrowLeft className="size-4" />
+          </button>
+        </div>
       </div>
     );
   }
@@ -1104,51 +1401,54 @@ function PanelContent({
   // Panel 1: Overview
   if (panel === 1) {
     return (
-      <div className="flex flex-col gap-4 text-center items-center pt-1">
-        <div className="flex size-11 items-center justify-center rounded-xl border border-line bg-secondary/60 text-primary">
-          <Compass className="size-5.5 text-primary" strokeWidth={1.75} />
+      <div className="flex flex-col justify-between min-h-full text-center items-center">
+        <div className="flex flex-col gap-4 items-center pt-1 w-full">
+          <div className="flex size-11 items-center justify-center rounded-xl border border-line bg-secondary/60 text-primary">
+            <Compass className="size-5.5 text-primary" strokeWidth={1.75} />
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
+              ما هو التقييم المبدئي؟
+            </h2>
+            <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed px-1 font-medium">
+              في تجربة قصيرة وممتعة (5-7 دقائق)، نبدأ بثلاثة أسئلة سريعة لك كولي أمر،
+              ثم سلّم الجهاز لابنك ليخوض 8 تحديات ذكية ممتعة تكتشف مهاراته في التفكير والإبداع وحل المشكلات.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 w-full mt-1">
+            <div className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-line bg-secondary/30 py-2.5 px-2">
+              <Users className="size-4.5 text-primary" />
+              <span className="text-[11px] font-semibold text-foreground text-center">3 أسئلة لك</span>
+            </div>
+            <div className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-line bg-secondary/30 py-2.5 px-2">
+              <Gamepad2 className="size-4.5 text-primary" />
+              <span className="text-[11px] font-semibold text-foreground text-center">8 تحديات لابنك</span>
+            </div>
+            <div className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-line bg-secondary/30 py-2.5 px-2">
+              <Calendar className="size-4.5 text-primary" />
+              <span className="text-[11px] font-semibold text-foreground text-center">حجز التقييم العملي</span>
+            </div>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
-            ما هو التقييم المبدئي؟
-          </h2>
-          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed px-1 font-medium">
-            في تجربة قصيرة وممتعة (5-7 دقائق)، نبدأ بثلاثة أسئلة سريعة لك كولي أمر،
-            ثم سلّم الجهاز لابنك ليخوض 8 تحديات ذكية ممتعة تكتشف مهاراته في التفكير والإبداع وحل المشكلات.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-3 gap-2 w-full mt-1">
-          <div className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-line bg-secondary/30 py-2.5 px-2">
-            <Users className="size-4.5 text-primary" />
-            <span className="text-[11px] font-semibold text-foreground text-center">3 أسئلة لك</span>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-line bg-secondary/30 py-2.5 px-2">
-            <Gamepad2 className="size-4.5 text-primary" />
-            <span className="text-[11px] font-semibold text-foreground text-center">8 تحديات لابنك</span>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-line bg-secondary/30 py-2.5 px-2">
-            <Calendar className="size-4.5 text-primary" />
-            <span className="text-[11px] font-semibold text-foreground text-center">حجز التقييم العملي</span>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2 w-full mt-2">
-          <button
-            type="button"
-            onClick={() => go(2, 1)}
-            className="h-10 sm:h-11 w-full rounded-full text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-[scale,opacity,background-color] duration-150 ease-out flex items-center justify-center gap-2 active:scale-[0.98] shadow-sm cursor-pointer"
-          >
-            <span>لنبدأ</span>
-            <ArrowLeft className="size-4" />
-          </button>
+        <div className="flex items-center gap-2.5 mt-auto pt-3.5 border-t border-line/70 w-full shrink-0" dir="rtl">
           <button
             type="button"
             onClick={() => go(0, -1)}
-            className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors py-1 cursor-pointer active:scale-[0.98]"
+            className="h-10 sm:h-11 px-4 rounded-full text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 flex items-center gap-1.5 cursor-pointer"
           >
-            تغيير العمر
+            <ArrowRight className="size-4" />
+            <span>السابق</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => go(2, 1)}
+            className="h-10 sm:h-11 flex-1 rounded-full text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+          >
+            <span>لنبدأ</span>
+            <ArrowLeft className="size-4" />
           </button>
         </div>
       </div>
@@ -1165,38 +1465,48 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-4 pt-1">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-medium text-muted-foreground">1 / 3</span>
-          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
-            <span className="text-[11px] font-semibold text-foreground">سؤال لولي الأمر</span>
-            <BookOpen className="size-3.5 text-primary" />
+      <div className="flex flex-col justify-between min-h-full w-full">
+        <div className="flex flex-col gap-4 pt-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-medium text-muted-foreground">1 / 3</span>
+            <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+              <span className="text-[11px] font-semibold text-foreground">سؤال لولي الأمر</span>
+              <BookOpen className="size-3.5 text-primary" />
+            </div>
           </div>
-        </div>
 
-        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center">
-          ما أكثر ما يجذب ابنك؟
-        </h2>
+          <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center">
+            ما أكثر ما يجذب ابنك؟
+          </h2>
 
-        <div className="flex flex-col gap-2">
-          {options.map((opt) => {
-            const checked = q1 === opt.id;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => setQ1(opt.id)}
-                className={cn( "flex items-center justify-between rounded-xl border p-3 transition-all cursor-pointer", checked ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40 font-semibold" : "border-line bg-secondary/25 hover:border-line-hover hover:bg-secondary/40 text-foreground" )}
-              >
-                <span className="text-xs sm:text-sm font-semibold">{opt.label}</span>
-                <span
-                  className={cn( "flex size-6 sm:size-7 items-center justify-center rounded-lg text-xs font-bold font-mono transition-colors", checked ? "bg-primary text-primary-foreground" : "border border-line bg-secondary text-foreground" )}
+          <div className="flex flex-col gap-2">
+            {options.map((opt) => {
+              const checked = q1 === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setQ1(opt.id)}
+                  className={cn(
+                    "flex items-center justify-between rounded-xl border p-3 transition-all cursor-pointer",
+                    checked
+                      ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40 font-semibold"
+                      : "border-line bg-secondary/25 hover:border-line-hover hover:bg-secondary/40 text-foreground"
+                  )}
                 >
-                  {opt.id}
-                </span>
-              </button>
-            );
-          })}
+                  <span className="text-xs sm:text-sm font-semibold">{opt.label}</span>
+                  <span
+                    className={cn(
+                      "flex size-6 sm:size-7 items-center justify-center rounded-lg text-xs font-bold font-mono transition-colors",
+                      checked ? "bg-primary text-primary-foreground" : "border border-line bg-secondary text-foreground"
+                    )}
+                  >
+                    {opt.id}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <QuestionNav
@@ -1217,38 +1527,48 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-4 pt-1">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-medium text-muted-foreground">2 / 3</span>
-          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
-            <span className="text-[11px] font-semibold text-foreground">سؤال لولي الأمر</span>
-            <BookOpen className="size-3.5 text-primary" />
+      <div className="flex flex-col justify-between min-h-full w-full">
+        <div className="flex flex-col gap-4 pt-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-medium text-muted-foreground">2 / 3</span>
+            <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+              <span className="text-[11px] font-semibold text-foreground">سؤال لولي الأمر</span>
+              <BookOpen className="size-3.5 text-primary" />
+            </div>
           </div>
-        </div>
 
-        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center">
-          هل لديه خبرة سابقة في البرمجة أو الروبوتات؟
-        </h2>
+          <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center">
+            هل لديه خبرة سابقة في البرمجة أو الروبوتات؟
+          </h2>
 
-        <div className="flex flex-col gap-2">
-          {options.map((opt) => {
-            const checked = q2 === opt.id;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => setQ2(opt.id)}
-                className={cn( "flex items-center justify-between rounded-xl border p-3 transition-all cursor-pointer", checked ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40 font-semibold" : "border-line bg-secondary/25 hover:border-line-hover hover:bg-secondary/40 text-foreground" )}
-              >
-                <span className="text-xs sm:text-sm font-semibold">{opt.label}</span>
-                <span
-                  className={cn( "flex size-6 sm:size-7 items-center justify-center rounded-lg text-xs font-bold font-mono transition-colors", checked ? "bg-primary text-primary-foreground" : "border border-line bg-secondary text-foreground" )}
+          <div className="flex flex-col gap-2">
+            {options.map((opt) => {
+              const checked = q2 === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setQ2(opt.id)}
+                  className={cn(
+                    "flex items-center justify-between rounded-xl border p-3 transition-all cursor-pointer",
+                    checked
+                      ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40 font-semibold"
+                      : "border-line bg-secondary/25 hover:border-line-hover hover:bg-secondary/40 text-foreground"
+                  )}
                 >
-                  {opt.id}
-                </span>
-              </button>
-            );
-          })}
+                  <span className="text-xs sm:text-sm font-semibold">{opt.label}</span>
+                  <span
+                    className={cn(
+                      "flex size-6 sm:size-7 items-center justify-center rounded-lg text-xs font-bold font-mono transition-colors",
+                      checked ? "bg-primary text-primary-foreground" : "border border-line bg-secondary text-foreground"
+                    )}
+                  >
+                    {opt.id}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <QuestionNav
@@ -1270,38 +1590,48 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-4 pt-1">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-medium text-muted-foreground">3 / 3</span>
-          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
-            <span className="text-[11px] font-semibold text-foreground">سؤال لولي الأمر</span>
-            <BookOpen className="size-3.5 text-primary" />
+      <div className="flex flex-col justify-between min-h-full w-full">
+        <div className="flex flex-col gap-4 pt-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-medium text-muted-foreground">3 / 3</span>
+            <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+              <span className="text-[11px] font-semibold text-foreground">سؤال لولي الأمر</span>
+              <BookOpen className="size-3.5 text-primary" />
+            </div>
           </div>
-        </div>
 
-        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center">
-          ما هدفك الأهم من انضمامه؟
-        </h2>
+          <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center">
+            ما هدفك الأهم من انضمامه؟
+          </h2>
 
-        <div className="flex flex-col gap-2">
-          {options.map((opt) => {
-            const checked = q3 === opt.id;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => setQ3(opt.id)}
-                className={cn( "flex items-center justify-between rounded-xl border p-3 transition-all cursor-pointer", checked ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40 font-semibold" : "border-line bg-secondary/25 hover:border-line-hover hover:bg-secondary/40 text-foreground" )}
-              >
-                <span className="text-xs sm:text-sm font-semibold">{opt.label}</span>
-                <span
-                  className={cn( "flex size-6 sm:size-7 items-center justify-center rounded-lg text-xs font-bold font-mono transition-colors", checked ? "bg-primary text-primary-foreground" : "border border-line bg-secondary text-foreground" )}
+          <div className="flex flex-col gap-2">
+            {options.map((opt) => {
+              const checked = q3 === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setQ3(opt.id)}
+                  className={cn(
+                    "flex items-center justify-between rounded-xl border p-3 transition-all cursor-pointer",
+                    checked
+                      ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40 font-semibold"
+                      : "border-line bg-secondary/25 hover:border-line-hover hover:bg-secondary/40 text-foreground"
+                  )}
                 >
-                  {opt.id}
-                </span>
-              </button>
-            );
-          })}
+                  <span className="text-xs sm:text-sm font-semibold">{opt.label}</span>
+                  <span
+                    className={cn(
+                      "flex size-6 sm:size-7 items-center justify-center rounded-lg text-xs font-bold font-mono transition-colors",
+                      checked ? "bg-primary text-primary-foreground" : "border border-line bg-secondary text-foreground"
+                    )}
+                  >
+                    {opt.id}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <QuestionNav
@@ -1316,37 +1646,40 @@ function PanelContent({
   // Panel 5: Child Handoff
   if (panel === 5) {
     return (
-      <div className="flex flex-col gap-4 text-center items-center pt-2">
-        <div className="flex size-14 items-center justify-center rounded-2xl border border-line bg-secondary/50 text-3xl">
-          🤖
+      <div className="flex flex-col justify-between min-h-full text-center items-center">
+        <div className="flex flex-col gap-4 items-center pt-2 w-full">
+          <div className="flex size-14 items-center justify-center rounded-2xl border border-line bg-secondary/50 text-3xl">
+            🤖
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
+              دور البطل يبدأ الآن!
+            </h2>
+            <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed px-1 font-medium">
+              من فضلك سلّم الجهاز إلى ابنك 📱. الأسئلة القادمة له وحده —
+              مجرد ألعاب ذكية ممتعة، ولا توجد إجابات تحرج. نيكسي سيرافقه في الرحلة!
+            </p>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-1.5">
-          <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
-            دور البطل يبدأ الآن!
-          </h2>
-          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed px-1 font-medium">
-            من فضلك سلّم الجهاز إلى ابنك 📱. الأسئلة القادمة له وحده —
-            مجرد ألعاب ذكية ممتعة، ولا توجد إجابات تحرج. نيكسي سيرافقه في الرحلة!
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-2.5 w-full mt-2">
+        <div className="flex items-center gap-2.5 mt-auto pt-3.5 border-t border-line/70 w-full shrink-0" dir="rtl">
+          <button
+            type="button"
+            onClick={() => go(4, -1)}
+            className="h-10 sm:h-11 px-4 rounded-full text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 flex items-center gap-1.5 cursor-pointer"
+          >
+            <ArrowRight className="size-4" />
+            <span>السابق</span>
+          </button>
           <Button
             type="button"
             onClick={() => go(6, 1)}
-            className="h-10 sm:h-11 w-full rounded-xl text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all flex items-center justify-center gap-2"
+            className="h-10 sm:h-11 flex-1 rounded-full text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
           >
             <span>أنا جاهز — لنبدأ!</span>
             <ArrowLeft className="size-4" />
           </Button>
-          <button
-            type="button"
-            onClick={() => go(4, -1)}
-            className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors self-center py-1 cursor-pointer"
-          >
-            السابق
-          </button>
         </div>
       </div>
     );
@@ -1361,47 +1694,54 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-4 pt-1">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-medium text-muted-foreground">1 / 8</span>
-          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
-            <span className="text-[11px] font-semibold text-foreground">النمط الرقمي</span>
-            <span className="text-yellow-500 text-xs">⚡</span>
-          </div>
-        </div>
-
-        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center">
-          أكمل المتتالية
-        </h2>
-
-        <div className="flex items-center justify-center gap-2 mt-1 bg-secondary/30 p-3 rounded-xl border border-line">
-          {[2, 6, 12, 20].map((num) => (
-            <div
-              key={num}
-              className="flex size-9 sm:size-10 items-center justify-center rounded-lg border border-line bg-card text-xs sm:text-sm font-bold font-mono text-foreground"
-            >
-              {num}
+      <div className="flex flex-col justify-between min-h-full w-full">
+        <div className="flex flex-col gap-4 pt-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-medium text-muted-foreground">1 / 8</span>
+            <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+              <span className="text-[11px] font-semibold text-foreground">النمط الرقمي</span>
+              <span className="text-yellow-500 text-xs">⚡</span>
             </div>
-          ))}
-          <div className="flex size-9 sm:size-10 items-center justify-center rounded-lg border border-dashed border-primary/50 bg-primary/10 text-xs sm:text-sm font-bold font-mono text-primary">
-            ؟
           </div>
-        </div>
 
-        <div className="grid grid-cols-3 gap-2 mt-2">
-          {options.map((opt) => {
-            const checked = c1 === opt.id;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => setC1(opt.id)}
-                className={cn( "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all cursor-pointer", checked ? "border-primary bg-primary text-primary-foreground font-bold ring-2 ring-primary/30" : "border-line bg-secondary/25 hover:border-line-hover text-foreground font-semibold" )}
+          <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center">
+            أكمل المتتالية
+          </h2>
+
+          <div className="flex items-center justify-center gap-2 mt-1 bg-secondary/30 p-3 rounded-xl border border-line">
+            {[2, 6, 12, 20].map((num) => (
+              <div
+                key={num}
+                className="flex size-9 sm:size-10 items-center justify-center rounded-lg border border-line bg-card text-xs sm:text-sm font-bold font-mono text-foreground"
               >
-                <span className="text-xs sm:text-sm font-mono">{opt.label}</span>
-              </button>
-            );
-          })}
+                {num}
+              </div>
+            ))}
+            <div className="flex size-9 sm:size-10 items-center justify-center rounded-lg border border-dashed border-primary/50 bg-primary/10 text-xs sm:text-sm font-bold font-mono text-primary">
+              ؟
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 mt-2">
+            {options.map((opt) => {
+              const checked = c1 === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setC1(opt.id)}
+                  className={cn(
+                    "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all cursor-pointer",
+                    checked
+                      ? "border-primary bg-primary text-primary-foreground font-bold ring-2 ring-primary/30"
+                      : "border-line bg-secondary/25 hover:border-line-hover text-foreground font-semibold"
+                  )}
+                >
+                  <span className="text-xs sm:text-sm font-mono">{opt.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <QuestionNav
@@ -1422,33 +1762,40 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-4 pt-1">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-medium text-muted-foreground">2 / 8</span>
-          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
-            <span className="text-[11px] font-semibold text-foreground">التفكير المنطقي</span>
-            <span className="text-yellow-500 text-xs">⚡</span>
+      <div className="flex flex-col justify-between min-h-full w-full">
+        <div className="flex flex-col gap-4 pt-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-medium text-muted-foreground">2 / 8</span>
+            <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+              <span className="text-[11px] font-semibold text-foreground">التفكير المنطقي</span>
+              <span className="text-yellow-500 text-xs">⚡</span>
+            </div>
           </div>
-        </div>
 
-        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
-          إذا A أكبر من B، و B أكبر من C — فما علاقة A بـ C؟
-        </h2>
+          <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
+            إذا A أكبر من B، و B أكبر من C — فما علاقة A بـ C؟
+          </h2>
 
-        <div className="flex flex-col gap-2 mt-1">
-          {options.map((opt) => {
-            const checked = c2 === opt.id;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => setC2(opt.id)}
-                className={cn( "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer", checked ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40" : "border-line bg-secondary/25 hover:border-line-hover text-foreground" )}
-              >
-                <span>{opt.label}</span>
-              </button>
-            );
-          })}
+          <div className="flex flex-col gap-2 mt-1">
+            {options.map((opt) => {
+              const checked = c2 === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setC2(opt.id)}
+                  className={cn(
+                    "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer",
+                    checked
+                      ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40"
+                      : "border-line bg-secondary/25 hover:border-line-hover text-foreground"
+                  )}
+                >
+                  <span>{opt.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <QuestionNav
@@ -1469,47 +1816,54 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-4 pt-1">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-medium text-muted-foreground">3 / 8</span>
-          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
-            <span className="text-[11px] font-semibold text-foreground">النمط</span>
-            <span className="text-yellow-500 text-xs">⚡</span>
-          </div>
-        </div>
-
-        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
-          كل رقم ضعف الذي قبله — ما التالي؟
-        </h2>
-
-        <div className="flex items-center justify-center gap-2 mt-1 bg-secondary/30 p-3 rounded-xl border border-line" dir="ltr">
-          {[1, 2, 4, 8].map((num) => (
-            <div
-              key={num}
-              className="flex size-9 sm:size-10 items-center justify-center rounded-lg border border-line bg-card text-xs sm:text-sm font-bold font-mono text-foreground"
-            >
-              {num}
+      <div className="flex flex-col justify-between min-h-full w-full">
+        <div className="flex flex-col gap-4 pt-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-medium text-muted-foreground">3 / 8</span>
+            <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+              <span className="text-[11px] font-semibold text-foreground">النمط</span>
+              <span className="text-yellow-500 text-xs">⚡</span>
             </div>
-          ))}
-          <div className="flex size-9 sm:size-10 items-center justify-center rounded-lg border border-dashed border-primary/50 bg-primary/10 text-xs sm:text-sm font-bold font-mono text-primary">
-            ؟
           </div>
-        </div>
 
-        <div className="grid grid-cols-3 gap-2 mt-2">
-          {options.map((opt) => {
-            const checked = c3 === opt.id;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => setC3(opt.id)}
-                className={cn( "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all cursor-pointer", checked ? "border-primary bg-primary text-primary-foreground font-bold ring-2 ring-primary/30" : "border-line bg-secondary/25 hover:border-line-hover text-foreground font-semibold" )}
+          <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
+            كل رقم ضعف الذي قبله — ما التالي؟
+          </h2>
+
+          <div className="flex items-center justify-center gap-2 mt-1 bg-secondary/30 p-3 rounded-xl border border-line" dir="ltr">
+            {[1, 2, 4, 8].map((num) => (
+              <div
+                key={num}
+                className="flex size-9 sm:size-10 items-center justify-center rounded-lg border border-line bg-card text-xs sm:text-sm font-bold font-mono text-foreground"
               >
-                <span className="text-xs sm:text-sm font-mono">{opt.label}</span>
-              </button>
-            );
-          })}
+                {num}
+              </div>
+            ))}
+            <div className="flex size-9 sm:size-10 items-center justify-center rounded-lg border border-dashed border-primary/50 bg-primary/10 text-xs sm:text-sm font-bold font-mono text-primary">
+              ؟
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 mt-2">
+            {options.map((opt) => {
+              const checked = c3 === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setC3(opt.id)}
+                  className={cn(
+                    "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all cursor-pointer",
+                    checked
+                      ? "border-primary bg-primary text-primary-foreground font-bold ring-2 ring-primary/30"
+                      : "border-line bg-secondary/25 hover:border-line-hover text-foreground font-semibold"
+                  )}
+                >
+                  <span className="text-xs sm:text-sm font-mono">{opt.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <QuestionNav
@@ -1530,33 +1884,40 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-4 pt-1">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-medium text-muted-foreground">4 / 8</span>
-          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
-            <span className="text-[11px] font-semibold text-foreground">حل المشكلات</span>
-            <span className="text-yellow-500 text-xs">⚡</span>
+      <div className="flex flex-col justify-between min-h-full w-full">
+        <div className="flex flex-col gap-4 pt-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-medium text-muted-foreground">4 / 8</span>
+            <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+              <span className="text-[11px] font-semibold text-foreground">حل المشكلات</span>
+              <span className="text-yellow-500 text-xs">⚡</span>
+            </div>
           </div>
-        </div>
 
-        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
-          لديك 5 دقائق لعرض فكرتك — بمَ تبدأ؟
-        </h2>
+          <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
+            لديك 5 دقائق لعرض فكرتك — بمَ تبدأ؟
+          </h2>
 
-        <div className="flex flex-col gap-2 mt-1">
-          {options.map((opt) => {
-            const checked = c4 === opt.id;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => setC4(opt.id)}
-                className={cn( "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer", checked ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40" : "border-line bg-secondary/25 hover:border-line-hover text-foreground" )}
-              >
-                <span>{opt.label}</span>
-              </button>
-            );
-          })}
+          <div className="flex flex-col gap-2 mt-1">
+            {options.map((opt) => {
+              const checked = c4 === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setC4(opt.id)}
+                  className={cn(
+                    "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer",
+                    checked
+                      ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40"
+                      : "border-line bg-secondary/25 hover:border-line-hover text-foreground"
+                  )}
+                >
+                  <span>{opt.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <QuestionNav
@@ -1590,55 +1951,62 @@ function PanelContent({
     };
 
     return (
-      <div className="flex flex-col gap-4 pt-1">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-medium text-muted-foreground">5 / 8</span>
-          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
-            <span className="text-[11px] font-semibold text-foreground">التسلسل</span>
-            <span className="text-yellow-500 text-xs">⚡</span>
+      <div className="flex flex-col justify-between min-h-full w-full">
+        <div className="flex flex-col gap-4 pt-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-medium text-muted-foreground">5 / 8</span>
+            <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+              <span className="text-[11px] font-semibold text-foreground">التسلسل</span>
+              <span className="text-yellow-500 text-xs">⚡</span>
+            </div>
           </div>
-        </div>
 
-        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
-          رتّب خطوات بناء مشروع بالترتيب الصحيح
-        </h2>
+          <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
+            رتّب خطوات بناء مشروع بالترتيب الصحيح
+          </h2>
 
-        <div className="grid grid-cols-3 gap-2 mt-2">
-          {options.map((opt) => {
-            const index = c5.indexOf(opt.id);
-            const isSelected = index !== -1;
-            return (
+          <div className="grid grid-cols-3 gap-2 mt-2">
+            {options.map((opt) => {
+              const index = c5.indexOf(opt.id);
+              const isSelected = index !== -1;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => toggleOption(opt.id)}
+                  className={cn(
+                    "relative flex h-13 sm:h-14 items-center justify-center rounded-xl border transition-all cursor-pointer",
+                    isSelected
+                      ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40 font-semibold"
+                      : "border-line bg-secondary/25 hover:border-line-hover text-foreground"
+                  )}
+                >
+                  {isSelected && (
+                    <span className="absolute -top-2 -right-1.5 flex size-5 items-center justify-center rounded-md bg-primary text-[10px] font-bold font-mono text-primary-foreground">
+                      {index + 1}
+                    </span>
+                  )}
+                  <span className="text-xs sm:text-sm font-semibold">{opt.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="flex items-center justify-between mt-1 px-1">
+            <p className="text-xs font-medium text-muted-foreground">
+              اضغط البطاقات بالترتيب (1 ثم 2 ثم 3)
+            </p>
+            {c5.length > 0 && (
               <button
-                key={opt.id}
                 type="button"
-                onClick={() => toggleOption(opt.id)}
-                className={cn( "relative flex h-13 sm:h-14 items-center justify-center rounded-xl border transition-all cursor-pointer", isSelected ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40 font-semibold" : "border-line bg-secondary/25 hover:border-line-hover text-foreground" )}
+                onClick={() => setC5([])}
+                className="text-xs text-primary hover:underline flex items-center gap-1 cursor-pointer font-medium"
               >
-                {isSelected && (
-                  <span className="absolute -top-2 -right-1.5 flex size-5 items-center justify-center rounded-md bg-primary text-[10px] font-bold font-mono text-primary-foreground">
-                    {index + 1}
-                  </span>
-                )}
-                <span className="text-xs sm:text-sm font-semibold">{opt.label}</span>
+                <RotateCcw className="size-3" />
+                <span>إعادة</span>
               </button>
-            );
-          })}
-        </div>
-
-        <div className="flex items-center justify-between mt-1 px-1">
-          <p className="text-xs font-medium text-muted-foreground">
-            اضغط البطاقات بالترتيب (1 ثم 2 ثم 3)
-          </p>
-          {c5.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setC5([])}
-              className="text-xs text-primary hover:underline flex items-center gap-1 cursor-pointer font-medium"
-            >
-              <RotateCcw className="size-3" />
-              <span>إعادة</span>
-            </button>
-          )}
+            )}
+          </div>
         </div>
 
         <QuestionNav
@@ -1659,33 +2027,40 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-4 pt-1">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-medium text-muted-foreground">6 / 8</span>
-          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
-            <span className="text-[11px] font-semibold text-foreground">التفكير المنطقي</span>
-            <span className="text-yellow-500 text-xs">⚡</span>
+      <div className="flex flex-col justify-between min-h-full w-full">
+        <div className="flex flex-col gap-4 pt-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-medium text-muted-foreground">6 / 8</span>
+            <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+              <span className="text-[11px] font-semibold text-foreground">التفكير المنطقي</span>
+              <span className="text-yellow-500 text-xs">⚡</span>
+            </div>
           </div>
-        </div>
 
-        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
-          أي رقم لا يقبل القسمة على 3؟
-        </h2>
+          <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
+            أي رقم لا يقبل القسمة على 3؟
+          </h2>
 
-        <div className="grid grid-cols-3 gap-2 mt-2">
-          {options.map((opt) => {
-            const checked = c6 === opt.id;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => setC6(opt.id)}
-                className={cn( "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all cursor-pointer", checked ? "border-primary bg-primary text-primary-foreground font-bold ring-2 ring-primary/30" : "border-line bg-secondary/25 hover:border-line-hover text-foreground font-semibold" )}
-              >
-                <span className="text-xs sm:text-sm font-mono">{opt.label}</span>
-              </button>
-            );
-          })}
+          <div className="grid grid-cols-3 gap-2 mt-2">
+            {options.map((opt) => {
+              const checked = c6 === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setC6(opt.id)}
+                  className={cn(
+                    "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all cursor-pointer",
+                    checked
+                      ? "border-primary bg-primary text-primary-foreground font-bold ring-2 ring-primary/30"
+                      : "border-line bg-secondary/25 hover:border-line-hover text-foreground font-semibold"
+                  )}
+                >
+                  <span className="text-xs sm:text-sm font-mono">{opt.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <QuestionNav
@@ -1706,33 +2081,40 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-4 pt-1">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-medium text-muted-foreground">7 / 8</span>
-          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
-            <span className="text-[11px] font-semibold text-foreground">الذكاء الاصطناعي</span>
-            <span className="text-yellow-500 text-xs">⚡</span>
+      <div className="flex flex-col justify-between min-h-full w-full">
+        <div className="flex flex-col gap-4 pt-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-medium text-muted-foreground">7 / 8</span>
+            <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+              <span className="text-[11px] font-semibold text-foreground">الذكاء الاصطناعي</span>
+              <span className="text-yellow-500 text-xs">⚡</span>
+            </div>
           </div>
-        </div>
 
-        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
-          لتعليم الحاسوب تمييز القطط، نعطيه كثيرًا من...؟
-        </h2>
+          <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
+            لتعليم الحاسوب تمييز القطط، نعطيه كثيرًا من...؟
+          </h2>
 
-        <div className="flex flex-col gap-2 mt-1">
-          {options.map((opt) => {
-            const checked = c7 === opt.id;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => setC7(opt.id)}
-                className={cn( "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer", checked ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40" : "border-line bg-secondary/25 hover:border-line-hover text-foreground" )}
-              >
-                <span>{opt.label}</span>
-              </button>
-            );
-          })}
+          <div className="flex flex-col gap-2 mt-1">
+            {options.map((opt) => {
+              const checked = c7 === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setC7(opt.id)}
+                  className={cn(
+                    "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer",
+                    checked
+                      ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40"
+                      : "border-line bg-secondary/25 hover:border-line-hover text-foreground"
+                  )}
+                >
+                  <span>{opt.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <QuestionNav
@@ -1753,33 +2135,40 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-4 pt-1">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono font-medium text-muted-foreground">8 / 8</span>
-          <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
-            <span className="text-[11px] font-semibold text-foreground">حل المشكلات</span>
-            <span className="text-yellow-500 text-xs">⚡</span>
+      <div className="flex flex-col justify-between min-h-full w-full">
+        <div className="flex flex-col gap-4 pt-1">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-mono font-medium text-muted-foreground">8 / 8</span>
+            <div className="flex items-center gap-1.5 rounded-md border border-line bg-secondary/50 px-2.5 py-1">
+              <span className="text-[11px] font-semibold text-foreground">حل المشكلات</span>
+              <span className="text-yellow-500 text-xs">⚡</span>
+            </div>
           </div>
-        </div>
 
-        <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
-          أفضل طريقة لاختبار فكرة بسرعة؟
-        </h2>
+          <h2 className="text-base sm:text-lg font-bold font-heading text-foreground text-center leading-snug">
+            أفضل طريقة لاختبار فكرة بسرعة؟
+          </h2>
 
-        <div className="flex flex-col gap-2 mt-1">
-          {options.map((opt) => {
-            const checked = c10 === opt.id;
-            return (
-              <button
-                key={opt.id}
-                type="button"
-                onClick={() => setC10(opt.id)}
-                className={cn( "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer", checked ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40" : "border-line bg-secondary/25 hover:border-line-hover text-foreground" )}
-              >
-                <span>{opt.label}</span>
-              </button>
-            );
-          })}
+          <div className="flex flex-col gap-2 mt-1">
+            {options.map((opt) => {
+              const checked = c10 === opt.id;
+              return (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setC10(opt.id)}
+                  className={cn(
+                    "flex h-10 sm:h-11 items-center justify-center rounded-xl border transition-all text-xs sm:text-sm font-semibold cursor-pointer",
+                    checked
+                      ? "border-primary bg-primary/10 text-primary ring-1 ring-primary/40"
+                      : "border-line bg-secondary/25 hover:border-line-hover text-foreground"
+                  )}
+                >
+                  <span>{opt.label}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <QuestionNav
@@ -1796,57 +2185,55 @@ function PanelContent({
   if (panel === 14) {
     const { quizCorrectCount } = computeWebsiteQuizStats({ c1, c2, c3, c4, c5, c6, c7, c10 });
     return (
-      <div className="flex flex-col gap-4 text-center items-center pt-1">
-        <div className="flex size-12 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-2xl">
-          🎉
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <span className="text-xs font-bold text-primary font-mono">القبول المبدئي</span>
-          <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground leading-snug">
-            تهانينا! تم قبولك مبدئياً
-          </h2>
-        </div>
-
-        <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed px-2 font-medium">
-          لقد اجتزت التقييم المبدئي للانتقال إلى المرحلة التالية. يمكنك الآن حجز جلسة التقييم الحضورية.
-        </p>
-
-        <div className="flex items-center gap-2 sm:gap-3 w-full mt-1 justify-center">
-          <div className="flex flex-col items-center justify-center gap-1 rounded-xl bg-secondary/25 py-2.5 px-3 border border-line flex-1">
-            <span className="text-sm sm:text-base font-bold font-heading text-primary truncate max-w-full px-1">{selectedTrack}</span>
-            <span className="text-[11px] font-medium text-muted-foreground text-center">المسار المقترح</span>
+      <div className="flex flex-col justify-between min-h-full text-center items-center">
+        <div className="flex flex-col gap-4 items-center pt-1 w-full">
+          <div className="flex size-12 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 text-2xl">
+            🎉
           </div>
-          <div className="flex flex-col items-center justify-center gap-1 rounded-xl bg-secondary/25 py-2.5 px-3 border border-line flex-1">
-            <div className="flex items-baseline gap-0.5">
-              <span className="text-xl sm:text-2xl font-bold font-mono text-primary">{quizCorrectCount}</span>
-              <span className="text-xs sm:text-sm font-bold font-mono text-muted-foreground">/8</span>
+
+          <div className="flex flex-col gap-1">
+            <span className="text-xs font-bold text-primary font-mono">القبول المبدئي</span>
+            <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground leading-snug">
+              تهانينا! تم قبولك مبدئياً
+            </h2>
+          </div>
+
+          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed px-2 font-medium">
+            لقد اجتزت التقييم المبدئي للانتقال إلى المرحلة التالية. يمكنك الآن حجز جلسة التقييم الحضورية.
+          </p>
+
+          <div className="flex items-center gap-2 sm:gap-3 w-full mt-1 justify-center">
+            <div className="flex flex-col items-center justify-center gap-1 rounded-xl bg-secondary/25 py-2.5 px-3 border border-line flex-1">
+              <span className="text-sm sm:text-base font-bold font-heading text-primary truncate max-w-full px-1">{selectedTrack}</span>
+              <span className="text-[11px] font-medium text-muted-foreground text-center">المسار المقترح</span>
             </div>
-            <span className="text-[11px] font-medium text-muted-foreground text-center">نتيجتك</span>
+            <div className="flex flex-col items-center justify-center gap-1 rounded-xl bg-secondary/25 py-2.5 px-3 border border-line flex-1">
+              <div className="flex items-baseline gap-0.5">
+                <span className="text-xl sm:text-2xl font-bold font-mono text-primary">{quizCorrectCount}</span>
+                <span className="text-xs sm:text-sm font-bold font-mono text-muted-foreground">/8</span>
+              </div>
+              <span className="text-[11px] font-medium text-muted-foreground text-center">نتيجتك</span>
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 w-full mt-2">
+        <div className="flex items-center gap-2.5 mt-auto pt-3.5 border-t border-line/70 w-full shrink-0" dir="rtl">
+          <button
+            type="button"
+            onClick={() => go(13, -1)}
+            className="h-10 sm:h-11 px-4 rounded-full text-xs sm:text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 flex items-center gap-1.5 cursor-pointer"
+          >
+            <ArrowRight className="size-4" />
+            <span>السابق</span>
+          </button>
           <Button
             type="button"
             onClick={() => go(15, 1)}
-            className="h-10 sm:h-11 w-full rounded-xl text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="h-10 sm:h-11 flex-1 rounded-full text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
           >
             <span>احجز جلسة التقييم الحضورية</span>
             <ArrowLeft className="size-4" />
           </Button>
-          <div className="flex items-center justify-between w-full px-1">
-            <button
-              type="button"
-              onClick={() => go(13, -1)}
-              className="text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-            >
-              السابق
-            </button>
-            <p className="text-[11px] font-medium text-muted-foreground">
-              المستوى النهائي يُؤكّد بالتقييم الحضوري
-            </p>
-          </div>
         </div>
       </div>
     );
@@ -1854,13 +2241,36 @@ function PanelContent({
 
   // Panel 15: Booking Calendar & Timeslots
   if (panel === 15) {
-    const daysOfWeek = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
-    const blanks = [0, 1, 2, 3];
-    const days = Array.from({ length: 31 }, (_, i) => i + 1);
+    const today = new Date();
+    const isCurrentMonth = calendarYear === today.getFullYear() && calendarMonth === today.getMonth();
+
+    const handlePrevMonth = () => {
+      if (isCurrentMonth) return;
+      if (calendarMonth === 0) {
+        setCalendarMonth(11);
+        setCalendarYear((y) => y - 1);
+      } else {
+        setCalendarMonth((m) => m - 1);
+      }
+    };
+
+    const handleNextMonth = () => {
+      if (calendarMonth === 11) {
+        setCalendarMonth(0);
+        setCalendarYear((y) => y + 1);
+      } else {
+        setCalendarMonth((m) => m + 1);
+      }
+    };
+
+    const firstDayOfWeek = new Date(calendarYear, calendarMonth, 1).getDay();
+    const blanks = Array.from({ length: firstDayOfWeek }, (_, i) => i);
+    const totalDaysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+    const days = Array.from({ length: totalDaysInMonth }, (_, i) => i + 1);
 
     const getDayName = (d: number) => {
-      const idx = (d + blanks.length - 1) % 7;
-      return daysOfWeek[idx];
+      const idx = new Date(calendarYear, calendarMonth, d).getDay();
+      return DAYS_OF_WEEK[idx] || "";
     };
 
     const timeslots = [
@@ -1870,77 +2280,104 @@ function PanelContent({
     ];
 
     return (
-      <div className="flex flex-col gap-4 pt-1">
-        <div className="flex flex-col gap-1 text-center">
-          <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
-            {refCode ? "الفترة والموعد المفضل للمقابلة" : "الموعد والفترة المفضلة لجلسة المقابلة"}
-          </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground font-medium">
-            اختر اليوم والوقت الأنسب لحضور طفلك (ساعات عمل الأكاديمية من 09:00 ص إلى 08:00 م)
-          </p>
-        </div>
-
-        {/* Calendar */}
-        <div className="flex flex-col gap-2 rounded-xl border border-line bg-secondary/20 p-3">
-          <div className="flex items-center justify-between px-1">
-            <button
-              type="button"
-              className="size-7 flex items-center justify-center hover:bg-secondary rounded-lg border border-line text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-            >
-              <ChevronRight className="size-4" />
-            </button>
-            <span className="text-xs sm:text-sm font-bold font-mono text-foreground">أكتوبر 2026</span>
-            <button
-              type="button"
-              className="size-7 flex items-center justify-center hover:bg-secondary rounded-lg border border-line text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-            >
-              <ChevronLeft className="size-4" />
-            </button>
+      <div className="flex flex-col justify-between min-h-full">
+        <div className="flex flex-col gap-3 pt-1">
+          <div className="flex flex-col gap-1 text-center">
+            <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
+              {refCode ? "الفترة والموعد المفضل للمقابلة" : "الموعد والفترة المفضلة لجلسة المقابلة"}
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground font-medium">
+              اختر اليوم والوقت الأنسب لحضور طفلك (ساعات عمل الأكاديمية من 09:00 ص إلى 08:00 م)
+            </p>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 text-center" dir="rtl">
-            {daysOfWeek.map((d) => (
-              <div key={d} className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground py-1">
-                {d}
-              </div>
-            ))}
-            {blanks.map((b) => (
-              <div key={`b-${b}`} className="py-1"></div>
-            ))}
-            {days.map((d) => {
-              const isFriday = (d + blanks.length - 1) % 7 === 5;
-              const isSelected = bookingDay === d;
-              return (
-                <button
-                  key={d}
-                  type="button"
-                  disabled={isFriday}
-                  onClick={() => {
-                    setBookingDay(d);
-                    setBookingPrompt(false);
-                    if (!bookingTime) {
-                      setBookingTime("4:00 م");
-                    }
-                  }}
-                  className={cn( "h-7 sm:h-8 w-full flex items-center justify-center text-xs font-semibold font-mono transition-all rounded-lg cursor-pointer", isFriday ? "text-muted-foreground/30 cursor-not-allowed" : isSelected ? "bg-primary text-primary-foreground font-bold ring-2 ring-primary/30" : "text-foreground hover:bg-secondary/70" )}
-                >
+          {/* Calendar Box */}
+          <div className="flex flex-col gap-2 rounded-xl border border-line bg-secondary/20 p-3">
+            <div className="flex items-center justify-between px-1">
+              <button
+                type="button"
+                onClick={handlePrevMonth}
+                disabled={isCurrentMonth}
+                className={cn(
+                  "size-7 flex items-center justify-center rounded-lg border border-line text-muted-foreground transition-colors cursor-pointer",
+                  isCurrentMonth
+                    ? "opacity-30 cursor-not-allowed"
+                    : "hover:bg-secondary hover:text-foreground"
+                )}
+                aria-label="الشهر السابق"
+              >
+                <ChevronRight className="size-4" />
+              </button>
+              <span className="text-xs sm:text-sm font-bold font-heading text-foreground">
+                {ARABIC_MONTHS[calendarMonth]} {calendarYear}
+              </span>
+              <button
+                type="button"
+                onClick={handleNextMonth}
+                className="size-7 flex items-center justify-center hover:bg-secondary rounded-lg border border-line text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                aria-label="الشهر التالي"
+              >
+                <ChevronLeft className="size-4" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-7 gap-1 text-center" dir="rtl">
+              {DAYS_OF_WEEK.map((d) => (
+                <div key={d} className="text-[10px] sm:text-[11px] font-semibold text-muted-foreground py-1">
                   {d}
-                </button>
-              );
-            })}
+                </div>
+              ))}
+              {blanks.map((b) => (
+                <div key={`b-${b}`} className="py-1"></div>
+              ))}
+              {days.map((d) => {
+                const dayDate = new Date(calendarYear, calendarMonth, d);
+                const isFriday = dayDate.getDay() === 5;
+                const isPast = isCurrentMonth && d < today.getDate();
+                const isDisabled = isFriday || isPast;
+                const isSelected = bookingDay === d && bookingMonth === calendarMonth && bookingYear === calendarYear;
+                return (
+                  <button
+                    key={d}
+                    type="button"
+                    disabled={isDisabled}
+                    onClick={() => {
+                      setBookingDay(d);
+                      setBookingMonth(calendarMonth);
+                      setBookingYear(calendarYear);
+                      setBookingPrompt(false);
+                      if (!bookingTime) {
+                        setBookingTime("04:00 م");
+                      }
+                    }}
+                    className={cn(
+                      "h-7 sm:h-8 w-full flex items-center justify-center text-xs font-semibold font-mono transition-all rounded-lg select-none",
+                      isDisabled
+                        ? "text-muted-foreground/30 cursor-not-allowed"
+                        : isSelected
+                        ? "bg-primary text-primary-foreground font-bold ring-2 ring-primary/30 cursor-pointer shadow-sm"
+                        : "text-foreground hover:bg-secondary/70 cursor-pointer"
+                    )}
+                  >
+                    {d}
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
 
-        {bookingDay && (
-          <div className="flex flex-col gap-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          {/* Timeslots */}
+          <div className="flex flex-col gap-2">
             <div className="flex items-center gap-1.5 text-foreground text-xs font-semibold">
               <Clock className="size-3.5 text-primary" />
               <span>
-                المواعيد المتاحة — {getDayName(bookingDay)} {bookingDay} أكتوبر
+                {bookingDay && bookingMonth === calendarMonth && bookingYear === calendarYear
+                  ? `المواعيد المتاحة — ${getDayName(bookingDay)} ${bookingDay} ${ARABIC_MONTHS[calendarMonth]}`
+                  : "المواعيد المتاحة"}
               </span>
             </div>
 
-            <div className="grid grid-cols-3 gap-2" dir="rtl">
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5" dir="rtl">
               {timeslots.map((time) => {
                 const isSelected = bookingTime === time;
                 return (
@@ -1951,7 +2388,12 @@ function PanelContent({
                       setBookingTime(time);
                       setBookingPrompt(false);
                     }}
-                    className={cn( "h-8.5 sm:h-9 rounded-lg text-xs font-medium transition-all border cursor-pointer", isSelected ? "bg-primary border-primary text-primary-foreground font-semibold ring-2 ring-primary/30" : "bg-secondary/25 border-line text-foreground hover:border-line-hover hover:bg-secondary/40" )}
+                    className={cn(
+                      "h-8 sm:h-8.5 rounded-lg text-xs font-medium transition-all border cursor-pointer select-none",
+                      isSelected
+                        ? "bg-primary border-primary text-primary-foreground font-semibold ring-2 ring-primary/30 shadow-sm"
+                        : "bg-secondary/25 border-line text-foreground hover:border-line-hover hover:bg-secondary/40"
+                    )}
                   >
                     {time}
                   </button>
@@ -1959,15 +2401,15 @@ function PanelContent({
               })}
             </div>
           </div>
-        )}
 
-        {bookingPrompt && (!bookingDay || !bookingTime) && (
-          <p className="text-destructive text-xs font-medium text-center animate-in fade-in">
-            يرجى تحديد اليوم والموعد المناسب للمتابعة
-          </p>
-        )}
+          {bookingPrompt && (!bookingDay || !bookingTime) && (
+            <p className="text-destructive text-xs font-medium text-center animate-in fade-in">
+              يرجى تحديد اليوم والموعد المناسب للمتابعة
+            </p>
+          )}
+        </div>
 
-        <div className="flex gap-2.5 mt-2" dir="rtl">
+        <div className="flex gap-2.5 mt-auto pt-3.5 border-t border-line/70 shrink-0" dir="rtl">
           <Button
             type="button"
             variant="outline"
@@ -1986,7 +2428,12 @@ function PanelContent({
                 setBookingPrompt(true);
               }
             }}
-            className={cn( "h-10 sm:h-11 flex-[2] rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer", bookingDay && bookingTime ? "bg-primary hover:bg-primary/90 text-primary-foreground" : "bg-secondary text-muted-foreground border border-line" )}
+            className={cn(
+              "h-10 sm:h-11 flex-[2] rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer",
+              bookingDay && bookingTime
+                ? "bg-primary hover:bg-primary/90 text-primary-foreground shadow-sm"
+                : "bg-secondary text-muted-foreground border border-line"
+            )}
           >
             <span>التالي — البيانات</span>
             <ArrowLeft className="size-4" />
@@ -2005,8 +2452,8 @@ function PanelContent({
       }
       if (!phone.trim()) {
         errs.phone = "يرجى كتابة رقم الجوال";
-      } else if (phone.trim().replace(/\D/g, "").length < 9) {
-        errs.phone = "رقم الجوال يجب ألا يقل عن 9 أرقام";
+      } else if (phone.trim().replace(/\D/g, "").length < 8) {
+        errs.phone = "رقم الجوال يجب ألا يقل عن 8 أرقام";
       }
       if (!email.trim()) {
         errs.email = "يرجى كتابة البريد الإلكتروني";
@@ -2016,7 +2463,7 @@ function PanelContent({
       if (!childrenList[0]?.name.trim()) {
         errs.studentName = "يرجى كتابة اسم الطفل";
       }
-      if (!birthDate.trim()) {
+      if (!birthDate || !birthDate.trim()) {
         errs.birthDate = "يرجى تحديد تاريخ ميلاد الطفل";
       }
 
@@ -2027,235 +2474,239 @@ function PanelContent({
     };
 
     return (
-      <div className="flex flex-col gap-4 pt-1">
-        <div className="flex flex-col gap-1 text-center">
-          <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
-            البيانات الشخصية
-          </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground font-medium">
-            لإتمام الحجز والتواصل معك لتأكيد الموعد
-          </p>
-        </div>
-
-        {/* Form Fields - 2 inputs per row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5" dir="rtl">
-          {/* 1. Parent Name */}
-          <div className="flex flex-col gap-1 min-w-0">
-            <label className="text-xs font-semibold text-foreground">
-              اسم ولي الأمر <span className="text-destructive">*</span>
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="الاسم الكامل"
-                value={parentName}
-                onChange={(e) => {
-                  setParentName(e.target.value);
-                  if (formErrors.parentName) {
-                    setFormErrors((prev) => ({ ...prev, parentName: "" }));
-                  }
-                }}
-                className={cn(
-                  "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors text-right pl-3 pr-9",
-                  formErrors.parentName
-                    ? "border-destructive focus:border-destructive ring-1 ring-destructive/30"
-                    : "border-line focus:border-primary"
-                )}
-              />
-              <User className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
-            </div>
-            {formErrors.parentName && (
-              <span className="text-[11px] font-medium text-destructive px-1">
-                {formErrors.parentName}
-              </span>
-            )}
+      <div className="flex flex-col justify-between min-h-full">
+        <div className="flex flex-col gap-3.5 pt-1">
+          <div className="flex flex-col gap-1 text-center">
+            <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
+              البيانات الشخصية
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground font-medium">
+              لإتمام الحجز والتواصل معك لتأكيد الموعد
+            </p>
           </div>
 
-          {/* 2. Phone Number */}
-          <div className="flex flex-col gap-1 min-w-0">
-            <label className="text-xs font-semibold text-foreground">
-              رقم الجوال <span className="text-destructive">*</span>
-            </label>
-            <div
-              className={cn(
-                "relative flex items-center h-10 w-full rounded-xl border bg-secondary/20 overflow-hidden transition-colors",
-                formErrors.phone
-                  ? "border-destructive focus-within:border-destructive ring-1 ring-destructive/30"
-                  : "border-line focus-within:border-primary"
+          {/* Form Fields - 2 inputs per row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5" dir="rtl">
+            {/* 1. Parent Name */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs font-semibold text-foreground">
+                اسم ولي الأمر <span className="text-destructive">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="الاسم الكامل"
+                  value={parentName}
+                  onChange={(e) => {
+                    setParentName(e.target.value);
+                    if (formErrors.parentName) {
+                      setFormErrors((prev) => ({ ...prev, parentName: "" }));
+                    }
+                  }}
+                  className={cn(
+                    "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors text-right pl-3 pr-9",
+                    formErrors.parentName
+                      ? "border-destructive focus:border-destructive ring-1 ring-destructive/30"
+                      : "border-line focus:border-primary"
+                  )}
+                />
+                <User className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
+              </div>
+              {formErrors.parentName && (
+                <span className="text-[11px] font-medium text-destructive px-1">
+                  {formErrors.parentName}
+                </span>
               )}
-            >
-              <input
-                type="tel"
-                placeholder="01XXXXXXXXX"
-                value={phone}
-                onChange={(e) => {
-                  setPhone(e.target.value);
-                  if (formErrors.phone) {
-                    setFormErrors((prev) => ({ ...prev, phone: "" }));
-                  }
-                }}
-                className="flex-1 min-w-0 h-full bg-transparent px-3 text-xs sm:text-sm outline-none text-left font-mono"
-                dir="ltr"
-              />
+            </div>
+
+            {/* 2. Phone Number */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs font-semibold text-foreground">
+                رقم الجوال <span className="text-destructive">*</span>
+              </label>
               <div
-                className="flex items-center gap-1.5 h-full px-2.5 border-r border-line bg-secondary/40 text-foreground text-xs font-semibold font-mono"
-                dir="ltr"
+                className={cn(
+                  "relative flex items-center h-10 w-full rounded-xl border bg-secondary/20 overflow-hidden transition-colors",
+                  formErrors.phone
+                    ? "border-destructive focus-within:border-destructive ring-1 ring-destructive/30"
+                    : "border-line focus-within:border-primary"
+                )}
               >
-                <ChevronDown className="size-3 text-muted-foreground" />
-                <span>+20</span>
-                <span className="text-xs leading-none">🇪🇬</span>
+                <input
+                  type="tel"
+                  placeholder={phoneCountryCode === "+20" ? "01XXXXXXXXX" : "5XXXXXXXX"}
+                  value={phone}
+                  onChange={(e) => {
+                    setPhone(e.target.value);
+                    if (formErrors.phone) {
+                      setFormErrors((prev) => ({ ...prev, phone: "" }));
+                    }
+                  }}
+                  className="flex-1 min-w-0 h-full bg-transparent px-3 text-xs sm:text-sm outline-none text-left font-mono"
+                  dir="ltr"
+                />
+                <div
+                  className="flex items-center gap-1 h-full px-2 border-r border-line bg-secondary/40 text-foreground text-xs font-semibold font-mono shrink-0"
+                  dir="ltr"
+                >
+                  <select
+                    value={phoneCountryCode}
+                    onChange={(e) => setPhoneCountryCode(e.target.value)}
+                    className="bg-transparent border-none text-xs font-semibold font-mono outline-none cursor-pointer pr-1 text-foreground"
+                    dir="ltr"
+                  >
+                    {COUNTRY_CODES.map((c) => (
+                      <option key={c.code} value={c.code} className="bg-card text-foreground font-sans">
+                        {c.flag} {c.code}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              {formErrors.phone && (
+                <span className="text-[11px] font-medium text-destructive px-1">
+                  {formErrors.phone}
+                </span>
+              )}
+            </div>
+
+            {/* 3. Email */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs font-semibold text-foreground">
+                البريد الإلكتروني <span className="text-destructive">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="email"
+                  placeholder="email@example.com"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (formErrors.email) {
+                      setFormErrors((prev) => ({ ...prev, email: "" }));
+                    }
+                  }}
+                  className={cn(
+                    "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors text-left pl-3 pr-9 font-mono",
+                    formErrors.email
+                      ? "border-destructive focus:border-destructive ring-1 ring-destructive/30"
+                      : "border-line focus:border-primary"
+                  )}
+                  dir="ltr"
+                />
+                <Mail className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
+              </div>
+              {formErrors.email && (
+                <span className="text-[11px] font-medium text-destructive px-1">
+                  {formErrors.email}
+                </span>
+              )}
+            </div>
+
+            {/* 4. Target Track */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                <Compass className="size-3.5 text-primary" />
+                <span>المسار الأكاديمي المطلوب</span>
+                <span className="text-destructive">*</span>
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedTrack}
+                  onChange={(e) => setSelectedTrack(e.target.value)}
+                  className="h-10 w-full rounded-xl border border-line bg-secondary/20 px-3 text-xs sm:text-sm outline-none focus:border-primary transition-colors text-right font-sans cursor-pointer"
+                >
+                  {REGISTRATION_TRACKS.map((t) => (
+                    <option key={t} value={t} className="bg-card text-foreground">
+                      {t}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
-            {formErrors.phone && (
-              <span className="text-[11px] font-medium text-destructive px-1">
-                {formErrors.phone}
-              </span>
-            )}
-          </div>
 
-          {/* 3. Email */}
-          <div className="flex flex-col gap-1 min-w-0">
-            <label className="text-xs font-semibold text-foreground">
-              البريد الإلكتروني <span className="text-destructive">*</span>
-            </label>
-            <div className="relative">
-              <input
-                type="email"
-                placeholder="email@example.com"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (formErrors.email) {
-                    setFormErrors((prev) => ({ ...prev, email: "" }));
-                  }
-                }}
-                className={cn(
-                  "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors text-left pl-3 pr-9 font-mono",
-                  formErrors.email
-                    ? "border-destructive focus:border-destructive ring-1 ring-destructive/30"
-                    : "border-line focus:border-primary"
-                )}
-                dir="ltr"
-              />
-              <Mail className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
-            </div>
-            {formErrors.email && (
-              <span className="text-[11px] font-medium text-destructive px-1">
-                {formErrors.email}
-              </span>
-            )}
-          </div>
-
-          {/* 4. Target Track */}
-          <div className="flex flex-col gap-1 min-w-0">
-            <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-              <Compass className="size-3.5 text-primary" />
-              <span>المسار الأكاديمي المطلوب</span>
-              <span className="text-destructive">*</span>
-            </label>
-            <div className="relative">
-              <select
-                value={selectedTrack}
-                onChange={(e) => setSelectedTrack(e.target.value)}
-                className="h-10 w-full rounded-xl border border-line bg-secondary/20 px-3 text-xs sm:text-sm outline-none focus:border-primary transition-colors text-right font-sans cursor-pointer"
-              >
-                {REGISTRATION_TRACKS.map((t) => (
-                  <option key={t} value={t} className="bg-card text-foreground">
-                    {t}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* 5. Child Name */}
-          <div className="flex flex-col gap-1 min-w-0">
-            <label className="text-xs font-semibold text-foreground">
-              اسم الطفل الكامل <span className="text-destructive">*</span>
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="اسم الطفل الكامل"
-                value={childrenList[0]?.name || ""}
-                onChange={(e) => {
-                  const newList = [...childrenList];
-                  if (newList[0]) newList[0].name = e.target.value;
-                  setChildrenList(newList);
-                  if (formErrors.studentName) {
-                    setFormErrors((prev) => ({ ...prev, studentName: "" }));
-                  }
-                }}
-                className={cn(
-                  "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors pr-9",
-                  formErrors.studentName
-                    ? "border-destructive focus:border-destructive ring-1 ring-destructive/30"
-                    : "border-line focus:border-primary"
-                )}
-              />
-              <Smile className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
-            </div>
-            {formErrors.studentName && (
-              <span className="text-[11px] font-medium text-destructive px-1">
-                {formErrors.studentName}
-              </span>
-            )}
-          </div>
-
-          {/* 6. Child Birth Date */}
-          <div className="flex flex-col gap-1 min-w-0">
-            <label className="text-xs font-semibold text-foreground flex items-center justify-between">
-              <span className="flex items-center gap-1">
-                <Calendar className="size-3.5 text-primary" />
-                <span>تاريخ ميلاد الطفل</span>
-                <span className="text-destructive">*</span>
-              </span>
-              {age ? (
-                <span className="text-[10px] font-bold text-primary font-mono bg-primary/10 px-1.5 py-0.5 rounded">
-                  ({age} سنوات)
-                </span>
-              ) : null}
-            </label>
-            <div className="relative">
-              <input
-                type="date"
-                max={new Date().toISOString().split("T")[0]}
-                min="2005-01-01"
-                value={birthDate}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setBirthDate(val);
-                  if (val) {
-                    const calculated = computeAge(val);
-                    if (calculated) {
-                      setAge(calculated);
-                      const newList = [...childrenList];
-                      if (newList[0]) newList[0].age = `${calculated}`;
-                      setChildrenList(newList);
+            {/* 5. Child Name */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs font-semibold text-foreground">
+                اسم الطفل الكامل <span className="text-destructive">*</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="اسم الطفل الكامل"
+                  value={childrenList[0]?.name || ""}
+                  onChange={(e) => {
+                    const newList = [...childrenList];
+                    if (newList[0]) newList[0].name = e.target.value;
+                    setChildrenList(newList);
+                    if (formErrors.studentName) {
+                      setFormErrors((prev) => ({ ...prev, studentName: "" }));
                     }
-                  }
-                  if (formErrors.birthDate) {
-                    setFormErrors((prev) => ({ ...prev, birthDate: "" }));
-                  }
-                }}
+                  }}
+                  className={cn(
+                    "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-colors pr-9",
+                    formErrors.studentName
+                      ? "border-destructive focus:border-destructive ring-1 ring-destructive/30"
+                      : "border-line focus:border-primary"
+                  )}
+                />
+                <Smile className="absolute right-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground/60" />
+              </div>
+              {formErrors.studentName && (
+                <span className="text-[11px] font-medium text-destructive px-1">
+                  {formErrors.studentName}
+                </span>
+              )}
+            </div>
+
+            {/* 6. Child Birth Date */}
+            <div className="flex flex-col gap-1 min-w-0">
+              <label className="text-xs font-semibold text-foreground flex items-center justify-between">
+                <span className="flex items-center gap-1">
+                  <Calendar className="size-3.5 text-primary" />
+                  <span>تاريخ ميلاد الطفل</span>
+                  <span className="text-destructive">*</span>
+                </span>
+                {age ? (
+                  <span className="text-[10px] font-bold text-primary font-mono bg-primary/10 px-1.5 py-0.5 rounded">
+                    ({age} سنوات)
+                  </span>
+                ) : null}
+              </label>
+
+              <button
+                type="button"
+                onClick={() => setBirthDateModalOpen(true)}
                 className={cn(
-                  "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs outline-none transition-colors font-sans text-right",
+                  "h-10 w-full rounded-xl border bg-secondary/20 px-3 text-xs sm:text-sm outline-none transition-all flex items-center justify-between text-foreground hover:border-primary/70 cursor-pointer pr-3.5 pl-3 group",
                   formErrors.birthDate
-                    ? "border-destructive focus:border-destructive ring-1 ring-destructive/30"
+                    ? "border-destructive ring-1 ring-destructive/30"
                     : "border-line focus:border-primary"
                 )}
-              />
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <Calendar className="size-4 text-primary shrink-0 transition-transform group-hover:scale-110" />
+                  <span className="font-semibold text-foreground text-xs sm:text-sm truncate">
+                    {formatArabicBirthDate(birthDate) || "اختر تاريخ ميلاد الطفل"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1 shrink-0 text-muted-foreground group-hover:text-primary transition-colors">
+                  <span className="text-[11px] font-medium">تحديد</span>
+                  <ChevronDown className="size-3.5" />
+                </div>
+              </button>
+
+              {formErrors.birthDate && (
+                <span className="text-[11px] font-medium text-destructive px-1">
+                  {formErrors.birthDate}
+                </span>
+              )}
             </div>
-            {formErrors.birthDate && (
-              <span className="text-[11px] font-medium text-destructive px-1">
-                {formErrors.birthDate}
-              </span>
-            )}
           </div>
         </div>
 
         {/* Navigation */}
-        <div className="flex gap-2.5 mt-2" dir="rtl">
+        <div className="flex gap-2.5 mt-auto pt-3.5 border-t border-line/70 shrink-0" dir="rtl">
           <Button
             type="button"
             variant="outline"
@@ -2268,91 +2719,125 @@ function PanelContent({
           <Button
             type="button"
             onClick={validateAndNext}
-            className="h-10 sm:h-11 flex-[2] rounded-xl text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all cursor-pointer flex items-center justify-center gap-1.5"
+            className="h-10 sm:h-11 flex-[2] rounded-xl text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
           >
             <span>التالي — التأكيد</span>
             <ArrowLeft className="size-4" />
           </Button>
         </div>
+
+        {/* Date of Birth Picker Modal */}
+        <BirthDatePickerModal
+          isOpen={birthDateModalOpen}
+          onClose={() => setBirthDateModalOpen(false)}
+          initialDate={birthDate}
+          initialAge={age}
+          onConfirm={(selectedDate) => {
+            setBirthDate(selectedDate);
+            if (formErrors.birthDate) {
+              setFormErrors((prev) => ({ ...prev, birthDate: "" }));
+            }
+          }}
+        />
       </div>
     );
   }
 
   // Panel 17: Summary
   if (panel === 17) {
-    const daysOfWeek = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
     const getDayName = (d: number | null) => {
       if (!d) return "";
-      const blanks = [0, 1, 2, 3];
-      const idx = (d + blanks.length - 1) % 7;
-      return daysOfWeek[idx];
+      const idx = new Date(bookingYear, bookingMonth, d).getDay();
+      return DAYS_OF_WEEK[idx] || "";
     };
 
     return (
-      <div className="flex flex-col gap-4 pt-1">
-        <div className="flex flex-col gap-1 text-center">
-          <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
-            ملخص الحجز
-          </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground font-medium">
-            تأكد من تفاصيل الموعد قبل تأكيد الحجز
-          </p>
-        </div>
+      <div className="flex flex-col justify-between min-h-full">
+        <div className="flex flex-col gap-3.5 pt-1">
+          <div className="flex flex-col gap-1 text-center">
+            <h2 className="text-lg sm:text-xl font-bold font-heading text-foreground">
+              ملخص الحجز
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground font-medium">
+              تأكد من تفاصيل الموعد قبل تأكيد الحجز
+            </p>
+          </div>
 
-        {/* Summary Content */}
-        <div className="flex flex-col rounded-xl border border-line divide-y divide-line bg-secondary/25 overflow-hidden" dir="rtl">
-          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground">الموعد</span>
-            <span className="text-xs sm:text-sm font-semibold text-foreground font-mono">
-              {getDayName(bookingDay)} {bookingDay} أكتوبر
-            </span>
+          {/* Summary Content */}
+          <div className="flex flex-col rounded-xl border border-line divide-y divide-line bg-secondary/25 overflow-hidden" dir="rtl">
+            <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
+              <span className="text-xs sm:text-sm font-medium text-muted-foreground">الموعد</span>
+              <span className="text-xs sm:text-sm font-semibold text-foreground font-mono">
+                {getDayName(bookingDay)} {bookingDay} {ARABIC_MONTHS[bookingMonth]} {bookingYear}
+              </span>
+            </div>
+            <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
+              <span className="text-xs sm:text-sm font-medium text-muted-foreground">الوقت</span>
+              <span className="text-xs sm:text-sm font-semibold text-foreground font-mono">
+                {bookingTime}
+              </span>
+            </div>
+            <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
+              <span className="text-xs sm:text-sm font-medium text-muted-foreground">ولي الأمر</span>
+              <span className="text-xs sm:text-sm font-semibold text-foreground">
+                {parentName || "-"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
+              <span className="text-xs sm:text-sm font-medium text-muted-foreground">الجوال</span>
+              <span className="text-xs sm:text-sm font-semibold text-foreground font-mono" dir="ltr">
+                {phone ? (phone.startsWith("+") ? phone : `${phoneCountryCode} ${phone}`) : "-"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
+              <span className="text-xs sm:text-sm font-medium text-muted-foreground">الطفل</span>
+              <span className="text-xs sm:text-sm font-semibold text-foreground">
+                {childrenList[0]?.name || "-"}
+              </span>
+            </div>
+            <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
+              <span className="text-xs sm:text-sm font-medium text-muted-foreground">تاريخ الميلاد</span>
+              <span className="text-xs sm:text-sm font-semibold text-foreground">
+                {(() => {
+                  if (!birthDate) return "-";
+                  const parts = birthDate.split("-");
+                  if (parts.length === 3) {
+                    const y = parts[0];
+                    const m = parseInt(parts[1], 10);
+                    const d = parseInt(parts[2], 10);
+                    const mName = ARABIC_MONTHS[m - 1] || parts[1];
+                    return (
+                      <span className="flex items-center gap-1.5" dir="rtl">
+                        <span>{d} {mName} {y}</span>
+                        {age ? (
+                          <span className="text-xs text-primary font-bold font-mono">
+                            ({age} سنوات)
+                          </span>
+                        ) : null}
+                      </span>
+                    );
+                  }
+                  return birthDate;
+                })()}
+              </span>
+            </div>
+            <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
+              <span className="text-xs sm:text-sm font-medium text-muted-foreground">المسار المطلوب</span>
+              <span className="text-xs sm:text-sm font-semibold text-primary font-bold">
+                {selectedTrack}
+              </span>
+            </div>
           </div>
-          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground">الوقت</span>
-            <span className="text-xs sm:text-sm font-semibold text-foreground font-mono">
-              {bookingTime}
-            </span>
-          </div>
-          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground">ولي الأمر</span>
-            <span className="text-xs sm:text-sm font-semibold text-foreground">
-              {parentName || "-"}
-            </span>
-          </div>
-          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground">الجوال</span>
-            <span className="text-xs sm:text-sm font-semibold text-foreground font-mono" dir="ltr">
-              {phone || "-"}
-            </span>
-          </div>
-          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground">الطفل</span>
-            <span className="text-xs sm:text-sm font-semibold text-foreground">
-              {childrenList[0]?.name || "-"}
-            </span>
-          </div>
-          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground">تاريخ الميلاد</span>
-            <span className="text-xs sm:text-sm font-semibold text-foreground font-mono" dir="ltr">
-              {birthDate || "-"} {age ? `(${age} سنوات)` : ""}
-            </span>
-          </div>
-          <div className="flex items-center justify-between px-3.5 sm:px-4 py-2.5">
-            <span className="text-xs sm:text-sm font-medium text-muted-foreground">المسار المطلوب</span>
-            <span className="text-xs sm:text-sm font-semibold text-primary font-bold">
-              {selectedTrack}
-            </span>
-          </div>
-        </div>
 
-        {submitError && (
-          <div className="p-2.5 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs font-medium text-center">
-            {submitError}
-          </div>
-        )}
+          {submitError && (
+            <div className="p-2.5 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-xs font-medium text-center">
+              {submitError}
+            </div>
+          )}
+        </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2.5 mt-2" dir="rtl">
+        <div className="flex gap-2.5 mt-auto pt-3.5 border-t border-line/70 shrink-0" dir="rtl">
           <Button
             type="button"
             variant="outline"
@@ -2367,7 +2852,7 @@ function PanelContent({
             type="button"
             onClick={() => onConfirmBooking?.()}
             disabled={isSubmitting}
-            className="h-10 sm:h-11 flex-[2] rounded-xl text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5"
+            className="h-10 sm:h-11 flex-[2] rounded-xl text-xs sm:text-sm font-semibold bg-primary hover:bg-primary/90 text-primary-foreground transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
           >
             {isSubmitting ? (
               <>
@@ -2388,54 +2873,54 @@ function PanelContent({
 
   // Panel 18: Success
   if (panel === 18) {
-    const daysOfWeek = ["أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة", "سبت"];
     const getDayName = (d: number | null) => {
       if (!d) return "";
-      const blanks = [0, 1, 2, 3];
-      const idx = (d + blanks.length - 1) % 7;
-      return daysOfWeek[idx];
+      const idx = new Date(bookingYear, bookingMonth, d).getDay();
+      return DAYS_OF_WEEK[idx] || "";
     };
 
     return (
-      <div className="flex flex-col gap-4 text-center items-center pt-2 pb-2">
-        <motion.div
-          initial={
-            reduceMotion
-              ? { opacity: 0 }
-              : { scale: 0.3, opacity: 0, filter: "blur(4px)" }
-          }
-          animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
-          transition={{ ...ICON_SWAP, delay: 0.08 }}
-          className="flex size-14 items-center justify-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-sm"
-        >
-          <CheckCircle2 className="size-8" />
-        </motion.div>
+      <div className="flex flex-col justify-between min-h-full text-center items-center pt-2 pb-1">
+        <div className="flex flex-col gap-3.5 items-center w-full">
+          <motion.div
+            initial={
+              reduceMotion
+                ? { opacity: 0 }
+                : { scale: 0.3, opacity: 0, filter: "blur(4px)" }
+            }
+            animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+            transition={{ ...ICON_SWAP, delay: 0.08 }}
+            className="flex size-14 items-center justify-center rounded-2xl border border-emerald-500/30 bg-emerald-500/10 text-emerald-500 shadow-sm"
+          >
+            <CheckCircle2 className="size-8" />
+          </motion.div>
 
-        <div className="flex flex-col gap-1">
-          <h2 className="text-xl sm:text-2xl font-bold font-heading text-foreground">
-            {refCode ? "تم استكمال استمارة التقييم الأولي بنجاح!" : "تم استلام طلب الحجز والتقييم بنجاح!"}
-          </h2>
-          <p className="text-xs sm:text-sm font-semibold text-primary font-mono" dir="rtl">
-            الموعد المفضل: {getDayName(bookingDay)} {bookingDay} — {bookingTime}
+          <div className="flex flex-col gap-1">
+            <h2 className="text-xl sm:text-2xl font-bold font-heading text-foreground">
+              {refCode ? "تم استكمال استمارة التقييم الأولي بنجاح!" : "تم استلام طلب الحجز والتقييم بنجاح!"}
+            </h2>
+            <p className="text-xs sm:text-sm font-semibold text-primary font-mono" dir="rtl">
+              الموعد المفضل: {getDayName(bookingDay)} {bookingDay} {ARABIC_MONTHS[bookingMonth]} — {bookingTime}
+            </p>
+          </div>
+
+          <p className="text-xs sm:text-sm text-muted-foreground font-medium max-w-[360px] leading-relaxed">
+            {refCode
+              ? "تم تسجيل وربط إجابات التقييم بملف الطالب مباشرة وسيطلع عليها الأخصائي أثناء جلسة المقابلة."
+              : "تم تسجيل طلبكم في طابور المراجعة بالأكاديمية وسيتواصل معكم فريق القبول والتسجيل قريباً."}
           </p>
+
+          {requestCode && (
+            <div className="inline-flex items-center gap-2 rounded-xl bg-secondary/50 border border-line px-3.5 py-2 text-xs font-semibold text-muted-foreground">
+              <span>رقم متابعة الطلب:</span>
+              <span dir="ltr" className="font-mono tracking-wider font-bold text-foreground">
+                {requestCode}
+              </span>
+            </div>
+          )}
         </div>
 
-        <p className="text-xs sm:text-sm text-muted-foreground font-medium max-w-[360px] leading-relaxed">
-          {refCode
-            ? "تم تسجيل وربط إجابات التقييم بملف الطالب مباشرة وسيطلع عليها الأخصائي أثناء جلسة المقابلة."
-            : "تم تسجيل طلبكم في طابور المراجعة بالأكاديمية وسيتواصل معكم فريق القبول والتسجيل قريباً."}
-        </p>
-
-        {requestCode && (
-          <div className="inline-flex items-center gap-2 rounded-xl bg-secondary/50 border border-line px-3.5 py-2 text-xs font-semibold text-muted-foreground">
-            <span>رقم متابعة الطلب:</span>
-            <span dir="ltr" className="font-mono tracking-wider font-bold text-foreground">
-              {requestCode}
-            </span>
-          </div>
-        )}
-
-        <div className="w-full mt-2" dir="rtl">
+        <div className="w-full mt-auto pt-3.5 border-t border-line/70 shrink-0" dir="rtl">
           <button
             type="button"
             onClick={() => onCreate?.()}
